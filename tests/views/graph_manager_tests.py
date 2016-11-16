@@ -23,7 +23,7 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class GraphManagerViewTests(ArchesTestCase):
@@ -92,7 +92,7 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        graph = json.loads(response.context['graph'])
+        graph = json.loads(response.context['graph_json'])
 
         graph['name'] = 'new graph name'
         post_data = {'graph':graph, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}
@@ -163,16 +163,11 @@ class GraphManagerViewTests(ArchesTestCase):
         self.client.login(username='admin', password='admin')
         graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
         url = reverse('clone_graph', kwargs={'graphid':graphid})
-        post_data = JSONSerializer().serialize({'name': 'test cloned graph'})
+        post_data = {}
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['nodes']), self.NODE_COUNT+1)
-
-        post_data = JSONSerializer().serialize({'isresource': False})
-        response = self.client.post(url, post_data, content_type)
-        response_json = json.loads(response.content)
-        self.assertFalse(response_json['isresource'])
 
     def test_new_graph(self):
         """
@@ -202,3 +197,34 @@ class GraphManagerViewTests(ArchesTestCase):
         edge_count = Edge.objects.filter(graph_id=graphid).count()
         self.assertEqual(node_count,0)
         self.assertEqual(edge_count,0)
+
+    def test_graph_export(self):
+        """
+        test graph export method
+
+        """
+
+        self.client.login(username='admin', password='admin')
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('export_graph', kwargs={'graphid':graphid})
+        response = self.client.get(url)
+        graph_json = json.loads(response._container[0])
+        node_count = len(graph_json['graph'][0]['nodes'])
+        self.assertTrue(response._container[0])
+        self.assertEqual(node_count, self.NODE_COUNT+1)
+        self.assertEqual(list(response._headers['content-type'])[1], 'json/plain')
+
+    def test_graph_import(self):
+        """
+        test graph import method
+
+        """
+
+        self.client.login(username='admin', password='admin')
+        url = reverse('import_graph')
+        with open(os.path.join(list(test_settings.RESOURCE_GRAPH_LOCATIONS)[0], 'archesv4_resource.json')) as f:
+            response = self.client.post(url, {'importedGraph': f})
+        self.assertIsNotNone(response.content)
+
+        imported_json = JSONDeserializer().deserialize(response.content)
+        self.assertEqual(imported_json, [])

@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import decimal
 import types
 import json
@@ -82,7 +82,7 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, 'serialize'):
-                return getattr(object, 'serialize')()  
+                return self.handle_object(getattr(object, 'serialize')())
             else:
                 return self.handle_model(object)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
@@ -186,7 +186,7 @@ class JSONSerializer(object):
                     else:
                         data[f.name] = list(qs.values_list('pk', flat=True))
             else:
-                data[f.name] = f.value_from_object(instance)
+                data[f.name] = self.handle_object(f.value_from_object(instance))
         return data
 
 

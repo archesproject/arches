@@ -19,14 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-{% block graph_title %}
-<div class="ep-tools-title">
-  <h1 class="page-header text-overflow ep-graph-title"><i class="text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (graph.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:graph.name"></span></h1>
-</div>
-{% endblock graph_title %}
-
 {% block graph_header_title %}
-{% trans "Resource Settings" %}
+<span data-bind="text: graph.isresource() ? '{% trans "Resource Model Settings" %}' : '{% trans "Branch Settings" %}'"></span>
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
@@ -38,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div class="ep-form-content">
+<div class="ep-form-content" style="display: none" data-bind="visible: graph">
     <div id="external-page-content">
         <div style="padding: 12px;">
             <div class="panel card-panel">
@@ -61,12 +55,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul class="nav nav-tabs card-nav-container">
                             <li id="xx-id-group" class="active">
                                 <a id="xx-id-tab" data-toggle="tab" href="#id-card" class="card-tab-title" aria-expanded="true">
-                                    {% trans "Resource Identifiers" %}
+                                    {% trans "Identifiers" %}
                                 </a>
                             </li>
                             <li id="xx-icon-group">
                                 <a id="xx-icon-tab" data-toggle="tab" href="#icons-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Icons" %}
+                                </a>
+                            </li>
+                            <li id="xx-map-style-group">
+                                <a id="xx-map-style" data-toggle="tab" href="#map-style-card" class="card-tab-title" aria-expanded="true">
+                                    {% trans "Appearence" %}
                                 </a>
                             </li>
                             <li id="xx-desc-group">
@@ -96,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Set the defaults for your resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Set the defaults for your resource model" %}' : '{% trans "Set the defaults for your branch" %}'"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -155,7 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: true, options: ontologyClasses, optionsText: 'source', optionsValue:'source', optionsCaption: '{% trans "None" %}', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'source', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -176,7 +175,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Pick an icon for your resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Pick an icon for your resource model" %}' : '{% trans "Pick an icon for your branch" %}'"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -234,6 +233,66 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
 
+
+                            <!-- Card -->
+                            <div id="map-style-card" class="tab-pane fade">
+                                <div class="panel-body card-panel-body">
+                                    <div class="card-content">
+
+                                        <!-- Card Level Alert -->
+                                        <div id="map-style-card-alert" class="panel install-card-alert"></div>
+
+                                        <!-- Card Instruction -->
+                                        <p id="install-instructions" class="content-instructions">
+                                            <span data-bind="if: graph.isresource()">
+                                                {% trans "Define this resource's default color when displayed on a map" %}
+                                            </span>
+                                            <span data-bind="if: !graph.isresource()">
+                                              {% trans "Define this resource's default color when displayed on a map" %}
+                                            </span>
+                                        </p>
+
+                                        <!-- Form -->
+                                        <div class="col-xs-12 col-sm-6" style="padding-bottom: 10px;">
+
+                                            <div class="row widget-container">
+                                                <div class="form-group">
+                                                  <div class="relative">
+                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                  </div>
+                                                  <div class="col-xs-12 colorpicker-component">
+                                                      <input placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.mapfeaturecolor, format:'rgba'}">
+                                                  </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row widget-container">
+                                                <div class="form-group">
+                                                  <div class="relative">
+                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Point Size" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                  </div>
+                                                  <div class="col-xs-12">
+                                                      <input type="number" placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="value:graph.mappointsize, valueUpdate: 'keyup'">
+                                                  </div>
+                                                </div>
+                                            </div>
+                                          <div class="row widget-container">
+                                              <div class="form-group">
+                                                  <div class="relative">
+                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Line Width" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                  </div>
+                                                  <div class="col-xs-12">
+                                                      <input type="number" placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="value:graph.maplinewidth, valueUpdate: 'keyup'">
+                                                  </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <!-- Card -->
                             <div id="meta-card" class="tab-pane fade">
                                 <div class="panel-body card-panel-body">
@@ -244,7 +303,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Define this resource's status" %}
+                                            <span data-bind="if: graph.isresource()">
+                                                {% trans "Define this resource model's status" %}
+                                            </span>
+                                            <span data-bind="if: !graph.isresource()">
+                                                {% trans "Define this branch's status" %}
+                                            </span>
                                         </p>
 
                                         <!-- Form -->
@@ -258,11 +322,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor">
-                                                            <label data-bind="css: { 'active': graph.isactive() }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="true"> {% trans "Active" %}
+                                                            <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
                                                             </label>
-                                                            <label data-bind="css: { 'active': !graph.isactive() }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="false"> {% trans "Inactive" %}
+                                                            <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
                                                             </label>
                                                         </div>
                                                     </div>
@@ -272,12 +336,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container" data-bind="visible: graph.isresource()">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resources that may be related:" %}</label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resource models that may be related:" %}</label>
                                                     </div>
 
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor columns">
-                                                            <!-- ko foreach: resources -->
+                                                            <!-- ko foreach: relatable_resources -->
                                                             <label class="form-checkbox form-normal form-primary form-text" data-bind="css: {'active': isRelatable()}">
                                                                 <input type="checkbox" data-bind="checked:isRelatable">
                                                                 <span data-bind="text:graph.name"></span>
@@ -303,7 +367,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Describe this resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Describe this resource model" %}' : '{% trans "Describe this branch" %}'"></span>
                                         </p>
 
                                         <!-- Form -->
@@ -329,7 +393,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                                            <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -353,7 +417,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('graph-settings-data', [], function () {
     return {
         icons: {{icons}},
-        graph: {{graph}},
+        graph: {{graph_json}},
         node: {{node_json}},
         ontologies: {{ontologies}},
         ontologyClasses: {{ontology_classes}},

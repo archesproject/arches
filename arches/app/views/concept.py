@@ -31,6 +31,27 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_string
+from arches.app.views.base import BaseManagerView
+
+
+class RDMView(BaseManagerView):
+    def get(self, request, conceptid):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        languages = models.DLanguage.objects.all()
+
+        concept_schemes = []
+        for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
+            concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
+        context = self.get_context_data(
+            main_script='rdm',
+            active_page='RDM',
+            languages=languages,
+            conceptid=conceptid,
+            concept_schemes=concept_schemes,
+            CORE_CONCEPTS=CORE_CONCEPTS
+        )
+        return render(request, 'rdm.htm', context)
 
 
 def get_sparql_providers(endpoint=None):
@@ -181,7 +202,7 @@ def concept(request, conceptid):
             imagefile = request.FILES.get('file', None)
 
             if imagefile:
-                value = models.FileValue(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = settings.LANGUAGE_CODE)
+                value = models.FileValue(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), concept_id = conceptid, valuetype_id = 'image',language_id = settings.LANGUAGE_CODE)
                 value.save()
                 return JSONResponse(value)
 
@@ -268,6 +289,17 @@ def confirm_delete(request, conceptid):
     concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
+
+def dropdown(request):
+    conceptid = request.GET.get('conceptid')
+    results = Concept().get_e55_domain(conceptid)
+    return JSONResponse(results)
+
+def get_pref_label(request):
+    valueid = request.GET.get('valueid')
+    label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
+    print label
+    return JSONResponse(label)
 
 def search(request):
     se = SearchEngineFactory().create()

@@ -33,6 +33,9 @@ define([
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
+                if (!item.filtered) {
+                    item.filtered = ko.observable();
+                }
                 item.filtered(true);
                 if(name.toLowerCase().indexOf(filter) !== -1){
                     item.filtered(false);
@@ -43,28 +46,52 @@ define([
         /**
         * initializes the view with optional parameters
         * @memberof ListView.prototype
-        * @param {object} options - optional parameters to pass in during initialization, currently unused
+        * @param {object} options - optional parameters to pass in during initialization
         */
         initialize: function(options) {
-            this.filter = ko.observable('');
-            this.filter.subscribe(this.filter_function, this, 'change');
+            var self = this;
+            if (options.items) {
+                this.items = options.items;
+            }
+            var initializeItem = function(item){
+                if (!item.filtered) {
+                    item.filtered = ko.observable(false);
+                }
+                if (!item.selected) {
+                    item.selected = ko.observable(false);
+                }
+            }
+            this.items.subscribe(function (items) {
+                items.forEach(initializeItem, this);
+            }, this);
+            if(this.filter_function){
+                this.filter = ko.observable('');
+                this.filter.subscribe(this.filter_function, this, 'change');
+                this.filter_function();
+            }
+
+            this.selectedItems = ko.computed(function(){
+                return this.items().filter(function(item){
+                    initializeItem(item);
+                    return item.selected();
+                }, this);
+            }, this);
         },
 
         /**
-        * Toggles the selected status of a single list item, if {@link ListView#single_select} is 
+        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
         *   true clear the selected status of all other list items
         * @memberof ListView.prototype
         * @param {object} item - the item to be selected or unselected
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
-            if(this.trigger('item-selected', item, evt)){
-                var selectedStatus = item.selected();
-                if(this.single_select){
-                    this.clearSelection();
-                }
-                item.selected(!selectedStatus);
+            var selectedStatus = item.selected();
+            if(this.single_select){
+                this.clearSelection();
             }
+            item.selected(!selectedStatus);
+            this.trigger('item-clicked', item, evt);
         },
 
         /**

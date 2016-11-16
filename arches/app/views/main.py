@@ -27,7 +27,6 @@ def index(request):
         'active_page': 'Home',
     })
 
-
 @never_cache
 def auth(request):
     auth_attempt_success = None
@@ -57,10 +56,17 @@ def auth(request):
                 'next': next
             })
 
-
 def search(request):
     return render(request, 'search.htm')
 
-
 def widget(request, template="text"):
     return render(request, 'views/forms/widgets/%s.htm' % template)
+
+def report_templates(request, template="text"):
+    return render(request, 'views/report-templates/%s.htm' % template)
+
+def function_templates(request, template):
+    return render(request, 'views/functions/%s.htm' % template)
+
+def templates(request, template):
+    return render(request, template)

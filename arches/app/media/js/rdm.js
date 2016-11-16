@@ -10,21 +10,16 @@ require([
     'views/rdm/modals/export-scheme-form',
     'views/rdm/modals/delete-scheme-form',
     'views/rdm/modals/import-scheme-form',
-    'views/page-view',
+    'views/base-manager',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, PageView) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, BaseManagerView) {
     $(document).ready(function() {
         window.onpopstate = function(event) {
           //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
           //window.location = document.location;
         };
 
-        var appHeader = $("#appheader");
-        var sidebar = $("#sidebar");
-        var topToHeaderPx = appHeader.offset().top;
-        var topToSidebarBottomPx = sidebar.offset().top + sidebar.height();
-        var sidebarWidth = sidebar.outerWidth();
-            // Models and views
+        // Models and views
         var concept = new ConceptModel({
             id: $('#selected-conceptid').val()
         });
@@ -153,6 +148,6 @@ require([
             })
         });
 
-        new PageView();
+        new BaseManagerView();
     });
 });

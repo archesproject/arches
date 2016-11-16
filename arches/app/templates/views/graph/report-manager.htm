@@ -1,0 +1,168 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Resource Reports" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_tools %}
+<div id="card-grid-tools" style="display: none;" data-bind="visible: reports">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a report..." %}" class="design" data-bind="value: selectedReportId, options: reportOptions, optionsText: 'name', optionsValue: 'reportid', chosen: {width: '100%'}">
+
+        </select>
+    </div>
+</div>
+{% endblock graph_header_tools %}
+
+{% block content %}
+<div class="card-library relative fade in" style="">
+
+    <!-- Card (Tile) Listing -->
+    <div class="crud-menu relative hide-card-library" data-bind="css: templateLibraryStatus">
+        <div class="panel crud-menu-panel data-widget-library relative" id="node-listing" data-bind="with: templateList">
+            <!-- Menu Title -->
+            <div class="panel-heading">
+                <div class="ep-menu-list-title">
+                    <h3 id="" class="panel-title card-main-title">{% trans "Report Templates" %}</h3>
+                    <span class="dismiss-card-library" data-bind="click: $root.toggleTemplateLibrary"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+
+            <!-- Menu List -->
+            <div class="panel-body">
+               <ul class="list-group ep-menu-list data-widget-library menu-title-shim">
+                    <!-- Menu Item -->
+                    <li id="" class="resource-selector">
+                        <div class="list-filter" style="">
+                            <input type="text" class="form-control" style="" placeholder="{% trans "Find a Template" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+                            <!-- Remove Search -->
+                            <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                    </li>
+
+                    <!-- Data Widget Library -->
+                    <li class="data-widget-container">
+                        <!-- Isotope Layout -->
+                        <div id="report-image-grid" class="report-image-grid" data-bind="foreach: items">
+
+                            <!-- card -->
+                            <div class="data-widget-grid-item relative" data-bind="drag: {value: $data}, visible: $data.filtered() == false">
+                                <div class="panel mar-no">
+
+                                    <!-- card Name -->
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
+                                    </div>
+
+                                    <!-- Abstract -->
+                                    <div class="panel-body library-card-body">
+                                        <p class="library-item-subtitle" data-bind="text:description"></p>
+                                    </div>
+
+                                    <!-- card Tools -->
+                                    <div class="panel-footer" style="height: 40px;">
+                                        <a href="#" class="pull-right" data-bind="click: $root.addReport.bind($root)"><i class="ion-plus-circled"></i> Add Report</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card-grid relative ep-form-content new-card-indent" data-bind="drop: {value: newReport}">
+        <div data-bind="visible: reports" style="display:none;">
+            <!-- Isotope Layout -->
+            <div id="report-image-grid" class="report-image-grid">
+
+                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card" data-bind="click: toggleTemplateLibrary">
+                    <a id="add-card" href="" data-toggle="modal" class="" style="">
+                        <h3 class="text-thin" style="margin-top: 10px;"> Add Report</h3>
+
+                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+                        </span>
+
+                        <h5 class="" style="font-weight: 200;"> Drag and drop a report template onto your resource </h5>
+                    </a>
+                </div>
+
+                <!-- ko foreach: reports -->
+                <div class="card-grid-item" data-bind="click: function () { $parent.openReport(get('reportid')()) }, attr: {'data-arches-reportid': get('reportid')}">
+                    <div class="panel mar-no">
+
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" data-bind="text:get('name')"></h3>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle">
+                                (Template:
+                                <span data-bind="text:template.name"></span>)
+                            </p>
+                            <!-- ko foreach: forms -->
+                                <div data-bind="text: label()" class="library-item-subtitle"></div>
+                            <!-- /ko -->
+                        </div>
+
+                        <!-- card Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="" class="" style=""><i data-bind="css: get('active')() ? 'fa fa-check-circle' : 'fa fa-ban'"></i> <span data-bind="text: get('active')() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></span></a>
+                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteReport($data) }, clickBubble: false"><i class="ion-minus-circled"></i> Delete Report</a>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /ko -->
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('report-manager-data', [], function () {
+    return {
+        templates: {{templates_json}},
+        reports: {{reports}},
+        datatypes: {{ datatypes_json }},
+        forms: {{forms}},
+        forms_x_cards: {{forms_x_cards}},
+        cards: {{cards}},
+        graph: {{graph_json}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

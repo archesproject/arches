@@ -99,15 +99,26 @@ INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 
 --Data types
-INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o');
-INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
-INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar');
-INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
-INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul');
-INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on');
-INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
+INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, null, '10000000-0000-0000-0000-000000000001');
+INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', null, null, null, '10000000-0000-0000-0000-000000000008');
+INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, '10000000-0000-0000-0000-000000000004');
+INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
+INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
+INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', null, null, null, '10000000-0000-0000-0000-000000000019');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
+-- data type functions
+INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'file-list', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (5, 'geojson-feature-collection', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
@@ -139,32 +150,95 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
 INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff, is_active, is_superuser, last_login, date_joined)
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
-INSERT INTO widgets(widgetid, name, component)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%"}');
 
-INSERT INTO widgets(widgetid, name, component)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
 
-INSERT INTO widgets(widgetid, name, component)
-    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-multiselect-widget', 'widgets/concept-multiselect', 'concept-list', '{ "placeholder": "Select an option", "options": [] }');
 
-INSERT INTO widgets(widgetid, name, component)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000015', 'domain-select-widget', 'widgets/domain-select', 'domain-value', '{ "placeholder": "Select an option" }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000016', 'domain-multiselect-widget', 'widgets/domain-multiselect', 'domain-value-list', '{ "placeholder": "Select an option" }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date',
+    '{
+        "placeholder": "Enter date",
+        "viewMode": "days",
+        "dateFormat": "YYYY-MM-DD",
+        "minDate": false,
+        "maxDate": false
+    }'
+);
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'widgets/map', 'geojson-feature-collection',
+    '{
+        "basemap": "streets",
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+        "overlayConfigs": [],
+        "geocoder": "MapzenGeocoder",
+        "zoom": 10,
+        "maxZoom": 20,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79,
+        "pitch": 0.0,
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search",
+        "geocoderVisible": true,
+        "resourceColor": null,
+        "resourceLineWidth": null,
+        "resourcePointSize": null
+    }'
+);
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'widgets/concept-radio', 'concept', '{ "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000013', 'concept-checkbox-widget', 'widgets/concept-checkbox', 'concept-list', '{ "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000017', 'domain-radio-widget', 'widgets/domain-radio', 'domain-value', '{}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'widgets/domain-checkbox', 'domain-value-list', '{}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'widgets/file', 'file-list', '{"acceptedFiles": "", "maxFilesize": "200"}');
 
 -- Node graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'fa fa-circle', 'Represents a single node in a graph.', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'string', '22000000-0000-0000-0000-000000000000');
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'semantic', '22000000-0000-0000-0000-000000000000');
 
-INSERT INTO node_groups(nodegroupid, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-100000000000', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+    VALUES ('20000000-0000-0000-0000-100000000000', '', 'n');
 -- End Node graph
 
 -- Node/NodeType graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  'f', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  't', 'fa fa-angle-double-down','Represents a node and node type pairing', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -172,29 +246,31 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'domain',
-            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
+            graphid, nodegroupid, config)
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'concept',
+            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '{"topConcept": null}');
 
-INSERT INTO node_groups(nodegroupid, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+    VALUES ('20000000-0000-0000-0000-100000000001', '', 'n');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type Card', 'A common pattern used frequently to match a value with a type', '', 'n', '20000000-0000-0000-0000-100000000001');
+INSERT INTO cards(cardid, name, description, instructions,
+        nodegroupid, graphid, active, visible, helpenabled)
+    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type', 'Represents a node and node type pairing', '',
+        '20000000-0000-0000-0000-100000000001', '22000000-0000-0000-0000-000000000001', 't', 't', 'f');
 -- End Node/NodeType graph
 
 
 -- Arches Configuration graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
-    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass)
+    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't', 'fa fa-cogs');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
+            graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
-        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
+        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"topConcept": null}');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -208,7 +284,7 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'concept',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
@@ -228,37 +304,36 @@ INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004', 'P1_is_identified_by');
 
-INSERT INTO node_groups(nodegroupid, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+    VALUES ('20000000-0000-0000-0000-000000000000', '', 'n');
 
-INSERT INTO node_groups(nodegroupid, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+    VALUES ('20000000-0000-0000-0000-000000000001', '', 'n');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here', 'n', '20000000-0000-0000-0000-000000000001');
+INSERT INTO cards(cardid, name, description, instructions,
+        nodegroupid, graphid, active, visible, helpenabled)
+    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here',
+        '20000000-0000-0000-0000-000000000001', '22000000-0000-0000-0000-000000000002', 't', 't', 'f');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '', 'n', '20000000-0000-0000-0000-000000000000');
+INSERT INTO cards(cardid, name, description, instructions,
+        nodegroupid, graphid, active, visible, helpenabled)
+    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '',
+        '20000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000002', 't', 't', 'f');
 -- End Arches Configuration graph
 
 
 -- for forms.py -- remove when done developing forms
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality)
-    VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '', 'n');
+-- INSERT INTO cards(cardid, name, description, instructions, cardinality)
+--     VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '', 'n');
 
-INSERT INTO node_groups(nodegroupid, legacygroupid)
-    VALUES ('11111111-0000-0000-0000-000000000000', '');
+-- INSERT INTO node_groups(nodegroupid, legacygroupid)
+--     VALUES ('11111111-0000-0000-0000-000000000000', '');
+
 -- end for forms.py
 
-INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
-    VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
-
-INSERT INTO validations(validationid, validation, validationtype, name, description)
-    VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
-
-INSERT INTO validations_x_nodes(validation_id, node_id)
-    VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
+INSERT INTO resource_instances(resourceinstanceid, graphid)
+    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002');
 
 INSERT INTO icons(name, cssclass)
     VALUES ('cc', 'fa fa-cc');
@@ -2048,3 +2123,1384 @@ INSERT INTO icons(name, cssclass)
 --                 "20000000-0000-0000-0000-000000000004": "23984ll2399494"
 --             }', '30000000-0000-0000-0000-000000000000',
 --             '20000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000');
+
+-- TODO: these are purely for testing, replace with real data
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 1', 'Card Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 2', 'Card Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 3', 'Card Function 3');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 1', 'Domain Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');
+
+
+INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
+    VALUES ('60000000-0000-0000-0000-000000000000', 'local_file_storage.py', 'LocalFileStorageFunction', 'node', 'Local File Upload', 'Sets the default storage mechanism for uploaded files', '{}', 'views/components/functions/local-file-storage');
+
+INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
+    VALUES ('60000000-0000-0000-0000-000000000001', 'resource_functions.py', 'PrimaryNameFunction', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"nodegroup_id": "", "string_template": ""}', 'views/components/functions/primary-name');
+
+INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
+    VALUES ('60000000-0000-0000-0000-000000000002', 'required-nodes.py', 'RequiredNodesFunction', 'validation', 'Required Nodes Function', 'A function that requires that specified nodes are populated', '{"nodegroup_id": ""}', 'views/components/functions/required-nodes');
+
+
+
+
+INSERT INTO map_sources(name, source)
+    VALUES ('mapbox-streets', '{
+        "url": "mapbox://mapbox.mapbox-streets-v7",
+        "type": "vector"
+    }');
+
+INSERT INTO map_sources(name, source)
+    VALUES ('mapbox-satellite', '{
+        "type": "raster",
+        "url": "mapbox://mapbox.satellite",
+        "tileSize": 256
+    }');
+
+INSERT INTO map_sources(name, source)
+   VALUES ('mapzen', '{
+               "type": "vector",
+               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+       }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('presidio', '{
+              "type": "geojson",
+              "data": {
+                         "type": "FeatureCollection",
+                         "features": [
+                             {
+                               "type": "Feature",
+                               "properties": {},
+                               "geometry": {
+                                 "type": "Polygon",
+                                 "coordinates": [
+                                   [
+                                     [
+                                       -122.44794845581055,
+                                       37.80666460115532
+                                     ],
+                                     [
+                                       -122.44709014892577,
+                                       37.791879793952084
+                                     ],
+                                     [
+                                       -122.46751785278319,
+                                       37.78808138412046
+                                     ],
+                                     [
+                                       -122.48828887939453,
+                                       37.78848836594184
+                                     ],
+                                     [
+                                       -122.47730255126952,
+                                       37.810326435534755
+                                     ],
+                                     [
+                                       -122.46356964111327,
+                                       37.80476580072879
+                                     ],
+                                     [
+                                       -122.44794845581055,
+                                       37.80666460115532
+                                     ]
+                                   ]
+                                 ]
+                               }
+                             },
+                             {
+                               "type": "Feature",
+                               "properties": {},
+                               "geometry": {
+                                 "type": "Point",
+                                 "coordinates": [
+                                   -122.24709014892577,
+                                   37.791879793952084
+                                 ]
+                               }
+                             }
+                         ]
+                       }
+              }');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'presidio', '[{
+        "id":"presidio-poly",
+        "source":"presidio",
+        "type":"fill",
+        "layout": {},
+        "paint": {
+            "fill-color": "#fb6017",
+            "fill-opacity": 0.8
+        }
+      },{
+          "id":"presidio-point",
+          "source":"presidio",
+          "type":"circle",
+          "layout": {},
+          "type": "circle",
+          "filter": ["!in", "$type", "Polygon"],
+          "paint": {
+              "circle-radius": 5,
+              "circle-color": "#fb6017"
+          }
+        }]', TRUE, 'fa fa-flag');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('sf-national-cemetery',
+    '{
+        "type": "geojson",
+        "data":
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -118.828125,
+                  37.996162679728116
+                ]
+              }
+            },
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ],
+                    [
+                      -122.4621319770813,
+                      37.800459411713945
+                    ],
+                    [
+                      -122.46494293212889,
+                      37.79742444343689
+                    ],
+                    [
+                      -122.46711015701293,
+                      37.79861131738665
+                    ],
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+    }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('stamen-terrain', '{
+      "type": "raster",
+      "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
+      "tileSize": 256
+  }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('geocode-point', '{
+      "type": "geojson",
+      "data": {
+          "type": "FeatureCollection",
+          "features": []
+      }
+  }');
+
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'sf-national-cemetery', '[{
+        "id":"sf-national-cemetery",
+        "source":"sf-national-cemetery",
+        "type":"fill",
+        "layout": {},
+        "paint": {
+            "fill-color": "#088",
+            "fill-opacity": 0.8
+        }
+      }]', TRUE, 'ion-ios-flag');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
+        "id": "stamen-terrain",
+        "type": "raster",
+        "source": "stamen-terrain",
+        "minzoom": 0,
+        "maxzoom": 22
+    }]', FALSE, 'fa fa-road');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
+        "id": "satellite",
+        "type": "raster",
+        "source": "mapbox-satellite",
+        "source-layer": "mapbox_satellite_full"
+    }]', FALSE, '');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'streets', '[{
+        "id": "landuse_overlay_national_park",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "landuse_overlay",
+        "filter": [
+            "==",
+            "class",
+            "national_park"
+        ],
+        "paint": {
+            "fill-color": "#d2edae",
+            "fill-opacity": 0.75
+        },
+        "interactive": true
+    },{
+        "id": "landuse_park",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "landuse",
+        "filter": [
+            "==",
+            "class",
+            "park"
+        ],
+        "paint": {
+            "fill-color": "#d2edae"
+        },
+        "interactive": true
+    },{
+        "id": "waterway",
+        "type": "line",
+        "source": "mapbox-streets",
+        "source-layer": "waterway",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "in",
+                "class",
+                "river",
+                "canal"
+            ]
+        ],
+        "paint": {
+            "line-color": "#a0cfdf",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        8,
+                        0.5
+                    ],
+                    [
+                        20,
+                        15
+                    ]
+                ]
+            }
+        },
+        "interactive": true
+    },{
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "water",
+        "paint": {
+            "fill-color": "#a0cfdf"
+        },
+        "interactive": true
+    },{
+        "id": "building",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "building",
+        "paint": {
+            "fill-color": "#d6d6d6"
+        },
+        "interactive": true
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "tunnel"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "tunnel_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            },
+            "line-dasharray": [
+                0.36,
+                0.18
+            ]
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "tunnel"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "tunnel_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            },
+            "line-dasharray": [
+                0.28,
+                0.14
+            ]
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "in",
+                    "structure",
+                    "none",
+                    "ford"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "road_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "in",
+                    "structure",
+                    "none",
+                    "ford"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "road_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_minor case",
+        "paint": {
+            "line-color": "#dedede",
+            "line-width": {
+                "base": 1.6,
+                "stops": [
+                    [
+                        12,
+                        0.5
+                    ],
+                    [
+                        20,
+                        10
+                    ]
+                ]
+            },
+            "line-gap-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_major case",
+        "paint": {
+            "line-color": "#dedede",
+            "line-width": {
+                "base": 1.6,
+                "stops": [
+                    [
+                        12,
+                        0.5
+                    ],
+                    [
+                        20,
+                        10
+                    ]
+                ]
+            },
+            "line-gap-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    },{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "<=",
+                    "admin_level",
+                    2
+                ],
+                [
+                    "==",
+                    "maritime",
+                    0
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "admin_country",
+        "paint": {
+            "line-color": "#8b8a8a",
+            "line-width": {
+                "base": 1.3,
+                "stops": [
+                    [
+                        3,
+                        0.5
+                    ],
+                    [
+                        22,
+                        15
+                    ]
+                ]
+            }
+        },
+        "source-layer": "admin"
+    },{
+        "interactive": true,
+        "minzoom": 5,
+        "layout": {
+            "icon-image": "{maki}-11",
+            "text-offset": [
+                0,
+                0.5
+            ],
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 8,
+            "text-anchor": "top",
+            "text-size": 11,
+            "icon-size": 1
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "all",
+                [
+                    "==",
+                    "scalerank",
+                    1
+                ],
+                [
+                    "==",
+                    "localrank",
+                    1
+                ]
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "poi_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-width": 1,
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-blur": 1
+        },
+        "source-layer": "poi_label"
+    },{
+        "interactive": true,
+        "layout": {
+            "symbol-placement": "line",
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-transform": "uppercase",
+            "text-letter-spacing": 0.1,
+            "text-size": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        10,
+                        8
+                    ],
+                    [
+                        20,
+                        14
+                    ]
+                ]
+            }
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "in",
+                "class",
+                "motorway",
+                "primary",
+                "secondary",
+                "tertiary",
+                "trunk"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "road_major_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 2
+        },
+        "source-layer": "road_label"
+    },{
+        "interactive": true,
+        "minzoom": 8,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 6,
+            "text-size": {
+                "stops": [
+                    [
+                        6,
+                        12
+                    ],
+                    [
+                        12,
+                        16
+                    ]
+                ]
+            }
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "in",
+                "type",
+                "town",
+                "village",
+                "hamlet",
+                "suburb",
+                "neighbourhood",
+                "island"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "place_label_other",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "place_label"
+    },{
+        "interactive": true,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Bold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 10,
+            "text-size": {
+                "stops": [
+                    [
+                        3,
+                        12
+                    ],
+                    [
+                        8,
+                        16
+                    ]
+                ]
+            }
+        },
+        "maxzoom": 16,
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "==",
+                "type",
+                "city"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "place_label_city",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "place_label"
+    },{
+        "interactive": true,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Regular",
+                "Arial Unicode MS Regular"
+            ],
+            "text-max-width": 10,
+            "text-size": {
+                "stops": [
+                    [
+                        3,
+                        14
+                    ],
+                    [
+                        8,
+                        22
+                    ]
+                ]
+            }
+        },
+        "maxzoom": 12,
+        "filter": [
+            "==",
+            "$type",
+            "Point"
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "country_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "country_label"
+    }]', FALSE, '');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+   VALUES (public.uuid_generate_v1mc(), 'mapzen', '
+     [
+     {
+         "id": "background",
+         "type": "background",
+         "paint": {
+           "background-color": "#ededed"
+         }
+       }, {
+         "id": "water-line",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "filter": ["==", "$type", "LineString"],
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.2,
+             "stops": [[8, 0.5], [20, 15]]
+           }
+         }
+       }, {
+         "id": "water-polygon",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "fill",
+         "filter": ["==", "$type", "Polygon"],
+         "paint": {
+           "fill-color": "#7acad0"
+         }
+       }, {
+         "id": "park",
+         "type": "fill",
+         "source": "mapzen",
+         "source-layer": "landuse",
+         "minzoom": 6,
+         "filter": ["in", "kind", "park", "forest", "garden", "grass", "farm", "meadow", "playground", "golf_course", "nature_reserve", "wetland", "wood", "cemetery"],
+         "paint": {
+           "fill-color": "#c2cd44"
+         }
+       }, {
+         "id": "river",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "minzoom": 6,
+         "filter": ["all", ["==", "$type", "LineString"], ["==", "kind", "river"]],
+         "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.2,
+             "stops": [[8, 0.75], [20, 15]]
+           }
+         }
+       }, {
+         "id": "stream-etc",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "minzoom": 11,
+         "filter": ["all", ["==", "$type", "LineString"], ["==", "kind", "stream"]],
+         "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.4,
+             "stops": [[10, 0.5], [20, 15]]
+           }
+         }
+       }, {
+           "id": "country-boundary",
+           "source": "mapzen",
+           "source-layer": "places",
+           "type": "line",
+           "filter": ["==", "admin_level", "2"],
+           "maxzoom": 4,
+           "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+           "paint": {
+             "line-color": "#afd3d3",
+           "line-width": {
+             "base": 2,
+             "stops": [[1, 0.5], [7, 3]]
+             }
+           }
+         }, {
+           "id": "state-boundary",
+           "source": "mapzen",
+           "source-layer": "places",
+           "type": "fill",
+           "filter": ["==", "admin_level", "4"],
+           "maxzoom": 10,
+           "paint": {
+             "fill-color": "#ededed",
+             "fill-outline-color": "#cacecc"
+           }
+         }, {
+         "id": "subways",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "paint": {
+           "line-color": "#ef7369",
+           "line-dasharray": [2, 1]
+         },
+         "filter": ["==", "railway", "subway"]
+       }, {
+         "id": "link-tunnel",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "is_tunnel", "yes"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#afd3d3",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.25], [20, 30]]
+           },
+           "line-dasharray": [1, 2]
+         }
+       }, {
+         "id": "buildings",
+         "type": "fill",
+         "source": "mapzen",
+         "source-layer": "buildings",
+         "paint": {
+         "fill-outline-color": "#afd3d3",
+         "fill-color": "#ededed"
+         }
+       }, {
+         "id": "road",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "kind", "minor_road"],["==", "kind", "major_road"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#c0c4c2",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.25], [20, 30]]
+           }
+         }
+       }, {
+         "id": "link-bridge",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "is_link", "yes"], ["==", "is_bridge", "yes"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#c0c4c2",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.5], [8, 1.5], [20, 40]]
+           }
+         }
+       }, {
+         "id": "highway",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["==", "kind", "highway"],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#5d6765",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.5], [8, 1.5], [20, 40]]
+           }
+         }
+       }, {
+         "id": "path",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["==", "kind", "path"],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "minzoom": 12,
+         "paint": {
+           "line-color": "#5d6765",
+           "line-width": {
+             "base": 1.8,
+             "stops": [[10, 0.15], [20, 15]]
+           },
+           "line-dasharray": [2, 2]
+         }
+       }, {
+         "id": "ocean-label",
+         "source": "mapzen",
+         "source-layer": "places",
+         "type": "symbol",
+         "minzoom": 2,
+         "maxzoom": 6,
+         "filter": ["==", "kind", "ocean"],
+         "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Italic", "Arial Unicode MS Regular"],
+             "text-max-width": 14,
+             "text-letter-spacing": 0.1
+           },
+         "paint": {
+           "text-color": "#ededed",
+           "text-halo-color": "rgba(0,0,0,0.2)"
+         }
+       }, {
+           "id": "other-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "neighbourhood"]],
+           "minzoom": 12,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 10
+           },
+           "paint": {
+             "text-color": "#cb4b49",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "city-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "city"]],
+           "minzoom": 10,
+           "maxzoom": 14,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 10,
+             "text-letter-spacing": 0.1
+           },
+           "paint": {
+             "text-color": "#384646",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "state-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "state"]],
+           "minzoom": 6,
+           "maxzoom": 12,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+             "text-max-width": 8
+           },
+           "paint": {
+             "text-color": "#f27a87",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "country-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "country"]],
+           "maxzoom": 7,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 4
+           },
+           "paint": {
+             "text-color": "#cb4b49",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }
+       ]
+
+     ', FALSE, '');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES ('50000000-0000-0000-0000-000000000002', 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
+        "basemap": "streets",
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+        "overlayConfigs": [],
+        "geocoder": "MapzenGeocoder",
+        "zoom": 10,
+        "maxZoom": 20,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79,
+        "pitch": 0.0,
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search",
+        "geocoderVisible": true,
+        "resourceColor": null,
+        "resourceLineWidth": null,
+        "resourcePointSize": null,
+        "featureEditingDisabled": true
+    }');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');

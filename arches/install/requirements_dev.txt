@@ -7,3 +7,4 @@ django-webtest
 sst
 django-nose
 coverage
+sauceclient

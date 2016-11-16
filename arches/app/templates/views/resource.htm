@@ -1,0 +1,171 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" >
+    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" >
+{% endblock css %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resource Manager" %}
+{% endblock title %}
+
+{% block main_content %}
+<div class="scroll-y">
+    <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
+        <div class="page-title-block">
+            <div class="center-div" style="padding-top: 0px; padding-left: 28px;">
+                <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> {% trans "Resource Manager" %}</h1>
+                <p class="arches-panel-subtitle">{% trans "Manage the content of your inventory" %}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="relative resource-toolbar" style="">
+
+            <!-- Search -->
+            <div class="edit-panel-search-bar">
+
+                <!-- Find Button -->
+                <div class="">
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                </div>
+
+                <!-- Find resource -->
+                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                    <div>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}'"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource/Graph Toggle -->
+            <div class="resource-tools relative" data-bind="visible: !showFind()">
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resources" %}</a>
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Recently Added" %}</a>
+            </div>
+
+        </div>
+
+        <!-- ko if: alert() -->
+        <div class="ep-form-alert-wrapper">
+            <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
+                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+
+                <div class="ep-form-alert-default-dismiss">
+                    <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                </div>
+
+                <div class="ep-form-alert-buttons">
+                    <!-- ko if: alert().cancel -->
+                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                    <!-- /ko -->
+                    <!-- ko if: alert().ok -->
+                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+
+    <!-- Default Page content-->
+    <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
+
+        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;" data-bind="visible: showResources()">
+
+            <!-- ko foreach: allGraphs -->
+            <!-- ko if: isresource -->
+            <div class="card-grid-item">
+                <div class="panel mar-no">
+                    <!-- card Name -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: iconclass"></i> <span data-bind="text:name"></span> </h3>
+                    </div>
+
+                    <!-- Abstract -->
+                    <div class="panel-body library-card-body">
+                        <p data-bind="text: description"></p>
+                    </div>
+
+                    <!-- card Tools -->
+                    <div class="panel-footer" style="height: 53px;">
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus " role="button" data-bind="attr: { href: '/graph/' + graphid + '/add_resource', 'data-arches-graphid': graphid}">{% trans "Create Resource" %}</a>
+                    <!--         <button id="select-blank" class="btn btn-primary btn-labeled fa fa-plus ">{% trans "Create Resource" %}</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+
+        </div>
+
+
+        <!-- Resource Instances -->
+        <div id="resource-records" class="report-image-grid" style="display: none;" data-bind="visible: !showResources()">
+
+            <!-- Resource Records Table -->
+            <div class="panel">
+                <div class="panel-body" style="background: #ebeef0;">
+                    <table data-bind="datatable: tableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Resource Id</th>
+                                <th>Resource Name</th>
+                                <th>Resource Type</th>
+                                <th class="min-desktop">Last Edit</th>
+                                <th class="min-desktop">QC Status</th>
+                                <th class="min-desktop">Public</th>
+                                <th class="min-tablet">Editor</th>
+                                <th class="min-tablet"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for summary in instance_summaries %}
+                            <tr>
+                                <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' summary.id %}')">{{summary.id}}</a></td>
+                                <td>{{summary.name}}</td>
+                                <td>{{summary.type}}</td>
+                                <td>{{summary.last_edited}}</td>
+                                <td>{{summary.qc}}</td>
+                                <td>{{summary.public}}</td>
+                                <td>{{summary.editor}}</td>
+                                <td>
+                                    <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' summary.id %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock main_content %}

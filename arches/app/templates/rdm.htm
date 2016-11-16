@@ -1,4 +1,4 @@
-{% extends "base-nifty.htm" %}
+{% extends "base-manager.htm" %}
 {% load i18n %}
 
 {% load staticfiles %}
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
 {% endblock css %}
 
-{% block content %}
+{% block main_content %}
 
 
     <!--=== App Header ===-->
@@ -162,4 +162,4 @@
     {% include "views/rdm/modals/import-scheme-form.htm" %}
 </div>
 
-{% endblock content %}
+{% endblock main_content %}

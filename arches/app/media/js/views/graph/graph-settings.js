@@ -4,7 +4,8 @@ require([
     'knockout',
     'knockout-mapping',
     'views/graph/graph-page-view',
-    'graph-settings-data'
+    'graph-settings-data',
+    'bindings/color-picker'
 ], function($, _, ko, koMapping, PageView, data) {
     /**
     * prep data for models
@@ -49,29 +50,13 @@ require([
             });
         }),
         graph: graph,
-        resources: data.resources,
+        relatable_resources: data.resources,
         ontologies: data.ontologies,
         ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {
             return _.filter(data.ontologyClasses, function (ontologyClass) {
                 return ontologyClass.ontology_id === graph.ontology_id();
             });
-        }),
-        isResource: ko.computed({
-            read: function() {
-                return graph.isresource().toString();
-            },
-            write: function(value) {
-                graph.isresource(value === "true");
-            }
-        }),
-        isActive: ko.computed({
-            read: function() {
-                return graph.isactive().toString();
-            },
-            write: function(value) {
-                graph.isactive(value === "true");
-            }
         }),
         save: function () {
             pageView.viewModel.loading(true);

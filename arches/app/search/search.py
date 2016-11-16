@@ -28,7 +28,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class SearchEngine(object):
 
     def __init__(self):
-        # 
+        #
         serializer = JSONSerializer()
         serializer.mimetype = 'application/json'
         serializer.dumps = serializer.serialize
@@ -56,13 +56,13 @@ class SearchEngine(object):
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
-                raise detail   
+                raise detail
         else:
             try:
                 return self.es.delete(ignore=[404], **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document: %s \nException detail: %s\n' % (datetime.now(), body, detail))
-                raise detail   
+                raise detail
 
     def delete_index(self, **kwargs):
         """
@@ -95,13 +95,13 @@ class SearchEngine(object):
                 return self.es.mget(**kwargs)
             else:
                 return self.es.get(**kwargs)
-        
+
         ret = None
-        try: 
+        try:
             ret = self.es.search(**kwargs)
         except Exception as detail:
             self.logger.warning('%s: WARNING: search failed for query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
-            pass   
+            pass
 
         return ret
 
@@ -120,7 +120,7 @@ class SearchEngine(object):
             already_indexed = False
             count = 1
             ids = [id]
-            
+
             try:
                 #_id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
                 _id = uuid.uuid3(uuid.NAMESPACE_DNS, '%s%s' % (hash(term), hash(context)))
@@ -138,14 +138,14 @@ class SearchEngine(object):
 
             except Exception as detail:
                 self.logger.warning('%s: WARNING: search failed to index term: %s \nException detail: %s\n' % (datetime.now(), term, detail))
-                raise detail   
-                  
+                raise detail
+
     def delete_terms(self, ids):
         """
-        If the term is referenced more then once simply decrement the 
+        If the term is referenced more then once simply decrement the
         count and remove the id of the deleted term from the from the existing index.
 
-        If the term is only referenced once then delete the index  
+        If the term is only referenced once then delete the index
 
         """
 
@@ -160,13 +160,13 @@ class SearchEngine(object):
                             "terms": {
                                 "ids": [id]
                             }
-                        }, 
+                        },
                         "query": {
                             "match_all": {}
                         }
                     }
-                }, 
-                "from": 0, 
+                },
+                "from": 0,
                 "size": 10
             }, ignore=404)
 
@@ -189,18 +189,18 @@ class SearchEngine(object):
 
         if not body:
             if fieldtype == 'geo_shape':
-                body =  { 
+                body =  {
                     doc_type : {
                         'properties' : {
                             fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
                         }
                     }
-                } 
+                }
             else:
                 fn = { 'type' : fieldtype }
                 if fieldindex:
                     fn['index'] = fieldindex
-                body =  { 
+                body =  {
                     doc_type : {
                         'properties' : {
                             fieldname : fn
@@ -220,7 +220,7 @@ class SearchEngine(object):
 
         If "id" is supplied then will use that as the id of the document
 
-        If "idfield" is supplied then will try to find that property in the 
+        If "idfield" is supplied then will try to find that property in the
             document itself and use the value found for the id of the document
 
         """

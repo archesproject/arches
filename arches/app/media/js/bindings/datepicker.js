@@ -1,41 +1,76 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
-    'bootstrap-datepicker'
-], function ($, ko) {
+    'moment',
+    'bootstrap-datetimepicker',
+], function ($, _, ko, moment) {
     /**
-    * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
-    * data-bind property to the datepicker on init
+    * A knockout.js binding for the jQuery UI datepicker
     * @constructor
     * @name datepicker
     */
     ko.bindingHandlers.datepicker = {
-        init: function(element, valueAccessor, allBindingsAccessor) {
-          //initialize datepicker with some optional options
-          var options = allBindingsAccessor().datepickerOptions || {};
-          var value = valueAccessor();
-          var widget = $(element).datepicker(options).data("datepicker");
-          if (typeof value() === 'string') {
-              var dateValue = new Date(value());
-              value(dateValue);
-              widget.setDate(dateValue);
-          }
+        init: function (element, valueAccessor, allBindingsAccessor) {
+            //initialize datepicker with some optional options
+            var options = valueAccessor() || {};
+            var minDate;
+            var maxDate;
 
-          //when a user changes the date, update the view model
-          ko.utils.registerEventHandler(element, "changeDate", function(event) {
-                 var value = valueAccessor();
-                 if (ko.isObservable(value)) {
-                     value(event.date);
-                 }
-          });
-        },
-        update: function(element, valueAccessor)   {
-            var widget = $(element).data("datepicker");
-             //when the view model is updated, update the widget
-            if (widget) {
-                widget.date = ko.utils.unwrapObservable(valueAccessor());
-                widget.setValue();
-            }
+            _.forEach(options, function (value, key){
+                if (ko.isObservable(value)) {
+                    if (key === 'minDate') {
+                        minDate = value;
+                    } else if (key === 'maxDate') {
+                        maxDate = value;
+                    }
+
+                    value.subscribe(function (newValue) {
+                        if (_.isObject(newValue)) {
+                          newValue = moment(newValue).format(options['format']);
+                        }
+                        options[key] = newValue;
+
+                        if ((key === 'minDate' || key === 'maxDate') &&
+                            typeof minDate === 'function' && minDate() &&
+                            typeof maxDate === 'function' && maxDate() &&
+                            (minDate() > maxDate() || maxDate() < minDate())) {
+                            if (key === 'minDate') {
+                                maxDate(minDate());
+                            } else {
+                                minDate(maxDate());
+                            }
+                            options[key === 'minDate' ? 'maxDate': 'minDate'] = newValue;
+                        }
+
+                        var picker = $(element).data("DateTimePicker");
+                        if (picker) {
+                            picker.options(options);
+                        }
+                    });
+
+                    options[key] = options[key]();
+                }
+            })
+
+            $(element).datetimepicker(options);
+
+            ko.utils.registerEventHandler(element, "dp.change", function (event) {
+                var value = allBindingsAccessor().value;
+                var picker = $(element).data("DateTimePicker");
+                if (ko.isObservable(value)) {
+                    if (event.date != null) {
+                        value(event.date.format(picker.format()));
+                    }
+                }
+            });
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                var picker = $(element).data("datepicker");
+                if (picker) {
+                    picker.destroy();
+                }
+            });
         }
     };
 

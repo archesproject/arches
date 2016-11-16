@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="node-widget-label concept-label">
+    <div class="control-label">
+        {% trans "Concept Collection" %}
+    </div>
+    <div>
+        <select data-bind="placeholder: 'Select a concept collection', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%'}"></select>
+    </div>
+</div>

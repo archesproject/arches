@@ -5,15 +5,14 @@ require([
     'views/graph/graph-page-view',
     'views/graph/graph-manager/graph',
     'views/graph/graph-manager/node-list',
-    'views/graph/graph-manager/permissions-list',
     'views/graph/graph-manager/node-form',
-    'views/graph/graph-manager/permissions-form',
     'models/node',
     'models/graph',
     'viewmodels/alert',
     'arches',
-    'graph-manager-data'
-], function($, _, ko, PageView, GraphView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, AlertViewModel, arches, data) {
+    'graph-manager-data',
+    'datatype-config-components'
+], function($, _, ko, PageView, GraphView, NodeListView, NodeFormView, NodeModel, GraphModel, AlertViewModel, arches, data) {
     /**
     * create graph model
     */
@@ -22,10 +21,12 @@ require([
         datatypes: data.datatypes
     });
 
+    var nextSelection = null;
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
-    graphModel.on('select-node', function(model, options){
+    graphModel.on('select-node', function(node){
+        nextSelection = node;
         viewModel.nodeForm.closeClicked(true);
     });
 
@@ -50,7 +51,7 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#node-crud'),
         graphModel: graphModel,
-        validations: data.validations,
+        functions: data.functions,
         branches: data.branches,
         loading: loading
     });
@@ -67,14 +68,6 @@ require([
 
     viewModel.nodeList.on('node-selected', function(node) {
         viewModel.graphView.zoomTo(node);
-    });
-
-    viewModel.permissionsList = new PermissionsListView({
-        el: $('#node-permissions')
-    });
-
-    viewModel.permissionsForm = new PermissionsFormView({
-        el: $('#permissions-panel')
     });
 
     /**
@@ -96,14 +89,22 @@ require([
         var node = viewModel.nodeForm.node();
         if (closeClicked && node && node.dirty()) {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function () {
-                viewModel.nodeForm.cancel();
+                viewModel.nodeForm.closeClicked(false);
+                nextSelection = null;
             }, function () {
-                viewModel.nodeForm.save();
+                viewModel.nodeForm.cancel();
+                viewModel.nodeForm.closeClicked(false);
+                if (nextSelection) {
+                    graphModel.selectNode(nextSelection);
+                }
+                nextSelection = null;
             }));
         } else {
             pageView.viewModel.alert(null);
         }
     });
+
+    graphModel.selectNode(graphModel.get('root'));
 
     /**
     * update the sizing of elements on window resize

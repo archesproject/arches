@@ -104,7 +104,7 @@ define([
         * @memberof GraphBase.prototype
         */
         renderNodes: function(){
-            this.allNodes = this.svg.selectAll(".node")
+            this.allNodes = this.svg.selectAll("g")
                 .data(this.tree_nodes, function(d) { return d.nodeid });
 
             this.node = this.allNodes.enter().append("g")

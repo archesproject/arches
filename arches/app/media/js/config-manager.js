@@ -2,7 +2,7 @@ require([
     'jquery',
     'views/page-view',
     'views/form',
-    'bootstrap-nifty',
+    'bootstrap',
     'knockout',
     'widgets'
 ], function($, PageView, Form) {

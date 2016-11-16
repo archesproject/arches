@@ -21,6 +21,7 @@ from arches.app.models import models
 from django.forms.models import model_to_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import validations as validation_methods
+from arches.app.views.concept import get_preflabel_from_valueid
 
 class Tile(object):
     def __init__(self, *args, **kwargs):
@@ -29,6 +30,7 @@ class Tile(object):
         self.resourceinstance_id = kwargs.get('resourceinstance_id', '')
         self.nodegroup_id = kwargs.get('nodegroup_id', '')
         self.data = kwargs.get('data', {})
+        self.sortorder = kwargs.get('sortorder', {})
         self.tiles = kwargs.get('tiles', {})
 
         if len(args) != 0:
@@ -50,6 +52,7 @@ class Tile(object):
         self.resourceinstance_id = obj.get('resourceinstance_id', '')
         self.nodegroup_id = obj.get('nodegroup_id', '')
         self.data = obj.get('data', {})
+        self.sortorder = obj.get('sortorder', {})
         if not isinstance(self.data, dict):
             self.data = {}
         self.tiles = {}
@@ -69,22 +72,29 @@ class Tile(object):
         return models.Node.objects.filter(nodegroup_id=self.nodegroup_id)
 
     def validate(self):
-        validations = {'is_valid': True}
+        functions = {'is_valid': True}
         for node in self.get_nodes():
             results = []
             node_is_valid = True
             value = None
             if str(node.nodeid) in self.data:
                 value = self.data[str(node.nodeid)]
-            for validation in node.validations.all():
-                validation_method = getattr(validation_methods, validation.validation)
+            for function in node.functions.all():
+                validation_method = getattr(validation_methods, function.function)
                 result = validation_method(value, node.nodeid, self.tileid)
                 if not result['valid']:
-                    validations['is_valid'] = False
+                    functions['is_valid'] = False
                     node_is_valid = False
                 results.append(result)
-            validations[str(node.nodeid)] = {'results': results, 'is_valid': node_is_valid}
-        return validations
+            functions[str(node.nodeid)] = {'results': results, 'is_valid': node_is_valid}
+        return functions
+
+    def get_node_display_values(self):
+        for nodeid, nodevalue in self.data.iteritems():
+            if models.Node.objects.get(pk=nodeid).datatype == 'concept':
+                self.data[nodeid] = get_preflabel_from_valueid(nodevalue, 'en-US')['value']
+
+        return self.data
 
     def save(self):
         self.tileid, created = uuid_get_or_create(self.tileid)

@@ -11,12 +11,14 @@
 from __future__ import unicode_literals
 
 import os
+import json
 import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
+from django.dispatch import receiver
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
@@ -36,15 +38,21 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class Card(models.Model):
+class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    helpenabled = models.BooleanField(default=False)
+    helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
-    nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
-    parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
-    cardinality = models.TextField(blank=True, default='n')
+    nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
+    graph = models.ForeignKey('GraphModel', db_column='graphid')
+    active = models.BooleanField(default=True)
+    visible = models.BooleanField(default=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_cards')
+    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -54,11 +62,12 @@ class Card(models.Model):
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
-    card = models.ForeignKey('Card', db_column='cardid')
+    card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    function = models.ForeignKey('Function', db_column='functionid')
-    inputmask = models.TextField(blank=True, null=True)
-    inputlabel = models.TextField(blank=True, null=True)
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_widgets')
+    config = JSONField(blank=True, null=True, db_column='config')
+    label = models.TextField(blank=True, null=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         managed = True
@@ -78,6 +87,11 @@ class Concept(models.Model):
 class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
+    defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True)
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+    configcomponent = models.TextField(blank=True, null=True)
+    configname = models.TextField(blank=True, null=True)
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_datatypes')
 
     class Meta:
         managed = True
@@ -160,10 +174,65 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class File(models.Model):
+    fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    path = models.FileField(upload_to='uploadedfiles')
+
+    class Meta:
+        managed = True
+        db_table = 'files'
+
+
+# These two event listeners auto-delete files from filesystem when they are unneeded:
+# from http://stackoverflow.com/questions/16041232/django-delete-filefield
+@receiver(models.signals.post_delete, sender=File)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `File` object is deleted.
+    """
+    if instance.path:
+        try:
+            if os.path.isfile(instance.path.path):
+                os.remove(instance.path.path)
+        ## except block added to deal with S3 file deletion
+        ## see comments on 2nd answer below
+        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except:
+            storage, name = instance.path.storage, instance.path.name
+            storage.delete(name)
+
+@receiver(models.signals.pre_save, sender=File)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `File` object is changed.
+    """
+
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = File.objects.get(pk=instance.pk).path
+    except File.DoesNotExist:
+        return False
+
+    new_file = instance.path
+    if not old_file == new_file:
+        try:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+        except Exception:
+            return False
+
+
 class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
+    iconclass = models.TextField(blank=True, null=True)
+    status = models.BooleanField(default=True)
+    visible = models.BooleanField(default=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
 
     class Meta:
         managed = True
@@ -171,27 +240,44 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    form = models.ForeignKey(Form, db_column='formid')
-    card = models.ForeignKey(Card, db_column='cardid')
+    id = models.AutoField(primary_key=True, serialize=True)
+    card = models.ForeignKey('CardModel', db_column='cardid')
+    form = models.ForeignKey('Form', db_column='formid')
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         managed = True
-        db_table = 'forms_x_card'
-        unique_together = (('form', 'card'),)
+        db_table = 'forms_x_cards'
 
 
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    functiontype = models.TextField(blank=True, null=True)
-    function = models.TextField()
     name = models.TextField(blank=True, null=True)
+    functiontype = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    defaultconfig = JSONField(blank=True, null=True)
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
+    component = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'functions'
 
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+class FunctionXGraph(models.Model):
+    id = models.AutoField(primary_key=True)
+    function = models.ForeignKey('Function', on_delete=models.CASCADE, db_column='functionid')
+    graph = models.ForeignKey('GraphModel', on_delete=models.CASCADE, db_column='graphid')
+    config = JSONField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'functions_x_graphs'
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -204,8 +290,12 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
+    mapfeaturecolor = models.TextField(blank=True, null=True)
+    mappointsize = models.IntegerField(blank=True, null=True)
+    maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
+    functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
 
     class Meta:
         managed = True
@@ -225,11 +315,20 @@ class Icon(models.Model):
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     legacygroupid = models.TextField(blank=True, null=True)
+    cardinality = models.TextField(blank=True, default='1')
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
     class Meta:
         managed = True
         db_table = 'node_groups'
+
+        default_permissions = ()
+        permissions = (
+            ('read_nodegroup', 'Read'),
+            ('write_nodegroup', 'Create/Update'),
+            ('delete_nodegroup', 'Delete'),
+            ('no_access_to_nodegroup', 'No Access'),
+        )
 
 
 class Node(models.Model):
@@ -246,7 +345,8 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
-    validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_nodes')
+    config = JSONField(blank=True, null=True, db_column='config')
 
     def get_child_nodes_and_edges(self):
         """
@@ -383,6 +483,39 @@ class Relation(models.Model):
     class Meta:
         managed = True
         db_table = 'relations'
+        unique_together = (('conceptfrom', 'conceptto', 'relationtype'),)
+
+
+class ReportTemplate(models.Model):
+    templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'report_templates'
+
+
+class Report(models.Model):
+    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(ReportTemplate, db_column='templateid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
+    config = JSONField(blank=True, null=True, db_column='config')
+    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'reports'
 
 
 class Resource2ResourceConstraint(models.Model):
@@ -409,21 +542,9 @@ class ResourceXResource(models.Model):
         db_table = 'resource_x_resource'
 
 
-class ResourceClassXForm(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    resourceclass = models.ForeignKey(Node, db_column='resourceclassid', blank=True, null=True)
-    form = models.ForeignKey(Form, db_column='formid')
-    status = models.TextField(blank=True, null=True) #This hides forms that may be deployed by an implementor for testing purposes. Once the switch is flipped to "prod" then regular permissions (defined at the nodegroup level) come into play.
-
-    class Meta:
-        managed = True
-        db_table = 'resource_classes_x_forms'
-        unique_together = (('resourceclass', 'form'),)
-
-
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclass = models.ForeignKey(Node, db_column='resourceclassid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
     resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
 
     class Meta:
@@ -458,22 +579,17 @@ class Tile(models.Model): #Tile
     parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         managed = True
         db_table = 'tiles'
 
-
-class Validation(models.Model):
-    validationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    validation = models.TextField(blank=True, null=True)
-    validationtype = models.TextField(blank=True, null=True)
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'validations'
+    def save(self, *args, **kwargs):
+        if(self.sortorder is None):
+            sortorder_max = Tile.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
 class Value(models.Model):
@@ -487,25 +603,70 @@ class Value(models.Model):
         managed = True
         db_table = 'values'
 
+class FileValue(models.Model):
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
+    concept = models.ForeignKey('Concept', db_column='conceptid')
+    valuetype = models.ForeignKey('DValueType', db_column='valuetype')
+    value = models.FileField(upload_to='concepts')
+    language = models.ForeignKey('DLanguage', db_column='languageid', blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'values'
+
+    def geturl(self):
+        if self.value != None:
+            return self.value.url
+        return ''
+
+    def getname(self):
+        if self.value != None:
+            return self.value.name
+        return ''
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     component = models.TextField()
-    defaultlabel = models.TextField(blank=True, null=True)
-    defaultmask = models.TextField(blank=True, null=True)
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
+    datatype = models.TextField()
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
 
     class Meta:
         managed = True
         db_table = 'widgets'
 
 
-class WidgetXDataType(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    widget = models.ForeignKey(db_column='widgetid', to='models.Widget')
-    datatype = models.ForeignKey(db_column='datatypeid', to='models.DDataType')
+class MapSources(models.Model):
+    name = models.TextField()
+    source = JSONField(blank=True, null=True, db_column='source')
+
+    @property
+    def source_json(self):
+        json_string = json.dumps(self.source)
+        return json_string
 
     class Meta:
         managed = True
-        db_table = 'widgets_x_datatypes'
+        db_table = 'map_sources'
+
+
+class MapLayers(models.Model):
+    maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
+    isoverlay = models.BooleanField(default=False)
+    icon = models.TextField(default=None)
+
+    @property
+    def layer_json(self):
+        json_string = json.dumps(self.layerdefinitions)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_layers'

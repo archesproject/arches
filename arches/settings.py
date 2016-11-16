@@ -91,8 +91,10 @@ RESOURCE_MARKER_ICON_UNICODE = '\uf060'
 RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
-BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 GOOGLE_ANALYTICS_TRACKING_ID = None
+
+# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = None
 
 def RESOURCE_TYPE_CONFIGS():
     return {
@@ -118,7 +120,11 @@ def RESOURCE_TYPE_CONFIGS():
         # },
     }
 
-GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
+GEOCODING_PROVIDERS = [
+    {'name': 'MapZen', 'api_key':'', 'id':'MapzenGeocoder'},
+    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
+    ]
+
 
 EXPORT_CONFIG = ''
 
@@ -164,11 +170,19 @@ USE_TZ = False
 # Default Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
-# see https://docs.djangoproject.com/en/1.6/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
+#
+# make sure to uncomment the Middleware class 'LocaleMiddleware'
+#
+# https://docs.djangoproject.com/en/1.9/ref/django-admin/#makemessages
+#
+# run
+# django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
+# django-admin.py compilemessages
 LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
@@ -251,6 +265,11 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -262,6 +281,7 @@ INSTALLED_APPS = (
     'arches',
     'arches.app.models',
     'arches.management',
+    'guardian',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -274,6 +294,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
+    # 'arches.app.utils.bing_geocoder'
 )
 
 ROOT_URLCONF = 'arches.urls'
@@ -313,6 +334,8 @@ RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+	os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
+    os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
 CONCEPT_SCHEME_LOCATIONS = (
@@ -329,6 +352,8 @@ BUSISNESS_DATA_FILES = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 try:
     from settings_local import *

@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-nifty.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -24,16 +24,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graph Manager" %}
 {% endblock title %}
 
-{% block body %}
-<div class="loading-mask" data-bind="visible:loading()"></div>
+{% block login_header %}{% endblock login_header %}
 
-<div id="edit-panel" class="pt-page fade relative in">
+{% block main_content %}
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
     <div class="ep-toolbar">
 
         <!-- Tools Menu -->
-        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }">
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
             <div class="">{% trans "Manage" %}
                 <i class="ion-more"></i>
             </div>
@@ -74,8 +74,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="panel-body">
                <ul class="list-group ep-menu-list">
                     <!-- Menu Item -->
-                    <li id="" class="resource-selector">
-                        <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: graphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
+                    <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
+                        <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
                     </li>
 
                     <!-- Menu Item -->
@@ -89,19 +89,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </li>
 
-                    <!-- Menu Item -->
-                    <li id="card-manager" class="edit-menu-item {% if main_script == "views/graph/card-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'card_manager' graphid %}') }">
+                    {% block card_manager_menu_item %}
+                    <li id="card-manager" class="edit-menu-item{% if main_script == "views/graph/card-manager" %} selected{% endif %}{% if not graph.isresource and not root_node.is_collector %} disabled{% endif %}">
+                        <a href="#" {% if graph.isresource or root_node.is_collector %}data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
+
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
+                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
                             </div>
                         </a>
                     </li>
+                    {% endblock card_manager_menu_item %}
 
+                    {% if graph.isresource %}
                     <!-- Menu Item -->
                     <li id="form-manager" class="edit-menu-item">
-                        <a href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
@@ -111,10 +114,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a id="" href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'report_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
+                            </div>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Menu Item -->
+                    <li class="edit-menu-item">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
                             </div>
                         </a>
                     </li>
@@ -131,10 +145,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a id="" href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Resource Designer" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resources" %} </span>
+                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
                             </div>
                         </a>
                     </li>
@@ -148,7 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Help Panel -->
-    <div id="" class="ep-help" style="display: none;">
+    <div class="ep-help" style="display: none;">
         <div class="panel ep-help-panel relative" style="">
 
             <!-- Help Item List -->
@@ -184,59 +198,60 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
             {% block graph_header_buttons %}
-            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Exit" %}</button>
+            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Done" %}</button>
             {% endblock graph_header_buttons %}
         </div>
     </div>
 
 
     <!-- Edit Content -->
-    <div class="relative ep-content graph-base-content">
-        <div id="" class="edit-content relative" style="top: 0px;" data-bind="css: {'alert-active': (alert() && alert().active())}">
-            <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
-                <!-- ko if: alert() -->
-                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-                <p class="ep-form-alert-text" data-bind="text: alert().text"></p>
+    <div class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
+        <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
+            <!-- ko if: alert() -->
+            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
 
-                <div class="ep-form-alert-default-dismiss">
-                    <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
-                </div>
+            <div class="ep-form-alert-default-dismiss">
+                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+            </div>
 
-                <div class="ep-form-alert-buttons">
-                    <!-- ko if: alert().cancel -->
-                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
-                    <!-- /ko -->
-                    <!-- ko if: alert().ok -->
-                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
-                    <!-- /ko -->
-                </div>
+            <div class="ep-form-alert-buttons">
+                <!-- ko if: alert().cancel -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                <!-- /ko -->
+                <!-- ko if: alert().ok -->
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
                 <!-- /ko -->
             </div>
-
-
-            <!-- Settings -->
-            <div id="settings-form" class="relative fade in" style="display: block;">
-
-                <!-- Page Content -->
-                {% block content %}
-                {% endblock content %}
-            </div>
-
-
+            <!-- /ko -->
         </div>
+
+
+        <!-- Settings -->
+        <!-- <div id="settings-form" class="relative fade in" style="display: block;"> -->
+
+            <!-- Page Content -->
+            {% block content %}
+            {% endblock content %}
+        <!-- </div> -->
+
+
     </div>
 </div>
-{% endblock body %}
+{% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
-<script>{% autoescape off %}
-define('graph-base-data', [], function () {
-    return {
-        graphs: {{graphs}},
-        graphid: '{{graphid}}'
-    };
-});
-{% endautoescape %}</script>
+    {{block.super}}
+    <script>
+        {% autoescape off %}
+        define('graph-base-data', [], function () {
+            return {
+                graphid: '{{graphid}}',
+                graph: {{graph_json}}
+            };
+        });
+        {% endautoescape %}
+    </script>
 {% endblock pre_require_js %}

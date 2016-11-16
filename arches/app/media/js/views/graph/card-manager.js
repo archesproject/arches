@@ -3,22 +3,32 @@ require([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'models/graph',
     'views/graph/graph-page-view',
-    'graph-cards-data'
-], function($, _, ko, koMapping, PageView, data) {
+    'views/list',
+    'viewmodels/alert',
+    'graph-cards-data',
+    'arches',
+    'bindings/dragDrop'
+], function($, _, ko, koMapping, GraphModel, PageView, ListView, AlertViewModel, data, arches) {
 
     /**
-    * a GraphPageView representing the graph cards page
+    * a PageView representing the graph cards page
     */
     var self = this;
+    var showCardLibrary = ko.observable(false);
     var viewModel = {
-        showCardLibrary: ko.observable(false),
+        graphModel: new GraphModel({
+            data: data.graph
+        }),
+        showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
-            this.showCardLibrary(!this.showCardLibrary());
-        }
-    }
+            showCardLibrary(!showCardLibrary());
+        },
+        selectedCardId: ko.observable(null)
+    };
     viewModel.cardLibraryStatus = ko.pureComputed(function() {
-        return this.showCardLibrary() ? 'show-card-library' : 'hide-card-library';
+        return showCardLibrary() ? 'show-card-library' : 'hide-card-library';
     }, viewModel);
     viewModel.appliedGraphs = ko.observableArray();
     viewModel.availableGraphs = ko.observableArray();
@@ -27,22 +37,80 @@ require([
         return _.find(branch.cards, function(card){
             return card.nodegroup_id === nodegroupid;
         })
-    }
+    };
     data.branches.forEach(function(branch){
         branch.nodegroups.forEach(function(nodegroup){
-            var card = findCard(branch, nodegroup.nodegroupid);
             if (!(nodegroup.parentnodegroup_id)){
-                branch.card = card;
+                branch.card = findCard(branch, nodegroup.nodegroupid);;
+                viewModel.availableGraphs.push(branch);
             }
         })
-        
-        viewModel.availableGraphs.push(branch);
     });
 
-    // data.graph.cards.forEach(function(card){
-        
-    //     viewModel.appliedGraphs.push(branch);
-    // });
+    viewModel.cardList = new ListView({
+        items: viewModel.availableGraphs
+    });
+
+    var alertFailure = function () {
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+    };
+
+    viewModel.addCard = function(data){
+        var self = this;
+        this.loading(true);
+        var cardGraph = new GraphModel({
+            data: data
+        });
+        this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, cardGraph, function(response, status){
+            var success = (status === 'success');
+            this.loading(false);
+            if (!success) alertFailure();
+        }, this)
+    };
+
+    viewModel.deleteCard = function (card) {
+        var self = this
+        var node = _.find(this.graphModel.get('nodes')(), function(node) {
+            return node.nodeid === card.nodegroup_id;
+        });
+        if (node) {
+            this.loading(true);
+            this.graphModel.deleteNode(node, function(response, status){
+                var success = (status === 'success');
+                self.loading(false);
+                if (!success) alertFailure();
+            });
+        }
+    };
+
+    viewModel.openCard = function (cardId) {
+        pageView.viewModel.navigate(arches.urls.card + cardId);
+    };
+
+    viewModel.selectedCardId.subscribe(function(cardId) {
+        if (cardId) {
+            viewModel.openCard(cardId);
+        }
+    });
+
+    viewModel.graphCardOptions = ko.computed(function () {
+        var options = [{
+            name: null,
+            graphId: null,
+            disabled: true
+        }]
+        return options.concat(viewModel.graphModel.graphCards());
+    });
+
+    viewModel.newCard = ko.computed({
+        read: function() {
+            return viewModel.graphModel.graphCards().length ? viewModel.graphModel.graphCards()[0] : null;
+        },
+        write: function(value) {
+            viewModel.addCard(value);
+        }
+    });
+
     var pageView = new PageView({
         viewModel: viewModel
     });

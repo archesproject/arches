@@ -1,0 +1,23 @@
+{% load i18n %}
+<!-- Card Container CRUD -->
+<div id="ep-card-container-crud">
+
+    <!-- ko if: 'isContainer' in selection() && selection().isContainer() -->
+    <div id="card-container-configuration" data-bind="visible: 'isContainer' in selection() && selection().isContainer()">
+        {% include 'views/graph/card-configuration/component-forms/card-container-configuration.htm' %}
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: 'isContainer' in selection() && !(selection().isContainer())-->
+    <div id="card-configuration" data-bind="visible: ('isContainer' in selection() && !(selection().isContainer()))" style="display:none">
+        {% include 'views/graph/card-configuration/component-forms/card-configuration.htm' %}
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: 'node' in selection()-->
+    <div id="widget-configuration" data-bind="visible: ('node' in selection())" style="display:none">
+        {% include 'views/graph/card-configuration/component-forms/widget-configuration.htm' %}
+    </div>
+    <!-- /ko -->
+
+</div>

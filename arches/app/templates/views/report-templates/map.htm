@@ -1,0 +1,31 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+<div>
+  <!-- ko component: {
+      name: 'map-widget',
+      params: {
+          config: report.configJSON,
+          node: null,
+          value: report.get('tiles'),
+          type: 'report-header',
+          graph: report.graph
+      }
+  } --><!-- /ko -->
+</div>
+{% endblock header %}
+
+{% block header_form %}
+<!-- ko component: {
+    name: 'map-widget',
+    params: {
+        config: report.configJSON,
+        node: null,
+        value: null,
+        configForm: true,
+        type: "report-header",
+        graph: report.graph
+    }
+} --><!-- /ko -->
+{% endblock header_form %}

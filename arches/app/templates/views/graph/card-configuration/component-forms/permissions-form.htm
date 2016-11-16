@@ -1,0 +1,41 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="tertiary-panel-content">
+    <div class="">
+        <h4 class="title-block-title" style="">{% trans "Card Permissions" %}</h4>
+        <div class="" style="padding-top: 20px; position: relative;">
+            <p class="library-instructions" style="">{% trans "Set permissions for this data entry card.  Update the Groups/User accounts you selected with the following permissions:" %}</p>
+        </div>
+    </div>
+ 
+    <!-- Premission Selector -->
+    <div style="margin-top: 8px;">
+        <div>
+            <select style="min-width: 200px;" class="resources" multiple data-bind="selectedOptions: selectedPermissions, options: permissions, optionsText: 'name', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+        </div>
+        <div class="flex">
+            <button id="apply-permissions" class="btn btn-primary btn-block btn-labeled fa fa-plus" style="margin: 10px;" data-bind="click: applyPermissions">{% trans "Apply permissions" %}</button>
+            <button id="apply-permissions" class="btn btn-mint btn-block btn-labeled fa fa-repeat" style="margin: 10px;" data-bind="click: resetPermissions">{% trans "Reset permissions" %}</button>
+        </div>
+    </div>
+
+    <!-- Premission Key -->
+    <div id="confirm-permissions">
+        
+        <h4 class="node-title" style="font-size: 13px;">{% trans "Applying permissions to the following users/groups:" %}</h4>
+
+        <div class="panel-body" style="padding: 0 10px 10px 10px;">
+            <dl>
+                <!-- ko foreach: selectedItems -->
+                    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length > 0 -->
+                    <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)().local"></dd>
+                    <!-- /ko -->
+                    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length == 0 -->
+                    <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)().default + ' ({% trans "default" %})'"></dd>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </dl>
+        </div>
+
+    </div>
+</div>

@@ -28,6 +28,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.db import IntegrityError
 import logging
 
 
@@ -67,13 +68,13 @@ class Concept(object):
     def __unicode__(self):
         return ('%s - %s') % (self.get_preflabel().value, self.id)
 
-    def __hash__(self): 
+    def __hash__(self):
         return hash(self.id)
-    def __eq__(self, x): 
+    def __eq__(self, x):
         return hash(self) == hash(x)
-    def __ne__(self, x): 
+    def __ne__(self, x):
         return hash(self) != hash(x)
-        
+
     def load(self, value):
         if isinstance(value, dict):
             self.id = str(value['id']) if 'id' in value else ''
@@ -98,8 +99,8 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, 
-        include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, 
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False,
+        include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None,
         lang=settings.LANGUAGE_CODE, semantic=True, pathway_filter=None, **kwargs):
 
         if id != '':
@@ -150,10 +151,10 @@ class Concept(object):
                     if depth_limit != None:
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
-                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id, 
-                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts, 
-                            include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, 
-                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
+                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id,
+                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts,
+                            include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
@@ -166,10 +167,10 @@ class Concept(object):
                     if up_depth_limit != None:
                         uplevel = uplevel + 1
                     for relation in conceptrealations:
-                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id, 
+                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id,
                             include_subconcepts=False,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts,exclude=exclude, include=include,
-                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         parentconcept.relationshiptype = relation.relationtype.pk
                         self.parentconcepts.append(parentconcept)
@@ -274,12 +275,13 @@ class Concept(object):
 
         """
 
-        relation = models.Relation()
-        relation.pk = str(uuid.uuid4())
-        relation.conceptfrom_id = self.id
-        relation.conceptto_id = concepttorelate.id
-        relation.relationtype_id = relationtype
-        relation.save()
+        # relation = models.Relation()
+        # relation.pk = str(uuid.uuid4())
+        # relation.conceptfrom_id = self.id
+        # relation.conceptto_id = concepttorelate.id
+        # relation.relationtype_id = relationtype
+        # relation.save()
+        relation, created = models.Relation.objects.get_or_create(conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype)
         return relation
 
     @staticmethod
@@ -571,7 +573,7 @@ class Concept(object):
         return graph
 
     def get_paths(self, lang=settings.LANGUAGE_CODE):
-        
+
         def graph_to_paths(current_concept, path=[], path_list=[], _cache=[]):
             if len(path) == 0:
                 current_path = []
@@ -690,7 +692,7 @@ class Concept(object):
                     return in_use
         return in_use
 
-    def get_e55_domain(self, entitytypeid):
+    def get_e55_domain(self, conceptid):
         """
         For a given entitytypeid creates a dictionary representing that entitytypeid's concept graph (member pathway) formatted to support
         select2 dropdowns
@@ -698,29 +700,27 @@ class Concept(object):
         """
         cursor = connection.cursor()
 
-        entitytype = models.EntityTypes.objects.get(pk=entitytypeid)
-
         sql = """
         WITH RECURSIVE children AS (
             SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
-                FROM concepts.relations d
-                JOIN concepts.values c ON(c.conceptid = d.conceptidto)
-                JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom)
+                FROM relations d
+                JOIN values c ON(c.conceptid = d.conceptidto)
+                JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
                 WHERE d.conceptidfrom = '{0}'
                 and c2.valuetype = 'prefLabel'
                 and c.valuetype in ('prefLabel', 'sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                 UNION
                 SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
-                FROM concepts.relations  d
+                FROM relations  d
                 JOIN children b ON(b.conceptidto = d.conceptidfrom)
-                JOIN concepts.values v ON(v.conceptid = d.conceptidto)
-                JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom)
+                JOIN values v ON(v.conceptid = d.conceptidto)
+                JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
                 WHERE  v2.valuetype = 'prefLabel'
                 and v.valuetype in ('prefLabel','sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
             ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
-        """.format(entitytype.conceptid_id)
+        """.format(conceptid)
 
 
         column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
@@ -735,9 +735,8 @@ class Concept(object):
                 self.sortorder = ''
                 self.collector = ''
                 self.children = []
-                self.entitytypeid = entitytypeid
 
-        result = Val(entitytype.conceptid_id)
+        result = Val(conceptid)
 
         def _findNarrower(val, path, rec):
             for conceptid in path:
@@ -856,7 +855,20 @@ class ConceptValue(object):
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
             if self.language != '':
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
-            value.save()
+            else:
+                value.language_id = settings.LANGUAGE_CODE
+            try:
+                if value.value != 'Resource To Resource Relationship Types':
+                    value.save()
+            except IntegrityError as e:
+                valuetype = models.DValueType()
+                valuetype.valuetype = value.valuetype_id
+                valuetype.category = 'undefined'
+                valuetype.namespace = 'arches'
+                valuetype.save()
+
+                value.save()
+
             self.category = value.valuetype.category
 
     def delete(self):

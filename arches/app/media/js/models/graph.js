@@ -50,7 +50,7 @@ define(['arches',
         deleteNode: function(node, callback, scope){
             this._doRequest({
                 type: "DELETE",
-                url: this.url + 'delete_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/delete_node',
                 data: JSON.stringify({nodeid:node.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -83,6 +83,11 @@ define(['arches',
                         });
                     nodes.push(node);
                     edges.push(edge);
+                    if (node.isCollector()) {
+                        this.get('cards').remove(function (card) {
+                            return card.nodegroup_id === node.nodeid;
+                        });
+                    }
                     this.get('edges').remove(function (edge) {
                         return _.contains(edges, edge);
                     });
@@ -148,7 +153,7 @@ define(['arches',
 
             this._doRequest({
                 type: "POST",
-                url: this.url + 'append_branch/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/append_branch',
                 data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -162,6 +167,12 @@ define(['arches',
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
                         self.get('edges').push(edge);
+                    }, this);
+                    response.responseJSON.nodegroups.forEach(function(nodegroup){
+                        self.get('nodegroups').push(nodegroup);
+                    }, this);
+                    response.responseJSON.cards.forEach(function(card){
+                        self.get('cards').push(card);
                     }, this);
 
                     if(!self.get('isresource')){
@@ -193,7 +204,7 @@ define(['arches',
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/move_node',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -209,7 +220,7 @@ define(['arches',
                             return response_node.nodeid === node.nodeid;
                         });
                         if (found_node){
-                            node.nodeGroupId(found_node.nodegroup_id);
+                            node.parse(found_node);
                         }
                     });
                 }
@@ -230,7 +241,7 @@ define(['arches',
         updateNode: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'update_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/update_node',
                 data: JSON.stringify(node.toJSON())
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -249,7 +260,7 @@ define(['arches',
         },
 
         /**
-         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node 
+         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node
          * referenced by it's id could be based on the location of the node in the graph
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -258,16 +269,15 @@ define(['arches',
          */
         getValidNodesEdges: function(nodeid, callback, scope){
             this._doRequest({
-                type: "POST",
-                url: this.url + this.get('graphid') + '/get_related_nodes',
-                data: JSON.stringify({'nodeid': nodeid})
+                type: "GET",
+                url: this.url + this.get('graphid') + '/get_related_nodes/' + nodeid,
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
             }, this);
         },
 
         /**
-         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node 
+         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node
          * referenced by it's id could use to be appened to other nodes
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -276,9 +286,8 @@ define(['arches',
          */
         getValidDomainClasses: function(nodeid, callback, scope){
             this._doRequest({
-                type: "POST",
-                url: this.url + this.get('graphid') + '/get_valid_domain_nodes',
-                data: JSON.stringify({'nodeid': nodeid})
+                type: "GET",
+                url: this.url + this.get('graphid') + '/get_valid_domain_nodes/' + nodeid,
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
             }, this);
@@ -329,7 +338,7 @@ define(['arches',
                     return false;
                 }
             }
-            
+
             if(this.get('isresource')){
                 if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
                     return false;
@@ -341,9 +350,7 @@ define(['arches',
             }else{ // this graph is a Graph
                 switch(this.isType()) {
                     case 'undefined':
-                        if(typeOfGraphToAppend === 'undefined'){
-                            return false;
-                        }
+                        return false;
                         break;
                     case 'card':
                         if(typeOfGraphToAppend === 'card'){
@@ -387,28 +394,32 @@ define(['arches',
             attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
-                datatypelookup[datatype.datatype] = datatype.iconclass;
+                datatypelookup[datatype.datatype] = datatype;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
             _.each(attributes.data, function(value, key){
                 switch(key) {
                     case 'edges':
-                        this.set('edges', ko.observableArray(value));
+                    case 'cards':
+                        this.set(key, ko.observableArray(value));
                         break;
                     case 'nodes':
+                        var nodes = [];
                         attributes.data.nodes.forEach(function (node, i) {
-                            attributes.data.nodes[i] = new NodeModel({
+                            var nodeModel = new NodeModel({
                                 source: node,
                                 datatypelookup: datatypelookup,
                                 graph: self
                             });
                             if(node.istopnode){
-                                this.set('root', attributes.data.nodes[i]);
-                                attributes.data.nodes[i].selected(true);
+                                this.set('root', nodeModel);
                             }
+                            nodes.push(nodeModel);
                         }, this);
-                        this.set('nodes', ko.observableArray(value));
+                        this.set('nodes', ko.observableArray(nodes));
+                        break;
+                    case 'root':
                         break;
                     default:
                         this.set(key, value)
@@ -421,6 +432,26 @@ define(['arches',
                 }, this);
                 return selectedNode;
             }));
+
+            var root = this.get('root');
+            if(!!root){
+                root.selected(true);
+            }
+
+            this.graphCards = ko.computed(function(){
+                var parentCards = [];
+                if (this.get('cards')) {
+                    var allCards = this.get('cards')();
+                    this.get('nodegroups').filter(function(nodegroup){
+                        return !!nodegroup.parentnodegroup_id === false;
+                    }, this).forEach(function(nodegroup){
+                        parentCards = parentCards.concat(allCards.filter(function(card){
+                            return card.nodegroup_id === nodegroup.nodegroupid;
+                        }, this))
+                    }, this);
+                }
+                return parentCards;
+            }, this);
         },
 
         /**
