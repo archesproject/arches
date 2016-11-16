@@ -72,32 +72,12 @@ define([
                 'resourceLineWidth',
                 'featureEditingDisabled',
                 'overlayConfigs',
-                'overlayOpacity'
+                'overlayOpacity',
+                'mapControlsHidden'
             ];
 
             WidgetViewModel.apply(this, [params]);
-            // this.overlayConfigMapped = koMapping.fromJS(this.config().overlayConfigs);
-      			// this.overlayConfigs = ko.computed({
-      			// 	read: function() {
-      			// 		return ko.toJS(this.overlayConfigMapped);
-      			// 	},
-      			// 	write: function(value) {
-      			// 		ko.fromJS(value, this.overlayConfigMapped);
-      			// 	},
-      			// 	owner: this
-      			// });
-      			// this.overlayConfigs.subscribe(function (val) {
-      			// 	var configObj = self.config();
-      			// 	configObj.overlayConfigs = val;
-      			// 	self.config(configObj);
-      			// });
-            //
-      			// self.config.subscribe(function(val) {
-            //   console.log(val)
-      			// 	if (_.isEqual(val.overlayConfigs, self.overlayConfigs()) === false) {
-      			// 		self.overlayConfigs(val[key]);
-      			// 	}
-      			// });
+
             this.geocoderViewModel = new GeocoderViewModel();
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
@@ -471,14 +451,15 @@ define([
                       maplayer.opacity(configMaplayer.opacity)
                     }
                     maplayer.opacity.subscribe(function(value) {
-                        maplayer.updateOpacity(value);
                         self.overlayOpacity(value);
                         this.overlayConfigs().forEach(
                           function(overlayConfig){
                             if (maplayer.maplayerid === overlayConfig.maplayerid) {
                               overlayConfig.opacity = value
+                              // self.overlayConfigs.valueHasMutated();
                             }
-                          })
+                          }, self)
+                          maplayer.updateOpacity(value);
                     }, self);
                     return maplayer
                 };
@@ -611,6 +592,14 @@ define([
 
             this.toggleMapTools = function(data, event) {
                 data.mapToolsExpanded(!data.mapToolsExpanded());
+            }
+
+            this.toggleMapToolsVisibility = function(e) {
+                if (self.mapControlsHidden() === true) {
+                    self.mapControlsHidden(false)
+                } else {
+                    self.mapControlsHidden(true)
+                }
             }
 
             this.toggleMapControlPanels = function(data, event) {

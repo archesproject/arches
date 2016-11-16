@@ -90,9 +90,8 @@
             <input id="geocoderInput" data-bind="
               geocodeData: selectedItems, geocoder: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div> -->
-
-        <div id="map-widget-container relative" class="">
-            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
+        <div id="map-widget-container relative">
+            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded, 'hide-maptools': mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
             </div>
 
@@ -281,16 +280,42 @@
 <div>Map summary details possibly to go here...</div>
 {% endblock report %} {% block config_form %}
 <div class="control-label map-config-header">Map Properties</div>
-<div class="panel-group accordion" id="accordion">
-    <div class="panel">
 
+<div class="panel-group accordion" id="accordion">
+
+    <!--ko if: reportHeader -->
+    <div class="panel">
+        <!--Accordion title-->
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-controls" aria-expanded="false" class="collapsed">Map Controls</a>
+            </h4>
+        </div>
+        <!--Accordion content-->
+        <div class="panel-collapse collapse" id="map-config-controls" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                  <div class="control-label">
+                      {% trans "Hide Map Controls" %}
+                  </div>
+                  <div class="col-xs-12 pad-no crud-widget-container">
+
+                      <div class="toggle-container">
+                          <span class="switch switch-small" data-bind="css: {'on': mapControlsHidden}, click: toggleMapToolsVisibility"><small></small></span>
+                          <p class="arches-toggle-sm">Toggle on hide the map controls</p>
+                      </div>
+                  </div>
+                </div>
+            </div>
+    </div>
+    <!-- /ko -->
+
+    <div class="panel">
         <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">Position</a>
             </h4>
         </div>
-
         <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
@@ -390,6 +415,7 @@
             </div>
         </div>
     </div>
+
     <div class="panel">
         <!--Accordion title-->
         <div class="panel-heading">
