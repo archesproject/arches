@@ -73,7 +73,6 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
-        # self.functions
         # self.itemtext
         # end from models.CardModel
         self.cardinality = ''
@@ -105,14 +104,12 @@ class Card(models.CardModel):
                     widget_model.sortorder = widget.get('sortorder', None)
                     if widget_model.pk == None:
                         widget_model.save()
-                    widget_model.functions.set(widget.get('functions', []))
                     self.widgets.append(widget_model)
 
                 for node in args[0]["nodes"]:
                     nodeid = node.get('nodeid', None)
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
-                        node_model.functions.set(node.get('functions', []))
                         node_model.config = node.get('config', None)
                         self.nodes.append(node_model)
 

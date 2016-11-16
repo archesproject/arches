@@ -51,7 +51,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_cards')
     itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -64,7 +63,6 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_widgets')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -91,7 +89,6 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_datatypes')
 
     class Meta:
         managed = True
@@ -345,7 +342,6 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_nodes')
     config = JSONField(blank=True, null=True, db_column='config')
 
     def get_child_nodes_and_edges(self):
