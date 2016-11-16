@@ -191,6 +191,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "overlayConfigs": [],
+        "overlayOpacity": 0.0,
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
