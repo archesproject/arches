@@ -51,7 +51,6 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#node-crud'),
         graphModel: graphModel,
-        functions: data.functions,
         branches: data.branches,
         loading: loading
     });

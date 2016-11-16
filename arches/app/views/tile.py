@@ -117,7 +117,9 @@ def getFunctionClassInstances(tile):
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
     for function in functions:
-        module = importlib.import_module('arches.app.functions.%s' % function.function.modulename)
+        print function.function.modulename.replace('.py', '')
+        mod_path = function.function.modulename.replace('.py', '')
+        module = importlib.import_module('arches.app.functions.%s' % mod_path)
         func = getattr(module, function.function.classname)()
         ret.append(func)
     return ret

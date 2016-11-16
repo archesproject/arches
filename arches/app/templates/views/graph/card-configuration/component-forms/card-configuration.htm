@@ -14,16 +14,6 @@
             </a>
         </li>
         <li>
-            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-gear add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Advanced Settings" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-wand add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Validations" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-        <li>
             <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-ios-people add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Permissions" %}', placement: 'bottom' }"></i>
             </a>
@@ -60,18 +50,16 @@
                 <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: card().get('instructions'), valueUpdate: 'keyup'">
             </div>
         </div>
-    </div>
 
-    <!-- Card CRUD ADVANCED SETTINGS Form -->
-    <div id="card-crud-advanced" class="tab-pane fade">
+        <div class="form-divider">
+            <h4 class="title-block-title" style=""> {% trans "Settings" %} </h4>
+        </div>
 
         <!-- Set Cardinaltiy -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
         <!-- Multiple values tools -->
         <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
-
-            <div class="form-divider" style="margin-top: 0px; margin-bottom: 10px;"></div>
 
             <!-- Cardinlity Tools: Tile Header -->
             <div class="node-widget-label" style="">
@@ -83,18 +71,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Card CRUD Validation/Functions Form -->
-    <div id="card-crud-validation" class="tab-pane fade">
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                {% trans "Functions" %}
-            </div>
-            <div data-bind="with: card">
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.cardfunctions, optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
+        
     </div>
 
     <!-- Card CRUD Permissions Form -->
