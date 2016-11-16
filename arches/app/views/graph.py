@@ -134,7 +134,6 @@ class GraphManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            functions=JSONSerializer().serialize(models.Function.objects.all()),
             branches=JSONSerializer().serialize(branch_graphs),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
@@ -278,7 +277,6 @@ class CardView(GraphBaseView):
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
-            functions=JSONSerializer().serialize(models.Function.objects.all()),
             map_layers=map_layers,
             map_sources=map_sources,
             concept_collections=concept_collections,

@@ -40,11 +40,8 @@ def import_graph(graphs):
 				errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
 			else:
 				for	card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
-					functions = card_x_node_x_widget['functions']
-					card_x_node_x_widget.pop('functions', None)
 					cardxnodexwidget = CardXNodeXWidget.objects.create(**card_x_node_x_widget)
 					cardxnodexwidget.save()
-					cardxnodexwidget.functions.set(functions)
 
 			if not hasattr(graph, 'forms'):
 				errors.append('{0} graph has no attribute forms'.format)
