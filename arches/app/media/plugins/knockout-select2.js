@@ -103,6 +103,11 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             $(el).on("change", function(val) {
                 return value(val.val);
             });
+            $(el).on("select2-opening", function(val) {
+                if (select2Config.clickBubble) {
+                    $(el).parent().trigger('click');
+                }
+            });
             value.subscribe(function(newVal) {
                 select2Config.value = newVal;
                 $(el).select2("val", newVal);

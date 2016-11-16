@@ -347,14 +347,22 @@ class Command(BaseCommand):
         resource_exporter.export(resources=resources, dest_dir=data_dest)
 
 
-    def import_json(self, data_source=None, graphs=None, resources=None, concepts=None):
+    def import_json(self, data_source='', graphs=None, resources=None, concepts=None):
         """
         Imports objects from arches.json.
 
         """
 
-        data_source = None if data_source == '' else data_source
-        ArchesFileImporter(data_source).import_all()
+        if data_source == '':
+            for path in settings.RESOURCE_GRAPH_LOCATIONS:
+                if os.path.isfile(os.path.join(path)):
+                    ArchesFileImporter(path).import_all()
+                else:
+                    file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
+                    for file_path in file_paths:
+                        ArchesFileImporter(os.path.join(path, file_path)).import_all()
+        else:
+            ArchesFileImporter(data_source).import_all()
 
 
     def start_livereload(self):

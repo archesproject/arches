@@ -24,7 +24,6 @@ require([
             data: data.graph
         }),
         permissions: data.permissions,
-        functions: data.functions,
         helpPreviewActive: ko.observable(false),
         reset: function () {
             viewModel.card.reset();

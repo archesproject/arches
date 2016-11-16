@@ -777,26 +777,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
         ),
         migrations.AddField(
-            model_name='node',
-            name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='functions_x_nodes'),
-        ),
-        migrations.AddField(
-            model_name='ddatatype',
-            name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='functions_x_datatypes'),
-        ),
-        migrations.AddField(
-            model_name='cardmodel',
-            name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='functions_x_cards'),
-        ),
-        migrations.AddField(
-            model_name='cardxnodexwidget',
-            name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='functions_x_widgets'),
-        ),
-        migrations.AddField(
             model_name='form',
             name='graph',
             field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False),

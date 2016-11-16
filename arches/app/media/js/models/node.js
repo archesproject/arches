@@ -54,7 +54,6 @@ define([
                 }
                 return component;
             });
-            self.functions = ko.observableArray();
             self.ontologyclass = ko.observable('');
             self.parentproperty = ko.observable('');
             self.ontology_cache = ko.observableArray().extend({
@@ -137,7 +136,6 @@ define([
                     name: self.name,
                     datatype: self.datatype,
                     nodegroup_id: self.nodeGroupId,
-                    functions: self.functions,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config
@@ -173,10 +171,6 @@ define([
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
-            self.functions.removeAll();
-            source.functions.forEach(function(fn) {
-                self.functions.push(fn);
-            });
 
             if (source.config) {
                 self.setupConfig(source.config);

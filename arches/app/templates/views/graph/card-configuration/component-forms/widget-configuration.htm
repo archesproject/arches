@@ -13,16 +13,6 @@
                 <i class="ion-settings add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Settings" %}', placement: 'bottom' }"></i>
             </a>
         </li>
-        <li>
-            <a href="#widget-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-gear add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Advanced Settings" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#widget-crud-validation" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-wand add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Validations" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
     </ul>
 
 </div>
@@ -36,11 +26,12 @@
             <div class="control-label">
                 {% trans "Widget Label" %}
             </div>
-            <div class="col-sm-12 pad-no crud-widget-container">
+            <div class="pad-no">
                 <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="value: widget().get('label'), valueUpdate: 'keyup'">
             </div>
         </div>
-        <div class='widget-config-form' data-bind='component: {
+
+        <div data-bind='component: {
             name: widgetLookup[widget().get("widget_id")()].name,
             params: {
                 config: widget().configJSON,
@@ -52,47 +43,18 @@
         }'></div>
 
         <!-- ko if: widget().node.datatypeConfigComponent -->
-        <div class='datatype-config-form' data-bind='component: {
+        <div data-bind='component: {
             name: widget().node.datatypeConfigComponent,
             params: widget().node
         }'></div>
         <!-- /ko -->
 
-    </div>
-
-    <div id="widget-crud-advanced" class="tab-pane fade">
-
         <div class="node-widget-label" style="">
-            <div class="
-            control-label">
+            <div class="control-label">
                 {% trans "Template" %}
             </div>
-            <div class="col-sm-12 pad-no crud-widget-container" data-bind="with: widget">
+            <div class="pad-no" data-bind="with: widget">
                 <select class="design" data-bind="value: $data.get('widget_id'), options: $parent.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
-
-    </div>
-
-    <div id="widget-crud-validation" class="tab-pane fade">
-
-        <!-- ko if: validations().length > 0 -->
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                {% trans "Validations" %}
-            </div>
-            <div data-bind="with: widget">
-                <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node.functions, options: $parent.validations, optionsText: 'function', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
-        <!-- /ko -->
-
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                {% trans "Functions" %}
-            </div>
-            <div data-bind="with: widget">
-                <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.functions, optionsText: 'function', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
