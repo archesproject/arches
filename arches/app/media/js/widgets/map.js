@@ -78,18 +78,28 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+            this.overlaySelectorClosed = ko.observable(true);
+            this.geocodeShimAdded = ko.observable(false);
+            this.selectedBasemap = this.basemap;
+            this.drawMode = ko.observable();
+            this.selectedFeatureType = ko.observable();
+            this.overlays = ko.observableArray();
+            this.overlayLibrary = ko.observableArray();
+            this.overlayLibraryList = new ListView({
+                items: self.overlayLibrary
+            })
 
-            this.geocoder = new GeocoderViewModel(
-              {
+            this.geocoder = new GeocoderViewModel({
                 geocodeProvider: this.geocodeProvider,
                 geocodePlaceholder: this.geocodePlaceholder,
                 geocoderVisible: this.geocoderVisible
-              }
-            );
+              });
 
             this.mapControls = new MapControlsViewModel({
-              mapControlsHidden: this.mapControlsHidden
-            });
+                mapControlsHidden: this.mapControlsHidden,
+                overlaySelectorClosed: this.overlaySelectorClosed,
+                overlays: this.overlays
+              });
 
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
@@ -109,50 +119,17 @@ define([
                     this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
-            this.selectedBasemap = this.basemap;
-            this.drawMode = ko.observable();
-            this.selectedFeatureType = ko.observable();
-            this.mapToolsExpanded = ko.observable(false);
-            this.overlaySelectorClosed = ko.observable(true);
-            this.geocodeShimAdded = ko.observable(false);
-            this.mapToolsExpanded.subscribe(function(expanded) {
-                self.geocodeShimAdded(expanded);
-            });
 
             this.toggleOverlaySelector = function(e) {
                 this.overlaySelectorClosed(!this.overlaySelectorClosed());
             };
 
+            this.mapControls.mapControlsExpanded.subscribe(function(expanded) {
+                self.geocodeShimAdded(expanded);
+            });
+
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
             this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
-
-            this.geometryTypeDetails = {
-                Point: {
-                    name: 'Point',
-                    icon: 'ion-location',
-                    drawMode: 'draw_point',
-                    active: ko.observable(false)
-                },
-                Line: {
-                    name: 'Line',
-                    icon: 'ion-steam',
-                    drawMode: 'draw_line_string',
-                    active: ko.observable(false)
-                },
-                Polygon: {
-                    name: 'Polygon',
-                    icon: 'fa fa-pencil-square-o',
-                    drawMode: 'draw_polygon',
-                    active: ko.observable(false)
-                }
-            }
-
-            this.mapControlPanels = {
-                basemaps: ko.observable(false),
-                overlays: ko.observable(true),
-                maptools: ko.observable(true),
-                legend: ko.observable(true)
-            };
 
             /**
              * Creates the map layer for the resource with widget configs
@@ -222,6 +199,27 @@ define([
 
                 initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
+            }
+
+            this.geometryTypeDetails = {
+                Point: {
+                    name: 'Point',
+                    icon: 'ion-location',
+                    drawMode: 'draw_point',
+                    active: ko.observable(false)
+                },
+                Line: {
+                    name: 'Line',
+                    icon: 'ion-steam',
+                    drawMode: 'draw_line_string',
+                    active: ko.observable(false)
+                },
+                Polygon: {
+                    name: 'Polygon',
+                    icon: 'fa fa-pencil-square-o',
+                    drawMode: 'draw_polygon',
+                    active: ko.observable(false)
+                }
             }
 
             this.geomTypeSelectSetup = {
@@ -409,8 +407,6 @@ define([
                     }
                 }
 
-                this.overlays = ko.observableArray();
-                this.overlayLibrary = ko.observableArray();
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
                     for (var i = initialConfigs.length; i-- > 0;) {
@@ -428,10 +424,6 @@ define([
                         }
                     }
                 });
-
-                this.overlayLibraryList = new ListView({
-                    items: self.overlayLibrary
-                })
 
                 this.createOverlay = function(maplayer) {
                     var self = this;
@@ -469,6 +461,7 @@ define([
                         this.overlayConfigs().forEach(
                           function(overlayConfig){
                             if (maplayer.maplayerid === overlayConfig.maplayerid) {
+                              // self.overlayConfigs.valueWillMutate();
                               overlayConfig.opacity = value
                               // self.overlayConfigs.valueHasMutated();
                             }
@@ -576,9 +569,9 @@ define([
                 }
 
                 this.map.on('moveend', this.updateConfigs());
-                this.map.on('draw.create', this.saveGeometries())
-                this.map.on('draw.update', this.saveGeometries())
-                this.map.on('draw.delete', this.saveGeometries())
+                ['draw.create','draw.update','draw.delete'].forEach(function(event){
+                  self.map.on(event, self.saveGeometries())
+                });
                 this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
@@ -604,33 +597,6 @@ define([
                 this.geocodeProvider(e.currentTarget.value)
             }
 
-            this.toggleMapTools = function(data, event) {
-                data.mapToolsExpanded(!data.mapToolsExpanded());
-            }
-
-            this.toggleMapControlPanels = function(data, event) {
-                var panel = data;
-                _.each(self.mapControlPanels, function(panelValue, panelName) {
-                    panelName === panel ? panelValue(false) : panelValue(true);
-                    panel === 'overlays' || self.overlaySelectorClosed(true);
-                });
-            }
-
-            this.moveOverlay = function(overlay, direction) {
-                var overlays = ko.utils.unwrapObservable(self.overlays);
-                var source = ko.utils.arrayIndexOf(overlays, overlay);
-                var target = (direction === 'up') ? source - 1 : source + 1;
-
-                if (target >= 0 && target < overlays.length) {
-                    self.overlays.valueWillMutate();
-
-                    overlays.splice(source, 1);
-                    overlays.splice(target, 0, overlay);
-
-                    self.overlays.valueHasMutated();
-                }
-            };
-
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {
                 "type": "geojson",
@@ -653,12 +619,12 @@ define([
                 "layers": []
             };
 
-            this.mapStyle.layers = this.addInitialLayers();
+           this.selectBasemap = function(val) {
+               self.basemap(val.name)
+               self.setBasemap(val);
+           }
 
-            this.selectBasemap = function(val) {
-                self.basemap(val.name)
-                self.setBasemap(val);
-            }
+            this.mapStyle.layers = this.addInitialLayers();
         },
         template: {
             require: 'text!widget-templates/map'

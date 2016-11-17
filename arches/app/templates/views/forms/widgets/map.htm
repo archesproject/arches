@@ -47,11 +47,12 @@
         </div>
         <!-- /ko -->
         <div class="overlay-selection-container" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+          <!-- ko foreach: { data: [$data], as: 'self' } -->
           <div data-bind="with: overlayLibraryList">
            <!-- Title -->
            <div class="overlay-title">
                Map Overlay Library
-               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: $parent.toggleOverlaySelector.bind($parent)"></i></span>
+               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
            </div>
            <!-- Filter -->
            <div class="overlay-filter-container">
@@ -63,7 +64,7 @@
 
            <div class="overlay-list-container">
                 <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: {data: items}">
-                     <div class="overlay-card" style="" data-bind="click: $parents[1].exchangeOverlay, css: {'selected': checkedOutOfLibrary}, visible: $data.filtered() == false">
+                     <div class="overlay-card" style="" data-bind="click: self.exchangeOverlay, css: {'selected': checkedOutOfLibrary}, visible: $data.filtered() == false">
                          <div class="overlay-card-item">
                              <div class="overlay-card-vis-toggle">
                                  <i class="ion-checkmark-circled"></i>
@@ -78,63 +79,56 @@
            </div>
 
          </div>
+         <!--/ko-->
         </div>
 
         <!-- Geocode Panel -->
-        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
+        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
             <input id="select2Input" data-bind="
               select2v4Data: geocoder.selected, select2v4: geocodeSelectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
         <!-- Map Tools Panel-->
-        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
+        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
             <input id="geocoderInput" data-bind="
               geocodeData: selectedItems, geocoderProvider: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div> -->
         <div id="map-widget-container relative">
-            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded, 'hide-maptools': mapControlsHidden}">
-                <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
+                <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
             </div>
 
-            <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapToolsExpanded, delay:200, fade:400">
+            <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400">
               <ul class="map-widget-toolbar-list" style="">
-                <li class="map-widget-toolbar-item text-center basemaps-map-tools" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
+                <li class="map-widget-toolbar-item text-center basemaps-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'active': !mapControls.mapControlPanels.basemaps()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
                 </li>
-                <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
+                <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('overlays')}, css : { 'active': !mapControls.mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                 </li>
                 <!-- ko ifnot: featureEditingDisabled -->
-                <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
+                <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('maptools')}, css : {'active': !mapControls.mapControlPanels.maptools() }">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
                 </li>
                 <!-- /ko -->
-                <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
+                <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
                     <a id="l" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
                 </li>
-                <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
-                    <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapControls.mapControlsExpanded}">
+                    <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                 </li>
               </ul>
             </div>
 
-            <!-- Basemaps -->
-            <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapToolsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControlPanels.basemaps}">
-                <!-- Panel Title -->
+            <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControls.mapControlPanels.basemaps}">
                 <div class="map-widget-panel-title">
                     <h4 class=""> Basemaps </h4>
                 </div>
 
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
-
                 <!-- ko foreach: basemaps -->
                 <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap">
                     <div class="map-overlay-vis-toogle text-center">
-                        <!-- ko if: name === self.basemap()-->
-                        <i class="ion-checkmark-circled"></i>
-                        <!-- /ko -->
-                        <!-- ko if: name !== self.basemap() -->
-                        <i class="ion-checkmark-circled basemap-unselected"></i>
-                        <!-- /ko -->
+                        <i class="ion-checkmark-circled" data-bind="css:{'basemap-unselected': name !== self.basemap()}"></i>
                     </div>
                     <div class="map-overlay-name">
                         <a id="" class="" href=""><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
@@ -145,9 +139,7 @@
             </div>
         </div>
 
-        <!-- Overlays -->
-        <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.overlays}">
-            <!-- Panel Title -->
+        <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
             <div class="map-widget-panel-title">
                 <h4 class=""> Overlays
                   <i class="ion-ios-plus pull-right add-tooltip"
@@ -157,7 +149,7 @@
                     data-bind="click: toggleOverlaySelector"
                     ></i></h4>
             </div>
-
+          <!--ko let: { self: $data }-->
             <div data-bind="sortable: overlays">
                 <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}">
                     <div class="map-overlay-vis-toogle text-center" data-bind="css:{'overlay-invisible':invisible}, click: toggleOverlayVisibility">
@@ -178,9 +170,6 @@
                     </div>
                     <div class="map-overlay-item-tools-panel" data-bind="fadeVisible: showingTools, delay:300, fade: 200">
 
-                        <!-- <div class="row"> -->
-
-                        <!-- <div class="col-xs-8"> -->
                         <div class="overlay-slider">
                             <div data-bind="noUiSlider: {
                                 start: opacity,
@@ -191,37 +180,28 @@
                                 connect: 'lower'
                             }"></div>
                         </div>
-                        <!-- </div> -->
 
-                        <!-- <div class="col-xs-4"> -->
                         <div class="overlay-tool-group">
                             <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
-                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'up') }">
+                            <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'up') }">
                                 <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
                             </a>
-                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'down') }">
+                            <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'down') }">
                                 <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
                             </a>
                         </div>
-                        <!-- </div> -->
-
-                        <!-- </div> -->
-
                     </div>
                 </div>
             </div>
-
+            <!-- /ko -->
         </div>
 
-        <!-- Map Tools -->
-        <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.maptools}">
-            <!-- Panel Title -->
+        <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
                 <h4 class=""> Map Tools </h4>
             </div>
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
-
             <!-- ko foreach: geometryTypes -->
             <div class="map-widget-overlay-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
                 <div class="map-overlay-vis-toogle text-center">
@@ -244,9 +224,7 @@
 
         </div>
 
-        <!-- Legend -->
-        <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.legend}">
-            <!-- Panel Title -->
+        <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.legend}">
             <div class="map-widget-panel-title">
                 <h4 class=""> Legend </h4>
             </div>
@@ -260,20 +238,13 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- Overlay Selector -->
     <div class="overlay-container" style="display: none;">
         <h3 class="panel-title card-main-title"> Overlays <i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
-
-        <!-- Overlay Listing -->
         <div id="report-image-grid" class="report-image-grid">
-
-
         </div>
-
     </div>
 </div>
 {% endblock form %} {% block report %}
@@ -285,13 +256,11 @@
 
     <!--ko if: reportHeader -->
     <div class="panel">
-        <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-controls" aria-expanded="false" class="collapsed">Map Controls</a>
             </h4>
         </div>
-        <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-controls" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
                   <div class="control-label">
@@ -310,13 +279,11 @@
     <!-- /ko -->
 
     <div class="panel">
-        <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">Position</a>
             </h4>
         </div>
-        <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
                 <div class="control-label">
@@ -348,14 +315,12 @@
     </div>
     <div class="panel">
 
-        <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">Zoom</a>
             </h4>
         </div>
 
-        <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-zoom" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
                 <div class="control-label">
@@ -380,14 +345,13 @@
         </div>
     </div>
     <div class="panel">
-        <!--Accordion title-->
+
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">Geocoder</a>
             </h4>
         </div>
 
-        <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-geocoder" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
                 <div class="control-label">
@@ -417,14 +381,12 @@
     </div>
 
     <div class="panel">
-        <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">Resource Properties</a>
             </h4>
         </div>
 
-        <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-resource-style" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
                 <div class="control-label">{% trans "Color" %}</div>

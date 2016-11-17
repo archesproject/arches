@@ -36,13 +36,16 @@ class ResourceEditorPage(MapWidgetPage):
         map = self.driver.find_element(*locators.MAP_CANVAS)
         ac.click(map).perform()
 
+        result = []
         for locator in (locators.SAVE_RESOURCE_EDITS_BUTTON, locators.MANAGE_MENU):
             el = self.driver.find_element(*locator)
             self.driver.execute_script("return arguments[0].scrollIntoView();", el)
             self.wait.until(
                 EC.element_to_be_clickable(locator)
             ).click()
-
+            result.append(el.text)
         self.wait.until(
             EC.element_to_be_clickable(locators.JUMP_TO_REPORT_BUTTON)
         ).click()
+        
+        return result
