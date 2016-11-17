@@ -183,6 +183,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "overlayConfigs": [],
+        "overlayOpacity": 0.0,
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
@@ -3491,7 +3492,8 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "resourceColor": null,
         "resourceLineWidth": null,
         "resourcePointSize": null,
-        "featureEditingDisabled": true
+        "featureEditingDisabled": true,
+        "mapControlsHidden": false
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)

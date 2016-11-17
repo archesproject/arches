@@ -4327,6 +4327,14 @@ div.row.widget-wrapper.report-header:hover {
     border: 1px solid #999;
 }
 
+.map-widget-container.hide-maptools {
+    display: none;
+  }
+
+.map-controls-config-toggle {
+  padding: 10px;
+}
+
 .overlay-selection-container {
     position: absolute;
     top: 0px;
