@@ -129,6 +129,7 @@
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
                 form: "{% url 'form' '' %}",
+                resource: "{% url 'resource' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
                 tile: "{% url 'tile' %}",
@@ -148,8 +149,12 @@
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
             },
             confirmGraphDelete: {
-                title: "{% trans 'Delete Graph/Resource?' %}",
-                text: "{% trans 'Deleting this graph/resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
+                title: "{% trans 'Delete Branch/Resource Model?' %}",
+                text: "{% trans 'Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
+            },
+            confirmResourceDelete: {
+                title: "{% trans 'Delete Resource?' %}",
+                text: "{% trans 'Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
             },
             graphImportFailed: {
                 title: "{% trans 'Graph import failed.'%}"
