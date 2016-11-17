@@ -76,10 +76,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Form Tools -->
                             <div class="panel-footer" style="height: 40px;">
-                                <span data-bind="if:status">
+                                <span data-bind="if:visible">
                                     <i class="fa fa-check-circle"></i> Active
                                 </span>
-                                <span data-bind="if:!status">
+                                <span data-bind="if:!visible">
                                     <i class="fa fa-minus-circle"></i> Inactive
                                 </span>
                                 <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Form</a>

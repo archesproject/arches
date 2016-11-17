@@ -397,7 +397,6 @@ class Migration(migrations.Migration):
                 ('title', models.TextField(blank=True, null=True)),
                 ('subtitle', models.TextField(blank=True, null=True)),
                 ('iconclass', models.TextField(blank=True, null=True)),
-                ('status', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
