@@ -1,101 +1,98 @@
 {% load i18n %}
 <!-- ko if: !configForm -->
 {% block report %}
-<div class="report-template-preview-container">
+<!-- Report Title Bar -->
+<div id="" class="relative" style="display: block;">
 
-    <!-- Report Title Bar -->
-    <div id="" class="relative" style="display: block;">
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title" data-bind="text: report.get('name')"></h4>
 
-        <!-- Title Block -->
-        <div class="report-toolbar-preview ep-form-toolbar">
-            <h4 class="report-toolbar-title" data-bind="text: report.get('name')"></h4>
-
-            <!-- Tools -->
-            <div class="ep-form-toolbar-tools mar-no flex">
-                <p class="report-print-date">Report Date: <span data-bind="text: reportDate"></span></p>
-                <button class="btn btn-primary print-btn mar-rgt" data-bind="click: function() { window.print() }"><i class="fa fa-print"></i> Print</button>
-            </div>
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date">Report Date: <span data-bind="text: reportDate"></span></p>
         </div>
     </div>
+</div>
 
-    <!-- Report Content -->
-    <div class="rp-report-container-preview">
+<!-- Report Content -->
+<div class="rp-report-container-preview">
 
-        {% block header %}
-        {% endblock header %}
+    {% block header %}
+    {% endblock header %}
 
-        {% block body %}
-        <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
-        <div class="rp-report-section relative">
-            <div class="rp-report-section-title">
-                <h4 class="rp-section-title" data-bind="text: form.label"></h4>
-            </div>
+    {% block body %}
+    <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
+    <div class="rp-report-section relative">
+        <div class="rp-report-section-title">
+            <h4 class="rp-section-title" data-bind="text: form.label"></h4>
+        </div>
 
-            <!-- ko foreach: { data: form.cards, as: 'card' } -->
-            <div class="rp-card-section">
-                <!-- ko let: { tiles: card.get('tiles')() } -->
-                    <!-- ko template: 'card-report' --> <!-- /ko -->
-                 <!-- /ko -->
-            </div>
-            <!-- /ko -->
+        <!-- ko foreach: { data: form.cards, as: 'card' } -->
+        <div class="rp-card-section">
+            <!-- ko let: { tiles: card.get('tiles')() } -->
+                <!-- ko template: 'card-report' --> <!-- /ko -->
+             <!-- /ko -->
         </div>
         <!-- /ko -->
+    </div>
+    <!-- /ko -->
 
-        <template id="card-report">
-            <!-- ko if: card.isContainer() -->
-            <h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
-                <!-- ko foreach: { data: tiles, as: 'tile' } -->
-                <div class="rp-report-container-tile">
-                    <!-- ko foreach: {
-                        data: card.get('cards'),
-                        as: 'card'
-                    } -->
-                        <!-- ko let: { tiles: tile.tiles() } -->
-                            <!-- ko if: tiles.length > 0 -->
-                                <!-- ko template: 'card-report' --> <!-- /ko -->
-                            <!-- /ko -->
-                         <!-- /ko -->
+    <template id="card-report">
+        <!-- ko if: card.isContainer() -->
+        <h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
+            <!-- ko foreach: { data: tiles, as: 'tile' } -->
+            <div class="rp-report-container-tile">
+                <!-- ko foreach: {
+                    data: card.get('cards'),
+                    as: 'card'
+                } -->
+                    <!-- ko let: { tiles: tile.tiles() } -->
+                        <!-- ko if: tiles.length > 0 -->
+                            <!-- ko template: 'card-report' --> <!-- /ko -->
+                        <!-- /ko -->
+                     <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: !card.isContainer() -->
+            <!-- ko foreach: { data: tiles, as: 'tile' } -->
+                <!-- ko if: tile.nodegroup_id() === card.get('nodegroup_id') -->
+                <div class="rp-report-tile">
+                    <dl class="dl-horizontal">
+                    <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
+                        <!-- ko component: {
+                            name: widget.widgetLookup[widget.get("widget_id")()].name,
+                            params: {
+                                config: configJSON,
+                                label: widget.get("label")(),
+                                node: widget.node,
+                                value: tile.data[widget.node.nodeid],
+                                state: "report"
+                            }
+                        } --><!-- /ko -->
                     <!-- /ko -->
+                    </dl>
                 </div>
                 <!-- /ko -->
             <!-- /ko -->
 
-            <!-- ko if: !card.isContainer() -->
-                <!-- ko foreach: { data: tiles, as: 'tile' } -->
-                    <!-- ko if: tile.nodegroup_id() === card.get('nodegroup_id') -->
-                    <div class="rp-report-tile">
-                        <dl class="dl-horizontal">
-                        <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-                            <!-- ko component: {
-                                name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                params: {
-                                    config: configJSON,
-                                    label: widget.get("label")(),
-                                    node: widget.node,
-                                    value: tile.data[widget.node.nodeid],
-                                    state: "report"
-                                }
-                            } --><!-- /ko -->
-                        <!-- /ko -->
-                        </dl>
-                    </div>
-                    <!-- /ko -->
-                <!-- /ko -->
+        <!-- /ko -->
 
-            <!-- /ko -->
-
-            <!-- ko if: tiles.length === 0 -->
-            <div class="row rp-report-tile" style="color: #808080">
-                {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
-            </div>
-            <!-- /ko -->
-        </template>
-        {% endblock body %}
-    </div>
-
-    {% block footer %}
-    {% endblock footer %}
+        <!-- ko if: tiles.length === 0 -->
+        <div class="row rp-report-tile" style="color: #808080">
+            {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+        </div>
+        <!-- /ko -->
+    </template>
+    {% endblock body %}
 </div>
+
+{% block footer %}
+{% endblock footer %}
+
 {% endblock report %}
 <!-- /ko -->
 
