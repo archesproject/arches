@@ -86,6 +86,14 @@ class ResourceEditorView(BaseManagerView):
 
         return HttpResponseNotFound()
 
+    def delete(self, request, resourceid=None):
+        if resourceid is not None:
+            #tiles = models.Tile.objects.filter(resourceinstance_id=resourceid).delete()
+            ret = models.ResourceInstance.objects.get(pk=resourceid).delete()
+            return JSONResponse(ret)
+
+        return HttpResponseNotFound()
+
 
 @method_decorator(group_required('edit'), name='dispatch')
 class ResourceData(View):
