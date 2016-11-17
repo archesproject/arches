@@ -73,7 +73,7 @@ class ResourceEditorView(BaseManagerView):
                 resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
+                forms=JSONSerializer().serialize(resource_instance.graph.form_set.filter(status=True,visible=True)),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
                 map_layers=map_layers,
