@@ -358,7 +358,7 @@
             "widget_id": "10000000-0000-0000-0000-000000000007",
             "node_id": "32bfad82-96f0-11e6-ad94-6c4008b05c4c",
             "sortorder": 0,
-            "config": "{\"resourcePointSize\":4,\"bearing\":0,\"resourceColor\":\"rgba(70,17,181,0.25)\",\"geometryTypes\":[{\"text\":\"Point\",\"id\":\"Point\"},{\"text\":\"Line\",\"id\":\"Line\"},{\"text\":\"Polygon\",\"id\":\"Polygon\"}],\"geocoder\":\"MapzenGeocoder\",\"pitch\":0,\"geocoderVisible\":true,\"zoom\":10,\"geocodePlaceholder\":\"Search\",\"minZoom\":0,\"centerX\":-122.3979693,\"resourceLineWidth\":1,\"overlayConfigs\":[],\"overlayOpacity\":0.0,\"maxZoom\":20,\"centerY\":37.79,\"basemap\":\"streets\",\"label\":\"Geometry\"}",
+            "config": "{\"resourcePointSize\":4,\"bearing\":0,\"resourceColor\":\"rgba(70,17,181,0.25)\",\"geometryTypes\":[{\"text\":\"Point\",\"id\":\"Point\"},{\"text\":\"Line\",\"id\":\"Line\"},{\"text\":\"Polygon\",\"id\":\"Polygon\"}],\"geocoder\":\"MapzenGeocoder\",\"pitch\":0,\"geocoderVisible\":true,\"zoom\":10,\"geocodePlaceholder\":\"Search\",\"minZoom\":0,\"centerX\":-122.3979693,\"resourceLineWidth\":1,\"overlayConfigs\":[],\"overlayOpacity\":0.0,\"mapControlsHidden\":false,\"maxZoom\":20,\"centerY\":37.79,\"basemap\":\"streets\",\"label\":\"Geometry\"}",
             "id": "7e086247-9d3a-11e6-80f2-6c4008b05c4c"
         }],
         "cards": [{

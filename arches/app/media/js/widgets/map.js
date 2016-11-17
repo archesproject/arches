@@ -11,13 +11,14 @@ define([
     'views/list',
     'widgets/map/map-styles',
     'viewmodels/geocoder',
+    'viewmodels/map-controls',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -33,7 +34,7 @@ define([
      * @param {number} params.config.zoom - map zoom level
      * @param {number} params.config.centerX - map center longitude
      * @param {number} params.config.centerY - map center latitude
-     * @param {string} params.config.geocoder - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
+     * @param {string} params.config.geocodeProvider - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {object} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {number} params.config.pitch - the pitch of the map in degrees
@@ -58,7 +59,7 @@ define([
                 'zoom',
                 'centerX',
                 'centerY',
-                'geocoder',
+                'geocodeProvider',
                 'basemap',
                 'geometryTypes',
                 'pitch',
@@ -78,7 +79,18 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
-            this.geocoderViewModel = new GeocoderViewModel();
+            this.geocoder = new GeocoderViewModel(
+              {
+                geocodeProvider: this.geocodeProvider,
+                geocodePlaceholder: this.geocodePlaceholder,
+                geocoderVisible: this.geocoderVisible
+              }
+            );
+
+            this.mapControls = new MapControlsViewModel({
+              mapControlsHidden: this.mapControlsHidden
+            });
+
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
@@ -208,7 +220,7 @@ define([
                     }
                 }, this);
 
-                initialLayers.push(this.geocoderViewModel.pointstyle);
+                initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
             }
 
@@ -341,8 +353,8 @@ define([
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
-                this.geocoderViewModel.selected.subscribe(this.geocoderViewModel.goToSelected, this);
-                this.geocodeSelectSetup = this.geocoderViewModel.setupGeocoder(self);
+                this.geocoder.selected.subscribe(this.geocoder.goToSelected, this);
+                this.geocodeSelectSetup = this.geocoder.setupGeocoder(self);
 
                 /**
                 * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
@@ -584,24 +596,16 @@ define([
                       }
                         this.addMaplayer(overlays[i])
                     }
-                    this.geocoderViewModel.redrawLayer(this.map, this.anchorLayerId);
+                    this.geocoder.redrawLayer(this.map, this.anchorLayerId);
                 }, this)
             } //end setup map
 
             this.onGeocodeSelection = function(val, e) {
-                this.geocoder(e.currentTarget.value)
+                this.geocodeProvider(e.currentTarget.value)
             }
 
             this.toggleMapTools = function(data, event) {
                 data.mapToolsExpanded(!data.mapToolsExpanded());
-            }
-
-            this.toggleMapToolsVisibility = function(e) {
-                if (self.mapControlsHidden() === true) {
-                    self.mapControlsHidden(false)
-                } else {
-                    self.mapControlsHidden(true)
-                }
             }
 
             this.toggleMapControlPanels = function(data, event) {
