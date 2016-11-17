@@ -309,6 +309,7 @@ define([
                             }
                         };
                         if (data) {
+                          if (data.features.length > 0) {
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
                             var tr = this.transform;
                             var nw = tr.project(bounds.getNorthWest());
@@ -323,6 +324,7 @@ define([
                             };
                             self.map.jumpTo(options);
                         }
+                      }
                     }
                 });
 
