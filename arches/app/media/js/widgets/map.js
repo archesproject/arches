@@ -9,13 +9,15 @@ define([
     'knockout-mapping',
     'geojson-extent',
     'views/list',
+    'widgets/map/map-styles',
+    'viewmodels/geocoder',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -69,11 +71,14 @@ define([
                 'resourcePointSize',
                 'resourceLineWidth',
                 'featureEditingDisabled',
-                'overlayConfigs'
+                'overlayConfigs',
+                'overlayOpacity',
+                'mapControlsHidden'
             ];
 
             WidgetViewModel.apply(this, [params]);
 
+            this.geocoderViewModel = new GeocoderViewModel();
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
@@ -107,16 +112,7 @@ define([
             };
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
-            // this.layers = _.clone(arches.mapLayers);
-            this.layers = $.extend(true, [], arches.mapLayers);
-
-            this.geocoderOptions = ko.observableArray([{
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }, {
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }]);
+            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
 
             this.geometryTypeDetails = {
                 Point: {
@@ -139,9 +135,6 @@ define([
                 }
             }
 
-            this.geocodeUrl = arches.urls.geocoder;
-            this.geocodeResponseOption = ko.observable();
-            this.selectedGeocodeItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -215,30 +208,8 @@ define([
                     }
                 }, this);
 
-                initialLayers.push({
-                    "id": "geocode-point",
-                    "source": "geocode-point",
-                    "type": "circle",
-                    "paint": {
-                        "circle-radius": 5,
-                        "circle-color": "red"
-                    }
-                });
-
+                initialLayers.push(this.geocoderViewModel.pointstyle);
                 return initialLayers;
-            }
-
-            /**
-             * toggles the visibility of the geocoder input in the map widget
-             * @param  {object} e event object
-             * @return {null}
-             */
-            this.toggleGeocoder = function(self, evt) {
-                if (self.geocoderVisible() === true) {
-                    self.geocoderVisible(false)
-                } else {
-                    self.geocoderVisible(true)
-                }
             }
 
             this.geomTypeSelectSetup = {
@@ -268,154 +239,16 @@ define([
                     controls: {
                         trash: false //if true, the backspace key is inactivated in the geocoder input
                     },
-                    styles: [{
-                        "id": "gl-draw-point-active",
-                        "type": "circle",
-                        "filter": ["all", ["!=", "meta", "vertex"],
-                            ["==", "$type", "Point"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": 5,
-                            "circle-color": "#FFF"
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-point",
-                        "type": "circle",
-                        "layout": {},
-                        "filter": ["all", ["!in", "$type", "LineString", "Polygon"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": this.resourcePointSize(),
-                            "circle-color": this.resourceColor(),
-                            "circle-opacity": 0.8
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-line",
-                        "type": "line",
-                        "filter": ["all", ["==", "$type", "LineString"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "layout": {
-                            "line-cap": "round",
-                            "line-join": "round"
-                        },
-                        "paint": {
-                            "line-color": this.resourceColor(),
-                            // "line-dasharray": [0.2, 2],
-                            "line-width": this.resourceLineWidth()
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-fill",
-                        "type": "fill",
-                        "filter": ["all", ["==", "$type", "Polygon"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "fill-color": this.resourceColor(),
-                            "fill-outline-color": this.resourceColor(),
-                            "fill-opacity": 0.1
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-stroke-active",
-                        "type": "line",
-                        "filter": ["all", ["==", "$type", "Polygon"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "layout": {
-                            "line-cap": "round",
-                            "line-join": "round"
-                        },
-                        "paint": {
-                            "line-color": this.resourceColor(),
-                            // "line-dasharray": [0.2, 2],
-                            "line-width": this.resourceLineWidth()
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-and-line-vertex-halo-active",
-                        "type": "circle",
-                        "filter": ["all", ["==", "meta", "vertex"],
-                            ["==", "$type", "Point"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": 5,
-                            "circle-color": "#FFF"
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-and-line-vertex-active",
-                        "type": "circle",
-                        "filter": ["all", ["==", "meta", "vertex"],
-                            ["==", "$type", "Point"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": 3,
-                            "circle-color": this.resourceColor(),
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-and-line-midpoint-halo-active",
-                        "type": "circle",
-                        "filter": ["all", ["==", "meta", "midpoint"],
-                            ["==", "$type", "Point"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": 4,
-                            "circle-color": "#FFF"
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-polygon-and-line-midpoint-active",
-                        "type": "circle",
-                        "filter": ["all", ["==", "meta", "midpoint"],
-                            ["==", "$type", "Point"],
-                            ["!=", "mode", "static"]
-                        ],
-                        "paint": {
-                            "circle-radius": 2,
-                            "circle-color": this.resourceColor(),
-                        },
-                        "interactive": true
-                    }, {
-                        "id": "gl-draw-line-static",
-                        "type": "line",
-                        "filter": ["all", ["==", "$type", "LineString"],
-                            ["==", "mode", "active"]
-                        ],
-                        "layout": {
-                            "line-cap": "round",
-                            "line-join": "round"
-                        },
-                        "paint": {
-                            "line-color": "#000",
-                            "line-width": this.resourceLineWidth()
-                        },
-                        "interactive": true
-                    }]
+                    styles: mapStyles.getDrawStyles(
+                      {linewidth: this.resourceLineWidth(),
+                        color:this.resourceColor(),
+                        pointsize: this.resourcePointSize()
+                      })
                 });
 
                 this.map = map;
                 this.draw = draw;
                 this.map.addControl(draw);
-
-                /**
-                * Reloads the geocode layer when a new geocode request is made
-                * @return {null}
-                */
-                this.redrawGeocodeLayer = function() {
-                    var cacheLayer = map.getLayer('geocode-point');
-                    map.removeLayer('geocode-point');
-                    map.addLayer(cacheLayer, this.anchorLayerId);
-                }
 
                 this.map.on('load', function() {
                     if (!self.configForm) {
@@ -506,15 +339,8 @@ define([
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
-                this.selectedGeocodeItems.subscribe(function(e) {
-                    var coords = e.geometry.coordinates;
-                    this.map.getSource('geocode-point').setData(e.geometry);
-                    this.redrawGeocodeLayer();
-                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                    this.map.flyTo({
-                        center: centerPoint
-                    });
-                }, this);
+                this.geocoderViewModel.selected.subscribe(this.geocoderViewModel.goToSelected, this);
+                this.geocodeSelectSetup = this.geocoderViewModel.setupGeocoder(self);
 
                 /**
                 * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
@@ -547,33 +373,6 @@ define([
                     }
 
                 }
-
-                this.geocodeQueryPayload =
-                    function(term, page) {
-                        return {
-                            q: term,
-                            geocoder: self.geocoder()
-                        };
-                    }
-
-                this.geocodeSelectSetup = {
-                    ajax: {
-                        url: arches.urls.geocoder,
-                        dataType: 'json',
-                        quietMillis: 250,
-                        data: this.geocodeQueryPayload,
-                        results: function(data, page) {
-                            return {
-                                results: data.results
-                            };
-                        },
-                        cache: true
-                    },
-                    minimumInputLength: 4,
-                    multiple: false,
-                    maximumSelectionSize: 1,
-                    placeholder: this.geocodePlaceholder()
-                };
 
                 this.removeMaplayer = function(maplayer) {
                   if (maplayer !== undefined) {
@@ -622,6 +421,7 @@ define([
 
                 this.createOverlay = function(maplayer) {
                     var self = this;
+                    var configMaplayer;
                     _.extend(maplayer, {
                         opacity: ko.observable(100),
                         color: _.filter(maplayer.layer_definitions[0].paint, function(prop, key) {
@@ -645,11 +445,21 @@ define([
                             }, map)
                         }
                     });
-                    maplayer.checkedOutOfLibrary(_.findWhere(this.overlayConfigs(), {
-                        "maplayerid": maplayer.maplayerid
-                    }) !== undefined)
+                    configMaplayer = _.findWhere(this.overlayConfigs(), {"maplayerid": maplayer.maplayerid})
+                    if (configMaplayer !== undefined) {
+                      maplayer.checkedOutOfLibrary(configMaplayer !== undefined)
+                      maplayer.opacity(configMaplayer.opacity)
+                    }
                     maplayer.opacity.subscribe(function(value) {
-                        maplayer.updateOpacity(value);
+                        self.overlayOpacity(value);
+                        this.overlayConfigs().forEach(
+                          function(overlayConfig){
+                            if (maplayer.maplayerid === overlayConfig.maplayerid) {
+                              overlayConfig.opacity = value
+                              // self.overlayConfigs.valueHasMutated();
+                            }
+                          }, self)
+                          maplayer.updateOpacity(value);
                     }, self);
                     return maplayer
                 };
@@ -685,7 +495,9 @@ define([
                         var self = this;
                         if (basemap.name === basemapType.name) {
                             basemap.layer_definitions.forEach(function(layer) {
-                                self.map.addLayer(layer, lowestOverlay)
+                                if (self.map.getLayer(layer.id) === undefined) {
+                                    self.map.addLayer(layer, lowestOverlay)
+                                }
                             })
                         } else {
                             basemap.layer_definitions.forEach(function(layer) {
@@ -770,7 +582,7 @@ define([
                       }
                         this.addMaplayer(overlays[i])
                     }
-                    this.redrawGeocodeLayer();
+                    this.geocoderViewModel.redrawLayer(this.map, this.anchorLayerId);
                 }, this)
             } //end setup map
 
@@ -780,6 +592,14 @@ define([
 
             this.toggleMapTools = function(data, event) {
                 data.mapToolsExpanded(!data.mapToolsExpanded());
+            }
+
+            this.toggleMapToolsVisibility = function(e) {
+                if (self.mapControlsHidden() === true) {
+                    self.mapControlsHidden(false)
+                } else {
+                    self.mapControlsHidden(true)
+                }
             }
 
             this.toggleMapControlPanels = function(data, event) {
@@ -805,8 +625,7 @@ define([
                 }
             };
 
-            // this.sources = _.clone(arches.mapSources);
-            this.sources = $.extend(true, {}, arches.mapSources);
+            this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {
                 "type": "geojson",
                 "data": {
