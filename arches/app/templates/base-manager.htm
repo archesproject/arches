@@ -45,6 +45,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="boxed">
                 <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
+                    
+                    <!-- ko if: alert() -->
+                    <div data-bind="visible: alert().active" class="relative">
+                        <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
+                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+
+                            <div class="ep-form-alert-default-dismiss">
+                                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                            </div>
+
+                            <div class="ep-form-alert-buttons">
+                                <!-- ko if: alert().cancel -->
+                                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                                <!-- /ko -->
+                                <!-- ko if: alert().ok -->
+                                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
                     {% block login_header %}
                     <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
