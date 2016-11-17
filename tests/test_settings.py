@@ -69,7 +69,7 @@ REMOTE_BROWSERS = [
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
-    '--nocapture',
+    '--nologcapture',
     '--cover-package=arches',
     '--verbosity=1',
     '--cover-erase',

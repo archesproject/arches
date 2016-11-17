@@ -276,7 +276,6 @@ class UITest(StaticLiveServerTestCase):
         resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
         resource_instance_id = resource_manager_page.add_new_resource()
         resource_editor_page = ResourceEditorPage(self.driver, self.live_server_url, 'resource', resource_instance_id)
-        resource_editor_page.create_map_data()
+        result = resource_editor_page.create_map_data()
         resource_editor_page.open_tools()
-
-        self.assertTrue(1 == 1)
+        self.assertTrue(result == ['Save', 'Manage'])
