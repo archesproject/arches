@@ -137,12 +137,14 @@
             "resourceLineWidth": 2,
             "resourceColor": "rgba(55,32,196,0.85)",
             "centerX": -122.39977301055693,
-            "geocoder": "MapzenGeocoder",
+            "geocodeProvider": "MapzenGeocoder",
             "geocoderVisible": true,
             "zoom": 10.007195441591573,
             "geocodePlaceholder": "Search",
+            "mapControlsHidden": false,
             "minZoom": 0,
             "overlayConfigs": [],
+            "overlayOpacity": 0.0,
             "geometryTypes": [
               {
                 "text": "Point",
