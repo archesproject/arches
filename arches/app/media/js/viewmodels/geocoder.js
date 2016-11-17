@@ -6,8 +6,11 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
      * @name GeocoderViewModel
      *
      */
-    var GeocoderViewModel = function() {
+    var GeocoderViewModel = function(params) {
         var self = this;
+        this.geocodeProvider = params.geocodeProvider || ko.observable('MapzenGeocoder');
+        this.geocodePlaceholder = params.geocodePlaceholder || ko.observable('Search');
+        this.geocoderVisible = params.geocoderVisible || ko.observable(true);
         this.pointstyle = {
             "id": "geocode-point",
             "source": "geocode-point",
@@ -20,12 +23,12 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
 
         this.selected = ko.observableArray()
 
-        this.setupGeocoder = function(vm) {
+        this.setupGeocoder = function() {
             var geocodeQueryPayload =
                 function(term, page) {
                     return {
                         q: term,
-                        geocoder: vm.geocoder()
+                        geocoder: self.geocodeProvider()
                     };
                 }
 
@@ -45,7 +48,7 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
                 minimumInputLength: 4,
                 multiple: false,
                 maximumSelectionSize: 1,
-                placeholder: vm.geocodePlaceholder()
+                placeholder: self.geocodePlaceholder()
             }
         };
 
@@ -79,14 +82,13 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
 
         /**
          * toggles the visibility of the geocoder input in the map widget
-         * @param  {object} vm the view model with the config to be updated
          * @return {null}
          */
-        this.toggleGeocoder = function(vm) {
-            if (vm.geocoderVisible() === true) {
-                vm.geocoderVisible(false)
+        this.toggleGeocoder = function() {
+            if (self.geocoderVisible() === true) {
+                self.geocoderVisible(false)
             } else {
-                vm.geocoderVisible(true)
+                self.geocoderVisible(true)
             }
         }
 
