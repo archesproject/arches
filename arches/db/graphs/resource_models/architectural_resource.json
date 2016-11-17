@@ -2312,7 +2312,6 @@
       "forms": [
         {
           "iconclass": "fa fa-bar-chart",
-          "status": true,
           "subtitle": "State of the resource",
           "title": "Condition Assessment",
           "formid": "6b3159a8-a5fe-11e6-b7da-6c4008b05c4c",
@@ -2322,7 +2321,6 @@
         },
         {
           "iconclass": "fa fa-map-marker",
-          "status": true,
           "subtitle": "Map, location description of resource",
           "title": "Locations",
           "formid": "7a5a95f3-a5fe-11e6-bcf7-6c4008b05c4c",

@@ -50,6 +50,29 @@ require([
         viewModel:{
             formList: formList,
             formView: formView,
+            deleteResource: function(){
+                pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
+                    return;
+                }, function(){
+                    pageView.viewModel.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: arches.urls.resource_editor + data.resourceid,
+                        success: function(response) {
+                        
+                        },
+                        error: function(response) {
+
+                        },
+                        complete: function (request, status) {
+                            pageView.viewModel.loading(false);
+                            if (status === 'success') {
+                                pageView.viewModel.navigate(arches.urls.resource);
+                            }
+                        },
+                    });
+                }));
+            }
         }
     });
 

@@ -5038,4 +5038,7 @@ a.map-widget-icon:hover {
     dd {
         margin-left:2px;
     }
+    .ep-tools {
+        display: none;
+    }
 }

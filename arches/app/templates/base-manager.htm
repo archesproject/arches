@@ -25,6 +25,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="wrapper">
         <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
 
+            {% block navheader %}
             <header id="navbar">
 
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
@@ -39,10 +40,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
             </header>
+            {% endblock navheader %}
 
 
             <div class="boxed">
-                <div id="content-container" style="padding-bottom: 20px; padding-top: 0px;">
+                <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
                     {% block login_header %}
                     <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
@@ -174,6 +176,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endblock main_content %}
                 </div>
 
+                {% block mainnav %}
                 <nav id="mainnav-container">
                     <div id="mainnav">
                         {% block navbar %}
@@ -307,13 +310,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endblock navbar %}
                     </div>
                 </nav>
+                {% endblock mainnav %}
 
+                {% block aside_container %}
                 <aside id="aside-container" style="position: fixed;">
                     <div id="aside">
                         {% block tabs %}
                         {% endblock tabs %}
                     </div>
                 </aside>
+                {% endblock aside_container %}
             </div>
 
             <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
