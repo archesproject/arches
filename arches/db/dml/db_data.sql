@@ -3492,7 +3492,8 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "resourceColor": null,
         "resourceLineWidth": null,
         "resourcePointSize": null,
-        "featureEditingDisabled": true
+        "featureEditingDisabled": true,
+        "mapControlsHidden": false
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
