@@ -391,8 +391,11 @@
             <div class="panel-body accordion-body">
                 <div class="control-label">{% trans "Color" %}</div>
 
-                <div class="col-xs-12 pad-no crud-widget-container colorpicker-component">
+                <div class="col-xs-12 pad-no crud-widget-container">
+                  <div class="colorpicker-component input-group">
                     <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: resourceColor, format:'rgba'}">
+                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: resourceColor}"></i></span>
+                  </div>
                 </div>
 
                 <div class="control-label">{% trans "Point Size" %}</div>
