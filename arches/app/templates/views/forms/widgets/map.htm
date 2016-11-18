@@ -92,11 +92,7 @@
             <input id="select2Input" data-bind="
               select2v4Data: selected, select2v4: config(), placeholder: placeholder" style="width: 100%"></input>
         </div>
-        <!-- Map Tools Panel-->
-        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
-            <input id="geocoderInput" data-bind="
-              geocodeData: selectedItems, geocoderProvider: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
-        </div> -->
+
         <div id="map-widget-container relative">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>

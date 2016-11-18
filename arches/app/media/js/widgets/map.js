@@ -87,7 +87,7 @@ define([
             this.overlayLibrary = ko.observableArray();
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
-            })
+            });
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.geocoder = new GeocoderViewModel({
@@ -110,7 +110,7 @@ define([
                 mapControlsHidden: this.mapControlsHidden,
                 overlaySelectorClosed: this.overlaySelectorClosed,
                 overlays: this.overlays
-              });
+            });
 
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
@@ -127,7 +127,7 @@ define([
                 if (this.resourceLineWidth() === null) {
                     this.resourceLineWidth(params.graph.get('maplinewidth'));
                 } else {
-                    this.resourceLineWidth(Number(this.resourceLineWidth()))
+                    this.resourceLineWidth(Number(this.resourceLineWidth()));
                 }
             }
 
@@ -258,11 +258,11 @@ define([
                     controls: {
                         trash: false //if true, the backspace key is inactivated in the geocoder input
                     },
-                    styles: mapStyles.getDrawStyles(
-                      {linewidth: this.resourceLineWidth(),
-                        color:this.resourceColor(),
+                    styles: mapStyles.getDrawStyles({
+                        linewidth: this.resourceLineWidth(),
+                        color: this.resourceColor(),
                         pointsize: this.resourcePointSize()
-                      })
+                    })
                 });
 
                 this.map = map;
@@ -281,8 +281,8 @@ define([
                         var data = null;
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined) {
-                          self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                          self.addMaplayer(self.resourceLayer);
+                            self.overlays.unshift(self.createOverlay(self.resourceLayer));
+                            self.addMaplayer(self.resourceLayer);
                         }
                         if (self.reportHeader === true && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
@@ -309,22 +309,22 @@ define([
                             }
                         };
                         if (data) {
-                          if (data.features.length > 0) {
-                            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-                            var tr = this.transform;
-                            var nw = tr.project(bounds.getNorthWest());
-                            var se = tr.project(bounds.getSouthEast());
-                            var size = se.sub(nw);
-                            var scaleX = (tr.width - 80) / size.x;
-                            var scaleY = (tr.height - 80) / size.y;
+                            if (data.features.length > 0) {
+                                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+                                var tr = this.transform;
+                                var nw = tr.project(bounds.getNorthWest());
+                                var se = tr.project(bounds.getSouthEast());
+                                var size = se.sub(nw);
+                                var scaleX = (tr.width - 80) / size.x;
+                                var scaleY = (tr.height - 80) / size.y;
 
-                            var options = {
-                                center: tr.unproject(nw.add(se).div(2)),
-                                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), Infinity)
-                            };
-                            self.map.jumpTo(options);
+                                var options = {
+                                    center: tr.unproject(nw.add(se).div(2)),
+                                    zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), Infinity)
+                                };
+                                self.map.jumpTo(options);
+                            }
                         }
-                      }
                     }
                 });
 
@@ -333,9 +333,9 @@ define([
                 };
 
                 /**
-                * Updates the appearance of the draw layer when feature appearance configs change
-                * @return {null}
-                */
+                 * Updates the appearance of the draw layer when feature appearance configs change
+                 * @return {null}
+                 */
                 this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
                     var val = isNumber ? Number(val) : val; //point size and line width must be number types
                     _.each(this.draw.options.styles, function(style) {
@@ -362,10 +362,10 @@ define([
                 }, this);
 
                 /**
-                * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
-                * @param  {string} selectedDrawTool the draw tool name selected in the map controls
-                * @return {null}
-                */
+                 * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
+                 * @param  {string} selectedDrawTool the draw tool name selected in the map controls
+                 * @return {null}
+                 */
                 this.selectEditingTool = function(self, selectedDrawTool) {
                     _.each(self.geometryTypeDetails, function(geomtype) {
                         if (geomtype.name === selectedDrawTool) {
@@ -394,23 +394,23 @@ define([
                 }
 
                 this.removeMaplayer = function(maplayer) {
-                  if (maplayer !== undefined) {
-                    maplayer.layer_definitions.forEach(function(layer) {
-                        if (map.getLayer(layer.id) !== undefined) {
-                            map.removeLayer(layer.id)
-                        }
-                    })
-                  }
+                    if (maplayer !== undefined) {
+                        maplayer.layer_definitions.forEach(function(layer) {
+                            if (map.getLayer(layer.id) !== undefined) {
+                                map.removeLayer(layer.id)
+                            }
+                        })
+                    }
                 }
 
                 this.addMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                      maplayer.layer_definitions.forEach(function(layer) {
-                          if (map.getLayer(layer.id) === undefined) {
-                              map.addLayer(layer, this.anchorLayerId);
-                              map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
-                          }
-                      }, this)
+                        maplayer.layer_definitions.forEach(function(layer) {
+                            if (map.getLayer(layer.id) === undefined) {
+                                map.addLayer(layer, this.anchorLayerId);
+                                map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
+                            }
+                        }, this)
                     }
                 }
 
@@ -421,9 +421,9 @@ define([
                             "maplayerid": initialConfigs[i].maplayerid
                         });
                         if (overlay === undefined) {
-                          var overlay = _.findWhere(overlays, {
-                              "maplayerid": self.graphId
-                          });
+                            var overlay = _.findWhere(overlays, {
+                                "maplayerid": self.graphId
+                            });
                         };
                         if (overlay !== undefined) {
                             self.addMaplayer(overlay)
@@ -458,22 +458,24 @@ define([
                             }, map)
                         }
                     });
-                    configMaplayer = _.findWhere(this.overlayConfigs(), {"maplayerid": maplayer.maplayerid})
+                    configMaplayer = _.findWhere(this.overlayConfigs(), {
+                        "maplayerid": maplayer.maplayerid
+                    })
                     if (configMaplayer !== undefined) {
-                      maplayer.checkedOutOfLibrary(configMaplayer !== undefined)
-                      maplayer.opacity(configMaplayer.opacity)
+                        maplayer.checkedOutOfLibrary(configMaplayer !== undefined)
+                        maplayer.opacity(configMaplayer.opacity)
                     }
                     maplayer.opacity.subscribe(function(value) {
                         self.overlayOpacity(value);
                         this.overlayConfigs().forEach(
-                          function(overlayConfig){
-                            if (maplayer.maplayerid === overlayConfig.maplayerid) {
-                              // self.overlayConfigs.valueWillMutate();
-                              overlayConfig.opacity = value
-                              // self.overlayConfigs.valueHasMutated();
-                            }
-                          }, self)
-                          maplayer.updateOpacity(value);
+                            function(overlayConfig) {
+                                if (maplayer.maplayerid === overlayConfig.maplayerid) {
+                                    // self.overlayConfigs.valueWillMutate();
+                                    overlayConfig.opacity = value
+                                        // self.overlayConfigs.valueHasMutated();
+                                }
+                            }, self)
+                        maplayer.updateOpacity(value);
                     }, self);
                     return maplayer
                 };
@@ -503,7 +505,7 @@ define([
                 this.setBasemap = function(basemapType) {
                     var lowestOverlay = this.anchorLayerId;
                     if (this.overlays().length > 0) {
-                      var lowestOverlay = _.first(_.last(this.overlays()).layer_definitions).id;
+                        var lowestOverlay = _.first(_.last(this.overlays()).layer_definitions).id;
                     };
                     this.basemaps.forEach(function(basemap) {
                         var self = this;
@@ -576,8 +578,8 @@ define([
                 }
 
                 this.map.on('moveend', this.updateConfigs());
-                ['draw.create','draw.update','draw.delete'].forEach(function(event){
-                  self.map.on(event, self.saveGeometries())
+                ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
+                    self.map.on(event, self.saveGeometries())
                 });
                 this.map.on('click', this.updateDrawMode())
 
@@ -587,18 +589,18 @@ define([
                         this.removeMaplayer(overlays[i])
                     }
                     for (var i = overlays.length; i-- > 0;) {
-                      if (overlays[i].isResource !== true) {
-                        this.overlayConfigs().push({
-                            'maplayerid': overlays[i].maplayerid,
-                            'name': overlays[i].name,
-                            'opacity': overlays[i].opacity()
-                        });
-                      }
+                        if (overlays[i].isResource !== true) {
+                            this.overlayConfigs().push({
+                                'maplayerid': overlays[i].maplayerid,
+                                'name': overlays[i].name,
+                                'opacity': overlays[i].opacity()
+                            });
+                        }
                         this.addMaplayer(overlays[i])
                     }
                     this.geocoder.redrawLayer();
                 }, this)
-            } //end setup map
+            }; //end setup map
 
 
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
@@ -623,10 +625,10 @@ define([
                 "layers": []
             };
 
-           this.selectBasemap = function(val) {
-               self.basemap(val.name)
-               self.setBasemap(val);
-           }
+            this.selectBasemap = function(val) {
+                self.basemap(val.name)
+                self.setBasemap(val);
+            }
 
             this.mapStyle.layers = this.addInitialLayers();
         },
