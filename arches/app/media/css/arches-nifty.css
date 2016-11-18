@@ -4922,6 +4922,29 @@ a.map-widget-icon:hover {
 .dz-img {
     object-fit: contain;
 }
+.geocoder-results {
+    max-height: 410px;
+    overflow-y: auto;
+    border: 1px solid #e2e2e2;
+}
+.geocoder-result-item {
+    min-height: 40px;
+    border: 1px solid #e2e2e2;
+    padding: 10px;
+}
+.geocode-clear {
+     position: absolute;
+     right: 10px;
+     top: 10px;
+     cursor: pointer;
+}
+.focused-geocoder-result {
+    background-color: #dbf1f5;
+}
+.selected-geocoder-result {
+    font-weight:bold;
+    border: 1px solid black;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

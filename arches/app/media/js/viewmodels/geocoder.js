@@ -22,36 +22,83 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             }
         };
 
-        this.selected = ko.observableArray();
-
-        this.config = ko.computed(function() {
-            var geocodeQueryPayload =
-                function(term, page) {
-                    return {
-                        q: term,
-                        geocoder: self.provider()
-                    };
-                }
-
+        this.selection = ko.observable(null);
+        this.focusItem = ko.observable(null);
+        this.options = ko.observableArray();
+        this.options.subscribe(function () {
+            self.selection(null);
+        });
+        this.selection.subscribe(function (selection) {
+            self.focusItem(selection);
+        });
+        this.loading = ko.observable(false);
+        this.isFocused = ko.observable(false).extend({
+            throttle: 200
+        });
+        this.isFocused.subscribe(function () {
+            self.focusItem(null);
+        });
+        this.query = ko.observable();
+        this.queryData = ko.computed(function () {
             return {
-                ajax: {
-                    url: arches.urls.geocoder,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: geocodeQueryPayload,
-                    results: function(data, page) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 4,
-                multiple: false,
-                maximumSelectionSize: 1,
-                placeholder: self.placeholder()
+                q: self.query(),
+                geocoder: self.provider()
+            }
+        }).extend({
+            rateLimit: {
+                timeout: 500,
+                method: "notifyWhenChangesStop"
             }
         });
+        this.queryData.subscribe(function (data) {
+            self.options([]);
+            if (data.q.length > 3) {
+                self.loading(true);
+                $.ajax({
+                    type: 'GET',
+                    url: arches.urls.geocoder,
+                    data: data,
+                    success: function(res){
+                        self.options(res.results);
+                    },
+                    complete: function () {
+                        self.loading(false);
+                    }
+                });
+            }
+        });
+
+        this.handleKeys = function (vm, e) {
+            var down = 40;
+            var up = 38;
+            var enter = 13;
+            if (e.keyCode === down || e.keyCode === up) {
+                var options = self.options();
+                var focusIndex = options.indexOf(self.focusItem());
+                if (e.keyCode === down) {
+                    focusIndex += 1;
+                }
+                if (e.keyCode === up) {
+                    focusIndex -= 1;
+                    if (focusIndex < -1) {
+                        focusIndex = options.length-1;
+                    }
+                }
+                if (focusIndex >= 0 && focusIndex < options.length) {
+                    self.focusItem(options[focusIndex])
+                } else {
+                    self.focusItem(null)
+                }
+                return false;
+            }
+            if (e.keyCode === enter) {
+                var focusItem = self.focusItem();
+                if (focusItem) {
+                    self.selection(focusItem);
+                }
+            }
+            return true;
+        }
 
         /**
          * Reloads the geocode layer when a new geocode request is made
@@ -65,10 +112,10 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             }
         };
 
-        this.selected.subscribe(function(e) {
-            if (self.map) {
-                var coords = e.geometry.coordinates;
-                self.map.getSource('geocode-point').setData(e.geometry);
+        this.selection.subscribe(function(item) {
+            if (self.map && item) {
+                var coords = item.geometry.coordinates;
+                self.map.getSource('geocode-point').setData(item.geometry);
                 self.redrawLayer();
                 var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
                 self.map.flyTo({
