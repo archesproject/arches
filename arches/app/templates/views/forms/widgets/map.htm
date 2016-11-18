@@ -2,16 +2,21 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
-          style: mapStyle,
-          zoom: zoom,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-          centerX: centerX,
-          centerY: centerY,
-          pitch: pitch,
-          bearing: bearing
-       }, afterRender: function(){setupMap(map)} }">
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: {
+        mapOptions: {
+            style: mapStyle,
+            zoom: zoom,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            centerX: centerX,
+            centerY: centerY,
+            pitch: pitch,
+            bearing: bearing
+        },
+        afterRender: function(map){
+            setupMap(map);
+        }
+    }">
 
         <!--ko if: drawMode -->
         <div class="geometry-editing-notifications">
@@ -83,15 +88,11 @@
         </div>
 
         <!-- Geocode Panel -->
-        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
+        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}, with: geocoder">
             <input id="select2Input" data-bind="
-              select2v4Data: geocoder.selected, select2v4: geocodeSelectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
+              select2v4Data: selected, select2v4: config(), placeholder: placeholder" style="width: 100%"></input>
         </div>
-        <!-- Map Tools Panel-->
-        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
-            <input id="geocoderInput" data-bind="
-              geocodeData: selectedItems, geocoderProvider: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
-        </div> -->
+
         <div id="map-widget-container relative">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
@@ -247,9 +248,13 @@
         </div>
     </div>
 </div>
-{% endblock form %} {% block report %}
-<div>Map summary details possibly to go here...</div>
-{% endblock report %} {% block config_form %}
+{% endblock form %}
+
+{% block report %}
+<!-- Map summary details possibly to go here... -->
+{% endblock report %}
+
+{% block config_form %}
 <div class="control-label map-config-header">{% trans "Map Properties" %}</div>
 
 <div class="panel-group accordion" id="accordion">
@@ -358,7 +363,7 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoder.geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoderProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}
@@ -372,7 +377,7 @@
                 <div class="col-xs-12 pad-no crud-widget-container">
 
                     <div class="toggle-container">
-                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: geocoder.toggleGeocoder"><small></small></span>
+                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: function () { geocoderVisible(!geocoderVisible()) }"><small></small></span>
                         <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>
                     </div>
                 </div>
