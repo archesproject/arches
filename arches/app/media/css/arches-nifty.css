@@ -4931,6 +4931,7 @@ a.map-widget-icon:hover {
     min-height: 40px;
     border: 1px solid #e2e2e2;
     padding: 10px;
+    cursor: pointer;
 }
 .geocode-clear {
      position: absolute;

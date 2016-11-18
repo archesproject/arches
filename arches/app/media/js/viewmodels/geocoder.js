@@ -28,9 +28,6 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
         this.options.subscribe(function () {
             self.selection(null);
         });
-        this.selection.subscribe(function (selection) {
-            self.focusItem(selection);
-        });
         this.loading = ko.observable(false);
         this.isFocused = ko.observable(false).extend({
             throttle: 200
