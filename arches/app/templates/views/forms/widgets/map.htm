@@ -30,16 +30,16 @@
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'simple_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a" %}<span data-bind="text: selectedFeatureType"></span>.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a " %}<span data-bind="text: selectedFeatureType"></span>.
                         <!-- ko if: selectedFeatureType() !== 'point'-->
                         <span>{% trans "Click and drag to move." %}</span>
                         <!-- /ko -->
                         <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>{% trans "Click and drag to move, or click it again to edit verticies." %}</span>
+                        <span>{% trans "Or, click it again to edit verticies." %}</span>
                         <!-- /ko -->
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing" %}<span data-bind="text: selectedFeatureType"></span>{% trans "verticies. Click outside the feature to exit." %}
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
                 </div>
