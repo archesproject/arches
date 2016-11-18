@@ -126,6 +126,9 @@
                 <div class="geocoder-results panel" data-bind="foreach: options">
                     <div class="geocoder-result-item" data-bind="
                         click:$parent.selection,
+                        event: {
+                            'mouseover': $parent.focusItem
+                        },
                         css: {
                             'selected-geocoder-result': $data === $parent.selection(),
                             'focused-geocoder-result': $data === $parent.focusItem()
