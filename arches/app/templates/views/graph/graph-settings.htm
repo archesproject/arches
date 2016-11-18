@@ -260,8 +260,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                   <div class="relative">
                                                       <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                   </div>
-                                                  <div class="col-xs-12 colorpicker-component">
-                                                      <input placeholder="{% trans "Map Feature Color" %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.mapfeaturecolor, format:'rgba'}">
+                                                  <div class="colorpicker-component input-group">
+                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: graph.mapfeaturecolor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: graph.mapfeaturecolor}"></i></span>
                                                   </div>
                                                 </div>
                                             </div>
