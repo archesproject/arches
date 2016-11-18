@@ -5,8 +5,6 @@ class BasePageLocators(object):
     MANAGE_MENU = (By.ID, "menu-control")
     SAVE_EDITS_BUTTON = (By.XPATH, "//*[@id='content-container']/div/div[4]/div[3]/span/button[2]")
     ADD_NEW_RESOURCE_NAVBAR_BUTTON = (By.XPATH, "//*[@id='mainnav-menu']/li[3]/a")
-    SAVE_RESOURCE_EDITS_BUTTON = (By.XPATH, "//*[@id='content-container']/div[2]/div[4]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div[1]/button[2]")
-    JUMP_TO_REPORT_BUTTON = (By.ID, 'report-manager')
 
 class CardPageLocators(BasePageLocators):
     def __init__(self):
@@ -79,3 +77,6 @@ class ResourceManagerPageLocators(BasePageLocators):
 class ResourceEditorPageLocators(MapWidgetPageLocators):
     def __init__(self):
         super(BasePageLocators, self).__init__()
+    
+    JUMP_TO_REPORT_BUTTON = (By.ID, 'report-manager')
+    SAVE_RESOURCE_EDITS_BUTTON = (By.XPATH, "//div[contains(@class, 'install-buttons')]/button[contains(@class, 'btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus')]")

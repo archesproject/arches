@@ -3711,11 +3711,10 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .ep-form-alert {
 	position: absolute;
-	top: 100px;
-    z-index:1000;
+	top: 0px;
+    z-index:4000;
 	width: 100%;
-	height: 0px;
-    display: none;
+	height: 90px;
 	padding: 10px 25px;
 	color: #fff;
 	transition: all .40s ease;
@@ -3962,61 +3961,7 @@ div.row.widget-wrapper {
 .no-instructions-shim {
 	margin-top: -40px;
 }
-.ep-form-alert {
-	position: absolute;
-	width: 100%;
-	height: 90px;
-	padding: 10px 25px;
-	color: #fff;
-	transition: all .40s ease;
-}
-.ep-alert-red {
-	background: #f87359;
-	border: 1px solid #B72F16;
-	border-right-width: 0px;
-	border-left-width: 0px;
-}
-.ep-alert-blue {
-	background: #57c1df;
-	border: 1px solid #1495B9;
-	border-right-width: 0px;
-	border-left-width: 0px;
-}
-.ep-alert-mint {
-	background: #53d1ad;
-	border: 1px solid #13A77E;
-	border-right-width: 0px;
-	border-left-width: 0px;
-}
-.ep-form-alert-shim {
-	margin-top: 90px;
-	transition: all .40s ease;
-}
-.ep-form-alert-title {
-	font-size: 15px;
-	font-weight: 600;
-	margin-top: 0px;
-	margin-bottom: 3px;
-}
-.ep-form-alert-text {
-	font-size: 12px;
-	font-weight: 400;
-}
-.ep-form-alert-default-dismiss {
-	position: absolute;
-	top: 10px;
-	right: 25px;
-	font-size: 16px;
-}
-.ep-form-alert-default-dismiss:hover {
-	cursor: pointer;
-	color: #f9f9f9;
-}
-.ep-form-alert-buttons {
-	position: absolute;
-	bottom: 10px;
-	right: 25px;
-}
+
 .card-drag-panel {
 	position: absolute;
 	top: 10px;
