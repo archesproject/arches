@@ -12,7 +12,6 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
          *      - add concept of focused row
          *      - add styles for selected + focused rows
          *      - add listener to up/down arrow keys to focus rows, enter to select
-         *      - add "x" button to clear options and selection
          */
         var self = this;
         this.provider = params.provider || ko.observable('MapzenGeocoder');
@@ -32,6 +31,7 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
         this.selection = ko.observable();
         this.options = ko.observableArray();
         this.loading = ko.observable(false);
+        this.focused = ko.observable(false).extend({ throttle: 200 });
         this.query = ko.observable();
         this.query.extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
         this.query.subscribe(function (query) {

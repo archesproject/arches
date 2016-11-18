@@ -4932,7 +4932,12 @@ a.map-widget-icon:hover {
     border: 1px solid #e2e2e2;
     padding: 10px;
 }
-
+.geocode-clear {
+     position: absolute;
+     right: 10px;
+     top: 10px;
+     cursor: pointer;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
