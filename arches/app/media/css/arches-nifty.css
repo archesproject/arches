@@ -4451,6 +4451,10 @@ div.row.widget-wrapper.report-header:hover {
     color: #666;
 }
 
+.resource-color-swatch {
+    font-size: 21px;
+}
+
 .geocode-container-shim {
     margin-right: 210px;
 }
