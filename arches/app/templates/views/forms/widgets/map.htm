@@ -2,7 +2,7 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container expanded-map relative" data-bind="mapboxgl: { mapOptions: {
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
           zoom: zoom,
           minZoom: minZoom,
@@ -21,25 +21,25 @@
                    </button>
                     <div class="media">
                         <!-- ko if: drawMode() === 'draw_point'  -->
-                        <strong>Edit Mode</strong> You are creating points. Click the Point tool to exit.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_polygon'-->
-                        <strong>Edit Mode</strong> You are creating polygons. Click the Polygon tool to exit.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating polygons. Click the Polygon tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_line_string'-->
-                        <strong>Edit Mode</strong> You are creating lines. Click the Line tool to exit.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'simple_select'-->
-                        <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a " %}<span data-bind="text: selectedFeatureType"></span>.
                         <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>Click and drag to move.</span>
+                        <span>{% trans "Click and drag to move." %}</span>
                         <!-- /ko -->
                         <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>Click and drag to move, or click it again to edit verticies.</span>
+                        <span>{% trans "Or, click it again to edit verticies." %}</span>
                         <!-- /ko -->
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
-                        <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
                 </div>
@@ -121,7 +121,7 @@
 
             <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControls.mapControlPanels.basemaps}">
                 <div class="map-widget-panel-title">
-                    <h4 class=""> Basemaps </h4>
+                    <h4 class="">{% trans "Basemaps" %}</h4>
                 </div>
 
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
@@ -141,7 +141,7 @@
 
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
             <div class="map-widget-panel-title">
-                <h4 class=""> Overlays
+                <h4 class="">{% trans "Overlays" %}
                   <i class="ion-ios-plus pull-right add-tooltip"
                     data-placement="left"
                     data-toggle="tooltip"
@@ -198,7 +198,7 @@
 
         <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
-                <h4 class=""> Map Tools </h4>
+                <h4 class="">{% trans "Map Tools" %}</h4>
             </div>
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
@@ -218,7 +218,7 @@
                     <i class='ion-trash-a'></i>
                 </div>
                 <div class="map-overlay-name">
-                    <a id="" class="" href=""><span>Delete<span></a>
+                    <a id="" class="" href=""><span>{% trans "Delete" %}<span></a>
                 </div>
             </div>
 
@@ -226,7 +226,7 @@
 
         <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.legend}">
             <div class="map-widget-panel-title">
-                <h4 class=""> Legend </h4>
+                <h4 class="">{% trans "Legend" %}</h4>
             </div>
             <div data-bind="sortable: overlays">
                 <div class="map-widget-overlay-item relative">
@@ -242,7 +242,7 @@
     </div>
 
     <div class="overlay-container" style="display: none;">
-        <h3 class="panel-title card-main-title"> Overlays <i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
+        <h3 class="panel-title card-main-title">{% trans  "Overlays" %}<i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
         <div id="report-image-grid" class="report-image-grid">
         </div>
     </div>
@@ -250,7 +250,7 @@
 {% endblock form %} {% block report %}
 <div>Map summary details possibly to go here...</div>
 {% endblock report %} {% block config_form %}
-<div class="control-label map-config-header">Map Properties</div>
+<div class="control-label map-config-header">{% trans "Map Properties" %}</div>
 
 <div class="panel-group accordion" id="accordion">
 
@@ -258,7 +258,7 @@
     <div class="panel">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-controls" aria-expanded="false" class="collapsed">Map Controls</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-controls" aria-expanded="false" class="collapsed">{% trans "Map Controls" %}</a>
             </h4>
         </div>
         <div class="panel-collapse collapse" id="map-config-controls" aria-expanded="false" style="height: 0px;">
@@ -270,7 +270,7 @@
 
                       <div class="toggle-container">
                           <span class="switch switch-small" data-bind="css: {'on': mapControlsHidden}, click: mapControls.toggleMapControlsVisibility"><small></small></span>
-                          <p class="arches-toggle-sm">Toggle on hide the map controls</p>
+                          <p class="arches-toggle-sm">{% trans "Toggle on hide the map controls" %}</p>
                       </div>
                   </div>
                 </div>
@@ -281,7 +281,7 @@
     <div class="panel">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">Position</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">{% trans "Position" %}</a>
             </h4>
         </div>
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
@@ -373,7 +373,7 @@
 
                     <div class="toggle-container">
                         <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: geocoder.toggleGeocoder"><small></small></span>
-                        <p class="arches-toggle-sm">Toggle on to show a geocoder on the map</p>
+                        <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>
                     </div>
                 </div>
             </div>
@@ -383,7 +383,7 @@
     <div class="panel">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">Resource Properties</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">{% trans "Resource Properties" %}</a>
             </h4>
         </div>
 
