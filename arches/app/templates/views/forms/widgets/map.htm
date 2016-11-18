@@ -2,16 +2,21 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
-          style: mapStyle,
-          zoom: zoom,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-          centerX: centerX,
-          centerY: centerY,
-          pitch: pitch,
-          bearing: bearing
-       }, afterRender: function(){setupMap(map)} }">
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: {
+        mapOptions: {
+            style: mapStyle,
+            zoom: zoom,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            centerX: centerX,
+            centerY: centerY,
+            pitch: pitch,
+            bearing: bearing
+        },
+        afterRender: function(map){
+            setupMap(map);
+        }
+    }">
 
         <!--ko if: drawMode -->
         <div class="geometry-editing-notifications">
@@ -247,9 +252,13 @@
         </div>
     </div>
 </div>
-{% endblock form %} {% block report %}
-<div>Map summary details possibly to go here...</div>
-{% endblock report %} {% block config_form %}
+{% endblock form %}
+
+{% block report %}
+<!-- Map summary details possibly to go here... -->
+{% endblock report %}
+
+{% block config_form %}
 <div class="control-label map-config-header">{% trans "Map Properties" %}</div>
 
 <div class="panel-group accordion" id="accordion">
