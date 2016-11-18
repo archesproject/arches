@@ -91,11 +91,20 @@ define([
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.geocoder = new GeocoderViewModel({
-                geocodeProvider: this.geocodeProvider,
-                geocodePlaceholder: this.geocodePlaceholder,
-                geocoderVisible: this.geocoderVisible,
+                provider: this.geocodeProvider,
+                placeholder: this.geocodePlaceholder,
                 anchorLayerId: this.anchorLayerId
             });
+
+
+            // TODO: This should be a system config rather than hard-coded here
+            this.geocoderProviders = ko.observableArray([{
+                'id': 'BingGeocoder',
+                'name': 'Bing'
+            }, {
+                'id': 'MapzenGeocoder',
+                'name': 'Mapzen'
+            }]);
 
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
@@ -591,9 +600,6 @@ define([
                 }, this)
             } //end setup map
 
-            this.onGeocodeSelection = function(val, e) {
-                this.geocodeProvider(e.currentTarget.value)
-            }
 
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {

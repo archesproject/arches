@@ -88,9 +88,9 @@
         </div>
 
         <!-- Geocode Panel -->
-        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
+        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}, with: geocoder">
             <input id="select2Input" data-bind="
-              select2v4Data: geocoder.selected, select2v4: geocoder.geocoderConfig(), placeholder: geocodePlaceholder" style="width: 100%"></input>
+              select2v4Data: selected, select2v4: config(), placeholder: placeholder" style="width: 100%"></input>
         </div>
         <!-- Map Tools Panel-->
         <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}">
@@ -367,7 +367,7 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoder.geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoderProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}
@@ -381,7 +381,7 @@
                 <div class="col-xs-12 pad-no crud-widget-container">
 
                     <div class="toggle-container">
-                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: geocoder.toggleGeocoder"><small></small></span>
+                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: function () { geocoderVisible(!geocoderVisible()) }"><small></small></span>
                         <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>
                     </div>
                 </div>
