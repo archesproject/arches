@@ -88,12 +88,14 @@ define([
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             })
+            this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.geocoder = new GeocoderViewModel({
                 geocodeProvider: this.geocodeProvider,
                 geocodePlaceholder: this.geocodePlaceholder,
-                geocoderVisible: this.geocoderVisible
-              });
+                geocoderVisible: this.geocoderVisible,
+                anchorLayerId: this.anchorLayerId
+            });
 
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
@@ -128,7 +130,6 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
             this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
 
             /**
@@ -244,7 +245,6 @@ define([
              * @return {null}
              */
             this.setupMap = function(map) {
-                var self = this;
                 var draw = Draw({
                     controls: {
                         trash: false //if true, the backspace key is inactivated in the geocoder input
@@ -257,6 +257,7 @@ define([
                 });
 
                 this.map = map;
+                this.geocoder.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -350,9 +351,6 @@ define([
                 this.resourceLineWidth.subscribe(function(e) {
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
-
-                this.geocoder.selected.subscribe(this.geocoder.goToSelected, this);
-                this.geocodeSelectSetup = this.geocoder.setupGeocoder(self);
 
                 /**
                 * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
@@ -589,7 +587,7 @@ define([
                       }
                         this.addMaplayer(overlays[i])
                     }
-                    this.geocoder.redrawLayer(this.map, this.anchorLayerId);
+                    this.geocoder.redrawLayer();
                 }, this)
             } //end setup map
 

@@ -11,6 +11,8 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
         this.geocodeProvider = params.geocodeProvider || ko.observable('MapzenGeocoder');
         this.geocodePlaceholder = params.geocodePlaceholder || ko.observable('Search');
         this.geocoderVisible = params.geocoderVisible || ko.observable(true);
+        this.anchorLayerId = params.anchorLayerId;
+        this.map = params.map;
         this.pointstyle = {
             "id": "geocode-point",
             "source": "geocode-point",
@@ -23,7 +25,7 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
 
         this.selected = ko.observableArray()
 
-        this.setupGeocoder = function() {
+        this.geocoderConfig = ko.computed(function() {
             var geocodeQueryPayload =
                 function(term, page) {
                     return {
@@ -50,7 +52,8 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
                 maximumSelectionSize: 1,
                 placeholder: self.geocodePlaceholder()
             }
-        };
+        });
+
 
         this.geocoderOptions = ko.observableArray([{ //This should be a system config rather than hard-coded here
             'id': 'BingGeocoder',
@@ -64,21 +67,25 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
          * Reloads the geocode layer when a new geocode request is made
          * @return {null}
          */
-        this.redrawLayer = function(map, anchorLayerId) {
-            var cacheLayer = map.getLayer('geocode-point');
-            map.removeLayer('geocode-point');
-            map.addLayer(cacheLayer, anchorLayerId);
+        this.redrawLayer = function() {
+            if (self.map) {
+                var cacheLayer = self.map.getLayer('geocode-point');
+                self.map.removeLayer('geocode-point');
+                self.map.addLayer(cacheLayer, self.anchorLayerId);
+            }
         }
 
-        this.goToSelected = function(e) {
-            var coords = e.geometry.coordinates;
-            this.map.getSource('geocode-point').setData(e.geometry);
-            self.redrawLayer(this.map, this.anchorLayerId);
-            var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-            this.map.flyTo({
-                center: centerPoint
-            });
-        }
+        this.selected.subscribe(function(e) {
+            if (self.map) {
+                var coords = e.geometry.coordinates;
+                self.map.getSource('geocode-point').setData(e.geometry);
+                self.redrawLayer();
+                var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                self.map.flyTo({
+                    center: centerPoint
+                });
+            }
+        });
 
         /**
          * toggles the visibility of the geocoder input in the map widget
@@ -92,6 +99,9 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             }
         }
 
+        this.setMap = function (map) {
+            self.map = map;
+        };
     };
     return GeocoderViewModel;
 });
