@@ -76,8 +76,8 @@ class MapzenGeocoder(Geocoder):
 
         for feature in response['features']:
             results.append({
-                'id': feature['properties']['name'],
-                'text': feature['properties']['name'],
+                'id': feature['properties']['id'],
+                'text': feature['properties']['label'],
                 'geometry': {
                     "type": "Point",
                     "coordinates": [

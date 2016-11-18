@@ -89,8 +89,23 @@
 
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapControls.mapControlsExpanded, 'hide-geocoder': geocoderVisible}, with: geocoder">
-            <input id="select2Input" data-bind="
-              select2v4Data: selected, select2v4: config(), placeholder: placeholder" style="width: 100%"></input>
+            <input type="text" class="form-control input-md widget-input" data-bind="attr: {placeholder: placeholder}, value: query, valueUpdate: 'keyup'">
+            <!-- ko if: loading -->
+            <div class="geocoder-results panel">
+                <div class="geocoder-result-item">
+                    <i class="fa fa-spinner fa-spin"></i> {% trans "searching...." %}
+                </div>
+            </div>
+            <!--/ko-->
+            <!-- ko if: options().length > 0 -->
+            <div class="geocoder-results panel" data-bind="foreach: options">
+                <div class="geocoder-result-item" data-bind="click:$parent.selection">
+                    <span data-bind="text: text"></span>
+                </div>
+            </div>
+            <!--/ko-->
+            <!-- <input id="select2Input" data-bind="
+              select2v4Data: selected, select2v4: config(), placeholder: placeholder" style="width: 100%"></input> -->
         </div>
 
         <div id="map-widget-container relative">

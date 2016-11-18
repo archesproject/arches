@@ -7,6 +7,13 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
      *
      */
     var GeocoderViewModel = function(params) {
+        /**
+         * TODO:
+         *      - add concept of focused row
+         *      - add styles for selected + focused rows
+         *      - add listener to up/down arrow keys to focus rows, enter to select
+         *      - add "x" button to clear options and selection
+         */
         var self = this;
         this.provider = params.provider || ko.observable('MapzenGeocoder');
         this.placeholder = params.placeholder || ko.observable('Search');
@@ -22,34 +29,29 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             }
         };
 
-        this.selected = ko.observableArray();
-
-        this.config = ko.computed(function() {
-            var geocodeQueryPayload =
-                function(term, page) {
-                    return {
-                        q: term,
-                        geocoder: self.provider()
-                    };
-                }
-
-            return {
-                ajax: {
+        this.selection = ko.observable();
+        this.options = ko.observableArray();
+        this.loading = ko.observable(false);
+        this.query = ko.observable();
+        this.query.extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
+        this.query.subscribe(function (query) {
+            self.options([]);
+            if (query.length > 3) {
+                self.loading(true);
+                $.ajax({
+                    type: 'GET',
                     url: arches.urls.geocoder,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: geocodeQueryPayload,
-                    results: function(data, page) {
-                        return {
-                            results: data.results
-                        };
+                    data: {
+                        q: query,
+                        geocoder: self.provider()
                     },
-                    cache: true
-                },
-                minimumInputLength: 4,
-                multiple: false,
-                maximumSelectionSize: 1,
-                placeholder: self.placeholder()
+                    success: function(res){
+                        self.options(res.results);
+                    },
+                    complete: function () {
+                        self.loading(false);
+                    }
+                });
             }
         });
 
@@ -65,10 +67,10 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             }
         };
 
-        this.selected.subscribe(function(e) {
+        this.selection.subscribe(function(item) {
             if (self.map) {
-                var coords = e.geometry.coordinates;
-                self.map.getSource('geocode-point').setData(e.geometry);
+                var coords = item.geometry.coordinates;
+                self.map.getSource('geocode-point').setData(item.geometry);
                 self.redrawLayer();
                 var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
                 self.map.flyTo({

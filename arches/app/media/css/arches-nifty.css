@@ -4922,6 +4922,17 @@ a.map-widget-icon:hover {
 .dz-img {
     object-fit: contain;
 }
+.geocoder-results {
+    max-height: 410px;
+    overflow-y: auto;
+    border: 1px solid #e2e2e2;
+}
+.geocoder-result-item {
+    min-height: 40px;
+    border: 1px solid #e2e2e2;
+    padding: 10px;
+}
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
