@@ -12,19 +12,11 @@ class ResourceEditorPage(MapWidgetPage):
     """
 
     def __init__(self, driver, live_server_url, target_page, page_id):
-        super(MapWidgetPage, self).__init__(target_page, page_id)
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.resource_id = page_id
-        self.base_url = '{0}/{1}'.format(target_page, self.resource_id)
-        self.wait = WebDriverWait(self.driver, 20)
+        super(ResourceEditorPage, self).__init__(driver, live_server_url, target_page, page_id)
+        self.driver.set_window_size(1400,900)
 
     def create_map_data(self):
-        self.driver.get(self.live_server_url + '/' + self.base_url)
-        self.wait.until(
-            EC.invisibility_of_element_located(locators.LOADING_MASK)
-        )
-        self.driver.set_window_size(1400,900)
+        self.open()
         self.open_tools()
         self.open_draw_tools()
         for element in (locators.MAP_DRAW_TOOLS, locators.POINT_DRAW_TOOL):
@@ -49,3 +41,12 @@ class ResourceEditorPage(MapWidgetPage):
         ).click()
         
         return result
+
+    def select_form_by_index(self, index):
+        return locators.FORM_LIST_ITEMS[index]
+
+    def select_form_by_name(self, name):
+        for locator in locators.FORM_LIST_ITEMS:
+            if locator + "/div[contains(@class, 'crud-card-main')]/a[contains(@class, 'listitem_name')]" == name:
+                print 'found'
+                return locator

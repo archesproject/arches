@@ -31,6 +31,7 @@ class GraphPageLocators(BasePageLocators):
     STATUS_TAB = (By.XPATH, "//*[@id='xx-meta-tab']")
     ACTIVE_STATUS_BUTTON = (By.XPATH, "//*[@id='meta-card']/div/div/div[2]/div[1]/div/div[2]/div/label[1]")
     SAVE_EDITS_BUTTON = (By.XPATH, "//*[@id='content-container']/div/div[4]/div[3]/button[2]")
+    IMPORT_GRAPH_BUTTON = (By.XPATH, "//a[contains(@class, 'arches-tool-item file-upload')]")
 
 class MapWidgetPageLocators(BasePageLocators):
     def __init__(self):
@@ -79,4 +80,5 @@ class ResourceEditorPageLocators(MapWidgetPageLocators):
         super(BasePageLocators, self).__init__()
     
     JUMP_TO_REPORT_BUTTON = (By.ID, 'report-manager')
-    SAVE_RESOURCE_EDITS_BUTTON = (By.XPATH, "//div[contains(@class, 'install-buttons')]/button[contains(@class, 'btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus')]")
+    SAVE_RESOURCE_EDITS_BUTTON = (By.XPATH, "//div[contains(@class, 'install-buttons')]/button[contains(@class, 'btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus')][1]")
+    FORM_LIST_ITEMS = (By.XPATH, "//div[contains(@class, 'library-card')]")

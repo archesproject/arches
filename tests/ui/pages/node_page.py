@@ -12,10 +12,7 @@ class NodePage(BasePage):
     """
 
     def __init__(self, driver, live_server_url, graph_id):
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.graph_id = graph_id
-        self.base_url = 'graph/' + self.graph_id
+        super(NodePage, self).__init__(driver, live_server_url, '/graph/' + graph_id)
 
     def add_new_node(self, appending_graph_id, datatype, is_resource=False, node_id=None):
         """
@@ -26,13 +23,8 @@ class NodePage(BasePage):
         is not yet fully implemented.
 
         """
-        self.driver.get(self.live_server_url + '/' + self.base_url)
-        self.driver.implicitly_wait(10)
-        wait = WebDriverWait(self.driver, 20)
-        wait.until(
-            EC.invisibility_of_element_located(locators.LOADING_MASK)
-        )
 
+        self.open()
         self.driver.find_element(*locators.NEW_NODE_BUTTON).click()
         appending_branch_button = (By.XPATH, "//*[@data-arches-graphid='" + appending_graph_id + "']")
 
@@ -45,7 +37,7 @@ class NodePage(BasePage):
             click_steps.append(locators.SELECTED_NODE_IN_LEFT_CONTAINER)
 
         for locator in click_steps:
-            wait.until(
+            self.wait.until(
                 EC.element_to_be_clickable(locator)
             ).click()
 
