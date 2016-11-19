@@ -64,7 +64,7 @@ class conceptImportTests(ArchesTestCase):
 
 	def test_authority_file_import(self):
 		og_concept_count = len(django_concept_model.objects.all())
-		path_to_files = os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'authority_files')
+		path_to_files = os.path.join(test_settings.TEST_ROOT, 'fixtures', 'authority_files')
 		authority_files.load_authority_files(path_to_files, break_on_error=True)
 		new_concept_count = len(django_concept_model.objects.all())
 		self.assertEqual(new_concept_count - og_concept_count, 43)

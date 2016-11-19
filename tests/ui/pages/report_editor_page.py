@@ -12,12 +12,7 @@ class ReportEditorPage(MapWidgetPage):
     """
 
     def __init__(self, driver, live_server_url, target_page, page_id):
-        super(MapWidgetPage, self).__init__(target_page, page_id)
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.page_id = page_id
-        self.base_url = '/' + target_page + '/' + self.page_id
-        self.wait = WebDriverWait(self.driver, 20)
+        super(ReportEditorPage, self).__init__(driver, live_server_url, target_page, page_id)
         self.driver.set_window_size(1400, 900)
 
     def save_report(self, report_name):

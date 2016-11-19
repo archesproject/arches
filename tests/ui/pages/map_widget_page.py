@@ -12,11 +12,7 @@ class MapWidgetPage(BasePage):
     """
 
     def __init__(self, driver, live_server_url, target_page, page_id):
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.page_id = page_id
-        self.base_url = '/' + target_page + '/' + self.page_id
-        self.wait = WebDriverWait(self.driver, 20)
+        super(MapWidgetPage, self).__init__(driver, live_server_url, '/' + target_page + '/' + page_id)
 
     def navigate_to_page(self):
         self.driver.get(self.live_server_url + self.base_url)

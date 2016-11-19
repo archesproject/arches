@@ -13,22 +13,15 @@ class FormPage(BasePage):
     """
 
     def __init__(self, driver, live_server_url, graph_id):
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.graph_id = graph_id
-        self.base_url = '/graph/' + self.graph_id + '/form_manager'
-        self.wait = WebDriverWait(self.driver, 20)
+        super(FormPage, self).__init__(driver, live_server_url, '/graph/' + graph_id + '/form_manager')
 
     def add_new_form(self):
         """
         Clicks on the add new form button and returns a new form_id
 
         """
-        self.wait.until(
-            EC.invisibility_of_element_located(locators.LOADING_MASK)
-        )
-        self.driver.get(self.live_server_url + self.base_url)
-        self.driver.implicitly_wait(10)
+
+        self.open()
         form_id = None
         self.wait.until(
             EC.element_to_be_clickable(locators.ADD_FORM_BUTTON)

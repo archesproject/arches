@@ -6,10 +6,11 @@ class LoginPage(BasePage):
 
     """
 
-    base_url = '/auth'
+    def __init__(self, driver, live_server_url):
+        super(LoginPage, self).__init__(driver, live_server_url, '/auth')
 
     def login(self, username, password):
-        self.driver.get(self.live_server_url + self.base_url)
+        self.open()
         self.driver.find_element_by_name("username").clear()
         self.driver.find_element_by_name("username").send_keys(username)
         self.driver.find_element_by_name("password").clear()
