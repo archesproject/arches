@@ -24,14 +24,14 @@ import inspect
 PACKAGE_NAME = 'arches'
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, '..', 'arches'))
-PACKAGE_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
+TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 
 
-RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'resource_graphs'),)
+RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'resource_graphs'),)
 
-CONCEPT_SCHEME_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'authority_files'),)
+CONCEPT_SCHEME_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'authority_files'),)
 
-ONTOLOGY_FIXTURES = os.path.join(PACKAGE_ROOT, 'fixtures', 'ontologies')
+ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, 'fixtures', 'ontologies')
 
 BUSISNESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
