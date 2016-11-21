@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.db import transaction
 

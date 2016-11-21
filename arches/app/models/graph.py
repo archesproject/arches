@@ -66,7 +66,10 @@ class Graph(models.GraphModel):
                         setattr(self, key, value)
 
                 for node in args[0]["nodes"]:
-                    self.add_node(node)
+                    nodegroups = {}
+                    for nodegroup in args[0]["nodegroups"]:
+                        nodegroups[nodegroup["nodegroupid"]] = nodegroup
+                    self.add_node(node, nodegroups)
 
                 for edge in args[0]["edges"]:
                     self.add_edge(edge)
@@ -140,7 +143,7 @@ class Graph(models.GraphModel):
 
         return Graph.objects.get(pk=graph.graphid)
 
-    def add_node(self, node):
+    def add_node(self, node, nodegroups=None):
         """
         Adds a node to this graph
 
@@ -166,6 +169,10 @@ class Graph(models.GraphModel):
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
+                if nodegroups is not None:
+                    node.nodegroup.cardinality = nodegroups[str(node.nodegroup_id)]["cardinality"]
+                    node.nodegroup.legacygroupid = nodegroups[str(node.nodegroup_id)]["legacygroupid"]
+                    node.nodegroup.parentnodegroupid = nodegroups[str(node.nodegroup_id)]["parentnodegroup_id"]
             else:
                 node.nodegroup = None
 

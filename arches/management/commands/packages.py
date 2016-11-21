@@ -362,7 +362,12 @@ class Command(BaseCommand):
                     for file_path in file_paths:
                         ArchesFileImporter(os.path.join(path, file_path)).import_all()
         else:
-            ArchesFileImporter(data_source).import_all()
+            if os.path.isfile(os.path.join(data_source)):
+                ArchesFileImporter(data_source).import_all()
+            else:
+                file_paths = [filename for filename in os.listdir(data_source) if filename.endswith('.json')]
+                for file_path in file_paths:
+                    ArchesFileImporter(os.path.join(data_source, file_path)).import_all()
 
 
     def start_livereload(self):
