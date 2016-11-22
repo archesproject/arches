@@ -68,6 +68,7 @@ class Graph(models.GraphModel):
                 for node in args[0]["nodes"]:
                     nodegroups = {}
                     for nodegroup in args[0]["nodegroups"]:
+                        nodegroup = JSONSerializer().serializeToPython(nodegroup)
                         nodegroups[nodegroup["nodegroupid"]] = nodegroup
                     self.add_node(node, nodegroups)
 
@@ -169,7 +170,7 @@ class Graph(models.GraphModel):
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
-                if nodegroups is not None:
+                if nodegroups is not None and node.nodegroup_id in nodegroups:
                     node.nodegroup.cardinality = nodegroups[str(node.nodegroup_id)]["cardinality"]
                     node.nodegroup.legacygroupid = nodegroups[str(node.nodegroup_id)]["legacygroupid"]
                     node.nodegroup.parentnodegroupid = nodegroups[str(node.nodegroup_id)]["parentnodegroup_id"]
