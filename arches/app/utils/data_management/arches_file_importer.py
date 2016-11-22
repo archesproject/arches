@@ -51,7 +51,7 @@ class ArchesFileImporter(object):
 						if 'business_data' in archesfile.keys():
 							self.business_data = archesfile['business_data']
 				else:
-					print file + ' is not a valid file'
+					print str(file) + ' is not a valid file'
 			else:
 				print path + ' is not a valid path'
 
