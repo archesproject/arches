@@ -82,12 +82,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- card Name -->
                     <div class="panel-heading">
                         <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: iconclass"></i> <span data-bind="text:name" ></span></h3>
-                        <!-- <h6 class="panel-title library-card-panel-title fa fa-plus"></h6> -->
                     </div>
-                  <!-- </br> -->
                     <!-- Abstract -->
                     <div class="panel-body library-card-body">
-                        <p data-bind="text: description"></p>
+                      <p>
+                        <!-- ko if: !forms -->
+                          <span class="fa fa-warning" style="padding-top: 19px; color: #b20000" data-bind="text: ' Add forms to this resource model to create a resource from it.'"></span>
+                        <!-- /ko -->
+                      </p>
+                      <p data-bind="text: description"></p>
                     </div>
 
                     <!-- card Tools -->
