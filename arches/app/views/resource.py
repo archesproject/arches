@@ -28,7 +28,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 
 
@@ -50,6 +50,11 @@ class ResourceListView(BaseManagerView):
             main_script='views/resource',
             instance_summaries=instance_summaries
         )
+        new_graphs = []
+        for graph in JSONDeserializer().deserialize(context['graphs']):
+            graph['forms'] = True if models.Form.objects.filter(graph_id=graph['graphid']).count() > 0 else False
+            new_graphs.append(graph)
+        context['graphs'] = JSONSerializer().serialize(new_graphs)
         return render(request, 'views/resource.htm', context)
 
 
