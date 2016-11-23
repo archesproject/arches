@@ -2722,7 +2722,7 @@
           "widget_id": "10000000-0000-0000-0000-000000000001",
           "node_id": "4ba3340c-a5fc-11e6-a7b7-6c4008b05c4c",
           "sortorder": 0,
-          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":128,\"label\":\"Parcel\"}",
+          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":10,\"inputMask\":\"000-000000\",\"label\":\"Parcel\"}",
           "id": "5de02af0-a609-11e6-8c6f-80e6500ee4e4"
         }
       ],
