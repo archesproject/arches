@@ -1,33 +1,18 @@
-from map_widget_page import MapWidgetPage
+from base_widget_page import BaseWidgetPage
 from page_locators import ResourceEditorPageLocators as locators
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-class ResourceEditorPage(MapWidgetPage):
+class ResourceEditorPage(BaseWidgetPage):
     """
     class to initialize the report-editor page
 
     """
 
-    def __init__(self, driver, live_server_url, target_page, page_id):
-        super(ResourceEditorPage, self).__init__(driver, live_server_url, target_page, page_id)
+    def __init__(self, driver, live_server_url, resource_instance_id):
+        super(ResourceEditorPage, self).__init__(driver, live_server_url, '/resource/' + resource_instance_id)
         self.driver.set_window_size(1400,900)
 
-    def create_map_data(self):
-        self.open()
-        self.open_tools()
-        self.open_draw_tools()
-        for element in (locators.MAP_DRAW_TOOLS, locators.POINT_DRAW_TOOL):
-            self.wait.until(
-                EC.element_to_be_clickable(element)
-            ).click()
-
-        ac = ActionChains(self.driver)
-        map = self.driver.find_element(*locators.MAP_CANVAS)
-        ac.click(map).perform()
-
+    def save_edits(self):
         result = []
         for locator in (locators.SAVE_RESOURCE_EDITS_BUTTON, locators.MANAGE_MENU):
             el = self.driver.find_element(*locator)

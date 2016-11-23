@@ -2,22 +2,23 @@
 # https://github.com/Victory/django-travis-saucelabs/blob/master/mysite/saucetests/tests.py
 import os
 import sys
+import uuid
 
 from tests import test_settings
 from selenium import webdriver
 from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from tests.ui.page_elements.map_widget import MapWidget
 from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.graph_page import GraphPage
 from tests.ui.pages.node_page import NodePage
 from tests.ui.pages.card_page import CardPage
-from tests.ui.pages.map_widget_page import MapWidgetPage
 from tests.ui.pages.form_page import FormPage
+from tests.ui.pages.card_designer_page import CardDesignerPage
 from tests.ui.pages.report_manager_page import ReportManagerPage
 from tests.ui.pages.report_editor_page import ReportEditorPage
 from tests.ui.pages.resource_manager_page import ResourceManagerPage
 from tests.ui.pages.resource_editor_page import ResourceEditorPage
-import uuid
 
 if test_settings.RUN_LOCAL:
     browsers = test_settings.LOCAL_BROWSERS
@@ -158,12 +159,14 @@ class UITest(StaticLiveServerTestCase):
         card_page = CardPage(self.driver, self.live_server_url, graph_id)
         card_id = card_page.select_card(node_ids)
 
-        map_widget_page = MapWidgetPage(self.driver, self.live_server_url, 'card', card_id)
+        card_designer_page = CardDesignerPage(self.driver, self.live_server_url, card_id)
+        map_widget = card_designer_page.add_widget(MapWidget)
+
         results = {}
-        map_widget_page.navigate_to_page()
-        results['opened maptools'] = map_widget_page.open_tools()
-        results['added basemap'] = map_widget_page.add_basemap()
-        results['added overlay'] = map_widget_page.add_overlay(1)
+        card_designer_page.open()
+        results['opened maptools'] = map_widget.open_tools()
+        results['added basemap'] = map_widget.add_basemap()
+        results['added overlay'] = map_widget.add_overlay(1)
         map_tools_working = True
         for k, v in results.iteritems():
             if v != True:
@@ -227,13 +230,14 @@ class UITest(StaticLiveServerTestCase):
             report_id_is_valid = False
 
         #Navigate to the report editor page click around to verify things are working, activate and save the report
-        report_editor_page = ReportEditorPage(self.driver, self.live_server_url, 'report_editor', report_id)
+        report_editor_page = ReportEditorPage(self.driver, self.live_server_url, report_id)
+        report_editor_page.open()
 
         results = {}
-        report_editor_page.navigate_to_page()
-        results['opened maptools'] = report_editor_page.open_tools()
-        results['added basemap'] = report_editor_page.add_basemap()
-        results['added overlay'] = report_editor_page.add_overlay(2)
+        map_widget = report_editor_page.add_widget(MapWidget)
+        results['opened maptools'] = map_widget.open_tools()
+        results['added basemap'] = map_widget.add_basemap()
+        results['added overlay'] = map_widget.add_overlay(2)
         map_tools_working = True
         for k, v in results.iteritems():
             if v != True:
@@ -267,15 +271,41 @@ class UITest(StaticLiveServerTestCase):
         report_manager_page = ReportManagerPage(self.driver, self.live_server_url, resource_graph_id)
         report_id = report_manager_page.add_new_report()
         #Navigate to the report editor page click around to verify things are working, activate and save the report
-        report_editor_page = ReportEditorPage(self.driver, self.live_server_url, 'report_editor', report_id)
-        report_editor_page.navigate_to_page()
-        report_editor_page.open_tools()
-        report_editor_page.add_overlay(2)
+        report_editor_page = ReportEditorPage(self.driver, self.live_server_url, report_id)
+        report_editor_page.open()
+        map_widget = report_editor_page.add_widget(MapWidget)
+        map_widget.open_tools()
+        map_widget.add_overlay(2)
         report_editor_page.save_report("Report B")
 
         resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
         resource_instance_id = resource_manager_page.add_new_resource()
-        resource_editor_page = ResourceEditorPage(self.driver, self.live_server_url, 'resource', resource_instance_id)
-        result = resource_editor_page.create_map_data()
-        resource_editor_page.open_tools()
+
+        resource_editor_page = ResourceEditorPage(self.driver, self.live_server_url, resource_instance_id)
+        map_widget = resource_editor_page.add_widget(MapWidget)
+        map_widget.draw_point()
+        result = resource_editor_page.save_edits()
         self.assertTrue(result == ['Save', 'Manage'])
+
+    # def test_cardinaltiy_CRUD(self):
+    #     import time
+    #     print "Testing all of the different permutations of cardinality"
+    #     page = LoginPage(self.driver, self.live_server_url)
+    #     page.login('admin', 'admin')
+
+    #     #Create a new branch model
+    #     # management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+    #     # graph_page = GraphPage(self.driver, self.live_server_url)
+    #     # resource_graph_id = graph_page.import_arches_json()
+
+    #     resource_graph_id = "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+    #     resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
+    #     resource_instance_id = resource_manager_page.add_new_resource()
+    #     print 'resource_instance_id'
+    #     print resource_instance_id
+
+    #     resource_editor_page = ResourceEditorPage(self.driver, self.live_server_url, resource_instance_id)
+    #     #time.sleep(4)
+    #     form_item = resource_editor_page.select_form_by_name('Form Scenario n-n')
+    #     print form_item
+    #     #time.sleep(4)
