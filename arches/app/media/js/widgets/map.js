@@ -327,8 +327,6 @@ define([
                             }
                         }
                     }
-                    //The listener below forces a resize of the map when a user selects a tab in card-form-preview containing a map 
-                    $(".editable-card").on('click', function(){window.setTimeout(function(){ window.dispatchEvent(new Event('resize'))}, 100)})
                 });
 
                 this.loadGeometriesIntoDrawLayer = function() {

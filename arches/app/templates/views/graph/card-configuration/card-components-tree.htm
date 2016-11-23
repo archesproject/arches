@@ -40,7 +40,7 @@
                 data: card.isContainer() ? get('cards') : get('widgets') ,
                 as: card.isContainer() ? 'card' : 'widget',
                 beforeMove: self.beforeMove
-            }"></div>
+            }, click: function(){window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 100)}"></div>
         </ul>
     </li>
 </template>

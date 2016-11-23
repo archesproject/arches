@@ -23,7 +23,7 @@
                         <li id="summary-group" data-bind="css: {
                             'active': self.currentTabIndex()===$index()
                         }, click: self.selection">
-                            <a id="summary-tab" href="#" class="card-tab-title">
+                            <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: function(){window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 100)}">
                                 <!-- Editable Span -->
                                 <span class="editable-card">
                                     <i class="fa fa-align-justify"></i> <span data-bind="text: get('name')"></span>
