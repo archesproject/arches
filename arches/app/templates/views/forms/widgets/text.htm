@@ -6,7 +6,7 @@
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <input type="text" data-bind="value: value, attr: {placeholder: placeholder, maxlength: maxLength}, style: {width: width}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="value: value, attr: {placeholder: placeholder, maxlength: maxLength}, style: {width: width}, inputmask: {mask: inputMask}" class="form-control input-lg widget-input">
         </div>
     </div>
 </div>
@@ -24,5 +24,11 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="" placeholder="{% trans "Max Length" %}" id="" class="form-control input-md widget-input" data-bind="value: maxLength, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Input Mask" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Input Mask" %}" id="" class="form-control input-md widget-input" data-bind="value: inputMask, valueUpdate: 'keyup'">
 </div>
 {% endblock config_form %}
