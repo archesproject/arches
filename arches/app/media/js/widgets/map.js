@@ -308,6 +308,7 @@ define([
                                 data = koMapping.toJS(self.value);
                             }
                         };
+
                         if (data) {
                             if (data.features.length > 0) {
                                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
@@ -326,6 +327,8 @@ define([
                             }
                         }
                     }
+                    //The listener below forces a resize of the map when a user selects a tab in card-form-preview containing a map 
+                    $(".editable-card").on('click', function(){window.setTimeout(function(){ window.dispatchEvent(new Event('resize'))}, 100)})
                 });
 
                 this.loadGeometriesIntoDrawLayer = function() {
