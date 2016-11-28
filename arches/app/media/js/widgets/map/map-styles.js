@@ -2,32 +2,48 @@ define(function() {
       var getDrawStyles = function(resource)
         {
           return [
-            {
-              "id": "gl-draw-point-active",
-              "type": "circle",
-              "filter": ["all", ["!=", "meta", "vertex"],
-                  ["==", "$type", "Point"],
-                  ["!=", "mode", "static"]
-              ],
-              "paint": {
-                  "circle-radius": 5,
-                  "circle-color": "#FFF"
-              },
-              "interactive": true
-          }, {
+          {
               "id": "gl-draw-point",
               "type": "circle",
               "layout": {},
-              "filter": ["all", ["!in", "$type", "LineString", "Polygon"],
-                  ["!=", "mode", "static"]
+              "filter": ["all",
+                  ["!in", "$type", "LineString", "Polygon"],
+                  ["!=", "mode", "static"],
+                  ["!=", "active", 'true']
               ],
               "paint": {
                   "circle-radius": resource.pointsize,
-                  "circle-color": resource.color,
-                  "circle-opacity": 0.8
+                  "circle-color": resource.color
               },
               "interactive": true
           }, {
+            "id": "gl-draw-point-active-halo",
+            "type": "circle",
+            "filter": ["all", ["!=", "meta", "vertex"],
+                ["==", "$type", "Point"],
+                ["!=", "mode", "static"],
+                ["==", "active", "true"],
+            ],
+            "paint": {
+                "circle-radius": resource.pointsize,
+                "circle-color": "#FFF"
+            },
+            "interactive": true
+        }, {
+              "id": "gl-draw-point-active",
+              "type": "circle",
+              "layout": {},
+              "filter": ["all",
+                  ["!in", "$type", "LineString", "Polygon"],
+                  ["!=", "mode", "static"],
+                  ["==", "active", 'true']
+              ],
+              "paint": {
+                  "circle-radius": resource.pointsize * 0.75,
+                  "circle-color": resource.color
+              },
+              "interactive": true
+          },{
               "id": "gl-draw-line",
               "type": "line",
               "filter": ["all", ["==", "$type", "LineString"],
@@ -79,7 +95,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": 5,
+                  "circle-radius": resource.pointsize,
                   "circle-color": "#FFF"
               },
               "interactive": true
@@ -91,7 +107,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": 3,
+                  "circle-radius": resource.pointsize * 0.75,
                   "circle-color": resource.color,
               },
               "interactive": true
@@ -103,7 +119,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": 4,
+                  "circle-radius": resource.pointsize,
                   "circle-color": "#FFF"
               },
               "interactive": true
@@ -115,23 +131,8 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": 2,
+                  "circle-radius": resource.pointsize * 0.75,
                   "circle-color": resource.color,
-              },
-              "interactive": true
-          }, {
-              "id": "gl-draw-line-static",
-              "type": "line",
-              "filter": ["all", ["==", "$type", "LineString"],
-                  ["==", "mode", "active"]
-              ],
-              "layout": {
-                  "line-cap": "round",
-                  "line-join": "round"
-              },
-              "paint": {
-                  "line-color": "#000",
-                  "line-width": resource.linewidth
               },
               "interactive": true
           }
