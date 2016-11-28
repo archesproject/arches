@@ -16,9 +16,10 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             "id": "geocode-point",
             "source": "geocode-point",
             "type": "circle",
+            "maxzoom": 20,
             "paint": {
                 "circle-radius": 5,
-                "circle-color": "red"
+                "circle-color": "#FF0000"
             }
         };
 
@@ -105,7 +106,7 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             if (self.map) {
                 var cacheLayer = self.map.getLayer('geocode-point');
                 self.map.removeLayer('geocode-point');
-                self.map.addLayer(cacheLayer, self.anchorLayerId);
+                self.map.addLayer(self.pointstyle, self.anchorLayerId);
             }
         };
 
