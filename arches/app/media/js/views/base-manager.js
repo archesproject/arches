@@ -9,7 +9,7 @@ define([
 
     var BaseManager = PageView.extend({
         /**
-        * Creates an instance of PageView, optionally using a passed in view model 
+        * Creates an instance of PageView, optionally using a passed in view model
         * appends the following properties to viewModel:
         * allGraphs - an array of graphs models as JSON (not model instances)
         *
@@ -33,10 +33,19 @@ define([
                 });
             });
             options.viewModel.resources = ko.computed(function() {
-                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+                var resources =  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+                    graph.disable = true;
                     return graph.isresource;
                 });
+                console.log(resources);
+                return resources;
             });
+
+            options.viewModel.setResourceOptionDisable = function(option, item) {
+              if (item) {
+                ko.applyBindingsToNode(option, {disable: !item.isactive || !item.forms}, item);
+              }
+            };
 
             PageView.prototype.constructor.call(this, options);
             return this;
