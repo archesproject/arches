@@ -106,6 +106,11 @@ define([
                 'name': 'Mapzen'
             }]);
 
+            //This listener unselects geometries in the map when the user hits the save button
+            $(document).on('updated-tile', $.proxy(function(e){
+              this.draw.changeMode('simple_select')
+            }, this))
+
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
                 overlaySelectorClosed: this.overlaySelectorClosed,

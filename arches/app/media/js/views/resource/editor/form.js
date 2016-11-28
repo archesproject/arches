@@ -267,6 +267,8 @@ define([
                     }
                 }
                 this.trigger('after-update', response, tile);
+                var saveEvent = new Event('updated-tile');
+                document.dispatchEvent(saveEvent);
             }, this, tile.formData);
         },
 
