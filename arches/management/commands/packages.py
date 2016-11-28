@@ -354,15 +354,18 @@ class Command(BaseCommand):
         """
 
         if data_source == '':
-            for path in settings.RESOURCE_GRAPH_LOCATIONS:
-                if os.path.isfile(os.path.join(path)):
-                    ArchesFileImporter(path).import_all()
-                else:
-                    file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
-                    for file_path in file_paths:
-                        ArchesFileImporter(os.path.join(path, file_path)).import_all()
-        else:
-            ArchesFileImporter(data_source).import_all()
+            data_source = settings.RESOURCE_GRAPH_LOCATIONS
+
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        for path in data_source:
+            if os.path.isfile(os.path.join(path)):
+                ArchesFileImporter(path).import_all()
+            else:
+                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
+                for file_path in file_paths:
+                    ArchesFileImporter(os.path.join(path, file_path)).import_all()
 
 
     def start_livereload(self):
