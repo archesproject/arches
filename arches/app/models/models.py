@@ -23,20 +23,6 @@ from django.dispatch import receiver
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
 
-class Address(models.Model):
-    addressnum = models.TextField(blank=True, null=True)
-    addressstreet = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
-    postalcode = models.TextField(blank=True, null=True)
-    addressesid = models.AutoField(primary_key=True)
-    geometry = models.PointField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'addresses'
-
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -443,30 +429,6 @@ class OntologyClass(models.Model):
         managed = True
         db_table = 'ontologyclasses'
         unique_together=(('source', 'ontology'),)
-
-
-class Overlay(models.Model):
-    overlaytyp = models.TextField(blank=True, null=True)
-    overlayval = models.TextField(blank=True, null=True)
-    overlayid = models.AutoField(primary_key=True)  # This field type is a guess.
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'overlays'
-
-
-class Parcel(models.Model):
-    parcelapn = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    parcelsid = models.AutoField(primary_key=True)
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'parcels'
 
 
 class Relation(models.Model):

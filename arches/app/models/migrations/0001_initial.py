@@ -178,22 +178,6 @@ class Migration(migrations.Migration):
        ),
 
         migrations.CreateModel(
-            name='Address',
-            fields=[
-                ('addressnum', models.TextField(null=True, blank=True)),
-                ('addressstreet', models.TextField(null=True, blank=True)),
-                ('vintage', models.TextField(null=True, blank=True)),
-                ('city', models.TextField(null=True, blank=True)),
-                ('postalcode', models.TextField(null=True, blank=True)),
-                ('addressesid', models.AutoField(serialize=False, primary_key=True)),
-                ('geometry', django.contrib.gis.db.models.fields.PointField(srid=4326, null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'addresses',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
             name='GraphModel',
             fields=[
                 ('graphid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
@@ -521,32 +505,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'ontologyclasses',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='Overlay',
-            fields=[
-                ('overlaytyp', models.TextField(null=True, blank=True)),
-                ('overlayval', models.TextField(null=True, blank=True)),
-                ('overlayid', models.AutoField(serialize=False, primary_key=True)),
-                ('geometry', django.contrib.gis.db.models.fields.PolygonField(srid=4326, null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'overlays',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='Parcel',
-            fields=[
-                ('parcelapn', models.TextField(null=True, blank=True)),
-                ('vintage', models.TextField(null=True, blank=True)),
-                ('parcelsid', models.AutoField(serialize=False, primary_key=True)),
-                ('geometry', django.contrib.gis.db.models.fields.PolygonField(srid=4326, null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'parcels',
                 'managed': True,
             },
         ),
