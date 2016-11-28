@@ -236,7 +236,7 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    id = models.AutoField(primary_key=True, serialize=True)
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     card = models.ForeignKey('CardModel', db_column='cardid')
     form = models.ForeignKey('Form', db_column='formid')
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -524,7 +524,7 @@ class Resource2ResourceConstraint(models.Model):
 
 
 class ResourceXResource(models.Model):
-    resourcexid = models.AutoField(primary_key=True)
+    resourcexid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)

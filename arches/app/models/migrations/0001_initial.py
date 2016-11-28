@@ -408,7 +408,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FormXCard',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=True)),
+                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
                 ('form', models.ForeignKey(to='models.Form', db_column='formid')),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
@@ -438,6 +438,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FunctionXGraph',
             fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
                 ('function', models.ForeignKey(to='models.Function', db_column='functionid')),
                 ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
                 ('config', JSONField(blank=True, null=True, db_column='config')),
@@ -620,7 +621,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ResourceXResource',
             fields=[
-                ('resourcexid', models.AutoField(primary_key=True, serialize=False)),
+                ('resourcexid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('notes', models.TextField(blank=True, null=True)),
                 ('datestarted', models.DateField(blank=True, null=True)),
                 ('dateended', models.DateField(blank=True, null=True)),
