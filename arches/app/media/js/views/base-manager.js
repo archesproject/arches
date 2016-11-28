@@ -33,12 +33,9 @@ define([
                 });
             });
             options.viewModel.resources = ko.computed(function() {
-                var resources =  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
-                    graph.disable = true;
+                return  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
                     return graph.isresource;
                 });
-                console.log(resources);
-                return resources;
             });
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
