@@ -324,10 +324,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor">
                                                             <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Editable" %}
                                                             </label>
                                                             <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
+                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Non-Editable" %}
                                                             </label>
                                                         </div>
                                                     </div>

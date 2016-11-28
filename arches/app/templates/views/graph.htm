@@ -86,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        
+
     </div>
 
 
@@ -106,7 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
-                    <div class="btn-group">
+                    <div class="btn-group" style="float:right;">
                         <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }"><i class="fa fa-wrench"></i> {% trans "Settings" %}</a>
@@ -135,7 +135,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                     </div>
                     <div>
-                        <p class="resource-status">{% trans "Status" %}: <span data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                        <p class="resource-status">{% trans "Status" %}: <span data-bind="text:isactive?'{% trans "Editable" %}':'{% trans "Non-Editable" %}'"></span></p>
                     </div>
                 </div>
             </div>

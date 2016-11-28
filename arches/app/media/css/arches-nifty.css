@@ -2800,6 +2800,13 @@ span.editable-card i.fa.fa-align-justify:hover{
     opacity: 1.0;
     border: 1px solid #aaa;
 }
+.card-grid-item.disabled {
+  float: left;
+  width: 290px;
+  border: 1px solid #ddd;
+  opacity: .79;
+  margin: 3px;
+}
 div.card-grid-item.selected {
     border: 1px solid #aaa;
     opacity: 1.0;
