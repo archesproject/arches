@@ -3499,3 +3499,24 @@ INSERT INTO report_templates(templateid, name, description, component, component
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
+
+INSERT INTO tileserver_layers(name, path)
+    VALUES ('hillshade', 'arches/tileserver/hillshade.xml');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('hillshade', '{
+      "type": "raster",
+      "tiles": ["/tileserver/hillshade/{z}/{x}/{y}.jpg"],
+      "tileSize": 256
+  }');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+ VALUES (public.uuid_generate_v1mc(), 'hillshade', '[
+         {
+             "id": "hillshade",
+             "type": "raster",
+             "source": "hillshade",
+             "minzoom": 0,
+             "maxzoom": 22
+         }
+     ]', TRUE, '');
