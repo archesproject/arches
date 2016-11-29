@@ -665,3 +665,12 @@ class MapLayers(models.Model):
     class Meta:
         managed = True
         db_table = 'map_layers'
+
+
+class TileserverLayers(models.Model):
+    name = models.TextField()
+    path = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = 'tileserver_layers'
