@@ -678,7 +678,7 @@ class Migration(migrations.Migration):
             name='MapLayers',
             fields=[
                 ('maplayerid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField()),
+                ('name', models.TextField(unique=True)),
                 ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
                 ('icon', models.TextField(default=None)),
@@ -692,7 +692,7 @@ class Migration(migrations.Migration):
             name='MapSources',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
+                ('name', models.TextField(unique=True)),
                 ('source', JSONField(blank=True, db_column='source', null=True)),
             ],
             options={
@@ -703,8 +703,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TileserverLayers',
             fields=[
-                ('name', models.TextField()),
+                ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
             ],
             options={
                 'db_table': 'tileserver_layers',
