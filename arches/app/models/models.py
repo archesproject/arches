@@ -670,6 +670,8 @@ class MapLayers(models.Model):
 class TileserverLayers(models.Model):
     name = models.TextField()
     path = models.TextField()
+    map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
+    map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
 
     class Meta:
         managed = True

@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -84,7 +84,7 @@ class Command(BaseCommand):
             help='A path to a mapnik xml file to generate a tileserver layer from.')
 
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
-            help='A name to use for a new tileserver layer.')
+            help='The name of the tileserver layer to add or delete.')
 
 
     def handle(self, *args, **options):
@@ -140,6 +140,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'add_tilserver_layer':
             self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'])
+
+        if options['operation'] == 'delete_tilserver_layer':
+            self.delete_tilserver_layer(options['layer_name'])
 
     def setup(self, package_name):
         """
@@ -421,6 +424,16 @@ class Command(BaseCommand):
                 }]
                 map_source = models.MapSources(name=layer_name, source=source_dict)
                 map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=True, icon='')
-                tileserver_layer.save()
                 map_source.save()
                 map_layer.save()
+                tileserver_layer.map_layer = map_layer
+                tileserver_layer.map_source = map_source
+                tileserver_layer.save()
+
+    def delete_tilserver_layer(self, layer_name=False):
+        if layer_name != False:
+            with transaction.atomic():
+                tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
+                tileserver_layer.map_layer.delete()
+                tileserver_layer.map_source.delete()
+                tileserver_layer.delete()

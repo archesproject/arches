@@ -705,6 +705,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.TextField()),
                 ('path', models.TextField()),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
             ],
             options={
                 'db_table': 'tileserver_layers',
