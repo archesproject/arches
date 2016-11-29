@@ -700,6 +700,17 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='TileserverLayers',
+            fields=[
+                ('name', models.TextField()),
+                ('path', models.TextField()),
+            ],
+            options={
+                'db_table': 'tileserver_layers',
+                'managed': True,
+            },
+        ),
         # migrations.AlterField(
         #     model_name='edge',
         #     name='graph',

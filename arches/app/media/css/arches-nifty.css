@@ -4432,9 +4432,15 @@ div.row.widget-wrapper.report-header:hover {
     top: 0px;
     left: 0px;
     z-index: 2;
-    width: -webkit-calc(100% - 250px);
-    width:    -moz-calc(100% - 250px);
-    width:         calc(100% - 250px);
+    width: -webkit-calc(100% - 55px);
+    width:    -moz-calc(100% - 55px);
+    width:         calc(100% - 55px);
+}
+
+.notifications-narrow {
+  width: -webkit-calc(100% - 250px);
+  width:    -moz-calc(100% - 250px);
+  width:         calc(100% - 250px);
 }
 
 .geocode-container.hide-geocoder {

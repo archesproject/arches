@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
-from arches.app.views import concept, entity, main, map, resources, search, config, graph
+from arches.app.views import concept, entity, main, map, resources, search, config, graph, tileserver
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
 from arches.app.views.concept import RDMView
@@ -102,6 +102,7 @@ urlpatterns = [
     url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
+    url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
