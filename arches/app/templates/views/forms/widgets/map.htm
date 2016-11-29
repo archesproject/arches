@@ -446,19 +446,19 @@
 
                 <div class="col-xs-12 pad-no crud-widget-container">
                   <div class="colorpicker-component input-group">
-                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: resourceColor, format:'rgba'}">
-                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: resourceColor}"></i></span>
+                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: featureColor, format:'rgba'}">
+                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: featureColor}"></i></span>
                   </div>
                 </div>
 
                 <div class="control-label">{% trans "Point Size" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourcePointSize, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featurePointSize, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Line Width" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourceLineWidth, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featureLineWidth, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Available Geometry Types" %}</div>

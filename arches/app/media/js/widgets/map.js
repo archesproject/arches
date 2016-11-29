@@ -68,9 +68,9 @@ define([
                 'geocoderVisible',
                 'minZoom',
                 'maxZoom',
-                'resourceColor',
-                'resourcePointSize',
-                'resourceLineWidth',
+                'featureColor',
+                'featurePointSize',
+                'featureLineWidth',
                 'featureEditingDisabled',
                 'overlayConfigs',
                 'overlayOpacity',
@@ -106,10 +106,20 @@ define([
                 'name': 'Mapzen'
             }]);
 
-            //This listener unselects geometries in the map when the user hits the save button
-            $(document).on('updated-tile', $.proxy(function(e){
-              this.draw.changeMode('simple_select')
-            }, this))
+
+            if (this.form) {
+                this.form.on('after-update', function(req, tile) {
+                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0]) && req.status === 200) {
+                       self.draw.changeMode('simple_select')
+                       self.featureColor(self.resourceColor)
+                    }
+                });
+                this.form.on('tile-reset', function(tile) {
+                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0])) {
+                        console.log('reset')
+                    }
+                });
+            }
 
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
@@ -121,19 +131,25 @@ define([
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
                 this.graphId = params.graph.get('graphid')
-                if (this.resourceColor() === null) {
-                    this.resourceColor(params.graph.get('mapfeaturecolor'));
+                this.resourceColor = params.graph.get('mapfeaturecolor')
+                this.resourcePointSize = params.graph.get('mappointsize')
+                this.resourceLineWidth = params.graph.get('maplinewidth')
+                if (!this.featureColor()) {
+                    this.featureColor(this.resourceColor);
                 }
-                if (this.resourcePointSize() === null) {
-                    this.resourcePointSize(params.graph.get('mappointsize'));
+                if (!this.featurePointSize()) {
+                    this.featurePointSize(this.resourcePointSize);
                 } else {
-                    this.resourcePointSize(Number(this.resourcePointSize()))
+                    this.featurePointSize(Number(this.featurePointSize()))
                 }
-                if (this.resourceLineWidth() === null) {
-                    this.resourceLineWidth(params.graph.get('maplinewidth'));
+                if (!this.featureLineWidth()) {
+                    this.featureLineWidth(this.resourceLineWidth);
                 } else {
-                    this.resourceLineWidth(Number(this.resourceLineWidth()));
+                    this.featureLineWidth(Number(this.featureLineWidth()));
                 }
+                this.featureColorCache = this.featureColor()
+                this.featurePointSizeCache = this.featurePointSize()
+                this.featureLineWidthCache = this.featureLineWidth()
             }
 
             this.toggleOverlaySelector = function(e) {
@@ -162,7 +178,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": this.resourceColor(),
+                            "fill-color": this.featureColor(),
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -172,8 +188,8 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
-                            "circle-radius": this.resourcePointSize(),
-                            "circle-color": this.resourceColor(),
+                            "circle-radius": this.featurePointSize(),
+                            "circle-color": this.featureColor(),
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -182,9 +198,9 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": this.resourceColor(),
+                            "line-color": this.featureColor(),
                             "line-opacity": 0.8,
-                            "line-width": this.resourceLineWidth()
+                            "line-width": this.featureLineWidth()
                         }
                     }],
                     isoverlay: false,
@@ -264,9 +280,9 @@ define([
                         trash: false //if true, the backspace key is inactivated in the geocoder input
                     },
                     styles: mapStyles.getDrawStyles({
-                        linewidth: this.resourceLineWidth(),
-                        color: this.resourceColor(),
-                        pointsize: this.resourcePointSize()
+                        linewidth: this.featureLineWidth,
+                        color: this.featureColor,
+                        pointsize: this.featurePointSize
                     }),
                     displayControlsDefault: false
                 });
@@ -355,15 +371,15 @@ define([
                     }, this)
                 }
 
-                this.resourceColor.subscribe(function(e) {
+                this.featureColor.subscribe(function(e) {
                     this.updateDrawLayerPaintProperties(['fill-outline-color', 'fill-color', 'circle-color', 'line-color'], e)
                 }, this);
 
-                this.resourcePointSize.subscribe(function(e) {
+                this.featurePointSize.subscribe(function(e) {
                     this.updateDrawLayerPaintProperties(['circle-radius'], e, true)
                 }, this);
 
-                this.resourceLineWidth.subscribe(function(e) {
+                this.featureLineWidth.subscribe(function(e) {
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
@@ -373,6 +389,9 @@ define([
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
+                    if (this.form) {
+                      this.featureColor(this.featureColorCache);
+                    }
                     _.each(self.geometryTypeDetails, function(geomtype) {
                         if (geomtype.name === selectedDrawTool) {
                             self.geometryTypeDetails[selectedDrawTool].active(!self.geometryTypeDetails[selectedDrawTool].active())
@@ -583,11 +602,23 @@ define([
                     }
                 }
 
+                this.updateFeatureStyles = function(){
+                  var self = this;
+                  return function(){
+                    if (self.form) {
+                      self.featureColor() === self.featureColorCache || self.featureColor(self.featureColorCache);
+                      self.featurePointSize() === self.featurePointSizeCache || self.featurePointSize(self.featurePointSizeCache);
+                      self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
+                    }
+                  };
+                };
+
                 this.map.on('moveend', this.updateConfigs());
                 ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
                     self.map.on(event, self.saveGeometries())
                 });
                 this.map.on('click', this.updateDrawMode())
+                this.map.on('draw.selectionchange', self.updateFeatureStyles());
 
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
