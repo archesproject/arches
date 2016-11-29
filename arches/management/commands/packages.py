@@ -86,6 +86,9 @@ class Command(BaseCommand):
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
 
+        parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
+            help='An icon class to use for a tileserver layer.')
+
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -139,7 +142,7 @@ class Command(BaseCommand):
             self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'add_tilserver_layer':
-            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'])
+            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'])
 
         if options['operation'] == 'delete_tilserver_layer':
             self.delete_tilserver_layer(options['layer_name'])
@@ -404,7 +407,7 @@ class Command(BaseCommand):
 
         ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)
 
-    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False):
+    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe'):
         if layer_name != False and mapnik_xml_path != False:
             with transaction.atomic():
                 tileserver_layer = models.TileserverLayers(name=layer_name, path=mapnik_xml_path)
@@ -423,7 +426,7 @@ class Command(BaseCommand):
                     "maxzoom": 22
                 }]
                 map_source = models.MapSources(name=layer_name, source=source_dict)
-                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=True, icon='')
+                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=True, icon=layer_icon)
                 map_source.save()
                 map_layer.save()
                 tileserver_layer.map_layer = map_layer
