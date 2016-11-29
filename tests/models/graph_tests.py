@@ -52,6 +52,7 @@ class GraphTests(ArchesTestCase):
         graph.version = "v1.0.0"
         graph.isactive = False
         graph.iconclass = "fa fa-building"
+        graph.nodegroups = []
         graph.save()
 
         graph.root.name = 'ROOT NODE'
@@ -101,6 +102,7 @@ class GraphTests(ArchesTestCase):
             "isresource": True,
             "isactive": False,
             "iconclass": "fa fa-building",
+            "nodegroups": [],
             'nodes':[{
                 "status": None,
                 "description": "",
@@ -399,7 +401,7 @@ class GraphTests(ArchesTestCase):
 
     def test_node_update(self):
         """
-        test to make sure that node groups and card are properly managed 
+        test to make sure that node groups and card are properly managed
         when changing a nodegroup value on a node being updated
 
         """
@@ -616,7 +618,7 @@ class GraphTests(ArchesTestCase):
 
     def test_save_and_update_dont_orphan_records_in_the_db(self):
         """
-        test that the proper number of nodes, edges, nodegroups, and cards are persisted 
+        test that the proper number of nodes, edges, nodegroups, and cards are persisted
         to the database during save and update opertaions
 
         """
@@ -625,7 +627,7 @@ class GraphTests(ArchesTestCase):
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
         card_count_before = models.CardModel.objects.count()
-        
+
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
 
@@ -666,7 +668,7 @@ class GraphTests(ArchesTestCase):
 
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
-        
+
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
         self.assertEqual(card_count_after-card_count_before, 1)
 
@@ -677,7 +679,7 @@ class GraphTests(ArchesTestCase):
 
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
-        
+
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
         self.assertEqual(card_count_after-card_count_before, 2)
 
@@ -691,12 +693,12 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.nodes), 2)
         self.assertEqual(len(graph.edges), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
-        
+
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
         card_count_before = models.CardModel.objects.count()
-        
+
         graph.delete()
 
         nodes_count_after = models.Node.objects.count()
@@ -728,7 +730,7 @@ class GraphTests(ArchesTestCase):
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
         card_count_before = models.CardModel.objects.count()
-        
+
         graph.delete_node(node)
 
         nodes_count_after = models.Node.objects.count()
@@ -786,8 +788,8 @@ class GraphTests(ArchesTestCase):
             if node is not graph.root:
                 nodeJson = JSONSerializer().serializeToPython(node)
                 nodeJson['nodegroup_id'] = nodeJson['nodeid']
-                graph.update_node(nodeJson)   
-                             
+                graph.update_node(nodeJson)
+
         graph.save()
 
         self.assertEqual(len(graph.get_cards()), 2)
@@ -846,7 +848,7 @@ class GraphTests(ArchesTestCase):
         for card in resource_graph.get_cards():
             self.assertEqual(card.name, the_card.name)
             self.assertEqual(card.description, the_card.description)
-        
+
         # after removing the card name and description, the cards should take on the node name and description
         the_card.name = ''
         the_card.description = ''

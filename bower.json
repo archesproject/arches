@@ -32,19 +32,20 @@
     "chosen": "1.4.2",
     "nouislider": "8.5.1",
     "blueimp-gallery": "2.15.2",
-    "mapbox-gl-plugins": "mapbox/mapbox-gl-js#0.26.0",
+    "mapbox-gl-plugins": "mapbox/mapbox-gl-js#0.28.0",
     "bower-knockout-mapping": "~2.6.0",
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
     "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin",
-    "mapbox-gl": "archesproject/mapbox-gl-js-bower#0.26.0",
+    "mapbox-gl": "archesproject/mapbox-gl-js-bower#0.28.0",
     "datatables.net": "~1.10.12",
     "datatables.net-bs": "~1.10.12",
     "datatables.net-responsive": "~2.1.0",
     "datatables.net-responsive-bs": "~2.1.0",
     "geojson-extent": "mapbox/geojson-extent#0.3.2",
     "bootstrap-colorpicker": "^2.3.6",
-    "uuid.js": "^3.3.0"
+    "uuid.js": "^3.3.0",
+    "jquery-mask-plugin": "^1.14.0"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

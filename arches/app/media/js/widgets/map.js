@@ -106,6 +106,11 @@ define([
                 'name': 'Mapzen'
             }]);
 
+            //This listener unselects geometries in the map when the user hits the save button
+            $(document).on('updated-tile', $.proxy(function(e){
+              this.draw.changeMode('simple_select')
+            }, this))
+
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
                 overlaySelectorClosed: this.overlaySelectorClosed,
@@ -262,7 +267,8 @@ define([
                         linewidth: this.resourceLineWidth(),
                         color: this.resourceColor(),
                         pointsize: this.resourcePointSize()
-                    })
+                    }),
+                    displayControlsDefault: false
                 });
 
                 this.map = map;
@@ -296,8 +302,7 @@ define([
                             source.setData(data)
                             _.each(['resource-poly', 'resource-line', 'resource-point'], function(layerId) { //clear and add resource layers so that they are on top of map
                                 var cacheLayer = self.map.getLayer(layerId);
-                                self.map.removeLayer(layerId);
-                                self.map.addLayer(cacheLayer, self.anchorLayerId)
+                                self.map.moveLayer(layerId, self.anchorLayerId)
                             }, self)
 
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
@@ -308,6 +313,7 @@ define([
                                 data = koMapping.toJS(self.value);
                             }
                         };
+
                         if (data) {
                             if (data.features.length > 0) {
                                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
