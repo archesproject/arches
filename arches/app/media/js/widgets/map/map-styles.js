@@ -14,8 +14,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize,
                   "circle-color": resource.color
-              },
-              "interactive": true
+              }
           }, {
             "id": "gl-draw-point-active-halo",
             "type": "circle",
@@ -27,8 +26,7 @@ define(function() {
             "paint": {
                 "circle-radius": resource.pointsize,
                 "circle-color": "#FFF"
-            },
-            "interactive": true
+            }
         }, {
               "id": "gl-draw-point-active",
               "type": "circle",
@@ -41,8 +39,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize * 0.75,
                   "circle-color": resource.color
-              },
-              "interactive": true
+              }
           },{
               "id": "gl-draw-line",
               "type": "line",
@@ -57,8 +54,7 @@ define(function() {
                   "line-color": resource.color,
                   // "line-dasharray": [0.2, 2],
                   "line-width": resource.linewidth
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-fill",
               "type": "fill",
@@ -69,8 +65,7 @@ define(function() {
                   "fill-color": resource.color,
                   "fill-outline-color": resource.color,
                   "fill-opacity": 0.1
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-stroke-active",
               "type": "line",
@@ -85,8 +80,7 @@ define(function() {
                   "line-color": resource.color,
                   // "line-dasharray": [0.2, 2],
                   "line-width": resource.linewidth
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-and-line-vertex-halo-active",
               "type": "circle",
@@ -97,8 +91,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize,
                   "circle-color": "#FFF"
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-and-line-vertex-active",
               "type": "circle",
@@ -109,8 +102,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize * 0.75,
                   "circle-color": resource.color,
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-and-line-midpoint-halo-active",
               "type": "circle",
@@ -121,8 +113,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize,
                   "circle-color": "#FFF"
-              },
-              "interactive": true
+              }
           }, {
               "id": "gl-draw-polygon-and-line-midpoint-active",
               "type": "circle",
@@ -133,8 +124,7 @@ define(function() {
               "paint": {
                   "circle-radius": resource.pointsize * 0.75,
                   "circle-color": resource.color,
-              },
-              "interactive": true
+              }
           }
         ];
        }

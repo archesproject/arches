@@ -2357,8 +2357,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         "paint": {
             "fill-color": "#d2edae",
             "fill-opacity": 0.75
-        },
-        "interactive": true
+        }
     },{
         "id": "landuse_park",
         "type": "fill",
@@ -2371,8 +2370,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         ],
         "paint": {
             "fill-color": "#d2edae"
-        },
-        "interactive": true
+        }
     },{
         "id": "waterway",
         "type": "line",
@@ -2407,8 +2405,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
                     ]
                 ]
             }
-        },
-        "interactive": true
+        }
     },{
         "id": "water",
         "type": "fill",
@@ -2416,8 +2413,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         "source-layer": "water",
         "paint": {
             "fill-color": "#a0cfdf"
-        },
-        "interactive": true
+        }
     },{
         "id": "building",
         "type": "fill",
@@ -2425,10 +2421,8 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         "source-layer": "building",
         "paint": {
             "fill-color": "#d6d6d6"
-        },
-        "interactive": true
+        }
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "butt",
             "line-join": "miter"
@@ -2486,7 +2480,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "butt",
             "line-join": "miter"
@@ -2541,7 +2534,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "round",
             "line-join": "round"
@@ -2596,7 +2588,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "round",
             "line-join": "round"
@@ -2648,7 +2639,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "butt",
             "line-join": "miter"
@@ -2715,7 +2705,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "butt",
             "line-join": "miter"
@@ -2779,7 +2768,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "round",
             "line-join": "round"
@@ -2833,7 +2821,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "round",
             "line-join": "round"
@@ -2884,7 +2871,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road"
     },{
-        "interactive": true,
         "layout": {
             "line-cap": "round",
             "line-join": "round"
@@ -2931,7 +2917,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "admin"
     },{
-        "interactive": true,
         "minzoom": 5,
         "layout": {
             "icon-image": "{maki}-11",
@@ -2981,7 +2966,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "poi_label"
     },{
-        "interactive": true,
         "layout": {
             "symbol-placement": "line",
             "text-field": "{name_en}",
@@ -3032,7 +3016,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "road_label"
     },{
-        "interactive": true,
         "minzoom": 8,
         "layout": {
             "text-field": "{name_en}",
@@ -3083,7 +3066,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "place_label"
     },{
-        "interactive": true,
         "layout": {
             "text-field": "{name_en}",
             "text-font": [
@@ -3129,7 +3111,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
         },
         "source-layer": "place_label"
     },{
-        "interactive": true,
         "layout": {
             "text-field": "{name_en}",
             "text-font": [
