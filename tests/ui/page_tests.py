@@ -327,4 +327,8 @@ class UITest(StaticLiveServerTestCase):
         string_widget.set_text('testing 123')
         result = resource_editor_page.save_edits()
         self.assertTrue(result == ['Save'])
-        
+
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name('Form Scenario n-n')
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == 'testing 123')
