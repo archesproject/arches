@@ -319,16 +319,75 @@ class UITest(StaticLiveServerTestCase):
         resource_instance_id = resource_manager_page.add_new_resource()
 
         resource_editor_page = ResourceEditorPage(self.driver, self.live_server_url, resource_instance_id)
-        resource_editor_page.select_form_by_name('Form Scenario n-n')
-        #resource_editor_page.select_form_by_index(5)
+        sample_text = "testing 123"
 
-        #ipdb.set_trace()
+        form_name = "Form Scenario 1-"
+        resource_editor_page.select_form_by_name(form_name)
         string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
-        string_widget.set_text('testing 123')
-        result = resource_editor_page.save_edits()
-        self.assertTrue(result == ['Save'])
-
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
         resource_editor_page.open()
-        resource_editor_page.select_form_by_name('Form Scenario n-n')
+        resource_editor_page.select_form_by_name(form_name)
         string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
-        self.assertTrue(string_widget.get_text() == 'testing 123')
+        self.assertTrue(string_widget.get_text() == sample_text)
+
+
+        form_name = "Form Scenario n-"
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == sample_text)
+
+
+        form_name = "Form Scenario 1-1"
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == sample_text)
+
+
+        form_name = "Form Scenario 1-n"
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == sample_text)
+
+
+        form_name = "Form Scenario n-1"
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == sample_text)
+
+
+        form_name = "Form Scenario n-n"
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        string_widget.set_text(sample_text)
+        resource_editor_page.save_edits()
+        
+        resource_editor_page.open()
+        resource_editor_page.select_form_by_name(form_name)
+        string_widget = resource_editor_page.add_widget(StringWidget, tab_index=0, widget_index=0)
+        self.assertTrue(string_widget.get_text() == sample_text)
