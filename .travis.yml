@@ -28,7 +28,6 @@ addons:
       - openjdk-7-jdk
       - python-setuptools
       - python-dev
-      - postgis
 
 services:
   - postgresql
