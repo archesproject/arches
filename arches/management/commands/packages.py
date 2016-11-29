@@ -408,7 +408,7 @@ class Command(BaseCommand):
                 source_dict = {
                     "type": "raster",
                     "tiles": [
-                        ("/tileserver/%s/{z}/{x}/{y}.jpg") % (layer_name)
+                        ("/tileserver/%s/{z}/{x}/{y}.png") % (layer_name)
                     ],
                     "tileSize": 256
                 }
