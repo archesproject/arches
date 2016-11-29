@@ -97,7 +97,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                         <!-- ko if: !$parent.getErrorMsg($data)-->
                         <div class="pull-right">
-                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="attr: { href: '/graph/' + graphid + '/add_resource', 'data-arches-graphid': graphid}, css: { 'disabled': !hasforms || !isactive || !formsvisible }">{% trans "Create Resource" %}</a>
+                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus" role="button" data-bind="attr: { href: '/graph/' + graphid + '/add_resource', 'data-arches-graphid': graphid}, css: { 'disabled': !hasforms || !isactive || !formsviewable }">{% trans "Create Resource" %}</a>
                         </div>
                         <!-- /ko -->
                     </div>
