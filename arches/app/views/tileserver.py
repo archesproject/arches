@@ -17,8 +17,8 @@ def handle_request(request):
 
     config_dict = {
         "cache": {
-            "name": "Test",
-            "verbose": True
+            "name": "Disk",
+            "path": os.path.join('arches', 'tileserver', 'cache')
         },
         "layers": layers
     }
