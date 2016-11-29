@@ -12,9 +12,6 @@ class MapWidget(BaseWidget):
 
     """
 
-    def __init__(self, page_instance, location=''):
-        super(MapWidget, self).__init__(page_instance, location)
-
     def open_tools(self):
         try:
             map_tools_button = self.page.wait.until(

@@ -18,3 +18,10 @@ class MapWidgetLocators(BaseWidgetLocators):
     MAP_CANVAS = (By.XPATH, "//*[@id='map']/div[8]/canvas")
     MAP_DRAW_TOOLS = (By.CSS_SELECTOR, ".drawing-map-tools")
     POINT_DRAW_TOOL = (By.XPATH, "//*[@id='maptools-panel']/div[2]")
+
+class StringWidgetLocators(BaseWidgetLocators):
+    def __init__(self):
+        super(StringWidgetLocators, self).__init__()
+                      
+    #INPUT_BOX = (By.XPATH, "//*[@id='content-container']/div[2]/div[4]/div/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/form/div/div/div/div/input")
+    INPUT_BOX = (By.XPATH, "./div/div/div/input")
