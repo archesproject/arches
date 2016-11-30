@@ -996,7 +996,7 @@ class Graph(models.GraphModel):
             nodeobj['parentproperty'] = parentproperties[node.nodeid]
             ret['nodes'].append(nodeobj)
 
-        return ret
+        return JSONSerializer().serializeToPython(ret)
 
     def validate(self):
         """
