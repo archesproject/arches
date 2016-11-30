@@ -13,8 +13,8 @@ class BasePage(object):
         self.driver.implicitly_wait(1)
         self.live_server_url = live_server_url
         self.base_url = base_url
-        
         self.wait = WebDriverWait(self.driver, wait)
+        self.wait_until_loading_mask_is_gone()
 
     def open(self, additional_path=''):
         if self.base_url is not None:
