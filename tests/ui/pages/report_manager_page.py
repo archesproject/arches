@@ -1,11 +1,7 @@
 import re
-from base_page import BasePage, script_returns_true
+from base_page import BasePage
 from page_locators import ReportManagerPageLocators as locators
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from arches.urls import uuid_regex
-from selenium.common.exceptions import StaleElementReferenceException
 
 
 class ReportManagerPage(BasePage):

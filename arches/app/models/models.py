@@ -23,20 +23,6 @@ from django.dispatch import receiver
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
 
-class Address(models.Model):
-    addressnum = models.TextField(blank=True, null=True)
-    addressstreet = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
-    postalcode = models.TextField(blank=True, null=True)
-    addressesid = models.AutoField(primary_key=True)
-    geometry = models.PointField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'addresses'
-
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -236,7 +222,7 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    id = models.AutoField(primary_key=True, serialize=True)
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     card = models.ForeignKey('CardModel', db_column='cardid')
     form = models.ForeignKey('Form', db_column='formid')
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -445,30 +431,6 @@ class OntologyClass(models.Model):
         unique_together=(('source', 'ontology'),)
 
 
-class Overlay(models.Model):
-    overlaytyp = models.TextField(blank=True, null=True)
-    overlayval = models.TextField(blank=True, null=True)
-    overlayid = models.AutoField(primary_key=True)  # This field type is a guess.
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'overlays'
-
-
-class Parcel(models.Model):
-    parcelapn = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    parcelsid = models.AutoField(primary_key=True)
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'parcels'
-
-
 class Relation(models.Model):
     conceptfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
     conceptto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
@@ -524,7 +486,7 @@ class Resource2ResourceConstraint(models.Model):
 
 
 class ResourceXResource(models.Model):
-    resourcexid = models.AutoField(primary_key=True)
+    resourcexid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)

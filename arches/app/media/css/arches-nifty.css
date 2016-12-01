@@ -2964,9 +2964,7 @@ ul.jqtree_common li.jqtree-folder {
 .library-title-block {
     height: 65px;
     color: #666;
-    border-bottom: 1px solid #eee;
     margin-bottom: 10px;
-    background: #f5f5f5;
     margin: -10px -10px;
     padding: 5px 5px;
 }
@@ -3240,18 +3238,19 @@ ul.jqtree_common li.jqtree-folder {
 }
 .card-tree-container {
     margin-right: -9px;
+    margin-left: -9px;
 }
 .card-tree-list {
     list-style: none;
     font-size: 12px;
     color: #888;
-    padding-top: 2px;
+    padding-top: 0px;
 }
 ul.card-tree-list-item {
-    margin-left: -30px;
+    margin-left: -40px;
 }
 li.card-tree-list:last-of-type {
-    margin-bottom: 8px;
+    margin-bottom: 0px;
 }
 .card-tree-list a {
     color: #777;
@@ -3260,6 +3259,28 @@ li.card-tree-list:last-of-type {
     color: #666;
     font-weight: 600;
 }
+
+ul div .card-tree-list .cc-link {
+    margin-left: 0px;
+}
+
+ul div .card-tree-list span {
+    margin-left: 15px;
+}
+
+ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
+    margin-left: 30px;
+}
+
+.node-indent a {
+    padding-left: 30px;
+}
+
+.bg-card {
+    background: #46bbdc;
+    color: #fff;
+}
+
 .ep-card-crud {
     position: absolute;
     top: 100px;
@@ -3294,13 +3315,13 @@ li.card-tree-list:last-of-type {
 }
 
 .left-column-container{
-    -ms-flex: 0 0 220px;
-    -webkit-flex: 0 0 220px;
-    flex: 0 0 220px;
+    -ms-flex: 0 0 250px;
+    -webkit-flex: 0 0 250px;
+    flex: 0 0 250px;
     margin-bottom: 0px;
     background-color: #f0f0f0;
     width: 200px;
-    padding: 7px;
+    padding: 0px 7px 7px 7px;
     border-right: solid 1px #dddddd;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -3517,19 +3538,68 @@ li.card-tree-list:last-of-type {
 }
 .cc-link {
     display: inline-block;
-    width: 97%;
+    width: 100%;
+    height: 58px;
+    margin-top: -3px;
+    margin-bottom: -2px;
+    background: #f8f8f8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 1px;
-    border: 1px solid rgba(255, 255, 255, 0);
+    padding: 10px 0px 5px 10px;
+    border: 1px solid #ddd;
 }
+
+.cc-link:hover {
+    background: #fff;
+}
+
+.cc-link.active:hover {
+    cursor: default;
+}
+
 .cc-link.active {
     color: #666;
     font-weight: 600;
-    background: #f8f8f8;
+    background: #fff;
     border: 1px solid #ddd;
 }
+
+.node-name {
+    display: block;
+    margin-top: -40px;
+    font-size: 13px;
+}
+
+.node-subname {
+    font-size: 11px;
+    color: #999;
+}
+
+.card-tree-list a .node-name {
+    margin-left: 40px;
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-tree-list a .node-subname {
+    margin-left: 40px;
+}
+
+ul .card-tree-list a .node-name {
+    margin-left: 60px;
+    width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+ul .card-tree-list a .node-subname {
+    margin-left: 60px;
+}
+
 .tertiary-panel {
     position: absolute;
     top: 100px;
@@ -4923,6 +4993,15 @@ a.map-widget-icon:hover {
 .selected-geocoder-result {
     font-weight:bold;
     background: #dbf1f5;
+}
+.hover-feature-info {
+    position: absolute;
+    z-index: 1000;
+    margin: 10px;
+    padding: 10px;
+    border: solid 1px #808080;
+    background-color: rgb(249, 249, 249);
+    opacity: 0.9;
 }
 @keyframes loader {
 	0% { background: #ddd; }

@@ -1,13 +1,6 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div>
-
-    <!-- Toggle form/report TOC -->
-    <div class="toc-title-block">
-        <h4 class="title-block-title"> {% trans "Card Contents" %}</h4>
-    </div>
-
-
     <!-- TOC Cards/Widgets -->
     <div class="card-tree-container">
         <!-- ko template: {
@@ -27,11 +20,14 @@
             'active': self.selection() === card
         },
         click: self.selection">
-            <i class="card-tree-list-icon" data-bind="css: {
-                'ion-ios-folder-outline': card.isContainer(),
-                'ion-ios-list-outline': !card.isContainer()
-            }"></i>
-            <span data-bind="text: card.get('name')"></span>
+            <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
+                <i class="card-tree-list-icon" data-bind="css: {
+                'ion-ios-folder': card.isContainer(),
+                'ion-ios-list': !card.isContainer()
+                }"></i>
+            </span>
+            <span class="node-name" data-bind="text: card.get('name')"></span>
+            <span class="node-subname">Card Container/Card</span>
         </a>
 
         <ul class="card-tree-list-item" aria-expanded="true">
@@ -46,15 +42,18 @@
 </template>
 
 <template id="card-tree-widgets">
-    <li class="card-tree-list" data-bind="css: {
+    <li class="card-tree-list node-indent" data-bind="css: {
         'active': self.selection() === widget
     }">
         <a href="#" class="cc-link" data-bind="css: {
             'active': self.selection() === widget
         },
         click: self.selection">
-            <i data-bind="css: widget.icon + ' card-tree-list-icon'"></i>
-            <span data-bind="text: widget.get('label')"></span>
+            <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
+                <i data-bind="css: widget.icon + ' card-tree-list-icon'"></i>
+            </span>
+            <span class="node-name" data-bind="text: widget.get('label')"></span>
+            <span class="node-subname">Widget</span>
         </a>
     </li>
 </template>
