@@ -2316,7 +2316,7 @@ input.cmn-toggle-yes-no:checked + label:after {
     font-weight: 300;
 }
 .img-login {
-    background-image: url(../img/backgrounds/easter_island.jpg);
+    background-image: url(../img/backgrounds/easter_island_night.jpg);
 }
 .img-register {
     background-image: url(../img/backgrounds/easter_island_night.jpg);
@@ -2807,9 +2807,16 @@ span.editable-card i.fa.fa-align-justify:hover{
   opacity: .79;
   margin: 3px;
 }
+.card-grid-item.disabled:hover {
+    cursor: default;
+}
 div.card-grid-item.selected {
     border: 1px solid #aaa;
     opacity: 1.0;
+}
+.form-warning {
+    font-size: 12px;
+    color: #b20000;
 }
 .card-search {
     margin-top: 3px;
@@ -4606,6 +4613,10 @@ a.map-widget-icon:hover {
     right: 10px;
 }
 
+.overlay-toggle-icon {
+    font-size: 17px;
+}
+
 .show-tools {
     height: 100px;
     transition: all .40s ease;
@@ -4760,6 +4771,10 @@ a.map-widget-icon:hover {
   padding-top: 1px;
 }
 
+#overlays-panel .map-widget-panel-title:hover {
+    cursor: pointer;
+}
+
 .noUi-target {
     position: relative;
     margin-top: 10px;
@@ -4884,12 +4899,15 @@ a.map-widget-icon:hover {
 }
 .geocoder-results {
     max-height: 410px;
+    width: 248px;
+    margin-left: 0px;
     overflow-y: auto;
-    border: 1px solid #e2e2e2;
 }
 .geocoder-result-item {
     min-height: 40px;
     border: 1px solid #e2e2e2;
+    border-top-width: 0px; 
+    background: #fbfbfb;
     padding: 10px;
     cursor: pointer;
 }
@@ -4904,7 +4922,7 @@ a.map-widget-icon:hover {
 }
 .selected-geocoder-result {
     font-weight:bold;
-    border: 1px solid black;
+    background: #dbf1f5;
 }
 @keyframes loader {
 	0% { background: #ddd; }
