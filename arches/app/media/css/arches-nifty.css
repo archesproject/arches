@@ -4906,6 +4906,15 @@ a.map-widget-icon:hover {
     font-weight:bold;
     border: 1px solid black;
 }
+.hover-feature-info {
+    position: absolute;
+    z-index: 1000;
+    margin: 10px;
+    padding: 10px;
+    border: solid 1px #808080;
+    background-color: rgb(249, 249, 249);
+    opacity: 0.9;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

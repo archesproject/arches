@@ -141,6 +141,14 @@
             <!--/ko-->
         </div>
 
+        <!-- ko if: hoverFeature() !== null -->
+        <div class="hover-feature-info">
+            <div data-bind="text: hoverFeature().properties.graph_name"></div>
+            <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
+            <div data-bind="text: hoverFeature().properties.resourceinstanceid"></div>
+        </div>
+        <!--/ko-->
+
         <div id="map-widget-container relative">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>

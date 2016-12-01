@@ -95,6 +95,7 @@ define([
                 placeholder: this.geocodePlaceholder,
                 anchorLayerId: this.anchorLayerId
             });
+            this.hoverFeature = ko.observable(null);
 
 
             // TODO: This should be a system config rather than hard-coded here
@@ -606,6 +607,16 @@ define([
                     }
                     this.geocoder.redrawLayer();
                 }, this)
+
+                self.map.on('mousemove', function (e) {
+                    var features = self.map.queryRenderedFeatures(e.point);
+                    var hoverFeature = _.find(features, function (feature) {
+                        return feature.layer.id.indexOf('resources') === 0;
+                    }) || null;
+                    if (self.hoverFeature() !== hoverFeature) {
+                        self.hoverFeature(hoverFeature);
+                    }
+                });
             }; //end setup map
 
 
