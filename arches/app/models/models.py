@@ -599,7 +599,7 @@ class Widget(models.Model):
 
 
 class MapSources(models.Model):
-    name = models.TextField()
+    name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')
 
     @property
@@ -614,7 +614,7 @@ class MapSources(models.Model):
 
 class MapLayers(models.Model):
     maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
+    name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
     icon = models.TextField(default=None)
@@ -630,8 +630,10 @@ class MapLayers(models.Model):
 
 
 class TileserverLayers(models.Model):
-    name = models.TextField()
+    name = models.TextField(unique=True)
     path = models.TextField()
+    map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
+    map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
 
     class Meta:
         managed = True

@@ -132,10 +132,10 @@
             }
           },
           "config": {
-            "resourcePointSize": 6,
+            "featurePointSize": 6,
             "bearing": 0,
-            "resourceLineWidth": 2,
-            "resourceColor": "rgba(55,32,196,0.85)",
+            "featureLineWidth": 2,
+            "featureColor": "rgba(55,32,196,0.85)",
             "centerX": -122.39977301055693,
             "geocodeProvider": "MapzenGeocoder",
             "geocoderVisible": true,

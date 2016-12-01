@@ -2,7 +2,7 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: {
+    <div id='map' class="map-crud-container expanded-map relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
             zoom: zoom,
@@ -57,7 +57,7 @@
            <!-- Title -->
            <div class="overlay-title">
                Map Overlay Library
-               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
+               <span class="pull-right"><i class="overlay-close ion-close-round" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
            </div>
            <!-- Filter -->
            <div class="overlay-filter-container">
@@ -141,6 +141,14 @@
             <!--/ko-->
         </div>
 
+        <!-- ko if: hoverFeature() !== null -->
+        <div class="hover-feature-info">
+            <div data-bind="text: hoverFeature().properties.graph_name"></div>
+            <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
+            <div data-bind="text: hoverFeature().properties.resourceinstanceid"></div>
+        </div>
+        <!--/ko-->
+
         <div id="map-widget-container relative">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
@@ -190,12 +198,11 @@
 
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
             <div class="map-widget-panel-title">
-                <h4 class="">{% trans "Overlays" %}
+                <h4 class="" data-bind="click: toggleOverlaySelector">{% trans "Overlays" %}
                   <i class="ion-ios-plus pull-right add-tooltip"
                     data-placement="left"
                     data-toggle="tooltip"
                     data-original-title="add overlay"
-                    data-bind="click: toggleOverlaySelector"
                     ></i></h4>
             </div>
           <!--ko let: { self: $data }-->
@@ -210,10 +217,10 @@
                     <div class="map-overlay-item-tools">
                         <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools, css:{'overlay-invisible':invisible}">
                             <!-- ko if: showingTools() === false  -->
-                            <i class="ion-arrow-left-b" data-bind="showingTools()"></i>
+                            <i class="ion-arrow-left-b overlay-toggle-icon" data-bind="showingTools()"></i>
                             <!-- /ko -->
                             <!-- ko if: showingTools() !== false  -->
-                            <i class="ion-arrow-down-b"></i>
+                            <i class="ion-arrow-down-b overlay-toggle-icon"></i>
                             <!-- /ko -->
                         </a>
                     </div>
@@ -446,19 +453,19 @@
 
                 <div class="col-xs-12 pad-no crud-widget-container">
                   <div class="colorpicker-component input-group">
-                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: resourceColor, format:'rgba'}">
-                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: resourceColor}"></i></span>
+                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: featureColor, format:'rgba'}">
+                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: featureColor}"></i></span>
                   </div>
                 </div>
 
                 <div class="control-label">{% trans "Point Size" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourcePointSize, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featurePointSize, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Line Width" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourceLineWidth, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featureLineWidth, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Available Geometry Types" %}</div>

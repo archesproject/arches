@@ -63,11 +63,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans "Icons" %}
                                 </a>
                             </li>
+                            <!--ko if: graph.isresource() -->
                             <li id="xx-map-style-group">
                                 <a id="xx-map-style" data-toggle="tab" href="#map-style-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Appearance" %}
                                 </a>
                             </li>
+                            <!--/ko-->
                             <li id="xx-desc-group">
                                 <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Description" %}

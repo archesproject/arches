@@ -143,7 +143,7 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null, "inputMask":""}');
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
@@ -194,9 +194,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null
     }'
 );
 
@@ -3471,12 +3471,101 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null,
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null,
         "featureEditingDisabled": true,
         "mapControlsHidden": false
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
+
+CREATE OR REPLACE VIEW vw_getgeoms AS
+    SELECT t.tileid,
+       t.resourceinstanceid,
+       n.nodeid,
+       st_transform(
+           ST_SetSRID(
+               st_geomfromgeojson((json_array_elements(t.tiledata::json -> n.nodeid::text -> 'features') -> 'geometry')::text),
+               4326
+           ), 900913)::geometry(Geometry,900913) AS geom,
+       n.name as node_name,
+       g.graphid,
+       g.name as graph_name
+      FROM tiles t
+    	LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+        LEFT JOIN graphs g ON n.graphid = g.graphid
+     WHERE (( SELECT count(*) AS count
+    		  FROM jsonb_object_keys(t.tiledata) jsonb_object_keys(jsonb_object_keys)
+    		 WHERE (jsonb_object_keys.jsonb_object_keys IN ( SELECT n_1.nodeid::text AS nodeid
+    				  FROM nodes n_1
+    				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
+
+INSERT INTO map_sources(name, source)
+    VALUES ('resources', '{
+        "type": "vector",
+        "tiles": ["http://localhost:8000/tileserver/resources/{z}/{x}/{y}.pbf"]
+    }');
+
+INSERT INTO map_sources(name, source)
+   VALUES ('resource-outlines', '{
+       "type": "vector",
+       "tiles": ["http://localhost:8000/tileserver/resource-outlines/{z}/{x}/{y}.pbf"]
+   }');
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+   VALUES (public.uuid_generate_v1mc(), 'resources', '[
+       {
+           "id": "resources-fill",
+           "type": "fill",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Polygon"]],
+           "paint": {
+               "fill-color": "rgba(251, 96, 23, 0.5)"
+           }
+       },
+       {
+           "id": "resources-outlines",
+           "type": "line",
+           "source": "resource-outlines",
+           "source-layer": "resource-outlines",
+           "layout": {
+               "visibility": "visible"
+           },
+           "paint": {
+               "line-color": "rgba(251, 96, 23, 1)"
+           }
+       },
+       {
+           "id": "resources-line",
+           "type": "line",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "LineString"]],
+           "paint": {
+               "line-color": "rgba(251, 96, 23, 1)"
+           }
+       },
+       {
+           "id": "resources-point",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"]],
+           "paint": {
+               "circle-radius": 5,
+               "circle-color": "rgba(251, 96, 23, 1)"
+           }
+       }
+   ]', TRUE, 'fa fa-globe');

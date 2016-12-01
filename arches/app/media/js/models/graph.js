@@ -109,16 +109,21 @@ define(['arches',
          * @memberof GraphModel.prototype
          * @param  {NodeModel} node - the node whose parent should be retrieved
          * @return {object} the parent node of the passed in node
+         * If parent node of the passed in node can't be found then reutrn passed in node.
          */
         getParentNode: function(node) {
             var edge = this.get('edges')()
                 .find(function (edge) {
                     return edge.rangenode_id === node.nodeid;
                 });
-            return this.get('nodes')()
-                .find(function (node) {
-                    return edge.domainnode_id === node.nodeid;
-                });
+            if (edge) {
+              return this.get('nodes')()
+                  .find(function (node) {
+                      return edge.domainnode_id === node.nodeid;
+                    });
+              } else {
+                  return node;
+              };
         },
 
         /**

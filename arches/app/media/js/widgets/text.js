@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/input-mask'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -10,7 +10,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/input-mask'], f
     */
     return ko.components.register('text-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'maxLength', 'inputMask'];
+            params.configKeys = ['placeholder', 'width', 'maxLength'];
             WidgetViewModel.apply(this, [params]);
         },
         template: { require: 'text!widget-templates/text' }
