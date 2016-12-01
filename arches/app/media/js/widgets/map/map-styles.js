@@ -5,15 +5,14 @@ define(function() {
           {
               "id": "gl-draw-point",
               "type": "circle",
-              "layout": {},
               "filter": ["all",
                   ["!in", "$type", "LineString", "Polygon"],
                   ["!=", "mode", "static"],
                   ["!=", "active", 'true']
               ],
               "paint": {
-                  "circle-radius": resource.pointsize,
-                  "circle-color": resource.color
+                  "circle-radius": resource.pointsize(),
+                  "circle-color": resource.color()
               }
           }, {
             "id": "gl-draw-point-active-halo",
@@ -24,7 +23,7 @@ define(function() {
                 ["==", "active", "true"],
             ],
             "paint": {
-                "circle-radius": resource.pointsize,
+                "circle-radius": resource.pointsize(),
                 "circle-color": "#FFF"
             }
         }, {
@@ -37,8 +36,8 @@ define(function() {
                   ["==", "active", 'true']
               ],
               "paint": {
-                  "circle-radius": resource.pointsize * 0.75,
-                  "circle-color": resource.color
+                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-color": resource.color()
               }
           },{
               "id": "gl-draw-line",
@@ -51,9 +50,9 @@ define(function() {
                   "line-join": "round"
               },
               "paint": {
-                  "line-color": resource.color,
+                  "line-color": resource.color(),
                   // "line-dasharray": [0.2, 2],
-                  "line-width": resource.linewidth
+                  "line-width": resource.linewidth()
               }
           }, {
               "id": "gl-draw-polygon-fill",
@@ -62,8 +61,8 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "fill-color": resource.color,
-                  "fill-outline-color": resource.color,
+                  "fill-color": resource.color(),
+                  "fill-outline-color": resource.color(),
                   "fill-opacity": 0.1
               }
           }, {
@@ -77,9 +76,9 @@ define(function() {
                   "line-join": "round"
               },
               "paint": {
-                  "line-color": resource.color,
+                  "line-color": resource.color(),
                   // "line-dasharray": [0.2, 2],
-                  "line-width": resource.linewidth
+                  "line-width": resource.linewidth()
               }
           }, {
               "id": "gl-draw-polygon-and-line-vertex-halo-active",
@@ -89,7 +88,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": "#FFF"
               }
           }, {
@@ -100,8 +99,8 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize * 0.75,
-                  "circle-color": resource.color,
+                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-color": resource.color(),
               }
           }, {
               "id": "gl-draw-polygon-and-line-midpoint-halo-active",
@@ -111,7 +110,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": "#FFF"
               }
           }, {
@@ -122,8 +121,8 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize * 0.75,
-                  "circle-color": resource.color,
+                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-color": resource.color(),
               }
           }
         ];

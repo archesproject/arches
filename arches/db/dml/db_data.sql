@@ -194,9 +194,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null
     }'
 );
 
@@ -3471,9 +3471,9 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null,
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null,
         "featureEditingDisabled": true,
         "mapControlsHidden": false
     }');
