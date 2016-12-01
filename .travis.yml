@@ -18,15 +18,9 @@ addons:
       - elasticsearch-2.x
     packages:
       - elasticsearch
-      - libproj-dev
       - libxml2-dev
-      - libjson0-dev
-      - xsltproc
-      - docbook-xsl
-      - docbook-mathml
       - libpq-dev
       - openjdk-7-jdk
-      - python-setuptools
       - python-dev
 
 services:
