@@ -3505,13 +3505,13 @@ CREATE OR REPLACE VIEW vw_getgeoms AS
 INSERT INTO map_sources(name, source)
     VALUES ('resources', '{
         "type": "vector",
-        "tiles": ["http://localhost:8000/tileserver/resources/{z}/{x}/{y}.pbf"]
+        "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
 
 INSERT INTO map_sources(name, source)
    VALUES ('resource-outlines', '{
        "type": "vector",
-       "tiles": ["http://localhost:8000/tileserver/resource-outlines/{z}/{x}/{y}.pbf"]
+       "tiles": ["/tileserver/resource-outlines/{z}/{x}/{y}.pbf"]
    }');
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
