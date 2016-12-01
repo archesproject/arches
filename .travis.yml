@@ -12,7 +12,7 @@ cache:
 
 addons:
   sauce_connect: false
-  postgresql: 9.6
+  postgresql: 9.5
   apt:
     sources:
       - elasticsearch-2.x
