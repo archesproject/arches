@@ -18,7 +18,6 @@ from tests.ui.pages.node_page import NodePage
 from tests.ui.pages.card_page import CardPage
 from tests.ui.pages.form_page import FormPage
 from tests.ui.pages.card_designer_page import CardDesignerPage
-from tests.ui.pages.map_widget_page import MapWidgetPage
 from tests.ui.pages.report_manager_page import ReportManagerPage
 from tests.ui.pages.report_editor_page import ReportEditorPage
 from tests.ui.pages.resource_manager_page import ResourceManagerPage
