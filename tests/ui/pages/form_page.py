@@ -1,8 +1,6 @@
 import re
 from base_page import BasePage, script_returns_true
 from page_locators import FormPageLocators as locators
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from arches.urls import uuid_regex
 

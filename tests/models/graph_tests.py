@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os, json, uuid
+from django.core import management
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
@@ -29,16 +30,17 @@ class GraphTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_json', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
         cls.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
         cls.SINGLE_NODE_GRAPHID = '22000000-0000-0000-0000-000000000000'
+        cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID = "11111111-0000-0000-0000-191919191919"
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
     @classmethod
     def tearDownClass(cls):
-        root = models.Node.objects.get(pk=cls.HERITAGE_RESOURCE_FIXTURE)
-        cls.deleteGraph(root)
+        cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
+        cls.deleteGraph(cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID)
 
     def setUp(self):
         graph = Graph.new()
@@ -62,7 +64,7 @@ class GraphTests(ArchesTestCase):
         self.rootNode = graph.root
 
     def tearDown(self):
-        self.deleteGraph(self.rootNode)
+        self.deleteGraph(self.rootNode.graph_id)
 
     def test_new_graph(self):
         name = "TEST NEW GRAPH"

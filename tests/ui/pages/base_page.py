@@ -13,17 +13,20 @@ class BasePage(object):
         self.driver.implicitly_wait(1)
         self.live_server_url = live_server_url
         self.base_url = base_url
-        
         self.wait = WebDriverWait(self.driver, wait)
+        self.wait_until_loading_mask_is_gone()
 
     def open(self, additional_path=''):
         if self.base_url is not None:
             self.driver.get(self.live_server_url + self.base_url + additional_path)
-            self.wait.until(
-                EC.invisibility_of_element_located(locators.LOADING_MASK)
-            )
+            self.wait_until_loading_mask_is_gone()
         else:
             raise Exception("You need to define a base_url when initializing the page class")
+
+    def wait_until_loading_mask_is_gone(self, wait=20):
+        WebDriverWait(self.driver, wait).until(
+            EC.invisibility_of_element_located(locators.LOADING_MASK)
+        )
 
 
 class script_returns_true(object):

@@ -20,6 +20,7 @@ import os, json
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.test import Client
+from django.core import management
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
@@ -30,8 +31,9 @@ class GraphManagerViewTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_json', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
+        cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID = "11111111-0000-0000-0000-191919191919"
         cls.ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
         cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
         cls.ARCHES_CONFIG_ID = '20000000-0000-0000-0000-000000000000'
@@ -42,8 +44,8 @@ class GraphManagerViewTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        root = Node.objects.get(pk=cls.ROOT_ID)
-        cls.deleteGraph(root)
+        cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
+        cls.deleteGraph(cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID)
 
     def test_graph_import(self):
         """
