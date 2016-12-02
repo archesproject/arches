@@ -127,7 +127,7 @@ define([
             }else{
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
                 tile.dirty = ko.computed(function(){
-                    return koMapping.toJSON(tile.data) !== tile._data();
+                    return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
                 });
             }
             if(!!tile.tiles){
