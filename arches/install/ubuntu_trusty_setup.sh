@@ -21,6 +21,7 @@ sudo apt-get install -y libgdal1-dev
 sudo apt-get install -y libpq-dev
 sudo apt-get install -y libgeos-3.4.2
 sudo apt-get install -y openjdk-7-jdk elasticsearch=2.2.0
+sudo apt-get install -y libmapnik2.2
 
 sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
 sudo echo "*:*:*:postgres:postgis" >> ~/.pgpass
@@ -49,4 +50,3 @@ sudo -u postgres createdb training -T template_postgis_20
 
 
 # sudo -u postgres createdb -E UTF8 -T template_postgis_20 --locale=en_US.utf8 arches
-
