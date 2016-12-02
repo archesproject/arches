@@ -43,13 +43,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% block graph_title %}
         <div class="ep-tools-title">
             <h1 class="page-header text-overflow ep-graph-title">
-              <!--ko if: graph.iconclass() === '' -->
-                <i class="fa fa-question text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-              <!--/ko-->
-              <!--ko if: graph.iconclass() !== '' -->
-                <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graph.iconclass"></i>
-              <!--/ko-->
-                <span data-bind="text: graph.name"></span>
+                <i class="{{graph.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span>
+                    {{graph.name}}
+                </span>
             </h1>
         </div>
         {% endblock graph_title %}
