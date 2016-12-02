@@ -650,6 +650,17 @@ define([
                 });
             }; //end setup map
 
+            // preprocess relative paths for app tileserver
+            // see: https://github.com/mapbox/mapbox-gl-js/issues/3636#issuecomment-261119004
+            _.each(arches.mapSources, function (sourceConfig, name) {
+                if (sourceConfig.tiles) {
+                    sourceConfig.tiles.forEach(function (url, i) {
+                        if (url.startsWith('/')) {
+                            sourceConfig.tiles[i] = window.location.origin + url;
+                        }
+                    });
+                }
+            });
 
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {

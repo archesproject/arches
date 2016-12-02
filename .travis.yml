@@ -1,3 +1,4 @@
+dist: trusty
 language: python
 
 python:
@@ -11,23 +12,16 @@ cache:
 
 addons:
   sauce_connect: false
-  postgresql: 9.4
+  postgresql: 9.5
   apt:
     sources:
       - elasticsearch-2.x
     packages:
       - elasticsearch
-      - libproj-dev
       - libxml2-dev
-      - libjson0-dev
-      - xsltproc
-      - docbook-xsl
-      - docbook-mathml
       - libpq-dev
       - openjdk-7-jdk
-      - python-setuptools
       - python-dev
-      - postgis
 
 services:
   - postgresql
