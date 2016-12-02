@@ -278,7 +278,6 @@ define([
                 console.log('savingParentTile: ' + savingParentTile)
                 console.log('singleValueCard: ' + singleValueCard)
                 //var savingParentTile = tiles().length === 0 && !parentTile.formid;
-                this.trigger('before-update');
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
@@ -293,6 +292,7 @@ define([
                 }else{
                     model = new TileModel(koMapping.toJS(tile))
                 }
+                this.trigger('before-update');
                 model.save(function(response, status, model){
                     if(response.status === 200){
                         // if we had to save an parentTile
@@ -340,7 +340,6 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
-            this.trigger('before-update');
             // parentTile.tiles.forEach(function (tile) {
             //     tile.formData.keys().forEach(function (key) {
             //         tile.formData.getAll(key).forEach(function (value) {
@@ -348,6 +347,7 @@ define([
             //         });
             //     });
             // });
+            this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){
                     this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
@@ -396,7 +396,6 @@ define([
          */
         deleteTile: function(parentTile, tile, justremove){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
-            this.trigger('before-update');
             if(justremove){
                 tiles.remove(tile);
                 if(tiles().length === 0){
@@ -410,6 +409,7 @@ define([
                 }else{
                     model = new TileModel(ko.toJS(tile));
                 }
+                this.trigger('before-update');
                 model.delete(function(response, status, model){
                     if(response.status === 200){
                         if(deletingParentTile){

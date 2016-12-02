@@ -97,6 +97,7 @@
                                         <!-- ko if: tile.dirty -->
                                             <!-- ko if: forceBlank -->
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.newSave.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
                                             <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
@@ -104,12 +105,9 @@
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                            <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.newSave.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
-                                            </div>
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.newSave.bind(form, parentTile, cardinality)">{% trans 'Save' %}</button>
                                             </div>
                                             <!-- /ko -->
                                         <!-- /ko -->
