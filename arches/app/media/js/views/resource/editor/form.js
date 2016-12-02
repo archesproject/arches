@@ -201,57 +201,14 @@ define([
 
         /**
          * saves a new tile object back to the database and adds it to the UI, in some instances it will
-         * save the outer most tile if that doesn't already exist
+         * save the outer most tile if it doesn't already exist
          * @memberof Form.prototype
-         * @param  {object} parentTile a reference to the outer most tile, used to determine if that tile needs to be saved instead
-         * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
+         * @param  {object} parentTile a reference to the outer most tile, used to determine if that tile needs to be saved as well
+         * @param  {boolean} cardinality the cardinaltiy code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
          * @param  {object} tile the tile to add/save
          * @return {null}
          */
-        saveTile: function(parentTile, justadd, tile){
-            var tiles = parentTile.tiles[tile.nodegroup_id()];
-            if(!!parentTile.tileid){
-                tile.parenttile_id(parentTile.tileid());
-            }
-            if(justadd){
-                parentTile.dirty(true);
-                tiles.push(this.initTile(koMapping.fromJS(ko.toJS(tile))));
-                this.clearTileValues(tile);
-            }else{
-                var model;
-                var savingParentTile = tiles().length === 0 && !parentTile.formid;
-                this.trigger('before-update');
-                // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
-                if(savingParentTile){
-                    model = new TileModel(koMapping.toJS(parentTile));
-                    model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
-                }else{
-                    model = new TileModel(koMapping.toJS(tile))
-                }
-                model.save(function(response, status, model){
-                    if(response.status === 200){
-                        // if we had to save an parentTile
-                        if(savingParentTile){
-                            parentTile.tileid(response.responseJSON.tileid);
-                            response.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                parentTile.tiles[tile.nodegroup_id].push(this.initTile(koMapping.fromJS(tile)));
-                            }, this)
-                            this.clearTile(tile);
-                        }else{
-                            tiles.push(this.initTile(koMapping.fromJS(response.responseJSON)));
-                            this.clearTileValues(tile);
-                        }
-                    }
-                    this.trigger('after-update', response, tile);
-                }, this, tile.formData);
-            }
-        },
-
-        newSave: function(parentTile, cardinality, tile){
-            // var cardinality = parentTileCardinality + '-';
-            // if(parentTile !== tile){
-            //     cardinality = parentTileCardinality + '-' + tileCardinality
-            // }
+        saveTile: function(parentTile, cardinality, tile){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
             var tileHasParent = cardinality === '1-1' || 
                                 cardinality === '1-n' || 
@@ -271,13 +228,13 @@ define([
                 if(tileHasParent && !parentTile.tileid()){
                     savingParentTile = true;
                 }
-                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1'){
+                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || cardinality === 'n-n'){
                     singleValueCard = true;
                 }
                 console.log('cardinality: ' + cardinality)
                 console.log('savingParentTile: ' + savingParentTile)
                 console.log('singleValueCard: ' + singleValueCard)
-                //var savingParentTile = tiles().length === 0 && !parentTile.formid;
+
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
@@ -285,7 +242,6 @@ define([
                         var tilemodel = {};
                         tilemodel[tile.nodegroup_id()] = [koMapping.toJS(tile)];
                         model.set('tiles', tilemodel);
-                        //model.get('tiles')[tile.nodegroup_id()] = [koMapping.toJS(tile)];
                     }else{
                         model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
                     }
@@ -357,34 +313,6 @@ define([
             }, this, parentTile.formData);
         },
 
-        /**
-         * saves the contents of an existing tile object back to the database
-         * @memberof Form.prototype
-         * @param  {object} tile the tile to save
-         * @param  {object} e event object
-         * @return {null}
-         */
-        updateTile: function(tile, e){
-            var model = new TileModel(ko.toJS(tile));
-            this.trigger('before-update');
-            model.save(function(response, status, model){
-                if(response.status === 200){
-                    _.each(tile.tiles, function(tile){
-                        _.each(response.responseJSON.tiles, function(savedtile){
-                            if(tile()[0].tileid() === savedtile[0].tileid){
-                                tile()[0]._data(JSON.stringify(savedtile[0].data));
-                            }
-                        }, this);
-                    }, this);
-                    if(!!tile._data){
-                        tile._data(JSON.stringify(response.responseJSON.data));
-                    }
-                }
-                this.trigger('after-update', response, tile);
-                var saveEvent = new Event('updated-tile');
-                document.dispatchEvent(saveEvent);
-            }, this, tile.formData);
-        },
 
         /**
          * deletes a tile object or tile collection from the database and removes it from the UI
@@ -512,6 +440,7 @@ define([
          */
         clearTile: function(tile){
             var card;
+            console.log(koMapping.toJS(tile))
             this.cards().forEach(function(c){
                 if(c.get('nodegroup_id') === tile.nodegroup_id()){
                     card = c;
@@ -523,6 +452,7 @@ define([
                     if(innerCard.get('cardinality')() === 'n'){
                         _.each(tile.tiles, function(innerTile, nodegroup_id, list){
                             if(nodegroup_id === innerCard.get('nodegroup_id')){
+                                console.log('here');
                                 innerTile.removeAll();
                             }
                         }, this);
