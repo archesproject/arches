@@ -220,7 +220,7 @@ define([
             if(cardinality === 'n-n' && !parentTile.tileid()){
                 parentTile.dirty(true);
                 tiles.push(this.initTile(koMapping.fromJS(ko.toJS(tile))));
-                this.clearTileValues(tile);
+                this.clearTile(tile);
             }else{
                 var model;
                 var savingParentTile = false;
@@ -280,7 +280,7 @@ define([
                             }else{
                                 tiles.push(this.initTile(koMapping.fromJS(response.responseJSON)));
                             }
-                            this.clearTileValues(tile);
+                            this.clearTile(tile);
                         }
                     }
                     this.trigger('after-update', response, tile);
@@ -439,48 +439,21 @@ define([
          * @return {null}
          */
         clearTile: function(tile){
-            var card;
-            console.log(koMapping.toJS(tile))
-            this.cards().forEach(function(c){
-                if(c.get('nodegroup_id') === tile.nodegroup_id()){
-                    card = c;
-                }
+            // remove any child tile instances
+            _.each(tile.tiles, function(innerTile, nodegroup_id, list){
+                innerTile.removeAll();
             }, this);
 
-            if(!!card){
-                card.get('cards')().forEach(function(innerCard){
-                    if(innerCard.get('cardinality')() === 'n'){
-                        _.each(tile.tiles, function(innerTile, nodegroup_id, list){
-                            if(nodegroup_id === innerCard.get('nodegroup_id')){
-                                console.log('here');
-                                innerTile.removeAll();
-                            }
-                        }, this);
-                        tile.dirty(false);
-                    }else{
-                        _.each(tile.tiles, function(innerTile, nodegroup_id, list){
-                            if(nodegroup_id === innerCard.get('nodegroup_id')){
-                                this.clearTileValues(innerTile()[0]);
-                            }
-                        }, this);
-                    }
-                }, this);
-            }
-        },
-
-        /**
-         * removes any existing values set on the tile.data attribute
-         * @memberof Form.prototype
-         * @param  {object} tile the tile to remove values from
-         * @return {null}
-         */
-        clearTileValues: function(tile){
+            // remove any data on the tile itself
             _.each(tile.data, function(value, key, list){
                 value("");
             }, this);
-            //tile.dirty(false);
-        }
 
+            // we have to manage the parent dirty state directly
+            if(ko.isObservable(tile.dirty) && !ko.isComputed(tile.dirty)){
+                tile.dirty(false);
+            }
+        }
     });
     return FormView;
 });
