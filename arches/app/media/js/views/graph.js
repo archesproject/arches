@@ -47,6 +47,10 @@ require([
                 });
             };
 
+            this.viewModel.leaveDropdown = function(e){
+              $('.dropdown').dropdown('toggle')
+            };
+
             this.viewModel.allGraphs().forEach(function(graph) {
                 graph.root = null;
                 graph.isCard = false;
