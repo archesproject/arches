@@ -132,7 +132,7 @@ require([
                             }
                         },
                         error: function(response) {
-                            self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Something went wrong. Please contact your system administrator for more details.'));
+                            self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
                             self.viewModel.loading(false);
                         },
                     });

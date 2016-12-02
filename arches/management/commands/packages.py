@@ -38,6 +38,7 @@ from arches.app.models import models
 import csv
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
+from django.db import transaction
 
 
 class Command(BaseCommand):
@@ -48,7 +49,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -79,7 +80,14 @@ class Command(BaseCommand):
         parser.add_argument('-c', '--concepts', action='store', dest='concepts', default=False,
             help='A comma separated list of the conceptids of the concepts you would like to import/export.')
 
+        parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
+            help='A path to a mapnik xml file to generate a tileserver layer from.')
 
+        parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
+            help='The name of the tileserver layer to add or delete.')
+
+        parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
+            help='An icon class to use for a tileserver layer.')
 
 
     def handle(self, *args, **options):
@@ -132,6 +140,12 @@ class Command(BaseCommand):
 
         if options['operation'] == 'export_json':
             self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
+
+        if options['operation'] == 'add_tilserver_layer':
+            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'])
+
+        if options['operation'] == 'delete_tilserver_layer':
+            self.delete_tilserver_layer(options['layer_name'])
 
     def setup(self, package_name):
         """
@@ -354,15 +368,18 @@ class Command(BaseCommand):
         """
 
         if data_source == '':
-            for path in settings.RESOURCE_GRAPH_LOCATIONS:
-                if os.path.isfile(os.path.join(path)):
-                    ArchesFileImporter(path).import_all()
-                else:
-                    file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
-                    for file_path in file_paths:
-                        ArchesFileImporter(os.path.join(path, file_path)).import_all()
-        else:
-            ArchesFileImporter(data_source).import_all()
+            data_source = settings.RESOURCE_GRAPH_LOCATIONS
+
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        for path in data_source:
+            if os.path.isfile(os.path.join(path)):
+                ArchesFileImporter(path).import_all()
+            else:
+                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
+                for file_path in file_paths:
+                    ArchesFileImporter(os.path.join(path, file_path)).import_all()
 
 
     def start_livereload(self):
@@ -387,3 +404,37 @@ class Command(BaseCommand):
             resources = [x.strip(' ') for x in resources.split(",")]
 
         ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)
+
+    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe'):
+        if layer_name != False and mapnik_xml_path != False:
+            with transaction.atomic():
+                tileserver_layer = models.TileserverLayers(name=layer_name, path=mapnik_xml_path)
+                source_dict = {
+                    "type": "raster",
+                    "tiles": [
+                        ("/tileserver/%s/{z}/{x}/{y}.png") % (layer_name)
+                    ],
+                    "tileSize": 256
+                }
+                layer_list = [{
+                    "id": layer_name,
+                    "type": "raster",
+                    "source": layer_name,
+                    "minzoom": 0,
+                    "maxzoom": 22
+                }]
+                map_source = models.MapSources(name=layer_name, source=source_dict)
+                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=True, icon=layer_icon)
+                map_source.save()
+                map_layer.save()
+                tileserver_layer.map_layer = map_layer
+                tileserver_layer.map_source = map_source
+                tileserver_layer.save()
+
+    def delete_tilserver_layer(self, layer_name=False):
+        if layer_name != False:
+            with transaction.atomic():
+                tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
+                tileserver_layer.map_layer.delete()
+                tileserver_layer.map_source.delete()
+                tileserver_layer.delete()

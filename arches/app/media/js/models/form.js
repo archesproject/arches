@@ -27,7 +27,6 @@ define([
             this.iconclass = ko.observable();
             this.title = ko.observable();
             this.subtitle = ko.observable();
-            this.status = ko.observable();
             this.visible = ko.observable();
             this.cards = ko.observableArray();
             this.availableCards = ko.observableArray();
@@ -46,7 +45,6 @@ define([
                     iconclass: self.iconclass(),
                     title: self.title(),
                     subtitle: self.subtitle(),
-                    status: self.status(),
                     visible: self.visible(),
                     cards: self.cards()
                 }))
@@ -66,10 +64,9 @@ define([
             this.iconclass(data.iconclass);
             this.title(data.title);
             this.subtitle(data.subtitle);
-            this.status(data.status);
             this.visible(data.visible);
             this.cards(data.cards);
-            
+
             var addedCardIds = _.map(this.cards(), function (card) {
                 return card.cardid;
             });

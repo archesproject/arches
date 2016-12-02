@@ -28,7 +28,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 
 
@@ -50,6 +50,12 @@ class ResourceListView(BaseManagerView):
             main_script='views/resource',
             instance_summaries=instance_summaries
         )
+        new_graphs = []
+        for graph in JSONDeserializer().deserialize(context['graphs']):
+            graph['hasforms'] = True if models.Form.objects.filter(graph_id=graph['graphid']).count() > 0 else False
+            graph['formsviewable'] = True if models.Form.objects.filter(graph_id=graph['graphid'], visible=True).count() > 0 else False
+            new_graphs.append(graph)
+        context['graphs'] = JSONSerializer().serialize(new_graphs)
         return render(request, 'views/resource.htm', context)
 
 
@@ -73,7 +79,7 @@ class ResourceEditorView(BaseManagerView):
                 resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
+                forms=JSONSerializer().serialize(resource_instance.graph.form_set.filter(visible=True)),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
                 map_layers=map_layers,
@@ -83,6 +89,14 @@ class ResourceEditorView(BaseManagerView):
                 graph_json=JSONSerializer().serialize(graph),
             )
             return render(request, 'views/resource/editor.htm', context)
+
+        return HttpResponseNotFound()
+
+    def delete(self, request, resourceid=None):
+        if resourceid is not None:
+            #tiles = models.Tile.objects.filter(resourceinstance_id=resourceid).delete()
+            ret = models.ResourceInstance.objects.get(pk=resourceid).delete()
+            return JSONResponse(ret)
 
         return HttpResponseNotFound()
 
@@ -107,7 +121,7 @@ class ResourceReportView(BaseManagerView):
         except models.Report.DoesNotExist:
            report = None
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        forms = resource_instance.graph.form_set.filter(status=True)
+        forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
         datatypes = models.DDataType.objects.all()

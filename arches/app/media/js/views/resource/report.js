@@ -32,7 +32,8 @@ require([
 
             this.viewModel.reportLookup = reportLookup;
             this.viewModel.report = report;
-            BaseManagerView.prototype.initialize.call(this, options)
+            this.viewModel.graph = data.graph;
+            BaseManagerView.prototype.initialize.call(this, options);
         }
     });
     return new ResourceReportView();

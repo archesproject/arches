@@ -1,0 +1,576 @@
+{
+    "graph": [
+        {
+            "subtitle": "",
+            "mapfeaturecolor": "#FF0000",
+            "isresource": true,
+            "forms_x_cards": [
+                {
+                    "card_id": "6d7bb397-adbc-11e6-8439-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "9e847e5e-adbd-11e6-b5af-14109fd34195",
+                    "id": "7614e899-b5a4-11e6-8ab2-14109fd34195"
+                },
+                {
+                    "card_id": "6f985ce3-adbc-11e6-83cb-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "b9ddae85-adbd-11e6-9428-14109fd34195",
+                    "id": "7615385e-b5a4-11e6-9b92-14109fd34195"
+                },
+                {
+                    "card_id": "70eb5235-adbc-11e6-a381-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "d2118802-adbd-11e6-9bc1-14109fd34195",
+                    "id": "76156c14-b5a4-11e6-890b-14109fd34195"
+                },
+                {
+                    "card_id": "6e59eb85-adbc-11e6-a446-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "dcd1bbd7-adbd-11e6-86fd-14109fd34195",
+                    "id": "76159fa6-b5a4-11e6-8554-14109fd34195"
+                },
+                {
+                    "card_id": "72048ac0-adbc-11e6-bb7d-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "ee014d05-adbd-11e6-8a63-14109fd34195",
+                    "id": "7615dad4-b5a4-11e6-9e50-14109fd34195"
+                },
+                {
+                    "card_id": "7372688a-adbc-11e6-a129-14109fd34195",
+                    "sortorder": 0,
+                    "form_id": "f6419887-adbd-11e6-8520-14109fd34195",
+                    "id": "76161a45-b5a4-11e6-8197-14109fd34195"
+                }
+            ],
+            "reports": [],
+            "iconclass": "",
+            "functions": [],
+            "domain_connections": [],
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "parentnodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195"
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "6e59e094-adbc-11e6-8531-14109fd34195",
+                    "parentnodegroup_id": "6e59e71c-adbc-11e6-ad8e-14109fd34195"
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "6d7baf1c-adbc-11e6-9ee6-14109fd34195",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "70eb53f8-adbc-11e6-be8c-14109fd34195",
+                    "parentnodegroup_id": "70eb4e3a-adbc-11e6-aee7-14109fd34195"
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "73726a75-adbc-11e6-a29a-14109fd34195",
+                    "parentnodegroup_id": "737264f3-adbc-11e6-a55b-14109fd34195"
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "6f985347-adbc-11e6-a0fc-14109fd34195",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " ",
+            "deploymentfile": null,
+            "forms": [
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form scenario 1-",
+                    "formid": "9e847e5e-adbd-11e6-b5af-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                },
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form Scenario n-",
+                    "formid": "b9ddae85-adbd-11e6-9428-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                },
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form Scenario 1-1",
+                    "formid": "d2118802-adbd-11e6-9bc1-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                },
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form Scenario 1-n",
+                    "formid": "dcd1bbd7-adbd-11e6-86fd-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                },
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form Scenario n-1",
+                    "formid": "ee014d05-adbd-11e6-8a63-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                },
+                {
+                    "iconclass": null,
+                    "subtitle": null,
+                    "title": "Form Scenario n-n",
+                    "formid": "f6419887-adbd-11e6-8520-14109fd34195",
+                    "visible": true,
+                    "sortorder": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+                }
+            ],
+            "version": "",
+            "nodes": [
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "datatype": "semantic",
+                    "nodegroup_id": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "Outer Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": null,
+                    "nodeid": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "datatype": "semantic",
+                    "nodegroup_id": null,
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Top Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "datatype": "semantic",
+                    "nodegroup_id": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "Outer Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "70eb53f8-adbc-11e6-be8c-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "70eb53f8-adbc-11e6-be8c-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "6f985347-adbc-11e6-a0fc-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "6f985347-adbc-11e6-a0fc-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Input"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "6d7baf1c-adbc-11e6-9ee6-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "6d7baf1c-adbc-11e6-9ee6-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Input"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "6e59e094-adbc-11e6-8531-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "6e59e094-adbc-11e6-8531-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "73726a75-adbc-11e6-a29a-14109fd34195",
+                    "datatype": "string",
+                    "nodegroup_id": "73726a75-adbc-11e6-a29a-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "String Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "datatype": "semantic",
+                    "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "Outer Node"
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": null,
+                    "nodeid": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "datatype": "semantic",
+                    "nodegroup_id": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "config": null,
+                    "parentproperty": null,
+                    "name": "Outer Node"
+                }
+            ],
+            "ontology_id": null,
+            "description": "Model to test the 6 different combinations of card container and child card cardinality",
+            "edges": [
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "6e59f91c-adbc-11e6-a4a6-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "70eb5d94-adbc-11e6-8408-14109fd34195",
+                    "domainnode_id": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "rangenode_id": "70eb53f8-adbc-11e6-be8c-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "6e59f747-adbc-11e6-a7f5-14109fd34195",
+                    "domainnode_id": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "rangenode_id": "6e59e094-adbc-11e6-8531-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "737273fd-adbc-11e6-9bb0-14109fd34195",
+                    "domainnode_id": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "rangenode_id": "73726a75-adbc-11e6-a29a-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "6d7bb833-adbc-11e6-b2fe-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "6d7baf1c-adbc-11e6-9ee6-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "6f986240-adbc-11e6-87d8-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "6f985347-adbc-11e6-a0fc-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "720497fd-adbc-11e6-9686-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "7204966e-adbc-11e6-b951-14109fd34195",
+                    "domainnode_id": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "rangenode_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "7372757a-adbc-11e6-8234-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                },
+                {
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "name": null,
+                    "edgeid": "70eb5f19-adbc-11e6-9dfb-14109fd34195",
+                    "domainnode_id": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                    "rangenode_id": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "ontologyproperty": null,
+                    "description": null
+                }
+            ],
+            "maplinewidth": 1,
+            "mappointsize": 3,
+            "graphid": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+            "name": "Cardinality Test Model",
+            "cards_x_nodes_x_widgets": [],
+            "cards": [
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card container that has a cardinality of '1' and a child card with cardinality of '1'",
+                    "name": "Scenario 1-1",
+                    "nodegroup_id": "70eb4e3a-adbc-11e6-aee7-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "70eb5235-adbc-11e6-a381-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card that has a cardinality of '1' and no child cards",
+                    "name": "Scenario 1-",
+                    "nodegroup_id": "6d7baf1c-adbc-11e6-9ee6-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "6d7bb397-adbc-11e6-8439-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card container that has a cardinality of 'n' and a child card with cardinality of '1'",
+                    "name": "Scenario n-1",
+                    "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "72048ac0-adbc-11e6-bb7d-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "name": "Inner Card",
+                    "nodegroup_id": "73726a75-adbc-11e6-a29a-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": 0,
+                    "cardid": "73726d94-adbc-11e6-8cfd-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card container that has a cardinality of 'n' and a child card with cardinality of 'n'",
+                    "name": "Scenario n-n",
+                    "nodegroup_id": "737264f3-adbc-11e6-a55b-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "7372688a-adbc-11e6-a129-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "name": "Inner Card",
+                    "nodegroup_id": "6e59e094-adbc-11e6-8531-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": 0,
+                    "cardid": "6e59e514-adbc-11e6-b866-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card container that has a cardinality of '1' and a child card with cardinality of 'n'",
+                    "name": "Scenario 1-n",
+                    "nodegroup_id": "6e59e71c-adbc-11e6-ad8e-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "6e59eb85-adbc-11e6-a446-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "name": "Inner Card",
+                    "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": 0,
+                    "cardid": "72048fde-adbc-11e6-a51d-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "A card that has a cardinality of 'n' and no child cards",
+                    "name": "Scenario n-",
+                    "nodegroup_id": "6f985347-adbc-11e6-a0fc-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "6f985ce3-adbc-11e6-83cb-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                },
+                {
+                    "itemtext": null,
+                    "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                    "description": "Represents a single node in a graph",
+                    "name": "Inner Card",
+                    "nodegroup_id": "70eb53f8-adbc-11e6-be8c-14109fd34195",
+                    "visible": true,
+                    "helpenabled": false,
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "70eb56f0-adbc-11e6-a1d2-14109fd34195",
+                    "helptitle": null,
+                    "active": true,
+                    "instructions": null
+                }
+            ],
+            "root": {
+                "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": null,
+                "nodeid": "2f7f8b26-adbc-11e6-b9d5-14109fd34195",
+                "datatype": "semantic",
+                "nodegroup_id": null,
+                "config": null,
+                "name": "Top Node"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "eb50821 2016-11-22 16:48:17 -0800",
+        "db": "PostgreSQL 9.5.1 on x86_64-apple-darwin, compiled by i686-apple-darwin11-llvm-gcc-4.2 (GCC) 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00), 64-bit",
+        "os version": "14.0.0",
+        "os": "Darwin"
+    }
+}

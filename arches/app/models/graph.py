@@ -65,8 +65,9 @@ class Graph(models.GraphModel):
                     if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
                         setattr(self, key, value)
 
+                nodegroups = dict((item['nodegroupid'], item) for item in args[0]["nodegroups"])
                 for node in args[0]["nodes"]:
-                    self.add_node(node)
+                    self.add_node(node, nodegroups)
 
                 for edge in args[0]["edges"]:
                     self.add_edge(edge)
@@ -140,7 +141,7 @@ class Graph(models.GraphModel):
 
         return Graph.objects.get(pk=graph.graphid)
 
-    def add_node(self, node):
+    def add_node(self, node, nodegroups=None):
         """
         Adds a node to this graph
 
@@ -160,13 +161,16 @@ class Graph(models.GraphModel):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.config = nodeobj.get('config', None)
-            node.functions.set(nodeobj.get('functions', []))
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
+                if nodegroups is not None and str(node.nodegroup_id) in nodegroups:
+                    node.nodegroup.cardinality = nodegroups[str(node.nodegroup_id)]["cardinality"]
+                    node.nodegroup.legacygroupid = nodegroups[str(node.nodegroup_id)]["legacygroupid"]
+                    node.nodegroup.parentnodegroupid = nodegroups[str(node.nodegroup_id)]["parentnodegroup_id"]
             else:
                 node.nodegroup = None
 
@@ -992,7 +996,7 @@ class Graph(models.GraphModel):
             nodeobj['parentproperty'] = parentproperties[node.nodeid]
             ret['nodes'].append(nodeobj)
 
-        return ret
+        return JSONSerializer().serializeToPython(ret)
 
     def validate(self):
         """

@@ -86,27 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        <!-- ko if: alert() -->
-        <div class="ep-form-alert-wrapper">
-            <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
-                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-                <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
 
-                <div class="ep-form-alert-default-dismiss">
-                    <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
-                </div>
-
-                <div class="ep-form-alert-buttons">
-                    <!-- ko if: alert().cancel -->
-                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
-                    <!-- /ko -->
-                    <!-- ko if: alert().ok -->
-                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
-                    <!-- /ko -->
-                </div>
-            </div>
-        </div>
-        <!-- /ko -->
     </div>
 
 
@@ -120,13 +100,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Resource Type -->
                 <div class="resource-grid-main-container" data-bind="click:function(){ $parent.navigate(graphid + '/settings') }, hover: hover, css: {active: hover}">
                     <div class="resource-grid-main">
-                        <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
+                        <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
                         <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
                     </div>
                 </div>
 
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
-                    <div class="btn-group">
+                    <div class="btn-group" style="float:right;">
                         <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }"><i class="fa fa-wrench"></i> {% trans "Settings" %}</a>
@@ -155,7 +135,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                     </div>
                     <div>
-                        <p class="resource-status">{% trans "Status" %}: <span data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                        <p class="resource-status">{% trans "Status" %}: <span data-bind="text:isactive?'{% trans "Editable" %}':'{% trans "Non-Editable" %}'"></span></p>
                     </div>
                 </div>
             </div>

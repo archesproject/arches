@@ -23,20 +23,6 @@ from django.dispatch import receiver
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
 
-class Address(models.Model):
-    addressnum = models.TextField(blank=True, null=True)
-    addressstreet = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
-    postalcode = models.TextField(blank=True, null=True)
-    addressesid = models.AutoField(primary_key=True)
-    geometry = models.PointField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'addresses'
-
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -51,7 +37,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_cards')
     itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -64,7 +49,6 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_widgets')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -91,7 +75,6 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_datatypes')
 
     class Meta:
         managed = True
@@ -229,7 +212,6 @@ class Form(models.Model):
     title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     iconclass = models.TextField(blank=True, null=True)
-    status = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
@@ -240,7 +222,7 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    id = models.AutoField(primary_key=True, serialize=True)
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     card = models.ForeignKey('CardModel', db_column='cardid')
     form = models.ForeignKey('Form', db_column='formid')
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -345,7 +327,6 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
-    functions = models.ManyToManyField(to='Function', db_table='functions_x_nodes')
     config = JSONField(blank=True, null=True, db_column='config')
 
     def get_child_nodes_and_edges(self):
@@ -450,30 +431,6 @@ class OntologyClass(models.Model):
         unique_together=(('source', 'ontology'),)
 
 
-class Overlay(models.Model):
-    overlaytyp = models.TextField(blank=True, null=True)
-    overlayval = models.TextField(blank=True, null=True)
-    overlayid = models.AutoField(primary_key=True)  # This field type is a guess.
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'overlays'
-
-
-class Parcel(models.Model):
-    parcelapn = models.TextField(blank=True, null=True)
-    vintage = models.TextField(blank=True, null=True)
-    parcelsid = models.AutoField(primary_key=True)
-    geometry = models.PolygonField(blank=True, null=True)
-    objects = models.GeoManager()
-
-    class Meta:
-        managed = True
-        db_table = 'parcels'
-
-
 class Relation(models.Model):
     conceptfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
     conceptto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
@@ -529,7 +486,7 @@ class Resource2ResourceConstraint(models.Model):
 
 
 class ResourceXResource(models.Model):
-    resourcexid = models.AutoField(primary_key=True)
+    resourcexid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
@@ -642,7 +599,7 @@ class Widget(models.Model):
 
 
 class MapSources(models.Model):
-    name = models.TextField()
+    name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')
 
     @property
@@ -657,7 +614,7 @@ class MapSources(models.Model):
 
 class MapLayers(models.Model):
     maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
+    name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
     icon = models.TextField(default=None)
@@ -670,3 +627,14 @@ class MapLayers(models.Model):
     class Meta:
         managed = True
         db_table = 'map_layers'
+
+
+class TileserverLayers(models.Model):
+    name = models.TextField(unique=True)
+    path = models.TextField()
+    map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
+    map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
+
+    class Meta:
+        managed = True
+        db_table = 'tileserver_layers'

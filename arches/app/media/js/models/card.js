@@ -20,7 +20,6 @@ define(['arches',
             var self = this;
             this.set('cards', ko.observableArray());
             this.set('nodes', ko.observableArray());
-            this.set('functions', ko.observableArray());
             this.set('widgets', ko.observableArray());
             this.set('tiles', ko.observableArray());
 
@@ -151,9 +150,6 @@ define(['arches',
                     case 'groups':
                     case 'tiles':
                         this.set(key, koMapping.fromJS(value));
-                        break;
-                    case 'functions':
-                        this.get(key)(value);
                         break;
                     default:
                         this.set(key, value);

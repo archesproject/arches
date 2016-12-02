@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.test import TestCase
-from arches.app.models import models
+from arches.app.models.graph import Graph
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -40,15 +40,8 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def deleteGraph(cls, root):
-        def delete_children(node):
-            if node.nodegroup:
-                node.nodegroup.delete()
-            for edge in models.Edge.objects.filter(rangenode=node):
-                edge.delete()
-                delete_children(edge.rangenode)
-         
-        delete_children(root)
-        root.delete()
+        graph = Graph.objects.get(graphid=str(root))
+        graph.delete()
 
     def setUp(self):
         pass

@@ -93,4 +93,14 @@ require([
     var pageView = new PageView({
         viewModel: viewModel
     });
+    var self = this;
+
+    var updatePageViewGraph = function(pageView, prop){
+      return function(e){
+        var graph = _.findWhere(pageView.viewModel.allGraphs(), {graphid: pageView.viewModel.graphid()})
+        graph[prop](e);
+      }
+    }
+    viewModel.graph.name.subscribe(updatePageViewGraph(pageView, 'name'))
+    viewModel.graph.iconclass.subscribe(updatePageViewGraph(pageView, 'iconclass'))
 });

@@ -88,7 +88,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li id="card-manager" class="edit-menu-item">
-                        <a href="" target="" class="">
+                        <a href="" target="" class="" data-bind="click: deleteResource">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>
@@ -165,27 +165,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Edit Content -->
-    <div class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
-        <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
-            <!-- ko if: alert() -->
-            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
-
-            <div class="ep-form-alert-default-dismiss">
-                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
-            </div>
-
-            <div class="ep-form-alert-buttons">
-                <!-- ko if: alert().cancel -->
-                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
-                <!-- /ko -->
-                <!-- ko if: alert().ok -->
-                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
-                <!-- /ko -->
-            </div>
-            <!-- /ko -->
-        </div>
-
+    <div class="flex" style="">
 
         <!-- Page Content -->
         {% block content %}

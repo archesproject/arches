@@ -134,7 +134,6 @@ class GraphManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            functions=JSONSerializer().serialize(models.Function.objects.all()),
             branches=JSONSerializer().serialize(branch_graphs),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
@@ -278,7 +277,6 @@ class CardView(GraphBaseView):
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
-            functions=JSONSerializer().serialize(models.Function.objects.all()),
             map_layers=map_layers,
             map_sources=map_sources,
             concept_collections=concept_collections,
@@ -355,7 +353,6 @@ class FormView(GraphBaseView):
         form.title = data['title']
         form.subtitle = data['subtitle']
         form.iconclass = data['iconclass']
-        form.status = data['status']
         form.visible = data['visible']
         forms_x_cards = models.FormXCard.objects.filter(form=form)
         with transaction.atomic():
@@ -383,7 +380,7 @@ class DatatypeTemplateView(TemplateView):
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
         datatypes = models.DDataType.objects.all()
@@ -415,7 +412,7 @@ class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
         self.graph = Graph.objects.get(graphid=report.graph.pk)
-        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
         datatypes = models.DDataType.objects.all()

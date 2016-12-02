@@ -1,0 +1,15 @@
+<Map background-color="transparent">
+	<Layer name="Hillshade">
+	    <StyleName>raster</StyleName>
+	    <Datasource>
+	        <Parameter name="type">gdal</Parameter>
+	        <Parameter name="file">hillshade.tif</Parameter>
+            <Parameter name="nodata">0</Parameter>
+	    </Datasource>
+	</Layer>
+	<Style name="raster">
+	    <Rule name="rule 1">
+	        <RasterSymbolizer opacity=".7" scaling="bilinear" mode="normal" />
+	    </Rule>
+	</Style>
+</Map>

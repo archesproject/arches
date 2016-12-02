@@ -24,7 +24,7 @@
                     <li id="summary-group" data-bind="css: {
                         'active': 0 === $index()
                     }, click: form.selectTab.bind($parent)">
-                        <a id="summary-tab" href="#" class="card-tab-title">
+                        <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: function(){window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 100)}">
                             <span data-bind="text: card.get('name')"></span>
                         </a>
                     </li>
@@ -302,7 +302,7 @@
         <!-- /ko -->
 
     </div>
-        
+
 </div>
 <!-- /ko -->
 <!-- /ko -->

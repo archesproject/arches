@@ -27,7 +27,6 @@ define([
             var map = new mapboxgl.Map(
                 _.defaults(mapInitOptions, defaults)
             );
-            viewModel.map = map;
 
             // prevents drag events from bubbling
             $(element).mousedown(function(event) {

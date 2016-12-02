@@ -1,48 +1,57 @@
-from map_widget_page import MapWidgetPage
+from base_widget_page import BaseWidgetPage
 from page_locators import ResourceEditorPageLocators as locators
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-class ResourceEditorPage(MapWidgetPage):
+class ResourceEditorPage(BaseWidgetPage):
     """
     class to initialize the report-editor page
 
     """
 
-    def __init__(self, driver, live_server_url, target_page, page_id):
-        super(MapWidgetPage, self).__init__(target_page, page_id)
-        self.driver = driver
-        self.live_server_url = live_server_url
-        self.resource_id = page_id
-        self.base_url = '{0}/{1}'.format(target_page, self.resource_id)
-        self.wait = WebDriverWait(self.driver, 20)
-
-    def create_map_data(self):
-        self.driver.get(self.live_server_url + '/' + self.base_url)
-        self.wait.until(
-            EC.invisibility_of_element_located(locators.LOADING_MASK)
-        )
+    def __init__(self, driver, live_server_url, resource_instance_id):
+        super(ResourceEditorPage, self).__init__(driver, live_server_url, '/resource/' + resource_instance_id)
         self.driver.set_window_size(1400,900)
-        self.open_tools()
-        self.open_draw_tools()
-        for element in (locators.MAP_DRAW_TOOLS, locators.POINT_DRAW_TOOL):
-            self.wait.until(
-                EC.element_to_be_clickable(element)
-            ).click()
 
-        ac = ActionChains(self.driver)
-        map = self.driver.find_element(*locators.MAP_CANVAS)
-        ac.click(map).perform()
+    def add_widget(self, widget, tab_index=0, widget_index=0):
+        return widget(self, tab_index=tab_index, widget_index=widget_index) 
 
-        for locator in (locators.SAVE_RESOURCE_EDITS_BUTTON, locators.MANAGE_MENU):
-            el = self.driver.find_element(*locator)
-            self.driver.execute_script("return arguments[0].scrollIntoView();", el)
-            self.wait.until(
-                EC.element_to_be_clickable(locator)
-            ).click()
+    def save_edits(self):
+        result = []
+        
+        locator = locators.SAVE_RESOURCE_EDITS_BUTTON
+        el = self.driver.find_element(*locator)
+        self.driver.execute_script("return arguments[0].scrollIntoView();", el)
+        self.wait.until(
+            EC.element_to_be_clickable(locator)
+        ).click()
+
+        result.append(el.text)
+        return result
+
+    def open_report(self):
+        locator = locators.MANAGE_MENU
+        el = self.driver.find_element(*locator)
+        self.driver.execute_script("return arguments[0].scrollIntoView();", el)
+        self.wait.until(
+            EC.element_to_be_clickable(locator)
+        ).click()
 
         self.wait.until(
             EC.element_to_be_clickable(locators.JUMP_TO_REPORT_BUTTON)
         ).click()
+
+    def select_form_by_index(self, index):
+        elements = self.driver.find_elements(*locators.FORM_LIST_ITEMS)
+        elements[index].click()
+        self.wait_until_loading_mask_is_gone()
+        return elements[index]
+
+    def select_form_by_name(self, name):
+        for element in self.driver.find_elements(*locators.FORM_LIST_ITEMS):
+            el = element.find_element(By.XPATH, "./div[contains(@class, 'crud-card-main')]/a[contains(@class, 'listitem_name')]")
+            if el.text == name:
+                el.click()
+                self.wait_until_loading_mask_is_gone()
+                return el
+        return None
