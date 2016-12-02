@@ -15,7 +15,6 @@
             'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
             'text': '{{ STATIC_URL }}bower_components/requirejs-text/text',
             'jquery': '{{ STATIC_URL }}bower_components/jquery/dist/jquery.min',
-            'inputmask': '{{ STATIC_URL }}bower_components/jquery-mask-plugin/dist/jquery.mask.min',
             'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
             'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
             'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
@@ -163,6 +162,12 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            resourceModelErrorMsgs: {
+                resourceNotActive: "{% trans ' Change resource model status in graph manager' %}",
+                formsNotAdded: "{% trans ' Add form(s)' %}",
+                formsNotViewable: "{% trans ' Make form(s) visible' %}",
+                endErrorMsg: "{% trans ' to make this resource editable.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}

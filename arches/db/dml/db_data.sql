@@ -143,7 +143,7 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null, "inputMask":""}');
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
@@ -194,9 +194,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null
     }'
 );
 
@@ -3471,9 +3471,9 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "bearing": 0.0,
         "geocodePlaceholder": "Search",
         "geocoderVisible": true,
-        "resourceColor": null,
-        "resourceLineWidth": null,
-        "resourcePointSize": null,
+        "featureColor": null,
+        "featureLineWidth": null,
+        "featurePointSize": null,
         "featureEditingDisabled": true,
         "mapControlsHidden": false
     }');

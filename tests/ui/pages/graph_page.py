@@ -3,7 +3,6 @@ from tests import test_settings
 from base_page import BasePage, script_returns_true
 from page_locators import GraphPageLocators as locators
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from arches.urls import uuid_regex
 

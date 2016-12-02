@@ -19,6 +19,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+<!-- Title Bar -->
+{% block graph_title %}
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow ep-graph-title">
+        <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
+        <span data-bind="text: graph.name()"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
+
 {% block graph_header_title %}
 <span data-bind="text: graph.isresource() ? '{% trans "Resource Model Settings" %}' : '{% trans "Branch Settings" %}'"></span>
 {% endblock graph_header_title %}
@@ -63,11 +73,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans "Icons" %}
                                 </a>
                             </li>
+                            <!--ko if: graph.isresource() -->
                             <li id="xx-map-style-group">
                                 <a id="xx-map-style" data-toggle="tab" href="#map-style-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Appearance" %}
                                 </a>
                             </li>
+                            <!--/ko-->
                             <li id="xx-desc-group">
                                 <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Description" %}
