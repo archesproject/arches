@@ -44,7 +44,7 @@
                     <!-- ko let: {'cardinality': outerCard.isContainer() ? outerCard.get('cardinality')() + '-' + card.get('cardinality')() : card.get('cardinality')() + '-'} -->
 
                     <!-- ko if: isWizard && !forceBlank -->
-                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTile.bind(form, form, parentTile, false)">
+                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
                         <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                     </a>
                     <!-- /ko -->
@@ -163,7 +163,7 @@
                                     </h5>
 
                                     <div class="effect" style="display:none; padding: 10px;">
-                                        <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank)">
+                                        <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank, cardinality)">
                                             <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                         </a>
 

@@ -238,13 +238,13 @@ define([
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
-                    if(singleValueCard){
+                    //if(singleValueCard){
                         var tilemodel = {};
                         tilemodel[tile.nodegroup_id()] = [koMapping.toJS(tile)];
                         model.set('tiles', tilemodel);
-                    }else{
-                        model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
-                    }
+                    //}else{
+                    //    model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
+                    //}
                 }else{
                     model = new TileModel(koMapping.toJS(tile))
                 }
@@ -306,17 +306,21 @@ define([
             }, this, parentTile.formData);
         },
 
-
         /**
          * deletes a tile object or tile collection from the database and removes it from the UI
          * @memberof Form.prototype
          * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
          * @param  {boolean} justremove if true, remove without deleting, else delete from the database
+         * @param  {boolean} cardinality the cardinaltiy code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
          * @return {null}
          */
-        deleteTile: function(parentTile, tile, justremove){
+        deleteTile: function(parentTile, tile, justremove, cardinality){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
+            var tileHasParent = cardinality === '1-1' || 
+                                cardinality === '1-n' || 
+                                cardinality === 'n-1' || 
+                                cardinality === 'n-n';
             if(justremove){
                 tiles.remove(tile);
                 if(tiles().length === 0){
@@ -324,7 +328,20 @@ define([
                 }
             }else{
                 var model;
-                var deletingParentTile = tiles().length === 1 && !parentTile.formid;
+                var deletingParentTile = tileHasParent; //tiles().length === 1 && !parentTile.formid;
+                if(tileHasParent){
+                    _.each(parentTile.tiles, function(t){
+                        if(t().length !== 1){
+                            deletingParentTile = false;
+                        }else{
+                            if(!_.isEqual(JSON.parse(koMapping.toJSON(t()[0])), JSON.parse(koMapping.toJSON(tile)))){
+                                if(!!t()[0].tileid() || !!t()[0].parenttile_id()){
+                                    deletingParentTile = false;
+                                }
+                            }
+                        }
+                    })
+                }
                 if(deletingParentTile){
                     model = new TileModel(ko.toJS(parentTile));
                 }else{
@@ -333,15 +350,32 @@ define([
                 this.trigger('before-update');
                 model.delete(function(response, status, model){
                     if(response.status === 200){
+                        tiles.remove(tile);
                         if(deletingParentTile){
+                            parentTile.tileid('');
                             this.tiles[parentTile.nodegroup_id()].remove(parentTile);
-                        }else{
-                            tiles.remove(tile);
                         }
                     }
-                    this.trigger('after-update', response);
+                    this.trigger('after-update', response, tile);
                 }, this);
             }
+        },
+
+        /**
+         * deletes a tile collection from the database and removes it from the UI
+         * @memberof Form.prototype
+         * @param  {object} parentTile a reference to the tile to delete
+         * @return {null}
+         */
+        deleteTileGroup: function(parentTile, e){
+            model = new TileModel(ko.toJS(parentTile));
+            this.trigger('before-update');
+            model.delete(function(response, status, model){
+                if(response.status === 200){
+                    this.tiles[parentTile.nodegroup_id()].remove(parentTile);
+                }
+                this.trigger('after-update', response, parentTile);
+            }, this);
         },
 
         /**
