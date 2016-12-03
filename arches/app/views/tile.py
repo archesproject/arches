@@ -84,12 +84,23 @@ class TileData(View):
     def delete(self, request):
         json = request.body
         if json != None:
+            ret = []
             data = JSONDeserializer().deserialize(json)
-            data = preDelete(data, request)
-            tile = models.Tile.objects.get(tileid = data['tileid'])
-            tile.delete()
-            tile.tileid = data['tileid']
-            return JSONResponse(tile)
+
+            with transaction.atomic():
+                data = preDelete(data, request)
+                ret.append(data)
+                tile = models.Tile.objects.get(tileid = data['tileid'])
+                tile.delete()
+                
+                # # delete the parent tile if it's not reference by any child tiles any more
+                # if(tile.parenttile_id is not None):
+                #     if models.Tile.objects.filter(parenttile_id=tile.parenttile_id).count() == 0:
+                #         parentTile = models.Tile.objects.filter(tileid=tile.parenttile_id)
+                #         ret.append(parentTile)
+                #         parentTile.delete()
+
+            return JSONResponse(ret)
 
         return HttpResponseNotFound()
 

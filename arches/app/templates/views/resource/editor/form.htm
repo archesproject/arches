@@ -41,8 +41,10 @@
                     as: 'card'
                 }, visible: !(isWizard && !forceBlank)">
 
+                    <!-- ko let: {'cardinality': outerCard.isContainer() ? outerCard.get('cardinality')() + '-' + card.get('cardinality')() : card.get('cardinality')() + '-'} -->
+
                     <!-- ko if: isWizard && !forceBlank -->
-                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTile.bind(form, form, parentTile, false)">
+                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
                         <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                     </a>
                     <!-- /ko -->
@@ -89,23 +91,23 @@
                                             }'></div>
                                         </form>
 
+
+
                                         <!-- Save/Add Buttons -->
                                         <!-- ko if: tile.dirty -->
                                             <!-- ko if: forceBlank -->
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, true)">{% trans 'Add' %}</button>
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
                                             <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
                                             <!-- /ko -->
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                            <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, parentTile)">{% trans "Save" %}</button>
-                                            </div>
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, false)">{% trans 'Save' %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                             </div>
                                             <!-- /ko -->
                                         <!-- /ko -->
@@ -161,7 +163,7 @@
                                     </h5>
 
                                     <div class="effect" style="display:none; padding: 10px;">
-                                        <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank)">
+                                        <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank, cardinality)">
                                             <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                         </a>
 
@@ -204,8 +206,8 @@
                                         <!-- Save/Add Button -->
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
                                         <div class="install-buttons">
-                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, innerTile)">{% trans "Cancel" %}</button>
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, innerTile)">{% trans "Save" %}</button>
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
                                         <!-- /ko -->
 
@@ -236,6 +238,8 @@
                         </aside>
 
                     </div>
+
+                    <!-- /ko -->
 
                 </div>
             </div>
