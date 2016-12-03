@@ -224,16 +224,19 @@ define([
             }else{
                 var model;
                 var savingParentTile = false;
-                var singleValueCard = false;
+                var updatingTile = false;
                 if(tileHasParent && !parentTile.tileid()){
                     savingParentTile = true;
                 }
-                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || (cardinality === 'n-n' && !!tile.tileid())){
-                    singleValueCard = true;
+                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || 
+                  (cardinality === 'n-n' && !!tile.tileid()) || 
+                  (cardinality === 'n-' && !!tile.tileid()) || 
+                  (cardinality === '1-n' && !!tile.tileid())){
+                    updatingTile = true;
                 }
                 console.log('cardinality: ' + cardinality)
                 console.log('savingParentTile: ' + savingParentTile)
-                console.log('singleValueCard: ' + singleValueCard)
+                console.log('updatingTile: ' + updatingTile)
 
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
@@ -249,7 +252,7 @@ define([
                     if(response.status === 200){
                         // if we had to save an parentTile
                         console.log(response.responseJSON)
-                        if(singleValueCard){
+                        if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){
                                 if(response.responseJSON.tiles[tile.nodegroup_id()].length > 1){
