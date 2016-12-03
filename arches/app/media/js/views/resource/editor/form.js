@@ -296,13 +296,6 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
-            // parentTile.tiles.forEach(function (tile) {
-            //     tile.formData.keys().forEach(function (key) {
-            //         tile.formData.getAll(key).forEach(function (value) {
-            //             parentTile.formData.append(key, value);
-            //         });
-            //     });
-            // });
             this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){
