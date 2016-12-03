@@ -228,7 +228,7 @@ define([
                 if(tileHasParent && !parentTile.tileid()){
                     savingParentTile = true;
                 }
-                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || cardinality === 'n-n'){
+                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || (cardinality === 'n-n' && !!tile.tileid())){
                     singleValueCard = true;
                 }
                 console.log('cardinality: ' + cardinality)
@@ -237,14 +237,10 @@ define([
 
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
+                    var tilemodel = {};
+                    tilemodel[tile.nodegroup_id()] = [koMapping.toJS(tile)];
                     model = new TileModel(koMapping.toJS(parentTile));
-                    //if(singleValueCard){
-                        var tilemodel = {};
-                        tilemodel[tile.nodegroup_id()] = [koMapping.toJS(tile)];
-                        model.set('tiles', tilemodel);
-                    //}else{
-                    //    model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
-                    //}
+                    model.set('tiles', tilemodel);
                 }else{
                     model = new TileModel(koMapping.toJS(tile))
                 }
