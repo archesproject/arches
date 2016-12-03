@@ -161,7 +161,27 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
+            this.createResouceModelOverlays = function(resources) {
+              var resourceLayers = [];
+              function MapLayer(resource) {
+                var maplayer = {
+                    icon: resource.icon,
+                    layer_definitions: mapStyles.getResourceModelStyles(resource),
+                    maplayerid: resource.maplayerid,
+                    name: resource.name,
+                    isoverlay: true
+                }
+                return maplayer
+              }
+              resources.forEach(function(resource){
+                resourceLayers.push(MapLayer(resource))
+              })
+              return resourceLayers;
+            }
+
+            this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
+            this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
+            this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
             /**
              * Creates the map layer for the resource with widget configs

@@ -128,5 +128,67 @@ define(function() {
         ];
        }
 
-      return {getDrawStyles: getDrawStyles};
+      var getResourceModelStyles = function(resource){
+        return [
+              {
+                  "id": "resources-fill",
+                  "type": "fill",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all",
+                    ["==", "$type", "Polygon"],
+                    ["==", "graphid", resource.maplayerid]
+                  ],
+                  "paint": {
+                      "fill-color": resource.color
+                  }
+              },
+              {
+                  "id": "resources-outlines",
+                  "type": "line",
+                  "source": "resource-outlines",
+                  "source-layer": "resource-outlines",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all",
+                    ["==", "graphid", resource.maplayerid]
+                  ],
+                  "paint": {
+                      "line-color": resource.color
+                  }
+              },
+              {
+                  "id": "resources-line",
+                  "type": "line",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all", ["==", "$type", "LineString"],["==", "graphid", resource.maplayerid]],
+                  "paint": {
+                      "line-color": resource.color
+                  }
+              },
+              {
+                  "id": "resources-point",
+                  "type": "circle",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all", ["==", "$type", "Point"],["==", "graphid", resource.maplayerid]],
+                  "paint": {
+                      "circle-radius": 5,
+                      "circle-color": "rgba(251, 96, 23, 1)"
+                  }
+              }];
+        }
+
+      return {getDrawStyles: getDrawStyles, getResourceModelStyles: getResourceModelStyles};
 });

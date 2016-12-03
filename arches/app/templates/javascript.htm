@@ -184,6 +184,14 @@
                 'label': '{{ concept_collection.label }}',
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
+            resources: [{% autoescape off %}{% for resource in resource_graphs %}{
+              'maplayerid': '{{resource.graphid}}',
+              'name': '{{ resource.name }}',
+              'color': '{{ resource.mapfeaturecolor }}',
+              'pointsize': '{{ resource.mappointsize }}',
+              'linewidth': '{{ resource.maplinewidth }}',
+              'icon': '{{ resource.iconclass }}',
+            },{% endfor %}{% endautoescape %}],
         };
     });
 
