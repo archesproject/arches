@@ -54,7 +54,8 @@ def import_business_data(business_data):
                         tileid = tile['tileid'],
                         data = tile['data']
                     )
-                    tile.save()
+                    tile.update_or_create()
+                    
     if type(business_data) == dict and business_data['relations']:
         for relation in business_data['relations']:
             relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
@@ -72,7 +73,7 @@ def import_business_data(business_data):
                 dateended = relation['dateended']
             )
             # print vars(relation)
-            relation.save()
+            relation.update_or_create()
 
 
 class ResourceLoader(object):

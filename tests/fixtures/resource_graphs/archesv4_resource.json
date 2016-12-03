@@ -7734,46 +7734,7 @@
   ],
   "business_data": {
     "relations": [],
-    "resources": [
-      {
-        "tiles": [
-          {
-            "parenttile_id": null,
-            "nodegroup_id": "3add057d-8fdd-11e6-91d7-80e6500ee4e4",
-            "resourceinstance_id": "7fd1b3c7-8fdd-11e6-b641-80e6500ee4e4",
-            "tileid": "923a6a8f-f7e4-481c-9aba-82fda42e1d70",
-            "data": {
-              "3add0982-8fdd-11e6-83cc-80e6500ee4e4": "193e7b70-216a-4773-82ec-0206402c6e4b",
-              "3add057d-8fdd-11e6-91d7-80e6500ee4e4": "Test State"
-            }
-          }
-        ],
-        "resourceinstance": {
-          "resourceinstanceid": "7fd1b3c7-8fdd-11e6-b641-80e6500ee4e4",
-          "resourceinstancesecurity": null,
-          "graph_id": "0904fd51-8fdd-11e6-b11a-80e6500ee4e4"
-        }
-      },
-      {
-        "tiles": [
-          {
-            "parenttile_id": null,
-            "nodegroup_id": "3add057d-8fdd-11e6-91d7-80e6500ee4e4",
-            "resourceinstance_id": "45c30dae-8fde-11e6-8698-80e6500ee4e4",
-            "tileid": "8b794802-7116-4544-b9d2-13c160d1d3df",
-            "data": {
-              "3add0982-8fdd-11e6-83cc-80e6500ee4e4": "6d9a8598-7436-4129-bcb1-17ee41970c3b",
-              "3add057d-8fdd-11e6-91d7-80e6500ee4e4": "Test Oregon"
-            }
-          }
-        ],
-        "resourceinstance": {
-          "resourceinstanceid": "45c30dae-8fde-11e6-8698-80e6500ee4e4",
-          "resourceinstancesecurity": null,
-          "graph_id": "0904fd51-8fdd-11e6-b11a-80e6500ee4e4"
-        }
-      }
-    ]
+    "resources": []
   },
   "ui_components": [
     {

@@ -139,7 +139,7 @@ class Command(BaseCommand):
             self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'export_json':
-            self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
+            self.export_json(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'add_tilserver_layer':
             self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'])
@@ -391,7 +391,7 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def export(self, data_dest=None, graphs=None, resources=None, concepts=None):
+    def export_json(self, data_dest=None, graphs=None, resources=None, concepts=None):
         """
         Export objects to arches.json.
         """
