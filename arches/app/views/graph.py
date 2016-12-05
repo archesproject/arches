@@ -243,7 +243,7 @@ class CardManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-manager',
-            branches=JSONSerializer().serialize(branch_graphs)
+            branches=JSONSerializer().serialize(branch_graphs),
         )
 
         return render(request, 'views/graph/card-manager.htm', context)
@@ -262,6 +262,7 @@ class CardView(GraphBaseView):
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
+        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
         top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
         for concept in top_concepts:
@@ -279,6 +280,7 @@ class CardView(GraphBaseView):
             widgets_json=JSONSerializer().serialize(widgets),
             map_layers=map_layers,
             map_sources=map_sources,
+            resource_graphs=resource_graphs,
             concept_collections=concept_collections,
         )
 
@@ -415,6 +417,7 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -431,6 +434,7 @@ class ReportEditorView(GraphBaseView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,
             map_layers=map_layers,
