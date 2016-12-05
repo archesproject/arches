@@ -131,7 +131,7 @@ define(function() {
       var getResourceModelStyles = function(resource){
         return [
               {
-                  "id": "resources-fill",
+                  "id": resource.maplayerid + "resources-fill",
                   "type": "fill",
                   "source": "resources",
                   "source-layer": "resources",
@@ -147,7 +147,7 @@ define(function() {
                   }
               },
               {
-                  "id": "resources-outlines",
+                  "id": resource.maplayerid + "resources-outlines",
                   "type": "line",
                   "source": "resource-outlines",
                   "source-layer": "resource-outlines",
@@ -162,7 +162,7 @@ define(function() {
                   }
               },
               {
-                  "id": "resources-line",
+                  "id": resource.maplayerid + "resources-line",
                   "type": "line",
                   "source": "resources",
                   "source-layer": "resources",
@@ -175,7 +175,7 @@ define(function() {
                   }
               },
               {
-                  "id": "resources-point",
+                  "id": resource.maplayerid + "resources-point",
                   "type": "circle",
                   "source": "resources",
                   "source-layer": "resources",
@@ -185,7 +185,7 @@ define(function() {
                   "filter": ["all", ["==", "$type", "Point"],["==", "graphid", resource.maplayerid]],
                   "paint": {
                       "circle-radius": 5,
-                      "circle-color": "rgba(251, 96, 23, 1)"
+                      "circle-color": resource.color
                   }
               }];
         }
