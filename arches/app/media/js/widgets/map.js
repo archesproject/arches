@@ -385,9 +385,14 @@ define([
                         var paint = this.map.getLayer(style.id).paint
                         var self = this;
                         paintProperties.forEach(function(prop) {
-                            if (paint.hasOwnProperty(prop)) {
-                                self.map.setPaintProperty(style.id, prop, val)
-                            }
+                          if (paint.hasOwnProperty(prop)) {
+                            if (!style.id.includes('halo')) {
+                                  self.map.setPaintProperty(style.id, prop, val)
+                              }
+                            if (style.id.includes('halo') && !prop.includes('color')) {
+                                self.map.setPaintProperty(style.id, prop, val * 1.25)
+                              }
+                          }
                         })
                     }, this)
                 }

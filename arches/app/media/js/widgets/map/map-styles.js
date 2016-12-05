@@ -23,7 +23,7 @@ define(function() {
                 ["==", "active", "true"],
             ],
             "paint": {
-                "circle-radius": resource.pointsize(),
+                "circle-radius": resource.pointsize() * 1.25,
                 "circle-color": "#FFF"
             }
         }, {
@@ -36,7 +36,7 @@ define(function() {
                   ["==", "active", 'true']
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color()
               }
           },{
@@ -88,7 +88,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize(),
+                  "circle-radius": resource.pointsize() * 1.25,
                   "circle-color": "#FFF"
               }
           }, {
@@ -99,7 +99,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color(),
               }
           }, {
@@ -110,7 +110,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize(),
+                  "circle-radius": resource.pointsize() * 1.25,
                   "circle-color": "#FFF"
               }
           }, {
@@ -121,7 +121,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color(),
               }
           }
