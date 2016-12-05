@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-copyright",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P75_possesses",
@@ -1545,13 +1546,13 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "n",
+          "cardinality": "1",
           "legacygroupid": null,
           "nodegroupid": "94ebff3e-9587-11e6-b664-024f9e178154",
           "parentnodegroup_id": null
         },
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "d28b7dd9-9587-11e6-b664-024f9e178154",
           "parentnodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154"
@@ -1563,33 +1564,6 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": false,
-          "ontologyclass": "E65_Creation",
-          "nodeid": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P94i_was_created_by",
-          "name": "Protection Event"
-        },
-        {
-          "functions": [],
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E30_Right",
-          "nodeid": "94ebff3e-9587-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "",
-          "name": "Right"
-        },
-        {
-          "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1602,7 +1576,30 @@
           "name": "Designation or Protection To Date"
         },
         {
-          "functions": [],
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E65_Creation",
+          "nodeid": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "datatype": "semantic",
+          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "P94i_was_created_by",
+          "name": "Protection Event"
+        },
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E30_Right",
+          "nodeid": "94ebff3e-9587-11e6-b664-024f9e178154",
+          "datatype": "semantic",
+          "nodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "",
+          "name": "Right"
+        },
+        {
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1615,7 +1612,6 @@
           "name": "Timespan of Designation or Protection"
         },
         {
-          "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "",
           "istopnode": false,
@@ -1630,7 +1626,6 @@
           "name": "Type of Designation or Protection"
         },
         {
-          "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1700,10 +1695,9 @@
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "",
-          "name": "Protection Event",
+          "name": "Designation or Protection",
           "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
           "visible": true,
           "helpenabled": false,
@@ -1712,27 +1706,25 @@
           "cardid": "d28b7ddb-9587-11e6-b664-024f9e178154",
           "helptitle": null,
           "active": true,
-          "instructions": ""
+          "instructions": "Define the resource's designation or protection status."
         },
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "Captures information about special status, protection, or privileges afforded under law.",
           "name": "Right",
           "nodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154",
-          "visible": false,
+          "visible": true,
           "helpenabled": false,
           "helptext": null,
           "sortorder": null,
           "cardid": "94ebff41-9587-11e6-b664-024f9e178154",
           "helptitle": null,
-          "active": false,
+          "active": true,
           "instructions": null
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
@@ -1746,5 +1738,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

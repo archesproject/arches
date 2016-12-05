@@ -1,0 +1,4798 @@
+{
+  "graph": [
+    {
+      "subtitle": "",
+      "mapfeaturecolor": "#FF0000",
+      "isresource": true,
+      "forms_x_cards": [],
+      "reports": [],
+      "iconclass": "",
+      "functions": [],
+      "domain_connections": [
+        {
+          "ontology_property": "P24_transferred_title_of",
+          "ontology_classes": [
+            "E8_Acquisition"
+          ]
+        },
+        {
+          "ontology_property": "P8_took_place_on_or_within",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "A5_Stratigraphic_Modification",
+            "E86_Leaving",
+            "E67_Birth",
+            "E11_Modification",
+            "E69_Death",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E4_Period",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "S19_Encounter_Event",
+            "E87_Curation_Activity",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "E5_Event",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "A9_Archaeological_Excavation",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "D10_Software_Execution",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S18_Alteration",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S2_Sample_Taking",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P113_removed",
+          "ontology_classes": [
+            "E80_Part_Removal"
+          ]
+        },
+        {
+          "ontology_property": "O19_has_found_object",
+          "ontology_classes": [
+            "S19_Encounter_Event"
+          ]
+        },
+        {
+          "ontology_property": "AP15_is_or_contains_remains_of",
+          "ontology_classes": [
+            "A8_Stratigraphic_Unit",
+            "A3_Stratigraphic_Interface",
+            "A2_Stratigraphic_Volume_Unit"
+          ]
+        },
+        {
+          "ontology_property": "P45i_is_incorporated_in",
+          "ontology_classes": [
+            "E57_Material"
+          ]
+        },
+        {
+          "ontology_property": "AP18_is_embedding_of",
+          "ontology_classes": [
+            "A7_Embedding"
+          ]
+        },
+        {
+          "ontology_property": "O17_generated",
+          "ontology_classes": [
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "S17_Physical_Genesis"
+          ]
+        },
+        {
+          "ontology_property": "P44i_is_condition_of",
+          "ontology_classes": [
+            "E3_Condition_State"
+          ]
+        },
+        {
+          "ontology_property": "P128i_is_carried_by",
+          "ontology_classes": [
+            "E75_Conceptual_Object_Appellation",
+            "SP12_Spacetime_Volume_Expression",
+            "E45_Address",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "E73_Information_Object",
+            "E48_Place_Name",
+            "E49_Time_Appellation",
+            "E35_Title",
+            "E90_Symbolic_Object",
+            "E36_Visual_Item",
+            "SP5_Geometric_Place_Expression",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E31_Document",
+            "E34_Inscription",
+            "E50_Date",
+            "E33_Linguistic_Object",
+            "E46_Section_Definition",
+            "D9_Data_Object",
+            "D35_Area",
+            "E41_Appellation",
+            "I4_Proposition_Set",
+            "E32_Authority_Document",
+            "D21_Person_Name",
+            "SP11_Temporal_Reference_System",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "D14_Software",
+            "E51_Contact_Point",
+            "E37_Mark",
+            "E42_Identifier",
+            "E44_Place_Appellation",
+            "E38_Image",
+            "E29_Design_or_Procedure",
+            "SP14_Time_Expression",
+            "E47_Spatial_Coordinates",
+            "E82_Actor_Appellation",
+            "D1_Digital_Object"
+          ]
+        },
+        {
+          "ontology_property": "P13_destroyed",
+          "ontology_classes": [
+            "E6_Destruction"
+          ]
+        },
+        {
+          "ontology_property": "P58i_defines_section",
+          "ontology_classes": [
+            "E46_Section_Definition"
+          ]
+        },
+        {
+          "ontology_property": "P111_added",
+          "ontology_classes": [
+            "E79_Part_Addition"
+          ]
+        },
+        {
+          "ontology_property": "P46_is_composed_of",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "E22_Man-Made_Object",
+            "E21_Person",
+            "D35_Area",
+            "D8_Digital_Device",
+            "S22_Segment_of_Matter",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "E25_Man-Made_Feature",
+            "E78_Collection",
+            "E19_Physical_Object",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "E20_Biological_Object",
+            "A2_Stratigraphic_Volume_Unit",
+            "E84_Information_Carrier",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "E24_Physical_Man-Made_Thing"
+          ]
+        },
+        {
+          "ontology_property": "P46i_forms_part_of",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "E22_Man-Made_Object",
+            "E21_Person",
+            "D35_Area",
+            "D8_Digital_Device",
+            "S22_Segment_of_Matter",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "E25_Man-Made_Feature",
+            "E78_Collection",
+            "E19_Physical_Object",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "E20_Biological_Object",
+            "A2_Stratigraphic_Volume_Unit",
+            "E84_Information_Carrier",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "E24_Physical_Man-Made_Thing"
+          ]
+        },
+        {
+          "ontology_property": "P53i_is_former_or_current_location_of",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "P59i_is_located_on_or_within",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "P156i_is_occupied_by",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "P157_is_at_rest_relative_to",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "Q2i_is_occupied_by",
+          "ontology_classes": [
+            "SP1_Phenomenal_Spacetime_Volume"
+          ]
+        },
+        {
+          "ontology_property": "P30_transferred_custody_of",
+          "ontology_classes": [
+            "E10_Transfer_of_Custody"
+          ]
+        },
+        {
+          "ontology_property": "P49i_is_former_or_current_keeper_of",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "P50i_is_current_keeper_of",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "P51i_is_former_or_current_owner_of",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "P52i_is_current_owner_of",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "Q6_is_at_rest_in_relation_to",
+          "ontology_classes": [
+            "SP3_Reference_Space"
+          ]
+        },
+        {
+          "ontology_property": "Q6_is_at_rest_in_relation_to",
+          "ontology_classes": [
+            "SP3_Reference_Space"
+          ]
+        },
+        {
+          "ontology_property": "L1_digitized",
+          "ontology_classes": [
+            "D2_Digitization_Process"
+          ]
+        },
+        {
+          "ontology_property": "O18_altered",
+          "ontology_classes": [
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "S17_Physical_Genesis",
+            "A5_Stratigraphic_Modification",
+            "S18_Alteration",
+            "E79_Part_Addition",
+            "D7_Digital_Machine_Event",
+            "D3_Formal_Derivation",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "D12_Data_Transfer_Event",
+            "E80_Part_Removal",
+            "E11_Modification",
+            "D10_Software_Execution"
+          ]
+        },
+        {
+          "ontology_property": "P34_concerned",
+          "ontology_classes": [
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "P10_falls_within",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "E67_Birth",
+            "E11_Modification",
+            "E92_Spacetime_Volume",
+            "E69_Death",
+            "E8_Acquisition",
+            "E19_Physical_Object",
+            "E7_Activity",
+            "E4_Period",
+            "E80_Part_Removal",
+            "E94_Space",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "D2_Digitization_Process",
+            "E86_Leaving",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "E21_Person",
+            "D8_Digital_Device",
+            "S19_Encounter_Event",
+            "D7_Digital_Machine_Event",
+            "E78_Collection",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "A9_Archaeological_Excavation",
+            "E5_Event",
+            "E20_Biological_Object",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "D35_Area",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "A6_Group_Declaration_Event",
+            "E83_Type_Creation",
+            "SP7_Declarative_Spacetime_Volume",
+            "D3_Formal_Derivation",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "S8_Categorical_Hypothesis_Building",
+            "E10_Transfer_of_Custody",
+            "E84_Information_Carrier",
+            "D12_Data_Transfer_Event",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "S20_Physical_Feature",
+            "E13_Attribute_Assignment",
+            "E93_Presence",
+            "E66_Formation",
+            "E24_Physical_Man-Made_Thing",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "S22_Segment_of_Matter",
+            "D11_Digital_Measurement_Event",
+            "D10_Software_Execution",
+            "S18_Alteration",
+            "A2_Stratigraphic_Volume_Unit",
+            "S4_Observation",
+            "S2_Sample_Taking",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E25_Man-Made_Feature",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P10i_contains",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "E67_Birth",
+            "E11_Modification",
+            "E92_Spacetime_Volume",
+            "E69_Death",
+            "E8_Acquisition",
+            "E19_Physical_Object",
+            "E7_Activity",
+            "E4_Period",
+            "E80_Part_Removal",
+            "E94_Space",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "D2_Digitization_Process",
+            "E86_Leaving",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "E21_Person",
+            "D8_Digital_Device",
+            "S19_Encounter_Event",
+            "D7_Digital_Machine_Event",
+            "E78_Collection",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "A9_Archaeological_Excavation",
+            "E5_Event",
+            "E20_Biological_Object",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "D35_Area",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "A6_Group_Declaration_Event",
+            "E83_Type_Creation",
+            "SP7_Declarative_Spacetime_Volume",
+            "D3_Formal_Derivation",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "S8_Categorical_Hypothesis_Building",
+            "E10_Transfer_of_Custody",
+            "E84_Information_Carrier",
+            "D12_Data_Transfer_Event",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "S20_Physical_Feature",
+            "E13_Attribute_Assignment",
+            "E93_Presence",
+            "E66_Formation",
+            "E24_Physical_Man-Made_Thing",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "S22_Segment_of_Matter",
+            "D11_Digital_Measurement_Event",
+            "D10_Software_Execution",
+            "S18_Alteration",
+            "A2_Stratigraphic_Volume_Unit",
+            "S4_Observation",
+            "S2_Sample_Taking",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E25_Man-Made_Feature",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P132_overlaps_with",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "E67_Birth",
+            "E11_Modification",
+            "E92_Spacetime_Volume",
+            "E69_Death",
+            "E8_Acquisition",
+            "E19_Physical_Object",
+            "E7_Activity",
+            "E4_Period",
+            "E80_Part_Removal",
+            "E94_Space",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "D2_Digitization_Process",
+            "E86_Leaving",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "E21_Person",
+            "D8_Digital_Device",
+            "S19_Encounter_Event",
+            "D7_Digital_Machine_Event",
+            "E78_Collection",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "A9_Archaeological_Excavation",
+            "E5_Event",
+            "E20_Biological_Object",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "D35_Area",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "A6_Group_Declaration_Event",
+            "E83_Type_Creation",
+            "SP7_Declarative_Spacetime_Volume",
+            "D3_Formal_Derivation",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "S8_Categorical_Hypothesis_Building",
+            "E10_Transfer_of_Custody",
+            "E84_Information_Carrier",
+            "D12_Data_Transfer_Event",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "S20_Physical_Feature",
+            "E13_Attribute_Assignment",
+            "E93_Presence",
+            "E66_Formation",
+            "E24_Physical_Man-Made_Thing",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "S22_Segment_of_Matter",
+            "D11_Digital_Measurement_Event",
+            "D10_Software_Execution",
+            "S18_Alteration",
+            "A2_Stratigraphic_Volume_Unit",
+            "S4_Observation",
+            "S2_Sample_Taking",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E25_Man-Made_Feature",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P133_is_separated_from",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "E67_Birth",
+            "E11_Modification",
+            "E92_Spacetime_Volume",
+            "E69_Death",
+            "E8_Acquisition",
+            "E19_Physical_Object",
+            "E7_Activity",
+            "E4_Period",
+            "E80_Part_Removal",
+            "E94_Space",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "D2_Digitization_Process",
+            "E86_Leaving",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "E21_Person",
+            "D8_Digital_Device",
+            "S19_Encounter_Event",
+            "D7_Digital_Machine_Event",
+            "E78_Collection",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "A9_Archaeological_Excavation",
+            "E5_Event",
+            "E20_Biological_Object",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "D35_Area",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "A6_Group_Declaration_Event",
+            "E83_Type_Creation",
+            "SP7_Declarative_Spacetime_Volume",
+            "D3_Formal_Derivation",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "S8_Categorical_Hypothesis_Building",
+            "E10_Transfer_of_Custody",
+            "E84_Information_Carrier",
+            "D12_Data_Transfer_Event",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "S20_Physical_Feature",
+            "E13_Attribute_Assignment",
+            "E93_Presence",
+            "E66_Formation",
+            "E24_Physical_Man-Made_Thing",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "S22_Segment_of_Matter",
+            "D11_Digital_Measurement_Event",
+            "D10_Software_Execution",
+            "S18_Alteration",
+            "A2_Stratigraphic_Volume_Unit",
+            "S4_Observation",
+            "S2_Sample_Taking",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E25_Man-Made_Feature",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P166_was_a_presence_of",
+          "ontology_classes": [
+            "E93_Presence"
+          ]
+        },
+        {
+          "ontology_property": "O23_is_defined_by",
+          "ontology_classes": [
+            "S22_Segment_of_Matter"
+          ]
+        },
+        {
+          "ontology_property": "Q12_approximates",
+          "ontology_classes": [
+            "SP7_Declarative_Spacetime_Volume"
+          ]
+        },
+        {
+          "ontology_property": "P161i_is_spatial_projection_of",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "P160i_is_temporal_projection_of",
+          "ontology_classes": [
+            "SP10_Declarative_Time-Span",
+            "E52_Time-Span",
+            "SP13_Phenomenal_Time-Span"
+          ]
+        },
+        {
+          "ontology_property": "P92_brought_into_existence",
+          "ontology_classes": [
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "S17_Physical_Genesis",
+            "D10_Software_Execution",
+            "E67_Birth",
+            "E66_Formation",
+            "D7_Digital_Machine_Event",
+            "D30_Annotation_Event",
+            "E81_Transformation",
+            "D3_Formal_Derivation",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E65_Creation",
+            "D12_Data_Transfer_Event",
+            "E63_Beginning_of_Existence",
+            "E83_Type_Creation"
+          ]
+        },
+        {
+          "ontology_property": "P12_occurred_in_the_presence_of",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "E5_Event",
+            "D30_Annotation_Event",
+            "A5_Stratigraphic_Modification",
+            "E86_Leaving",
+            "E67_Birth",
+            "E11_Modification",
+            "E69_Death",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S6_Data_Evaluation",
+            "A1_Excavation_Process_Unit",
+            "S19_Encounter_Event",
+            "E87_Curation_Activity",
+            "S17_Physical_Genesis",
+            "S5_Inference_Making",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "E81_Transformation",
+            "E68_Dissolution",
+            "S2_Sample_Taking",
+            "E6_Destruction",
+            "E63_Beginning_of_Existence",
+            "E9_Move",
+            "E12_Production",
+            "A4_Stratigraphic_Genesis",
+            "A9_Archaeological_Excavation",
+            "S21_Measurement",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "E17_Type_Assignment",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "D10_Software_Execution",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "E64_End_of_Existence",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S18_Alteration",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment",
+            "E16_Measurement"
+          ]
+        },
+        {
+          "ontology_property": "P123_resulted_in",
+          "ontology_classes": [
+            "E81_Transformation"
+          ]
+        },
+        {
+          "ontology_property": "P124_transformed",
+          "ontology_classes": [
+            "E81_Transformation"
+          ]
+        },
+        {
+          "ontology_property": "P93_took_out_of_existence",
+          "ontology_classes": [
+            "E68_Dissolution",
+            "E64_End_of_Existence",
+            "E69_Death",
+            "E81_Transformation",
+            "E6_Destruction"
+          ]
+        },
+        {
+          "ontology_property": "P104i_applies_to",
+          "ontology_classes": [
+            "E30_Right"
+          ]
+        },
+        {
+          "ontology_property": "P105i_has_right_on",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "L33i_is_maker_of",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "O15i_was_occupied_by",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "S22_Segment_of_Matter",
+            "A3_Stratigraphic_Interface",
+            "SP15_Geometry",
+            "E25_Man-Made_Feature",
+            "E53_Place",
+            "A8_Stratigraphic_Unit",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "SP6_Declarative_Place",
+            "E27_Site",
+            "SP2_Phenomenal_Place"
+          ]
+        },
+        {
+          "ontology_property": "AP9_took_matter_from",
+          "ontology_classes": [
+            "A4_Stratigraphic_Genesis"
+          ]
+        },
+        {
+          "ontology_property": "O3_sampled_from",
+          "ontology_classes": [
+            "S3_Measurement_by_Sampling",
+            "S2_Sample_Taking"
+          ]
+        },
+        {
+          "ontology_property": "O1_diminished",
+          "ontology_classes": [
+            "A9_Archaeological_Excavation",
+            "E80_Part_Removal",
+            "S2_Sample_Taking",
+            "A1_Excavation_Process_Unit",
+            "S3_Measurement_by_Sampling",
+            "S1_Matter_Removal"
+          ]
+        },
+        {
+          "ontology_property": "P39_measured",
+          "ontology_classes": [
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E16_Measurement",
+            "S21_Measurement",
+            "S3_Measurement_by_Sampling"
+          ]
+        },
+        {
+          "ontology_property": "P140_assigned_attribute_to",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "E16_Measurement",
+            "S5_Inference_Making",
+            "E13_Attribute_Assignment",
+            "S19_Encounter_Event",
+            "S8_Categorical_Hypothesis_Building",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S21_Measurement",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S6_Data_Evaluation",
+            "E17_Type_Assignment",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "P141_assigned",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "E16_Measurement",
+            "S5_Inference_Making",
+            "E13_Attribute_Assignment",
+            "S19_Encounter_Event",
+            "S8_Categorical_Hypothesis_Building",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S21_Measurement",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S6_Data_Evaluation",
+            "E17_Type_Assignment",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "P48i_is_preferred_identifier_of",
+          "ontology_classes": [
+            "E42_Identifier"
+          ]
+        },
+        {
+          "ontology_property": "P2i_is_type_of",
+          "ontology_classes": [
+            "E57_Material",
+            "E58_Measurement_Unit",
+            "E56_Language",
+            "E55_Type",
+            "S9_Property_Type"
+          ]
+        },
+        {
+          "ontology_property": "P137i_is_exemplified_by",
+          "ontology_classes": [
+            "E57_Material",
+            "E58_Measurement_Unit",
+            "E56_Language",
+            "E55_Type",
+            "S9_Property_Type"
+          ]
+        },
+        {
+          "ontology_property": "P1i_identifies",
+          "ontology_classes": [
+            "E51_Contact_Point",
+            "E75_Conceptual_Object_Appellation",
+            "E42_Identifier",
+            "E45_Address",
+            "SP5_Geometric_Place_Expression",
+            "E44_Place_Appellation",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E35_Title",
+            "E50_Date",
+            "E41_Appellation",
+            "E82_Actor_Appellation",
+            "D21_Person_Name",
+            "E48_Place_Name",
+            "E49_Time_Appellation",
+            "E47_Spatial_Coordinates",
+            "SP14_Time_Expression",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "E46_Section_Definition"
+          ]
+        },
+        {
+          "ontology_property": "BM.PX_is_related_to",
+          "ontology_classes": [
+            "S20_Physical_Feature",
+            "E22_Man-Made_Object",
+            "E21_Person",
+            "D35_Area",
+            "D8_Digital_Device",
+            "S22_Segment_of_Matter",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "E25_Man-Made_Feature",
+            "E78_Collection",
+            "E19_Physical_Object",
+            "E26_Physical_Feature",
+            "D13_Digital_Information_Carrier",
+            "E20_Biological_Object",
+            "A2_Stratigraphic_Volume_Unit",
+            "E84_Information_Carrier",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "E24_Physical_Man-Made_Thing"
+          ]
+        },
+        {
+          "ontology_property": "L43_annotates",
+          "ontology_classes": [
+            "D29_Annotation_Object"
+          ]
+        },
+        {
+          "ontology_property": "P67_refers_to",
+          "ontology_classes": [
+            "E89_Propositional_Object",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "E73_Information_Object",
+            "E35_Title",
+            "E36_Visual_Item",
+            "SP5_Geometric_Place_Expression",
+            "D29_Annotation_Object",
+            "E31_Document",
+            "E34_Inscription",
+            "SP15_Geometry",
+            "E33_Linguistic_Object",
+            "D9_Data_Object",
+            "D35_Area",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E30_Right",
+            "E32_Authority_Document",
+            "I4_Proposition_Set",
+            "SP12_Spacetime_Volume_Expression",
+            "SP11_Temporal_Reference_System",
+            "SP6_Declarative_Place",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "E37_Mark",
+            "D14_Software",
+            "E38_Image",
+            "E29_Design_or_Procedure",
+            "SP14_Time_Expression",
+            "I3_Inference_Logic",
+            "D1_Digital_Object"
+          ]
+        },
+        {
+          "ontology_property": "P129_is_about",
+          "ontology_classes": [
+            "E89_Propositional_Object",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "E73_Information_Object",
+            "E35_Title",
+            "E36_Visual_Item",
+            "SP5_Geometric_Place_Expression",
+            "D29_Annotation_Object",
+            "E31_Document",
+            "E34_Inscription",
+            "SP15_Geometry",
+            "E33_Linguistic_Object",
+            "D9_Data_Object",
+            "D35_Area",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E30_Right",
+            "E32_Authority_Document",
+            "I4_Proposition_Set",
+            "SP12_Spacetime_Volume_Expression",
+            "SP11_Temporal_Reference_System",
+            "SP6_Declarative_Place",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "E37_Mark",
+            "D14_Software",
+            "E38_Image",
+            "E29_Design_or_Procedure",
+            "SP14_Time_Expression",
+            "I3_Inference_Logic",
+            "D1_Digital_Object"
+          ]
+        },
+        {
+          "ontology_property": "P136_was_based_on",
+          "ontology_classes": [
+            "E83_Type_Creation"
+          ]
+        },
+        {
+          "ontology_property": "P71_lists",
+          "ontology_classes": [
+            "E32_Authority_Document"
+          ]
+        },
+        {
+          "ontology_property": "P15_was_influenced_by",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E87_Curation_Activity",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "E86_Leaving",
+            "E16_Measurement",
+            "E17_Type_Assignment",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "S6_Data_Evaluation",
+            "S2_Sample_Taking",
+            "S21_Measurement",
+            "E9_Move",
+            "E12_Production",
+            "A9_Archaeological_Excavation",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "P17_was_motivated_by",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E87_Curation_Activity",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "E86_Leaving",
+            "E16_Measurement",
+            "E17_Type_Assignment",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "S6_Data_Evaluation",
+            "S2_Sample_Taking",
+            "S21_Measurement",
+            "E9_Move",
+            "E12_Production",
+            "A9_Archaeological_Excavation",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "P70_documents",
+          "ontology_classes": [
+            "E32_Authority_Document",
+            "E31_Document"
+          ]
+        },
+        {
+          "ontology_property": "P138_represents",
+          "ontology_classes": [
+            "E34_Inscription",
+            "E37_Mark",
+            "E36_Visual_Item",
+            "E38_Image"
+          ]
+        },
+        {
+          "ontology_property": "P62_depicts",
+          "ontology_classes": [
+            "E22_Man-Made_Object",
+            "D13_Digital_Information_Carrier",
+            "D8_Digital_Device",
+            "E25_Man-Made_Feature",
+            "E78_Collection",
+            "E24_Physical_Man-Made_Thing",
+            "E84_Information_Carrier"
+          ]
+        },
+        {
+          "ontology_property": "O16_observed_value",
+          "ontology_classes": [
+            "E16_Measurement",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S21_Measurement",
+            "S19_Encounter_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling"
+          ]
+        },
+        {
+          "ontology_property": "L54_is_same-as",
+          "ontology_classes": [
+            "D21_Person_Name",
+            "E83_Type_Creation",
+            "E25_Man-Made_Feature",
+            "E72_Legal_Object",
+            "E7_Activity",
+            "E74_Group",
+            "S14_Fluid_Body",
+            "A8_Stratigraphic_Unit",
+            "E57_Material",
+            "I2_Belief",
+            "S12_Amount_of_Fluid",
+            "D29_Annotation_Object",
+            "S6_Data_Evaluation",
+            "E20_Biological_Object",
+            "E70_Thing",
+            "E9_Move",
+            "E51_Contact_Point",
+            "A9_Archaeological_Excavation",
+            "E92_Spacetime_Volume",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E69_Death",
+            "I3_Inference_Logic",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "E2_Temporal_Entity",
+            "SP6_Declarative_Place",
+            "E17_Type_Assignment",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "A4_Stratigraphic_Genesis",
+            "E93_Presence",
+            "S22_Segment_of_Matter",
+            "E29_Design_or_Procedure",
+            "E64_End_of_Existence",
+            "E84_Information_Carrier",
+            "D2_Digitization_Process",
+            "S18_Alteration",
+            "E24_Physical_Man-Made_Thing",
+            "E82_Actor_Appellation",
+            "S13_Sample",
+            "E15_Identifier_Assignment",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "S9_Property_Type",
+            "E8_Acquisition",
+            "S10_Material_Substantial",
+            "E80_Part_Removal",
+            "E48_Place_Name",
+            "S16_State",
+            "E27_Site",
+            "E36_Visual_Item",
+            "E21_Person",
+            "D7_Digital_Machine_Event",
+            "E68_Dissolution",
+            "E50_Date",
+            "E52_Time-Span",
+            "E1_CRM_Entity",
+            "D35_Area",
+            "E55_Type",
+            "E18_Physical_Thing",
+            "E32_Authority_Document",
+            "S4_Observation",
+            "S8_Categorical_Hypothesis_Building",
+            "SP12_Spacetime_Volume_Expression",
+            "E10_Transfer_of_Custody",
+            "SP11_Temporal_Reference_System",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "S15_Observable_Entity",
+            "E13_Attribute_Assignment",
+            "E71_Man-Made_Thing",
+            "E66_Formation",
+            "SP3_Reference_Space",
+            "E38_Image",
+            "E89_Propositional_Object",
+            "SP14_Time_Expression",
+            "D1_Digital_Object",
+            "E75_Conceptual_Object_Appellation",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "E86_Leaving",
+            "E67_Birth",
+            "E77_Persistent_Item",
+            "SP2_Phenomenal_Place",
+            "E28_Conceptual_Object",
+            "E4_Period",
+            "E73_Information_Object",
+            "E49_Time_Appellation",
+            "S3_Measurement_by_Sampling",
+            "E90_Symbolic_Object",
+            "S17_Physical_Genesis",
+            "E78_Collection",
+            "E31_Document",
+            "E5_Event",
+            "S21_Measurement",
+            "SP15_Geometry",
+            "E63_Beginning_of_Existence",
+            "E46_Section_Definition",
+            "E40_Legal_Body",
+            "E79_Part_Addition",
+            "A3_Stratigraphic_Interface",
+            "D3_Formal_Derivation",
+            "E30_Right",
+            "E53_Place",
+            "SP10_Declarative_Time-Span",
+            "D13_Digital_Information_Carrier",
+            "E56_Language",
+            "E37_Mark",
+            "E42_Identifier",
+            "E44_Place_Appellation",
+            "D11_Digital_Measurement_Event",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "E14_Condition_Assessment",
+            "D9_Data_Object",
+            "E45_Address",
+            "E19_Physical_Object",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "S7_Simulation_or_Prediction",
+            "A7_Embedding",
+            "E16_Measurement",
+            "D8_Digital_Device",
+            "E39_Actor",
+            "E81_Transformation",
+            "E35_Title",
+            "E34_Inscription",
+            "E58_Measurement_Unit",
+            "E6_Destruction",
+            "E33_Linguistic_Object",
+            "E12_Production",
+            "E41_Appellation",
+            "E54_Dimension",
+            "I4_Proposition_Set",
+            "SP7_Declarative_Spacetime_Volume",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "D12_Data_Transfer_Event",
+            "E85_Joining",
+            "SP13_Phenomenal_Time-Span",
+            "S20_Physical_Feature",
+            "E26_Physical_Feature",
+            "S11_Amount_of_Matter",
+            "D14_Software",
+            "SP5_Geometric_Place_Expression",
+            "E47_Spatial_Coordinates",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "E94_Space",
+            "S2_Sample_Taking",
+            "E3_Condition_State"
+          ]
+        },
+        {
+          "ontology_property": "L54i_is_same-as",
+          "ontology_classes": [
+            "D21_Person_Name",
+            "E83_Type_Creation",
+            "E25_Man-Made_Feature",
+            "E72_Legal_Object",
+            "E7_Activity",
+            "E74_Group",
+            "S14_Fluid_Body",
+            "A8_Stratigraphic_Unit",
+            "E57_Material",
+            "I2_Belief",
+            "S12_Amount_of_Fluid",
+            "D29_Annotation_Object",
+            "S6_Data_Evaluation",
+            "E20_Biological_Object",
+            "E70_Thing",
+            "E9_Move",
+            "E51_Contact_Point",
+            "A9_Archaeological_Excavation",
+            "E92_Spacetime_Volume",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "E69_Death",
+            "I3_Inference_Logic",
+            "SP1_Phenomenal_Spacetime_Volume",
+            "E2_Temporal_Entity",
+            "SP6_Declarative_Place",
+            "E17_Type_Assignment",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "A4_Stratigraphic_Genesis",
+            "E93_Presence",
+            "S22_Segment_of_Matter",
+            "E29_Design_or_Procedure",
+            "E64_End_of_Existence",
+            "E84_Information_Carrier",
+            "D2_Digitization_Process",
+            "S18_Alteration",
+            "E24_Physical_Man-Made_Thing",
+            "E82_Actor_Appellation",
+            "S13_Sample",
+            "E15_Identifier_Assignment",
+            "A5_Stratigraphic_Modification",
+            "E87_Curation_Activity",
+            "S9_Property_Type",
+            "E8_Acquisition",
+            "S10_Material_Substantial",
+            "E80_Part_Removal",
+            "E48_Place_Name",
+            "S16_State",
+            "E27_Site",
+            "E36_Visual_Item",
+            "E21_Person",
+            "D7_Digital_Machine_Event",
+            "E68_Dissolution",
+            "E50_Date",
+            "E52_Time-Span",
+            "E1_CRM_Entity",
+            "D35_Area",
+            "E55_Type",
+            "E18_Physical_Thing",
+            "E32_Authority_Document",
+            "S4_Observation",
+            "S8_Categorical_Hypothesis_Building",
+            "SP12_Spacetime_Volume_Expression",
+            "E10_Transfer_of_Custody",
+            "SP11_Temporal_Reference_System",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "S15_Observable_Entity",
+            "E13_Attribute_Assignment",
+            "E71_Man-Made_Thing",
+            "E66_Formation",
+            "SP3_Reference_Space",
+            "E38_Image",
+            "E89_Propositional_Object",
+            "SP14_Time_Expression",
+            "D1_Digital_Object",
+            "E75_Conceptual_Object_Appellation",
+            "D30_Annotation_Event",
+            "E22_Man-Made_Object",
+            "E86_Leaving",
+            "E67_Birth",
+            "E77_Persistent_Item",
+            "SP2_Phenomenal_Place",
+            "E28_Conceptual_Object",
+            "E4_Period",
+            "E73_Information_Object",
+            "E49_Time_Appellation",
+            "S3_Measurement_by_Sampling",
+            "E90_Symbolic_Object",
+            "S17_Physical_Genesis",
+            "E78_Collection",
+            "E31_Document",
+            "E5_Event",
+            "S21_Measurement",
+            "SP15_Geometry",
+            "E63_Beginning_of_Existence",
+            "E46_Section_Definition",
+            "E40_Legal_Body",
+            "E79_Part_Addition",
+            "A3_Stratigraphic_Interface",
+            "D3_Formal_Derivation",
+            "E30_Right",
+            "E53_Place",
+            "SP10_Declarative_Time-Span",
+            "D13_Digital_Information_Carrier",
+            "E56_Language",
+            "E37_Mark",
+            "E42_Identifier",
+            "E44_Place_Appellation",
+            "D11_Digital_Measurement_Event",
+            "D23_Room",
+            "A2_Stratigraphic_Volume_Unit",
+            "E14_Condition_Assessment",
+            "D9_Data_Object",
+            "E45_Address",
+            "E19_Physical_Object",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "S7_Simulation_or_Prediction",
+            "A7_Embedding",
+            "E16_Measurement",
+            "D8_Digital_Device",
+            "E39_Actor",
+            "E81_Transformation",
+            "E35_Title",
+            "E34_Inscription",
+            "E58_Measurement_Unit",
+            "E6_Destruction",
+            "E33_Linguistic_Object",
+            "E12_Production",
+            "E41_Appellation",
+            "E54_Dimension",
+            "I4_Proposition_Set",
+            "SP7_Declarative_Spacetime_Volume",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "D12_Data_Transfer_Event",
+            "E85_Joining",
+            "SP13_Phenomenal_Time-Span",
+            "S20_Physical_Feature",
+            "E26_Physical_Feature",
+            "S11_Amount_of_Matter",
+            "D14_Software",
+            "SP5_Geometric_Place_Expression",
+            "E47_Spatial_Coordinates",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "E94_Space",
+            "S2_Sample_Taking",
+            "E3_Condition_State"
+          ]
+        },
+        {
+          "ontology_property": "P41_classified",
+          "ontology_classes": [
+            "E17_Type_Assignment"
+          ]
+        },
+        {
+          "ontology_property": "L60_documents",
+          "ontology_classes": [
+            "D2_Digitization_Process"
+          ]
+        },
+        {
+          "ontology_property": "P43i_is_dimension_of",
+          "ontology_classes": [
+            "D9_Data_Object",
+            "E54_Dimension"
+          ]
+        },
+        {
+          "ontology_property": "P130_shows_features_of",
+          "ontology_classes": [
+            "E75_Conceptual_Object_Appellation",
+            "E22_Man-Made_Object",
+            "D21_Person_Name",
+            "E45_Address",
+            "S9_Property_Type",
+            "E29_Design_or_Procedure",
+            "E25_Man-Made_Feature",
+            "E72_Legal_Object",
+            "E28_Conceptual_Object",
+            "S10_Material_Substantial",
+            "S14_Fluid_Body",
+            "E73_Information_Object",
+            "E48_Place_Name",
+            "E49_Time_Appellation",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "E57_Material",
+            "E90_Symbolic_Object",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "E36_Visual_Item",
+            "E21_Person",
+            "S12_Amount_of_Fluid",
+            "SP5_Geometric_Place_Expression",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "D29_Annotation_Object",
+            "E78_Collection",
+            "E35_Title",
+            "E34_Inscription",
+            "E50_Date",
+            "E20_Biological_Object",
+            "SP15_Geometry",
+            "E33_Linguistic_Object",
+            "E58_Measurement_Unit",
+            "E38_Image",
+            "E70_Thing",
+            "E44_Place_Appellation",
+            "E46_Section_Definition",
+            "D9_Data_Object",
+            "E51_Contact_Point",
+            "D14_Software",
+            "D35_Area",
+            "E55_Type",
+            "E41_Appellation",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "I3_Inference_Logic",
+            "E32_Authority_Document",
+            "E30_Right",
+            "E26_Physical_Feature",
+            "E19_Physical_Object",
+            "SP12_Spacetime_Volume_Expression",
+            "SP11_Temporal_Reference_System",
+            "SP6_Declarative_Place",
+            "I4_Proposition_Set",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "E42_Identifier",
+            "S20_Physical_Feature",
+            "E37_Mark",
+            "E56_Language",
+            "D13_Digital_Information_Carrier",
+            "E71_Man-Made_Thing",
+            "S22_Segment_of_Matter",
+            "D8_Digital_Device",
+            "E89_Propositional_Object",
+            "S11_Amount_of_Matter",
+            "SP14_Time_Expression",
+            "E84_Information_Carrier",
+            "E31_Document",
+            "E47_Spatial_Coordinates",
+            "A2_Stratigraphic_Volume_Unit",
+            "E24_Physical_Man-Made_Thing",
+            "E82_Actor_Appellation",
+            "S13_Sample",
+            "D1_Digital_Object"
+          ]
+        },
+        {
+          "ontology_property": "P130i_features_are_also_found_on",
+          "ontology_classes": [
+            "E75_Conceptual_Object_Appellation",
+            "E22_Man-Made_Object",
+            "D21_Person_Name",
+            "E45_Address",
+            "S9_Property_Type",
+            "E29_Design_or_Procedure",
+            "E25_Man-Made_Feature",
+            "E72_Legal_Object",
+            "E28_Conceptual_Object",
+            "S10_Material_Substantial",
+            "S14_Fluid_Body",
+            "E73_Information_Object",
+            "E48_Place_Name",
+            "E49_Time_Appellation",
+            "A8_Stratigraphic_Unit",
+            "E27_Site",
+            "E57_Material",
+            "E90_Symbolic_Object",
+            "SP4_Spatial_Coordinate_Reference_System",
+            "E36_Visual_Item",
+            "E21_Person",
+            "S12_Amount_of_Fluid",
+            "SP5_Geometric_Place_Expression",
+            "http://www.opengis.net/ont/geosparql#gmlLiteral",
+            "D29_Annotation_Object",
+            "E78_Collection",
+            "E35_Title",
+            "E34_Inscription",
+            "E50_Date",
+            "E20_Biological_Object",
+            "SP15_Geometry",
+            "E33_Linguistic_Object",
+            "E58_Measurement_Unit",
+            "E38_Image",
+            "E70_Thing",
+            "E44_Place_Appellation",
+            "E46_Section_Definition",
+            "D9_Data_Object",
+            "E51_Contact_Point",
+            "D14_Software",
+            "D35_Area",
+            "E55_Type",
+            "E41_Appellation",
+            "E18_Physical_Thing",
+            "A3_Stratigraphic_Interface",
+            "I3_Inference_Logic",
+            "E32_Authority_Document",
+            "E30_Right",
+            "E26_Physical_Feature",
+            "E19_Physical_Object",
+            "SP12_Spacetime_Volume_Expression",
+            "SP11_Temporal_Reference_System",
+            "SP6_Declarative_Place",
+            "I4_Proposition_Set",
+            "http://www.opengis.net/ont/geosparql#wktLiteral",
+            "E42_Identifier",
+            "S20_Physical_Feature",
+            "E37_Mark",
+            "E56_Language",
+            "D13_Digital_Information_Carrier",
+            "E71_Man-Made_Thing",
+            "S22_Segment_of_Matter",
+            "D8_Digital_Device",
+            "E89_Propositional_Object",
+            "S11_Amount_of_Matter",
+            "SP14_Time_Expression",
+            "E84_Information_Carrier",
+            "E31_Document",
+            "E47_Spatial_Coordinates",
+            "A2_Stratigraphic_Volume_Unit",
+            "E24_Physical_Man-Made_Thing",
+            "E82_Actor_Appellation",
+            "S13_Sample",
+            "D1_Digital_Object"
+          ]
+        },
+        {
+          "ontology_property": "P101i_was_use_of",
+          "ontology_classes": [
+            "E57_Material",
+            "E58_Measurement_Unit",
+            "E56_Language",
+            "E55_Type",
+            "S9_Property_Type"
+          ]
+        },
+        {
+          "ontology_property": "P16_used_specific_object",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E87_Curation_Activity",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "E86_Leaving",
+            "E16_Measurement",
+            "E17_Type_Assignment",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "S6_Data_Evaluation",
+            "S2_Sample_Taking",
+            "S21_Measurement",
+            "E9_Move",
+            "E12_Production",
+            "A9_Archaeological_Excavation",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
+        {
+          "ontology_property": "O8_observed",
+          "ontology_classes": [
+            "E16_Measurement",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "S21_Measurement",
+            "S19_Encounter_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling"
+          ]
+        },
+        {
+          "ontology_property": "O11_described",
+          "ontology_classes": [
+            "S6_Data_Evaluation"
+          ]
+        },
+        {
+          "ontology_property": "O12i_is_dimension_of",
+          "ontology_classes": [
+            "D9_Data_Object",
+            "E54_Dimension"
+          ]
+        },
+        {
+          "ontology_property": "O24_measured",
+          "ontology_classes": [
+            "S3_Measurement_by_Sampling",
+            "S21_Measurement"
+          ]
+        }
+      ],
+      "nodegroups": [
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a7b-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e180-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f121-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "95577334-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "parentnodegroup_id": null
+        }
+      ],
+      "author": " GCI",
+      "deploymentfile": null,
+      "forms": [],
+      "version": "",
+      "nodes": [
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P15_was_influenced_by",
+          "name": "Evaluation Criteria Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "f743547f-b8fa-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "External Identifier Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E64_End_of_Existence",
+          "nodeid": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P93i_was_taken_out_of_existence_by",
+          "name": "End of Existence"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "516cfbbe-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Start Date of Existence"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc936d-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Heritage Resource Type To Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "95577338-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Designation or Protection From Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "4211c761-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "End Date of Existence"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "aef77174-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept-list",
+          "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Construction Technique"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E11_Modification",
+          "nodeid": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P12i_was_present_at",
+          "name": "Modification Event"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc9376-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Style To Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "64c8ac0a-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Modification Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E13_Attribute_Assignment",
+          "nodeid": "64c8ac08-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P140i_was_attributed_by",
+          "name": "Modification Description Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc937a-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Ancillary Feature Use Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E47_Spatial_Coordinates",
+          "nodeid": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "geojson-feature-collection",
+          "nodegroup_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P87_is_identified_by",
+          "name": "Spatial Coordinates Geometry"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E16_Measurement",
+          "nodeid": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P39i_was_measured_by",
+          "name": "Measurement Event"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E62_String",
+          "nodeid": "a191c5be-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P3_has_note",
+          "name": "Description"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E62_String",
+          "nodeid": "5b97e189-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P3_has_note",
+          "name": "Condition Description"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E44_Place_Appellation",
+          "nodeid": "2b7d0a8c-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P87_is_identified_by",
+          "name": "Administrative Subdivision Name"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E57_Material",
+          "nodeid": "aef77172-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept-list",
+          "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Material"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc9374-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Ancillary Feature From Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E17_Type_Assignment",
+          "nodeid": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P41i_was_classified_by",
+          "name": "Ancillary Feature Phase Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "01180e90-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Measurement Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "0b21f127-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Date Evaluated"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E14_Condition_Assessment",
+          "nodeid": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P34i_was_assessed_by",
+          "name": "Condition Assessment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E30_Right",
+          "nodeid": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P104_is_subject_to",
+          "name": "Right"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E53_Place",
+          "nodeid": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P53_has_former_or_current_location",
+          "name": "Place"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "64c8ac07-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Modification Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E13_Attribute_Assignment",
+          "nodeid": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P140i_was_attributed_by",
+          "name": "Evaluation Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E18_Physical_Thing",
+          "nodeid": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": null,
+          "config": null,
+          "parentproperty": "",
+          "name": "Heritage Resource"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "5b97e18a-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Date Condition Assessed"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E89_Propositional_Object",
+          "nodeid": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P67i_is_referred_to_by",
+          "name": "Management Recommendation"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E13_Attribute_Assignment",
+          "nodeid": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P140i_was_attributed_by",
+          "name": "Condition Description Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "2b7d0a8b-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Address Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "95577339-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Type of Designation or Protection"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc9373-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Style Cultural Period"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "4211c762-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "End of Existence Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P15_was_influenced_by",
+          "name": "Integrity Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "95577337-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Designation or Protection To Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc9377-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Heritage Resource Type Cultural Period"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "0b21f128-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Period of Significance From Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E13_Attribute_Assignment",
+          "nodeid": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P140i_was_attributed_by",
+          "name": "Description Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E62_String",
+          "nodeid": "64c8ac09-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P3_has_note",
+          "name": "Modification Description"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E63_Beginning_of_Existence",
+          "nodeid": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P92i_was_brought_into_existence_by",
+          "name": "Beginning of Existence"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc937b-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Ancillary Feature Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E41_Appellation",
+          "nodeid": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P1_is_identified_by",
+          "name": "Name"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc9371-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Style From Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E42_Identifier",
+          "nodeid": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P1_is_identified_by",
+          "name": "External XRef"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "f743547e-b8fa-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "External Source"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc9375-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Style Use Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E53_Place",
+          "nodeid": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P89_falls_within",
+          "name": "Administration Subdivision"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "516cfbbc-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Beginning of Existence Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "a191c5bf-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Description Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E60_Number",
+          "nodeid": "01180e91-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "number",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P90_has_value",
+          "name": "Measurement Value"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P15_was_influenced_by",
+          "name": "Eligibility Requirement Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E12_Production",
+          "nodeid": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P92i_was_brought_into_existence_by",
+          "name": "Phase Type Production"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc936c-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Ancillary Feature Cultural Period"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Keyword"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E13_Attribute_Assignment",
+          "nodeid": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P140i_was_attributed_by",
+          "name": "Place Description Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "26cc9370-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Style Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E3_Condition_State",
+          "nodeid": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P35_has_identified",
+          "name": "Condition State"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "9557733a-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Timespan of Designation or Protection"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E62_String",
+          "nodeid": "0b21f121-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "0b21f121-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P3_has_note",
+          "name": "Reasons"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E44_Place_Appellation",
+          "nodeid": "2b7d0a7b-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "2b7d0a7b-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P87_is_identified_by",
+          "name": "Cadastral Reference"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "64c8ac06-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Modification Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc9378-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Heritage Resource Use Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "0b21f129-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Period of Significance To Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "2b7d0a8a-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Geometry Qualifier"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "26cc937c-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Heritage Resource Type Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc9372-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Style"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "2b7d0a8e-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": "d5230d60-0eb9-483d-90f4-9965eaca0292"
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Administrative Subdivision Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E45_Address",
+          "nodeid": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P87_is_identified_by",
+          "name": "Place Address"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E58_Measurement_Unit",
+          "nodeid": "01180e92-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P91_has_unit",
+          "name": "Measurement Unit"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E17_Type_Assignment",
+          "nodeid": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P41i_was_classified_by",
+          "name": "Heritage Resource Phase Type Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "26cc936e-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P42_assigned",
+          "name": "Heritage Resource Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P141_assigned",
+          "name": "Status"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "5b97e18b-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Recommendation Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Threat Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "15189054-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Name Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E18_Physical_Thing",
+          "nodeid": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P46_is_composed_of",
+          "name": "Component"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "516cfbbd-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Beginning of Existence Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Period of Significance"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "4211c760-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "End of Existence Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Condition Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Condition Time Span "
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "26cc9379-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Ancillary Feature Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E62_String",
+          "nodeid": "2b7d0a8d-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P3_has_note",
+          "name": "Place Description"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E65_Creation",
+          "nodeid": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P94i_was_created_by",
+          "name": "Protection Event"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "aef77173-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Component Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E38_Image",
+          "nodeid": "5b97e180-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "file-list",
+          "nodegroup_id": "5b97e180-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P138i_has_representation",
+          "name": "Condition Image"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc936f-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Heritage Resource Type From Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Evaluation Time Span"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E17_Type_Assignment",
+          "nodeid": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P41i_was_classified_by",
+          "name": "Style Phase Type Assignment"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Resource Type Classification"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E54_Dimension",
+          "nodeid": "01180e93-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P40_observed_dimension",
+          "name": "Measurement"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Disturbance Type"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "26cc936b-b8fc-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Ancilary Feature To Date"
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Setting Type"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "This resource model describes heritage resources, which includes monuments, buildings, structures, etc.",
+      "edges": [
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "01180e97-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "01180e93-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P40_observed_dimension",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19b-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc938d-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9373-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "f7435484-b8fa-11e6-84a5-026d961c88e6",
+          "domainnode_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "f743547e-b8fa-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc93a0-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9377-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19f-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P34i_was_assessed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9391-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc936c-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "aef77178-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "aef77172-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19a-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e180-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P138i_has_representation",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "516cfbc2-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "516cfbbd-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9f-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a8d-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P3_has_note",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0aa3-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P53_has_former_or_current_location",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "4211c765-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "4211c762-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "4211c761-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9399-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9378-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939d-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P41i_was_classified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "aef7717a-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "aef77174-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9394-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9370-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "01180e9b-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P39i_was_measured_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "95577342-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "9557733a-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac10-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac08-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P140i_was_attributed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f13b-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P15_was_influenced_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e197-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P140i_was_attributed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f133-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f129-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e194-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P35_has_identified",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19e-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e18b-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9393-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9379-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc936b-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f137-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f127-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a98-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "f7435485-b8fa-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P1_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9c-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a8e-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc938e-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9379-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc93a1-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P92i_was_brought_into_existence_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "01180e98-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "01180e93-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "01180e91-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P90_has_value",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0aa0-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P89_falls_within",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "516cfbc3-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "516cfbbc-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9396-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9379-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9374-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "4211c766-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "4211c762-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939a-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9375-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e199-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e18a-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc938f-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9372-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9d-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P87_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "9557733e-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P94i_was_created_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "f7435483-b8fa-11e6-84a5-026d961c88e6",
+          "domainnode_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "f743547f-b8fa-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939e-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P41i_was_classified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9395-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P41i_was_classified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9b-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a8b-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19c-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P67i_is_referred_to_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "aef77179-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "aef77173-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac11-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "64c8ac08-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac09-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P3_has_note",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "1ffacb54-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f134-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P15_was_influenced_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e195-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "15189057-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "15189054-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e198-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e189-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P3_has_note",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f138-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a99-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P87_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f13c-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P140i_was_attributed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "95577343-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P104_is_subject_to",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "a191c5c2-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "a191c5bf-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0aa1-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P140i_was_attributed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "3a323a21-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "516cfbc4-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P92i_was_brought_into_existence_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "01180e99-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "01180e90-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "4211c767-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "4211c760-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9392-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc937a-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939f-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc937c-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac0e-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac07-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "95577340-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "9557733a-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "95577338-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e19d-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "a191c5c4-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P140i_was_attributed_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939c-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc936e-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f135-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P15_was_influenced_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "5b97e196-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "5b97e18c-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "15189058-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P1_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "01180e9a-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "01180e93-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "01180e92-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P91_has_unit",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f139-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f128-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9a-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a8c-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P87_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc938c-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc937b-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P42_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0a9e-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a7b-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P87_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9390-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc937c-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc936d-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "9557733f-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "9557733a-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "95577337-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "516cfbc1-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "516cfbbc-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "516cfbbe-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "2b7d0aa2-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "2b7d0a8a-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9398-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9370-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9371-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f13a-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P141_assigned",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "4211c768-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P93i_was_taken_out_of_existence_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "aef7717b-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P46_is_composed_of",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "95577341-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "95577339-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "a191c5c3-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "a191c5be-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P3_has_note",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc9397-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc937c-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc936f-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac0f-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac0a-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac12-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "64c8ac07-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac06-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f132-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "64c8ac13-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "99417384-b8fa-11e6-84a5-026d961c88e6",
+          "rangenode_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P12i_was_present_at",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "0b21f136-b8fb-11e6-84a5-026d961c88e6",
+          "domainnode_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "rangenode_id": "0b21f121-b8fb-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P3_has_note",
+          "description": null
+        },
+        {
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "name": null,
+          "edgeid": "26cc939b-b8fc-11e6-84a5-026d961c88e6",
+          "domainnode_id": "26cc9370-b8fc-11e6-84a5-026d961c88e6",
+          "rangenode_id": "26cc9376-b8fc-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        }
+      ],
+      "maplinewidth": 1,
+      "mappointsize": 3,
+      "graphid": "99417385-b8fa-11e6-84a5-026d961c88e6",
+      "name": "Heritage Resource Model",
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "5b97e185-b8fb-11e6-84a5-026d961c88e6",
+          "label": "Condition",
+          "node_id": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "sortorder": 0,
+          "config": "{\"placeholder\":\"Select condition\",\"options\":[],\"label\":\"Condition\"}",
+          "id": "5b97e191-b8fb-11e6-84a5-026d961c88e6"
+        }
+      ],
+      "cards": [
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Phase Type Assignments for Heritage Resource E18.\n\nConnects via P92i",
+          "name": "Heritage Resource Phase Type",
+          "nodegroup_id": "26cc9368-b8fc-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "26cc936a-b8fc-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the physical location of a resource.\n\nRelates to Activity E7 with P7\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\nRelates to Actor E39 with P74 (this restricts the place to former and current residences, which can be as broad or narrow)\nRelates to Historical Event E5 with P7\nRelates to Information Resource E73 with P67",
+          "name": "Place",
+          "nodegroup_id": "2b7d0a75-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "2b7d0a77-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "This branch evaluates instances of Heritage Resource E18 and Heritage Resource Group E27\n\nRelates to E18 and E27 resource models via P140i.",
+          "name": "Evaluation",
+          "nodegroup_id": "0b21f118-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "0b21f11a-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the type and time span of the beginning of a resource's existence.\n\nRelates to the Actor resource model E39 via P92i.\nRelates to Historic Event E5 and Activity E7 via p116i.",
+          "name": "Beginning of Existence",
+          "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "516cfbbb-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Please enter the date of the beginning of existence for the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Date Assessed",
+          "nodegroup_id": "5b97e17a-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "5b97e17c-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter the date the resource's condition was assessed."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Evaluation Criteria",
+          "nodegroup_id": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 1,
+          "cardid": "0b21f11d-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the criteria type used for evaluation."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
+          "name": "Keyword",
+          "nodegroup_id": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "3a323a1f-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select keywords associated with the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Condition Description",
+          "nodegroup_id": "5b97e17d-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 5,
+          "cardid": "5b97e17f-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Describe the assessed condition of the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Status",
+          "nodegroup_id": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 5,
+          "cardid": "0b21f114-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the resource status based on the evaluation."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Period of Significance",
+          "nodegroup_id": "0b21f11e-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 2,
+          "cardid": "0b21f120-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Define the period of significance that is being used for evaluation. "
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Integrity",
+          "nodegroup_id": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 3,
+          "cardid": "0b21f126-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the type of integrity that the resource maintains. "
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Reasons",
+          "nodegroup_id": "0b21f121-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 6,
+          "cardid": "0b21f123-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Describe the reasons for the evaluated resource's status."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i",
+          "name": "Modification Event",
+          "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "64c8ac05-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Describe modification or alteration to the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Administration Subdivision",
+          "nodegroup_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 2,
+          "cardid": "2b7d0a86-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the administrative/governmental subdivision name and type."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Description Location",
+          "nodegroup_id": "2b7d0a7e-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 4,
+          "cardid": "2b7d0a80-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Describe the location of the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Condition Image",
+          "nodegroup_id": "5b97e180-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 1,
+          "cardid": "5b97e182-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
+          "name": "End of Existence",
+          "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "4211c75f-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Please enter the date of the end of existence for the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Spatial Location",
+          "nodegroup_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "2b7d0a89-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Define the spatial location."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Intended to be evolution from v3 description branch. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).\n\nConnects to all resources with P140i",
+          "name": "Description",
+          "nodegroup_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "a191c5bd-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter a description and description type for the resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
+          "name": "Condition Assessment",
+          "nodegroup_id": "5b97e171-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "5b97e173-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Threat Type",
+          "nodegroup_id": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 2,
+          "cardid": "5b97e179-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select "
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Used to identify an Information Resource.",
+          "name": "External Identifier",
+          "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "f743547d-b8fa-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter information for identifiers of the resource from other external sources."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Captures information about special status, protection, or privileges afforded under law.",
+          "name": "Right",
+          "nodegroup_id": "95577334-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "95577336-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Physical thing on a heritage resource.",
+          "name": "Component",
+          "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "aef77171-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the architectural component and the component's material and technique"
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "name": "Style",
+          "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 1,
+          "cardid": "26cc9364-b8fc-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Define the style for the heritage resource and the cultural period and/or date range for the heritage resource's style."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Management Recommendation",
+          "nodegroup_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 6,
+          "cardid": "5b97e188-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select management recommendation in response to condition assessment."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
+          "name": "Measurement",
+          "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "01180e8f-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Setting Type",
+          "nodegroup_id": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 3,
+          "cardid": "2b7d0a7a-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "For Historic Resources only, define the setting of the historic resource."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "name": "Designation or Protection",
+          "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "95577333-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Define the resource's designation or protection status."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Evaluation Date",
+          "nodegroup_id": "0b21f10f-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "0b21f111-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter the date resource was evaluated."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Describes the type of resource.",
+          "name": "Resource Type Classification",
+          "nodegroup_id": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "1ffacb53-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "name": "Related/Ancillary Feature",
+          "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 2,
+          "cardid": "26cc9361-b8fc-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Describe a related/ancillary feature  and the cultural period and/or date range for the feature."
+        },
+        {
+          "itemtext": "a really long name that goes on and on and on",
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "The name of a resource.",
+          "name": "Name",
+          "nodegroup_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "15189053-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter the resource name and its respective type."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "",
+          "name": "Heritage Resource Type",
+          "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "26cc9367-b8fc-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Define the heritage resource type and the cultural period and/or date range for that type."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Address",
+          "nodegroup_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 1,
+          "cardid": "2b7d0a83-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter the address of the location."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Disturbance Type",
+          "nodegroup_id": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 3,
+          "cardid": "5b97e176-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the disturbance."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Eligibility Requirements",
+          "nodegroup_id": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 4,
+          "cardid": "0b21f117-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the eligibility requirements that the resource meets."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Cadastral Reference",
+          "nodegroup_id": "2b7d0a7b-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 5,
+          "cardid": "2b7d0a7d-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Enter the cadastral reference number."
+        },
+        {
+          "itemtext": null,
+          "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "name": "Condition",
+          "nodegroup_id": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 4,
+          "cardid": "5b97e185-b8fb-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select the assessed condition of the resource."
+        }
+      ],
+      "root": {
+        "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+        "description": "",
+        "istopnode": true,
+        "ontologyclass": "E18_Physical_Thing",
+        "nodeid": "99417384-b8fa-11e6-84a5-026d961c88e6",
+        "datatype": "semantic",
+        "nodegroup_id": null,
+        "config": null,
+        "name": "Heritage Resource"
+      },
+      "isactive": true,
+      "deploymentdate": null
+    }
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
+}

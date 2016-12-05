@@ -252,7 +252,7 @@ class Function(models.Model):
         return json_string
 
 class FunctionXGraph(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     function = models.ForeignKey('Function', on_delete=models.CASCADE, db_column='functionid')
     graph = models.ForeignKey('GraphModel', on_delete=models.CASCADE, db_column='graphid')
     config = JSONField(blank=True, null=True)

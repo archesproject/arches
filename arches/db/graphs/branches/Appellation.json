@@ -1,8 +1,83 @@
 {
   "graph": [
     {
+      "subtitle": "",
+      "mapfeaturecolor": null,
+      "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-at",
+      "functions": [],
       "domain_connections": [
+        {
+          "ontology_property": "P131_is_identified_by",
+          "ontology_classes": [
+            "E40_Legal_Body",
+            "E74_Group",
+            "E39_Actor",
+            "E21_Person"
+          ]
+        },
+        {
+          "ontology_property": "P102i_is_title_of",
+          "ontology_classes": [
+            "E35_Title"
+          ]
+        },
+        {
+          "ontology_property": "P103i_was_intention_of",
+          "ontology_classes": [
+            "E57_Material",
+            "E58_Measurement_Unit",
+            "E56_Language",
+            "E55_Type",
+            "S9_Property_Type"
+          ]
+        },
+        {
+          "ontology_property": "P19_was_intended_use_of",
+          "ontology_classes": [
+            "E15_Identifier_Assignment",
+            "D30_Annotation_Event",
+            "E87_Curation_Activity",
+            "E8_Acquisition",
+            "E7_Activity",
+            "E80_Part_Removal",
+            "E65_Creation",
+            "S19_Encounter_Event",
+            "A1_Excavation_Process_Unit",
+            "D10_Software_Execution",
+            "E86_Leaving",
+            "E16_Measurement",
+            "E17_Type_Assignment",
+            "D12_Data_Transfer_Event",
+            "D7_Digital_Machine_Event",
+            "S6_Data_Evaluation",
+            "S2_Sample_Taking",
+            "S21_Measurement",
+            "E9_Move",
+            "E12_Production",
+            "A9_Archaeological_Excavation",
+            "E79_Part_Addition",
+            "E83_Type_Creation",
+            "S8_Categorical_Hypothesis_Building",
+            "D3_Formal_Derivation",
+            "E10_Transfer_of_Custody",
+            "S5_Inference_Making",
+            "S1_Matter_Removal",
+            "E85_Joining",
+            "E13_Attribute_Assignment",
+            "E66_Formation",
+            "S7_Simulation_or_Prediction",
+            "D2_Digitization_Process",
+            "D11_Digital_Measurement_Event",
+            "E11_Modification",
+            "A6_Group_Declaration_Event",
+            "S4_Observation",
+            "S3_Measurement_by_Sampling",
+            "E14_Condition_Assessment"
+          ]
+        },
         {
           "ontology_property": "P1_is_identified_by",
           "ontology_classes": [
@@ -179,66 +254,6 @@
             "SP14_Time_Expression",
             "http://www.opengis.net/ont/geosparql#wktLiteral",
             "E46_Section_Definition"
-          ]
-        },
-        {
-          "ontology_property": "P102i_is_title_of",
-          "ontology_classes": [
-            "E35_Title"
-          ]
-        },
-        {
-          "ontology_property": "P103i_was_intention_of",
-          "ontology_classes": [
-            "E57_Material",
-            "E58_Measurement_Unit",
-            "E56_Language",
-            "E55_Type",
-            "S9_Property_Type"
-          ]
-        },
-        {
-          "ontology_property": "P19_was_intended_use_of",
-          "ontology_classes": [
-            "E15_Identifier_Assignment",
-            "D30_Annotation_Event",
-            "E87_Curation_Activity",
-            "E8_Acquisition",
-            "E7_Activity",
-            "E80_Part_Removal",
-            "E65_Creation",
-            "S19_Encounter_Event",
-            "A1_Excavation_Process_Unit",
-            "D10_Software_Execution",
-            "E86_Leaving",
-            "E16_Measurement",
-            "E17_Type_Assignment",
-            "D12_Data_Transfer_Event",
-            "D7_Digital_Machine_Event",
-            "S6_Data_Evaluation",
-            "S2_Sample_Taking",
-            "S21_Measurement",
-            "E9_Move",
-            "E12_Production",
-            "A9_Archaeological_Excavation",
-            "E79_Part_Addition",
-            "E83_Type_Creation",
-            "S8_Categorical_Hypothesis_Building",
-            "D3_Formal_Derivation",
-            "E10_Transfer_of_Custody",
-            "S5_Inference_Making",
-            "S1_Matter_Removal",
-            "E85_Joining",
-            "E13_Attribute_Assignment",
-            "E66_Formation",
-            "S7_Simulation_or_Prediction",
-            "D2_Digitization_Process",
-            "D11_Digital_Measurement_Event",
-            "E11_Modification",
-            "A6_Group_Declaration_Event",
-            "S4_Observation",
-            "S3_Measurement_by_Sampling",
-            "E14_Condition_Assessment"
           ]
         },
         {
@@ -1434,30 +1449,89 @@
           ]
         }
       ],
-      "graphid": "27453615-9576-11e6-b664-024f9e178154",
-      "name": "Appellation",
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "27453614-9576-11e6-b664-024f9e178154",
           "parentnodegroup_id": null
         }
       ],
       "author": " GCI",
-      "description": "Describes an appellation assigned to an Actor Resource.",
       "deploymentfile": null,
-      "isresource": false,
-      "edges": [],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "forms": [],
       "version": "",
+      "nodes": [
+        {
+          "graph_id": "27453615-9576-11e6-b664-024f9e178154",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E82_Actor_Appellation",
+          "nodeid": "27453614-9576-11e6-b664-024f9e178154",
+          "datatype": "string",
+          "nodegroup_id": "27453614-9576-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "",
+          "name": "Appellation"
+        },
+        {
+          "graph_id": "27453615-9576-11e6-b664-024f9e178154",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "fe1eb127-ac5d-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "27453614-9576-11e6-b664-024f9e178154",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Appellation Type"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "Describes an appellation assigned to an Actor Resource.\n\nRelates to resource model via P131",
+      "edges": [
+        {
+          "graph_id": "27453615-9576-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "fe1eb128-ac5d-11e6-84a5-026d961c88e6",
+          "domainnode_id": "27453614-9576-11e6-b664-024f9e178154",
+          "rangenode_id": "fe1eb127-ac5d-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        }
+      ],
+      "maplinewidth": null,
+      "mappointsize": null,
+      "graphid": "27453615-9576-11e6-b664-024f9e178154",
+      "name": "Appellation",
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c29e6",
+          "label": "Actor Name Type",
+          "node_id": "fe1eb127-ac5d-11e6-84a5-026d961c88e6",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select a name type\",\"options\":[],\"label\":\"Actor Name Type\"}",
+          "id": "287f82ed-ac5e-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000001",
+          "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c29e6",
+          "label": "Actor Name",
+          "node_id": "27453614-9576-11e6-b664-024f9e178154",
+          "sortorder": 0,
+          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter name here\",\"label\":\"Actor Name\"}",
+          "id": "287f82ec-ac5e-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "27453615-9576-11e6-b664-024f9e178154",
-          "description": "Appellation card",
-          "name": "Appellation card",
+          "description": "Describes an appellation assigned to an Actor Resource.\n\nRelates to resource model via P131",
+          "name": "Appellation",
           "nodegroup_id": "27453614-9576-11e6-b664-024f9e178154",
           "visible": true,
           "helpenabled": false,
@@ -1466,37 +1540,16 @@
           "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c29e6",
           "helptitle": null,
           "active": true,
-          "instructions": null
-        }
-      ],
-      "cards_x_nodes_x_widgets": [],
-      "forms": [],
-      "forms_x_cards": [],
-      "reports": [],
-      "subtitle": "",
-      "nodes": [
-        {
-          "functions": [],
-          "graph_id": "27453615-9576-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E41_Appellation",
-          "nodeid": "27453614-9576-11e6-b664-024f9e178154",
-          "datatype": "string",
-          "nodegroup_id": "27453614-9576-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "",
-          "name": "Appellation"
+          "instructions": "Enter the Actor name and respective name type."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "27453615-9576-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
-        "ontologyclass": "E41_Appellation",
+        "ontologyclass": "E82_Actor_Appellation",
         "nodeid": "27453614-9576-11e6-b664-024f9e178154",
-        "datatype": "semantic",
+        "datatype": "string",
         "nodegroup_id": "27453614-9576-11e6-b664-024f9e178154",
         "config": null,
         "name": "Appellation"
@@ -1504,5 +1557,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

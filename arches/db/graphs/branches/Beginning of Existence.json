@@ -1,7 +1,13 @@
 {
   "graph": [
     {
+      "subtitle": "",
+      "mapfeaturecolor": null,
+      "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-long-arrow-up",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P92i_was_brought_into_existence_by",
@@ -2382,8 +2388,6 @@
           ]
         }
       ],
-      "graphid": "da8cf543-957e-11e6-b664-024f9e178154",
-      "name": "Beginning of Existence",
       "nodegroups": [
         {
           "cardinality": "1",
@@ -2393,9 +2397,63 @@
         }
       ],
       "author": " GCI",
-      "description": "Describes the type and time span of the beginning of a resource's existence.",
       "deploymentfile": null,
-      "isresource": false,
+      "forms": [],
+      "version": "",
+      "nodes": [
+        {
+          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "860c246b-957f-11e6-b664-024f9e178154",
+          "datatype": "date",
+          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Start Date of Existence"
+        },
+        {
+          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "36229b3d-957f-11e6-b664-024f9e178154",
+          "datatype": "concept",
+          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Beginning of Existence Type"
+        },
+        {
+          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "741f5d77-957f-11e6-b664-024f9e178154",
+          "datatype": "semantic",
+          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "Beginning of Existence Time Span"
+        },
+        {
+          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E63_Beginning_of_Existence",
+          "nodeid": "da8cf542-957e-11e6-b664-024f9e178154",
+          "datatype": "semantic",
+          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "",
+          "name": "Beginning of Existence"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "Describes the type and time span of the beginning of a resource's existence.\n\nRelates to the Actor resource model E39 via P92i.\nRelates to Historic Event E5 and Activity E7 via p116i.",
       "edges": [
         {
           "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
@@ -2425,15 +2483,36 @@
           "description": null
         }
       ],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "version": "",
+      "maplinewidth": null,
+      "mappointsize": null,
+      "graphid": "da8cf543-957e-11e6-b664-024f9e178154",
+      "name": "Beginning of Existence",
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c80e6",
+          "label": "Beginning of Existence Type",
+          "node_id": "36229b3d-957f-11e6-b664-024f9e178154",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select type \",\"options\":[],\"label\":\"Beginning of Existence Type\"}",
+          "id": "cf8eb3e3-ad20-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000004",
+          "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c80e6",
+          "label": "Start Date of Existence",
+          "node_id": "860c246b-957f-11e6-b664-024f9e178154",
+          "sortorder": 0,
+          "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Start Date of Existence\"}",
+          "id": "cf8eb3e2-ad20-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Beginning of Existence Card",
-          "name": "",
+          "description": "Describes the type and time span of the beginning of a resource's existence.\n\nRelates to the Actor resource model E39 via P92i.\nRelates to Historic Event E5 and Activity E7 via p116i.",
+          "name": "Beginning of Existence",
           "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
           "visible": true,
           "helpenabled": false,
@@ -2442,72 +2521,10 @@
           "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c80e6",
           "helptitle": null,
           "active": true,
-          "instructions": null
-        }
-      ],
-      "cards_x_nodes_x_widgets": [],
-      "forms": [],
-      "forms_x_cards": [],
-      "reports": [],
-      "subtitle": "",
-      "nodes": [
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E52_Time-Span",
-          "nodeid": "741f5d77-957f-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P4_has_time-span",
-          "name": "Beginning of Existence Time Span"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E55_Type",
-          "nodeid": "36229b3d-957f-11e6-b664-024f9e178154",
-          "datatype": "concept",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": {
-            "topConcept": "0e7f2299-2824-4c12-b9fb-eebc05cbff06"
-          },
-          "parentproperty": "P2_has_type",
-          "name": "Beginning of Existence Type"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E49_Time_Appellation",
-          "nodeid": "860c246b-957f-11e6-b664-024f9e178154",
-          "datatype": "date",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P78_is_identified_by",
-          "name": "Start Date of Existence"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E63_Beginning_of_Existence",
-          "nodeid": "da8cf542-957e-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "",
-          "name": "Beginning of Existence"
+          "instructions": "Please enter the date of the beginning of existence for the resource."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
@@ -2521,5 +2538,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }
