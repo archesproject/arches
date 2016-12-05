@@ -110,15 +110,11 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0]) && req.status === 200) {
-                       self.draw.changeMode('simple_select')
-                       self.featureColor(self.resourceColor)
-                    }
+                   self.draw.changeMode('simple_select')
+                   self.featureColor(self.resourceColor)
                 });
                 this.form.on('tile-reset', function(tile) {
-                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0])) {
-                        console.log('reset')
-                    }
+                    console.log('reset')
                 });
             }
 
