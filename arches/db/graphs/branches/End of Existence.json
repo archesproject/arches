@@ -4,7 +4,10 @@
       "subtitle": "",
       "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
       "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-arrow-down",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P93i_was_taken_out_of_existence_by",
@@ -2387,7 +2390,7 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
           "parentnodegroup_id": null
@@ -2395,38 +2398,10 @@
       ],
       "author": " GCI",
       "deploymentfile": null,
+      "forms": [],
       "version": "",
       "nodes": [
         {
-          "functions": [],
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E55_Type",
-          "nodeid": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
-          "datatype": "concept",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": {
-            "topConcept": null
-          },
-          "parentproperty": "P2_has_type",
-          "name": "End of Existence Type"
-        },
-        {
-          "functions": [],
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E49_Time_Appellation",
-          "nodeid": "158c01fb-97d3-11e6-84a5-026d961c88e6",
-          "datatype": "date",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "P78_is_identified_by",
-          "name": "End Date of Existence"
-        },
-        {
-          "functions": [],
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -2439,7 +2414,18 @@
           "name": "End of Existence Time Span"
         },
         {
-          "functions": [],
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "158c01fb-97d3-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "End Date of Existence"
+        },
+        {
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "description": "",
           "istopnode": true,
@@ -2450,10 +2436,24 @@
           "config": null,
           "parentproperty": "",
           "name": "End of Existence"
+        },
+        {
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "End of Existence Type"
         }
       ],
       "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "description": "Describes the type and time span of the end of a resource's existence.",
+      "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
       "edges": [
         {
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
@@ -2467,19 +2467,19 @@
         {
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "eff93ff4-97d2-11e6-84a5-026d961c88e6",
+          "edgeid": "ff813526-97d2-11e6-84a5-026d961c88e6",
           "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "rangenode_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P2_has_type",
+          "rangenode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
           "description": null
         },
         {
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "ff813526-97d2-11e6-84a5-026d961c88e6",
+          "edgeid": "eff93ff4-97d2-11e6-84a5-026d961c88e6",
           "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "rangenode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P4_has_time-span",
+          "rangenode_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
           "description": null
         }
       ],
@@ -2487,16 +2487,31 @@
       "mappointsize": 4,
       "graphid": "b3993f59-97d2-11e6-84a5-026d961c88e6",
       "name": "End of Existence",
-      "cards_x_nodes_x_widgets": [],
-      "forms": [],
-      "forms_x_cards": [],
-      "reports": [],
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
+          "label": "End of Existence Type",
+          "node_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"End of Existence Type\"}",
+          "id": "595dcf13-ad22-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000004",
+          "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
+          "label": "End Date of Existence",
+          "node_id": "158c01fb-97d3-11e6-84a5-026d961c88e6",
+          "sortorder": 0,
+          "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"End Date of Existence\"}",
+          "id": "595dcf12-ad22-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Describes the type and time span of the end of a resource's existence.",
+          "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
           "name": "End of Existence",
           "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
           "visible": true,
@@ -2506,11 +2521,10 @@
           "cardid": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
           "helptitle": null,
           "active": true,
-          "instructions": null
+          "instructions": "Please enter the date of the end of existence for the resource."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
         "description": "",
         "istopnode": true,
@@ -2524,5 +2538,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

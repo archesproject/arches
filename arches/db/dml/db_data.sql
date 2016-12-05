@@ -246,8 +246,8 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
     VALUES ('20000000-0000-0000-0000-100000000001', '', 'n');
 
-INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
+INSERT INTO edges(edgeid, graphid, domainnodeid, rangenodeid, ontologyproperty)
+    VALUES ('22200000-0000-0000-0000-000000000001', '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
 INSERT INTO cards(cardid, name, description, instructions,
         nodegroupid, graphid, active, visible, helpenabled)

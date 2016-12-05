@@ -1,7 +1,13 @@
 {
   "graph": [
     {
+      "subtitle": "",
+      "mapfeaturecolor": null,
+      "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-font",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P135_created_type",
@@ -1741,49 +1747,20 @@
           ]
         }
       ],
-      "graphid": "ca4c43c9-955a-11e6-b664-024f9e178154",
-      "name": "Keyword",
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "ca4c43c8-955a-11e6-b664-024f9e178154",
           "parentnodegroup_id": null
         }
       ],
       "author": " GCI",
-      "description": "An informative word used for resource information retrieval that indicates the content of a resource.",
       "deploymentfile": null,
-      "isresource": false,
-      "edges": [],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "version": "",
-      "cards": [
-        {
-          "itemtext": null,
-          "functions": [],
-          "graph_id": "ca4c43c9-955a-11e6-b664-024f9e178154",
-          "description": "Keyword Card",
-          "name": "Keyword Card",
-          "nodegroup_id": "ca4c43c8-955a-11e6-b664-024f9e178154",
-          "visible": true,
-          "helpenabled": false,
-          "helptext": null,
-          "sortorder": null,
-          "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c26e6",
-          "helptitle": null,
-          "active": true,
-          "instructions": null
-        }
-      ],
-      "cards_x_nodes_x_widgets": [],
       "forms": [],
-      "forms_x_cards": [],
-      "reports": [],
-      "subtitle": "",
+      "version": "",
       "nodes": [
         {
-          "functions": [],
           "graph_id": "ca4c43c9-955a-11e6-b664-024f9e178154",
           "description": "",
           "istopnode": true,
@@ -1798,8 +1775,42 @@
           "name": "Keyword"
         }
       ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
+      "edges": [],
+      "maplinewidth": null,
+      "mappointsize": null,
+      "graphid": "ca4c43c9-955a-11e6-b664-024f9e178154",
+      "name": "Keyword",
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c26e6",
+          "label": "Keyword",
+          "node_id": "ca4c43c8-955a-11e6-b664-024f9e178154",
+          "sortorder": 0,
+          "config": "{\"placeholder\":\"Select keywords\",\"options\":[],\"label\":\"Keyword\"}",
+          "id": "b8c9b7fe-ad22-11e6-84a5-026d961c88e6"
+        }
+      ],
+      "cards": [
+        {
+          "itemtext": null,
+          "graph_id": "ca4c43c9-955a-11e6-b664-024f9e178154",
+          "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
+          "name": "Keyword",
+          "nodegroup_id": "ca4c43c8-955a-11e6-b664-024f9e178154",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c26e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": "Select keywords associated with the resource."
+        }
+      ],
       "root": {
-        "functions": [],
         "graph_id": "ca4c43c9-955a-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
@@ -1815,5 +1826,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

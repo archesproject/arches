@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-film",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P102i_is_title_of",
@@ -2145,7 +2146,6 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
           "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
           "description": "",
           "istopnode": true,
@@ -2158,7 +2158,6 @@
           "name": "Information Carrier"
         },
         {
-          "functions": [],
           "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -2190,11 +2189,20 @@
       "mappointsize": null,
       "graphid": "93304b15-955f-11e6-b664-024f9e178154",
       "name": "Information Carrier",
-      "cards_x_nodes_x_widgets": [],
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "93304b17-955f-11e6-b664-024f9e178154",
+          "label": "Information Carrier Format Type",
+          "node_id": "514b446f-9560-11e6-b664-024f9e178154",
+          "sortorder": 0,
+          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"Information Carrier Format Type\"}",
+          "id": "f6ce6ede-b8f1-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
           "description": "An object or substance used to record and accumulate data",
           "name": "Information Carrier",
@@ -2206,11 +2214,10 @@
           "cardid": "93304b17-955f-11e6-b664-024f9e178154",
           "helptitle": null,
           "active": true,
-          "instructions": null
+          "instructions": "Select the information carrier for the information resource."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
@@ -2224,5 +2231,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-underline",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P1_is_identified_by",
@@ -1441,7 +1442,7 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "bbd0d022-955d-11e6-b664-024f9e178154",
           "parentnodegroup_id": null
@@ -1453,7 +1454,6 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
           "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
           "description": "",
           "istopnode": true,
@@ -1466,7 +1466,6 @@
           "name": "Name"
         },
         {
-          "functions": [],
           "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1498,11 +1497,29 @@
       "mappointsize": null,
       "graphid": "bbd0d023-955d-11e6-b664-024f9e178154",
       "name": "Name",
-      "cards_x_nodes_x_widgets": [],
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "bbd0d025-955d-11e6-b664-024f9e178154",
+          "label": "Name Type",
+          "node_id": "f9d9b911-955d-11e6-b664-024f9e178154",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select a name type \",\"options\":[],\"label\":\"Name Type\"}",
+          "id": "1621a11e-ac5b-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000001",
+          "card_id": "bbd0d025-955d-11e6-b664-024f9e178154",
+          "label": "Name",
+          "node_id": "bbd0d022-955d-11e6-b664-024f9e178154",
+          "sortorder": 0,
+          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter name here\",\"label\":\"Name\"}",
+          "id": "1621a11f-ac5b-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
-          "itemtext": null,
-          "functions": [],
+          "itemtext": "a really long name that goes on and on and on",
           "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
           "description": "The name of a resource.",
           "name": "Name",
@@ -1514,11 +1531,10 @@
           "cardid": "bbd0d025-955d-11e6-b664-024f9e178154",
           "helptitle": null,
           "active": true,
-          "instructions": null
+          "instructions": "Enter the resource name and its respective type."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
         "description": "",
         "istopnode": true,
@@ -1532,5 +1548,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

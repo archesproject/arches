@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                     {% trans "Add" %} <i class="ion-more"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
                     <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
                     <li class="file-upload upload">
@@ -98,7 +98,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko foreach: currentList -->
             <div class="resource-grid-item relative">
                 <!-- Resource Type -->
-                <div class="resource-grid-main-container" data-bind="click:function(){ $parent.navigate(graphid + '/settings') }, hover: hover, css: {active: hover}">
+                <div class="resource-grid-main-container" data-bind="click:function(){ $parent.navigate(graphid + '/settings') }, hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
                     <div class="resource-grid-main">
                         <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
                         <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
@@ -108,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
                     <div class="btn-group" style="float:right;">
                         <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
-                        <ul class="dropdown-menu dropdown-menu-right">
+                        <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }"><i class="fa fa-wrench"></i> {% trans "Settings" %}</a>
                             </li>
                             <li><a href="#" data-bind="click:function() { $parent.navigate(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
