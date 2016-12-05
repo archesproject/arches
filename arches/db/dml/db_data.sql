@@ -3507,9 +3507,3 @@ INSERT INTO map_sources(name, source)
         "type": "vector",
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
-
-INSERT INTO map_sources(name, source)
-   VALUES ('resource-outlines', '{
-       "type": "vector",
-       "tiles": ["/tileserver/resource-outlines/{z}/{x}/{y}.pbf"]
-   }');
