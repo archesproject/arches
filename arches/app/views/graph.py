@@ -417,6 +417,7 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -433,6 +434,7 @@ class ReportEditorView(GraphBaseView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,
             map_layers=map_layers,
