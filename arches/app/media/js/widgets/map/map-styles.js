@@ -147,21 +147,6 @@ define(function() {
                   }
               },
               {
-                  "id": resource.maplayerid + "resources-outlines",
-                  "type": "line",
-                  "source": "resource-outlines",
-                  "source-layer": "resource-outlines",
-                  "layout": {
-                      "visibility": "visible"
-                  },
-                  "filter": ["all",
-                    ["==", "graphid", resource.maplayerid]
-                  ],
-                  "paint": {
-                      "line-color": resource.color
-                  }
-              },
-              {
                   "id": resource.maplayerid + "resources-line",
                   "type": "line",
                   "source": "resources",
