@@ -25,42 +25,25 @@ def handle_request(request):
                     },
                     "queries": [
                         """SELECT tileid::text,
-                                resourceinstanceid::text,
-                                nodeid::text,
-                                graphid::text,
-                                node_name,
-                                graph_name,
-                                geom AS __geometry__,
-                                row_number() over () as __id__
-                            FROM vw_getgeoms"""
-                    ]
-                },
-            },
-            "allowed origin": "*",
-            "compress": True,
-            "write cache": False
-        },
-        "resource-outlines": {
-            "provider": {
-                "class": "TileStache.Goodies.VecTiles:Provider",
-                "kwargs": {
-                    "dbinfo": {
-                        "host": "localhost",
-                        "user": "postgres",
-                        "password": "postgis",
-                        "database": "arches"
-                    },
-                    "queries": [
-                        """SELECT tileid::text,
-                                resourceinstanceid::text,
-                                nodeid::text,
-                                graphid::text,
-                                node_name,
-                                graph_name,
-                                ST_ExteriorRing(geom) AS __geometry__,
-                                row_number() over () as __id__
-                            FROM vw_getgeoms
-                            where ST_GeometryType(geom) = 'ST_Polygon'"""
+                                    resourceinstanceid::text,
+                                    nodeid::text,
+                                    graphid::text,
+                                    node_name,
+                                    graph_name,
+                                    geom AS __geometry__,
+                                    row_number() over () as __id__
+                                FROM vw_getgeoms
+                            UNION
+                            SELECT tileid::text,
+                                    resourceinstanceid::text,
+                                    nodeid::text,
+                                    graphid::text,
+                                    node_name,
+                                    graph_name,
+                                    ST_ExteriorRing(geom) AS __geometry__,
+                                    row_number() over () as __id__
+                                FROM vw_getgeoms
+                                where ST_GeometryType(geom) = 'ST_Polygon'"""
                     ]
                 },
             },

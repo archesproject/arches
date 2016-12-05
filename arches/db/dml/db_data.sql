@@ -3508,12 +3508,6 @@ INSERT INTO map_sources(name, source)
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
 
-INSERT INTO map_sources(name, source)
-   VALUES ('resource-outlines', '{
-       "type": "vector",
-       "tiles": ["/tileserver/resource-outlines/{z}/{x}/{y}.pbf"]
-   }');
-
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'resources', '[
        {
@@ -3527,18 +3521,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "filter": ["all", ["==", "$type", "Polygon"]],
            "paint": {
                "fill-color": "rgba(251, 96, 23, 0.5)"
-           }
-       },
-       {
-           "id": "resources-outlines",
-           "type": "line",
-           "source": "resource-outlines",
-           "source-layer": "resource-outlines",
-           "layout": {
-               "visibility": "visible"
-           },
-           "paint": {
-               "line-color": "rgba(251, 96, 23, 1)"
            }
        },
        {
