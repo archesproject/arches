@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-font",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P1_is_identified_by",
@@ -1441,7 +1442,7 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "fe350938-97d3-11e6-84a5-026d961c88e6",
           "parentnodegroup_id": null
@@ -1453,7 +1454,18 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
+          "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E41_Appellation",
+          "nodeid": "fe350938-97d3-11e6-84a5-026d961c88e6",
+          "datatype": "string",
+          "nodegroup_id": "fe350938-97d3-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "",
+          "name": "Title"
+        },
+        {
           "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1466,19 +1478,6 @@
           },
           "parentproperty": "P2_has_type",
           "name": "Title Type"
-        },
-        {
-          "functions": [],
-          "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E41_Appellation",
-          "nodeid": "fe350938-97d3-11e6-84a5-026d961c88e6",
-          "datatype": "string",
-          "nodegroup_id": "fe350938-97d3-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "",
-          "name": "Title"
         }
       ],
       "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -1498,11 +1497,29 @@
       "mappointsize": 4,
       "graphid": "fe350939-97d3-11e6-84a5-026d961c88e6",
       "name": "Title",
-      "cards_x_nodes_x_widgets": [],
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "fe35093b-97d3-11e6-84a5-026d961c88e6",
+          "label": "Title Type",
+          "node_id": "8b2f6b77-97d4-11e6-84a5-026d961c88e6",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"Title Type\"}",
+          "id": "af6aa5af-b8f5-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000001",
+          "card_id": "fe35093b-97d3-11e6-84a5-026d961c88e6",
+          "label": "Title",
+          "node_id": "fe350938-97d3-11e6-84a5-026d961c88e6",
+          "sortorder": 0,
+          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter title\",\"label\":\"Title\"}",
+          "id": "af6aa5ae-b8f5-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
           "description": "Describes the title of an Information Resource.",
           "name": "Title",
@@ -1514,11 +1531,10 @@
           "cardid": "fe35093b-97d3-11e6-84a5-026d961c88e6",
           "helptitle": null,
           "active": true,
-          "instructions": null
+          "instructions": "Enter the information resource's title and the type of that title. "
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
         "description": "",
         "istopnode": true,
@@ -1532,5 +1548,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-anchor",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P39i_was_measured_by",
@@ -3751,7 +3752,7 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
           "parentnodegroup_id": null
@@ -3763,20 +3764,6 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
-          "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E54_Dimension",
-          "nodeid": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-          "datatype": "semantic",
-          "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "P40_observed_dimension",
-          "name": "Measurement"
-        },
-        {
-          "functions": [],
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -3791,7 +3778,18 @@
           "name": "Measurement Unit"
         },
         {
-          "functions": [],
+          "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E54_Dimension",
+          "nodeid": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P40_observed_dimension",
+          "name": "Measurement"
+        },
+        {
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -3804,20 +3802,6 @@
           "name": "Measurement Value"
         },
         {
-          "functions": [],
-          "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E16_Measurement",
-          "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-          "datatype": "semantic",
-          "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "",
-          "name": "Measurement Event"
-        },
-        {
-          "functions": [],
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -3830,6 +3814,18 @@
           },
           "parentproperty": "P2_has_type",
           "name": "Measurement Type"
+        },
+        {
+          "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E16_Measurement",
+          "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "",
+          "name": "Measurement Event"
         }
       ],
       "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -3838,10 +3834,10 @@
         {
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "8ceadf52-ab8d-11e6-84a5-026d961c88e6",
-          "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-          "rangenode_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P91_has_unit",
+          "edgeid": "f4a13702-ab8a-11e6-84a5-026d961c88e6",
+          "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
+          "rangenode_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P2_has_type",
           "description": null
         },
         {
@@ -3856,19 +3852,19 @@
         {
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "f2d2fbe8-ab8c-11e6-84a5-026d961c88e6",
-          "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-          "rangenode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P40_observed_dimension",
+          "edgeid": "8ceadf52-ab8d-11e6-84a5-026d961c88e6",
+          "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
+          "rangenode_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P91_has_unit",
           "description": null
         },
         {
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "f4a13702-ab8a-11e6-84a5-026d961c88e6",
+          "edgeid": "f2d2fbe8-ab8c-11e6-84a5-026d961c88e6",
           "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-          "rangenode_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P2_has_type",
+          "rangenode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P40_observed_dimension",
           "description": null
         }
       ],
@@ -3878,37 +3874,36 @@
       "name": "Measurement",
       "cards_x_nodes_x_widgets": [
         {
+          "widget_id": "10000000-0000-0000-0000-000000000008",
           "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
           "label": "Measurement Value",
-          "widget_id": "10000000-0000-0000-0000-000000000008",
           "node_id": "578120f5-ab8d-11e6-84a5-026d961c88e6",
-          "sortorder": 0,
-          "config": "{\"max\":\"\",\"placeholder\":\"Enter number\",\"width\":\"100%\",\"min\":\"\",\"label\":\"Measurement Value\"}",
+          "sortorder": 2,
+          "config": "{\"max\":\"\",\"placeholder\":\"Enter value\",\"width\":\"100%\",\"min\":\"\",\"label\":\"Measurement Value\"}",
           "id": "fc0448fe-ab8d-11e6-84a5-026d961c88e6"
         },
         {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
           "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
           "label": "Measurement Type",
-          "widget_id": "10000000-0000-0000-0000-000000000002",
           "node_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
-          "sortorder": 1,
-          "config": "{\"placeholder\":\"Select an option\",\"options\":[],\"label\":\"Measurement Type\"}",
+          "sortorder": 0,
+          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"Measurement Type\"}",
           "id": "fc0448ff-ab8d-11e6-84a5-026d961c88e6"
         },
         {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
           "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
           "label": "Measurement Unit",
-          "widget_id": "10000000-0000-0000-0000-000000000002",
           "node_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
-          "sortorder": 2,
-          "config": "{\"placeholder\":\"Select an option\",\"options\":[],\"label\":\"Measurement Unit\"}",
+          "sortorder": 1,
+          "config": "{\"placeholder\":\"Select unit\",\"options\":[],\"label\":\"Measurement Unit\"}",
           "id": "fc044900-ab8d-11e6-84a5-026d961c88e6"
         }
       ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
           "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
           "name": "Measurement",
@@ -3924,7 +3919,6 @@
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
         "description": "",
         "istopnode": true,
@@ -3938,5 +3932,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }

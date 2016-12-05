@@ -7,6 +7,7 @@
       "forms_x_cards": [],
       "reports": [],
       "iconclass": "fa fa-copyright",
+      "functions": [],
       "domain_connections": [
         {
           "ontology_property": "P75_possesses",
@@ -1545,7 +1546,7 @@
       ],
       "nodegroups": [
         {
-          "cardinality": "1",
+          "cardinality": "n",
           "legacygroupid": null,
           "nodegroupid": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
           "parentnodegroup_id": null
@@ -1557,7 +1558,6 @@
       "version": "",
       "nodes": [
         {
-          "functions": [],
           "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
           "description": "",
           "istopnode": true,
@@ -1570,7 +1570,6 @@
           "name": "Right Description"
         },
         {
-          "functions": [],
           "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
           "description": "Represents a single node in a graph",
           "istopnode": false,
@@ -1602,11 +1601,29 @@
       "mappointsize": null,
       "graphid": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
       "name": "Right Description",
-      "cards_x_nodes_x_widgets": [],
+      "cards_x_nodes_x_widgets": [
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000005",
+          "card_id": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
+          "label": "Copyright Description",
+          "node_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+          "sortorder": 1,
+          "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"label\":\"Copyright Description\"}",
+          "id": "1429ad60-b8f5-11e6-84a5-026d961c88e6"
+        },
+        {
+          "widget_id": "10000000-0000-0000-0000-000000000002",
+          "card_id": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
+          "label": "Copright Type",
+          "node_id": "6b220cc7-963f-11e6-8a28-026d961c88e6",
+          "sortorder": 0,
+          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"Copright Type\"}",
+          "id": "1429ad61-b8f5-11e6-84a5-026d961c88e6"
+        }
+      ],
       "cards": [
         {
           "itemtext": null,
-          "functions": [],
           "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
           "description": "Used to define legal privileges associated with an Information Resource",
           "name": "Right Description",
@@ -1618,11 +1635,10 @@
           "cardid": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
           "helptitle": null,
           "active": true,
-          "instructions": null
+          "instructions": "Describe the copyright for the information resource."
         }
       ],
       "root": {
-        "functions": [],
         "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
         "description": "",
         "istopnode": true,
@@ -1636,5 +1652,11 @@
       "isactive": true,
       "deploymentdate": null
     }
-  ]
+  ],
+  "metadata": {
+    "git hash": "423bab3 2016-11-16 12:05:13 -0800",
+    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+    "os version": "4.4.0-45-generic",
+    "os": "Linux"
+  }
 }
