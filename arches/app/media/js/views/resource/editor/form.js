@@ -413,8 +413,10 @@ define([
                       tile.data[nodegroup_id](oldData[nodegroup_id]);
                     } else {
                       _.keys(tile.data[nodegroup_id]).forEach(function(key){
-                        console.log(key)
-                      })
+                        if (ko.isObservable(tile.data[nodegroup_id][key])) {
+                          tile.data[nodegroup_id][key](oldData[nodegroup_id][key])
+                        }
+                      }, this)
                     }
                     self.trigger('tile-reset', tile);
                 }

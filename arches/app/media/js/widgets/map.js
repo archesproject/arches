@@ -107,10 +107,14 @@ define([
                 'name': 'Mapzen'
             }]);
 
+            this.loadGeometriesIntoDrawLayer = function() {
+                this.draw.deleteAll()
+                this.draw.add(koMapping.toJS(self.value));
+            };
 
             this.resetDrawLayer = function(){
               var draw = self.draw;
-              console.log(draw)
+              self.loadGeometriesIntoDrawLayer()
             }
 
             if (this.form) {
@@ -369,11 +373,6 @@ define([
                         }
                     }
                 });
-
-                this.loadGeometriesIntoDrawLayer = function() {
-                    console.log(self.value)
-                    this.draw.add(koMapping.toJS(self.value));
-                };
 
                 /**
                  * Updates the appearance of the draw layer when feature appearance configs change
