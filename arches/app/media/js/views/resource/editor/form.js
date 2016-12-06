@@ -210,9 +210,9 @@ define([
          */
         saveTile: function(parentTile, cardinality, tile){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
-            var tileHasParent = cardinality === '1-1' || 
-                                cardinality === '1-n' || 
-                                cardinality === 'n-1' || 
+            var tileHasParent = cardinality === '1-1' ||
+                                cardinality === '1-n' ||
+                                cardinality === 'n-1' ||
                                 cardinality === 'n-n';
             if(tileHasParent){
                 tile.parenttile_id(parentTile.tileid());
@@ -228,9 +228,9 @@ define([
                 if(tileHasParent && !parentTile.tileid()){
                     savingParentTile = true;
                 }
-                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' || 
-                  (cardinality === 'n-n' && !!tile.tileid()) || 
-                  (cardinality === 'n-' && !!tile.tileid()) || 
+                if(cardinality === '1-' || cardinality === '1-1' || cardinality === 'n-1' ||
+                  (cardinality === 'n-n' && !!tile.tileid()) ||
+                  (cardinality === 'n-' && !!tile.tileid()) ||
                   (cardinality === '1-n' && !!tile.tileid())){
                     updatingTile = true;
                 }
@@ -264,7 +264,7 @@ define([
                             }else{
                                 updatedTileData = response.responseJSON;
                             }
-                            
+
                             tile.tileid(updatedTileData.tileid);
                             tile.parenttile_id(updatedTileData.parenttile_id);
                             if(!!tile._data()){
@@ -316,9 +316,9 @@ define([
          */
         deleteTile: function(parentTile, tile, justremove, cardinality){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
-            var tileHasParent = cardinality === '1-1' || 
-                                cardinality === '1-n' || 
-                                cardinality === 'n-1' || 
+            var tileHasParent = cardinality === '1-1' ||
+                                cardinality === '1-n' ||
+                                cardinality === 'n-1' ||
                                 cardinality === 'n-n';
             if(justremove){
                 tiles.remove(tile);
@@ -409,7 +409,13 @@ define([
             var self = this;
             _.keys(tile.data).forEach(function(nodegroup_id){
                 if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
-                    tile.data[nodegroup_id](oldData[nodegroup_id]);
+                    if (ko.isObservable(tile.data[nodegroup_id])) {
+                      tile.data[nodegroup_id](oldData[nodegroup_id]);
+                    } else {
+                      _.keys(tile.data[nodegroup_id]).forEach(function(key){
+                        console.log(key)
+                      })
+                    }
                     self.trigger('tile-reset', tile);
                 }
             }, this);

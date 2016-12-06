@@ -108,14 +108,17 @@ define([
             }]);
 
 
+            this.resetDrawLayer = function(){
+              var draw = self.draw;
+              console.log(draw)
+            }
+
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                    self.draw.changeMode('simple_select')
                    self.featureColor(self.resourceColor)
                 });
-                this.form.on('tile-reset', function(tile) {
-                    console.log('reset')
-                });
+                this.form.on('tile-reset', this.resetDrawLayer)
             }
 
             this.mapControls = new MapControlsViewModel({
@@ -368,6 +371,7 @@ define([
                 });
 
                 this.loadGeometriesIntoDrawLayer = function() {
+                    console.log(self.value)
                     this.draw.add(koMapping.toJS(self.value));
                 };
 
