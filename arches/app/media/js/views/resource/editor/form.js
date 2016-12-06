@@ -446,6 +446,7 @@ define([
             var contentPane = $(e.currentTarget.nextElementSibling);
             contentPane.toggle('fast');
             $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
+            window.setTimeout(function(){window.dispatchEvent(new Event('resize'))},200) //ensures the map expands to the extent of its container element
         },
 
         /**
@@ -481,7 +482,7 @@ define([
 
             // remove any data on the tile itself
             _.each(tile.data, function(value, key, list){
-                value("");
+                value(null);
             }, this);
 
             // we have to manage the parent dirty state directly
