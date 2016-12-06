@@ -110,7 +110,6 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    console.log('test');
                     if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0]) && req.status === 200) {
                        self.draw.changeMode('simple_select')
                        self.featureColor(self.resourceColor)
