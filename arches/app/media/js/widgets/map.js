@@ -107,15 +107,17 @@ define([
                 'name': 'Mapzen'
             }]);
 
+            this.loadGeometriesIntoDrawLayer = function() {
+                self.draw.deleteAll()
+                self.draw.add(koMapping.toJS(self.value));
+            };
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                    self.draw.changeMode('simple_select')
                    self.featureColor(self.resourceColor)
                 });
-                this.form.on('tile-reset', function(tile) {
-                    console.log('reset')
-                });
+                this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer)
             }
 
             this.mapControls = new MapControlsViewModel({
@@ -366,10 +368,6 @@ define([
                         }
                     }
                 });
-
-                this.loadGeometriesIntoDrawLayer = function() {
-                    this.draw.add(koMapping.toJS(self.value));
-                };
 
                 /**
                  * Updates the appearance of the draw layer when feature appearance configs change
