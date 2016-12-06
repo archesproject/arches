@@ -7,6 +7,11 @@ from arches.app.models import models
 
 
 def handle_request(request):
+    # TODO: the resource queries here perhaps should be moved to a separate view
+    # and url.  We may want to consider parameterizing it to support filtering
+    # on graphid and we will need to support filtering data based on user
+    # permissions, which are defined at the node level; ie only show geometries
+    # for nodes which the authenticated user has read permissions
     layers = {
         "resources": {
             "provider": {
@@ -19,26 +24,26 @@ def handle_request(request):
                         "database": "arches"
                     },
                     "queries": [
-                        "SELECT tileid::text, resourceinstanceid::text, nodeid::text, graphid::text, node_name, graph_name, geom AS __geometry__, row_number() over () as __id__ FROM vw_getgeoms"
-                    ]
-                },
-            },
-            "allowed origin": "*",
-            "compress": True,
-            "write cache": False
-        },
-        "resource-outlines": {
-            "provider": {
-                "class": "TileStache.Goodies.VecTiles:Provider",
-                "kwargs": {
-                    "dbinfo": {
-                        "host": "localhost",
-                        "user": "postgres",
-                        "password": "postgis",
-                        "database": "arches"
-                    },
-                    "queries": [
-                        "SELECT tileid::text, resourceinstanceid::text, nodeid::text, graphid::text, node_name, graph_name, ST_ExteriorRing(geom) AS __geometry__, row_number() over () as __id__ FROM vw_getgeoms where ST_GeometryType(geom) = 'ST_Polygon'"
+                        """SELECT tileid::text,
+                                    resourceinstanceid::text,
+                                    nodeid::text,
+                                    graphid::text,
+                                    node_name,
+                                    graph_name,
+                                    geom AS __geometry__,
+                                    row_number() over () as __id__
+                                FROM vw_getgeoms
+                            UNION
+                            SELECT tileid::text,
+                                    resourceinstanceid::text,
+                                    nodeid::text,
+                                    graphid::text,
+                                    node_name,
+                                    graph_name,
+                                    ST_ExteriorRing(geom) AS __geometry__,
+                                    row_number() over () as __id__
+                                FROM vw_getgeoms
+                                where ST_GeometryType(geom) = 'ST_Polygon'"""
                     ]
                 },
             },

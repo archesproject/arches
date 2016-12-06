@@ -110,15 +110,11 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0]) && req.status === 200) {
-                       self.draw.changeMode('simple_select')
-                       self.featureColor(self.resourceColor)
-                    }
+                   self.draw.changeMode('simple_select')
+                   self.featureColor(self.resourceColor)
                 });
                 this.form.on('tile-reset', function(tile) {
-                    if (_.contains(_.keys(tile.tiles), _.keys(self.tile.data)[0])) {
-                        console.log('reset')
-                    }
+                    console.log('reset')
                 });
             }
 
@@ -161,7 +157,27 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
+            this.createResouceModelOverlays = function(resources) {
+              var resourceLayers = [];
+              function MapLayer(resource) {
+                var maplayer = {
+                    icon: resource.icon,
+                    layer_definitions: mapStyles.getResourceModelStyles(resource),
+                    maplayerid: resource.maplayerid,
+                    name: resource.name,
+                    isoverlay: true
+                }
+                return maplayer
+              }
+              resources.forEach(function(resource){
+                resourceLayers.push(MapLayer(resource))
+              })
+              return resourceLayers;
+            }
+
+            this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
+            this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
+            this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
             /**
              * Creates the map layer for the resource with widget configs
@@ -365,9 +381,14 @@ define([
                         var paint = this.map.getLayer(style.id).paint
                         var self = this;
                         paintProperties.forEach(function(prop) {
-                            if (paint.hasOwnProperty(prop)) {
-                                self.map.setPaintProperty(style.id, prop, val)
-                            }
+                          if (paint.hasOwnProperty(prop)) {
+                            if (!style.id.includes('halo')) {
+                                  self.map.setPaintProperty(style.id, prop, val)
+                              }
+                            if (style.id.includes('halo') && !prop.includes('color')) {
+                                self.map.setPaintProperty(style.id, prop, val * 1.25)
+                              }
+                          }
                         })
                     }, this)
                 }

@@ -23,7 +23,7 @@ define(function() {
                 ["==", "active", "true"],
             ],
             "paint": {
-                "circle-radius": resource.pointsize(),
+                "circle-radius": resource.pointsize() * 1.25,
                 "circle-color": "#FFF"
             }
         }, {
@@ -36,7 +36,7 @@ define(function() {
                   ["==", "active", 'true']
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color()
               }
           },{
@@ -88,7 +88,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize(),
+                  "circle-radius": resource.pointsize() * 1.25,
                   "circle-color": "#FFF"
               }
           }, {
@@ -99,7 +99,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color(),
               }
           }, {
@@ -110,7 +110,7 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize(),
+                  "circle-radius": resource.pointsize() * 1.25,
                   "circle-color": "#FFF"
               }
           }, {
@@ -121,12 +121,59 @@ define(function() {
                   ["!=", "mode", "static"]
               ],
               "paint": {
-                  "circle-radius": resource.pointsize() * 0.75,
+                  "circle-radius": resource.pointsize(),
                   "circle-color": resource.color(),
               }
           }
         ];
        }
 
-      return {getDrawStyles: getDrawStyles};
+      var getResourceModelStyles = function(resource){
+        return [
+              {
+                  "id": resource.maplayerid + "resources-fill",
+                  "type": "fill",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all",
+                    ["==", "$type", "Polygon"],
+                    ["==", "graphid", resource.maplayerid]
+                  ],
+                  "paint": {
+                      "fill-color": resource.color
+                  }
+              },
+              {
+                  "id": resource.maplayerid + "resources-line",
+                  "type": "line",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all", ["==", "$type", "LineString"],["==", "graphid", resource.maplayerid]],
+                  "paint": {
+                      "line-color": resource.color
+                  }
+              },
+              {
+                  "id": resource.maplayerid + "resources-point",
+                  "type": "circle",
+                  "source": "resources",
+                  "source-layer": "resources",
+                  "layout": {
+                      "visibility": "visible"
+                  },
+                  "filter": ["all", ["==", "$type", "Point"],["==", "graphid", resource.maplayerid]],
+                  "paint": {
+                      "circle-radius": 5,
+                      "circle-color": resource.color
+                  }
+              }];
+        }
+
+      return {getDrawStyles: getDrawStyles, getResourceModelStyles: getResourceModelStyles};
 });
