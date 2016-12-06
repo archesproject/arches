@@ -103,7 +103,6 @@ urlpatterns = [
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
-    url(r'^clean_resource_cache/*', tileserver.clean_resource_cache, name="clean_resource_cache"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
