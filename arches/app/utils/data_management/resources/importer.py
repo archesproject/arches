@@ -33,12 +33,11 @@ def import_business_data(business_data):
                 resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
                 resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
 
-                resourceinstance = ResourceInstance(
+                resourceinstance = ResourceInstance.objects.update_or_create(
                     resourceinstanceid = resource['resourceinstance']['resourceinstanceid'],
                     graph_id = resource['resourceinstance']['graphid'],
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                 )
-                resourceinstance.save()
 
             if resource['tiles'] != []:
                 for tile in resource['tiles']:
@@ -47,15 +46,14 @@ def import_business_data(business_data):
                     tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
                     tile['tileid'] = uuid.UUID(str(tile['tileid']))
 
-                    tile = Tile(
+                    tile = Tile.objects.update_or_create(
                         resourceinstance = tile['resourceinstance_id'],
                         parenttile = tile['parenttile_id'],
                         nodegroup = tile['nodegroup_id'],
                         tileid = tile['tileid'],
                         data = tile['data']
                     )
-                    tile.update_or_create()
-                    
+
     if type(business_data) == dict and business_data['relations']:
         for relation in business_data['relations']:
             relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
