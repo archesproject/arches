@@ -353,6 +353,11 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Set to true to cache resource vector tiles; slows tile save performance, but
+# improves performance of tile layers on client. Usually, you will want to use
+# in production, but not during development
+CACHE_RESOURCE_TILES = False
+
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 try:

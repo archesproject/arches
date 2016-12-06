@@ -25,6 +25,7 @@ from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.db import transaction
+from django.conf import settings
 from tileserver import clean_resource_cache
 from shapely.geometry import asShape
 
@@ -53,12 +54,11 @@ class TileData(View):
                         }
                     )
 
-                    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                    for node in nodegroup.node_set.all():
-                        if node.datatype == 'geojson-feature-collection':
-                            node_data = tile.data[str(node.pk)]
-                            for feature in node_data['features']:
-                                feature['geometry']
+                    if settings.CACHE_RESOURCE_TILES:
+                        bbox = get_tile_bounds(tile)
+                        if (bbox):
+                            clean_resource_cache(bbox)
+
                     return data
 
                 with transaction.atomic():
@@ -100,6 +100,10 @@ class TileData(View):
                 data = preDelete(data, request)
                 ret.append(data)
                 tile = models.Tile.objects.get(tileid = data['tileid'])
+                if settings.CACHE_RESOURCE_TILES:
+                    bbox = get_tile_bounds(tile)
+                    if (bbox):
+                        clean_resource_cache(bbox)
                 tile.delete()
 
                 # # delete the parent tile if it's not reference by any child tiles any more
@@ -113,6 +117,28 @@ class TileData(View):
 
         return HttpResponseNotFound()
 
+def get_tile_bounds(tile):
+    bounds = None
+    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+    for node in nodegroup.node_set.all():
+        if node.datatype == 'geojson-feature-collection':
+            node_data = tile.data[str(node.pk)]
+            for feature in node_data['features']:
+                shape = asShape(feature['geometry'])
+                if bounds == None:
+                    bounds = shape.bounds
+                else:
+                    minx, miny, maxx, maxy = bounds
+                    if shape.bounds[0] < minx:
+                        minx = shape.bounds[0]
+                    if shape.bounds[1] < miny:
+                        miny = shape.bounds[1]
+                    if shape.bounds[2] > maxx:
+                        maxx = shape.bounds[2]
+                    if shape.bounds[3] > maxy:
+                        maxy = shape.bounds[3]
+                    bounds = (minx, miny, maxx, maxy)
+    return bounds
 
 def preSave(tile, request):
     for function in getFunctionClassInstances(tile):

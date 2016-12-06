@@ -4,13 +4,10 @@ import os
 import shutil
 import sys
 from arches.app.models import models
-from TileStache import parseConfig, getTile
-from TileStache.Core import KnownUnknown
-from TileStache.Caches import Disk, Multi
-from sys import stderr, path
-from json import dump as json_dump
+from TileStache import parseConfig
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
+from django.conf import settings
 
 def get_tileserver_config():
     # TODO: the resource queries here perhaps should be moved to a separate view
@@ -60,7 +57,7 @@ def get_tileserver_config():
                 },
                 "allowed origin": "*",
                 "compress": True,
-                "write cache": False
+                "write cache": settings.CACHE_RESOURCE_TILES
             }
         }
     }
@@ -126,7 +123,7 @@ def generate_coordinates(ul, lr, zooms, padding):
 
 
 def clean_resource_cache(bbox):
-    # bbox = (37.777, -122.352, 37.839, -122.226)
+    # bbox = (-122.592289978711, 37.70856070649707, -122.23798089667974, 37.85779759136601)
     zooms = range(20)
 
     config = parseConfig(get_tileserver_config())
@@ -135,7 +132,7 @@ def clean_resource_cache(bbox):
     extension = 'pbf'
     mimetype, format = layer.getTypeByExtension(extension)
 
-    lat1, lon1, lat2, lon2 = bbox
+    lon1, lat1, lon2, lat2 = bbox
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 
@@ -148,5 +145,4 @@ def clean_resource_cache(bbox):
     coordinates = generate_coordinates(ul, lr, zooms, 0)
 
     for (offset, count, coord) in coordinates:
-        path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom, coord.column, coord.row, extension)
         config.cache.remove(layer, coord, format)
