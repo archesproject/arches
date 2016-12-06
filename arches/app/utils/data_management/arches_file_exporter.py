@@ -48,11 +48,10 @@ class ArchesFileExporter(object):
 		reference_data = referenceDataExporter(conceptids)
 		self.write_to_file(reference_data, data_dir)
 
-	def export_business_data(self):
-		# resource_exporter = ResourceExporter('json')
-        # resourece_data = resource_exporter.export(resources=resources)
-		# self.write_to_file(resource_data, data_dir)
-		pass
+	def export_business_data(self, data_dir, resourceids):
+		resource_exporter = resourceDataExporter('json')
+		resource_data = resource_exporter.get_resources_for_export(resourceids)
+		self.write_to_file(resource_data, data_dir)
 
 	def export_metadata(self):
 		os_type = platform.system()
@@ -95,7 +94,8 @@ class ArchesFileExporter(object):
 			data['reference_data'] = reference_data_for_export
 
 		if resourceids != False:
-			resource_data_for_export = resourceDataExporter(resourceids)['business_data']
+			resource_exporter = resourceDataExporter('json')
+			resource_data_for_export = resource_exporter.get_resources_for_export(resourceids)['business_data']
 			data['business_data'] = resource_data_for_export
 
 		self.write_to_file(data, data_dir)

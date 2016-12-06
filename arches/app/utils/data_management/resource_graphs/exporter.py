@@ -4,7 +4,7 @@ import csv
 from pprint import pprint as pp
 import os
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def export(export_dir):
@@ -69,7 +69,7 @@ def get_report_data_for_export(resource_graph):
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
-    if graphids == None or graphids[0] == 'all':
+    if graphids == None or graphids[0] == 'all' or graphids == ['']:
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(name='Arches configuration'))
     elif graphids[0] == 'resources':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(name='Arches configuration'))
@@ -85,3 +85,26 @@ def get_graphs_for_export(graphids=None):
         resource_graph['reports'] = get_report_data_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
     return graphs
+
+def create_mapping_configuration_file(graphids, data_dir):
+    nodes = []
+    if graphids != False:
+        if graphids == None or graphids[0] == 'all' or graphids == ['']:
+            node_query = Node.objects.filter(graph_id__isresource=True).exclude(graph_id='22000000-0000-0000-0000-000000000002')
+        else:
+            node_query = Node.objects.filter(graph_id__in=graphids).exclude(datatype='semantic')
+
+        for node in node_query:
+            export_node = {}
+            export_node['sourceresourcemodelid'] = node.graph_id
+            export_node['sourceResourceModelName'] = JSONSerializer().serializeToPython(Graph.objects.filter(graphid=node.graph_id))[0]['name']
+            export_node['nodeid'] = node.nodeid
+            export_node['name'] = node.name
+            nodes.append(export_node)
+
+            keys = nodes[0].keys()
+            with open(os.path.join(data_dir), 'w') as config_file:
+                csv.dict_writer = csv.DictWriter(config_file, keys)
+                writer = csv.writer(config_file)
+                writer.writerow(['sourceresourcemodelid', 'sourceResourceModelName', 'sourcenodeid', 'sourceNodeName', 'targetresourcemodelid', 'targetResourceModelName', 'targetnodeid', 'targetNodeName'])
+                csv.dict_writer.writerows(nodes)
