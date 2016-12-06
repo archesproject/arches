@@ -25,7 +25,8 @@ from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.db import transaction
-
+from tileserver import clean_resource_cache
+from shapely.geometry import asShape
 
 @method_decorator(group_required('edit'), name='dispatch')
 class TileData(View):
@@ -41,6 +42,7 @@ class TileData(View):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
 
                     data = preSave(data, request)
+
                     tile, created = models.Tile.objects.update_or_create(
                         tileid = data['tileid'],
                         defaults = {
@@ -50,6 +52,13 @@ class TileData(View):
                             'parenttile_id': data['parenttile_id']
                         }
                     )
+
+                    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+                    for node in nodegroup.node_set.all():
+                        if node.datatype == 'geojson-feature-collection':
+                            node_data = tile.data[str(node.pk)]
+                            for feature in node_data['features']:
+                                feature['geometry']
                     return data
 
                 with transaction.atomic():
@@ -69,7 +78,7 @@ class TileData(View):
             json = request.body
             if json != None:
                 data = JSONDeserializer().deserialize(json)
-                
+
                 if 'tiles' in data and len(data['tiles']) > 0:
                     sortorder = 0
                     for tile in data['tiles']:
@@ -92,7 +101,7 @@ class TileData(View):
                 ret.append(data)
                 tile = models.Tile.objects.get(tileid = data['tileid'])
                 tile.delete()
-                
+
                 # # delete the parent tile if it's not reference by any child tiles any more
                 # if(tile.parenttile_id is not None):
                 #     if models.Tile.objects.filter(parenttile_id=tile.parenttile_id).count() == 0:
