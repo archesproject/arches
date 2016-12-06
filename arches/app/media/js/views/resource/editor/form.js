@@ -482,7 +482,7 @@ define([
 
             // remove any data on the tile itself
             _.each(tile.data, function(value, key, list){
-                value("");
+                value(null);
             }, this);
 
             // we have to manage the parent dirty state directly

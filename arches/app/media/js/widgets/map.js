@@ -112,12 +112,24 @@ define([
                 self.draw.add(koMapping.toJS(self.value));
             };
 
+            this.clearGeometries = function(val, key) {
+                if (self.draw !== undefined && val === null) {
+                    self.draw.deleteAll()
+                }
+            };
+
+            if (ko.isObservable(this.value)) {
+              this.value.subscribe(this.clearGeometries)
+            }
+
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                   self.draw.changeMode('simple_select')
-                   self.featureColor(self.resourceColor)
+                   if (self.draw !== undefined) {
+                     self.draw.changeMode('simple_select')
+                     self.featureColor(self.resourceColor)
+                   }
                 });
-                this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer)
+                this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
 
             this.mapControls = new MapControlsViewModel({
