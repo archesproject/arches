@@ -49,7 +49,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
+            'create_mapping_file'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -146,6 +147,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'delete_tilserver_layer':
             self.delete_tilserver_layer(options['layer_name'])
+
+        if options['operation'] == 'create_mapping_file':
+            self.create_mapping_file(options['dest_dir'], options['resources'])
 
     def setup(self, package_name):
         """
@@ -438,3 +442,10 @@ class Command(BaseCommand):
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()
+
+
+    def create_mapping_file(self, dest_dir=None, resources=None):
+        if resources != False:
+            resources = [x.strip(' ') for x in resources.split(",")]
+
+        graph_exporter.create_mapping_configuration_file(resources, dest_dir)
