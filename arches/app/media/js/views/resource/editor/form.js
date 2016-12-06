@@ -432,6 +432,7 @@ define([
          */
         toggleTile: function(data, e){
             $(e.currentTarget.nextElementSibling).toggle('fast');
+            window.setTimeout(function(){window.dispatchEvent(new Event('resize'))},200) //ensures the map expands to the extent of its container element
         },
 
         /**
