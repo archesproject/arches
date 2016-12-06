@@ -25,7 +25,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 def get_reference_data_for_export(conceptids=None):
     reference_data_dict = {}
     reference_data = []
-    if conceptids is None or conceptids[0] == 'all':
+    if conceptids is None or conceptids[0] == 'all' or conceptids == ['']:
         reference_data.append(Concept().get('00000000-0000-0000-0000-000000000001', include_subconcepts=True, semantic=True))
     else:
         for conceptid in conceptids:

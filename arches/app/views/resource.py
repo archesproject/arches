@@ -68,6 +68,7 @@ class ResourceEditorView(BaseManagerView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
@@ -86,6 +87,7 @@ class ResourceEditorView(BaseManagerView):
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
+                resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
             )
             return render(request, 'views/resource/editor.htm', context)
@@ -121,6 +123,7 @@ class ResourceReportView(BaseManagerView):
         except models.Report.DoesNotExist:
            report = None
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
+        resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
@@ -140,8 +143,9 @@ class ResourceReportView(BaseManagerView):
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
-            map_layers = map_layers,
-            map_sources = map_sources,
+            map_layers=map_layers,
+            map_sources=map_sources,
+            resource_graphs=resource_graphs,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name,
             graph_json = JSONSerializer().serialize(graph)
