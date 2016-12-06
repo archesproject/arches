@@ -108,21 +108,20 @@ define([
             }]);
 
             this.loadGeometriesIntoDrawLayer = function() {
-                this.draw.deleteAll()
-                this.draw.add(koMapping.toJS(self.value));
+                self.draw.deleteAll()
+                self.draw.add(koMapping.toJS(self.value));
             };
 
-            this.resetDrawLayer = function(){
-              var draw = self.draw;
-              self.loadGeometriesIntoDrawLayer()
-            }
+            // this.resetDrawLayer = function(){
+            //   self.loadGeometriesIntoDrawLayer()
+            // }
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                    self.draw.changeMode('simple_select')
                    self.featureColor(self.resourceColor)
                 });
-                this.form.on('tile-reset', this.resetDrawLayer)
+                this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer)
             }
 
             this.mapControls = new MapControlsViewModel({
