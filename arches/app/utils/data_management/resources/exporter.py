@@ -78,13 +78,27 @@ class ResourceExporter(object):
 
     def get_resources_for_export(self, resourceids):
         resources = []
-        if resourceids == None or resourceids == []:
+        relations = []
+        business_data_dict = {}
+        business_data_dict['business_data'] = {}
+
+        if resourceids == None or resourceids == [] or resourceids == ['']:
+            resourceids = []
             for resourceinstance in models.ResourceInstance.objects.all():
                 resourceids.append(resourceinstance.resourceinstanceid)
+
         for resourceid in resourceids:
             if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
+                resourceid = uuid.UUID(str(resourceid))
                 resource = {}
-                resource['resourceinstanceid'] = resourceid
                 resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
+                resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
-        return JSONSerializer().serialize(resources)
+
+        for relation in models.ResourceXResource.objects.all():
+            relations.append(relation)
+
+        business_data_dict['business_data']['resources'] = resources
+        business_data_dict['business_data']['relations'] = relations
+
+        return business_data_dict
