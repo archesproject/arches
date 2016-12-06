@@ -112,10 +112,6 @@ define([
                 self.draw.add(koMapping.toJS(self.value));
             };
 
-            // this.resetDrawLayer = function(){
-            //   self.loadGeometriesIntoDrawLayer()
-            // }
-
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                    self.draw.changeMode('simple_select')
