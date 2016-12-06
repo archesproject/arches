@@ -446,6 +446,7 @@ define([
             var contentPane = $(e.currentTarget.nextElementSibling);
             contentPane.toggle('fast');
             $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
+            window.setTimeout(function(){window.dispatchEvent(new Event('resize'))},200) //ensures the map expands to the extent of its container element
         },
 
         /**
