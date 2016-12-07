@@ -27,7 +27,6 @@ from django.views.generic import View
 from django.db import transaction
 from django.conf import settings
 from tileserver import clean_resource_cache
-from shapely.geometry import asShape
 
 @method_decorator(group_required('edit'), name='dispatch')
 class TileData(View):
@@ -54,10 +53,7 @@ class TileData(View):
                         }
                     )
 
-                    if settings.CACHE_RESOURCE_TILES:
-                        bbox = get_tile_bounds(tile)
-                        if bbox is not None:
-                            clean_resource_cache(bbox)
+                    clean_resource_cache(tile)
 
                     return data
 
@@ -100,10 +96,7 @@ class TileData(View):
                 data = preDelete(data, request)
                 ret.append(data)
                 tile = models.Tile.objects.get(tileid = data['tileid'])
-                if settings.CACHE_RESOURCE_TILES:
-                    bbox = get_tile_bounds(tile)
-                    if (bbox):
-                        clean_resource_cache(bbox)
+                clean_resource_cache(tile)
                 tile.delete()
 
                 # # delete the parent tile if it's not reference by any child tiles any more

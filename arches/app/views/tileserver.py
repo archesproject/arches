@@ -8,6 +8,9 @@ from TileStache import parseConfig
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
+from arches.app.models import models
+from shapely.geometry import asShape
+
 
 def get_tileserver_config():
     # TODO: the resource queries here perhaps should be moved to a separate view
@@ -61,6 +64,7 @@ def get_tileserver_config():
         }
     }
 
+
 def handle_request(request):
     config_dict = get_tileserver_config()
     layer_models = models.TileserverLayers.objects.all()
@@ -88,17 +92,41 @@ def handle_request(request):
     response['Content-length'] = str(len(content))
     return response
 
-def clean_resource_cache(bbox):
-    # bbox = (-122.592289978711, 37.70856070649707, -122.23798089667974, 37.85779759136601)
-    zooms = range(20)
 
+def clean_resource_cache(tile):
+    if not settings.CACHE_RESOURCE_TILES:
+        return
+
+    # get the tile model's bounds
+    bounds = None
+    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+    for node in nodegroup.node_set.all():
+        if node.datatype == 'geojson-feature-collection':
+            node_data = tile.data[str(node.pk)]
+            for feature in node_data['features']:
+                shape = asShape(feature['geometry'])
+                if bounds is None:
+                    bounds = shape.bounds
+                else:
+                    minx, miny, maxx, maxy = bounds
+                    if shape.bounds[0] < minx:
+                        minx = shape.bounds[0]
+                    if shape.bounds[1] < miny:
+                        miny = shape.bounds[1]
+                    if shape.bounds[2] > maxx:
+                        maxx = shape.bounds[2]
+                    if shape.bounds[3] > maxy:
+                        maxy = shape.bounds[3]
+                    bounds = (minx, miny, maxx, maxy)
+    if bounds is None:
+        return
+
+    zooms = range(20)
     config = parseConfig(get_tileserver_config())
     layer = config.layers['resources']
+    mimetype, format = layer.getTypeByExtension('pbf')
 
-    extension = 'pbf'
-    mimetype, format = layer.getTypeByExtension(extension)
-
-    lon1, lat1, lon2, lat2 = bbox
+    lon1, lat1, lon2, lat2 = bounds
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 
