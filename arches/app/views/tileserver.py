@@ -15,21 +15,20 @@ def get_tileserver_config():
     # on graphid and we will need to support filtering data based on user
     # permissions, which are defined at the node level; ie only show geometries
     # for nodes which the authenticated user has read permissions
+    database = settings.DATABASES['default']
     return {
-        "cache": {
-            "name": "Disk",
-            "path": os.path.join('arches', 'tileserver', 'cache')
-        },
+        "cache": settings.TILE_CACHE_CONFIG,
         "layers": {
             "resources": {
                 "provider": {
                     "class": "TileStache.Goodies.VecTiles:Provider",
                     "kwargs": {
                         "dbinfo": {
-                            "host": "localhost",
-                            "user": "postgres",
-                            "password": "postgis",
-                            "database": "arches"
+                            "host": database["HOST"],
+                            "user": database["USER"],
+                            "password": database["PASSWORD"],
+                            "database": database["NAME"],
+                            "port": database["PORT"]
                         },
                         "queries": [
                             """SELECT tileid::text,
@@ -89,39 +88,6 @@ def handle_request(request):
     response['Content-length'] = str(len(content))
     return response
 
-def generate_coordinates(ul, lr, zooms, padding):
-    """ Generate a stream of (offset, count, coordinate) tuples for seeding.
-        Flood-fill coordinates based on two corners, a list of zooms and padding.
-    """
-    # start with a simple total of all the coordinates we will need.
-    count = 0
-
-    for zoom in zooms:
-        ul_ = ul.zoomTo(zoom).container().left(padding).up(padding)
-        lr_ = lr.zoomTo(zoom).container().right(padding).down(padding)
-
-        rows = lr_.row + 1 - ul_.row
-        cols = lr_.column + 1 - ul_.column
-
-        count += int(rows * cols)
-
-    # now generate the actual coordinates.
-    # offset starts at zero
-    offset = 0
-
-    for zoom in zooms:
-        ul_ = ul.zoomTo(zoom).container().left(padding).up(padding)
-        lr_ = lr.zoomTo(zoom).container().right(padding).down(padding)
-
-        for row in range(int(ul_.row), int(lr_.row + 1)):
-            for column in range(int(ul_.column), int(lr_.column + 1)):
-                coord = Coordinate(row, column, zoom)
-
-                yield (offset, count, coord)
-
-                offset += 1
-
-
 def clean_resource_cache(bbox):
     # bbox = (-122.592289978711, 37.70856070649707, -122.23798089667974, 37.85779759136601)
     zooms = range(20)
@@ -142,7 +108,24 @@ def clean_resource_cache(bbox):
     ul = layer.projection.locationCoordinate(northwest)
     lr = layer.projection.locationCoordinate(southeast)
 
-    coordinates = generate_coordinates(ul, lr, zooms, 0)
+    # start with a simple total of all the coordinates we will need.
+    for zoom in zooms:
+        ul_ = ul.zoomTo(zoom).container()
+        lr_ = lr.zoomTo(zoom).container()
 
-    for (offset, count, coord) in coordinates:
+        rows = lr_.row + 1 - ul_.row
+        cols = lr_.column + 1 - ul_.column
+
+    # now generate the actual coordinates.
+    coordinates = []
+    for zoom in zooms:
+        ul_ = ul.zoomTo(zoom).container()
+        lr_ = lr.zoomTo(zoom).container()
+
+        for row in range(int(ul_.row), int(lr_.row + 1)):
+            for column in range(int(ul_.column), int(lr_.column + 1)):
+                coord = Coordinate(row, column, zoom)
+                coordinates.append(coord)
+
+    for coord in coordinates:
         config.cache.remove(layer, coord, format)

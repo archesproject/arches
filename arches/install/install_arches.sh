@@ -25,6 +25,8 @@ sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
 
 python manage.py packages -o setup_db
 python manage.py packages -o import_json
+python manage.py packages -o add_tilserver_layer -m arches/tileserver/hillshade.xml -n hillshade
+python manage.py packages -o add_tilserver_layer -m arches/tileserver/world.xml -n world
 
 python manage.py collectstatic --noinput
 sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log

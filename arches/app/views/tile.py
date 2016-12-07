@@ -56,7 +56,7 @@ class TileData(View):
 
                     if settings.CACHE_RESOURCE_TILES:
                         bbox = get_tile_bounds(tile)
-                        if (bbox):
+                        if bbox is not None:
                             clean_resource_cache(bbox)
 
                     return data
