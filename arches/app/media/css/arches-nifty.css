@@ -3477,9 +3477,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 .clear-node-search {
     position: absolute;
-    top: 8px;
-    right: 5px;
-    font-size: 12px;
+    top: 9px;
+    right: 10px;
+    font-size: 14px;
 }
 .node-list {
     position: absolute;
@@ -4321,8 +4321,8 @@ h4.report-toolbar-title {
     color: #fff;
     background: #123;
     opacity: 1.0;
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     border-radius: 2px;
     border: 1px solid #123;
     transition: all .4s ease;
@@ -4370,7 +4370,7 @@ div.row.widget-wrapper.report-header:hover {
     left: 0px;
     padding: 10px 25px;
     width: calc(100% - 250px);
-    background: #fdfdfd;
+    background: #fcfcfc;
     height: 500px;
     border: 1px solid #eee;
     border-right-width: 0px;
@@ -4406,12 +4406,14 @@ div.row.widget-wrapper.report-header:hover {
     padding-bottom: 10px;
 }
 .overlay-list-container {
-    padding-top: 20px;
+    padding-top: 0px;
     padding-left: 0px;
+    height: 375px;
+    overflow-y: scroll;
 }
 
 .overlay-filter {
-  height:34px
+  height: 38px;
 }
 
 .overlay-card {
@@ -4497,7 +4499,6 @@ div.row.widget-wrapper.report-header:hover {
     opacity: .9;
     width: 250px;
     height: 36px;
-    border: 1px solid #ddd;
     border-radius: 2px;
     transition: all .450s ease;
     z-index: 1;
@@ -4969,7 +4970,7 @@ a.map-widget-icon:hover {
 }
 .geocoder-results {
     max-height: 410px;
-    width: 248px;
+    width: 250px;
     margin-left: 0px;
     overflow-y: auto;
 }
