@@ -110,29 +110,6 @@ class TileData(View):
 
         return HttpResponseNotFound()
 
-def get_tile_bounds(tile):
-    bounds = None
-    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-    for node in nodegroup.node_set.all():
-        if node.datatype == 'geojson-feature-collection':
-            node_data = tile.data[str(node.pk)]
-            for feature in node_data['features']:
-                shape = asShape(feature['geometry'])
-                if bounds == None:
-                    bounds = shape.bounds
-                else:
-                    minx, miny, maxx, maxy = bounds
-                    if shape.bounds[0] < minx:
-                        minx = shape.bounds[0]
-                    if shape.bounds[1] < miny:
-                        miny = shape.bounds[1]
-                    if shape.bounds[2] > maxx:
-                        maxx = shape.bounds[2]
-                    if shape.bounds[3] > maxy:
-                        maxy = shape.bounds[3]
-                    bounds = (minx, miny, maxx, maxy)
-    return bounds
-
 def preSave(tile, request):
     for function in getFunctionClassInstances(tile):
         try:
@@ -140,7 +117,6 @@ def preSave(tile, request):
         except NotImplementedError:
             pass
     return tile
-
 
 def preDelete(tile, request):
     for function in getFunctionClassInstances(tile):
