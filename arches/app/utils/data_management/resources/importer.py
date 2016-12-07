@@ -48,7 +48,7 @@ def import_business_data(business_data):
 
                     tile = Tile.objects.update_or_create(
                         resourceinstance = tile['resourceinstance_id'],
-                        parenttile = tile['parenttile_id'],
+                        parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
                         nodegroup = tile['nodegroup_id'],
                         tileid = tile['tileid'],
                         data = tile['data']
@@ -61,7 +61,7 @@ def import_business_data(business_data):
             relation['resourceinstanceidto'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto'])))
             relation['relationshiptype'] = uuid.UUID(str(relation['relationshiptype']))
 
-            relation = ResourceXResource(
+            relation = ResourceXResource.objects.update_or_create(
                 resourcexid = relation['resourcexid'],
                 resourceinstanceidfrom = relation['resourceinstanceidfrom'],
                 resourceinstanceidto = relation['resourceinstanceidto'],

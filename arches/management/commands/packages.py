@@ -149,7 +149,7 @@ class Command(BaseCommand):
             self.delete_tilserver_layer(options['layer_name'])
 
         if options['operation'] == 'create_mapping_file':
-            self.create_mapping_file(options['dest_dir'], options['resources'])
+            self.create_mapping_file(options['dest_dir'], options['graphs'])
 
     def setup(self, package_name):
         """
@@ -444,8 +444,8 @@ class Command(BaseCommand):
                 tileserver_layer.delete()
 
 
-    def create_mapping_file(self, dest_dir=None, resources=None):
-        if resources != False:
-            resources = [x.strip(' ') for x in resources.split(",")]
+    def create_mapping_file(self, dest_dir=None, graphs=None):
+        if graphs != False:
+            graphs = [x.strip(' ') for x in graphs.split(",")]
 
-        graph_exporter.create_mapping_configuration_file(resources, dest_dir)
+        graph_exporter.create_mapping_configuration_file(graphs, dest_dir)
