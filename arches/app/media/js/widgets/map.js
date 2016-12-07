@@ -90,6 +90,13 @@ define([
             });
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
+            this.summaryDetails = []
+            if (ko.unwrap(this.value) !== null) {
+                this.summaryDetails =  koMapping.toJS(this.value).features || [];
+            } else {
+              console.log(this.value)
+            }
+
             this.geocoder = new GeocoderViewModel({
                 provider: this.geocodeProvider,
                 placeholder: this.geocodePlaceholder,
@@ -131,6 +138,7 @@ define([
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
+
 
             this.mapControls = new MapControlsViewModel({
                 mapControlsHidden: this.mapControlsHidden,
@@ -584,16 +592,20 @@ define([
 
                 this.updateConfigs = function() {
                     var self = this;
-                    return function() {
-                        var mapCenter = this.getCenter()
-                        var zoom = self.map.getZoom()
-                        if (self.zoom() !== zoom) {
-                            self.zoom(zoom);
-                        };
-                        self.centerX(mapCenter.lng);
-                        self.centerY(mapCenter.lat);
-                        self.bearing(this.getBearing());
-                        self.pitch(this.getPitch());
+                    if (this.form === null && this.reportHeader !== true) {
+                      return function() {
+                          var mapCenter = this.getCenter()
+                          var zoom = self.map.getZoom()
+                          if (self.zoom() !== zoom) {
+                              self.zoom(zoom);
+                          };
+                          self.centerX(mapCenter.lng);
+                          self.centerY(mapCenter.lat);
+                          self.bearing(this.getBearing());
+                          self.pitch(this.getPitch());
+                      }
+                    } else {
+                      return function() {}
                     }
                 }
 

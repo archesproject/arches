@@ -307,7 +307,10 @@
 {% endblock form %}
 
 {% block report %}
-<!-- Map summary details possibly to go here... -->
+<dt data-bind="text: label"></dt>
+<dd data-bind="foreach: summaryDetails">
+  <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
+</dd>
 {% endblock report %}
 
 {% block config_form %}
