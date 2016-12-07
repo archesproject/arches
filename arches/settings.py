@@ -353,6 +353,25 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Set to true to cache resource vector tiles; slows tile save performance, but
+# improves performance of tile layers on client. Usually, you may want to use
+# this in production, but probably not during development
+CACHE_RESOURCE_TILES = False
+
+# configure where the tileserver should store its cache
+TILE_CACHE_CONFIG = {
+    "name": "Disk",
+    "path": os.path.join(ROOT_DIR, 'tileserver', 'cache')
+
+    # to reconfigure to use S3 (recommended for production), use the following
+    # template:
+
+    # "name": "S3",
+    # "bucket": "<bucket name>",
+    # "access": "<access key>",
+    # "secret": "<secret key>"
+}
+
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 try:
