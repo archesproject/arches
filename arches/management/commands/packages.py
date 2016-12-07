@@ -412,7 +412,7 @@ class Command(BaseCommand):
     def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe'):
         if layer_name != False and mapnik_xml_path != False:
             with transaction.atomic():
-                tileserver_layer = models.TileserverLayers(name=layer_name, path=mapnik_xml_path)
+                tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
                 source_dict = {
                     "type": "raster",
                     "tiles": [
