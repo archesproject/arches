@@ -215,6 +215,11 @@
     padding-bottom: 10px;
     padding-right: 20px;
 }
+
+.help-panel-title {
+    padding: 0 10px 0 10px;
+}
+
 .card-help-panel {
     width: 40%;
     max-width: 275px;
@@ -486,6 +491,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .help-text-small {
     font-size: 12px;
+    padding-right: 5px;
 }
 .tile-record {
     position: relative;
@@ -2202,6 +2208,7 @@ input.cmn-toggle-yes-no:checked + label:after {
     color: #888;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-height: 89px;
 }
 .library-card-body {
     height: 106px;
@@ -3602,8 +3609,8 @@ ul .card-tree-list a .node-subname {
 
 .tertiary-panel {
     position: absolute;
-    top: 100px;
-    left: 469px;
+    top: 105px;
+    left: 499px;
     bottom: 0;
     z-index: 50;
 }
@@ -4171,7 +4178,7 @@ div.row.widget-wrapper {
     margin-bottom: 5px;
     color: #666;
     padding-bottom: 10px;
-    padding-left: 20px;
+    padding-left: 40px;
     background: #fafafa;
 }
 .rp-section-title {
@@ -4190,7 +4197,7 @@ div.row.widget-wrapper {
 .rp-tile-title {
 	position: absolute;
 	top: 0px;
-    left: 25px;
+    left: 45px;
 	width: 250px;
 	font-size: 15px;
     font-weight: 500;
@@ -4207,7 +4214,7 @@ div.row.widget-wrapper {
 }
 .rp-report-tile {
 	padding-bottom: 15px;
-	padding-left: 270px;
+	padding-left: 70px;
 	margin-top: 0px;
 }
 
@@ -4248,6 +4255,7 @@ div.row.widget-wrapper {
 	font-size: 11px;
 	color: #999;
 	margin: 7px;
+    padding-right: 20px;
 }
 .responsive-content {
 	margin-left: 50px;
@@ -4292,7 +4300,7 @@ div.row.widget-wrapper {
     font-weight: 500;
     margin-top: 0px;
     width: 400px;
-    padding: 14px 0 5px 15px;
+    padding: 14px 0 5px 45px;
     color: #555;
 }
 h4.report-toolbar-title {
@@ -4569,11 +4577,9 @@ div.row.widget-wrapper.report-header:hover {
 }*/
 
 .map-crud-container {
-    /*position: absolute;*/
     top: 0px;
-    /*left: 0px;
-    right: 0px;*/
     height: 500px;
+    background: #fbfbfb;
 }
 
 .expanded-map {
