@@ -233,7 +233,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- ko foreach: allGraphs -->
                                                 <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource') ">
+                                                    <a class="link-submenu" href="#" data-bind="click: !hasforms || !isactive || !formsviewable ? null: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource'), css: { 'arches-menu-item-disabled': (!hasforms || !isactive || !formsviewable) }  ">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
