@@ -127,10 +127,13 @@ def preDelete(tile, request):
             pass
     return tile
 
-def getFunctionClassInstances(tile):
+def getFunctionClassInstances(tile, exclusive=False):
     ret = []
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
-    functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+    if exclusive == False:
+        functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+    else:
+        functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id).exclude(config__triggering_nodegroups__contains=[tile['nodegroup_id']])
     for function in functions:
         print function.function.modulename.replace('.py', '')
         mod_path = function.function.modulename.replace('.py', '')
