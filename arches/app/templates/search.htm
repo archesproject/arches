@@ -1,15 +1,4 @@
-{% extends "base-manager.htm" %}
-{% load i18n %}
-{% load staticfiles %}
-
-{% block title %}
-{{ block.super }}
-{% trans "Search" %}
-{% endblock title %}
-
-{% block login_header %}{% endblock login_header %}
-
-{% block main_content %}
+{% extends "base-manager.htm" %} {% load i18n %} {% load staticfiles %} {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %} {% block login_header %}{% endblock login_header %} {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
@@ -19,16 +8,14 @@
         <div class="ep-tools-title">
             <h1 class="page-header text-overflow ep-graph-title">
                 <i class="fa fa-search text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-                <span>
-                    {% trans "Search" %}
-                </span>
+                <span>{% trans "Search" %}</span>
             </h1>
         </div>
 
         <!-- Help Bar -->
         <a href="" class="ep-tools ep-tools-right">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
-              <i class="ion-information-circled"></i>
+                <i class="ion-information-circled"></i>
             </div>
         </a>
     </div>
@@ -53,25 +40,38 @@
         </div>
     </div>
 
+
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+        Search tools here...
+    </div>
+
     <div class="flex">
-        {% block content %}
-        {% endblock content %}
+
+        <div class="flex">
+
+            <!--Form Listing -->
+            <div class="left-column-crud-container form-list search-results">
+                <!-- Title Block -->
+                <div class="title-block-title">
+                    <h4 class="title-block-title">Results here...</h4>
+                </div>
+            </div>
+
+            <!-- Card Container -->
+            <div class="card-form-preview-container">
+                Map, etc here....
+            </div>
+        </div>
     </div>
 
 </div>
-{% endblock main_content %}
+{% endblock main_content %} {% block tabs %}{% endblock tabs %} {% block pre_require_js %} {{block.super}}
+<script>{% autoescape off %}
+    define('search-data', [], function() {
+        return {
 
-{% block tabs %}{% endblock tabs %}
-
-{% block pre_require_js %}
-    {{block.super}}
-    <script>
-        {% autoescape off %}
-        define('search-data', [], function () {
-            return {
-
-            };
-        });
-        {% endautoescape %}
-    </script>
+        };
+    });
+{% endautoescape %}</script>
 {% endblock pre_require_js %}

@@ -4985,7 +4985,7 @@ a.map-widget-icon:hover {
 .geocoder-result-item {
     min-height: 40px;
     border: 1px solid #e2e2e2;
-    border-top-width: 0px; 
+    border-top-width: 0px;
     background: #fbfbfb;
     padding: 10px;
     cursor: pointer;
@@ -5011,6 +5011,11 @@ a.map-widget-icon:hover {
     border: solid 1px #808080;
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
+}
+.search-results {
+    -ms-flex: 0 0 400px;
+    -webkit-flex: 0 0 400px;
+    flex: 0 0 400px;
 }
 @keyframes loader {
 	0% { background: #ddd; }
