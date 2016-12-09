@@ -32,6 +32,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from django.utils.module_loading import import_string
+from arches.app.views.base import BaseManagerView
 
 import csv
 
@@ -39,6 +40,13 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+class SearchView(BaseManagerView):
+    def get(self, request):
+        context = self.get_context_data(
+            main_script='search',
+        )
+        return render(request, 'search.htm', context)
 
 def home_page(request):
     return render(request, 'search.htm', {

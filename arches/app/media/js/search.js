@@ -1,5 +1,5 @@
 require([
-    'views/page-view'
+    'views/base-manager'
 ], function(PageView) {
     new PageView();
 });

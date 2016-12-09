@@ -1,3 +1,82 @@
-{% extends "base.htm" %}
+{% extends "base-manager.htm" %}
 {% load i18n %}
 {% load staticfiles %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Search" %}
+{% endblock title %}
+
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <!-- Page Header -->
+    <div class="ep-toolbar">
+
+        <!-- Title Bar -->
+        <div class="ep-tools-title">
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="{{graph.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span>
+                    Test
+                </span>
+            </h1>
+        </div>
+
+        <!-- Help Bar -->
+        <a href="" class="ep-tools ep-tools-right">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+              <i class="ion-information-circled"></i>
+            </div>
+        </a>
+    </div>
+
+
+    <!-- Help Panel -->
+    <div class="ep-help" style="display: none;">
+        <div class="panel ep-help-panel relative" style="">
+
+            <!-- Help Item List -->
+            <div class="panel-body">
+                <p class="ep-tool-title">Help Topics Go Here</p>
+
+            </div>
+
+            <div class="panel-footer ep-menu-footer">
+                <div class="footer-tools">
+                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">{% trans "Close" %}</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+        Test
+    </div>
+
+    <div class="flex">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+    {{block.super}}
+    <script>
+        {% autoescape off %}
+        define('search-data', [], function () {
+            return {
+
+            };
+        });
+        {% endautoescape %}
+    </script>
+{% endblock pre_require_js %}
