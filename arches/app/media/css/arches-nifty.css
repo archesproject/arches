@@ -4099,8 +4099,14 @@ div.row.widget-wrapper {
 	color: #abb1b7;
 	transform: translate(0, -2px);
 }
-.arches-menu-item-disabled {
+
+.arches-menu-item-disabled:hover {
+    cursor: default;
+    margin-left: -3px;
 }
+
+
+
 .add-card-icon {
 	color: #fff;
 	height: 56px;
