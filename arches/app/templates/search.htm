@@ -1,4 +1,15 @@
-{% extends "base-manager.htm" %} {% load i18n %} {% load staticfiles %} {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %} {% block login_header %}{% endblock login_header %} {% block main_content %}
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %}
+    {{ block.super }}
+    {% trans "Search" %}
+{% endblock title %}
+
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
@@ -66,7 +77,12 @@
     </div>
 
 </div>
-{% endblock main_content %} {% block tabs %}{% endblock tabs %} {% block pre_require_js %} {{block.super}}
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
 <script>{% autoescape off %}
     define('search-data', [], function() {
         return {
