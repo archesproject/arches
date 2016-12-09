@@ -32,6 +32,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from django.utils.module_loading import import_string
+from arches.app.views.base import BaseManagerView
 
 import csv
 
@@ -40,15 +41,16 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+class SearchView(BaseManagerView):
+    def get(self, request):
+        context = self.get_context_data(
+            main_script='search',
+        )
+        return render(request, 'search.htm', context)
+
 def home_page(request):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
     return render(request, 'search.htm', {
         'main_script': 'search',
-        'active_page': 'Search',
-        'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
-        'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
-        'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
     })
 
 def search_terms(request):
