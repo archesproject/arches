@@ -8,6 +8,8 @@ class RequiredNodesFunction(BaseFunction):
         return self.get_required_nodes(resource, config)
 
     def get_required_nodes(self, resource, config):
+        import ipdb
+        ipdb.set_trace()
         for tile in models.Tile.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0):
             for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
                 if str(node.nodeid) in tile.data:
