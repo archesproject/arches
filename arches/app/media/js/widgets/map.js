@@ -130,11 +130,17 @@ define([
             }
 
             if (this.form) {
+                var resourcesUrl = null;
                 this.form.on('after-update', function(req, tile) {
                    if (self.draw !== undefined) {
                      self.draw.changeMode('simple_select')
                      self.featureColor(self.resourceColor)
                    }
+                   resourcesUrl = resourcesUrl || self.sources['resources'].tiles[0];
+                   var style = self.map.getStyle();
+                   style.sources['resources'].tiles[0] = self.sources['resources'].tiles[0] + "?" + (new Date().getTime());
+                   style.sources = _.defaults(self.sources, style.sources);
+                   self.map.setStyle(style);
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
