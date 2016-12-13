@@ -43,21 +43,18 @@ class TileData(View):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
                     data = preSave(data, request)
 
-                    try:
-                        tile, created = models.Tile.objects.update_or_create(
-                            tileid = data['tileid'],
-                            defaults = {
-                                'nodegroup_id': data['nodegroup_id'],
-                                'data': data['data'],
-                                'resourceinstance_id': data['resourceinstance_id'],
-                                'parenttile_id': data['parenttile_id']
-                            }
-                        )
+                    tile, created = models.Tile.objects.update_or_create(
+                        tileid = data['tileid'],
+                        defaults = {
+                            'nodegroup_id': data['nodegroup_id'],
+                            'data': data['data'],
+                            'resourceinstance_id': data['resourceinstance_id'],
+                            'parenttile_id': data['parenttile_id']
+                        }
+                    )
 
-                        clean_resource_cache(tile)
+                    clean_resource_cache(tile)
 
-                    except:
-                        pass
 
                     return data
 
@@ -69,7 +66,7 @@ class TileData(View):
                             for tile in tiles:
                                 tile['parenttile_id'] = parenttile['tileid']
                                 try:
-                                    saveTile(data)
+                                    saveTile(tile)
                                 except ValidationError as e:
                                     return JSONResponse({'status':'false','message':e.args}, status=500)
                     else:
@@ -137,25 +134,11 @@ def preDelete(tile, request):
             pass
     return tile
 
-def get_graph_functions_by_tile(tile):
-    resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
-    functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
-    if len(functions) > 0:
-        return functions
-    else:
-        for tileid, children in tile['tiles'].iteritems():
-            for child in children:
-                functions = get_graph_functions_by_tile(child)
-                if len(functions) > 0:
-                    return functions
-
 def getFunctionClassInstances(tile):
     ret = []
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
-    # functions = get_graph_functions_by_tile(tile)
     for function in functions:
-        print 'TEST' * 10
         print function.function.modulename.replace('.py', '')
         mod_path = function.function.modulename.replace('.py', '')
         module = importlib.import_module('arches.app.functions.%s' % mod_path)

@@ -1,5 +1,8 @@
 class BaseFunction(object):
 
+    def __init__(self, config=None):
+        self.config = config
+
     def get(self, *args, **kwargs):
         raise NotImplementedError
 
