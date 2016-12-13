@@ -1,4 +1,5 @@
 from arches.app.models.tile import Tile
+from arches.app.models import models
 from arches.app.functions.base import BaseFunction
 
 class LocalFileStorageFunction(BaseFunction):
@@ -23,7 +24,7 @@ class LocalFileStorageFunction(BaseFunction):
                         if incoming_file == None:
                             deleted_file = models.File.objects.get(pk=model_file["file_id"])
                             deleted_file.delete()
-                    
+
                     files = request.FILES.getlist('file-list_' + str(node.pk), [])
                     for file_data in files:
                         file_model = models.File()
