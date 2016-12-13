@@ -19,6 +19,6 @@ class RequiredNodesFunction(BaseFunction):
                 missing_nodes.append(required_node)
 
         if missing_nodes != []:
-            raise ValidationError('You must complete all required fields before this card can be saved')
+            raise ValidationError('You must complete all required fields before this card can be saved', (',').join(missing_nodes))
 
         return tile

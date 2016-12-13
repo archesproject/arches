@@ -39,10 +39,11 @@ require([
         pageView.viewModel.loading(false);
         var errorMessageTitle = arches.requestFailed.title
         var errorMessageText = arches.requestFailed.text
+        pageView.viewModel.alert(null);
         if(response.status != 200){
             if (response.responseJSON) {
               errorMessageTitle = response.responseJSON.message[0]
-              errorMessageText = response.responseJSON.message.slice(1).join(',')
+              errorMessageText = response.responseJSON.message[1]
             }
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
         }
