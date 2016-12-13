@@ -1,109 +1,92 @@
-{% extends "base.htm" %}
+{% extends "base-manager.htm" %}
 {% load i18n %}
 {% load staticfiles %}
-{% block css %}
+
+{% block title %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/plugins/bootstrap-slider.min.css' %}">    
-{% endblock css%}
-{% block content %}
+    {% trans "Search" %}
+{% endblock title %}
 
-<!--=== Search Block ===-->
-<div class="search-block">
-    
-    <!-- Search Terms -->
-    <div class="container">
-        <div class="row">
-            
-            <!-- Search Widget -->
-            <div class="col-xs-12 col-md-7 col-lg-8">
-                <div class="form-group">       
-                    <input class="select2 resource_search_widget arches-select2" name="" style="width:100%" placeholder="{% trans "Search for a resource..." %}" value="">
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <!-- Page Header -->
+    <div class="ep-toolbar">
+
+        <!-- Title Bar -->
+        <div class="ep-tools-title">
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="fa fa-search text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span>{% trans "Search" %}</span>
+            </h1>
+        </div>
+
+        <!-- Help Bar -->
+        <a href="" class="ep-tools ep-tools-right">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+                <i class="ion-information-circled"></i>
+            </div>
+        </a>
+    </div>
+
+
+    <!-- Help Panel -->
+    <div class="ep-help" style="display: none;">
+        <div class="panel ep-help-panel relative" style="">
+
+            <!-- Help Item List -->
+            <div class="panel-body">
+                <p class="ep-tool-title">Help Topics Go Here</p>
+            </div>
+
+            <div class="panel-footer ep-menu-footer">
+                <div class="footer-tools">
+                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">{% trans "Close" %}</button>
                 </div>
             </div>
-            <!-- End Search Widget -->
 
-
-            <!-- Advanced Search Option -->
-            <div class="col-xs-12 col-md-5 col-lg-4">
-
-                <button class="btn btn-success btn" id="map-filter-button" style=""> 
-                    <i class="fa fa-map-marker" style="padding-right:8px;"></i>{% trans "Location Filter" %}
-                </button>
-
-                <button class="btn btn-success btn" id="time-filter-button" style=""> 
-                    <i class="fa fa-clock-o" style="padding-right:8px;"></i>{% trans "Time Filter" %}
-                </button>
-                
-
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        {% trans "Tools" %}
-                        <i class="fa fa-chevron-down"></i>
-                        <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="javascript:void(0);" id="view-saved-searches">{% trans "View Popular Searches" %}</a></li>
-                        <li class="divider"></li>
-                        <li><a class="dataexport" id="shp" href="" target="_blank">Export results to .SHP</a></li>
-                        <li><a class="dataexport" id="csv" href="" target="_blank">Export results to .CSV</a></li>
-                        <li><a class="dataexport" id="kml" href="" target="_blank">Export results to .KML</a></li>
-                        <li class="divider"></li>
-                        <li><a href="javascript:void(0);" id="clear-search">{% trans "Clear Search" %}</a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- End Advanced Search Option -->
         </div>
     </div>
-    <!-- End Search Terms -->  
-
-</div>    
-<!--=== End Search Block ===-->
 
 
-<!--=== Default Resource Summary ===-->
-<div class="container margin-bottom-50">
-
-    <div class="row" id="saved-searches" style="margin-left:0px; margin-right:0px;">
-        <!-- Results Header -->
-        <h2 style="margin-bottom:8px;">
-            <div class="row">        
-                <div class="col-xs-12">
-                    <span class="text-muted" style="margin-bottom: 5px;">{% trans "Popular Searches:" %}</span>
-                </div>
-
-            </div>
-        </h2>   
-        <!-- Results Header -->
-
-        {% include 'views/saved-searches.htm' %}
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+        Search tools here...
     </div>
 
-    <div class="row" id="search-results" style="margin-left:0px; margin-right:0px;">
-       <!-- Results Header -->
-        <h2 style="margin-bottom:8px;">
-            <div class="row" id="search-results-count" data-count="">        
-                <div class="col-xs-12 col-lg-2" data-bind="if: total() >= 0">
-                    <span class="" style="font-size:23px;" data-bind="text: total() + ' {% trans "Results" %}'"></span>                               
-                </div>
+    <div class="flex">
 
+        <div class="flex">
+
+            <!--Form Listing -->
+            <div class="left-column-crud-container form-list search-results">
+                <!-- Title Block -->
+                <div class="title-block-title">
+                    <h4 class="title-block-title">Results here...</h4>
+                </div>
             </div>
-        </h2>   
-        <!-- Results Header -->      
-          
-        <div class="s-results margin-bottom-50">
-            <div class="row" id="map-filter-container" data-filtertext="{% trans "Map Filter Enabled" %}" style="margin-right: 20px;"> 
-                {% include 'views/search/map-filter.htm' %}
-            </div>
-            <div class="row" id="time-filter-container" data-filtertext="{% trans "Time Filter Enabled" %}"> 
-                {% include 'views/search/time-filter.htm' %}
-            </div>
-            <div class="row" id="search-results-container"> 
-                {% include 'views/search/search-results.htm' %}
+
+            <!-- Card Container -->
+            <div class="card-form-preview-container">
+                Map, etc here....
             </div>
         </div>
     </div>
 
 </div>
+{% endblock main_content %}
 
-{% endblock content %}
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+<script>{% autoescape off %}
+    define('search-data', [], function() {
+        return {
+
+        };
+    });
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

@@ -131,7 +131,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </ul>
                             </li>
 
-                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right" style="background-color: transparent;">
                                 <span class="pull-right">
                                     <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
                                 </span>
