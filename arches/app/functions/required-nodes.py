@@ -1,16 +1,24 @@
 import uuid
+from django.core.exceptions import ValidationError
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
 
 class RequiredNodesFunction(BaseFunction):
-    def get(self, resource, config):
-        return self.get_required_nodes(resource, config)
 
-    def get_required_nodes(self, resource, config):
-        for tile in models.Tile.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0):
-            for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
-                if str(node.nodeid) in tile.data:
-                    config['string_template'] = config['string_template'].replace('<%s>' % node.name, tile.data[str(node.nodeid)])
+    def __init__(self, config):
+        self.config = config
 
-        return config['string_template']
+    def save(self, resource, config):
+        return self.get_required_nodes(resource, self.config)
+
+    def get_required_nodes(self, tile, config):
+        missing_nodes = []
+        for required_node in config['required_nodes']:
+            if tile['data'][required_node] in ['', None]:
+                missing_nodes.append(required_node)
+
+        if missing_nodes != []:
+            raise ValidationError('You must complete all required fields before this card can be saved')
+
+        return tile

@@ -23,6 +23,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
 from django.conf import settings
@@ -40,20 +41,23 @@ class TileData(View):
 
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
-
                     data = preSave(data, request)
 
-                    tile, created = models.Tile.objects.update_or_create(
-                        tileid = data['tileid'],
-                        defaults = {
-                            'nodegroup_id': data['nodegroup_id'],
-                            'data': data['data'],
-                            'resourceinstance_id': data['resourceinstance_id'],
-                            'parenttile_id': data['parenttile_id']
-                        }
-                    )
+                    try:
+                        tile, created = models.Tile.objects.update_or_create(
+                            tileid = data['tileid'],
+                            defaults = {
+                                'nodegroup_id': data['nodegroup_id'],
+                                'data': data['data'],
+                                'resourceinstance_id': data['resourceinstance_id'],
+                                'parenttile_id': data['parenttile_id']
+                            }
+                        )
 
-                    clean_resource_cache(tile)
+                        clean_resource_cache(tile)
+
+                    except:
+                        pass
 
                     return data
 
@@ -64,9 +68,16 @@ class TileData(View):
                         for tiles in data['tiles'].itervalues():
                             for tile in tiles:
                                 tile['parenttile_id'] = parenttile['tileid']
-                                saveTile(tile)
+                                try:
+                                    saveTile(data)
+                                except ValidationError as e:
+                                    return JSONResponse({'status':'false','message':e.args}, status=500)
+
                     else:
-                        saveTile(data)
+                        try:
+                            saveTile(data)
+                        except ValidationError as e:
+                            return JSONResponse({'status':'false','message':e.args}, status=500)
 
                 return JSONResponse(data)
 
@@ -131,11 +142,12 @@ def getFunctionClassInstances(tile):
     ret = []
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+
     for function in functions:
         print function.function.modulename.replace('.py', '')
         mod_path = function.function.modulename.replace('.py', '')
         module = importlib.import_module('arches.app.functions.%s' % mod_path)
-        func = getattr(module, function.function.classname)()
+        func = getattr(module, function.function.classname)(function.config)
         ret.append(func)
     return ret
 

@@ -9,6 +9,7 @@ function (ko, koMapping, FunctionViewModel, chosen) {
             var nodegroups = {};
             this.nodegroup_id = params.config.nodegroup_id;
             this.required_nodes = params.config.required_nodes;
+            this.triggering_nodegroups = params.config.triggering_nodegroups;
             this.cards = ko.observableArray();
             this.nodeOptions = ko.observableArray();
 
@@ -44,6 +45,7 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                 var nodes = _.filter(this.graph.nodes, function(node){
                     return node.nodegroup_id === nodegroup_id;
                 }, this);
+                this.triggering_nodegroups.push(nodegroup_id)
                 this.nodeOptions(nodes);
                 window.setTimeout(this.updateNodeValues(), 100);
             }, this);

@@ -17,7 +17,7 @@ require([
         forms: ko.observableArray(data.forms)
     })
     formList.selectItem(formList.items()[0]);
-    
+
     var formView = new FormView({
         formid: formList.items()[0].formid,
         resourceid: data.resourceid,
@@ -37,8 +37,14 @@ require([
     });
     formView.on('after-update', function(response){
         pageView.viewModel.loading(false);
+        var errorMessageTitle = arches.requestFailed.title
+        var errorMessageText = arches.requestFailed.text
         if(response.status != 200){
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));   
+            if (response.responseJSON) {
+              errorMessageTitle = response.responseJSON.message[0]
+              errorMessageText = response.responseJSON.message.slice(1).join(',')
+            }
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
         }
     });
 
@@ -59,7 +65,7 @@ require([
                         type: "DELETE",
                         url: arches.urls.resource_editor + data.resourceid,
                         success: function(response) {
-                        
+
                         },
                         error: function(response) {
 
