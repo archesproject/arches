@@ -1,5 +1,6 @@
 import os
 import uuid
+import importlib
 import csv
 import datetime
 from time import time
@@ -22,9 +23,40 @@ from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
 from arches.app.models.models import Tile
 from arches.app.models.models import ResourceInstance
+from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
+from django.core.exceptions import ValidationError
 
+def pre_import(tile, graph_id):
+    for function in get_function_class_instances(tile, graph_id):
+        try:
+            function.on_import(tile)
+        except NotImplementedError:
+            pass
+    return tile
+
+def get_function_class_instances(tile, graph_id):
+    ret = []
+    functions = FunctionXGraph.objects.filter(graph_id=graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+    for function in functions:
+        mod_path = function.function.modulename.replace('.py', '')
+        module = importlib.import_module('arches.app.functions.%s' % mod_path)
+        func = getattr(module, function.function.classname)(function.config)
+        ret.append(func)
+    return ret
+
+def validate_business_data(business_data):
+    errors = []
+    if type(business_data) == dict and business_data['resources']:
+        for resource in business_data['resources']:
+            graph_id = resource['resourceinstance']['graph_id']
+            for tile in resource['tiles']:
+                try:
+                    pre_import(tile, graph_id)
+                except ValidationError as e:
+                    errors.append(e.args)
+    return errors
 
 def import_business_data(business_data):
     if type(business_data) == dict and business_data['resources']:
@@ -45,7 +77,6 @@ def import_business_data(business_data):
                     tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
                     tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
                     tile['tileid'] = uuid.UUID(str(tile['tileid']))
-
                     tile = Tile.objects.update_or_create(
                         resourceinstance = tile['resourceinstance_id'],
                         parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,

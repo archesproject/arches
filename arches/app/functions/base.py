@@ -11,3 +11,6 @@ class BaseFunction(object):
 
     def delete(self, *args, **kwargs):
         raise NotImplementedError
+
+    def on_import(self, *args, **kwargs):
+        raise NotImplementedError

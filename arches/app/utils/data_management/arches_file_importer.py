@@ -25,6 +25,7 @@ from django.conf import settings
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
 from arches.app.utils.data_management.concepts.importer import import_reference_data as conceptImporter
 from arches.app.utils.data_management.resources.importer import import_business_data as businessDataImporter
+from arches.app.utils.data_management.resources.importer import validate_business_data as businessDataValidator
 
 
 class ArchesFileImporter(object):
@@ -74,6 +75,12 @@ class ArchesFileImporter(object):
 		businessDataImporter(self.business_data)
 
 	def import_all(self):
+		errors = []
 		conceptImporter(self.reference_data)
 		resourceGraphImporter(self.graphs)
-		businessDataImporter(self.business_data)
+		errors = businessDataValidator(self.business_data)
+		if len(errors) == 0:
+			businessDataImporter(self.business_data)
+		else:
+			for error in errors:
+				print "{0} {1}".format(error[0], error[1])
