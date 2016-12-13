@@ -72,7 +72,6 @@ class TileData(View):
                                     saveTile(data)
                                 except ValidationError as e:
                                     return JSONResponse({'status':'false','message':e.args}, status=500)
-
                     else:
                         try:
                             saveTile(data)
@@ -138,12 +137,25 @@ def preDelete(tile, request):
             pass
     return tile
 
+def get_graph_functions_by_tile(tile):
+    resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
+    functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+    if len(functions) > 0:
+        return functions
+    else:
+        for tileid, children in tile['tiles'].iteritems():
+            for child in children:
+                functions = get_graph_functions_by_tile(child)
+                if len(functions) > 0:
+                    return functions
+
 def getFunctionClassInstances(tile):
     ret = []
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
-
+    # functions = get_graph_functions_by_tile(tile)
     for function in functions:
+        print 'TEST' * 10
         print function.function.modulename.replace('.py', '')
         mod_path = function.function.modulename.replace('.py', '')
         module = importlib.import_module('arches.app.functions.%s' % mod_path)

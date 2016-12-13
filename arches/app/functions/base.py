@@ -1,4 +1,5 @@
 class BaseFunction(object):
+
     def get(self, *args, **kwargs):
         raise NotImplementedError
 

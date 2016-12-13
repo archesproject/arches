@@ -6,7 +6,7 @@ from arches.app.models.tile import Tile
 
 class RequiredNodesFunction(BaseFunction):
 
-    def __init__(self, config):
+    def __init__(self, config=None):
         self.config = config
 
     def save(self, resource, config):
