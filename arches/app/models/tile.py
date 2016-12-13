@@ -16,8 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import ipdb
-import uuid, importlib
+import uuid, importlib, ipdb
 from arches.app.utils.uuid_helpers import uuid_get_or_create
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -89,6 +88,8 @@ class Tile(models.TileModel):
                             self.tiles[key].append(tile)
                             
     def save(self, *args, **kwargs):
+        print 'in tile save'
+        #ipdb.set_trace()
         request = kwargs.pop('request', None)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
@@ -110,6 +111,35 @@ class Tile(models.TileModel):
                 self.data[nodeid] = get_preflabel_from_valueid(nodevalue, 'en-US')['value']
 
         return self.data
+
+    @staticmethod   
+    def get_blank_tile(nodeid, resourceid=None):
+        parent_nodegroup = None
+        
+        node = models.Node.objects.get(pk=nodeid)
+        if node.nodegroup.parentnodegroup_id is not None:
+            parent_nodegroup = node.nodegroup.parentnodegroup
+            parent_tile = Tile()
+            parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
+            parent_tile.resourceinstance_id = resourceid
+            parent_tile.data = {}
+            for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
+                parent_tile.data[nodegroup.pk] = Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid)
+            return parent_tile
+        else:
+            return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
+
+    @staticmethod
+    def get_blank_tile_from_nodegroup_id(nodegroup_id, resourceid=None):
+        tile = Tile()
+        tile.nodegroup_id = nodegroup_id
+        tile.resourceinstance_id = resourceid
+        tile.data = {}
+
+        for node in models.Node.objects.filter(nodegroup=nodegroup_id):
+            tile.data[str(node.nodeid)] = ''
+
+        return tile
 
     def __preSave(self, request):
         for function in self.__getFunctionClassInstances():
