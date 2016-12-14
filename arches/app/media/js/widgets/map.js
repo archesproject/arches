@@ -132,11 +132,6 @@ define([
             if (this.form) {
                 var resourcesUrl = null;
                 this.form.on('after-update', function(req, tile) {
-                   if (self.draw !== undefined) {
-                     self.draw.changeMode('simple_select')
-                     self.featureColor(self.resourceColor)
-                   }
-
                    // Update resources source url w/ defeat cache param and
                    // reset the map's style to force a refresh of the resources
                    // vector tiles, see:
@@ -150,6 +145,13 @@ define([
                    style.sources['resources'].tiles[0] = resourcesUrl + "?" + (new Date().getTime());
                    style.sources = _.defaults(self.sources, style.sources);
                    self.map.setStyle(style);
+
+                   if (self.draw !== undefined) {
+                     self.draw.changeMode('simple_select')
+                     self.featureColor(self.resourceColor)
+                   }
+
+                   self.loadGeometriesIntoDrawLayer();
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
