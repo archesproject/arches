@@ -50,7 +50,7 @@ def manager(request):
 
             def saveTile(data, parenttile_id=None):
                 data['tileid'], created = uuid.get_or_create(data['tileid'])
-                tile, created = models.Tile.objects.update_or_create(
+                tile, created = models.TileModel.objects.update_or_create(
                     tileid = data['tileid'], 
                     defaults = {
                         'nodegroup_id': data['nodegroup_id'], 
@@ -78,7 +78,7 @@ def manager(request):
         if json != None:
             data = JSONDeserializer().deserialize(json)
             print data
-            tile = models.Tile.objects.get(tileid = data['tileid'])
+            tile = models.TileModel.objects.get(tileid = data['tileid'])
             tile.delete()
             tile.tileid = data['tileid']
         return JSONResponse(tile)

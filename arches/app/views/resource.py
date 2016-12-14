@@ -96,7 +96,6 @@ class ResourceEditorView(BaseManagerView):
 
     def delete(self, request, resourceid=None):
         if resourceid is not None:
-            #tiles = models.Tile.objects.filter(resourceinstance_id=resourceid).delete()
             ret = models.ResourceInstance.objects.get(pk=resourceid).delete()
             return JSONResponse(ret)
 
@@ -117,7 +116,7 @@ class ResourceData(View):
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        tiles = models.Tile.objects.filter(resourceinstance=resource_instance)
+        tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
         try:
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
         except models.Report.DoesNotExist:

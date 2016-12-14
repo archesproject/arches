@@ -590,12 +590,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Tile',
+            name='TileModel',
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('data', JSONField(blank=True, db_column='tiledata', null=True)),
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
-                ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.Tile')),
+                ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.TileModel')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],

@@ -33,7 +33,7 @@ class Form(object):
             self.load(resourceid, formid=formid)
 
     def load(self, resourceid, formid=None):
-        tiles = models.Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
+        tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
 
         # get the form and card data
         if formid is not None:
@@ -69,7 +69,7 @@ class Form(object):
         for form in self.forms:
             for cardgroup in form['cardgroups']:
                 # add blank parent tile
-                parentTile = JSONSerializer().serializeToPython(models.Tile())
+                parentTile = JSONSerializer().serializeToPython(Tile())
                 parentTile['tileid'] = ''
                 parentTile['parenttile_id'] = None
                 parentTile['resourceinstance_id'] = resourceid
@@ -84,7 +84,7 @@ class Form(object):
 
                 for card in cardgroup['cards']:
                     # make a blank tile
-                    tile = JSONSerializer().serializeToPython(models.Tile())
+                    tile = JSONSerializer().serializeToPython(Tile())
                     tile['tileid'] = ''
                     tile['parenttile_id'] = None # parentTile
                     tile['resourceinstance_id'] = resourceid

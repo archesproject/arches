@@ -21,7 +21,7 @@ from optparse import make_option
 from formats.archesfile import ArchesReader
 from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
-from arches.app.models.models import Tile
+from arches.app.models.tile import Tile
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
