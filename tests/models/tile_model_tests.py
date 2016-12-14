@@ -111,7 +111,7 @@ class TileTests(ArchesTestCase):
             "parenttile_id": '',
             "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
-            "data": '{}'
+            "data": {}
         }
 
         t = Tile(json)

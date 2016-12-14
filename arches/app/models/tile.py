@@ -87,7 +87,6 @@ class Tile(models.TileModel):
                             self.tiles[key].append(tile)
                             
     def save(self, *args, **kwargs):
-        print 'in tile save'
         request = kwargs.pop('request', None)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
