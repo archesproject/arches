@@ -1,5 +1,5 @@
-from arches.app.models.tile import Tile
 from arches.app.models import models
+from arches.app.models.tile import Tile
 from arches.app.functions.base import BaseFunction
 
 class LocalFileStorageFunction(BaseFunction):
