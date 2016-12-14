@@ -44,13 +44,13 @@ except ImportError:
 class SearchView(BaseManagerView):
     def get(self, request):
         context = self.get_context_data(
-            main_script='search',
+            main_script='views/search',
         )
         return render(request, 'views/search.htm', context)
 
 def home_page(request):
     return render(request, 'views/search.htm', {
-        'main_script': 'search',
+        'main_script': 'views/search',
     })
 
 def search_terms(request):
