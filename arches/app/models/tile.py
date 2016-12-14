@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid, importlib, ipdb
+import uuid, importlib
 from arches.app.utils.uuid_helpers import uuid_get_or_create
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -71,7 +71,6 @@ class Tile(models.TileModel):
 
         if args:
             if isinstance(args[0], dict):
-                #ipdb.set_trace()
                 for key, value in args[0].iteritems():
                     if not (key == 'tiles'):
                         setattr(self, key, value)
@@ -89,7 +88,6 @@ class Tile(models.TileModel):
                             
     def save(self, *args, **kwargs):
         print 'in tile save'
-        #ipdb.set_trace()
         request = kwargs.pop('request', None)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
@@ -122,9 +120,9 @@ class Tile(models.TileModel):
             parent_tile = Tile()
             parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
             parent_tile.resourceinstance_id = resourceid
-            parent_tile.data = {}
+            parent_tile.tiles = {}
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
-                parent_tile.data[nodegroup.pk] = Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid)
+                parent_tile.tiles[nodegroup.pk] = [Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid)]
             return parent_tile
         else:
             return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
