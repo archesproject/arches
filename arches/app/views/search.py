@@ -46,10 +46,10 @@ class SearchView(BaseManagerView):
         context = self.get_context_data(
             main_script='search',
         )
-        return render(request, 'search.htm', context)
+        return render(request, 'views/search.htm', context)
 
 def home_page(request):
-    return render(request, 'search.htm', {
+    return render(request, 'views/search.htm', {
         'main_script': 'search',
     })
 

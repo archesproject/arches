@@ -57,7 +57,7 @@ def auth(request):
             })
 
 def search(request):
-    return render(request, 'search.htm')
+    return render(request, 'views/search.htm')
 
 def widget(request, template="text"):
     return render(request, 'views/forms/widgets/%s.htm' % template)
