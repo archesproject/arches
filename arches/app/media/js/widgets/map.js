@@ -136,9 +136,18 @@ define([
                      self.draw.changeMode('simple_select')
                      self.featureColor(self.resourceColor)
                    }
+
+                   // Update resources source url w/ defeat cache param and
+                   // reset the map's style to force a refresh of the resources
+                   // vector tiles, see:
+                   // https://github.com/mapbox/mapbox-gl-js/issues/3709#issuecomment-265346656
+                   //
+                   // Currently, this causes the map to flicker, but this
+                   // should be resolved in the next version of mapbox-gl-js:
+                   // https://github.com/mapbox/mapbox-gl-js/pull/3621
                    resourcesUrl = resourcesUrl || self.sources['resources'].tiles[0];
                    var style = self.map.getStyle();
-                   style.sources['resources'].tiles[0] = self.sources['resources'].tiles[0] + "?" + (new Date().getTime());
+                   style.sources['resources'].tiles[0] = resourcesUrl + "?" + (new Date().getTime());
                    style.sources = _.defaults(self.sources, style.sources);
                    self.map.setStyle(style);
                 });
