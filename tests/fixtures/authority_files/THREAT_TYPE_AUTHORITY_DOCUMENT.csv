@@ -1,5 +1,5 @@
 conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider ,Source
-THREAT_TYPE:1,meteorological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:1,meteorological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Collector,GCI,AAT/Events (activities)
 THREAT_TYPE:2,storm,,THREAT_TYPE:1,Index,GCI,
 THREAT_TYPE:3,fire induced by lightning,,THREAT_TYPE:1,Index,GCI,
 THREAT_TYPE:4,hydrological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
