@@ -509,7 +509,7 @@ class ResourceInstance(models.Model):
         db_table = 'resource_instances'
 
 
-class Tile(models.Model): #Tile
+class TileModel(models.Model): #Tile
     """
     the data JSONField has this schema:
 
@@ -544,9 +544,9 @@ class Tile(models.Model): #Tile
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None):
-            sortorder_max = Tile.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            sortorder_max = TileModel.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(TileModel, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
 class Value(models.Model):

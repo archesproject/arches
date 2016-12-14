@@ -75,22 +75,6 @@ class TileTests(ArchesTestCase):
     def tearDown(self):
         pass
 
-    def test_load_from_JSON(self):
-        """
-        Test that we can initialize a Tile object from JSON
-
-        """
-
-        json = '{"tiles": {"99999999-0000-0000-0000-000000000000": [], "99999999-0000-0000-0000-000000000001": [{"parenttile_id": null, "nodegroup_id": "99999999-0000-0000-0000-000000000001", "resourceinstance_id": "40000000-0000-0000-0000-000000000000", "tileid": "985da56d-316a-4f2e-8759-8e17b6cad918", "data": {"20000000-0000-0000-0000-000000000004": "TEST 2", "20000000-0000-0000-0000-000000000002": "TEST 1"}}]}, "resourceinstance_id": "40000000-0000-0000-0000-000000000000", "parenttile_id": null, "nodegroup_id": "21111111-0000-0000-0000-000000000000", "tileid": "", "data": null}'
-
-        t = Tile(json)
-        subTiles = t.tiles["99999999-0000-0000-0000-000000000001"]
-
-        self.assertEqual(t.resourceinstance_id, "40000000-0000-0000-0000-000000000000")
-        self.assertEqual(t.data, {})
-        self.assertEqual(subTiles[0].data["20000000-0000-0000-0000-000000000002"], "TEST 1")
-
-
     def test_load_from_python_dict(self):
         """
         Test that we can initialize a Tile object from a Python dictionary
@@ -127,7 +111,7 @@ class TileTests(ArchesTestCase):
             "parenttile_id": '',
             "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
-            "data": '{}'
+            "data": {}
         }
 
         t = Tile(json)
@@ -180,7 +164,7 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save()
 
-        tiles = models.Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+        tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
         self.assertEqual(tiles.count(), 3)
 
     def test_simple_get(self):
@@ -203,7 +187,7 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save()
 
-        t2 = Tile.get(tileid=t.tileid)
+        t2 = Tile.objects.get(tileid=t.tileid)
 
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["20000000-0000-0000-0000-000000000004"], "TEST 1")

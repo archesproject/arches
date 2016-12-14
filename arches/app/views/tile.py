@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid, importlib
 from arches.app.models import models
+from arches.app.models.tile import Tile
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -32,43 +33,27 @@ from tileserver import clean_resource_cache
 class TileData(View):
     action = 'update_tile'
 
+    def get(self, request):
+        from arches.app.models.graph import Graph
+        from arches.app.models.card import Card
+        from arches.app.models.forms import Form
+        if self.action == 'get_blank_tile':
+            ret = {}
+            nodeid = request.GET.get('nodeid', None)
+            ret = Form.get_blank_tile_from_nodeid(nodeid, resourceid=None)
+            
+            return JSONResponse(ret)
+
     def post(self, request):
         if self.action == 'update_tile':
             json = request.POST.get('data', None)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
-
-                def saveTile(data, parenttile_id=None):
-                    data['tileid'], created = uuid.get_or_create(data['tileid'])
-
-                    data = preSave(data, request)
-
-                    tile, created = models.Tile.objects.update_or_create(
-                        tileid = data['tileid'],
-                        defaults = {
-                            'nodegroup_id': data['nodegroup_id'],
-                            'data': data['data'],
-                            'resourceinstance_id': data['resourceinstance_id'],
-                            'parenttile_id': data['parenttile_id']
-                        }
-                    )
-
-                    clean_resource_cache(tile)
-
-                    return data
-
+                tile = Tile(data)
                 with transaction.atomic():
-                    if 'tiles' in data and len(data['tiles']) > 0:
-                        parenttile = saveTile(data)
+                    tile.save(request=request)
 
-                        for tiles in data['tiles'].itervalues():
-                            for tile in tiles:
-                                tile['parenttile_id'] = parenttile['tileid']
-                                saveTile(tile)
-                    else:
-                        saveTile(data)
-
-                return JSONResponse(data)
+                return JSONResponse(tile)
 
         if self.action == 'reorder_tiles':
             json = request.body
@@ -77,10 +62,12 @@ class TileData(View):
 
                 if 'tiles' in data and len(data['tiles']) > 0:
                     sortorder = 0
-                    for tile in data['tiles']:
-                        t = models.Tile(tileid=tile['tileid'], sortorder=sortorder)
-                        sortorder = sortorder + 1
-                        t.save(update_fields=['sortorder'])
+                    with transaction.atomic():
+                        for tile in data['tiles']:
+                            t = Tile(tile)
+                            t.sortorder = sortorder
+                            t.save(update_fields=['sortorder'], request=request)
+                            sortorder = sortorder + 1
 
                     return JSONResponse(data)
 
@@ -93,51 +80,13 @@ class TileData(View):
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
-                data = preDelete(data, request)
-                ret.append(data)
-                tile = models.Tile.objects.get(tileid = data['tileid'])
+                tile = Tile.objects.get(tileid = data['tileid'])
                 clean_resource_cache(tile)
-                tile.delete()
+                tile.delete(request=request)
 
-                # # delete the parent tile if it's not reference by any child tiles any more
-                # if(tile.parenttile_id is not None):
-                #     if models.Tile.objects.filter(parenttile_id=tile.parenttile_id).count() == 0:
-                #         parentTile = models.Tile.objects.filter(tileid=tile.parenttile_id)
-                #         ret.append(parentTile)
-                #         parentTile.delete()
-
-            return JSONResponse(ret)
+            return JSONResponse(tile)
 
         return HttpResponseNotFound()
-
-def preSave(tile, request):
-    for function in getFunctionClassInstances(tile):
-        try:
-            function.save(tile, request)
-        except NotImplementedError:
-            pass
-    return tile
-
-def preDelete(tile, request):
-    for function in getFunctionClassInstances(tile):
-        try:
-            function.delete(tile, request)
-            print 'deleting'
-        except NotImplementedError:
-            pass
-    return tile
-
-def getFunctionClassInstances(tile):
-    ret = []
-    resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
-    functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
-    for function in functions:
-        print function.function.modulename.replace('.py', '')
-        mod_path = function.function.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.functions.%s' % mod_path)
-        func = getattr(module, function.function.classname)()
-        ret.append(func)
-    return ret
 
 # Move to util function
 def get(id):

@@ -59,7 +59,7 @@ class JsonWriter(Writer):
             if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
                 resourceid = uuid.UUID(str(resourceid))
                 resource = {}
-                resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
+                resource['tiles'] = models.TileModel.objects.filter(resourceinstance_id=resourceid)
                 resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
 
