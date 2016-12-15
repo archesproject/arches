@@ -24,6 +24,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
 from django.conf import settings
@@ -41,7 +42,7 @@ class TileData(View):
             ret = {}
             nodeid = request.GET.get('nodeid', None)
             ret = Form.get_blank_tile_from_nodeid(nodeid, resourceid=None)
-            
+
             return JSONResponse(ret)
 
     def post(self, request):
@@ -51,7 +52,10 @@ class TileData(View):
                 data = JSONDeserializer().deserialize(json)
                 tile = Tile(data)
                 with transaction.atomic():
-                    tile.save(request=request)
+                    try:
+                        tile.save(request=request)
+                    except ValidationError as e:
+                        return JSONResponse({'status':'false','message':e.args}, status=500)
 
                 return JSONResponse(tile)
 

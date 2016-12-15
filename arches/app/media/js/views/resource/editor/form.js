@@ -87,7 +87,6 @@ define([
                     },this);
                 },
                 error: function(response) {
-
                 },
                 complete: function(response){
                     self.ready(true);
@@ -256,7 +255,7 @@ define([
                             var updatedTileData;
                             if(savingParentTile){
                                 if(response.responseJSON.tiles[tile.nodegroup_id()].length > 1){
-                                    throw('oh shit');
+                                    throw('Error: tile has multiple parents');
                                 }
                                 parentTile.tileid(response.responseJSON.tileid);
                                 updatedTileData = response.responseJSON.tiles[tile.nodegroup_id()][0];
@@ -491,5 +490,6 @@ define([
             }
         }
     });
+
     return FormView;
 });
