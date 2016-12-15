@@ -28,7 +28,9 @@ define([
         }
 
         var flattenOptions = function(opt, allOpts) {
-            allOpts.push(opt);
+            if (opt['id'] !== undefined) {
+                allOpts.push(opt);
+            }
             if (opt.children) {
                 opt.children.forEach(function(child) {
                     flattenOptions(child, allOpts);
