@@ -27,6 +27,11 @@ define([
             this.node.configKeys.valueHasMutated();
         }
 
+        this.testValArray = ko.isObservable(params.value) && 'push' in params.value ? params.value : params.value = ko.observableArray();
+        this.testValArray.subscribe(function(item){
+            console.log(item);
+        })
+
         var flattenOptions = function(opt, allOpts) {
             allOpts.push(opt);
             if (opt.children) {
@@ -69,6 +74,18 @@ define([
             });
             return flatOptions;
         });
+
+        this.toggleCheckedState = function(item){
+            console.log(item)
+            if(params.value().indexOf(item.id) === -1){
+                params.value.push(item.id);
+            }else{
+                params.value.remove(item.id);
+            }
+        }
+
+        this.optionsArrray = ko.observableArray(this.flatOptions());
+        console.log(this.flatOptions());
 
         this.multiple = false;
 
