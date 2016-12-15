@@ -27,7 +27,7 @@
                 }"></i>
             </span>
             <span class="node-name" data-bind="text: card.get('name')"></span>
-            <span class="node-subname">Card Container/Card</span>
+            <span class="node-subname" data-bind="text: card.isContainer() ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
         </a>
 
         <ul class="card-tree-list-item" aria-expanded="true">

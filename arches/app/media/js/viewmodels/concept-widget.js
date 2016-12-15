@@ -13,6 +13,15 @@ define([
     var ConceptWidgetViewModel = function(params) {
         var self = this;
 
+        params.prepData = function(data) {
+            data.forEach(function (record) {
+                if (record.collector) {
+                    record.id = undefined;
+                }
+            })
+            return data;
+        }
+
         RemoteDomainWidgetViewModel.apply(this, [params]);
 
         var setUrl = function (id) {

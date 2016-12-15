@@ -10,10 +10,10 @@
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
                 <label class="form-radio form-normal form-text"
                     data-bind="css: {
-                        'active': selected()
+                        'active': $parent.isOptionSelected($data)
                     },
                     click: function () {
-                        selected(true);
+                        $parent.setOptionSelection($data, true);
                     }">
                     <input type="radio" data-bind="checked: $parent.value,
                         attr: {
