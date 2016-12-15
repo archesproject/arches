@@ -17,7 +17,7 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         if (this.node.config.options) {
-            this.options = this.node.config.options;
+            this.options = JSON.parse(JSON.stringify(this.node.config.options));
             this.options().forEach(function(option) {
                 if (!ko.isObservable(option.text)) {
                     option.text = ko.observable(option.text);
@@ -27,11 +27,6 @@ define([
             this.node.configKeys.valueHasMutated();
         }
 
-        this.testValArray = ko.isObservable(params.value) && 'push' in params.value ? params.value : params.value = ko.observableArray();
-        this.testValArray.subscribe(function(item){
-            console.log(item);
-        })
-
         var flattenOptions = function(opt, allOpts) {
             allOpts.push(opt);
             if (opt.children) {
@@ -39,31 +34,34 @@ define([
                     flattenOptions(child, allOpts);
                 });
             }
-            if (typeof opt.selected !== 'function') {
-                opt.selected = ko.computed({
-                    read: function() {
-                        var selected = false;
-                        var val = self.value();
-                        if (val && val.indexOf) {
-                            selected = val.indexOf(opt.id) >= 0;
-                        }
-                        return selected;
-                    },
-                    write: function(selected) {
-                        if (self.multiple) {
-                            var val = self.value();
-                            self.value(
-                                selected ?
-                                _.union([opt.id], val) :
-                                _.without(val ? val : [], opt.id)
-                            );
-                        } else if (selected) {
-                            self.value(opt.id);
-                        }
-                    }
-                });
-            }
             return allOpts;
+        };
+
+        this.toggleOptionSelection = function (opt) {
+            var selected = !self.isOptionSelected(opt);
+            self.setOptionSelection(opt, selected);
+        };
+
+        this.setOptionSelection = function (opt, selected) {
+            if (self.multiple) {
+                var val = self.value();
+                self.value(
+                    selected ?
+                    _.union([opt.id], val) :
+                    _.without(val ? val : [], opt.id)
+                );
+            } else if (selected) {
+                self.value(opt.id);
+            }
+        };
+
+        this.isOptionSelected = function (opt) {
+            var selected = false;
+            var val = self.value();
+            if (val && val.indexOf) {
+                selected = val.indexOf(opt.id) >= 0;
+            }
+            return selected;
         };
 
         this.flatOptions = ko.computed(function() {
@@ -74,18 +72,6 @@ define([
             });
             return flatOptions;
         });
-
-        this.toggleCheckedState = function(item){
-            console.log(item)
-            if(params.value().indexOf(item.id) === -1){
-                params.value.push(item.id);
-            }else{
-                params.value.remove(item.id);
-            }
-        }
-
-        this.optionsArrray = ko.observableArray(this.flatOptions());
-        console.log(this.flatOptions());
 
         this.multiple = false;
 

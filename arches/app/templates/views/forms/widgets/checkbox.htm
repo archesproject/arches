@@ -7,14 +7,13 @@
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
         <div class="col-xs-12">
-            <div class="pad-hor columns" data-bind="foreach: optionsArrray">
-                <label class="form-checkbox form-normal form-primary form-text"               
+            <div class="pad-hor columns" data-bind="foreach: flatOptions">
+                <label class="form-checkbox form-normal form-primary form-text"
                     data-bind="css: {
-                        'active': $parent.testValArray().indexOf(id) > -1
+                        'active': $parent.isOptionSelected($data)
                     },
-                    click: $parent.toggleCheckedState">
-
-                    <input type="checkbox" data-bind="checked: $parent.testValArray, checkedValue:id">
+                    click: $parent.toggleOptionSelection">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
                     <span data-bind="text:text"></span>
                 </label>
             </div>
