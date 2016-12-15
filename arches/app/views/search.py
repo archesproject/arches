@@ -93,10 +93,10 @@ def search_results(request):
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', '{}'))
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
+    temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
 
     se = SearchEngineFactory().create()
 

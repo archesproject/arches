@@ -577,8 +577,14 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .select2-results .select2-no-results, 
 .select2-results .select2-searching, 
-.select2-results .select2-selection-limits{
+.select2-results .select2-selection-limits,
+.select2-results .select2-ajax-error{
+    background: #f4f4f4;
     line-height: 30px;
+    padding-left: 5px;
+}
+.select2-results .select2-ajax-error{
+    color: #9e1515;
 }
 
 .switch {

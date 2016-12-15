@@ -30,9 +30,9 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = ko.observable();
 
-                ko.applyBindings(this, $('#search-results-list')[0]);
-                ko.applyBindings(this, $('#search-results-count')[0]);
-                ko.applyBindings(this, $('#paginator')[0]);
+                // ko.applyBindings(this, $('#search-results-list')[0]);
+                // ko.applyBindings(this, $('#search-results-count')[0]);
+                // ko.applyBindings(this, $('#paginator')[0]);
 
             },
 
