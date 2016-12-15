@@ -17,15 +17,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
-from arches.app.utils.uuid_helpers import uuid_get_or_create
+from django.conf import settings
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_valueid
+from arches.app.search.search_engine_factory import SearchEngineFactory
+
 
 
 class Tile(models.TileModel):
     """
-    Used for mapping complete card object to and from the database
+    Used for mapping complete tile object to and from the database
 
     """
 
@@ -34,26 +36,26 @@ class Tile(models.TileModel):
 
     def __init__(self, *args, **kwargs):
         """
-        Init a Card from a dictionary representation of from a model method call
+        Init a Tile from a dictionary representation of from a model method call
 
         init this object by using Django query syntax, eg:
         .. code-block:: python
 
-            Card.objects.get(pk=some_card_id)
+            Tile.objects.get(pk=some_tile_id)
             # or
-            Card.objects.filter(name=some_value_to_filter_by)
+            Tile.objects.filter(name=some_value_to_filter_by)
 
         OR, init this object with a dictionary, eg:
         .. code-block:: python
 
-            Card({
+            Tile({
                 name:'some name',
-                cardid: '12341234-1234-1234-1324-1234123433433',
+                tileid: '12341234-1234-1234-1324-1234123433433',
                 ...
             })
 
         Arguments:
-        args -- a dictionary of properties repsenting a Card object
+        args -- a dictionary of properties repsenting a Tile object
         kwargs -- unused
 
         """
@@ -90,6 +92,7 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
+        self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.save(*args, request=request, **kwargs)
@@ -101,6 +104,44 @@ class Tile(models.TileModel):
                 tile.delete(*args, request=request, **kwargs)
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
+
+    def index(self):
+        """
+        Indexes all the nessesary documents related to resources to support the map, search, and reports
+
+        """
+
+        se = SearchEngineFactory().create()
+
+        # search_documents = self.prepare_documents_for_search_index()
+        # for document in search_documents:
+        #     se.index_data('entity', self.entitytypeid, document, id=self.entityid)
+
+        #     report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
+        #     for report_document in report_documents:
+        #         se.index_data('resource', self.entitytypeid, report_document, id=self.entityid)
+
+        #     geojson_documents = self.prepare_documents_for_map_index(geom_entities=document['geometries'])
+        #     for geojson in geojson_documents:
+        #         se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
+
+        for term in self.prepare_terms_for_search_index():
+           se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
+    
+    def prepare_terms_for_search_index(self):
+        """
+        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM  
+        long and any concept associated with a resource to support term search  
+
+        """
+
+        terms = []
+        for nodeid, nodevalue in self.data.iteritems():
+            node = models.Node.objects.get(pk=nodeid)
+            if node.datatype == 'string':
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
+        return terms
 
     def get_node_display_values(self):
         for nodeid, nodevalue in self.data.iteritems():
@@ -121,16 +162,17 @@ class Tile(models.TileModel):
             parent_tile.resourceinstance_id = resourceid
             parent_tile.tiles = {}
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
-                parent_tile.tiles[nodegroup.pk] = [Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid)]
+                parent_tile.tiles[nodegroup.pk] = [Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile)]
             return parent_tile
         else:
             return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
 
     @staticmethod
-    def get_blank_tile_from_nodegroup_id(nodegroup_id, resourceid=None):
+    def get_blank_tile_from_nodegroup_id(nodegroup_id, resourceid=None, parenttile=None):
         tile = Tile()
         tile.nodegroup_id = nodegroup_id
         tile.resourceinstance_id = resourceid
+        tile.parenttile = parenttile
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
