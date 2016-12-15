@@ -17,7 +17,7 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         if (this.node.config.options) {
-            this.options = JSON.parse(JSON.stringify(this.node.config.options));
+            this.options = this.node.config.options;
             this.options().forEach(function(option) {
                 if (!ko.isObservable(option.text)) {
                     option.text = ko.observable(option.text);
