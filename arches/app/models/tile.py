@@ -65,7 +65,7 @@ class Tile(models.TileModel):
         # self.parenttile
         # self.data
         # self.nodegroup
-        # self.sortorder 
+        # self.sortorder
         # end from models.TileModel
         self.tiles = {}
 
@@ -85,7 +85,7 @@ class Tile(models.TileModel):
                             tile = Tile(tile_obj)
                             tile.parenttile = self
                             self.tiles[key].append(tile)
-                            
+
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         self.__preSave(request)
@@ -109,10 +109,10 @@ class Tile(models.TileModel):
 
         return self.data
 
-    @staticmethod   
+    @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
         parent_nodegroup = None
-        
+
         node = models.Node.objects.get(pk=nodeid)
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
@@ -157,10 +157,9 @@ class Tile(models.TileModel):
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
         for function in functions:
-            print function.function.modulename.replace('.py', '')
             mod_path = function.function.modulename.replace('.py', '')
             module = importlib.import_module('arches.app.functions.%s' % mod_path)
-            func = getattr(module, function.function.classname)()
+            func = getattr(module, function.function.classname)(function.config)
             ret.append(func)
         return ret
 
@@ -174,4 +173,3 @@ class Tile(models.TileModel):
         ret['tiles'] = self.tiles
 
         return ret
-
