@@ -53,6 +53,9 @@ define([
             if (options.items) {
                 this.items = options.items;
             }
+            if (options.items) {
+                this.groups = options.groups;
+            }
             var initializeItem = function(item){
                 if (!item.filtered) {
                     item.filtered = ko.observable(false);
