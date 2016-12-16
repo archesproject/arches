@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </span>
 
 {% if graph.isresource %}
-<button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'card_manager' graph_id %}') }">{% trans "Back to Cards" %}</button>
+<a href="#" class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'card_manager' graph_id %}') }, attr: { href: '{% url 'card_manager' graph_id %}' }">{% trans "Back to Cards" %}</a>
 {% else %}
 {{ block.super }}
 {% endif %}
