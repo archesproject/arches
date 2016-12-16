@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% endblock graph_title %}
 
         <!-- Search Bar -->
-        <a href="javascript:void(0)" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
               <i class="ion-search"></i>
             </div>
@@ -81,7 +81,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Menu Item -->
                     <li id="settings-manager" class="edit-menu-item {% if main_script == "views/graph/graph-settings" %} selected{% endif %}">
 
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
+                        <a href="{% url 'graph_settings' graphid %}" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-wrench"></i> {% trans "Settings" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Asset Name, Settings, Relations" %}</span>
@@ -91,7 +91,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     {% block card_manager_menu_item %}
                     <li id="card-manager" class="edit-menu-item{% if main_script == "views/graph/card-manager" %} selected{% endif %}{% if not graph.isresource and not root_node.is_collector %} disabled{% endif %}">
-                        <a href="#" {% if graph.isresource or root_node.is_collector %}data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
+                        <a {% if graph.isresource or root_node.is_collector %}
+                            href="{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"
+                            {% else %}
+                            href="#"
+                            {% endif %}>
 
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
@@ -104,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% if graph.isresource %}
                     <!-- Menu Item -->
                     <li id="form-manager" class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
+                        <a href="{% url 'form_manager' graphid %}" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
@@ -114,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'report_manager' graphid %}'); }">
+                        <a href="{% url 'report_manager' graphid %}" data-bind="click:function () { navigate('{% url 'report_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
@@ -125,7 +129,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                        <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
@@ -135,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
+                        <a href="{% url 'graph' graphid %}" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Define graph, permissions" %}</span>
@@ -145,7 +149,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                        <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
@@ -198,7 +202,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
             {% block graph_header_buttons %}
-            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Done" %}</button>
+            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Done" %}</a>
             {% endblock graph_header_buttons %}
         </div>
     </div>

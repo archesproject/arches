@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Search Bar -->
-    <a href="javascript:void(0)" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+    <a href="#" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
           <i class="ion-search"></i>
         </div>
