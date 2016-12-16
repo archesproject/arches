@@ -45,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="boxed">
                 <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
-                    
+
                     <!-- ko if: alert() -->
                     <div data-bind="visible: alert().active" class="relative">
                         <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
@@ -223,7 +223,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="#" data-bind="click: navigate.bind(this, '/resource') ">
+                                            <a href="/resource" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
@@ -233,7 +233,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- ko foreach: allGraphs -->
                                                 <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: !hasforms || !isactive || !formsviewable ? null: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource'), css: { 'arches-menu-item-disabled': (!hasforms || !isactive || !formsviewable) }  ">
+                                                    <a class="link-submenu" href="#" data-bind="click: !hasforms || !isactive || !formsviewable ? null: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource'),
+                                                        css: {
+                                                            'arches-menu-item-disabled': (!hasforms || !isactive || !formsviewable)
+                                                        },
+                                                        attr: {
+                                                            href: (!hasforms || !isactive || !formsviewable) ? '#' : ('/graph/' + graphid + '/add_resource')
+                                                        }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
@@ -251,10 +257,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                             <ul class="collapse" aria-expanded="false">
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu"  href="#" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}</a>
+                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}</a>
+                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -262,7 +268,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
-                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>System Settings</strong>
@@ -317,7 +323,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
-                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
+                                            <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
                                                     RDM
