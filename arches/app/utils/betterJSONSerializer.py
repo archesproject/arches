@@ -78,7 +78,8 @@ class JSONSerializer(object):
         elif isinstance(object, dict):
             return self.handle_dictionary(object)
         elif (isinstance(object, list) or 
-              isinstance(object, tuple)):
+              isinstance(object, tuple) or 
+              isinstance(object, set)):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, 'serialize'):

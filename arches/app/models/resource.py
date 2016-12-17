@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import importlib
 from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Resource(models.ResourceInstance):
 
@@ -52,3 +53,18 @@ class Resource(models.ResourceInstance):
         #     return 'undefined'
         #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
         #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
+
+
+    def serialize(self):
+        """
+        serialize to a different form then used by the internal class structure
+
+        used to append additional values (like parent ontology properties) that
+        internal objects (like models.Nodes) don't support
+
+        """
+
+        ret = JSONSerializer().handle_model(self)
+        ret['tiles'] = self.tiles
+
+        return JSONSerializer().serializeToPython(ret)

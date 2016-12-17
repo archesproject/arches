@@ -80,13 +80,46 @@ def prepare_search_index(resource_model_id, create=False):
         },
         'mappings': {
             resource_model_id : {
-                'tiles' : { 
-                    'type' : 'nested',
-                    'properties' : {
-                        'tileid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                        'nodegroupid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                        'parenttileid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                        'resourceinstanceid' : {'type' : 'string', 'index' : 'not_analyzed'}
+                'properties' : {
+                    'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'tiles' : { 
+                        'type' : 'nested',
+                        'properties' : {
+                            'tileid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'nodegroup_id' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'parenttile_id' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'resourceinstanceid_id' : {'type' : 'string', 'index' : 'not_analyzed'}
+                        }
+                    },
+                    'strings' : {
+                        'type' : 'string',
+                        'index' : 'analyzed',
+                        'fields' : {
+                            'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                            'folded': { 'type': 'string', 'analyzer': 'folding'}
+                        }
+                    },
+                    'domains' : { 
+                        'properties' : {
+                            'value' : {
+                                'type' : 'string',
+                                'index' : 'analyzed',
+                                'fields' : {
+                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                }
+                            },
+                            'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'valueid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        }
+                    },
+                    'geometries' : {
+                        "type": "geo_shape"
+                    },
+                    'dates' : { 
+                        "type" : "date"
+                    },
+                    'numbers' : { 
+                        "type" : "double"
                     }
                 }
             }
@@ -174,9 +207,14 @@ def prepare_search_index(resource_model_id, create=False):
     if create:
         se = SearchEngineFactory().create()
         try:
-            se.create_index(index='entity', body=index_settings)
+            se.create_index(index='resource2', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='entity', doc_type=resource_type_id, body=index_settings)
+            se.create_mapping(index='resource2', doc_type=resource_model_id, body=index_settings)
 
     return index_settings
+
+
+def delete_search_index(resource_model_id):
+    pass
+
