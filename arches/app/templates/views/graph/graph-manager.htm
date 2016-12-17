@@ -35,7 +35,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block card_manager_menu_item %}
 <li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !graphModel.get('isresource') && !graphModel.get('root').isCollector()}">
-    <a href="#" {% if root_node.is_collector or graph.isresource %} data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
+    <a {% if root_node.is_collector or graph.isresource %}
+        href="{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"
+        {% else %}
+
+        {% endif %}>
 
         <div class="media-body">
             <!-- <p>is resource {{graph.isresource}}<span>is collector {{root_node.is_collector}}</span></p> -->

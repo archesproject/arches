@@ -587,6 +587,52 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     color: #9e1515;
 }
 
+.select2-container-multi .select2-choices .select2-search-choice {
+    padding: 3px 10px 5px 18px;
+    margin: 3px 0 0px 5px;
+    background: #42a5f5;
+    position: relative;
+    line-height: 13px;
+    color: #fff;
+    cursor: default;
+    border: 1px solid #3b8dd5;
+    border-radius: 2px;
+    -webkit-box-shadow: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    background-image: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.select2-container-multi .select2-choices li {
+    float: left;
+    list-style: none;
+}
+
+.select2-container-multi .select2-search-choice-close {
+    left: 3px;
+    color: #fff;
+}
+
+a.select2-search-choice-close {
+    background-color: #fff;
+    border-radius: 3px;
+}
+
+.select2-search-choice div {
+    margin-top: 1px;
+}
+
+.btn-display-toggle{
+    width: 40px;
+}
+
+
 .switch {
     background-color: #fff;
     border: 1px solid #dfdfdf;

@@ -28,37 +28,42 @@ define([
         }
 
         var flattenOptions = function(opt, allOpts) {
-            allOpts.push(opt);
+            if (opt['id'] !== undefined) {
+                allOpts.push(opt);
+            }
             if (opt.children) {
                 opt.children.forEach(function(child) {
                     flattenOptions(child, allOpts);
                 });
             }
-            if (typeof opt.selected !== 'function') {
-                opt.selected = ko.computed({
-                    read: function() {
-                        var selected = false;
-                        var val = self.value();
-                        if (val && val.indexOf) {
-                            selected = val.indexOf(opt.id) >= 0;
-                        }
-                        return selected;
-                    },
-                    write: function(selected) {
-                        if (self.multiple) {
-                            var val = self.value();
-                            self.value(
-                                selected ?
-                                _.union([opt.id], val) :
-                                _.without(val ? val : [], opt.id)
-                            );
-                        } else if (selected) {
-                            self.value(opt.id);
-                        }
-                    }
-                });
-            }
             return allOpts;
+        };
+
+        this.toggleOptionSelection = function (opt) {
+            var selected = !self.isOptionSelected(opt);
+            self.setOptionSelection(opt, selected);
+        };
+
+        this.setOptionSelection = function (opt, selected) {
+            if (self.multiple) {
+                var val = self.value();
+                self.value(
+                    selected ?
+                    _.union([opt.id], val) :
+                    _.without(val ? val : [], opt.id)
+                );
+            } else if (selected) {
+                self.value(opt.id);
+            }
+        };
+
+        this.isOptionSelected = function (opt) {
+            var selected = false;
+            var val = self.value();
+            if (val && val.indexOf) {
+                selected = val.indexOf(opt.id) >= 0;
+            }
+            return selected;
         };
 
         this.flatOptions = ko.computed(function() {
