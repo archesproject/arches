@@ -36,7 +36,7 @@ require([
             });
 
             this.viewModel.searchResults = new SearchResults({
-                el: $('#search-results-container')[0],
+                //el: $('#search-results-container')[0],
                 viewModel: this.viewModel
             });
             this.viewModel.searchResults.on('mouseover', function(resourceid){

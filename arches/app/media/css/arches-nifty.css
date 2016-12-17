@@ -5105,6 +5105,60 @@ a.map-widget-icon:hover {
     -webkit-flex: 0 0 400px;
     flex: 0 0 400px;
 }
+.search-control-container {
+    -ms-flex: 0 0 400px;
+    -webkit-flex: 0 0 400px;
+    flex: 0 0 400px;
+    margin-bottom: 0px;
+    background-color: #fafafa;
+    padding: 20px;
+    border-right: solid 1px #dddddd;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: all .5s;
+}
+.search-title {
+    font-size: 19px;
+    font-weight: 500;
+    margin-top: 0px;
+}
+.search-listing {
+    height: 141px;
+    width: 360px;
+    background: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+.search-listing:hover {
+    cursor: move;
+}
+.search-listing-title {
+    font-size: 17px;
+    font-weight: 500;
+    background: #fff;
+    color: #666;
+    border-bottom: 1px solid #ddd;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 10px 5px 10px 10px;
+}
+.search-listing-icon {
+    transform: translate(0, -2px);
+    font-size: 13px;
+}
+.search-listing-body {
+    height: 70px;
+    color: #888;
+    background: #fff;
+    padding: 5px 10px;
+}
+.search-listing-footer {
+    height: 30px;
+    font-size: 11px;
+    padding: 8px 10px;
+    background: #fafafa;
+    border-top: 1px solid #ddd;
+}
 .pagination>li>a.disabled{
     cursor: default;
     color: rgb(160, 160, 160);

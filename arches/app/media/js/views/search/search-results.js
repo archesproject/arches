@@ -72,7 +72,7 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 
-                $.each(response.results.hits.hits, function(){
+                response.results.hits.hits.forEach(function(result){
                     var description = "test";//resourceTypes[this._source.entitytypeid].defaultDescription;
                     // var descriptionNode = resourceTypes[this._source.entitytypeid].descriptionNode;
                     // $.each(this._source.child_entities, function(i, entity){
@@ -81,16 +81,16 @@ define(['jquery',
                     //     }
                     // })
 
-                    self.results.push({
-                        primaryname: this._source.primaryname,
-                        resourceid: this._source.entityid,
-                        entitytypeid: this._source.entitytypeid,
-                        description: description,
-                        geometries: ko.observableArray(this._source.geometries),
+                    this.results.push({
+                        primaryname: result._source.primaryname,
+                        resourceid: result._source.entityid,
+                        entitytypeid: result._source.entitytypeid,
+                        primarydescription: description,
+                        geometries: ko.observableArray(result._source.geometries),
                         // typeIcon: resourceTypes[this._source.entitytypeid].icon,
                         // typeName: resourceTypes[this._source.entitytypeid].name
                     });
-                });
+                }, this);
 
                 return data;
             },
