@@ -5122,6 +5122,11 @@ a.map-widget-icon:hover {
     font-weight: 500;
     margin-top: 0px;
 }
+.search-candidate-title,
+.search-candidate-link {
+    color: steelblue;
+}
+
 .search-listing {
     height: 141px;
     width: 360px;

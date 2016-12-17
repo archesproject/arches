@@ -7,10 +7,10 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'views/related-resources-graph',
-    'resource-types',
+    'view-data',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, RelatedResourcesGraph, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, RelatedResourcesGraph, viewdata) {
 
         return Backbone.View.extend({
 
@@ -80,6 +80,9 @@ define(['jquery',
                     //         description = entity.value;
                     //     }
                     // })
+                    graphdata = _.find(viewdata.graphs, function(graphdata){
+                        return result._source.graph_id === graphdata.graphid;
+                    })
 
                     this.results.push({
                         primaryname: result._source.primaryname,
@@ -87,7 +90,7 @@ define(['jquery',
                         entitytypeid: result._source.entitytypeid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        // typeIcon: resourceTypes[this._source.entitytypeid].icon,
+                        iconclass: graphdata.iconclass,
                         // typeName: resourceTypes[this._source.entitytypeid].name
                     });
                 }, this);
