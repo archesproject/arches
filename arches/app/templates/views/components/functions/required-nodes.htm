@@ -30,7 +30,7 @@
                   <div class="required-node-card" style="" data-bind="visible: anitem.filtered() == false, click: self.toggleRequired">
                       <div class="required-node-card-item">
                           <div class="required-node-card-vis-toggle">
-                              <i class="ion-checkmark-circled"></i>
+                              <i data-bind="css: {'ion-checkmark-circled': anitem.selected}"></i>
                           </div>
                           <div class="required-node-card-main" style="">
                               <a class="" style="" href="#">
