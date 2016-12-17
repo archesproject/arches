@@ -296,7 +296,7 @@ class GraphModel(models.Model):
             msg.append(_(' add form(s)'))
         if not forms_viewable:
             msg.append(_(' make form(s) visible'))
-        return _('To make this resource editable: ') + ','.join(msg)
+        return _('To make this resource editable:') + ','.join(msg)
 
     class Meta:
         managed = True
