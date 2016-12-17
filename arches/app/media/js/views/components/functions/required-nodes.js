@@ -48,9 +48,7 @@ function (ko, koMapping, ListView, FunctionViewModel, chosen) {
 
             this.toggleRequired = function(e){
               e.selected(!e.selected())
-              console.log('test')
               if (!_.has(self.required, e.nodegroup_id)) {
-                console.log('here we go')
                 self.required[e.nodegroup_id] = ko.observableArray()
                 self.required[e.nodegroup_id].subscribe(self.compareRequiredNodes(e))
                 self.required[e.nodegroup_id].push(e.nodeid)
