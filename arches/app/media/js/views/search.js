@@ -36,7 +36,8 @@ require([
             });
 
             this.viewModel.searchResults = new SearchResults({
-                el: $('#search-results-container')[0]
+                el: $('#search-results-container')[0],
+                viewModel: this.viewModel
             });
             this.viewModel.searchResults.on('mouseover', function(resourceid){
                 this.viewModel.mapFilter.selectFeatureById(resourceid);
@@ -112,7 +113,7 @@ require([
             });
             
 
-           BaseManagerView.prototype.initialize.call(this, options);
+            BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function () {
@@ -129,10 +130,10 @@ require([
                 type: "GET",
                 url: arches.urls.search_results,
                 data: queryString,
-                success: function(results){
-                    var data = self.viewModel.searchResults.updateResults(results);
-                    self.viewModel.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
-                    self.viewModel.mapFilter.applyBuffer();
+                success: function(response){
+                    var data = self.viewModel.searchResults.updateResults(response);
+                    // self.viewModel.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
+                    // self.viewModel.mapFilter.applyBuffer();
                     self.isNewQuery = false;
                     $('.loading-mask').hide();
                 },
