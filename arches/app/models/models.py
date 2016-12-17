@@ -282,9 +282,11 @@ class GraphModel(models.Model):
 
     @property
     def disable_instance_creation(self):
+        if not self.isresource:
+            return _('Only resource models may be edited - branches are not editable')
         has_forms = True if Form.objects.filter(graph_id=self.pk).count() > 0 else False
         forms_viewable = True if Form.objects.filter(graph_id=self.pk, visible=True).count() > 0 else False
-        disable_instance_creation = not self.isresource or not has_forms or not self.isactive or not forms_viewable
+        disable_instance_creation = not has_forms or not self.isactive or not forms_viewable
         if not disable_instance_creation:
             return False
         msg = []
