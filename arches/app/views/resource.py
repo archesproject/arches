@@ -50,12 +50,6 @@ class ResourceListView(BaseManagerView):
             main_script='views/resource',
             instance_summaries=instance_summaries
         )
-        new_graphs = []
-        for graph in JSONDeserializer().deserialize(context['graphs']):
-            graph['hasforms'] = True if models.Form.objects.filter(graph_id=graph['graphid']).count() > 0 else False
-            graph['formsviewable'] = True if models.Form.objects.filter(graph_id=graph['graphid'], visible=True).count() > 0 else False
-            new_graphs.append(graph)
-        context['graphs'] = JSONSerializer().serialize(new_graphs)
         return render(request, 'views/resource.htm', context)
 
 
