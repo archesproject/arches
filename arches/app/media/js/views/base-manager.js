@@ -44,7 +44,7 @@ define([
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {
-                ko.applyBindingsToNode(option, {disable: !item.isactive || !item.hasforms || !item.formsviewable}, item);
+                ko.applyBindingsToNode(option, {disable: item.disable_instance_creation}, item);
               }
             };
 

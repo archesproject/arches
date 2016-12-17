@@ -54,7 +54,7 @@ class JSONSerializer(object):
         # this is especially important when doing bulk operations in elasticsearch
         if (isinstance(obj, basestring)):
             return obj
-            
+
         ret = self.handle_object(obj)
 
         return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())
@@ -77,7 +77,7 @@ class JSONSerializer(object):
             raise UnableToSerializeMethodTypesError(type(object))
         elif isinstance(object, dict):
             return self.handle_dictionary(object)
-        elif (isinstance(object, list) or 
+        elif (isinstance(object, list) or
               isinstance(object, tuple)):
             return self.handle_list(object)
         elif isinstance(object, Model):
@@ -93,10 +93,10 @@ class JSONSerializer(object):
                 ret.append(self.handle_object(item))
             return ret
         elif (isinstance(object, int) or
-              isinstance(object, float) or 
-              isinstance(object, long) or 
-              isinstance(object, basestring) or 
-              isinstance(object, bool) or 
+              isinstance(object, float) or
+              isinstance(object, long) or
+              isinstance(object, basestring) or
+              isinstance(object, bool) or
               object is None):
             return object
         elif (isinstance(object, datetime.datetime) or
@@ -113,7 +113,7 @@ class JSONSerializer(object):
         elif hasattr(object, '__dict__'):
             # call an objects serialize method if it exists
             if hasattr(object, 'serialize'):
-                return getattr(object, 'serialize')()  
+                return getattr(object, 'serialize')()
             else:
                 return self.handle_dictionary(object.__dict__)
         else:
@@ -158,8 +158,14 @@ class JSONSerializer(object):
         opts = instance._meta
         data = {}
         #print '='*40
+        properties = [k for k,v in instance.__class__.__dict__.iteritems() if type(v) is property]
+        for property_name in properties:
+            if fields and property_name not in fields:
+                continue
+            if exclude and property_name in exclude:
+                continue
+            data[property_name] = self.handle_object(getattr(instance, property_name))
         for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
-            #print f.name
             if not getattr(f, 'editable', False):
                 continue
             if fields and f.name not in fields:
@@ -167,7 +173,7 @@ class JSONSerializer(object):
             if exclude and f.name in exclude:
                 continue
             if isinstance(f, ForeignKey):
-                # Emulate the naming convention used by django when accessing the 
+                # Emulate the naming convention used by django when accessing the
                 # related model's id field
                 # see https://github.com/django/django/blob/master/django/db/models/fields/__init__.py
                 val = getattr(instance, f.name, None)
@@ -219,14 +225,14 @@ class JSONDeserializer(object):
                 return self.handle_model(object)
             else:
                 return self.handle_dictionary(object)
-        elif (isinstance(object, list) or 
+        elif (isinstance(object, list) or
               isinstance(object, tuple)):
             return self.handle_list(object)
         elif (isinstance(object, int) or
-              isinstance(object, float) or 
-              isinstance(object, long) or 
-              isinstance(object, basestring) or 
-              isinstance(object, bool) or 
+              isinstance(object, float) or
+              isinstance(object, long) or
+              isinstance(object, basestring) or
+              isinstance(object, bool) or
               object is None):
             return object
         #elif isinstance(object, tuple):
