@@ -19,6 +19,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
+from django.utils.translation import ugettext as _
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
@@ -278,6 +279,24 @@ class GraphModel(models.Model):
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
+
+    @property
+    def disable_instance_creation(self):
+        if not self.isresource:
+            return _('Only resource models may be edited - branches are not editable')
+        has_forms = True if Form.objects.filter(graph_id=self.pk).count() > 0 else False
+        forms_viewable = True if Form.objects.filter(graph_id=self.pk, visible=True).count() > 0 else False
+        disable_instance_creation = not has_forms or not self.isactive or not forms_viewable
+        if not disable_instance_creation:
+            return False
+        msg = []
+        if not self.isactive:
+            msg.append(_(' change resource model status in graph manager'))
+        if not has_forms:
+            msg.append(_(' add form(s)'))
+        if not forms_viewable:
+            msg.append(_(' make form(s) visible'))
+        return _('To make this resource editable:') + ','.join(msg)
 
     class Meta:
         managed = True

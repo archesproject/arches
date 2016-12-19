@@ -30,32 +30,6 @@ require([
                             "next": '<i class="fa fa-angle-right"></i>'
                         }
                     }
-                },
-                getErrorMsg: function(resourceModel) {
-                  if (resourceModel.isactive && !resourceModel.hasforms && resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.formsNotAdded.concat(arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (resourceModel.isactive && resourceModel.hasforms && !resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.formsNotViewable.concat(arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (resourceModel.isactive && !resourceModel.hasforms && !resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.formsNotAdded.concat(' and', arches.resourceModelErrorMsgs.formsNotViewable.toLowerCase(), arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (!resourceModel.isactive && resourceModel.hasforms && resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.resourceNotActive.concat(arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (!resourceModel.isactive && !resourceModel.hasforms && resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.resourceNotActive.concat(' and', arches.resourceModelErrorMsgs.formsNotAdded.toLowerCase(), arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (!resourceModel.isactive && resourceModel.hasforms && !resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.resourceNotActive.concat(arches.resourceModelErrorMsgs.formsNotViewable.toLowerCase(), arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else if (!resourceModel.isactive && !resourceModel.hasforms && !resourceModel.formsviewable) {
-                    return arches.resourceModelErrorMsgs.resourceNotActive.concat(',', arches.resourceModelErrorMsgs.formsNotAdded.toLowerCase(), ' and', arches.resourceModelErrorMsgs.formsNotViewable.toLowerCase(), arches.resourceModelErrorMsgs.endErrorMsg);
-                  }
-                  else {
-                    return false;
-                  }
                 }
             });
 
