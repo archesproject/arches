@@ -42,7 +42,7 @@ def get_function_class_instances(tile, graph_id):
     for function in functions:
         mod_path = function.function.modulename.replace('.py', '')
         module = importlib.import_module('arches.app.functions.%s' % mod_path)
-        func = getattr(module, function.function.classname)(function.config)
+        func = getattr(module, function.function.classname)(function.config, tile['nodegroup_id'])
         ret.append(func)
     return ret
 

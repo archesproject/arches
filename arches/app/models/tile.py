@@ -127,11 +127,11 @@ class Tile(models.TileModel):
 
         for term in self.prepare_terms_for_search_index():
            se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
-    
+
     def prepare_terms_for_search_index(self):
         """
-        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM  
-        long and any concept associated with a resource to support term search  
+        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM
+        long and any concept associated with a resource to support term search
 
         """
 
@@ -201,7 +201,7 @@ class Tile(models.TileModel):
         for function in functions:
             mod_path = function.function.modulename.replace('.py', '')
             module = importlib.import_module('arches.app.functions.%s' % mod_path)
-            func = getattr(module, function.function.classname)(function.config)
+            func = getattr(module, function.function.classname)(function.config, self.nodegroup_id)
             ret.append(func)
         return ret
 
