@@ -533,6 +533,39 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     height: 36px!important;
     padding: 4px 0 0 16px !important;
 }
+
+.select2-container .select2-choice {
+    display: block;
+    height: 26px;
+    padding: 0 0 0 8px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #aaa;
+    white-space: nowrap;
+    line-height: 26px;
+    color: #444;
+    text-decoration: none;
+    border-radius: 4px;
+    background-clip: padding-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #fff;
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0,#eee),color-stop(0.5,#fff));
+    background-image: -webkit-linear-gradient(center bottom,#eee 0,#fff 50%);
+    background-image: -moz-linear-gradient(center bottom,#eee 0,#fff 50%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff',endColorstr = '#eeeeee',GradientType = 0);
+    background-image: linear-gradient(to top,#eee 0,#fff 50%);
+}
+
+a.select2-choice {
+    background: #42a5f5;
+}
+
+
+
 .select2-dropdown-open .select2-choice {
     background-color: #fff!important;
 }
@@ -583,7 +616,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .select2-container-multi .select2-choices .select2-search-choice {
     padding: 3px 10px 5px 18px;
-    margin: 3px 0 0px 5px;
+    margin: 4px 0 0px 5px;
     background: #42a5f5;
     position: relative;
     line-height: 13px;
@@ -624,8 +657,12 @@ a.select2-search-choice-close {
 
 .btn-display-toggle{
     width: 40px;
+    height: 34px;
 }
 
+.btn-group .btn+.btn {
+    margin-left: 0px;
+}
 
 .switch {
     background-color: #fff;
@@ -5099,6 +5136,18 @@ a.map-widget-icon:hover {
     -webkit-flex: 0 0 400px;
     flex: 0 0 400px;
 }
+
+.arches-select2 .select2-choices .select2-search-field {
+    height: 34px;
+}
+
+.arches-select2 .select2-choices .select2-search-field input {
+    margin-top: 3px;
+}
+
+
+
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
