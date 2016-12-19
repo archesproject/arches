@@ -1,6 +1,51 @@
 {% load i18n %}
 <div>
-    <div class="row widget-container">
+
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+  <div data-bind="with: cardList">
+      <div class="required-node-filter" style="display:none" data-bind="visible: filter_function">
+          <input type="text" class="form-control" style="" placeholder="Filter Nodes" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+          <!-- Clear Search -->
+          <span class="clear-node-search" data-bind="click: clearSearch"><i class="fa fa-times-circle"></i></span>
+
+          <!-- ko if: single_select == false -->
+          <!-- <div class="pad-rgt pad-btm clear-selection" style="">
+              <a class="clear-selection-link" style="" data-bind="click: clearSelection">clear selection</a>
+          </div> -->
+          <!-- /ko -->
+      </div>
+      <div style="position: relative;" data-bind="foreach: {data: groups, as: 'group'}">
+          <div class="required-node-card-group" style="">
+              <div class="required-node-card-item">
+                  <div class="required-node-card-main-group" style="">
+                      <a class="" style="" href="#">
+                        <span data-bind="text: group.name"></span>
+                     </a>
+                  </div>
+              </div>
+          </div>
+              <div style="position: relative;" data-bind="foreach: {data: $parent.items, as: 'anitem'}">
+                  <!--ko if: group.nodegroup_id === anitem.nodegroup_id -->
+                  <div class="required-node-card" style="" data-bind="visible: anitem.filtered() == false, click: self.toggleRequired">
+                      <div class="required-node-card-item">
+                          <div class="required-node-card-vis-toggle">
+                              <i data-bind="css: {'ion-checkmark-circled': anitem.selected}"></i>
+                          </div>
+                          <div class="required-node-card-main" style="">
+                              <a class="" style="" href="#">
+                                <span data-bind="text: anitem.name"></span>
+                             </a>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- /ko -->
+                </div>
+           </div>
+        </div>
+  <!-- /ko -->
+
+    <!-- <div class="row widget-container">
         <div class="form-group">
             <div class="relative">
                 <label class="col-xs-12 control-label widget-input-label"> {% trans "Card Name" %}</label>
@@ -21,5 +66,6 @@
                   <select data-placeholder="{% trans 'Select a node' %}" multiple data-bind="chosen: {width: '100%'}, selectedOptions: required_nodes, options: nodeOptions, optionsText: 'name', optionsValue: 'nodeid'"></select>
               </div>
           </div>
-    </div>
+    </div> -->
+
 </div>
