@@ -11,6 +11,12 @@ class PrimaryNameFunction(BaseFunction):
         for tile in models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0):
             for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
                 if str(node.nodeid) in tile.data:
-                    config['string_template'] = config['string_template'].replace('<%s>' % node.name, tile.data[str(node.nodeid)])
+                    value = tile.data[str(node.nodeid)]
+                    concept_values = []
+                    if node.datatype == 'concept':
+                        concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
+                    if len(concept_values) == 1:
+                        value = concept_values[0].value
+                    config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
 
         return config['string_template']
