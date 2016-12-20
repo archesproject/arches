@@ -93,8 +93,6 @@ define([
             this.summaryDetails = []
             if (ko.unwrap(this.value) !== null) {
                 this.summaryDetails =  koMapping.toJS(this.value).features || [];
-            } else {
-              console.log(this.value)
             }
 
             this.geocoder = new GeocoderViewModel({
