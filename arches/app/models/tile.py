@@ -138,7 +138,7 @@ class Tile(models.TileModel):
         terms = []
         for nodeid, nodevalue in self.data.iteritems():
             node = models.Node.objects.get(pk=nodeid)
-            if node.datatype == 'string':
+            if node.datatype == 'string' and nodevalue is not None:
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
