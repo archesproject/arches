@@ -2,11 +2,12 @@ require([
     'jquery',
     'knockout',
     'arches',
+    'viewmodels/alert',
     'views/search/base-filter',
     'views/search/term-filter', 
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, BaseFilter, TermFilter, SearchResults, BaseManagerView) {
+], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         // updateRequest: '',
@@ -82,10 +83,12 @@ require([
                         // mapExpanded: self.viewModel.mapFilter.expanded(),
                         // timeExpanded: self.viewModel.timeFilter.expanded()
                     };
-                    if (self.viewModel.termFilter.query.filter.terms().length === 0 &&
-                        self.viewModel.timeFilter.query.filter.year_min_max().length === 0 &&
-                        self.viewModel.timeFilter.query.filter.filters().length === 0 &&
-                        self.viewModel.mapFilter.query.filter.geometry.coordinates().length === 0) {
+                    if (
+                        self.viewModel.termFilter.query.filter.terms().length === 0// &&
+                        // self.viewModel.timeFilter.query.filter.year_min_max().length === 0 &&
+                        // self.viewModel.timeFilter.query.filter.filters().length === 0 &&
+                        // self.viewModel.mapFilter.query.filter.geometry.coordinates().length === 0
+                        ) {
                         params.no_filters = true;
                     }
 
@@ -123,21 +126,26 @@ require([
                 this.updateRequest.abort();
             }
 
-            $('.loading-mask').show();
+            this.viewModel.loading(true);
             window.history.pushState({}, '', '?'+queryString);
 
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
                 data: queryString,
+                context: this,
                 success: function(response){
-                    var data = self.viewModel.searchResults.updateResults(response);
-                    // self.viewModel.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
-                    // self.viewModel.mapFilter.applyBuffer();
-                    self.isNewQuery = false;
-                    $('.loading-mask').hide();
+                    var data = this.viewModel.searchResults.updateResults(response);
+                    // this.viewModel.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
+                    // this.viewModel.mapFilter.applyBuffer();
+                    this.isNewQuery = false;
                 },
-                error: function(){}
+                error: function(response, status, error){
+                    this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                },
+                complete: function (request, status) {
+                    this.viewModel.loading(false);
+                }
             });
         },
 

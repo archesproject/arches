@@ -79,7 +79,9 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
+    print dsl
     results = dsl.search(index='resource2', doc_type='')
+    print results
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
@@ -151,27 +153,24 @@ def build_search_results_dsl(request):
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
                 #entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
-                boolfilter = Bool()
-                #boolfilter.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
-                boolfilter.must(Match(field='strings', query=term['value'], type='phrase'))
-                nested_boolfilter = Nested(path='strings', query=boolfilter)
+                bool_dsl = Bool()
+                #bool_dsl.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
+                bool_dsl.must(Match(field='strings', query=term['value'], type='phrase'))
                 if term['inverted']:
-                    boolfilter.must_not(boolfilter)
+                    boolfilter.must_not(bool_dsl)
                 else:
-                    boolfilter.must(boolfilter)
+                    boolfilter.must(bool_dsl)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 terms = Terms(field='domains.conceptid', terms=concept_ids)
-                nested = Nested(path='domains', query=terms)
                 if term['inverted']:
-                    boolfilter.must_not(nested)
+                    boolfilter.must_not(terms)
                 else:
-                    boolfilter.must(nested)
+                    boolfilter.must(terms)
             elif term['type'] == 'string':
                 boolfilter = Bool()
                 boolfilter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
                 boolfilter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
-                #nested_boolfilter = Nested(path='strings', query=boolfilter)
                 if term['inverted']:
                     boolquery.must_not(boolfilter)
                 else:
