@@ -116,7 +116,7 @@ class Tile(models.TileModel):
 
         search_documents = self.prepare_documents_for_search_index()
         for document in search_documents:
-            se.index_data('resource2', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
+            se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
 
         #     report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
         #     for report_document in report_documents:

@@ -79,16 +79,14 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    print dsl
-    results = dsl.search(index='resource2', doc_type='')
-    print results
+    results = dsl.search(index='resource', doc_type='')
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
     if request.GET.get('include_ids', 'false') == 'false':
         all_entity_ids = ['_none']
     elif request.GET.get('no_filters', '') == '':
-        full_results = dsl.search(index='resource2', doc_type='', start=0, limit=10000, fields=[])
+        full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
         all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
     paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)

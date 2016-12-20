@@ -232,14 +232,14 @@ def prepare_search_index(resource_model_id, create=False):
     if create:
         se = SearchEngineFactory().create()
         try:
-            se.create_index(index='resource2', body=index_settings)
+            se.create_index(index='resource', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='resource2', doc_type=resource_model_id, body=index_settings)
+            se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
 
     return index_settings
 
 
 def delete_search_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='resource2')
+    se.delete_index(index='resource')
