@@ -3395,6 +3395,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-left: 30px;
 }
 
+.report-tree-list {
+    margin-bottom: 0px;
+}
+
 .node-indent a {
     padding-left: 30px;
 }
@@ -3402,6 +3406,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .bg-card {
     background: #46bbdc;
     color: #fff;
+}
+
+.bg-report-card {
+    background: #9EE0F3;
+    color: #fff;
+    font-weight: 400;
 }
 
 .ep-card-crud {
@@ -3692,6 +3702,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: block;
     margin-top: -40px;
     font-size: 13px;
+}
+
+.node-name-report {
+    margin-top: -32px;
 }
 
 .node-subname {
@@ -4433,7 +4447,7 @@ h4.report-toolbar-title {
     color: #808080;
 }
 .dataTable tr:hover {
-    background-color: #f0f0f0 !important;
+    background-color: #dbf1f5 !important;
     cursor: pointer;
 }
 
