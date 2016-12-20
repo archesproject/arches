@@ -58,48 +58,70 @@ def validate_business_data(business_data):
                     errors.append(e.args)
     return errors
 
-def import_business_data(business_data):
-    results = {'resource_count': 0, 'resources_saved': 0, 'tile_count': 0, 'tiles_saved': 0, 'relationship_count': 0}
 
+class ResourceImportReporter:
+    def __init__(self, business_data):
+        self.resources = 0
+        self.tiles = 0
+        self.resources_saved = 0
+        self.tiles_saved = 0
+        self.relations_saved = 0
+        self.relations = 0
+
+        if 'resources' in business_data:
+            self.resources = business_data['resources']
+
+        if 'relations' in business_data:
+            self.relations = business_data['relations']
+
+    def update_resources_saved(count=1):
+        self.resources_saved += count
+        print self.resources_saved
+
+    def update_tiles_saved(count=1):
+        self.tiles_saved += count
+        print self.tiles_saved
+
+    def update_relations_saved(count=1):
+        self.tiles_saved += count
+        print self.tiles_saved
+
+    def report_results():
+        print "{0}".format(self.resources)
+
+def import_business_data(business_data):
     try:
-        results['resource_count'] = len(business_data['resources'])
         for resource in business_data['resources']:
+            reporter = ResourceImportReporter(business_data)
             if resource['resourceinstance'] != None:
                 resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
                 resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
 
-                resourceinstance = ResourceInstance.objects.update_or_create(
+                resourceinstance, created = ResourceInstance.objects.update_or_create(
                     resourceinstanceid = resource['resourceinstance']['resourceinstanceid'],
                     graph_id = resource['resourceinstance']['graphid'],
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                 )
 
             if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
-                results['resources_saved'] += 1
+                reporter.update_resources_saved()
 
             if resource['tiles'] != []:
-                results['tile_count'] += len(resource['tiles'])
                 for tile in resource['tiles']:
-                    tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
-                    tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
-                    tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
-                    tile['tileid'] = uuid.UUID(str(tile['tileid']))
-                    tile = Tile.objects.update_or_create(
-                         resourceinstance = tile['resourceinstance_id'],
+                    Tile.objects.update_or_create(
+                        resourceinstance = resourceinstance,
                         parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                        nodegroup = tile['nodegroup_id'],
-                        tileid = tile['tileid'],
+                        nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                        tileid = uuid.UUID(str(tile['tileid'])),
                         data = tile['data']
                     )
                     if len(Tile.objects.filter(tileid=tile[0].tileid)) == 1:
-                        results['tiles_saved'] += 1
-        print results
+                        reporter.update_tiles_saved()
 
     except (KeyError, TypeError) as e:
         print e, 'resources not in business data'
 
     try:
-        results['relations_count'] = len(business_data['relations'])
         for relation in business_data['relations']:
             relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
             relation['resourceinstanceidfrom'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom'])))
@@ -117,11 +139,9 @@ def import_business_data(business_data):
             )
             # print vars(relation)
             relation.update_or_create()
+
     except (KeyError, TypeError) as e:
         print e, 'relations not in business data'
-
-    return results
-
 
 class ResourceLoader(object):
 
