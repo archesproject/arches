@@ -59,7 +59,7 @@ def validate_business_data(business_data):
     return errors
 
 def import_business_data(business_data):
-    results = {'resource_count': 0, 'tile_count': 0, 'relationship_count': 0}
+    results = {'resource_count': 0, 'resources_saved': 0, 'tile_count': 0, 'tiles_saved': 0, 'relationship_count': 0}
 
     try:
         results['resource_count'] = len(business_data['resources'])
@@ -74,6 +74,9 @@ def import_business_data(business_data):
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                 )
 
+            if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                results['resources_saved'] += 1
+
             if resource['tiles'] != []:
                 results['tile_count'] += len(resource['tiles'])
                 for tile in resource['tiles']:
@@ -82,12 +85,16 @@ def import_business_data(business_data):
                     tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
                     tile['tileid'] = uuid.UUID(str(tile['tileid']))
                     tile = Tile.objects.update_or_create(
-                        resourceinstance = tile['resourceinstance_id'],
+                         resourceinstance = tile['resourceinstance_id'],
                         parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
                         nodegroup = tile['nodegroup_id'],
                         tileid = tile['tileid'],
                         data = tile['data']
                     )
+                    if len(Tile.objects.filter(tileid=tile[0].tileid)) == 1:
+                        results['tiles_saved'] += 1
+        print results
+
     except (KeyError, TypeError) as e:
         print e, 'resources not in business data'
 

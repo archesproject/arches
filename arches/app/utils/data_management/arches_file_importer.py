@@ -34,7 +34,6 @@ class ArchesFileImporter(object):
 		self.graphs = ''
 		self.reference_data = ''
 		self.business_data = ''
-		self.count = 0
 
 		if not file:
 			file = settings.RESOURCE_GRAPH_LOCATIONS
