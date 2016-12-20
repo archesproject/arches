@@ -325,8 +325,8 @@ class Graph(models.GraphModel):
             for widget in self.widgets.itervalues():
                 widget.delete()
 
-            if self.isresource:
-                delete_search_index(self.graphid)
+            # if self.isresource:
+            #     delete_search_index(self.graphid)
 
             super(Graph, self).delete()
 

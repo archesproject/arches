@@ -91,12 +91,14 @@ class Tile(models.TileModel):
 
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
+        index = kwargs.pop('index', True)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
-        self.index()
+        if index:
+            self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
-                tile.save(*args, request=request, **kwargs)
+                tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)

@@ -13,6 +13,16 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
                 }, this)
             };
 
+            this.hasFilters = function(){
+                // returns a boolean true if this filter is currently active, else false
+            };
+
+            this.appendFilters = function(queryStringObject){
+                // append your filters onto this object which ultimately is used in the URL
+
+                return queryStringObject;
+            };
+
             this.restoreState = function(filter){
                 // a function to drive the state of the ui based on 
                 // the filter object passed into the function

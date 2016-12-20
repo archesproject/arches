@@ -162,7 +162,7 @@ class TileTests(ArchesTestCase):
         }
 
         t = Tile(json)
-        t.save()
+        t.save(index=False)
 
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
         self.assertEqual(tiles.count(), 3)
@@ -185,7 +185,7 @@ class TileTests(ArchesTestCase):
         }
 
         t = Tile(json)
-        t.save()
+        t.save(index=False)
 
         t2 = Tile.objects.get(tileid=t.tileid)
 
