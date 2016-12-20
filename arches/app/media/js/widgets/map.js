@@ -115,8 +115,13 @@ define([
             }]);
 
             this.loadGeometriesIntoDrawLayer = function() {
-                self.draw.deleteAll()
-                self.draw.add(koMapping.toJS(self.value));
+                if (self.draw) {
+                    var val = koMapping.toJS(self.value);
+                    self.draw.deleteAll()
+                    if (val) {
+                        self.draw.add(val);
+                    }
+                }
             };
 
             this.clearGeometries = function(val, key) {
@@ -141,17 +146,19 @@ define([
                    // should be resolved in the next version of mapbox-gl-js:
                    // https://github.com/mapbox/mapbox-gl-js/pull/3621
                    resourcesUrl = resourcesUrl || self.sources['resources'].tiles[0];
-                   var style = self.map.getStyle();
-                   style.sources['resources'].tiles[0] = resourcesUrl + "?" + (new Date().getTime());
-                   style.sources = _.defaults(self.sources, style.sources);
-                   self.map.setStyle(style);
+                   if (self.map) {
+                       var style = self.map.getStyle();
+                       style.sources['resources'].tiles[0] = resourcesUrl + "?" + (new Date().getTime());
+                       style.sources = _.defaults(self.sources, style.sources);
+                       self.map.setStyle(style);
+                   }
 
                    if (self.draw !== undefined) {
                      self.draw.changeMode('simple_select')
                      self.featureColor(self.resourceColor)
+                     self.loadGeometriesIntoDrawLayer();
                    }
 
-                   self.loadGeometriesIntoDrawLayer();
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
