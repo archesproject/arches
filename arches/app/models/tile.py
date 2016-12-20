@@ -154,20 +154,21 @@ class Tile(models.TileModel):
         for tile in models.TileModel.objects.filter(resourceinstance=self.resourceinstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
-                if node.datatype == 'string':
-                    document['strings'].append(nodevalue)
-                elif node.datatype == 'concept' or node.datatype == 'concept-list':
-                    if node.datatype == 'concept':
-                        nodevalue = [nodevalue]
-                    for concept_valueid in nodevalue:
-                        value = models.Value.objects.get(pk=concept_valueid)
-                        document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
-                elif node.datatype == 'date':
-                    document['dates'].append(nodevalue)
-                elif node.datatype == 'geojson-feature-collection':
-                    document['geometries'].append(nodevalue)
-                elif node.datatype == 'number':
-                    document['numbers'].append(nodevalue)
+                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    if node.datatype == 'string':
+                        document['strings'].append(nodevalue)
+                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
+                        if node.datatype == 'concept':
+                            nodevalue = [nodevalue]
+                        for concept_valueid in nodevalue:
+                            value = models.Value.objects.get(pk=concept_valueid)
+                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
+                    elif node.datatype == 'date':
+                        document['dates'].append(nodevalue)
+                    elif node.datatype == 'geojson-feature-collection':
+                        document['geometries'].append(nodevalue)
+                    elif node.datatype == 'number':
+                        document['numbers'].append(nodevalue)
 
         return [JSONSerializer().serializeToPython(document)]
 
