@@ -34,6 +34,7 @@ class ArchesFileImporter(object):
 		self.graphs = ''
 		self.reference_data = ''
 		self.business_data = ''
+		self.count = 0
 
 		if not file:
 			file = settings.RESOURCE_GRAPH_LOCATIONS
@@ -80,7 +81,8 @@ class ArchesFileImporter(object):
 		resourceGraphImporter(self.graphs)
 		errors = businessDataValidator(self.business_data)
 		if len(errors) == 0:
-			businessDataImporter(self.business_data)
+			results = businessDataImporter(self.business_data)
+			print results
 		else:
 			for error in errors:
 				print "{0} {1}".format(error[0], error[1])

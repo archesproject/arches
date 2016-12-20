@@ -59,7 +59,10 @@ def validate_business_data(business_data):
     return errors
 
 def import_business_data(business_data):
-    if type(business_data) == dict and business_data['resources']:
+    results = {'resource_count': 0, 'tile_count': 0, 'relationship_count': 0}
+
+    try:
+        results['resource_count'] = len(business_data['resources'])
         for resource in business_data['resources']:
             if resource['resourceinstance'] != None:
                 resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
@@ -72,6 +75,7 @@ def import_business_data(business_data):
                 )
 
             if resource['tiles'] != []:
+                results['tile_count'] += len(resource['tiles'])
                 for tile in resource['tiles']:
                     tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
                     tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
@@ -84,8 +88,11 @@ def import_business_data(business_data):
                         tileid = tile['tileid'],
                         data = tile['data']
                     )
+    except (KeyError, TypeError) as e:
+        print e, 'resources not in business data'
 
-    if type(business_data) == dict and business_data['relations']:
+    try:
+        results['relations_count'] = len(business_data['relations'])
         for relation in business_data['relations']:
             relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
             relation['resourceinstanceidfrom'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom'])))
@@ -103,6 +110,10 @@ def import_business_data(business_data):
             )
             # print vars(relation)
             relation.update_or_create()
+    except (KeyError, TypeError) as e:
+        print e, 'relations not in business data'
+
+    return results
 
 
 class ResourceLoader(object):
