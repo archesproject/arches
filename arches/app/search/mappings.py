@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
 def prepare_term_index(create=False):
@@ -231,9 +232,14 @@ def prepare_search_index(resource_model_id, create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        #try:
-        se.create_index(index='resource', body=index_settings, ignore=400)
-        # except:
+        #print JSONSerializer().serialize(index_settings)
+        try:
+            se.create_index(index='resource', body=index_settings, ignore=400)
+            #print 'index created'
+        except:
+            pass
+            #print JSONSerializer().serialize(index_settings)
+            # pass
         #     index_settings = index_settings['mappings']
         #     se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
 
