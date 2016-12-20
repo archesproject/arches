@@ -285,12 +285,16 @@ class GraphModel(models.Model):
         if not self.isresource:
             return _('Only resource models may be edited - branches are not editable')
         msg = []
+        forms = Form.objects.filter(graph_id=self.pk)
         if not self.isactive:
             msg.append(_('change resource model status in graph manager'))
-        if Form.objects.filter(graph_id=self.pk).count() == 0:
+        if forms.count() == 0:
             msg.append(_('add form(s)'))
-        if Form.objects.filter(graph_id=self.pk, visible=True).count() == 0:
-            msg.append(_('make form(s) visible'))
+        else:
+            if FormXCard.objects.filter(form__in=forms).count() == 0:
+                msg.append(_('add card(s) to form(s)'))
+            if forms.filter(visible=True).count() == 0:
+                msg.append(_('make form(s) visible'))
         if len(msg) == 0:
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
