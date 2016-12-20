@@ -61,6 +61,10 @@ def prepare_term_index(create=False):
 
     return index_settings
 
+def delete_term_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='term')
+
 def prepare_search_index(resource_model_id, create=False):
     """
     Creates the settings and mappings in Elasticsearch to support resource search
@@ -115,7 +119,26 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'geometries' : {
-                        "type": "geo_shape"
+                        "properties": {
+                            "features": {
+                                "properties": {
+                                    "geometry": {
+                                        "properties": {
+                                            "coordinates": {
+                                                "type": "double"
+                                            },
+                                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
+                                        }
+                                    },
+                                    "id": { 'type' : 'string', 'index' : 'not_analyzed'},
+                                    "type": { 'type' : 'string', 'index' : 'not_analyzed'},
+                                    "properties": {
+                                         "enabled": False
+                                    }
+                                }
+                            },
+                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
+                        }
                     },
                     'dates' : { 
                         "type" : "date"
@@ -217,6 +240,6 @@ def prepare_search_index(resource_model_id, create=False):
     return index_settings
 
 
-def delete_search_index(resource_model_id):
-    pass
-
+def delete_search_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='resource2')

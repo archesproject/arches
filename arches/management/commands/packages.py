@@ -33,7 +33,7 @@ import arches.management.commands.package_utils.resource_graphs as resource_grap
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import prepare_term_index
+from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index
 from arches.app.models import models
 import csv
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
@@ -104,10 +104,14 @@ class Command(BaseCommand):
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
+            self.delete_indexes(package_name)
             self.setup_indexes(package_name)
 
         if options['operation'] == 'setup_indexes':
             self.setup_indexes(package_name)
+
+        if options['operation'] == 'delete_indexes':
+            self.delete_indexes(package_name)
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
@@ -252,6 +256,10 @@ class Command(BaseCommand):
 
     def setup_indexes(self, package_name):
         prepare_term_index(create=True)
+
+    def delete_indexes(self, package_name):
+        delete_term_index()
+        delete_search_index()
 
     def generate_procfile(self, package_name):
         """
