@@ -31,10 +31,6 @@ define(['jquery',
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
 
-                //ko.applyBindings(this, $('#search-results-list')[0]);
-                //ko.applyBindings(this, $('#search-results-count')[0]);
-                //ko.applyBindings(this, $('#paginator')[0]);
-
             },
 
             showRelatedResouresGraph: function (e) {
@@ -73,7 +69,7 @@ define(['jquery',
                 this.results.removeAll();
                 
                 response.results.hits.hits.forEach(function(result){
-                    var description = "test";//resourceTypes[this._source.entitytypeid].defaultDescription;
+                    var description = "we should probably have a 'Primary Description Function' like we do for primary name";//resourceTypes[this._source.entitytypeid].defaultDescription;
                     // var descriptionNode = resourceTypes[this._source.entitytypeid].descriptionNode;
                     // $.each(this._source.child_entities, function(i, entity){
                     //     if (entity.entitytypeid === descriptionNode){
