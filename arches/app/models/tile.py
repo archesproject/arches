@@ -93,7 +93,7 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
-        self.index()
+        # self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.save(*args, request=request, **kwargs)
@@ -105,6 +105,17 @@ class Tile(models.TileModel):
                 tile.delete(*args, request=request, **kwargs)
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
+
+    def copy(self):
+        tile = Tile()
+        tile.tileid = self.tileid
+        tile.resourceinstance_id = self.resourceinstance_id
+        tile.parenttile = self.parenttile
+        tile.data = self.data
+        tile.nodegroup = self.nodegroup
+        tile.sortorder = self.sortorder
+
+        return tile
 
     def index(self):
         """

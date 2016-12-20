@@ -77,8 +77,8 @@ class JSONSerializer(object):
             raise UnableToSerializeMethodTypesError(type(object))
         elif isinstance(object, dict):
             return self.handle_dictionary(object)
-        elif (isinstance(object, list) or 
-              isinstance(object, tuple) or 
+        elif (isinstance(object, list) or
+              isinstance(object, tuple) or
               isinstance(object, set)):
             return self.handle_list(object)
         elif isinstance(object, Model):
@@ -177,8 +177,8 @@ class JSONSerializer(object):
                 # Emulate the naming convention used by django when accessing the
                 # related model's id field
                 # see https://github.com/django/django/blob/master/django/db/models/fields/__init__.py
-                val = getattr(instance, f.name, None)
-                data[f.attname] = val.pk if val else val
+                val = getattr(instance, f.attname, None)
+                data[f.attname] = val
             elif isinstance(f, ManyToManyField):
                 # If the object doesn't have a primary key yet, just use an empty
                 # list for its m2m fields. Calling f.value_from_object will raise

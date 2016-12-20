@@ -31,7 +31,7 @@ from arches.app.utils.data_management.resources.importer import validate_busines
 
 class ArchesFileImporter(object):
 
-	def __init__(self, file=None):
+	def __init__(self, file=None, mapping_file=None):
 		self.graphs = ''
 		self.reference_data = ''
 		self.business_data = ''
@@ -42,10 +42,16 @@ class ArchesFileImporter(object):
 		else:
 			file = [file]
 
-		try:
-			mapping_file = [file[0].split('.')[0] + '.mapping']
-		except:
-			print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
+		if mapping_file == None:
+			try:
+				mapping_file = [file[0].split('.')[0] + '.mapping']
+			except:
+				print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
+		else:
+			try:
+				mapping_file = [mapping_file]
+			except:
+				print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
 
 		for path in mapping_file:
 			if os.path.exists(path):
@@ -90,6 +96,7 @@ class ArchesFileImporter(object):
 		businessDataImporter(self.business_data)
 
 	def import_all(self):
+
 		errors = []
 		conceptImporter(self.reference_data)
 		resourceGraphImporter(self.graphs)

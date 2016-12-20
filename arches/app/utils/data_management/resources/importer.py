@@ -28,6 +28,7 @@ from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from copy import deepcopy
 
 def pre_import(tile, graph_id):
     for function in get_function_class_instances(tile, graph_id):
@@ -60,7 +61,7 @@ def validate_business_data(business_data):
     return errors
 
 def import_business_data(business_data, mapping=None):
-    if mapping == None:
+    if mapping == None or mapping == '':
         if type(business_data) == dict and business_data['resources']:
             for resource in business_data['resources']:
                 if resource['resourceinstance'] != None:
@@ -108,14 +109,19 @@ def import_business_data(business_data, mapping=None):
     else:
         if type(business_data) == dict and business_data['resources']:
             blanktilecache = {}
+            target_nodegroup_cardinalities = {}
+            for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
+                target_nodegroup_cardinalities[nodegroup['nodegroupid']] = nodegroup['cardinality']
 
             def replace_source_nodeid(tiles, mapping):
                 for tile in tiles:
-                    for key in tile['data'].keys():
+                    for sourcekey in tile['data'].keys():
                         for row in mapping:
-                            if row['sourcenodeid'] == key:
-                                tile['data'][row['targetnodeid']] = tile['data'][key]
-                                del tile['data'][key]
+                            if row['sourcenodeid'] == sourcekey:
+                                tile['data'][row['targetnodeid']] = tile['data'][sourcekey]
+                                del tile['data'][sourcekey]
+                    if sourcekey in tile['data'].keys():
+                        del tile['data'][sourcekey]
                 return tiles
 
             def cache(blank_tile):
@@ -153,10 +159,11 @@ def import_business_data(business_data, mapping=None):
                                 ret = [tile]
 
                             #deletes nodes that don't have values
-                            for tile in ret:
-                                for key, value in tile['data'].iteritems():
-                                    if value == "":
-                                        del tile['data'][key]
+                            if ret is not None:
+                                for tile in ret:
+                                    for key, value in tile['data'].iteritems():
+                                        if value == "":
+                                            del tile['data'][key]
                             return ret
 
                         def get_blank_tile(sourcetilegroup):
@@ -168,8 +175,7 @@ def import_business_data(business_data, mapping=None):
                                     else:
                                         blank_tile = blanktilecache[tiles[0]['data'].keys()[0]]
                                 else:
-                                    print sourcetilegroup
-                                    print '#'*80
+                                    blank_tile = None
                             return blank_tile
 
                         tiles = get_tiles(tile)
@@ -177,23 +183,58 @@ def import_business_data(business_data, mapping=None):
                             mapped_tiles = replace_source_nodeid(tiles, mapping)
                             blank_tile = get_blank_tile(tiles)
 
+                            # def populate_tile_og(sourcetilegroup, target_tile):
+                            #     need_new_tile = False
+                            #     for source_tile in sourcetilegroup:
+                            #         for nodeid in source_tile['data'].keys():
+                            #             # check data array in first tile
+                            #             if target_tile.data != None:
+                            #                 if nodeid in target_tile.data.keys():
+                            #                     target_tile.data[nodeid] = source_tile['data'][nodeid]
+                            #                     del source_tile['data'][nodeid]
+                            #             elif target_tile.tiles != None:
+                            #                 # check if child tiles then check their data arrays
+                            #                 for targetchildtiles in target_tile.tiles.values():
+                            #                     for targetchildtile in targetchildtiles:
+                            #                         if isinstance(targetchildtile, Tile):
+                            #                             if nodeid in targetchildtile.data.keys():
+                            #                                 targetchildtile.data[nodeid] = source_tile['data'][nodeid]
+                            #                                 del source_tile['data'][nodeid]
+                            #     populated_tiles.append(target_tile)
+                            #
+                            #     for source_tile in sourcetilegroup:
+                            #         if len(source_tile['data'].keys()) > 0:
+                            #             need_new_tile = True
+                            #
+                            #     if need_new_tile:
+                            #         populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+
                             def populate_tile(sourcetilegroup, target_tile):
                                 need_new_tile = False
-                                for source_tile in sourcetilegroup:
-                                    for nodeid in source_tile['data'].keys():
-                                        # check data array in first tile
-                                        if target_tile.data != None:
+                                target_tile_cardinality = target_nodegroup_cardinalities[str(target_tile.nodegroup_id)]
+
+                                if target_tile.data != None:
+                                    for source_tile in sourcetilegroup:
+                                        for nodeid in source_tile['data'].keys():
                                             if nodeid in target_tile.data.keys():
                                                 target_tile.data[nodeid] = source_tile['data'][nodeid]
                                                 del source_tile['data'][nodeid]
-                                        elif target_tile.tiles != None:
-                                            # check if child tiles then check their data arrays
-                                            for targetchildtiles in target_tile.tiles.values():
-                                                for targetchildtile in targetchildtiles:
-                                                    if isinstance(targetchildtile, Tile):
-                                                        if nodeid in targetchildtile.data.keys():
-                                                            targetchildtile.data[nodeid] = source_tile['data'][nodeid]
-                                                            del source_tile['data'][nodeid]
+
+                                elif target_tile.tiles != None:
+                                    for nodegroupid, childtile in target_tile.tiles.iteritems():
+                                        prototype_tile = childtile.pop()
+                                        prototype_tile.tileid = None
+
+                                        for source_tile in sourcetilegroup:
+                                            prototype_tile_copy = deepcopy(prototype_tile)
+                                            for nodeid in source_tile['data'].keys():
+                                                if nodeid in prototype_tile.data.keys():
+                                                    prototype_tile_copy.data[nodeid] = source_tile['data'][nodeid]
+                                                    del source_tile['data'][nodeid]
+                                            childtile.append(prototype_tile_copy)
+                                        if target_tile_cardinality == 1:
+                                            break
+
                                 populated_tiles.append(target_tile)
 
                                 for source_tile in sourcetilegroup:
@@ -203,13 +244,15 @@ def import_business_data(business_data, mapping=None):
                                 if need_new_tile:
                                     populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
 
-                            populate_tile(mapped_tiles, blank_tile)
+                            if blank_tile != None:
+                                populate_tile(mapped_tiles, blank_tile)
 
                 newresourceinstance = ResourceInstance.objects.create(
                     resourceinstanceid = resourceinstanceid,
                     graph_id = target_resource_model,
                     resourceinstancesecurity = None
                 )
+                # print JSONSerializer().serialize(populated_tiles)
                 for populated_tile in populated_tiles:
                     populated_tile.resourceinstance = newresourceinstance
                     populated_tile.save()
