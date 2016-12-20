@@ -8,7 +8,7 @@ class PrimaryNameFunction(BaseFunction):
         return self.get_primary_name_from_nodes(resource, config)
 
     def get_primary_name_from_nodes(self, resource, config):
-        for tile in models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0):
+        for tile in models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0).filter(resourceinstance__resourceinstanceid=resource.resourceinstanceid):
             for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
                 if str(node.nodeid) in tile.data:
                     value = tile.data[str(node.nodeid)]
