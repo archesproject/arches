@@ -80,8 +80,7 @@ class ArchesFileImporter(object):
 		resourceGraphImporter(self.graphs)
 		errors = businessDataValidator(self.business_data)
 		if len(errors) == 0:
-			results = businessDataImporter(self.business_data)
-			print results
+			businessDataImporter(self.business_data)
 		else:
 			for error in errors:
 				print "{0} {1}".format(error[0], error[1])

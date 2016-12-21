@@ -69,30 +69,32 @@ class ResourceImportReporter:
         self.relations = 0
 
         if 'resources' in business_data:
-            self.resources = business_data['resources']
+            self.resources = len(business_data['resources'])
 
         if 'relations' in business_data:
-            self.relations = business_data['relations']
+            self.relations = len(business_data['relations'])
 
-    def update_resources_saved(count=1):
+    def update_resources_saved(self, count=1):
+        print 'updating'
         self.resources_saved += count
-        print self.resources_saved
+        print self.resources_saved, 'resources saved'
 
-    def update_tiles_saved(count=1):
+    def update_tiles_saved(self, count=1):
         self.tiles_saved += count
         print self.tiles_saved
 
-    def update_relations_saved(count=1):
+    def update_relations_saved(self, count=1):
         self.tiles_saved += count
         print self.tiles_saved
 
-    def report_results():
-        print "{0}".format(self.resources)
+    def report_results(self):
+        print "Resources Imported: {0}, Resources Saved: {1}".format(self.resources, self.resources_saved)
 
 def import_business_data(business_data):
+
+    reporter = ResourceImportReporter(business_data)
     try:
         for resource in business_data['resources']:
-            reporter = ResourceImportReporter(business_data)
             if resource['resourceinstance'] != None:
                 resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
                 resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
@@ -102,9 +104,9 @@ def import_business_data(business_data):
                     graph_id = resource['resourceinstance']['graphid'],
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                 )
-
-            if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
-                reporter.update_resources_saved()
+                print 'resource instance', created
+                if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                    reporter.update_resources_saved()
 
             if resource['tiles'] != []:
                 for tile in resource['tiles']:
@@ -142,6 +144,8 @@ def import_business_data(business_data):
 
     except (KeyError, TypeError) as e:
         print e, 'relations not in business data'
+
+    print reporter.report_results()
 
 class ResourceLoader(object):
 
