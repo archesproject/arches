@@ -137,6 +137,7 @@ def import_business_data(business_data, mapping=None):
                 parenttileids = []
                 populated_tiles = []
                 resourceinstanceid = uuid.uuid4()
+                populated_nodegroups = []
 
                 for row in mapping:
                     if resource['resourceinstance']['graph_id'] == row['sourceresourcemodelid']:
@@ -212,37 +213,44 @@ def import_business_data(business_data, mapping=None):
                             def populate_tile(sourcetilegroup, target_tile):
                                 need_new_tile = False
                                 target_tile_cardinality = target_nodegroup_cardinalities[str(target_tile.nodegroup_id)]
-
-                                if target_tile.data != None:
-                                    for source_tile in sourcetilegroup:
-                                        for nodeid in source_tile['data'].keys():
-                                            if nodeid in target_tile.data.keys():
-                                                target_tile.data[nodeid] = source_tile['data'][nodeid]
-                                                del source_tile['data'][nodeid]
-
-                                elif target_tile.tiles != None:
-                                    for nodegroupid, childtile in target_tile.tiles.iteritems():
-                                        prototype_tile = childtile.pop()
-                                        prototype_tile.tileid = None
-
+                                # print target_tile.nodegroup_id
+                                if str(target_tile.nodegroup_id) not in populated_nodegroups:
+                                    if target_tile.data != None:
                                         for source_tile in sourcetilegroup:
-                                            prototype_tile_copy = deepcopy(prototype_tile)
                                             for nodeid in source_tile['data'].keys():
-                                                if nodeid in prototype_tile.data.keys():
-                                                    prototype_tile_copy.data[nodeid] = source_tile['data'][nodeid]
+                                                if nodeid in target_tile.data.keys():
+                                                    target_tile.data[nodeid] = source_tile['data'][nodeid]
                                                     del source_tile['data'][nodeid]
-                                            childtile.append(prototype_tile_copy)
-                                        if target_tile_cardinality == 1:
-                                            break
 
-                                populated_tiles.append(target_tile)
+                                    elif target_tile.tiles != None:
+                                        for nodegroupid, childtile in target_tile.tiles.iteritems():
+                                            prototype_tile = childtile.pop()
+                                            prototype_tile.tileid = None
 
-                                for source_tile in sourcetilegroup:
-                                    if len(source_tile['data'].keys()) > 0:
-                                        need_new_tile = True
+                                            for source_tile in sourcetilegroup:
+                                                prototype_tile_copy = deepcopy(prototype_tile)
+                                                for nodeid in source_tile['data'].keys():
+                                                    if nodeid in prototype_tile.data.keys():
+                                                        prototype_tile_copy.data[nodeid] = source_tile['data'][nodeid]
+                                                        del source_tile['data'][nodeid]
+                                                childtile.append(prototype_tile_copy)
+                                            if target_tile_cardinality == 1:
+                                                break
 
-                                if need_new_tile:
-                                    populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+                                    populated_tiles.append(target_tile)
+
+                                    for source_tile in sourcetilegroup:
+                                        if len(source_tile['data'].keys()) > 0:
+                                            need_new_tile = True
+
+                                    if need_new_tile:
+                                        populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+
+                                    if target_tile_cardinality == '1':
+                                        populated_nodegroups.append(str(target_tile.nodegroup_id))
+                                else:
+                                    print target_tile.nodegroup_id
+                                    target_tile = None
 
                             if blank_tile != None:
                                 populate_tile(mapped_tiles, blank_tile)
