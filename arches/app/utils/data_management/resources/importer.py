@@ -65,7 +65,7 @@ def import_business_data(business_data):
                 resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
                 resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
 
-                resourceinstance = ResourceInstance.objects.update_or_create(
+                resourceinstance, created = ResourceInstance.objects.update_or_create(
                     resourceinstanceid = resource['resourceinstance']['resourceinstanceid'],
                     graph_id = resource['resourceinstance']['graphid'],
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
@@ -73,15 +73,11 @@ def import_business_data(business_data):
 
             if resource['tiles'] != []:
                 for tile in resource['tiles']:
-                    tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
-                    tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
-                    tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
-                    tile['tileid'] = uuid.UUID(str(tile['tileid']))
-                    tile = Tile.objects.update_or_create(
-                        resourceinstance = tile['resourceinstance_id'],
+                    Tile.objects.update_or_create(
+                        resourceinstance = resourceinstance,
                         parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                        nodegroup = tile['nodegroup_id'],
-                        tileid = tile['tileid'],
+                        nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                        tileid = uuid.UUID(str(tile['tileid'])),
                         data = tile['data']
                     )
 
