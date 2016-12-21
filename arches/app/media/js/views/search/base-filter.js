@@ -33,6 +33,6 @@ define(['jquery', 'backbone', 'knockout'], function($, Backbone, ko) {
         clear: function() {
             // a function that clears the filter and restores
             // the ui to a clean and unfiltered state
-        },
+        }
     });
 });
