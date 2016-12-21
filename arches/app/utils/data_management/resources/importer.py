@@ -238,7 +238,13 @@ def import_business_data(business_data, mapping=None):
                                                                 del source_tile['data'][nodeid]
                                                                 if child_tile_cardinality == '1':
                                                                     populated_child_nodegroups.append(prototype_tile.nodegroup_id)
-                                                        childtile.append(prototype_tile_copy)
+                                                        for key in prototype_tile_copy.data.keys():
+                                                            if prototype_tile_copy.data[key] == '':
+                                                                del prototype_tile_copy.data[key]
+                                                        if prototype_tile_copy.data == {}:
+                                                            prototype_tile_copy = None
+                                                        if prototype_tile_copy is not None:
+                                                            childtile.append(prototype_tile_copy)
                                                     else:
                                                         break
 
