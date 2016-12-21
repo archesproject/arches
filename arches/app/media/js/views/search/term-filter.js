@@ -22,6 +22,51 @@ define(['jquery',
             $(window).resize(resize);
         },
 
+        restoreState: function(query) {
+            var self = this;
+            var doQuery = false;
+            if ('termFilter' in query) {
+                query.termFilter = JSON.parse(query.termFilter);
+                doQuery = true;
+            }
+            var filter = query.termFilter;
+            if (typeof filter !== 'undefined' && filter.length > 0) {
+                var results = [];
+                $.each(filter, function() {
+                    self.filter.terms.push(this);
+
+                    results.push({
+                        inverted: this.inverted,
+                        type: this.type,
+                        context: this.context,
+                        context_label: this.context_label,
+                        id: this.id,
+                        text: this.text,
+                        value: this.value
+                    });
+                });
+
+                this.searchbox.select2('data', results).trigger('change');
+
+                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+                    if ($(el).data('select2-data').inverted) {
+                        $(el).addClass('inverted');
+                    }
+                });
+            }
+            return doQuery;
+        },
+
+        clear: function() {
+            this.filter.terms.removeAll();
+            this.searchbox.select2('data', []);
+        },
+
+        appendFilters: function(filterParams) {
+            filterParams.termFilter = ko.toJSON(this.filter.terms());
+            return this.filter.terms().length === 0;
+        },
+
         render: function() {
             var self = this;
             this.searchbox = this.$el.select2({
@@ -176,51 +221,6 @@ define(['jquery',
                     $(el).addClass('inverted');
                 }
             });
-        },
-
-        restoreState: function(query) {
-            var self = this;
-            var doQuery = false;
-            if ('termFilter' in query) {
-                query.termFilter = JSON.parse(query.termFilter);
-                doQuery = true;
-            }
-            var filter = query.termFilter;
-            if (typeof filter !== 'undefined' && filter.length > 0) {
-                var results = [];
-                $.each(filter, function() {
-                    self.filter.terms.push(this);
-
-                    results.push({
-                        inverted: this.inverted,
-                        type: this.type,
-                        context: this.context,
-                        context_label: this.context_label,
-                        id: this.id,
-                        text: this.text,
-                        value: this.value
-                    });
-                });
-
-                this.searchbox.select2('data', results).trigger('change');
-
-                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-                    if ($(el).data('select2-data').inverted) {
-                        $(el).addClass('inverted');
-                    }
-                });
-            }
-            return doQuery;
-        },
-
-        clear: function() {
-            this.filter.terms.removeAll();
-            this.searchbox.select2('data', []);
-        },
-
-        appendFilters: function(filterParams) {
-            filterParams.termFilter = ko.toJSON(this.filter.terms());
-            return this.filter.terms().length === 0;
         }
     });
 });

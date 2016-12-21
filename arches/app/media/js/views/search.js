@@ -118,7 +118,6 @@ require([
             if (doQuery) {
                 this.doQuery();
             }
-
         },
 
         clear: function() {
