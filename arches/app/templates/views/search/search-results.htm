@@ -14,7 +14,7 @@
     <!-- Begin Search Results -->
     <div>
         
-        <div id="search-results-list" data-bind="foreach: searchResults.results, visible: true" style="display: none;">
+        <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
 
             <div class="search-listing">
                 <h3 class="search-listing-title"><a class="search-candidate-title" href="" data-bind="click: $parent.viewReport"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></a></h3>
@@ -36,20 +36,20 @@
         <div class="margin-bottom-30"></div>
 
         <!-- Pagination -->
-        <!-- ko if: searchResults.showPaginator -->
-        <div id="paginator" data-bind="with: searchResults.paginator">
+        <!-- ko if: showPaginator -->
+        <div id="paginator" data-bind="with: paginator">
             <div class="text-center">
                 <ul class="pagination">
-                    <li><a data-bind="css: {'disabled': !has_previous()}, click: $root.searchResults.newPage.bind($root.searchResults, previous_page_number())" href="#">«</a></li>
+                    <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#">«</a></li>
                     <!-- ko foreach: { data: pages, as: 'page' } -->
                         <!-- ko if: page -->
-                            <li class="page" data-bind="click: $root.searchResults.newPage.bind($root.searchResults), css: {'current active': (page == $parent.number())}"><a href="#" data-bind="text: page, attr:{'data-page':page}"></a></li>
+                            <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.number())}"><a href="#" data-bind="text: page, attr:{'data-page':page}"></a></li>
                         <!-- /ko -->
                         <!-- ko ifnot: page -->
                             <li class="disabled"><a href="#">...</a></li>
                         <!-- /ko -->
                     <!-- /ko -->
-                    <li><a data-bind="css: { 'disabled': !has_next()}, click: $root.searchResults.newPage.bind($root.searchResults, next_page_number())" href="#">»</a></li>
+                    <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#">»</a></li>
                 </ul>
             </div>  
         </div>
