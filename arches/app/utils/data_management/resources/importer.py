@@ -213,7 +213,6 @@ def import_business_data(business_data, mapping=None):
                             def populate_tile(sourcetilegroup, target_tile):
                                 need_new_tile = False
                                 target_tile_cardinality = target_nodegroup_cardinalities[str(target_tile.nodegroup_id)]
-                                # print target_tile.nodegroup_id
                                 if str(target_tile.nodegroup_id) not in populated_nodegroups:
                                     if target_tile.data != None:
                                         for source_tile in sourcetilegroup:
@@ -249,7 +248,6 @@ def import_business_data(business_data, mapping=None):
                                     if target_tile_cardinality == '1':
                                         populated_nodegroups.append(str(target_tile.nodegroup_id))
                                 else:
-                                    print target_tile.nodegroup_id
                                     target_tile = None
 
                             if blank_tile != None:
