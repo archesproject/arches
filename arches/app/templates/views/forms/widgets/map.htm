@@ -1,8 +1,9 @@
 {% extends "views/forms/widgets/base.htm" %} {% load i18n %} {% block form %}
-<div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
+
+<div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container expanded-map relative" data-bind="mapboxgl: {
+    <div id='map' class="expanded-map relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
             zoom: zoom,
@@ -16,7 +17,7 @@
         afterRender: function(map){
             setupMap(map);
         }
-    }">
+    }, css: getContextCss()">
 
         <!--ko if: drawMode -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
@@ -318,7 +319,7 @@
 
 <div class="panel-group accordion" id="accordion">
 
-    <!--ko if: reportHeader -->
+    <!--ko if: context === 'report-header' -->
     <div class="panel">
         <div class="panel-heading">
             <h4 class="panel-title">

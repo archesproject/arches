@@ -4,10 +4,11 @@ require([
     'arches',
     'viewmodels/alert',
     'views/search/base-filter',
-    'views/search/term-filter', 
+    'views/search/term-filter',
+    'views/search/map-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, SearchResults, BaseManagerView) {
+], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, mapFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         // updateRequest: '',
@@ -20,7 +21,7 @@ require([
         //     'click a.dataexport': 'exportSearch'
         // },
 
-        initialize: function(options) { 
+        initialize: function(options) {
             var mapFilterText, timeFilterText;
             var self = this;
 
@@ -52,7 +53,7 @@ require([
                 if (expand) {
                     this.viewModel.mapFilter.expanded(true);
                 }
-                
+
                 _.each(data.geometries, function (geometryData) {
                     var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
                     geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
@@ -114,7 +115,7 @@ require([
                 self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
-            
+
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
@@ -227,13 +228,13 @@ require([
             //     doQuery = true;
             // }
             // this.viewModel.mapFilter.restoreState(query.spatialFilter, query.mapExpanded);
-            
+
 
             if(doQuery){
                 this.doQuery();
                 this.hideSavedSearches();
             }
-            
+
         },
 
         clear: function(){
