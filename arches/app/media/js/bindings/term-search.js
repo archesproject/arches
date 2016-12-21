@@ -6,6 +6,11 @@ define(['jquery', 'knockout', 'arches', 'select2'], function($, ko, arches) {
 
             selection.subscribe(function (value) {
                 searchbox.select2('data', value).trigger('change');
+                $(el).parent().find('.select2-search-choice').each(function(i, el) {
+                    if ($(el).data('select2-data').inverted) {
+                        $(el).addClass('inverted');
+                    }
+                });
             });
 
             var searchbox = $(el).select2({
@@ -97,7 +102,7 @@ define(['jquery', 'knockout', 'arches', 'select2'], function($, ko, arches) {
                     selection.push(term);
                 });
             });
-
+            searchbox.select2('data', ko.unwrap(selection)).trigger('change');
         }
     };
 

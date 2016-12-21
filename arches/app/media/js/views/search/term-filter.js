@@ -24,12 +24,6 @@ define(['jquery',
             var filters = query.termFilter;
             if (typeof filters !== 'undefined' && filters.length > 0) {
                 self.filter.terms(filters);
-
-                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-                    if ($(el).data('select2-data').inverted) {
-                        $(el).addClass('inverted');
-                    }
-                });
             }
             return doQuery;
         },
