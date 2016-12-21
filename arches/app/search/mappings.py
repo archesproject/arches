@@ -92,6 +92,7 @@ def prepare_search_index(resource_model_id, create=False):
                     'tiles' : { 
                         'type' : 'nested',
                         'properties' : {
+                            "tiles": {'enabled': False},
                             'tileid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'nodegroup_id' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'parenttile_id' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -234,14 +235,10 @@ def prepare_search_index(resource_model_id, create=False):
         se = SearchEngineFactory().create()
         #print JSONSerializer().serialize(index_settings)
         try:
-            se.create_index(index='resource', body=index_settings, ignore=400)
-            #print 'index created'
+            se.create_index(index='resource', body=index_settings)
         except:
-            pass
-            #print JSONSerializer().serialize(index_settings)
-            # pass
-        #     index_settings = index_settings['mappings']
-        #     se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
+            index_settings = index_settings['mappings']
+            se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
 
     return index_settings
 
