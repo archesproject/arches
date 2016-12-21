@@ -62,7 +62,7 @@ def validate_business_data(business_data):
 class ResourceImportReporter:
     def __init__(self, business_data):
         self.resources = 0
-        self.tiles = 0
+        self.total_tiles = 0
         self.resources_saved = 0
         self.tiles_saved = 0
         self.relations_saved = 0
@@ -75,23 +75,32 @@ class ResourceImportReporter:
             self.relations = len(business_data['relations'])
 
     def update_resources_saved(self, count=1):
-        print 'updating'
         self.resources_saved += count
-        print self.resources_saved, 'resources saved'
+        print '{0} of {1} resources saved'.format(self.resources_saved, self.resources)
+
+    def update_tiles(self, count=1):
+        self.total_tiles += count
 
     def update_tiles_saved(self, count=1):
         self.tiles_saved += count
-        print self.tiles_saved
 
     def update_relations_saved(self, count=1):
-        self.tiles_saved += count
+        self.relations_saved += count
         print self.tiles_saved
 
     def report_results(self):
-        print "Resources Imported: {0}, Resources Saved: {1}".format(self.resources, self.resources_saved)
+        if self.resources > 0:
+            result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
+            print result.format(
+                    self.resources,
+                    self.resources_saved,
+                    self.total_tiles,
+                    self.tiles_saved,
+                    self.relations,
+                    self.relations_saved
+                    )
 
 def import_business_data(business_data):
-
     reporter = ResourceImportReporter(business_data)
     try:
         for resource in business_data['resources']:
@@ -104,11 +113,11 @@ def import_business_data(business_data):
                     graph_id = resource['resourceinstance']['graphid'],
                     resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                 )
-                print 'resource instance', created
                 if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
                     reporter.update_resources_saved()
 
             if resource['tiles'] != []:
+                reporter.update_tiles(len(resource['tiles']))
                 for tile in resource['tiles']:
                     Tile.objects.update_or_create(
                         resourceinstance = resourceinstance,
@@ -117,11 +126,11 @@ def import_business_data(business_data):
                         tileid = uuid.UUID(str(tile['tileid'])),
                         data = tile['data']
                     )
-                    if len(Tile.objects.filter(tileid=tile[0].tileid)) == 1:
+                    if len(Tile.objects.filter(tileid=tile['tileid'])) == 1:
                         reporter.update_tiles_saved()
 
     except (KeyError, TypeError) as e:
-        print e, 'resources not in business data'
+        print e
 
     try:
         for relation in business_data['relations']:
@@ -141,11 +150,13 @@ def import_business_data(business_data):
             )
             # print vars(relation)
             relation.update_or_create()
+            if len(ResourceXResource.objects.filter(resourcexid=relation['resourcexid'])) == 1:
+                reporter.update_relations_saved()
 
     except (KeyError, TypeError) as e:
-        print e, 'relations not in business data'
+        print e
 
-    print reporter.report_results()
+    reporter.report_results()
 
 class ResourceLoader(object):
 
