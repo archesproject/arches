@@ -13,7 +13,6 @@ define(['jquery', 'backbone', 'knockout'], function($, Backbone, ko) {
             }, this);
         },
 
-
         hasFilters: function() {
             // returns a boolean true if this filter is currently active, else false
         },
