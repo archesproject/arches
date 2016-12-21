@@ -6,12 +6,14 @@ define(['jquery',
     'views/search/base-filter'
 ], function($, Backbone, arches, Select2, ko, BaseFilter) {
     return BaseFilter.extend({
-
         initialize: function(options) {
             var self = this;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter.terms = ko.observableArray();
+            this.filter.terms.subscribe(function () {
+                self.searchbox.select2('data', self.filter.terms()).trigger('change');
+            });
 
             this.render();
 
@@ -29,24 +31,9 @@ define(['jquery',
                 query.termFilter = JSON.parse(query.termFilter);
                 doQuery = true;
             }
-            var filter = query.termFilter;
-            if (typeof filter !== 'undefined' && filter.length > 0) {
-                var results = [];
-                $.each(filter, function() {
-                    self.filter.terms.push(this);
-
-                    results.push({
-                        inverted: this.inverted,
-                        type: this.type,
-                        context: this.context,
-                        context_label: this.context_label,
-                        id: this.id,
-                        text: this.text,
-                        value: this.value
-                    });
-                });
-
-                this.searchbox.select2('data', results).trigger('change');
+            var filters = query.termFilter;
+            if (typeof filters !== 'undefined' && filters.length > 0) {
+                self.filter.terms(filters);
 
                 $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
                     if ($(el).data('select2-data').inverted) {
@@ -59,7 +46,6 @@ define(['jquery',
 
         clear: function() {
             this.filter.terms.removeAll();
-            this.searchbox.select2('data', []);
         },
 
         appendFilters: function(filterParams) {
