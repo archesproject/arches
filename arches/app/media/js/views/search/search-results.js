@@ -97,6 +97,10 @@ define(['jquery',
                 window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
             },
 
+            editResource: function(resourceinstance){
+                window.open(arches.urls.resource_editor + resourceinstance.resourceinstanceid);
+            },
+
             itemMouseover: function(evt){
                 if(this.currentTarget !== evt.currentTarget){
                     var data = $(evt.currentTarget).data();
