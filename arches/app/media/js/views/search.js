@@ -36,6 +36,12 @@ require([
                 //el: $.find('input.resource_search_widget')[0]
             });
 
+            this.filters = [
+                this.viewModel.termFilter,
+                this.viewModel.timeFilter,
+                this.viewModel.mapFilter
+            ];
+
             this.viewModel.searchResults = new SearchResults({
                 //el: $('#search-results-container')[0],
                 viewModel: this.viewModel
@@ -69,41 +75,21 @@ require([
             // timeFilterText = this.viewModel.timeFilter.$el.data().filtertext;
 
             self.isNewQuery = true;
-            this.searchQuery = {
-                queryString: function() {
-                    var params = {
-                        page: self.viewModel.searchResults.page(),
-                        termFilter: ko.toJSON(self.viewModel.termFilter.filter.terms()),
-                        // temporalFilter: ko.toJSON({
-                        //     year_min_max: self.viewModel.timeFilter.filter.year_min_max(),
-                        //     filters: self.viewModel.timeFilter.filter.filters(),
-                        //     inverted: self.viewModel.timeFilter.filter.inverted()
-                        // }),
-                        // spatialFilter: ko.toJSON(self.viewModel.mapFilter.filter),
-                        // mapExpanded: self.viewModel.mapFilter.expanded(),
-                        // timeExpanded: self.viewModel.timeFilter.expanded()
-                    };
-                    if (
-                        self.viewModel.termFilter.filter.terms().length === 0 // &&
-                        // self.viewModel.timeFilter.filter.year_min_max().length === 0 &&
-                        // self.viewModel.timeFilter.filter.filters().length === 0 &&
-                        // self.viewModel.mapFilter.filter.geometry.coordinates().length === 0
-                    ) {
-                        params.no_filters = true;
-                    }
 
-                    params.include_ids = self.isNewQuery;
-                    return $.param(params).split('+').join('%20');
-                },
-                changed: ko.pureComputed(function() {
-                    var ret = ko.toJSON(this.viewModel.termFilter.changed()) +
-                        ko.toJSON(this.viewModel.timeFilter.changed()) +
-                        ko.toJSON(this.viewModel.mapFilter.changed());
-                    return ret;
-                }, this).extend({
-                    rateLimit: 200
-                })
-            };
+            this.queryString = ko.pureComputed(function() {
+                var params = {
+                    page: self.viewModel.searchResults.page(),
+                    include_ids: self.isNewQuery,
+                    no_filters: true
+                };
+                self.filters.forEach(function(filter) {
+                    var filtersAdded = filter.appendFilters(params);
+                    if (filtersAdded) {
+                        params.no_filters = false;
+                    }
+                });
+                return $.param(params).split('+').join('%20');
+            });
 
             this.getSearchQuery();
 
@@ -111,19 +97,18 @@ require([
                 self.doQuery();
             });
 
-            this.searchQuery.changed.subscribe(function() {
+            this.queryString.subscribe(function() {
                 self.isNewQuery = true;
                 self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
-
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
             var self = this;
-            var queryString = this.searchQuery.queryString();
+            var queryString = this.queryString();
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
@@ -170,7 +155,7 @@ require([
                 this.hideSavedSearches();
             }
             this.viewModel.mapFilter.expanded(!this.viewModel.mapFilter.expanded());
-            window.history.pushState({}, '', '?' + this.searchQuery.queryString());
+            window.history.pushState({}, '', '?' + this.queryString());
         },
 
         toggleTimeFilter: function() {
@@ -179,7 +164,7 @@ require([
                 this.hideSavedSearches();
             }
             this.viewModel.timeFilter.expanded(!this.viewModel.timeFilter.expanded());
-            window.history.pushState({}, '', '?' + this.searchQuery.queryString());
+            window.history.pushState({}, '', '?' + this.queryString());
         },
 
         getSearchQuery: function() {
@@ -203,35 +188,11 @@ require([
             }
             this.viewModel.searchResults.restoreState(query.page);
 
-
-            if ('termFilter' in query) {
-                query.termFilter = JSON.parse(query.termFilter);
-                doQuery = true;
-            }
-            this.viewModel.termFilter.restoreState(query.termFilter);
-
-
-            // if('temporalFilter' in query){
-            //     query.temporalFilter = JSON.parse(query.temporalFilter);
-            //     doQuery = true;
-            // }
-            // if('timeExpanded' in query){
-            //     query.timeExpanded = JSON.parse(query.timeExpanded);
-            //     doQuery = true;
-            // }
-            // this.viewModel.timeFilter.restoreState(query.temporalFilter, query.timeExpanded);
-
-
-            // if('spatialFilter' in query){
-            //     query.spatialFilter = JSON.parse(query.spatialFilter);
-            //     doQuery = true;
-            // }
-            // if('mapExpanded' in query){
-            //     query.mapExpanded = JSON.parse(query.mapExpanded);
-            //     doQuery = true;
-            // }
-            // this.viewModel.mapFilter.restoreState(query.spatialFilter, query.mapExpanded);
-
+            this.filters.forEach(function (filter) {
+                if (filter.restoreState(query)){
+                    doQuery = true;
+                }
+            });
 
             if (doQuery) {
                 this.doQuery();
@@ -241,15 +202,10 @@ require([
         },
 
         clear: function() {
-            this.viewModel.mapFilter.clear();
-            this.viewModel.timeFilter.clear();
-            this.viewModel.termFilter.clear();
+            this.filters.forEach(function(filter) {
+                filter.clear();;
+            });
         }
-
-
-
-
-
     });
 
     return new SearchView();

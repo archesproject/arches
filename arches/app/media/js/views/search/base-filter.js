@@ -6,11 +6,6 @@ define(['jquery', 'backbone', 'knockout'], function($, Backbone, ko) {
 
         initialize: function(options) {
             $.extend(this, options);
-
-            this.changed = ko.pureComputed(function(){
-                var ret = ko.toJSON(this.filter);
-                return ret;
-            }, this);
         },
 
         hasFilters: function() {
@@ -19,8 +14,8 @@ define(['jquery', 'backbone', 'knockout'], function($, Backbone, ko) {
 
         appendFilters: function(queryStringObject) {
             // append your filters onto this object which ultimately is used in the URL
-
-            return queryStringObject;
+            // return true if filters are added
+            return false;
         },
 
         restoreState: function(filter) {

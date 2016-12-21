@@ -94,7 +94,7 @@ define(['jquery',
 
                 if (e.added) {
                     if (e.added.type !== 'filter-flag') {
-                        self.query.filter.terms.push(e.added);
+                        self.filter.terms.push(e.added);
                     }
 
                 }
@@ -102,7 +102,7 @@ define(['jquery',
                     if (e.removed.type === 'filter-flag') {
                         self.trigger('filter-removed', e.removed);
                     } else {
-                        self.query.filter.terms.remove(function(item) {
+                        self.filter.terms.remove(function(item) {
                             return item.id === e.removed.id && item.context_label === e.removed.context_label;
                         });
                     }
@@ -123,9 +123,9 @@ define(['jquery',
                 // filter-flag types don't rebuild the array and hence don't trigger a an updated search
                 // instead they listen to choice-selected events and use that
                 if (data.type == 'string' || data.type == 'concept' || data.type == 'term') {
-                    self.query.filter.terms.removeAll();
+                    self.filter.terms.removeAll();
                     $.each(self.searchbox.select2('data'), function(index, term) {
-                        self.query.filter.terms.push(term);
+                        self.filter.terms.push(term);
                     });
                 }
                 if (data.type == 'filter-flag') {
@@ -178,12 +178,18 @@ define(['jquery',
             });
         },
 
-        restoreState: function(filter) {
+        restoreState: function(query) {
             var self = this;
+            var doQuery = false;
+            if ('termFilter' in query) {
+                query.termFilter = JSON.parse(query.termFilter);
+                doQuery = true;
+            }
+            var filter = query.termFilter;
             if (typeof filter !== 'undefined' && filter.length > 0) {
                 var results = [];
                 $.each(filter, function() {
-                    self.query.filter.terms.push(this);
+                    self.filter.terms.push(this);
 
                     results.push({
                         inverted: this.inverted,
@@ -204,12 +210,17 @@ define(['jquery',
                     }
                 });
             }
+            return doQuery;
         },
 
         clear: function() {
-            this.query.filter.terms.removeAll();
+            this.filter.terms.removeAll();
             this.searchbox.select2('data', []);
-        }
+        },
 
+        appendFilters: function(filterParams) {
+            filterParams.termFilter = ko.toJSON(this.filter.terms());
+            return this.filter.terms().length === 0;
+        }
     });
 });
