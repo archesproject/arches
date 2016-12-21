@@ -51,13 +51,31 @@
                     <!-- /ko -->
                     <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#">»</a></li>
                 </ul>
-            </div>  
+            </div>
         </div>
-        <!-- /ko -->
-        <!-- End Pagination -->  
-
     </div> 
     <!-- End Search Results -->
+
+    <!-- Pagination -->
+    <!-- ko if: searchResults.showPaginator -->
+    <div class="" id="paginator" data-bind="with: searchResults.paginator">
+        <div class="text-center">
+            <ul class="pagination">
+                <li><a data-bind="css: {'disabled': !has_previous()}, click: $root.searchResults.newPage.bind($root.searchResults, previous_page_number())" href="#">«</a></li>
+                <!-- ko foreach: { data: pages, as: 'page' } -->
+                    <!-- ko if: page -->
+                        <li class="page" data-bind="click: $root.searchResults.newPage.bind($root.searchResults), css: {'current active': (page == $parent.number())}"><a href="#" data-bind="text: page, attr:{'data-page':page}"></a></li>
+                    <!-- /ko -->
+                    <!-- ko ifnot: page -->
+                        <li class="disabled"><a href="#">...</a></li>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <li><a data-bind="css: { 'disabled': !has_next()}, click: $root.searchResults.newPage.bind($root.searchResults, next_page_number())" href="#">»</a></li>
+            </ul>
+        </div>  
+    </div>
+    <!-- /ko -->
+    <!-- End Pagination --> 
                                
 </div>
 <!-- End Content --> 
