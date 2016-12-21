@@ -93,8 +93,8 @@ define(['jquery',
                 }
             },
 
-            viewReport: function(){
-
+            viewReport: function(resourceinstance){
+                window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
             },
 
             itemMouseover: function(evt){
