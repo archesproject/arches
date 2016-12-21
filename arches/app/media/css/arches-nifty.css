@@ -5287,6 +5287,7 @@ a.map-widget-icon:hover {
 .search-candidate-title,
 .search-candidate-link {
     color: steelblue;
+    padding-right: 8px;
 }
 
 .search-listing {

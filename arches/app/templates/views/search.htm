@@ -76,9 +76,9 @@
         <div class="flex">
 
             <!--Form Listing -->
-            <div class="left-column-crud-container search-control-container">
+            <div class="left-column-crud-container search-control-container" data-bind="with: searchResults">
                 <!-- Title Block -->
-                <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + searchResults.total()"></h3>
+                <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div class="row" id="search-results-container"> 
                     {% include 'views/search/search-results.htm' %}
                 </div>

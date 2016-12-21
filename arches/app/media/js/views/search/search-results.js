@@ -69,25 +69,18 @@ define(['jquery',
                 this.results.removeAll();
                 
                 response.results.hits.hits.forEach(function(result){
-                    var description = "we should probably have a 'Primary Description Function' like we do for primary name";//resourceTypes[this._source.entitytypeid].defaultDescription;
-                    // var descriptionNode = resourceTypes[this._source.entitytypeid].descriptionNode;
-                    // $.each(this._source.child_entities, function(i, entity){
-                    //     if (entity.entitytypeid === descriptionNode){
-                    //         description = entity.value;
-                    //     }
-                    // })
+                    var description = "we should probably have a 'Primary Description Function' like we do for primary name";
+
                     graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
                     })
 
                     this.results.push({
                         primaryname: result._source.primaryname,
-                        resourceid: result._source.entityid,
-                        entitytypeid: result._source.entitytypeid,
+                        resourceinstanceid: result._source.resourceinstanceid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata.iconclass,
-                        // typeName: resourceTypes[this._source.entitytypeid].name
+                        iconclass: graphdata ? graphdata.iconclass : ''
                     });
                 }, this);
 
@@ -98,6 +91,10 @@ define(['jquery',
                 if(typeof page !== 'undefined'){
                     this.page(ko.utils.unwrapObservable(page));
                 }
+            },
+
+            viewReport: function(resourceinstance){
+                window.open(arches.urls.resource_report + resourceinstance.resourceinstanceid);
             },
 
             itemMouseover: function(evt){
