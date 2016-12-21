@@ -86,7 +86,7 @@ define(['jquery',
                         entitytypeid: result._source.entitytypeid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata.iconclass,
+                        iconclass: graphdata ? graphdata.iconclass : '',
                         // typeName: resourceTypes[this._source.entitytypeid].name
                     });
                 }, this);
