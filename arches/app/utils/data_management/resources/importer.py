@@ -222,19 +222,25 @@ def import_business_data(business_data, mapping=None):
                                                     del source_tile['data'][nodeid]
 
                                     elif target_tile.tiles != None:
+                                        populated_child_nodegroups = []
                                         for nodegroupid, childtile in target_tile.tiles.iteritems():
-                                            prototype_tile = childtile.pop()
-                                            prototype_tile.tileid = None
+                                            child_tile_cardinality = target_nodegroup_cardinalities[str(childtile[0].nodegroup_id)]
+                                            if str(childtile[0].nodegroup_id) not in populated_child_nodegroups:
+                                                prototype_tile = childtile.pop()
+                                                prototype_tile.tileid = None
 
-                                            for source_tile in sourcetilegroup:
-                                                prototype_tile_copy = deepcopy(prototype_tile)
-                                                for nodeid in source_tile['data'].keys():
-                                                    if nodeid in prototype_tile.data.keys():
-                                                        prototype_tile_copy.data[nodeid] = source_tile['data'][nodeid]
-                                                        del source_tile['data'][nodeid]
-                                                childtile.append(prototype_tile_copy)
-                                            if target_tile_cardinality == 1:
-                                                break
+                                                for source_tile in sourcetilegroup:
+                                                    if prototype_tile.nodegroup_id not in populated_child_nodegroups:
+                                                        prototype_tile_copy = deepcopy(prototype_tile)
+                                                        for nodeid in source_tile['data'].keys():
+                                                            if nodeid in prototype_tile.data.keys():
+                                                                prototype_tile_copy.data[nodeid] = source_tile['data'][nodeid]
+                                                                del source_tile['data'][nodeid]
+                                                                if child_tile_cardinality == '1':
+                                                                    populated_child_nodegroups.append(prototype_tile.nodegroup_id)
+                                                        childtile.append(prototype_tile_copy)
+                                                    else:
+                                                        break
 
                                     populated_tiles.append(target_tile)
 
@@ -243,7 +249,8 @@ def import_business_data(business_data, mapping=None):
                                             need_new_tile = True
 
                                     if need_new_tile:
-                                        populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+                                        if get_blank_tile(sourcetilegroup) != None:
+                                            populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
 
                                     if target_tile_cardinality == '1':
                                         populated_nodegroups.append(str(target_tile.nodegroup_id))
