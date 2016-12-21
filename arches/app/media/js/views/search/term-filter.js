@@ -1,33 +1,25 @@
-define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Backbone, arches, Select2, ko) {
-    return Backbone.View.extend({
+define(['jquery',
+    'backbone',
+    'arches',
+    'select2',
+    'knockout',
+    'views/search/base-filter'
+], function ($, Backbone, arches, Select2, ko, BaseFilter) {
+    return BaseFilter.extend({
 
         initialize: function(options) {
-            $.extend(this, options);            
             var self = this;
+            BaseFilter.prototype.initialize.call(this, options);
 
-            this.query = {
-                filter:  {
-                    terms: ko.observableArray()
-                },
-                isEmpty: function(){
-                    if (this.filter.terms.length === 0){
-                        return true;
-                    }
-                    return false;
-                },
-                changed: ko.pureComputed(function(){
-                    var ret = ko.toJSON(this.query.filter.terms());
-                    return ret;
-                }, this)
-            };
+            this.filter.terms = ko.observableArray();
 
         	this.render();
 
             var resize = function() {
                 $('.resource_search_widget_dropdown .select2-results').css('maxHeight', $(window).height() - self.$el.offset().top - 100 + 'px');
-            };       
+            };
             resize();
-            $(window).resize(resize);             
+            $(window).resize(resize);
         },
 
         render: function(){
@@ -48,10 +40,10 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     results: function (data, page) {
                         var value = $('div.resource_search_widget').find('.select2-input').val();
 
-                        // this result is being hidden by a style in arches.css 
+                        // this result is being hidden by a style in arches.css
                         // .select2-results li:first-child{
                         //     display:none;
-                        // } 
+                        // }
                         var results = [{
                             inverted: false,
                             type: 'string',
@@ -98,7 +90,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
 
                 if(e.added){
                     if(e.added.type !== 'filter-flag'){
-                        self.query.filter.terms.push(e.added);                        
+                        self.query.filter.terms.push(e.added);
                     }
 
                 }
@@ -108,7 +100,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     }else{
                         self.query.filter.terms.remove(function(item){
                             return item.id === e.removed.id && item.context_label === e.removed.context_label;
-                        });                   
+                        });
                     }
                 }
             }).on('choice-selected', function(e, el) {
@@ -135,7 +127,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 if (data.type == 'filter-flag'){
                     self.trigger('filter-inverted', data);
                 }
-            });    
+            });
         },
 
         getUrl: function(){
@@ -217,4 +209,3 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
 
     });
 });
-

@@ -4,7 +4,7 @@ require([
     'arches',
     'viewmodels/alert',
     'views/search/base-filter',
-    'views/search/term-filter', 
+    'views/search/term-filter',
     'views/search/search-results',
     'views/base-manager'
 ], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, SearchResults, BaseManagerView) {
@@ -20,7 +20,7 @@ require([
         //     'click a.dataexport': 'exportSearch'
         // },
 
-        initialize: function(options) { 
+        initialize: function(options) {
             var mapFilterText, timeFilterText;
             var self = this;
 
@@ -52,7 +52,7 @@ require([
                 if (expand) {
                     this.viewModel.mapFilter.expanded(true);
                 }
-                
+
                 _.each(data.geometries, function (geometryData) {
                     var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
                     geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
@@ -73,21 +73,21 @@ require([
                 queryString: function(){
                     var params = {
                         page: self.viewModel.searchResults.page(),
-                        termFilter: ko.toJSON(self.viewModel.termFilter.query.filter.terms()),
+                        termFilter: ko.toJSON(self.viewModel.termFilter.filter.terms()),
                         // temporalFilter: ko.toJSON({
-                        //     year_min_max: self.viewModel.timeFilter.query.filter.year_min_max(),
-                        //     filters: self.viewModel.timeFilter.query.filter.filters(),
-                        //     inverted: self.viewModel.timeFilter.query.filter.inverted()
+                        //     year_min_max: self.viewModel.timeFilter.filter.year_min_max(),
+                        //     filters: self.viewModel.timeFilter.filter.filters(),
+                        //     inverted: self.viewModel.timeFilter.filter.inverted()
                         // }),
-                        // spatialFilter: ko.toJSON(self.viewModel.mapFilter.query.filter),
+                        // spatialFilter: ko.toJSON(self.viewModel.mapFilter.filter),
                         // mapExpanded: self.viewModel.mapFilter.expanded(),
                         // timeExpanded: self.viewModel.timeFilter.expanded()
                     };
                     if (
-                        self.viewModel.termFilter.query.filter.terms().length === 0// &&
-                        // self.viewModel.timeFilter.query.filter.year_min_max().length === 0 &&
-                        // self.viewModel.timeFilter.query.filter.filters().length === 0 &&
-                        // self.viewModel.mapFilter.query.filter.geometry.coordinates().length === 0
+                        self.viewModel.termFilter.filter.terms().length === 0// &&
+                        // self.viewModel.timeFilter.filter.year_min_max().length === 0 &&
+                        // self.viewModel.timeFilter.filter.filters().length === 0 &&
+                        // self.viewModel.mapFilter.filter.geometry.coordinates().length === 0
                         ) {
                         params.no_filters = true;
                     }
@@ -96,9 +96,9 @@ require([
                     return $.param(params).split('+').join('%20');
                 },
                 changed: ko.pureComputed(function(){
-                    var ret = ko.toJSON(this.viewModel.termFilter.query.changed()) +
-                        ko.toJSON(this.viewModel.timeFilter.query.changed()) +
-                        ko.toJSON(this.viewModel.mapFilter.query.changed());
+                    var ret = ko.toJSON(this.viewModel.termFilter.changed()) +
+                        ko.toJSON(this.viewModel.timeFilter.changed()) +
+                        ko.toJSON(this.viewModel.mapFilter.changed());
                     return ret;
                 }, this).extend({ rateLimit: 200 })
             };
@@ -114,7 +114,7 @@ require([
                 self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
-            
+
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
@@ -227,13 +227,13 @@ require([
             //     doQuery = true;
             // }
             // this.viewModel.mapFilter.restoreState(query.spatialFilter, query.mapExpanded);
-            
+
 
             if(doQuery){
                 this.doQuery();
                 this.hideSavedSearches();
             }
-            
+
         },
 
         clear: function(){
