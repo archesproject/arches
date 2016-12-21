@@ -138,7 +138,6 @@ class Tile(models.TileModel):
         """
 
         document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
-        document['primaryname'] = Resource.objects.get(pk=self.resourceinstance_id).primary_name
         tile = Tile()
         tile.tileid = self.tileid
         tile.resourceinstance = self.resourceinstance

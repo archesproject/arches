@@ -14,10 +14,10 @@
     <!-- Begin Search Results -->
     <div>
         
-        <div id="search-results-list" data-bind="foreach: searchResults.results, visible: true" style="display: none;">
+        <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
 
             <div class="search-listing">
-                <h3 class="search-listing-title"><a class="search-candidate-title" href=""><i class="search-listing-icon" data-bind="css: iconclass"></i> <span data-bind="text: primaryname"></span></a></h3>
+                <h3 class="search-listing-title"><a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></a></h3>
 
                 <div class="search-listing-body" data-bind="text: primarydescription">
                     A very long description of a very interesting resource, just to see how its rendered in the default search listing widget.  Not sure if it will fit, but you never know
@@ -25,12 +25,32 @@
 
                 <div class="search-listing-footer">
                     {% if 'edit' in user.user_groups %}<a class="search-candidate-link" href=""><i class="ion-ios-refresh-empty"></i> Edit</a>{% endif %}
+                    <a class="search-candidate-link" href="" data-bind="visible: geometries().length > 0, attr: { 'data-resourceinstanceid': resourceinstanceid, 'data-geometries': JSON.stringify(geometries()) }"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
                     <a class="search-candidate-link pull-right" href=""><i class="fa fa-code-fork"></i> Related Resources</a>
-                    <span class="mar-lft search-candidate-link" data-bind="visible: geometries().length > 0" >
-                        <i class="arches-search-link fa fa-map-marker"></i>
-                        <a class="search-candidate-link" href="javascript:void(0);" data-bind="attr: { 'data-resourceid': resourceid, 'data-geometries': JSON.stringify(geometries()) }" class="info-link navigate-map"><span class="arches-search-link">{% trans "Map" %}</span></a>
-                    </span>
+                    
                 </div>
+            </div>
+
+        </div>
+
+        <div class="margin-bottom-30"></div>
+
+        <!-- Pagination -->
+        <!-- ko if: showPaginator -->
+        <div id="paginator" data-bind="with: paginator">
+            <div class="text-center">
+                <ul class="pagination">
+                    <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#">«</a></li>
+                    <!-- ko foreach: { data: pages, as: 'page' } -->
+                        <!-- ko if: page -->
+                            <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.number())}"><a href="#" data-bind="text: page, attr:{'data-page':page}"></a></li>
+                        <!-- /ko -->
+                        <!-- ko ifnot: page -->
+                            <li class="disabled"><a href="#">...</a></li>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                    <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#">»</a></li>
+                </ul>
             </div>
         </div>
     </div> 

@@ -12,11 +12,13 @@ class PrimaryNameFunction(BaseFunction):
             for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
                 if str(node.nodeid) in tile.data:
                     value = tile.data[str(node.nodeid)]
-                    concept_values = []
-                    if node.datatype == 'concept':
-                        concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
-                    if len(concept_values) == 1:
-                        value = concept_values[0].value
-                    config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
+                    if value:
+                        concept_values = []
+                        if node.datatype == 'concept':
+                            print tile.data[str(node.nodeid)]
+                            concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
+                        if len(concept_values) == 1:
+                            value = concept_values[0].value
+                        config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
 
         return config['string_template']

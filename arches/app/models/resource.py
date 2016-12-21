@@ -35,7 +35,7 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     @property
-    def primary_name(self):
+    def primaryname(self):
         module = importlib.import_module('arches.app.functions.resource_functions')
         PrimaryNameFunction = getattr(module, 'PrimaryNameFunction')()
         #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
