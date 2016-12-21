@@ -30,58 +30,58 @@ from arches.app.utils.data_management.resources.importer import validate_busines
 
 class ArchesFileImporter(object):
 
-	def __init__(self, file=None):
-		self.graphs = ''
-		self.reference_data = ''
-		self.business_data = ''
+    def __init__(self, file=None):
+        self.graphs = ''
+        self.reference_data = ''
+        self.business_data = ''
 
-		if not file:
-			file = settings.RESOURCE_GRAPH_LOCATIONS
-		else:
-			file = [file]
+        if not file:
+            file = settings.RESOURCE_GRAPH_LOCATIONS
+        else:
+            file = [file]
 
-		for path in file:
-			if os.path.exists(path):
-				if isfile(join(path)):
-					with open(file[0], 'rU') as f:
-						archesfile = JSONDeserializer().deserialize(f)
-						if 'graph' in archesfile.keys():
-							self.graphs = archesfile['graph']
-						if 'reference_data' in archesfile.keys():
-							self.reference_data = archesfile['reference_data']
-						if 'business_data' in archesfile.keys():
-							self.business_data = archesfile['business_data']
-				else:
-					print str(file) + ' is not a valid file'
-			else:
-				print path + ' is not a valid path'
+        for path in file:
+            if os.path.exists(path):
+                if isfile(join(path)):
+                    with open(file[0], 'rU') as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        if 'graph' in archesfile.keys():
+                            self.graphs = archesfile['graph']
+                        if 'reference_data' in archesfile.keys():
+                            self.reference_data = archesfile['reference_data']
+                        if 'business_data' in archesfile.keys():
+                            self.business_data = archesfile['business_data']
+                else:
+                    print str(file) + ' is not a valid file'
+            else:
+                print path + ' is not a valid path'
 
-	def import_graphs(self):
-		"""
-		Wrapper around arches.app.utils.data_management.resource_graphs.importer method.
-		"""
-		resourceGraphImporter(self.graphs)
+    def import_graphs(self):
+        """
+        Wrapper around arches.app.utils.data_management.resource_graphs.importer method.
+        """
+        resourceGraphImporter(self.graphs)
 
-	def import_reference_data(self):
-		"""
-		Wrapper around arches.app.utils.data_management.concepts.importer method.
-		"""
-		conceptImporter(self.reference_data)
+    def import_reference_data(self):
+        """
+        Wrapper around arches.app.utils.data_management.concepts.importer method.
+        """
+        conceptImporter(self.reference_data)
 
-	def import_business_data(self):
-		"""
-		Wrapper around arches.app.utils.data_management.resources.importer method.
-		"""
-		businessDataImporter(self.business_data)
+    def import_business_data(self):
+        """
+        Wrapper around arches.app.utils.data_management.resources.importer method.
+        """
+        businessDataImporter(self.business_data)
 
-	def import_all(self):
-		errors = []
-		conceptImporter(self.reference_data)
-		resourceGraphImporter(self.graphs)
-		errors = businessDataValidator(self.business_data)
-		if len(errors) == 0:
-			if self.business_data not in ('',[]):
-				businessDataImporter(self.business_data)
-		else:
-			for error in errors:
-				print "{0} {1}".format(error[0], error[1])
+    def import_all(self):
+        errors = []
+        conceptImporter(self.reference_data)
+        resourceGraphImporter(self.graphs)
+        errors = businessDataValidator(self.business_data)
+        if len(errors) == 0:
+            if self.business_data not in ('',[]):
+                businessDataImporter(self.business_data)
+        else:
+            for error in errors:
+                print "{0} {1}".format(error[0], error[1])
