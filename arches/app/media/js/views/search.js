@@ -12,9 +12,7 @@ require([
         initialize: function(options) {
             var self = this;
 
-            this.viewModel.termFilter = new TermFilter({
-                el: $.find('input.resource_search_widget')[0]
-            });
+            this.viewModel.termFilter = new TermFilter();
             this.viewModel.timeFilter = new BaseFilter();
             this.viewModel.mapFilter = new BaseFilter();
 
