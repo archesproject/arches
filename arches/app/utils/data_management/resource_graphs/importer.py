@@ -23,41 +23,41 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.db import transaction
 
 def import_graph(graphs):
-	with transaction.atomic():
-		errors = []
-		for resource in graphs:
-			graph = Graph(resource)
+    with transaction.atomic():
+        errors = []
+        for resource in graphs:
+            graph = Graph(resource)
 
-			if not hasattr(graph, 'cards'):
-				errors.append('{0} graph has no attribute cards'.format(graph.name))
-			else:
-				if graph.cards == [] or graph.cards == {}:
-					errors.append('{0} graph has no cards'.format(graph.name))
-				else:
-					graph.save()
+            if not hasattr(graph, 'cards'):
+                errors.append('{0} graph has no attribute cards'.format(graph.name))
+            else:
+                if graph.cards == [] or graph.cards == {}:
+                    errors.append('{0} graph has no cards'.format(graph.name))
+                else:
+                    graph.save()
 
-			if not hasattr(graph, 'cards_x_nodes_x_widgets'):
-				errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
-			else:
-				for	card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
-					cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
+            if not hasattr(graph, 'cards_x_nodes_x_widgets'):
+                errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
+            else:
+                for	   card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+                    cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
 
-			if not hasattr(graph, 'forms'):
-				errors.append('{0} graph has no attribute forms'.format)
-			else:
-				for form in graph.forms:
-					form = Form.objects.update_or_create(**form)
+            if not hasattr(graph, 'forms'):
+                errors.append('{0} graph has no attribute forms'.format)
+            else:
+                for form in graph.forms:
+                    form = Form.objects.update_or_create(**form)
 
-			if not hasattr(graph, 'forms_x_cards'):
-				errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
-			else:
-				for form_x_card in graph.forms_x_cards:
-					formxcard = FormXCard.objects.update_or_create(**form_x_card)
+            if not hasattr(graph, 'forms_x_cards'):
+                errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
+            else:
+                for form_x_card in graph.forms_x_cards:
+                    formxcard = FormXCard.objects.update_or_create(**form_x_card)
 
-			if not hasattr(graph, 'reports'):
-				errors.append('{0} graph has no attribute reports'.format(graph.name))
-			else:
-				for report in graph.reports:
-					report = Report.objects.update_or_create(**report)
+            if not hasattr(graph, 'reports'):
+                errors.append('{0} graph has no attribute reports'.format(graph.name))
+            else:
+                for report in graph.reports:
+                    report = Report.objects.update_or_create(**report)
 
-		return errors
+        return errors

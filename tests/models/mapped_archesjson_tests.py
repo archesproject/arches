@@ -66,6 +66,13 @@ class mappedArchesJSONImportTests(ArchesTestCase):
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 1)
 
+	def test_single_n_n(self):
+		og_tile_count = TileModel.objects.count()
+		ArchesFileImporter('tests/fixtures/data/archesjson_cardinality_tests/source.json','tests/fixtures/data/archesjson_cardinality_tests/single-n_n.mapping').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 3)
+
 	def test_1_1_1_1(self):
 		og_tile_count = TileModel.objects.count()
 		ArchesFileImporter('tests/fixtures/data/archesjson_cardinality_tests/source.json','tests/fixtures/data/archesjson_cardinality_tests/1_1_1_1.mapping').import_all()
