@@ -22,7 +22,29 @@ from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.db import transaction
 
+class GraphImportReporter:
+    def __init__(self, graphs):
+        self.graphs = len(graphs)
+        self.graphs_saved = 0
+        self.reports_saved = 0
+        self.forms_saved = 0
+
+    def update_graphs_saved(self, count=1):
+        self.graphs_saved += count
+
+    def update_forms_saved(self, count=1):
+        self.forms_saved += count
+
+    def update_reports_saved(self, count=1):
+        self.reports_saved += count
+
+    def report_results(self):
+        result = "Graphs saved: {0}"
+        print result.format(self.graphs_saved)
+
 def import_graph(graphs):
+    reporter = GraphImportReporter(graphs)
+
     with transaction.atomic():
         errors = []
         for resource in graphs:
@@ -39,7 +61,7 @@ def import_graph(graphs):
             if not hasattr(graph, 'cards_x_nodes_x_widgets'):
                 errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
             else:
-                for	   card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+                for card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
                     cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
 
             if not hasattr(graph, 'forms'):
@@ -61,3 +83,4 @@ def import_graph(graphs):
                     report = Report.objects.update_or_create(**report)
 
         return errors
+        # reporter.report_results()

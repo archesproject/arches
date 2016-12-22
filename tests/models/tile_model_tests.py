@@ -122,50 +122,50 @@ class TileTests(ArchesTestCase):
         self.assertEqual(subTiles[0].data["20000000-0000-0000-0000-000000000004"], "TEST 1")
 
 
-    # def test_save(self):
-    #     """
-    #     Test that we can save a Tile object back to the database
-    #
-    #     """
-    #
-    #     json = {
-    #         "tiles": {
-    #             "19999999-0000-0000-0000-000000000000": [{
-    #                 "tiles": {},
-    #                 "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-    #                 "parenttile_id": '',
-    #                 "nodegroup_id": "19999999-0000-0000-0000-000000000000",
-    #                 "tileid": "",
-    #                 "data": {
-    #                   "20000000-0000-0000-0000-000000000004": "TEST 1",
-    #                   "20000000-0000-0000-0000-000000000002": "TEST 2",
-    #                   "20000000-0000-0000-0000-000000000003": "TEST 3"
-    #                 }
-    #             }],
-    #             "32999999-0000-0000-0000-000000000000": [{
-    #                 "tiles": {},
-    #                 "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-    #                 "parenttile_id": '',
-    #                 "nodegroup_id": "32999999-0000-0000-0000-000000000000",
-    #                 "tileid": "",
-    #                 "data": {
-    #                   "20000000-0000-0000-0000-000000000004": "TEST 4",
-    #                   "20000000-0000-0000-0000-000000000002": "TEST 5",
-    #                 }
-    #             }]
-    #         },
-    #         "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-    #         "parenttile_id": '',
-    #         "nodegroup_id": "20000000-0000-0000-0000-000000000001",
-    #         "tileid": "",
-    #         "data": {}
-    #     }
-    #
-    #     t = Tile(json)
-    #     t.save(index=False)
-    #
-    #     tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
-    #     self.assertEqual(tiles.count(), 3)
+    def test_save(self):
+        """
+        Test that we can save a Tile object back to the database
+
+        """
+
+        json = {
+            "tiles": {
+                "19999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "19999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 1",
+                      "20000000-0000-0000-0000-000000000002": "TEST 2",
+                      "20000000-0000-0000-0000-000000000003": "TEST 3"
+                    }
+                }],
+                "32999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "32999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 4",
+                      "20000000-0000-0000-0000-000000000002": "TEST 5",
+                    }
+                }]
+            },
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+            "tileid": "",
+            "data": {}
+        }
+
+        t = Tile(json)
+        t.save(index=False)
+
+        tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
+        self.assertEqual(tiles.count(), 3)
 
     def test_simple_get(self):
         """

@@ -97,11 +97,12 @@ class Tile(models.TileModel):
         if index:
             try:
                 self.index()
-            except AttributeError as e:
-                print e
-                for tiles in self.tiles.itervalues():
-                    for tile in tiles:
-                        tile.save(*args, request=request, index=index, **kwargs)
+            except:
+                pass
+        for tiles in self.tiles.itervalues():
+            for tile in tiles:
+                tile.save(*args, request=request, index=index, **kwargs)
+
 
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -110,17 +111,6 @@ class Tile(models.TileModel):
                 tile.delete(*args, request=request, **kwargs)
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
-
-    def copy(self):
-        tile = Tile()
-        tile.tileid = self.tileid
-        tile.resourceinstance_id = self.resourceinstance_id
-        tile.parenttile = self.parenttile
-        tile.data = self.data
-        tile.nodegroup = self.nodegroup
-        tile.sortorder = self.sortorder
-
-        return tile
 
     def index(self):
         """

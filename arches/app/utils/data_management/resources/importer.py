@@ -60,9 +60,51 @@ def validate_business_data(business_data):
                     errors.append(e.args)
     return errors
 
+class ResourceImportReporter:
+    def __init__(self, business_data):
+        self.resources = 0
+        self.total_tiles = 0
+        self.resources_saved = 0
+        self.tiles_saved = 0
+        self.relations_saved = 0
+        self.relations = 0
+
+        if 'resources' in business_data:
+            self.resources = len(business_data['resources'])
+
+        if 'relations' in business_data:
+            self.relations = len(business_data['relations'])
+
+    def update_resources_saved(self, count=1):
+        self.resources_saved += count
+        print '{0} of {1} resources saved'.format(self.resources_saved, self.resources)
+
+    def update_tiles(self, count=1):
+        self.total_tiles += count
+
+    def update_tiles_saved(self, count=1):
+        self.tiles_saved += count
+
+    def update_relations_saved(self, count=1):
+        self.relations_saved += count
+        print self.tiles_saved
+
+    def report_results(self):
+        if self.resources > 0:
+            result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
+            print result.format(
+                    self.resources,
+                    self.resources_saved,
+                    self.total_tiles,
+                    self.tiles_saved,
+                    self.relations,
+                    self.relations_saved
+                    )
+
 def import_business_data(business_data, mapping=None):
-    if mapping == None or mapping == '':
-        if type(business_data) == dict and business_data['resources']:
+    reporter = ResourceImportReporter(business_data)
+    try:
+        if mapping == None or mapping == '':
             for resource in business_data['resources']:
                 if resource['resourceinstance'] != None:
 
@@ -71,8 +113,11 @@ def import_business_data(business_data, mapping=None):
                         graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
                         resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                     )
+                    if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                        reporter.update_resources_saved()
 
                 if resource['tiles'] != []:
+                    reporter.update_tiles(len(resource['tiles']))
                     for tile in resource['tiles']:
                         tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
 
@@ -83,26 +128,23 @@ def import_business_data(business_data, mapping=None):
                             tileid = uuid.UUID(str(tile['tileid'])),
                             data = tile['data']
                         )
+                        if len(Tile.objects.filter(tileid=tile['tileid'])) == 1:
+                            reporter.update_tiles_saved()
 
-        if type(business_data) == dict and business_data['relations']:
             for relation in business_data['relations']:
-                relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
-                relation['resourceinstanceidfrom'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom'])))
-                relation['resourceinstanceidto'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto'])))
-                relation['relationshiptype'] = uuid.UUID(str(relation['relationshiptype']))
-
                 relation = ResourceXResource.objects.update_or_create(
-                    resourcexid = relation['resourcexid'],
-                    resourceinstanceidfrom = relation['resourceinstanceidfrom'],
-                    resourceinstanceidto = relation['resourceinstanceidto'],
+                    resourcexid = uuid.UUID(str(relation['resourcexid'])),
+                    resourceinstanceidfrom = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom']))),
+                    resourceinstanceidto = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto']))),
                     notes = relation['notes'],
-                    relationshiptype = relation['relationshiptype'],
+                    relationshiptype = uuid.UUID(str(relation['relationshiptype'])),
                     datestarted = relation['datestarted'],
                     dateended = relation['dateended']
                 )
-                relation.update_or_create()
-    else:
-        if type(business_data) == dict and business_data['resources']:
+                if len(ResourceXResource.objects.filter(resourcexid=relation['resourcexid'])) == 1:
+                    reporter.update_relations_saved()
+        else:
+
             blanktilecache = {}
             target_nodegroup_cardinalities = {}
             for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
@@ -132,6 +174,7 @@ def import_business_data(business_data, mapping=None):
                 #     print blank_tile
 
             for resource in business_data['resources']:
+                reporter.update_tiles(len(resource['tiles']))
                 parenttileids = []
                 populated_tiles = []
                 resourceinstanceid = uuid.uuid4()
@@ -183,32 +226,6 @@ def import_business_data(business_data, mapping=None):
                         if tiles is not None:
                             mapped_tiles = replace_source_nodeid(tiles, mapping)
                             blank_tile = get_blank_tile(tiles)
-
-                            # def populate_tile_og(sourcetilegroup, target_tile):
-                            #     need_new_tile = False
-                            #     for source_tile in sourcetilegroup:
-                            #         for nodeid in source_tile['data'].keys():
-                            #             # check data array in first tile
-                            #             if target_tile.data != None:
-                            #                 if nodeid in target_tile.data.keys():
-                            #                     target_tile.data[nodeid] = source_tile['data'][nodeid]
-                            #                     del source_tile['data'][nodeid]
-                            #             elif target_tile.tiles != None:
-                            #                 # check if child tiles then check their data arrays
-                            #                 for targetchildtiles in target_tile.tiles.values():
-                            #                     for targetchildtile in targetchildtiles:
-                            #                         if isinstance(targetchildtile, Tile):
-                            #                             if nodeid in targetchildtile.data.keys():
-                            #                                 targetchildtile.data[nodeid] = source_tile['data'][nodeid]
-                            #                                 del source_tile['data'][nodeid]
-                            #     populated_tiles.append(target_tile)
-                            #
-                            #     for source_tile in sourcetilegroup:
-                            #         if len(source_tile['data'].keys()) > 0:
-                            #             need_new_tile = True
-                            #
-                            #     if need_new_tile:
-                            #         populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
 
                             def populate_tile(sourcetilegroup, target_tile):
                                 need_new_tile = False
@@ -295,11 +312,21 @@ def import_business_data(business_data, mapping=None):
                     graph_id = target_resource_model,
                     resourceinstancesecurity = None
                 )
+                if len(ResourceInstance.objects.filter(resourceinstanceid=resourceinstanceid)) == 1:
+                    reporter.update_resources_saved()
+
                 # print JSONSerializer().serialize(populated_tiles)
                 for populated_tile in populated_tiles:
                     populated_tile.resourceinstance = newresourceinstance
-                    populated_tile.save()
+                    saved_tile = populated_tile.save()
+                    # print saved_tile
+                    # tile_saved = count parent tile and count of tile array if tile array != {}
+                    # reporter.update_tiles_saved(tile_saved)
 
+    except (KeyError, TypeError) as e:
+        print e
+
+    reporter.report_results()
 
 class ResourceLoader(object):
 
