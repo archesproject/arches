@@ -71,6 +71,21 @@ define([
         initialize: function(options) {
             ko.applyBindings(this.viewModel);
             $('[data-toggle="tooltip"]').tooltip();
+            
+            $('.ep-help-topic-toggle').click(function (){
+                var sectionEl = $(this).closest('div');
+                contentEl = $(sectionEl).find('.ep-help-topic-content');
+                contentEl.slideToggle();
+            });
+            
+            $('.ep-help-toggle').click(function (){
+                $('#ep-help-panel').toggle('slide', { direction: 'right' });
+            });
+            
+            $('.reloadable-img').click(function(){
+                $(this).attr('src', $(this).attr('src'));
+            });
+            
         }
     });
     return PageView;
