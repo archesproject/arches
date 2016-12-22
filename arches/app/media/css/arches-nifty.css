@@ -4836,7 +4836,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-search-container {
     top: 0px;
-    height: 1500px;
+    height: 700px;
     background: #fbfbfb;
 }
 
@@ -5306,7 +5306,7 @@ a.map-widget-icon:hover {
 }
 
 .search-listing {
-    width: 360px;
+    width: 370px;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
@@ -5341,6 +5341,12 @@ a.map-widget-icon:hover {
     background: #fafafa;
     border-top: 1px solid #ddd;
 }
+
+.search-results-pagination {
+    position: fixed;
+    bottom: 0px;
+}
+
 .pagination>li>a.disabled{
     cursor: default;
     color: rgb(160, 160, 160);
