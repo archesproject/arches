@@ -39,7 +39,7 @@ class ResourceListView(BaseManagerView):
         for resource_instance in Resource.objects.all():
             instance_summaries.append({
                 'id': resource_instance.pk,
-                'name': resource_instance.primary_name,
+                'name': resource_instance.primaryname,
                 'type': resource_instance.graph.name,
                 'last_edited': '',
                 'qc': '',
@@ -69,12 +69,15 @@ class ResourceEditorView(BaseManagerView):
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayers.objects.all()
             map_sources = models.MapSources.objects.all()
+            forms = resource_instance.graph.form_set.filter(visible=True)
+            forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
+            forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
-                forms=JSONSerializer().serialize(resource_instance.graph.form_set.filter(visible=True)),
+                forms=JSONSerializer().serialize(forms_w_cards),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
                 map_layers=map_layers,

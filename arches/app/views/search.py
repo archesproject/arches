@@ -79,17 +79,55 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    results = dsl.search(index='entity', doc_type='')
+    results = dsl.search(index='resource', doc_type='')
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
     if request.GET.get('include_ids', 'false') == 'false':
         all_entity_ids = ['_none']
     elif request.GET.get('no_filters', '') == '':
-        full_results = dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
+        full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
         all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-    return get_paginator(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
+    paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
+    page = paginator.page(page)
+    
+    ret = {}
+    ret['results'] = results
+    ret['paginator'] = JSONSerializer().serializeToPython(page)
+    ret['paginator']['has_next'] = page.has_next()
+    ret['paginator']['has_previous'] = page.has_previous()
+    ret['paginator']['has_other_pages'] = page.has_other_pages()
+    ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
+    ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
+    ret['paginator']['start_index'] = page.start_index()
+    ret['paginator']['end_index'] = page.end_index()
+    ret['paginator']['pages'] = pages
+    return JSONResponse(ret)
+
+def get_paginator(request, results, total_count, page, count_per_page, all_ids):
+    paginator = Paginator(range(total_count), count_per_page)
+    pages = [page]
+    if paginator.num_pages > 1:
+        # before = paginator.page_range[0:page-1]
+        # after = paginator.page_range[page:paginator.num_pages]
+        # default_ct = 3
+        # ct_before = default_ct if len(after) > default_ct else default_ct*2-len(after)
+        # ct_after = default_ct if len(before) > default_ct else default_ct*2-len(before)
+        # if len(before) > ct_before:
+        #     before = [1,None]+before[-1*(ct_before-1):]
+        # if len(after) > ct_after:
+        #     after = after[0:ct_after-1]+[None,paginator.num_pages]
+        pages = [page for page in paginator.page_range]
+
+    return paginator, pages
+
+    return render(request, 'pagination.htm', {
+        'pages': pages,
+        'page_obj': paginator.page(page),
+        'results': JSONSerializer().serialize(results),
+        'all_ids': JSONSerializer().serialize(all_ids)
+    })
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
@@ -112,32 +150,29 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
-                boolfilter_nested = Bool()
-                boolfilter_nested.must(Terms(field='child_entities.entitytypeid', terms=[entitytype.pk]))
-                boolfilter_nested.must(Match(field='child_entities.value', query=term['value'], type='phrase'))
-                nested = Nested(path='child_entities', query=boolfilter_nested)
+                #entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
+                bool_dsl = Bool()
+                #bool_dsl.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
+                bool_dsl.must(Match(field='strings', query=term['value'], type='phrase'))
                 if term['inverted']:
-                    boolfilter.must_not(nested)
+                    boolfilter.must_not(bool_dsl)
                 else:
-                    boolfilter.must(nested)
+                    boolfilter.must(bool_dsl)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 terms = Terms(field='domains.conceptid', terms=concept_ids)
-                nested = Nested(path='domains', query=terms)
                 if term['inverted']:
-                    boolfilter.must_not(nested)
+                    boolfilter.must_not(terms)
                 else:
-                    boolfilter.must(nested)
+                    boolfilter.must(terms)
             elif term['type'] == 'string':
-                boolfilter_folded = Bool()
-                boolfilter_folded.should(Match(field='child_entities.value', query=term['value'], type='phrase_prefix'))
-                boolfilter_folded.should(Match(field='child_entities.value.folded', query=term['value'], type='phrase_prefix'))
-                nested = Nested(path='child_entities', query=boolfilter_folded)
+                boolfilter = Bool()
+                boolfilter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
+                boolfilter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
                 if term['inverted']:
-                    boolquery.must_not(nested)
+                    boolquery.must_not(boolfilter)
                 else:
-                    boolquery.must(nested)
+                    boolquery.must(boolfilter)
 
     if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
         geojson = spatial_filter['geometry']
@@ -220,28 +255,6 @@ def _get_child_concepts(conceptid):
         ret.add(row[0])
         ret.add(row[1])
     return list(ret)
-
-def get_paginator(results, total_count, page, count_per_page, all_ids):
-    paginator = Paginator(range(total_count), count_per_page)
-    pages = [page]
-    if paginator.num_pages > 1:
-        before = paginator.page_range[0:page-1]
-        after = paginator.page_range[page:paginator.num_pages]
-        default_ct = 3
-        ct_before = default_ct if len(after) > default_ct else default_ct*2-len(after)
-        ct_after = default_ct if len(before) > default_ct else default_ct*2-len(before)
-        if len(before) > ct_before:
-            before = [1,None]+before[-1*(ct_before-1):]
-        if len(after) > ct_after:
-            after = after[0:ct_after-1]+[None,paginator.num_pages]
-        pages = before+pages+after
-
-    return render(request, 'pagination.htm', {
-        'pages': pages,
-        'page_obj': paginator.page(page),
-        'results': JSONSerializer().serialize(results),
-        'all_ids': JSONSerializer().serialize(all_ids)
-    })
 
 def geocode(request):
     geocoding_provider_id = request.GET.get('geocoder', '')

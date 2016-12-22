@@ -2136,7 +2136,7 @@ INSERT INTO functions(functionid, modulename, classname, functiontype, name, des
     VALUES ('60000000-0000-0000-0000-000000000001', 'resource_functions.py', 'PrimaryNameFunction', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"nodegroup_id": "", "string_template": ""}', 'views/components/functions/primary-name');
 
 INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
-    VALUES ('60000000-0000-0000-0000-000000000002', 'required-nodes.py', 'RequiredNodesFunction', 'validation', 'Required Nodes Function', 'A function that requires that specified nodes are populated', '{"nodegroup_id": "", "required_nodes":[]}', 'views/components/functions/required-nodes');
+    VALUES ('60000000-0000-0000-0000-000000000002', 'required-nodes.py', 'RequiredNodesFunction', 'validation', 'Required Nodes Function', 'A function that requires that specified nodes are populated', '{"required_nodes":"{}"}', 'views/components/functions/required-nodes');
 
 
 

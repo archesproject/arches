@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
 def prepare_term_index(create=False):
@@ -61,6 +62,10 @@ def prepare_term_index(create=False):
 
     return index_settings
 
+def delete_term_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='term')
+
 def prepare_search_index(resource_model_id, create=False):
     """
     Creates the settings and mappings in Elasticsearch to support resource search
@@ -81,10 +86,13 @@ def prepare_search_index(resource_model_id, create=False):
         'mappings': {
             resource_model_id : {
                 'properties' : {
+                    'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
                     'tiles' : { 
                         'type' : 'nested',
                         'properties' : {
+                            "tiles": {'enabled': False},
                             'tileid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'nodegroup_id' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'parenttile_id' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -113,7 +121,26 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'geometries' : {
-                        "type": "geo_shape"
+                        "properties": {
+                            "features": {
+                                "properties": {
+                                    "geometry": {
+                                        "properties": {
+                                            "coordinates": {
+                                                "type": "double"
+                                            },
+                                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
+                                        }
+                                    },
+                                    "id": { 'type' : 'string', 'index' : 'not_analyzed'},
+                                    "type": { 'type' : 'string', 'index' : 'not_analyzed'},
+                                    "properties": {
+                                         "enabled": False
+                                    }
+                                }
+                            },
+                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
+                        }
                     },
                     'dates' : { 
                         "type" : "date"
@@ -206,15 +233,16 @@ def prepare_search_index(resource_model_id, create=False):
 
     if create:
         se = SearchEngineFactory().create()
+        #print JSONSerializer().serialize(index_settings)
         try:
-            se.create_index(index='resource2', body=index_settings)
+            se.create_index(index='resource', body=index_settings)
         except:
             index_settings = index_settings['mappings']
-            se.create_mapping(index='resource2', doc_type=resource_model_id, body=index_settings)
+            se.create_mapping(index='resource', doc_type=resource_model_id, body=index_settings)
 
     return index_settings
 
 
-def delete_search_index(resource_model_id):
-    pass
-
+def delete_search_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='resource')

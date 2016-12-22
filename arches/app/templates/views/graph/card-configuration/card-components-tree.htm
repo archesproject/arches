@@ -49,11 +49,11 @@
             'active': self.selection() === widget
         },
         click: self.selection">
-            <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
+            <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
                 <i data-bind="css: widget.icon + ' card-tree-list-icon'"></i>
             </span>
-            <span class="node-name" data-bind="text: widget.get('label')"></span>
-            <span class="node-subname">Widget</span>
+            <span class="node-name" data-bind="text: widget.node.name"></span>
+            <span class="node-subname">{% trans "Widget" %}</span>
         </a>
     </li>
 </template>

@@ -44,7 +44,7 @@ def get_function_class_instances(tile, graph_id):
     for function in functions:
         mod_path = function.function.modulename.replace('.py', '')
         module = importlib.import_module('arches.app.functions.%s' % mod_path)
-        func = getattr(module, function.function.classname)(function.config)
+        func = getattr(module, function.function.classname)(function.config, tile['nodegroup_id'])
         ret.append(func)
     return ret
 
@@ -65,27 +65,22 @@ def import_business_data(business_data, mapping=None):
         if type(business_data) == dict and business_data['resources']:
             for resource in business_data['resources']:
                 if resource['resourceinstance'] != None:
-                    resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
-                    resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
 
                     resourceinstance = ResourceInstance.objects.update_or_create(
-                        resourceinstanceid = resource['resourceinstance']['resourceinstanceid'],
-                        graph_id = resource['resourceinstance']['graphid'],
+                        resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
+                        graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
                         resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
                     )
 
                 if resource['tiles'] != []:
                     for tile in resource['tiles']:
                         tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
-                        tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
-                        tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
-                        tile['tileid'] = uuid.UUID(str(tile['tileid']))
 
                         tile = Tile.objects.update_or_create(
-                            resourceinstance = tile['resourceinstance_id'],
+                            resourceinstance = resourceinstance.resourceinstance_id,
                             parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                            nodegroup = tile['nodegroup_id'],
-                            tileid = tile['tileid'],
+                            nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                            tileid = uuid.UUID(str(tile['tileid'])),
                             data = tile['data']
                         )
 

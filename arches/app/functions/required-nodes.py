@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
+import json
 
 class RequiredNodesFunction(BaseFunction):
 
@@ -16,7 +17,9 @@ class RequiredNodesFunction(BaseFunction):
 
     def check_for_required_nodes(self, tile, config, message, return_id=False):
         missing_nodes = []
-        for required_node in config['required_nodes']:
+        required_node_groups = json.loads(config['required_nodes'])
+        required_nodes = required_node_groups[self.nodegroup_id]
+        for required_node in required_nodes:
             try:
                 tile_data = tile.data
             except AttributeError as e:

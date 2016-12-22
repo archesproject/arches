@@ -91,12 +91,17 @@ class Tile(models.TileModel):
 
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
+        index = kwargs.pop('index', True)
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
-        # self.index()
-        for tiles in self.tiles.itervalues():
-            for tile in tiles:
-                tile.save(*args, request=request, **kwargs)
+        if index:
+            try:
+                self.index()
+            except AttributeError as e:
+                print e
+                for tiles in self.tiles.itervalues():
+                    for tile in tiles:
+                        tile.save(*args, request=request, index=index, **kwargs)
 
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -127,7 +132,7 @@ class Tile(models.TileModel):
 
         search_documents = self.prepare_documents_for_search_index()
         for document in search_documents:
-            se.index_data('resource2', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
+            se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
 
         #     report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
         #     for report_document in report_documents:
@@ -139,7 +144,7 @@ class Tile(models.TileModel):
 
         for term in self.prepare_terms_for_search_index():
            se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
-     
+
     def prepare_documents_for_search_index(self):
         """
         Generates a list of specialized resource based documents to support resource search
@@ -147,7 +152,6 @@ class Tile(models.TileModel):
         """
 
         document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
-        document['primaryname'] = Resource.objects.get(pk=self.resourceinstance_id).primary_name
         tile = Tile()
         tile.tileid = self.tileid
         tile.resourceinstance = self.resourceinstance
@@ -161,38 +165,39 @@ class Tile(models.TileModel):
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
-        
+
         for tile in models.TileModel.objects.filter(resourceinstance=self.resourceinstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
-                if node.datatype == 'string':
-                    document['strings'].append(nodevalue)
-                elif node.datatype == 'concept' or node.datatype == 'concept-list':
-                    if node.datatype == 'concept':
-                        nodevalue = [nodevalue]
-                    for concept_valueid in nodevalue:
-                        value = models.Value.objects.get(pk=concept_valueid)
-                        document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
-                elif node.datatype == 'date':
-                    document['dates'].append(nodevalue)
-                elif node.datatype == 'geojson-feature-collection':
-                    document['geometries'].append(nodevalue)
-                elif node.datatype == 'number':
-                    document['numbers'].append(nodevalue)
+                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    if node.datatype == 'string':
+                        document['strings'].append(nodevalue)
+                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
+                        if node.datatype == 'concept':
+                            nodevalue = [nodevalue]
+                        for concept_valueid in nodevalue:
+                            value = models.Value.objects.get(pk=concept_valueid)
+                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
+                    elif node.datatype == 'date':
+                        document['dates'].append(nodevalue)
+                    elif node.datatype == 'geojson-feature-collection':
+                        document['geometries'].append(nodevalue)
+                    elif node.datatype == 'number':
+                        document['numbers'].append(nodevalue)
 
         return [JSONSerializer().serializeToPython(document)]
 
     def prepare_terms_for_search_index(self):
         """
-        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM  
-        long and any concept associated with a resource to support term search  
+        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM
+        long and any concept associated with a resource to support term search
 
         """
 
         terms = []
         for nodeid, nodevalue in self.data.iteritems():
             node = models.Node.objects.get(pk=nodeid)
-            if node.datatype == 'string':
+            if node.datatype == 'string' and nodevalue is not None:
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
@@ -255,7 +260,7 @@ class Tile(models.TileModel):
         for function in functions:
             mod_path = function.function.modulename.replace('.py', '')
             module = importlib.import_module('arches.app.functions.%s' % mod_path)
-            func = getattr(module, function.function.classname)(function.config)
+            func = getattr(module, function.function.classname)(function.config, self.nodegroup_id)
             ret.append(func)
         return ret
 
