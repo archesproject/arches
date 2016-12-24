@@ -62,13 +62,13 @@
 
         <div class="" style="margin-top: -5px;">
             <div class="btn-group">
-                <button id="search-map-btn" class="btn btn-default btn-display-toggle add-tooltip search selected" data-toggle="tooltip" data-placement="bottom" data-original-title="map filter"><i class="fa fa-map-marker"></i></button>
-                <button id="search-time-btn" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="time filter"><i class="fa fa-calendar"></i></button>
-                <button id="saved-search-btn" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="saved searches"><i class="ion-ios-heart"></i></button>
-                <button id="advanced-search-btn" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="advanced"><i class="ion-plus-round"></i></button>
-                <button id="search-rr-btn" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources"><i class="fa fa-code-fork"></i></button>
+                <a id="search-map-btn" href="#map-filter-id" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="map filter" data-bind="css: {'active': mapFilter.visible}, click: function(){switchFilterType(mapFilter)}"><i class="fa fa-map-marker"></i></a>
+                <a id="search-time-btn" href="#time-filter-id" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="time filter" data-bind="css: {'active': timeFilter.visible}, click: function(){switchFilterType(timeFilter)}"><i class="fa fa-calendar"></i></a>
+                <a id="saved-search-btn" href="#saved-search-id" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="saved searches" data-bind="css: {'active': savedSearches}, click: function(){switchFilterType(savedSearches)}"><i class="ion-ios-heart"></i></a>
+                <a id="advanced-search-btn" href="#advanced-filter-id" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="advanced" data-bind="css: {'active': advancedFilter}, click: function(){switchFilterType(advancedFilter)}"><i class="ion-plus-round"></i></a>
+                <a id="search-rr-btn" href="#related-resource-search-id" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources" data-bind="css: {'active': searchRelatedResources}, click: function(){switchFilterType(searchRelatedResources)}"><i class="fa fa-code-fork"></i></a>
             </div>
-        </div> 
+        </div>
     </div>
 
     <div class="flex">
@@ -79,14 +79,29 @@
             <div class="left-column-crud-container search-control-container" data-bind="with: searchResults">
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                <div class="row" id="search-results-container"> 
+                <div class="row" id="search-results-container">
                     {% include 'views/search/search-results.htm' %}
                 </div>
             </div>
 
             <!-- Card Container -->
             <div class="card-form-preview-container">
-                Map, etc here....
+                <div class="tab-content">
+                <div id="map-filter-id" class="tab-pane" data-bind="css: {'active': mapFilter.visible}">
+                    {% include 'views/search/map-filter.htm' %}
+                </div>
+                <div id="time-filter-id" class="tab-pane" data-bind="css: {'active': timeFilter.visible}">
+                    <div>search by time</div>
+                </div>
+                <div id="saved-search-id" class="tab-pane" data-bind="css: {'active': savedSearches}">
+                    <div>save my search</div>
+                </div>
+                <div id="advanced-filter-id" class="tab-pane" data-bind="css: {'active': advancedFilter}">
+                    <div>perform complex search</div>
+                </div>
+                <div id="related-resource-search-id" class="tab-pane" data-bind="css: {'active': searchRelatedResources}">
+                    <div>perform complex search</div>
+                </div>
             </div>
         </div>
     </div>

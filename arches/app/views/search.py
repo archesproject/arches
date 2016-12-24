@@ -43,7 +43,11 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
         context = self.get_context_data(
+            map_layers=map_layers,
+            map_sources=map_sources,
             main_script='views/search',
         )
         return render(request, 'views/search.htm', context)
@@ -91,7 +95,7 @@ def search_results(request):
 
     paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
     page = paginator.page(page)
-    
+
     ret = {}
     ret['results'] = results
     ret['paginator'] = JSONSerializer().serializeToPython(page)

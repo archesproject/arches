@@ -5,16 +5,18 @@ require([
     'viewmodels/alert',
     'views/search/base-filter',
     'views/search/term-filter',
+    'views/search/map-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, SearchResults, BaseManagerView) {
+], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
 
             this.viewModel.termFilter = new TermFilter();
             this.viewModel.timeFilter = new BaseFilter();
-            this.viewModel.mapFilter = new BaseFilter();
+            this.viewModel.mapFilter = new MapFilter();
 
             this.filters = [
                 this.viewModel.termFilter,
@@ -25,6 +27,24 @@ require([
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
+
+            this.viewModel.mapFilter.visible = ko.observable(true)
+            this.viewModel.timeFilter.visible = ko.observable(false)
+            this.viewModel.savedSearches = ko.observable(false)
+            this.viewModel.advancedFilter = ko.observable(false)
+            this.viewModel.searchRelatedResources = ko.observable(false)
+
+            this.viewModel.switchFilterType = function(e){
+                var clicked = e;
+                _.each([this.mapFilter, this.timeFilter], function(filter){
+                    if (filter === e) {
+                        filter.visible(true);
+                    } else {
+                        filter.visible(false);
+                    };
+
+                })
+            }
 
             self.isNewQuery = true;
 

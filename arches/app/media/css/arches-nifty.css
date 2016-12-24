@@ -608,8 +608,8 @@ a.select2-choice {
     line-height: 22px;
     color: #595959;
 }
-.select2-results .select2-no-results, 
-.select2-results .select2-searching, 
+.select2-results .select2-no-results,
+.select2-results .select2-searching,
 .select2-results .select2-selection-limits,
 .select2-results .select2-ajax-error{
     background: #f4f4f4;
@@ -4834,15 +4834,30 @@ div.row.widget-wrapper.report-header:hover {
     background: #fbfbfb;
 }
 
+.map-search-container {
+    top: 0px;
+    height: 700px;
+    background: #fbfbfb;
+}
+
+.map-report-header-container {
+    height: 500px;
+    background: #fbfbfb;
+}
+
 .expanded-map {
     margin-top: -50px;
     margin-left: -18px;
     margin-right: -33px;
 }
 
+.map-search-container.expanded-map {
+    margin-top: -25px;
+    margin-right: -15px;
+}
+
 .report-header .expanded-map {
     margin-top: 0px;
-    margin-left: 0px;
     margin-right: 0px;
 }
 
