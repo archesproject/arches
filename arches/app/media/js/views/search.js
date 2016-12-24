@@ -41,6 +41,29 @@ require([
                 //el: $('#search-results-container')[0],
                 viewModel: this.viewModel
             });
+
+            toggleVisibility = function(){
+
+            }
+
+            this.viewModel.mapFilter.visible = ko.observable(true)
+            this.viewModel.timeFilter.visible = ko.observable(false)
+            this.viewModel.savedSearches = ko.observable(false)
+            this.viewModel.advancedFilter = ko.observable(false)
+            this.viewModel.searchRelatedResources = ko.observable(false)
+
+            this.viewModel.switchFilterType = function(e){
+                var clicked = e;
+                _.each([this.mapFilter, this.timeFilter], function(filter){
+                    if (filter === e) {
+                        filter.visible(true);
+                    } else {
+                        filter.visible(false);
+                    };
+
+                })
+            }
+            
             this.viewModel.searchResults.on('mouseover', function(resourceid) {
                 this.viewModel.mapFilter.selectFeatureById(resourceid);
             }, this);
