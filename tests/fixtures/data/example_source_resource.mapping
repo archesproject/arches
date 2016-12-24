@@ -1,6 +1,6 @@
 sourceresourcemodelid,sourceResourceModelName,sourcenodeid,sourceNodeName,targetresourcemodelid,targetResourceModelName,targetnodeid,targetNodeName
 6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,d295b387-bbe1-11e6-ad41-685b3597724b,Destruction Date,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,4211c761-b8fb-11e6-84a5-026d961c88e6,End of Existence Date
-6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,c15f5dae-bbe8-11e6-9251-685b3597724b,Height,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,01180e90-b8fb-11e6-84a5-026d961c88e6,Measurement Type
+6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,c15f5dae-bbe8-11e6-9251-685b3597724b,Height,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,01180e91-b8fb-11e6-84a5-026d961c88e6,Measurement Value
 6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,b2b79afa-bbe6-11e6-a7bd-685b3597724b,Name,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,15189051-b8fb-11e6-84a5-026d961c88e6,Name
 6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,8a3e81c2-bbe5-11e6-8d56-685b3597724b,Geometry Type,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,2b7d0a8a-b8fb-11e6-84a5-026d961c88e6,Geometry Qualifier
 6e77a868-bbe0-11e6-973a-685b3597724b,Example Source Resource,b2b79cfa-bbe6-11e6-a69e-685b3597724b,Alternate Name,99417385-b8fa-11e6-84a5-026d961c88e6,Heritage Resource Model,15189051-b8fb-11e6-84a5-026d961c88e6,Name

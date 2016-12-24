@@ -56,12 +56,25 @@ from django.db import transaction
 #             conceptto = concept_objs[relation['conceptidto']]
 #             conceptfrom.add_relation(conceptto, relation['relationtype'])
 
+class ConceptImportReporter:
+    def __init__(self, reference_data):
+        self.concepts_saved = 4
+
+    def update_concepts_saved(self, count=1):
+        self.concepts_saved += count
+
+    def report_results(self):
+        result = "Concepts saved: {0}"
+        print result.format(self.concepts_saved)
+
 def import_reference_data(reference_data):
     # with transaction.atomic():
     # if reference_data != '':
     for data in reference_data:
         print '\nLOADING {0} CONCEPT SCHEME FROM ARCHES JSON'.format(data['legacyoid'])
         print '---------------------------------------------'
+
+        reporter = ConceptImportReporter(data)
 
         def create_collections(concept):
             relations = {'':'hasCollection', 'hasTopConcept':'member', 'narrower':'member', 'narrowerTransitive':'member'}
@@ -70,8 +83,10 @@ def import_reference_data(reference_data):
                     if concept.id == '00000000-0000-0000-0000-000000000001':
                         concept.id = '00000000-0000-0000-0000-000000000003'
                     models.Relation.objects.get_or_create(conceptfrom_id=concept.id, conceptto_id=subconcept.id, relationtype_id=relations[concept.relationshiptype])
+                    reporter.update_concepts_saved()
 
         concept = Concept(data)
         concept.save()
         concept.traverse(create_collections, 'down')
         concept.index(scheme=concept)
+        reporter.report_results()
