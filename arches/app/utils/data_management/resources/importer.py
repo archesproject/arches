@@ -108,7 +108,7 @@ def import_business_data(business_data, mapping=None):
             for resource in business_data['resources']:
                 if resource['resourceinstance'] != None:
 
-                    resourceinstance = ResourceInstance.objects.update_or_create(
+                    resourceinstance, created = ResourceInstance.objects.update_or_create(
                         resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
                         graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
                         resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
@@ -121,14 +121,14 @@ def import_business_data(business_data, mapping=None):
                     for tile in resource['tiles']:
                         tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
 
-                        tile = Tile.objects.update_or_create(
-                            resourceinstance = resourceinstance.resourceinstance_id,
+                        tile, created = Tile.objects.update_or_create(
+                            resourceinstance = resourceinstance,
                             parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
                             nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
                             tileid = uuid.UUID(str(tile['tileid'])),
                             data = tile['data']
                         )
-                        if len(Tile.objects.filter(tileid=tile['tileid'])) == 1:
+                        if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
                             reporter.update_tiles_saved()
 
             for relation in business_data['relations']:
