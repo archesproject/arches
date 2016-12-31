@@ -4508,7 +4508,7 @@ div.row.widget-wrapper.report-header:hover {
     background: rgba(17,17,17,0.21);
     opacity: .9;
     width: 250px;
-    height: 500px;
+    height: 100vh;
     border: 1px solid #999;
 }
 
@@ -4527,7 +4527,7 @@ div.row.widget-wrapper.report-header:hover {
     padding: 10px 25px;
     width: calc(100% - 250px);
     background: #fcfcfc;
-    height: 500px;
+    height: 100vh;
     border: 1px solid #eee;
     border-right-width: 0px;
     z-index: 10;
@@ -4801,7 +4801,7 @@ div.row.widget-wrapper.report-header:hover {
     right: 0px;
     padding: 0px;
     background: transparent;
-    border-bottom: 1px solid #ddd;
+    box-shadow: none;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
 }
@@ -4836,7 +4836,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-search-container {
     top: 0px;
-    height: 700px;
+    height: 100vh;
     background: #fbfbfb;
 }
 
@@ -5319,17 +5319,18 @@ a.map-widget-icon:hover {
     font-weight: 500;
     background: #fff;
     color: #666;
-    border-bottom: 1px solid #ddd;
     margin-top: 0px;
     margin-bottom: 0px;
-    padding: 10px 5px 10px 10px;
+    padding: 10px 5px 0px 10px;
 }
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 13px;
 }
 .search-listing-body {
-    height: 70px;
+    max-height: 70px;
+    min-height: 70px;
+    font-size: 12px;
     color: #888;
     background: #fff;
     padding: 5px 10px;
@@ -5356,6 +5357,10 @@ a.map-widget-icon:hover {
     border-color: #dcdcdc;
     box-shadow: none;
     background-color: transparent;
+}
+
+.map-filter-panel {
+    margin-left: 10px;
 }
 
 
