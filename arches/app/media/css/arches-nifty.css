@@ -4621,13 +4621,13 @@ div.row.widget-wrapper.report-header:hover {
    padding-top: 15px;
    font-size: 17px;
    border-right: 1px solid #ddd;
-   color: #999;
+   color: #ccc;
    vertical-align: middle;
    display: table-cell;
 }
 
 .overlay-card-main a {
-    color: #999;
+    color: #aaa;
 }
 
 .overlay-card.selected div div a {
@@ -4637,6 +4637,15 @@ div.row.widget-wrapper.report-header:hover {
 .overlay-card.selected div div i {
     color: #666;
 }
+
+.overlay-card:hover div div i {
+    color: rgb(102, 102, 102);
+}
+
+.overlay-card:hover div div a {
+    color: rgb(102, 102, 102);
+}
+
 
 .overlay-list-container {
     padding-top: 0px;
