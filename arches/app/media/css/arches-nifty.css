@@ -4899,6 +4899,10 @@ div.row.widget-wrapper.report-header:hover {
   background-color: #f3f3f3;
 }
 
+.map-widget-overlay-item.map-draw-tools-active:hover {
+  background-color: #f3f3f3;
+}
+
 .map-widget-toolbar-list {
     list-style: none;
     padding-left: 0px;
@@ -4942,12 +4946,12 @@ a.map-widget-icon:hover {
     width: 248px;
     height: 50px;
     padding: 7px;
-    background: #fcfcfc;
+    background: #fff;
     border-bottom: 1px solid #ddd;
 }
 
 .map-widget-overlay-item:hover {
-    background: #fff;
+    background: #fafafa;
     cursor: pointer;
 }
 
