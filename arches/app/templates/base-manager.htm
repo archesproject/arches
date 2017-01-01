@@ -83,6 +83,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         </ul>
                         <ul class="nav navbar-top-links pull-right">
+                            <li class="">
+                                <a href="#" class="main-navbar-item" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
+                                    <div class="text-center" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+                                      <i class="ion-search main-navbar-icon"></i>
+                                    </div>
+                                </a>
+                            </li>
+
                             <li class="dropdown">
                                 <a id="demo-lang-switch" class="lang-selector dropdown-toggle" href="#" data-toggle="dropdown">
                                     <span class="lang-selected">
@@ -131,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </ul>
                             </li>
 
-                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right" style="background-color: transparent;">
+                            <a class="" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right" style="background-color: transparent;">
                                 <span class="pull-right">
                                     <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
                                 </span>
