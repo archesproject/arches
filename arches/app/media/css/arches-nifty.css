@@ -32,8 +32,12 @@
     text-decoration: underline;
 }
 
-.navbar-top-links:last-child>li {
+/*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
+}*/
+
+.btn:not(.disabled):not(:disabled).active {
+    box-shadow: none;
 }
 
 #navbar{
@@ -58,10 +62,20 @@
     margin-right: 10px;
 }
 
+.main-navbar-item {
+    width: 48px;
+    border-right-width: 0px; 
+}
+
+.main-navbar-icon {
+    font-size: 17px;
+}
+
 .username {
     margin: 0px;
     padding-left: 10px;
     padding-right: 10px;
+    border-left: 1px solid #ddd;
 }
 
 .username:hover {
@@ -4509,7 +4523,7 @@ div.row.widget-wrapper.report-header:hover {
     opacity: .9;
     width: 250px;
     height: 100vh;
-    border: 1px solid #999;
+    border: 0px solid #999;
 }
 
 .map-widget-container.hide-maptools {
@@ -4948,7 +4962,11 @@ a.map-widget-icon:hover {
 }
 
 .basemap-unselected {
-  color: #999;
+  color: #ccc;
+}
+
+span.basemap-unselected {
+    color: #aaa;
 }
 
 .map-widget-overlay-item {
@@ -4962,6 +4980,14 @@ a.map-widget-icon:hover {
 .map-widget-overlay-item:hover {
     background: #fafafa;
     cursor: pointer;
+}
+
+.map-widget-overlay-item:hover div i {
+    color: #666;
+}
+
+.map-widget-overlay-item:hover div a span {
+    color: #454545;
 }
 
 .map-overlay-item-tools {
