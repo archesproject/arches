@@ -3192,6 +3192,14 @@ ul.jqtree_common li.jqtree-folder {
     border: 1px solid #ddd;
     z-index: 4000;
 }
+.ep-menu-editor {
+    position: absolute;
+    top: -1px;
+    left: 0px;
+    bottom: 0;
+    border: 1px solid #ddd;
+    z-index: 4000;
+}
 .ep-menu-panel {
     position: absolute;
     top: 0;
@@ -4652,11 +4660,11 @@ div.row.widget-wrapper.report-header:hover {
     color: #666;
 }
 
-.overlay-card:hover div div i {
+.overlay-card:hover div div i not:selected {
     color: rgb(102, 102, 102);
 }
 
-.overlay-card:hover div div a {
+.overlay-card:hover div div {
     color: rgb(102, 102, 102);
 }
 
