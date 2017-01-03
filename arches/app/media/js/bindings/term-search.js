@@ -1,4 +1,9 @@
-define(['jquery', 'knockout', 'arches', 'select2'], function($, ko, arches) {
+define([
+    'jquery',
+    'knockout',
+    'arches',
+    'select2'
+], function($, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
