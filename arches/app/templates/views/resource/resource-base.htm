@@ -47,6 +47,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </h1>
     </div>
 
+    <!-- Recently Addedd -->
+    <ul class="nav navbar-top-links pull-left">
+        <li class="mega-dropdown open">
+            <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
+                <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent edits"></i>
+            </a>
+            <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
+                
+                <!-- Resource Records Table -->
+                <div class="pad-all">
+                    Table of recently added resource instances will go here.
+                </div>
+
+            </div>
+        </li>
+    </ul>
+
     <!-- Search Bar -->
     <a href="#" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">

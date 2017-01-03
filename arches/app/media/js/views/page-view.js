@@ -41,6 +41,7 @@ define([
                 showTabs: ko.observable(false),
                 tabsActive: ko.observable(false),
                 menuActive: ko.observable(false),
+                recentsActive: ko.observable(false),
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),

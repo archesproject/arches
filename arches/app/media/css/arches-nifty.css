@@ -82,6 +82,16 @@
     background: #f2f2f2;
 }
 
+
+.navbar-top-links>.mega-dropdown>.dropdown-menu.mega-dropdown-menu {
+    left: 50px;
+    max-width: 100%; 
+    top: 39px;
+    right: -10px;
+    height: 100vh;
+}
+
+
 .brand-icon {
     height: 20px !important;
     width: 20px !important;
@@ -3249,6 +3259,29 @@ ul.jqtree_common li.jqtree-folder {
     background: #f8f8f8;
 }
 
+.navbar-top-links>li>a.navbar-button {
+    height: 49px;
+    width: 50px;
+    background: #fff;
+    text-align: center;
+    border-left: 1px solid #ddd;
+}
+
+.navbar-top-links>li>a.navbar-button:hover {
+    border-left: 1px solid #ddd;
+    background: #f8f8f8;
+}
+
+.navbar-top-links>li>a.navbar-button:active {
+    border-left: 1px solid #ddd;
+    background: #f8f8f8;
+}
+
+.navbar-top-links>li>a.navbar-button:focus {
+    border-left: 1px solid #ddd;
+    background: #f8f8f8;
+}
+
 .ep-tools-right {
     border-right: none;
     border-left: 1px solid #ddd;
@@ -3256,6 +3289,7 @@ ul.jqtree_common li.jqtree-folder {
     padding-left: 20px;
     padding-right: 20px;
     min-width: 50px;
+    max-width: 50px;
 }
 
 .ep-tools-right a:first-child {
