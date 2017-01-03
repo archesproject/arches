@@ -1,5 +1,6 @@
 define([
     'views/search/base-filter',
+    'bindings/chosen'
 ],
 function(BaseFilter) {
     return BaseFilter.extend({
