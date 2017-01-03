@@ -84,19 +84,19 @@
             <!-- Card Container -->
             <div class="card-form-preview-container">
                 <div class="tab-content">
-                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}">
+                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}, with: mapFilter">
                         {% include 'views/search/map-filter.htm' %}
                     </div>
-                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}">
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}, with: timeFilter">
                         {% include 'views/search/time-filter.htm' %}
                     </div>
-                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === savedSearches}">
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === savedSearches}, with: savedSearches">
                         <div>save my search</div>
                     </div>
-                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}">
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
                         <div>perform complex search</div>
                     </div>
-                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}">
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}, with: searchRelatedResources">
                         <div>search related resources</div>
                     </div>
                 </div>
