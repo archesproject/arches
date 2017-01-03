@@ -17,34 +17,24 @@ require([
             this.viewModel.termFilter = new TermFilter();
             this.viewModel.timeFilter = new BaseFilter();
             this.viewModel.mapFilter = new MapFilter();
+            this.viewModel.savedSearches = new BaseFilter();
+            this.viewModel.advancedFilter = new BaseFilter();
+            this.viewModel.searchRelatedResources = new BaseFilter();
 
             this.filters = [
                 this.viewModel.termFilter,
                 this.viewModel.timeFilter,
-                this.viewModel.mapFilter
+                this.viewModel.mapFilter,
+                this.viewModel.savedSearches,
+                this.viewModel.advancedFilter,
+                this.viewModel.searchRelatedResources
             ];
 
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
 
-            this.viewModel.mapFilter.visible = ko.observable(true)
-            this.viewModel.timeFilter.visible = ko.observable(false)
-            this.viewModel.savedSearches = ko.observable(false)
-            this.viewModel.advancedFilter = ko.observable(false)
-            this.viewModel.searchRelatedResources = ko.observable(false)
-
-            this.viewModel.switchFilterType = function(e){
-                var clicked = e;
-                _.each([this.mapFilter, this.timeFilter], function(filter){
-                    if (filter === e) {
-                        filter.visible(true);
-                    } else {
-                        filter.visible(false);
-                    };
-
-                })
-            }
+            this.viewModel.selectedTab = ko.observable(this.viewModel.mapFilter);
 
             self.isNewQuery = true;
 
