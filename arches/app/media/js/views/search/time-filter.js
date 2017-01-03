@@ -1,26 +1,26 @@
-define(['jquery', 
+define(['jquery',
     'underscore',
     'backbone',
     'bootstrap',
-    'arches', 
+    'arches',
     'select2',
     'knockout',
-    'knockout-mapping', 
+    'knockout-mapping',
     'plugins/bootstrap-slider/bootstrap-slider.min',
     'views/forms/sections/branch-list',
     'resource-types',
     'bootstrap-datetimepicker',
-    'plugins/knockout-select2'], 
+    'plugins/knockout-select2'],
     function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, Slider, BranchList, resourceTypes) {
 
         return Backbone.View.extend({
 
-            initialize: function(options) { 
+            initialize: function(options) {
                 var self = this;
                 var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});
-                
+
                 date_picker.on('dp.change', function(evt){
-                    $('#date').trigger('change'); 
+                    $('#date').trigger('change');
                 });
 
                 ko.observableArray.fn.get = function(entitytypeid, key) {
@@ -42,7 +42,7 @@ define(['jquery',
                     }else{
                         self.query.filter.year_min_max(evt.value);
                     }
-                });                
+                });
 
                 this._rawdata = ko.toJSON(JSON.parse($('#timefilterdata').val()));
                 this.viewModel = JSON.parse(this._rawdata);
@@ -69,11 +69,11 @@ define(['jquery',
                                 date_operators__value: '',
                                 date_operators__label: ''
                             }
-                        } 
+                        }
                     },
                     changed: ko.pureComputed(function(){
                         var ret = ko.toJSON(this.query.filter.year_min_max()) +
-                            ko.toJSON(this.query.filter.filters()) + 
+                            ko.toJSON(this.query.filter.filters()) +
                             ko.toJSON(this.query.filter.inverted());
                         return ret;
                     }, this).extend({ rateLimit: 200 })
@@ -107,35 +107,10 @@ define(['jquery',
                     self.query.filter.filters.removeAll();
                     _.each(this.getData(), function(item){
                         self.query.filter.filters.push(item);
-                    })                
+                    })
                 })
 
                 //ko.applyBindings(this.query.filter, $('#time-filter')[0]);
-            },
-
-            toggleFilterSection: function(ele, expand){
-                if(expand){
-                    this.slideToggle(ele, 'show');
-                }else{
-                    this.slideToggle(ele, 'hide');               
-                }
-            },
-
-            slideToggle: function(ele, showOrHide){
-                var self = this;
-                if ($(ele).is(":visible") && showOrHide === 'hide'){
-                    ele.slideToggle('slow');
-                    return;
-                }
-
-                if (!($(ele).is(":visible")) && showOrHide === 'show'){
-                    ele.slideToggle('slow');
-                    return;
-                }
-
-                if (!showOrHide){
-                    ele.slideToggle('slow');                    
-                }
             },
 
             restoreState: function(filter, expanded){
@@ -147,7 +122,7 @@ define(['jquery',
                         _.each(filter.filters, function(filter){
                             this.query.filter.filters.push(filter);
                             var branch = koMapping.fromJS({
-                                'editing':ko.observable(false), 
+                                'editing':ko.observable(false),
                                 'nodes': ko.observableArray(filter.nodes)
                             });
                             this.time_filter_branchlist.viewModel.branch_lists.push(branch);
@@ -159,19 +134,12 @@ define(['jquery',
                         }, this);
                     }
                 }
-
-                if(typeof expanded === 'undefined'){
-                    expanded = false;
-                }
-                this.expanded(expanded);
-
             },
 
             clear: function(){
                 this.query.filter.inverted(false);
                 this.query.filter.filters.removeAll();
                 this.query.filter.year_min_max.removeAll();
-                this.slider.setValue([this.slider.getAttribute('min'),this.slider.getAttribute('max')]);
             }
 
         });
