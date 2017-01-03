@@ -1,16 +1,11 @@
-define(['jquery',
-    'backbone',
-    'arches',
-    'select2',
+define([
     'knockout',
     'views/search/base-filter',
     'bindings/term-search'
-], function($, Backbone, arches, Select2, ko, BaseFilter) {
+], function(ko, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {
-            var self = this;
             BaseFilter.prototype.initialize.call(this, options);
-
             this.filter.terms = ko.observableArray();
         },
 
