@@ -4,18 +4,19 @@ require([
     'arches',
     'viewmodels/alert',
     'views/search/base-filter',
+    'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+], function($, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
 
             this.viewModel.termFilter = new TermFilter();
-            this.viewModel.timeFilter = new BaseFilter();
+            this.viewModel.timeFilter = new TimeFilter();
             this.viewModel.mapFilter = new MapFilter();
             this.viewModel.savedSearches = new BaseFilter();
             this.viewModel.advancedFilter = new BaseFilter();
