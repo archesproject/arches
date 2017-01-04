@@ -100,8 +100,6 @@ class ResourceImportReporter:
                     self.relations,
                     self.relations_saved
                     )
-        else:
-            print 'no resources'
 
 def import_business_data(business_data, mapping=None):
     print "importing business data"
@@ -328,7 +326,7 @@ def import_business_data(business_data, mapping=None):
 
     except (KeyError, TypeError) as e:
         print e
-        
+
     finally:
         reporter.report_results()
 
