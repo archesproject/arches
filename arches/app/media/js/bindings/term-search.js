@@ -1,4 +1,9 @@
-define(['jquery', 'knockout', 'arches', 'select2'], function($, ko, arches) {
+define([
+    'jquery',
+    'knockout',
+    'arches',
+    'select2'
+], function($, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
@@ -86,21 +91,19 @@ define(['jquery', 'knockout', 'arches', 'select2'], function($, ko, arches) {
                     });
                 }
             }).on('choice-selected', function(e, el) {
-                var data = $(el).data('select2-data');
-
-                if ($(el).hasClass('inverted')) {
-                    $(el).removeClass('inverted');
-                    $(el).find('.fa-minus').hide();
-                } else {
-                    $(el).addClass('inverted');
+                var selectedTerm = $(el).data('select2-data');
+                var terms = searchbox.select2('data');
+                
+                selectedTerm.inverted = !selectedTerm.inverted;
+                
+                if(selectedTerm.inverted){
                     $(el).find('.fa-minus').show();
+                }else{
+                    $(el).find('.fa-minus').hide();
                 }
-                data.inverted = $(el).hasClass('inverted');
+                
+                selection(terms);
 
-                selection.removeAll();
-                $.each(searchbox.select2('data'), function(index, term) {
-                    selection.push(term);
-                });
             });
             searchbox.select2('data', ko.unwrap(selection)).trigger('change');
         }

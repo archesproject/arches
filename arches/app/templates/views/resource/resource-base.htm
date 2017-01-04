@@ -47,6 +47,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </h1>
     </div>
 
+    <!-- Recently Addedd -->
+    <ul class="nav navbar-top-links pull-left">
+        <li class="mega-dropdown open">
+            <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
+                <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent edits"></i>
+            </a>
+            <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
+                
+                <!-- Resource Records Table -->
+                <div class="pad-all">
+                    Table of recently added resource instances will go here.
+                </div>
+
+            </div>
+        </li>
+    </ul>
+
     <!-- Search Bar -->
     <a href="#" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
@@ -55,9 +72,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </a>
 
     <!-- Help Bar -->
-    <a href="" class="ep-tools ep-tools-right">
+    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
-          <i class="ion-information-circled"></i>
+          <i class="ion-help"></i>
         </div>
     </a>
 </div>
@@ -69,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Menu -->
-    <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+    <div id="menu-panel" class="ep-menu-editor" style="display: none;" data-bind="visible:menuActive()">
         <div class="panel ep-menu-panel relative" style="">
 
             <!-- Menu List -->
@@ -123,23 +140,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Help Panel -->
-    <div class="ep-help" style="display: none;">
-        <div class="panel ep-help-panel relative" style="">
-
-            <!-- Help Item List -->
-            <div class="panel-body">
-                <p class="ep-tool-title">Help Topics Go Here</p>
-
-            </div>
-
-            <div class="panel-footer ep-menu-footer">
-                <div class="footer-tools">
-                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">{% trans "Close" %}</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    {% include 'help-panel-base.htm' %}
 
 
     <!-- Title Block -->

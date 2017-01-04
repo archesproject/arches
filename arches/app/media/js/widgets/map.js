@@ -52,13 +52,15 @@ define([
     return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
+            var result;
             this.context = params.type
             this.getContextCss = ko.pureComputed(function(){
                 lookup = {'report-header':'map-report-header-container',
                           'search-filter':'map-search-container',
                           'resource-editor':'map-crud-container'
                         };
-                return lookup[this.context];
+                result = lookup[this.context] || 'map-crud-container';
+                return result;
             }, this)
             this.configType = params.reportHeader || 'header';
             params.configKeys = [

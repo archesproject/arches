@@ -1,4 +1,7 @@
-define(['jquery', 'backbone', 'knockout'], function($, Backbone, ko) {
+define([
+    'jquery',
+    'backbone'
+], function($, Backbone) {
     return Backbone.View.extend({
         // the various filters managed by this search filter widget
         filter: {},

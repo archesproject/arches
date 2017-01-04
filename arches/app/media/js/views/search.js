@@ -1,50 +1,35 @@
 require([
     'jquery',
+    'underscore',
     'knockout',
     'arches',
     'viewmodels/alert',
     'views/search/base-filter',
+    'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
-
-            this.viewModel.termFilter = new TermFilter();
-            this.viewModel.timeFilter = new BaseFilter();
-            this.viewModel.mapFilter = new MapFilter();
-
-            this.filters = [
-                this.viewModel.termFilter,
-                this.viewModel.timeFilter,
-                this.viewModel.mapFilter
-            ];
+            this.filters = {
+                termFilter: new TermFilter(),
+                timeFilter: new TimeFilter(),
+                mapFilter: new MapFilter(),
+                savedSearches: new BaseFilter(),
+                advancedFilter: new BaseFilter(),
+                searchRelatedResources: new BaseFilter()
+            };
+            _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
 
-            this.viewModel.mapFilter.visible = ko.observable(true)
-            this.viewModel.timeFilter.visible = ko.observable(false)
-            this.viewModel.savedSearches = ko.observable(false)
-            this.viewModel.advancedFilter = ko.observable(false)
-            this.viewModel.searchRelatedResources = ko.observable(false)
-
-            this.viewModel.switchFilterType = function(e){
-                var clicked = e;
-                _.each([this.mapFilter, this.timeFilter], function(filter){
-                    if (filter === e) {
-                        filter.visible(true);
-                    } else {
-                        filter.visible(false);
-                    };
-
-                })
-            }
+            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
 
             self.isNewQuery = true;
 
@@ -54,7 +39,7 @@ require([
                     include_ids: self.isNewQuery,
                     no_filters: true
                 };
-                self.filters.forEach(function(filter) {
+                _.each(self.filters, function (filter) {
                     var filtersAdded = filter.appendFilters(params);
                     if (filtersAdded) {
                         params.no_filters = false;
@@ -127,7 +112,7 @@ require([
             }
             this.viewModel.searchResults.restoreState(query.page);
 
-            this.filters.forEach(function (filter) {
+            _.each(this.filters, function (filter) {
                 if (filter.restoreState(query)){
                     doQuery = true;
                 }
@@ -139,8 +124,8 @@ require([
         },
 
         clear: function() {
-            this.filters.forEach(function(filter) {
-                filter.clear();;
+            _.each(this.filters, function (filter) {
+                filter.clear();
             });
         }
     });
