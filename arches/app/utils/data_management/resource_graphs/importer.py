@@ -44,7 +44,7 @@ class GraphImportReporter:
         if self.resource_model == True:
             result = "Saved Resource Model: {0}, Forms: {1}, Reports: {2}"
         else:
-            result = "Saved Branch Model: {0}"
+            result = "Saved Branch: {0}"
 
         print result.format(self.name, self.forms_saved, self.reports_saved)
 
