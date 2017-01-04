@@ -268,7 +268,6 @@ def import_business_data(business_data, mapping=None):
                                                                                 del data[nodeid]
                                                                         if child_tile_cardinality == '1':
                                                                             populated_child_nodegroups.append(prototype_tile.nodegroup_id)
-                                                                # print prototype_tile_copy
                                                         for data in source_tile['data']:
                                                             if data == {}:
                                                                 source_tile['data'].remove(data)

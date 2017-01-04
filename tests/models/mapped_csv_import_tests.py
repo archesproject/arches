@@ -26,7 +26,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands.package_utils import authority_files
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
-from arches.app.utils.data_management.csv_importer import  CSVFileImporter
+from arches.app.utils.data_management.csv_file_importer import  CSVFileImporter
 
 
 # these tests can be run from the command line via
@@ -48,7 +48,35 @@ class mappedCSVFileImportTests(ArchesTestCase):
 
 	def test_single_1(self):
 		og_tile_count = TileModel.objects.count()
-		CSVFileImporter('tests/fixtures/data/json/cardinality_test_data/single-1.csv').import_all()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-1.csv').import_all()
 		new_tile_count = TileModel.objects.count()
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 1)
+
+	def test_single_n(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-n.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 2)
+
+	def test_1_1(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/1-1.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 2)
+
+	def test_1_n(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/1-n.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 3)
+
+	# def test_n_1(self):
+	# 	og_tile_count = TileModel.objects.count()
+	# 	CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/n-1.csv').import_all()
+	# 	new_tile_count = TileModel.objects.count()
+	# 	tile_difference = new_tile_count - og_tile_count
+	# 	self.assertEqual(tile_difference, 4)

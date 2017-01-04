@@ -72,9 +72,9 @@ def import_business_data(business_data, mapping=None):
                         for nodegroupid, childtile in blank_tile.tiles.iteritems():
                             prototype_tile = childtile.pop()
                             prototype_tile.tileid = None
-                            prototype_tile_copy = deepcopy(prototype_tile)
 
                             for source_tile in source_data:
+                                prototype_tile_copy = deepcopy(prototype_tile)
                                 for nodeid in source_tile.keys():
                                     if nodeid in prototype_tile.data.keys():
                                         if prototype_tile.data[nodeid] == '':
@@ -85,8 +85,8 @@ def import_business_data(business_data, mapping=None):
                                             # if child_tile_cardinality == '1':
                                             #     populated_child_nodegroups.append(prototype_tile.nodegroup_id)
 
-                            if prototype_tile_copy is not None:
-                                childtile.append(prototype_tile_copy)
+                                if prototype_tile_copy is not None:
+                                    childtile.append(prototype_tile_copy)
 
                     for source_tile in source_data:
                         source_data = [value for value in source_data if value != {}]
