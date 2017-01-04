@@ -21,15 +21,16 @@
         <!-- Date Selector -->
         <div class="calendar">
             <h3 class="search-label">Within</h3>
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="chosen:{ width: '100%' }">
-                <option>Custom date range</option>
-                <option>Today</option>
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>This week</option>
-                <option>This month</option>
-                <option>This quarter</option>
-                <option>This year</option>
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="chosen:{ width: '100%' }, value: dateRangeType">
+                <!-- chosen: {width: '100%', disable_search_threshold: 15}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true -->
+                <option value="custom">{% trans "Custom date range" %}</option>
+                <option value="today">{% trans "Today" %}</option>
+                <option value="last-7">{% trans "Last 7 days" %}</option>
+                <option value="last-30">{% trans "Last 30 days" %}</option>
+                <option value="this-week">{% trans "This week" %}</option>
+                <option value="this-month">{% trans "This month" %}</option>
+                <option value="this-quarter">{% trans "This quarter" %}</option>
+                <option value="this-year">{% trans "This year" %}</option>
             </select>
         </div>
 
@@ -37,7 +38,7 @@
         <div class="calendar">
             <h3 class="search-label">From</h3>
             <div id="search-from-c">
-                <input type="text" class="form-control input-lg">
+                <input class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: 'YYYY-MM-DD'}">
             </div>
         </div>
 
@@ -45,7 +46,7 @@
         <div class="calendar">
             <h3 class="search-label">To</h3>
             <div id="search-from-b">
-                <input type="text" class="form-control input-lg">
+                <input class="form-control input-lg" data-bind="value: toDate, datepicker: {format: 'YYYY-MM-DD'}">
             </div>
         </div>
     </div>
