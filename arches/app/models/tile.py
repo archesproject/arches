@@ -95,10 +95,14 @@ class Tile(models.TileModel):
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
         if index:
-            self.index()
+            try:
+                self.index()
+            except:
+                pass
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.save(*args, request=request, index=index, **kwargs)
+
 
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -130,7 +134,7 @@ class Tile(models.TileModel):
 
         for term in self.prepare_terms_for_search_index():
            se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
-     
+
     def prepare_documents_for_search_index(self):
         """
         Generates a list of specialized resource based documents to support resource search
@@ -151,7 +155,7 @@ class Tile(models.TileModel):
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
-        
+
         for tile in models.TileModel.objects.filter(resourceinstance=self.resourceinstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)

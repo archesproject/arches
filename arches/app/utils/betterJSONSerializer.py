@@ -77,8 +77,8 @@ class JSONSerializer(object):
             raise UnableToSerializeMethodTypesError(type(object))
         elif isinstance(object, dict):
             return self.handle_dictionary(object)
-        elif (isinstance(object, list) or 
-              isinstance(object, tuple) or 
+        elif (isinstance(object, list) or
+              isinstance(object, tuple) or
               isinstance(object, set)):
             return self.handle_list(object)
         elif isinstance(object, Model):

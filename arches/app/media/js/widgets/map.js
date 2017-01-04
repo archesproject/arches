@@ -52,8 +52,16 @@ define([
     return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
-            this.reportHeader = params.type === 'report-header' ? true : false;
-            this.resourceEditor = params.type === 'resource-editor' ? true : false;
+            var result;
+            this.context = params.type
+            this.getContextCss = ko.pureComputed(function(){
+                lookup = {'report-header':'map-report-header-container',
+                          'search-filter':'map-search-container',
+                          'resource-editor':'map-crud-container'
+                        };
+                result = lookup[this.context] || 'map-crud-container';
+                return result;
+            }, this)
             this.configType = params.reportHeader || 'header';
             params.configKeys = [
                 'zoom',
@@ -276,7 +284,7 @@ define([
              */
             this.addInitialLayers = function() {
                 var initialLayers = [];
-                if (this.reportHeader) {
+                if (this.context === 'report-header') {
                     this.resourceLayer = this.defineResourceLayer();
                     this.layers.unshift(this.resourceLayer);
                 }
@@ -367,7 +375,7 @@ define([
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
                             self.addMaplayer(self.resourceLayer);
                         }
-                        if (self.reportHeader === true && !ko.isObservable(self.value)) {
+                        if (self.context === 'report-header' && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
                                     if (_.contains(val, 'FeatureCollection')) {
@@ -382,7 +390,7 @@ define([
                                 self.map.moveLayer(layerId, self.anchorLayerId)
                             }, self)
 
-                        } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
+                        } else if (self.context !== 'report-header' && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
                             self.loadGeometriesIntoDrawLayer()
                         } else { //if values are for a form widget...
@@ -409,6 +417,7 @@ define([
                             }
                         }
                     }
+                    window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 30)
                 });
 
                 /**
@@ -614,7 +623,7 @@ define([
 
                 this.updateConfigs = function() {
                     var self = this;
-                    if (this.form === null && this.reportHeader !== true) {
+                    if (this.form === null && this.context !== 'report-header') {
                       return function() {
                           var mapCenter = this.getCenter()
                           var zoom = self.map.getZoom()

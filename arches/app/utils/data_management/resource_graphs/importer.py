@@ -24,6 +24,8 @@ from django.db import transaction
 
 class GraphImportReporter:
     def __init__(self, graphs):
+        self.name = ''
+        self.resource_model = False
         self.graphs = len(graphs)
         self.graphs_saved = 0
         self.reports_saved = 0
@@ -39,8 +41,12 @@ class GraphImportReporter:
         self.reports_saved += count
 
     def report_results(self):
-        result = "Graphs saved: {0}"
-        print result.format(self.graphs_saved)
+        if self.resource_model == True:
+            result = "Saved Resource Model: {0}, Forms: {1}, Reports: {2}"
+        else:
+            result = "Saved Branch Model: {0}"
+
+        print result.format(self.name, self.forms_saved, self.reports_saved)
 
 def import_graph(graphs):
     reporter = GraphImportReporter(graphs)
@@ -48,6 +54,8 @@ def import_graph(graphs):
     with transaction.atomic():
         errors = []
         for resource in graphs:
+            reporter.name = resource['name']
+            reporter.resource_model = resource['isresource']
             graph = Graph(resource)
 
             if not hasattr(graph, 'cards'):
@@ -57,6 +65,7 @@ def import_graph(graphs):
                     errors.append('{0} graph has no cards'.format(graph.name))
                 else:
                     graph.save()
+                    reporter.update_graphs_saved()
 
             if not hasattr(graph, 'cards_x_nodes_x_widgets'):
                 errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
@@ -69,6 +78,7 @@ def import_graph(graphs):
             else:
                 for form in graph.forms:
                     form = Form.objects.update_or_create(**form)
+                    reporter.update_forms_saved()
 
             if not hasattr(graph, 'forms_x_cards'):
                 errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
@@ -81,6 +91,6 @@ def import_graph(graphs):
             else:
                 for report in graph.reports:
                     report = Report.objects.update_or_create(**report)
+                    reporter.update_reports_saved()
 
-        # return errors
-        reporter.report_results()
+        return errors, reporter
