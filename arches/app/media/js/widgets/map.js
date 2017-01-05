@@ -6,6 +6,7 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
+    'turf',
     'knockout-mapping',
     'geojson-extent',
     'views/list',
@@ -18,7 +19,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
