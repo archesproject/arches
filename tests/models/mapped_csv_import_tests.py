@@ -48,25 +48,32 @@ class mappedCSVFileImportTests(ArchesTestCase):
 
 	def test_single_1(self):
 		og_tile_count = TileModel.objects.count()
-		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-1.csv').import_all()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-1_to_1.csv').import_all()
 		new_tile_count = TileModel.objects.count()
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 1)
 
-	def test_single_n(self):
+	def test_single_n_to_n(self):
 		og_tile_count = TileModel.objects.count()
-		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-n.csv').import_all()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-n_to_n.csv').import_all()
 		new_tile_count = TileModel.objects.count()
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 2)
-
+	#
+	def test_single_n_to_1(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/single-n_to_1.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 1)
+	#
 	def test_1_1(self):
 		og_tile_count = TileModel.objects.count()
 		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/1-1.csv').import_all()
 		new_tile_count = TileModel.objects.count()
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 2)
-
+	#
 	def test_1_n(self):
 		og_tile_count = TileModel.objects.count()
 		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/1-n.csv').import_all()
@@ -74,9 +81,16 @@ class mappedCSVFileImportTests(ArchesTestCase):
 		tile_difference = new_tile_count - og_tile_count
 		self.assertEqual(tile_difference, 3)
 
-	# def test_n_1(self):
-	# 	og_tile_count = TileModel.objects.count()
-	# 	CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/n-1.csv').import_all()
-	# 	new_tile_count = TileModel.objects.count()
-	# 	tile_difference = new_tile_count - og_tile_count
-	# 	self.assertEqual(tile_difference, 4)
+	def test_n_1(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/n-1.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 4)
+
+	def test_n_n(self):
+		og_tile_count = TileModel.objects.count()
+		CSVFileImporter('tests/fixtures/data/csv/cardinality_test_data/n-n.csv').import_all()
+		new_tile_count = TileModel.objects.count()
+		tile_difference = new_tile_count - og_tile_count
+		self.assertEqual(tile_difference, 6)
