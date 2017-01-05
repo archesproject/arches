@@ -166,7 +166,7 @@
                 </li>
                 <!-- ko ifnot: featureEditingDisabled -->
                 <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('maptools')}, css : {'active': !mapControls.mapControlPanels.maptools() }">
-                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
+                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans toolType %}', placement: 'bottom' }"></i></a>
                 </li>
                 <!-- /ko -->
                 <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
@@ -256,7 +256,7 @@
 
         <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
-                <h4 class="">{% trans "Map Tools" %}</h4>
+                <h4 class="" data-bind='text: toolType'></h4>
             </div>
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
