@@ -8,9 +8,10 @@ require([
     'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/resource-type-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
@@ -18,6 +19,7 @@ require([
             this.filters = {
                 termFilter: new TermFilter(),
                 timeFilter: new TimeFilter(),
+                resourceTypeFilter: new ResourceTypeFilter(),
                 mapFilter: new MapFilter(),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
