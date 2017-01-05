@@ -92,7 +92,6 @@ require([
         },
 
         getSearchQuery: function() {
-            var doQuery = false;
             var query = _.chain(decodeURIComponent(location.search).slice(1).split('&'))
                 // Split each array item into [key, value]
                 // ignore empty string if search is empty
@@ -108,19 +107,16 @@ require([
 
             if ('page' in query) {
                 query.page = JSON.parse(query.page);
-                doQuery = true;
+            } else {
+                query.page = 1;
             }
             this.viewModel.searchResults.restoreState(query.page);
 
             _.each(this.filters, function (filter) {
-                if (filter.restoreState(query)){
-                    doQuery = true;
-                }
+                filter.restoreState(query)
             });
 
-            if (doQuery) {
-                this.doQuery();
-            }
+            this.doQuery();
         },
 
         clear: function() {
