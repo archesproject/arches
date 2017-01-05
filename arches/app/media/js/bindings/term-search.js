@@ -6,14 +6,14 @@ define([
 ], function($, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var self = this;
+            var self = allBindingsAccessor.termSearch;
             var selection = valueAccessor();
 
             selection.subscribe(function (value) {
                 searchbox.select2('data', value).trigger('change');
                 $(el).parent().find('.select2-search-choice').each(function(i, el) {
-                    if ($(el).data('select2-data').inverted) {
-                        $(el).addClass('inverted');
+                    if ($(el).data('select2-data').type === 'filter-flag') {
+                        $(el).addClass('filter-flag');
                     }
                 });
             });
@@ -76,6 +76,9 @@ define([
                     if (result.inverted) {
                         markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
                     }
+                    // if (result.type === 'filter-flag') {
+                    //     $(el).addClass('filter-flag');
+                    // }
                     return markup;
                 },
                 escapeMarkup: function(m) {
@@ -105,7 +108,7 @@ define([
                 selection(terms);
 
             });
-            searchbox.select2('data', ko.unwrap(selection)).trigger('change');
+            searchbox.select2('data', ko.unwrap(selection)).trigger('change');            
         }
     };
 

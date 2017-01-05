@@ -66,9 +66,9 @@
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="#" data-bind="click: test.bind($data, 'undefined')">{% trans "All resources" %}</a></li>
+                                <li><a href="#" data-bind="click: selectModelType.bind($data, null)">{% trans "All resources" %}</a></li>
                                 <!-- ko foreach: $root.resources -->
-                                <li><a href="#" data-bind="text: name, click: $parent.test.bind($parent)"></a></li>
+                                <li><a href="#" data-bind="text: name, click: $parent.selectModelType.bind($parent)"></a></li>
                                 <!-- /ko -->
                             </ul>
                         </div>

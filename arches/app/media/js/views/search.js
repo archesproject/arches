@@ -16,10 +16,13 @@ require([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
+            var termFilter = new TermFilter()
             this.filters = {
-                termFilter: new TermFilter(),
+                termFilter: termFilter,
                 timeFilter: new TimeFilter(),
-                resourceTypeFilter: new ResourceTypeFilter(),
+                resourceTypeFilter: new ResourceTypeFilter({
+                    termFilter: termFilter
+                }),
                 mapFilter: new MapFilter(),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
@@ -61,6 +64,14 @@ require([
                 self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
+
+            this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
+                if(enabled){
+                    this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
+                }else{
+                    this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
+                }
+            },this);
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
