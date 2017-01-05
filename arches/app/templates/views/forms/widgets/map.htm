@@ -19,7 +19,7 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode -->
+        <!--ko if: drawMode & context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning" role="alert">
@@ -271,6 +271,8 @@
             </div>
             <!-- /ko -->
             <!-- /ko -->
+
+            <!--ko if: context !== 'search-filter' -->
             <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-overlay-vis-toogle text-center">
                     <i class='ion-trash-a'></i>
@@ -279,6 +281,20 @@
                     <a id="" class="" href=""><span>{% trans "Delete" %}<span></a>
                 </div>
             </div>
+            <!-- /ko -->
+
+            <!--ko if: context === 'search-filter' -->
+            <div class="map-widget-overlay-item relative editing-tool">
+                <div class="map-query-tool">
+                    <div class="map-query-tool-name">
+                        <a id="" class="" href=""><span>{% trans "Buffer(ft)" %}<span></a>
+                    </div>
+                    <div>
+                        <input type="number" min=0.0 id="" placeholder="{% trans " buffer " %" class="form-control input-md widget-input map-query-tool-input" data-bind="value: buffer, valueUpdate: 'keyup'">
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
 
         </div>
 

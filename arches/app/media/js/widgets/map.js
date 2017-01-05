@@ -97,6 +97,7 @@ define([
                 items: self.overlayLibrary
             });
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
+            this.buffer = ko.observable(0.0);
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
