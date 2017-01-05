@@ -149,6 +149,7 @@ define([
                        var oldDc = dc;
                        dc = '-' + new Date().getTime();
                        style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
+                       delete style.sources[resourceSourceId + oldDc];
                        _.each(style.layers, function(layer) {
                           if (layer.source === resourceSourceId + oldDc) {
                               layer.source = resourceSourceId + dc;
