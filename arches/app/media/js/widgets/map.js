@@ -136,35 +136,26 @@ define([
                 }
             };
 
-            this.refreshSource = function(sourceId, url) {
-                var style = self.map.getStyle();
-                var newSourceId = sourceId + '-' + new Date().getTime();
-
-                style.sources[newSourceId] = style.sources[sourceId];
-                if (url) {
-                    style.sources[newSourceId].tiles = url;
-                }
-
-                style.layers.forEach(function(layer) {
-                    if (layer.source === sourceId) {
-                        layer.source = newSourceId;
-                    }
-                });
-
-                style.sources = _.defaults(self.sources, style.sources);
-                self.map.setStyle(style);
-                return newSourceId;
-            }
-
             if (ko.isObservable(this.value)) {
               this.value.subscribe(this.clearGeometries)
             }
 
             if (this.form) {
+                var dc = '';
                 var resourceSourceId = 'resources';
                 this.form.on('after-update', function(req, tile) {
                    if (self.map) {
-                       resourceSourceId = self.refreshSource(resourceSourceId)
+                       var style = self.map.getStyle();
+                       var oldDc = dc;
+                       dc = '-' + new Date().getTime();
+                       style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
+                       _.each(style.layers, function(layer) {
+                          if (layer.source === resourceSourceId + oldDc) {
+                              layer.source = resourceSourceId + dc;
+                          }
+                       });
+                       style.sources = _.defaults(self.sources, style.sources);
+                       self.map.setStyle(style);
                    }
 
                    if (self.draw !== undefined) {
@@ -172,6 +163,7 @@ define([
                      self.featureColor(self.resourceColor)
                      self.loadGeometriesIntoDrawLayer();
                    }
+
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
             }
