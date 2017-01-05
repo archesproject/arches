@@ -102,6 +102,7 @@ class ResourceImportReporter:
                     )
 
 def import_business_data(business_data, mapping=None):
+    print "importing business data"
     reporter = ResourceImportReporter(business_data)
     try:
         if mapping == None or mapping == '':
@@ -326,7 +327,8 @@ def import_business_data(business_data, mapping=None):
     except (KeyError, TypeError) as e:
         print e
 
-    reporter.report_results()
+    finally:
+        reporter.report_results()
 
 class ResourceLoader(object):
 
