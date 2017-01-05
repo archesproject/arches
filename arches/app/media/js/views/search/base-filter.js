@@ -3,8 +3,13 @@ define([
     'backbone'
 ], function($, Backbone) {
     return Backbone.View.extend({
-        // the various filters managed by this search filter widget
-        filter: {},
+        constructor: function() {
+            // the various filters managed by this widget
+            this.filter = {};
+
+            // Call the original constructor
+            Backbone.View.apply(this, arguments);
+        },
 
         initialize: function(options) {
             $.extend(this, options);
