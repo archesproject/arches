@@ -52,13 +52,15 @@ define([
     return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
+            var result;
             this.context = params.type
             this.getContextCss = ko.pureComputed(function(){
                 lookup = {'report-header':'map-report-header-container',
                           'search-filter':'map-search-container',
                           'resource-editor':'map-crud-container'
                         };
-                return lookup[this.context];
+                result = lookup[this.context] || 'map-crud-container';
+                return result;
             }, this)
             this.configType = params.reportHeader || 'header';
             params.configKeys = [
@@ -139,20 +141,20 @@ define([
             }
 
             if (this.form) {
-                var resourcesUrl = null;
+                var dc = '';
+                var resourceSourceId = 'resources';
                 this.form.on('after-update', function(req, tile) {
-                   // Update resources source url w/ defeat cache param and
-                   // reset the map's style to force a refresh of the resources
-                   // vector tiles, see:
-                   // https://github.com/mapbox/mapbox-gl-js/issues/3709#issuecomment-265346656
-                   //
-                   // Currently, this causes the map to flicker, but this
-                   // should be resolved in the next version of mapbox-gl-js:
-                   // https://github.com/mapbox/mapbox-gl-js/pull/3621
-                   resourcesUrl = resourcesUrl || self.sources['resources'].tiles[0];
                    if (self.map) {
                        var style = self.map.getStyle();
-                       style.sources['resources'].tiles[0] = resourcesUrl + "?" + (new Date().getTime());
+                       var oldDc = dc;
+                       dc = '-' + new Date().getTime();
+                       style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
+                       delete style.sources[resourceSourceId + oldDc];
+                       _.each(style.layers, function(layer) {
+                          if (layer.source === resourceSourceId + oldDc) {
+                              layer.source = resourceSourceId + dc;
+                          }
+                       });
                        style.sources = _.defaults(self.sources, style.sources);
                        self.map.setStyle(style);
                    }

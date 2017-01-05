@@ -10,15 +10,13 @@ define([
         },
 
         restoreState: function(query) {
-            var self = this;
             var doQuery = false;
             if ('termFilter' in query) {
                 query.termFilter = JSON.parse(query.termFilter);
+                if (query.termFilter.length > 0) {
+                    this.filter.terms(query.termFilter);
+                }
                 doQuery = true;
-            }
-            var filters = query.termFilter;
-            if (typeof filters !== 'undefined' && filters.length > 0) {
-                self.filter.terms(filters);
             }
             return doQuery;
         },
