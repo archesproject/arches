@@ -98,7 +98,8 @@ class ArchesFileImporter(object):
     def import_all(self):
         errors = []
         conceptImporter(self.reference_data)
-        resourceGraphImporter(self.graphs)
+        resource_graph_errors, resource_graph_reporter = resourceGraphImporter(self.graphs)
+        resource_graph_reporter.report_results()
         errors = businessDataValidator(self.business_data)
         if len(errors) == 0:
             if self.business_data not in ('',[]):
