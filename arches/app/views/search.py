@@ -83,7 +83,7 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    results = dsl.search(index='resource', doc_type='')
+    results = dsl.search(index='resource', doc_type=get_doc_type(request))
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
@@ -108,6 +108,13 @@ def search_results(request):
     ret['paginator']['end_index'] = page.end_index()
     ret['paginator']['pages'] = pages
     return JSONResponse(ret)
+
+def get_doc_type(request):
+    doc_type = ''
+    type_filter = JSONDeserializer().deserialize(request.GET.get('typeFilter', '{}'))
+    if 'types' in type_filter:
+        doc_type = type_filter['types']
+    return doc_type
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
