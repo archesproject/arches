@@ -139,6 +139,10 @@ require([
                 }
             });
 
+            if(_.isEmpty(query)){
+                doQuery = true;
+            }
+
             if (doQuery) {
                 this.doQuery();
             }
