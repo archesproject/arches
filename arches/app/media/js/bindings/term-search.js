@@ -6,12 +6,15 @@ define([
 ], function($, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var self = this;
+            var self = allBindingsAccessor.termSearch;
             var selection = valueAccessor();
 
             selection.subscribe(function (value) {
                 searchbox.select2('data', value).trigger('change');
                 $(el).parent().find('.select2-search-choice').each(function(i, el) {
+                    if ($(el).data('select2-data').type === 'filter-flag') {
+                        $(el).addClass('filter-flag');
+                    }
                     if ($(el).data('select2-data').inverted) {
                         $(el).addClass('inverted');
                     }
@@ -39,7 +42,7 @@ define([
                         //     display:none;
                         // }
                         var results = [{
-                            inverted: false,
+                            inverted: ko.observable(false),
                             type: 'string',
                             context: '',
                             context_label: '',
@@ -49,7 +52,7 @@ define([
                         }];
                         $.each(data.hits.hits, function() {
                             results.push({
-                                inverted: false,
+                                inverted: ko.observable(false),
                                 type: this._source.options.conceptid ? 'concept' : 'term',
                                 context: this._source.context,
                                 context_label: this._source.options.context_label,
@@ -70,11 +73,14 @@ define([
                     var formatedresult = '<span class="concept_result">' + markup.join("") + '</span>' + context;
                     return formatedresult;
                 },
-                formatSelection: function(result) {
+                formatSelection: function(result, container) {
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
                     var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
-                    if (result.inverted) {
+                    if (result.inverted()) {
                         markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
+                    }
+                    if (result.type === 'filter-flag') {
+                        $(container.prevObject).addClass('filter-flag');
                     }
                     return markup;
                 },
@@ -94,18 +100,19 @@ define([
                 var selectedTerm = $(el).data('select2-data');
                 var terms = searchbox.select2('data');
                 
-                selectedTerm.inverted = !selectedTerm.inverted;
                 
-                if(selectedTerm.inverted){
+                if(!selectedTerm.inverted()){
                     $(el).find('.fa-minus').show();
                 }else{
                     $(el).find('.fa-minus').hide();
                 }
+
+                selectedTerm.inverted(!selectedTerm.inverted());
                 
-                selection(terms);
+                //selection(terms);
 
             });
-            searchbox.select2('data', ko.unwrap(selection)).trigger('change');
+            searchbox.select2('data', ko.unwrap(selection)).trigger('change');            
         }
     };
 

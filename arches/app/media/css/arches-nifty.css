@@ -666,6 +666,9 @@ a.select2-choice {
     user-select: none;
 }
 
+.filter-flag {
+    background: #30ad24 !important;
+}
 
 .select2-container-multi .select2-choices li {
     float: left;
