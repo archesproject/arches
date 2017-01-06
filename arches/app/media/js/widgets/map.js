@@ -658,8 +658,8 @@ define([
                             })
                         } else {
                             self.value(currentDrawing)
-                            self.prebufferFeature = currentDrawing.features[0];
                         }
+                        self.prebufferFeature = currentDrawing.features[currentDrawing.features.length - 1];
                     }
                 }
 
@@ -673,11 +673,9 @@ define([
                             _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature){
                                 self.draw.delete(feature.id)
                             }, self)
-                            self.buffer(0.0)
                         }
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
-                            self.buffer(0.0);
                         } else {
                             self.drawMode(self.draw.getMode());
                             if (context !== 'search-filter') {
@@ -733,17 +731,14 @@ define([
                 this.buffer.subscribe(function(val){
                     if (self.value().features.length > 0) {
                         var feature = self.value().features[0]
-                        var featureCount = self.draw.getAll().features.length;
-                        self.draw.deleteAll();
+                        self.draw.delete('buffer-layer');
                         if (val > 0) {
                             var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
+                            buffer.id = 'buffer-layer';
                             self.value().features[0] = buffer
                             self.draw.add(buffer)
-                            self.value().features[1] = self.prebufferFeature
-                            self.draw.add(self.prebufferFeature)
                         } else {
                             self.value().features = [self.prebufferFeature]
-                            self.draw.add(self.prebufferFeature)
                         }
                         self.value(self.value())
                         self.draw.changeMode(self.drawMode())
