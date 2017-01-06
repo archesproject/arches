@@ -197,16 +197,16 @@ def build_search_results_dsl(request):
         else:
             buffer = spatial_filter['buffer']
             geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-            geoshape = GeoShape(field='geometries.value', type=geojson['type'], coordinates=geojson['coordinates'] )
-            nested = Nested(path='geometries', query=geoshape)
+            geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
+            #nested = Nested(path='geometries', query=geoshape)
 
         if 'inverted' not in spatial_filter:
             spatial_filter['inverted'] = False
 
         if spatial_filter['inverted']:
-            boolfilter.must_not(nested)
+            boolfilter.must_not(geoshape)
         else:
-            boolfilter.must(nested)
+            boolfilter.must(geoshape)
 
     if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)
