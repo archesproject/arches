@@ -48,31 +48,13 @@ define([
                 text: term,
                 value: term
             });
-
-            //this.updateTerms(this.filter.terms);
         },
 
         removeTag: function(term){
             this.filter.terms.remove(function(term_item){ 
                 return term_item.id == term && term_item.text == term && term_item.value == term; 
             });
-
-            //this.updateTerms(terms);
-        },
-
-        // updateTerms: function(terms){
-        //     //searchbox.select2('data', terms);
-
-        //     $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-        //         if ($(el).data('select2-data').type === 'filter-flag') {
-        //             $(el).addClass('filter-flag');
-        //         }
-        //         if ($(el).data('select2-data').inverted) {
-        //             $(el).addClass('inverted');
-        //         }
-        //     });
-        // }
-
+        }
 
     });
 });
