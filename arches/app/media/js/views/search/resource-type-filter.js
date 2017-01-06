@@ -40,10 +40,12 @@ define([
         },
 
         appendFilters: function(filterParams) {
-            filterParams.typeFilter = ko.toJSON({
-                types: this.filter.types,
-                inverted: this.inverted
-            });
+            if(this.filter.types().length !== 0){
+                filterParams.typeFilter = ko.toJSON({
+                    types: this.filter.types,
+                    inverted: this.inverted
+                });
+            }
 
             return this.filter.types().length !== 0;
         },

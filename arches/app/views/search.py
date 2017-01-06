@@ -166,29 +166,27 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                #entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
-                bool_dsl = Bool()
-                #bool_dsl.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
-                bool_dsl.must(Match(field='strings', query=term['value'], type='phrase'))
+                term_filter = Bool()
+                term_filter.must(Match(field='strings', query=term['value'], type='phrase'))
                 if term['inverted']:
-                    boolfilter.must_not(bool_dsl)
+                    boolfilter.must_not(term_filter)
                 else:
-                    boolfilter.must(bool_dsl)
+                    boolfilter.must(term_filter)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
-                terms = Terms(field='domains.conceptid', terms=concept_ids)
+                conceptid_filter = Terms(field='domains.conceptid', terms=concept_ids)
                 if term['inverted']:
-                    boolfilter.must_not(terms)
+                    boolfilter.must_not(conceptid_filter)
                 else:
-                    boolfilter.must(terms)
+                    boolfilter.must(conceptid_filter)
             elif term['type'] == 'string':
-                boolfilter = Bool()
-                boolfilter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
-                boolfilter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
+                string_filter = Bool()
+                string_filter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
+                string_filter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
                 if term['inverted']:
-                    boolquery.must_not(boolfilter)
+                    boolfilter.must_not(string_filter)
                 else:
-                    boolquery.must(boolfilter)
+                    boolfilter.must(string_filter)
 
     if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
         geojson = spatial_filter['geometry']

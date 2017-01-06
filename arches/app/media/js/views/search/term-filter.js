@@ -18,8 +18,12 @@ define([
             if ('termFilter' in query) {
                 query.termFilter = JSON.parse(query.termFilter);
                 if (query.termFilter.length > 0) {
+                    query.termFilter.forEach(function(term){
+                        term.inverted = ko.observable(term.inverted);
+                    })
                     this.filter.terms(query.termFilter);
                 }
+
                 doQuery = true;
             }
             return doQuery;
@@ -34,8 +38,11 @@ define([
                 return term.type !== 'filter-flag';
             }, this);
 
-            filterParams.termFilter = ko.toJSON(terms);
-            return terms.length !== 0;
+            if(terms.length > 0){
+                filterParams.termFilter = ko.toJSON(terms);
+            }
+
+            return terms.length > 0;
         },
 
         addTag: function(term, inverted){
