@@ -23,8 +23,9 @@ define([
             var doQuery = false;
             if ('typeFilter' in query) {
                 query.typeFilter = JSON.parse(query.typeFilter);
-                if (query.typeFilter.length > 0) {
-                    this.filter.types(query.typeFilter);
+                if (query.typeFilter.types.length > 0) {
+                    this.filter.types(query.typeFilter.types);
+                    this.inverted(query.typeFilter.inverted);
                     //this.termFilter.addTag(this.name, this.inverted());
                 }
                 doQuery = true;
@@ -37,10 +38,11 @@ define([
         },
 
         appendFilters: function(filterParams) {
-            // this.filter.types().forEach(function(modelType){
+            filterParams.typeFilter = ko.toJSON({
+                types: this.filter.types(),
+                inverted: this.inverted()
+            });
 
-            // }, this);
-            filterParams.typeFilter = ko.toJSON(this.filter.types());
             return this.filter.types().length !== 0;
         },
 
