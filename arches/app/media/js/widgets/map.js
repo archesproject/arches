@@ -608,26 +608,22 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var lowestOverlay = this.anchorLayerId;
-                    if (this.overlays().length > 0) {
-                        var lowestOverlay = _.first(_.last(this.overlays()).layer_definitions).id;
-                    };
-                    this.basemaps.forEach(function(basemap) {
-                        var self = this;
-                        if (basemap.name === basemapType.name) {
-                            basemap.layer_definitions.forEach(function(layer) {
-                                if (self.map.getLayer(layer.id) === undefined) {
-                                    self.map.addLayer(layer, lowestOverlay)
-                                }
-                            })
-                        } else {
-                            basemap.layer_definitions.forEach(function(layer) {
-                                if (self.map.getLayer(layer.id) !== undefined) {
-                                    self.map.removeLayer(layer.id);
-                                }
-                            })
-                        }
-                    }, this)
+                    var style = this.map.getStyle();
+                    style.sources = _.defaults(self.sources, style.sources);
+                    var basemapToAdd = _.find(this.basemaps, function(basemap) {
+                        return basemap.name === basemapType.name;
+                    });
+                    var basemapIds = _.map(this.basemaps, function(basemap) {
+                        return _.map(basemap.layer_definitions, function (layer) {
+                            return layer.id;
+                        });
+                    }).reduce(function(ids1, ids2) {
+                        return ids1.concat(ids2);
+                    });
+                    style.layers = basemapToAdd.layer_definitions.concat(_.filter(style.layers, function(layer) {
+                        return !_.contains(basemapIds, layer.id);
+                    }));
+                    self.map.setStyle(style);
                 };
 
                 this.updateConfigs = function() {
