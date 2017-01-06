@@ -16,13 +16,10 @@ require([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
-            var termFilter = new TermFilter()
             this.filters = {
-                termFilter: termFilter,
+                termFilter: new TermFilter(),
                 timeFilter: new TimeFilter(),
-                resourceTypeFilter: new ResourceTypeFilter({
-                    termFilter: termFilter
-                }),
+                resourceTypeFilter: new ResourceTypeFilter(),
                 mapFilter: new MapFilter(),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
@@ -53,7 +50,24 @@ require([
                 return $.param(params).split('+').join('%20');
             });
 
-            this.getSearchQuery();
+            // this.filters.termFilter.filter.terms.subscribe(function(terms){
+            //     _.each(terms, function (term) {
+            //         var filtersAdded = filter.appendFilters(params);
+            //         if (filtersAdded) {
+            //             params.no_filters = false;
+            //         }
+            //     });
+            // }, this);
+
+            this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
+                if(enabled){
+                    this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
+                }else{
+                    this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
+                }
+            },this);
+
+            this.restoreState();
 
             this.viewModel.searchResults.page.subscribe(function() {
                 self.doQuery();
@@ -65,23 +79,15 @@ require([
                 self.doQuery();
             });
 
-            this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
-                if(enabled){
-                    this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
-                }else{
-                    this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
-                }
-            },this);
-
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
             var self = this;
             var queryString = this.queryString();
-            if (this.updateRequest) {
-                this.updateRequest.abort();
-            }
+            // if (this.updateRequest) {
+            //     this.updateRequest.abort();
+            // }
 
             this.viewModel.loading(true);
             window.history.pushState({}, '', '?' + queryString);
@@ -100,11 +106,12 @@ require([
                 },
                 complete: function(request, status) {
                     this.viewModel.loading(false);
+                    this.updateRequest = undefined;
                 }
             });
         },
 
-        getSearchQuery: function() {
+        restoreState: function() {
             var doQuery = false;
             var query = _.chain(decodeURIComponent(location.search).slice(1).split('&'))
                 // Split each array item into [key, value]
