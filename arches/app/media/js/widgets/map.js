@@ -465,7 +465,8 @@ define([
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
-                    if (this.context = 'search-filter' && draw.getAll().features.length > 0) {
+                    if (this.context === 'search-filter' && draw.getAll().features.length > 0) {
+                        console.log(this.context)
                         this.draw.deleteAll();
                     }
                     if (this.form) {
