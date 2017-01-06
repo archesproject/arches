@@ -260,8 +260,8 @@
             </div>
 
             <!--ko if: context === 'search-filter' -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: toggleExtentSearch, css:{'map-draw-tools-active': extentSearch}">
-                <div class="map-overlay-vis-toogle text-center">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: toggleExtentSearch, css:{'map-draw-tools-active': extentSearch}">
+                <div class="map-draw-tools-item-icon text-center">
                     <i class="ion-checkmark-circled"></i>
                 </div>
                 <div class="map-overlay-name">
@@ -272,8 +272,8 @@
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
             <!-- ko foreach: geometryTypes -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
-                <div class="map-overlay-vis-toogle text-center">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
+                <div class="map-draw-tools-item-icon text-center">
                     <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
                 </div>
                 <div class="map-overlay-name">
@@ -284,8 +284,8 @@
             <!-- /ko -->
 
             <!--ko if: context !== 'search-filter' -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
-                <div class="map-overlay-vis-toogle text-center">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+                <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
                 </div>
                 <div class="map-overlay-name">
@@ -295,7 +295,7 @@
             <!-- /ko -->
 
             <!--ko if: context === 'search-filter' -->
-            <div class="map-widget-overlay-item relative editing-tool">
+            <div class="map-draw-tools-item relative query-tool">
                 <div class="map-query-tool">
                     <div class="map-query-tool-name">
                         <a id="" class="" href=""><span>{% trans "Buffer(ft)" %}<span></a>

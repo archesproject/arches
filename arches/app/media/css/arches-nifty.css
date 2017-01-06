@@ -5004,14 +5004,6 @@ div.row.widget-wrapper.report-header:hover {
     opacity: 1.0;
 }
 
-.map-widget-overlay-item.map-draw-tools-active {
-  background-color: #f3f3f3;
-}
-
-.map-widget-overlay-item.map-draw-tools-active:hover {
-  background-color: #f3f3f3;
-}
-
 .map-widget-toolbar-list {
     list-style: none;
     padding-left: 0px;
@@ -5133,6 +5125,54 @@ span.basemap-unselected {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.map-draw-tools-item-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 50px;
+    padding-top: 13px;
+    font-size: 19px;
+    border-right: 1px solid #ddd;
+    color: inherit;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.map-draw-tools-item {
+    width: 248px;
+    height: 50px;
+    padding: 7px;
+    background: #fff;
+    color: #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
+.map-draw-tools-item a {
+  color: inherit;
+}
+
+.map-draw-tools-item i {
+  color: inherit;
+}
+
+.map-draw-tools-item.map-draw-tools-active {
+  background-color: #fff;
+  color: #666;
+}
+
+.map-draw-tools-item:hover {
+  background-color: #fafafa;
+  color: #666;
+  cursor: pointer;
+}
+
+.map-draw-tools-item.query-tool {
+    background: #fff;
+    color: #666;
+    border-bottom: 1px solid #ddd;
 }
 
 .map-query-tool {
