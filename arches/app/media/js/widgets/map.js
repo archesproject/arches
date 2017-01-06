@@ -469,6 +469,7 @@ define([
                     if (this.context === 'search-filter') {
                         this.extentSearch(false);
                         this.draw.deleteAll();
+                        this.prebufferFeature = undefined;
                     }
                     if (this.form) {
                       this.featureColor(this.featureColorCache);
@@ -725,7 +726,7 @@ define([
                 }, this)
 
                 this.applySearchBuffer = function(val) {
-                        if (self.value().features.length > 0) {
+                        if (self.value().features.length > 0 && self.prebufferFeature !== undefined) {
                             var feature = self.value().features[0]
                             self.draw.delete('buffer-layer');
                             if (val > 0) {
@@ -773,7 +774,7 @@ define([
                         }
                         self.value().features = [boundsFeature];
                         self.value(self.value());
-                    } 
+                    }
                 }
 
                 this.extentSearch.subscribe(function(){
