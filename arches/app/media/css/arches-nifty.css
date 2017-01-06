@@ -666,6 +666,7 @@ a.select2-choice {
     user-select: none;
 }
 
+
 .select2-container-multi .select2-choices li {
     float: left;
     list-style: none;
@@ -3286,7 +3287,7 @@ ul.jqtree_common li.jqtree-folder {
     border-right: none;
     border-left: 1px solid #ddd;
     font-size: 17px;
-    padding-left: 20px;
+    padding-left: 16px;
     padding-right: 20px;
     min-width: 50px;
     max-width: 50px;
@@ -3440,6 +3441,10 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-help-topic-content {
     display: none;
+}
+
+.ep-help-toggle div .ion-help {
+    padding-left: 3px;
 }
 
 .reloadable-img {
@@ -5431,7 +5436,34 @@ span.basemap-unselected {
 }
 
 
+.search-results-button {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 2px;
+    width: 40px;
+    height: 40px;
+    background: #fafafa;
+    border: 1px solid #dddddd;
+    border-left-width: 0px; 
+    padding-left: 6px;
+    padding-top: 10px;
+    z-index: 1;
+}
 
+.search-results-panel-closed {
+    left: 10px;
+}
+
+.map-filter-panel div #map-widget-container .search-results-button {
+    display: block;
+}
+
+.search-results-button-icon {
+    font-size: 19px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
 
 .search-listing:hover {
     cursor: move;
