@@ -41,18 +41,18 @@ def prepare_term_index(create=False):
                 'properties': {
                     'ids':{'type': 'string', 'index' : 'not_analyzed'},
                     'context':{'type': 'string', 'index' : 'not_analyzed'},
-                    'term': { 
+                    'term': {
                         'type': 'string',
                         'analyzer': 'standard',
                         'fields': {
-                            'folded': { 
+                            'folded': {
                                 'type': 'string',
                                 'analyzer': 'folding'
                             }
                         }
                     }
-                }            
-            }            
+                }
+            }
         }
     }
 
@@ -72,7 +72,7 @@ def prepare_search_index(resource_model_id, create=False):
 
     """
 
-    index_settings = { 
+    index_settings = {
         'settings':{
             'analysis': {
                 'analyzer': {
@@ -89,7 +89,7 @@ def prepare_search_index(resource_model_id, create=False):
                     'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'tiles' : { 
+                    'tiles' : {
                         'type' : 'nested',
                         'properties' : {
                             "tiles": {'enabled': False},
@@ -107,7 +107,7 @@ def prepare_search_index(resource_model_id, create=False):
                             'folded': { 'type': 'string', 'analyzer': 'folding'}
                         }
                     },
-                    'domains' : { 
+                    'domains' : {
                         'properties' : {
                             'value' : {
                                 'type' : 'string',
@@ -124,14 +124,7 @@ def prepare_search_index(resource_model_id, create=False):
                         "properties": {
                             "features": {
                                 "properties": {
-                                    "geometry": {
-                                        "properties": {
-                                            "coordinates": {
-                                                "type": "double"
-                                            },
-                                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
-                                        }
-                                    },
+                                    "geometry": {"type": "geo_shape"},
                                     "id": { 'type' : 'string', 'index' : 'not_analyzed'},
                                     "type": { 'type' : 'string', 'index' : 'not_analyzed'},
                                     "properties": {
@@ -142,10 +135,10 @@ def prepare_search_index(resource_model_id, create=False):
                             "type": { 'type' : 'string', 'index' : 'not_analyzed'}
                         }
                     },
-                    'dates' : { 
+                    'dates' : {
                         "type" : "date"
                     },
-                    'numbers' : { 
+                    'numbers' : {
                         "type" : "double"
                     }
                 }
@@ -160,7 +153,7 @@ def prepare_search_index(resource_model_id, create=False):
     #                 'value' : {'type' : 'string', 'index' : 'not_analyzed'},
     #                 'label' : {'type' : 'string', 'index' : 'not_analyzed'},
     #                 'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'child_entities' : { 
+    #                 'child_entities' : {
     #                     'type' : 'nested',
     #                     'properties' : {
     #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -179,7 +172,7 @@ def prepare_search_index(resource_model_id, create=False):
     #                         }
     #                     }
     #                 },
-    #                 'domains' : { 
+    #                 'domains' : {
     #                     'type' : 'nested',
     #                     'properties' : {
     #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -198,7 +191,7 @@ def prepare_search_index(resource_model_id, create=False):
     #                         'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
     #                     }
     #                 },
-    #                 'geometries' : { 
+    #                 'geometries' : {
     #                     'type' : 'nested',
     #                     'properties' : {
     #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -212,7 +205,7 @@ def prepare_search_index(resource_model_id, create=False):
     #                         }
     #                     }
     #                 },
-    #                 'dates' : { 
+    #                 'dates' : {
     #                     'type' : 'nested',
     #                     'properties' : {
     #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},

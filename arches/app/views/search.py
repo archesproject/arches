@@ -191,20 +191,21 @@ def build_search_results_dsl(request):
                 geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
                 nested = Nested(path='geometries', query=geoshape)
             else:
-                print 'trying::::::'
-                print spatial_filter['features'][0]['properties']
-                buffer = spatial_filter['features'][0]['properties']['buffer']
+                feature_properties = spatial_filter['features'][0]['properties']
+                buffer = {'width':0,'unit':'ft'}
+                if 'buffer' in feature_properties:
+                    buffer = feature_properties['buffer']
                 geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-                geoshape = GeoShape(field='geometries.value', type=geojson['type'], coordinates=geojson['coordinates'] )
-                nested = Nested(path='geometries', query=geoshape)
+                geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
+                # nested = Nested(path='geometries', query=geoshape)
 
             if 'inverted' not in spatial_filter:
                 spatial_filter['inverted'] = False
 
             if spatial_filter['inverted']:
-                boolfilter.must_not(nested)
+                boolfilter.must_not(geoshape)
             else:
-                boolfilter.must(nested)
+                boolfilter.must(geoshape)
 
     if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)
