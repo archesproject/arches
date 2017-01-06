@@ -466,7 +466,6 @@ define([
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
                     if (this.context = 'search-filter' && draw.getAll().features.length > 0) {
-                        this.buffer(0.0);
                         this.draw.deleteAll();
                     }
                     if (this.form) {
@@ -676,6 +675,9 @@ define([
                         }
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
+                            if (context === 'search-filter') {
+                                self.applySearchBuffer(self.buffer())
+                            }
                         } else {
                             self.drawMode(self.draw.getMode());
                             if (context !== 'search-filter') {
@@ -728,24 +730,28 @@ define([
                     this.geocoder.redrawLayer();
                 }, this)
 
-                this.buffer.subscribe(function(val){
-                    if (self.value().features.length > 0) {
-                        var feature = self.value().features[0]
-                        self.draw.delete('buffer-layer');
-                        if (val > 0) {
-                            var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
-                            buffer.id = 'buffer-layer';
-                            self.value().features[0] = buffer
-                            self.draw.add(buffer)
+                this.applySearchBuffer = function(val) {
+                        if (self.value().features.length > 0) {
+                            var feature = self.value().features[0]
+                            self.draw.delete('buffer-layer');
+                            if (val > 0) {
+                                var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
+                                buffer.id = 'buffer-layer';
+                                self.value().features[0] = buffer
+                                self.draw.add(buffer)
+                            } else {
+                                self.value().features = [self.prebufferFeature]
+                            }
+                            self.value(self.value())
+                            self.draw.changeMode(self.drawMode())
                         } else {
-                            self.value().features = [self.prebufferFeature]
+                            console.log('no features ')
                         }
-                        self.value(self.value())
-                        self.draw.changeMode(self.drawMode())
-                    } else {
-                        console.log('no features ')
                     }
-                })
+
+                this.buffer.subscribe(function(val){
+                    self.applySearchBuffer(val)
+                });
 
                 self.map.on('mousemove', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
