@@ -3290,7 +3290,7 @@ ul.jqtree_common li.jqtree-folder {
     border-right: none;
     border-left: 1px solid #ddd;
     font-size: 17px;
-    padding-left: 20px;
+    padding-left: 16px;
     padding-right: 20px;
     min-width: 50px;
     max-width: 50px;
@@ -3444,6 +3444,10 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-help-topic-content {
     display: none;
+}
+
+.ep-help-toggle div .ion-help {
+    padding-left: 3px;
 }
 
 .reloadable-img {
@@ -4874,6 +4878,10 @@ div.row.widget-wrapper.report-header:hover {
     visibility: hidden;
 }
 
+.geocode-container input {
+    border-color: #aaa;
+}
+
 .geometry-editing-notifications {
     position: absolute;
     top: 0px;
@@ -5413,7 +5421,7 @@ span.basemap-unselected {
     flex: 0 0 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
-    padding: 20px;
+    padding: 10px 20px 20px 20px;
     border-right: solid 1px #dddddd;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -5430,42 +5438,43 @@ span.basemap-unselected {
     padding-right: 8px;
 }
 
-.search-listing {
-    width: 370px;
-    background: #fff;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
+
+.search-results-button {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 2px;
+    width: 40px;
+    height: 40px;
+    background: #fafafa;
+    border: 1px solid #dddddd;
+    border-left-width: 0px; 
+    padding-left: 6px;
+    padding-top: 10px;
+    z-index: 1;
 }
+
+.search-results-panel-closed {
+    left: 10px;
+}
+
+.map-filter-panel div #map-widget-container .search-results-button {
+    display: block;
+}
+
+.search-results-button-icon {
+    font-size: 19px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
 .search-listing:hover {
     cursor: move;
 }
-.search-listing-title {
-    font-size: 17px;
-    font-weight: 500;
-    background: #fff;
-    color: #666;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 10px 5px 0px 10px;
-}
+
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 13px;
-}
-.search-listing-body {
-    max-height: 70px;
-    min-height: 70px;
-    font-size: 12px;
-    color: #888;
-    background: #fff;
-    padding: 5px 10px;
-}
-.search-listing-footer {
-    height: 30px;
-    font-size: 11px;
-    padding: 8px 10px;
-    background: #fafafa;
-    border-top: 1px solid #ddd;
 }
 
 .search-results-pagination {
@@ -5642,10 +5651,9 @@ span.basemap-unselected {
 	font-weight: 500;
 	background: #fff;
 	color: #666;
-	border-bottom: 1px solid #ddd;
 	margin-top: 0px;
 	margin-bottom: 0px;
-	padding: 10px 5px 10px 10px;
+	padding: 10px 5px 0px 10px;
 }
 
 .search-listing-icon {
@@ -5654,16 +5662,18 @@ span.basemap-unselected {
 }
 
 .search-listing-body {
-	height: 70px;
+	max-height: 70px;
+    min-height: 70px;
+    line-height: 1.35;
 	color: #888;
 	background: #fff;
 	padding: 5px 10px;
 }
 
 .search-listing-footer {
-	height: 30px;
+	height: 40px;
 	font-size: 11px;
-	padding: 8px 10px;
+	padding: 10px 10px 0px 10px;
 	background: #fafafa;
 	border-top: 1px solid #ddd;
 }
