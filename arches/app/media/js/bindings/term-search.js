@@ -15,6 +15,9 @@ define([
                     if ($(el).data('select2-data').type === 'filter-flag') {
                         $(el).addClass('filter-flag');
                     }
+                    if ($(el).data('select2-data').inverted) {
+                        $(el).addClass('inverted');
+                    }
                 });
             });
 
