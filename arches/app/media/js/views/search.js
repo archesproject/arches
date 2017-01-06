@@ -25,6 +25,7 @@ require([
                 advancedFilter: new BaseFilter(),
                 searchRelatedResources: new BaseFilter()
             };
+            this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
@@ -48,7 +49,7 @@ require([
                     }
                 });
                 return $.param(params).split('+').join('%20');
-            });
+            }).extend({ deferred: true });
 
             // this.filters.termFilter.filter.terms.subscribe(function(terms){
             //     _.each(terms, function (term) {
@@ -59,13 +60,13 @@ require([
             //     });
             // }, this);
 
-            this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
-                if(enabled){
-                    this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
-                }else{
-                    this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
-                }
-            },this);
+            // this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
+            //     if(enabled){
+            //         this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
+            //     }else{
+            //         this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
+            //     }
+            // },this);
 
             this.restoreState();
 

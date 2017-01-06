@@ -26,7 +26,9 @@ define([
                 if (query.typeFilter.types.length > 0) {
                     this.filter.types(query.typeFilter.types);
                     this.inverted(query.typeFilter.inverted);
-                    //this.termFilter.addTag(this.name, this.inverted());
+                    query.typeFilter.types.forEach(function(item){
+                        this.termFilter.addTag(item.name, this.inverted);
+                    }, this);
                 }
                 doQuery = true;
             }
@@ -39,8 +41,8 @@ define([
 
         appendFilters: function(filterParams) {
             filterParams.typeFilter = ko.toJSON({
-                types: this.filter.types(),
-                inverted: this.inverted()
+                types: this.filter.types,
+                inverted: this.inverted
             });
 
             return this.filter.types().length !== 0;
@@ -48,8 +50,12 @@ define([
 
         selectModelType: function(item){
             console.log(item);
+            this.filter.types().forEach(function(item){
+                this.termFilter.removeTag(item.name);
+            }, this);
             if(!!item){
-                this.filter.types([item.graphid]);
+                this.termFilter.addTag(item.name(), this.inverted);
+                this.filter.types([{graphid:item.graphid, name: item.name()}]);
             }else{
                 this.clear();
             }

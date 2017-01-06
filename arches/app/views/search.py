@@ -110,10 +110,15 @@ def search_results(request):
     return JSONResponse(ret)
 
 def get_doc_type(request):
-    doc_type = ''
+    doc_type = []
     type_filter = JSONDeserializer().deserialize(request.GET.get('typeFilter', '{}'))
     if 'types' in type_filter:
-        doc_type = type_filter['types']
+        for modelType in type_filter['types']:
+            doc_type.append(modelType['graphid'])
+    if 'inverted' in type_filter and type_filter['inverted'] == True:
+        resource_model_ids = list(models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
+        resource_model_ids[:] = (str(value) for value in resource_model_ids if str(value) not in doc_type)
+        doc_type = resource_model_ids
     return doc_type
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
