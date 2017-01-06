@@ -99,6 +99,7 @@ define([
             });
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
             this.buffer = ko.observable(0.0);
+            this.prebufferFeature;
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
@@ -464,6 +465,10 @@ define([
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
+                    if (this.context = 'search-filter' && draw.getAll().features.length > 0) {
+                        this.buffer(0.0);
+                        this.draw.deleteAll();
+                    }
                     if (this.form) {
                       this.featureColor(this.featureColorCache);
                     }
@@ -657,25 +662,37 @@ define([
                             })
                         } else {
                             self.value(currentDrawing)
+                            self.prebufferFeature = currentDrawing.features[0];
                         }
                     }
                 }
 
                 this.updateDrawMode = function(e) {
                     var self = this;
+                    var context = this.context
                     return function(e) {
                         var selectedFeatureType;
+                        var featureCount = self.draw.getAll().features.length;
+                        if (context === 'search-filter' && featureCount > 1) {
+                            _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature){
+                                self.draw.delete(feature.id)
+                            }, self)
+                            self.buffer(0.0)
+                        }
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
+                            self.buffer(0.0);
                         } else {
                             self.drawMode(self.draw.getMode());
-                            if (self.draw.getSelectedIds().length > 0) {
-                                selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
-                                self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
-                            } else {
-                                if (self.draw.getMode().endsWith("select")) {
-                                    self.drawMode(undefined);
-                                };
+                            if (context !== 'search-filter') {
+                                if (self.draw.getSelectedIds().length > 0) {
+                                    selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                    self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                                } else {
+                                    if (self.draw.getMode().endsWith("select")) {
+                                        self.drawMode(undefined);
+                                    };
+                                }
                             }
                         }
                     }
@@ -716,6 +733,28 @@ define([
                     }
                     this.geocoder.redrawLayer();
                 }, this)
+
+                this.buffer.subscribe(function(val){
+                    if (self.value().features.length > 0) {
+                        var feature = self.value().features[0]
+                        var featureCount = self.draw.getAll().features.length;
+                        self.draw.deleteAll();
+                        if (val > 0) {
+                            var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
+                            self.value().features[0] = buffer
+                            self.draw.add(buffer)
+                            self.value().features[1] = self.prebufferFeature
+                            self.draw.add(self.prebufferFeature)
+                        } else {
+                            self.value().features = [self.prebufferFeature]
+                            self.draw.add(self.prebufferFeature)
+                        }
+                        self.value(self.value())
+                        self.draw.changeMode(self.drawMode())
+                    } else {
+                        console.log('no features ')
+                    }
+                })
 
                 self.map.on('mousemove', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
