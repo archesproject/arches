@@ -100,6 +100,7 @@ define([
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
             this.buffer = ko.observable(0.0);
             this.prebufferFeature;
+            this.extentSearch = ko.observable(false);
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
@@ -465,8 +466,8 @@ define([
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
-                    if (this.context === 'search-filter' && draw.getAll().features.length > 0) {
-                        console.log(this.context)
+                    if (this.context === 'search-filter') {
+                        this.extentSearch(false);
                         this.draw.deleteAll();
                     }
                     if (this.form) {
@@ -479,7 +480,6 @@ define([
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
-
                     if (self.geometryTypeDetails[selectedDrawTool] === undefined) { //it has no geom type, so must be trash
                         self.draw.trash();
                         self.drawMode(null);
@@ -706,13 +706,6 @@ define([
                   };
                 };
 
-                this.map.on('moveend', this.updateConfigs());
-                ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
-                    self.map.on(event, self.saveGeometries())
-                });
-                this.map.on('click', this.updateDrawMode())
-                this.map.on('draw.selectionchange', self.updateFeatureStyles());
-
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
                     for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
@@ -750,6 +743,43 @@ define([
                         }
                     }
 
+                this.toggleExtentSearch = function(val) {
+                    this.extentSearch(!this.extentSearch())
+                    if (this.extentSearch() === true){
+                        self.draw.deleteAll();
+                        self.draw.changeMode('simple_select');
+                        self.drawMode(undefined);
+                        _.each(self.geometryTypeDetails, function(geomtype){
+                            geomtype.active(false);
+                        })
+                    }
+                }
+
+                this.searchByExtent = function(){
+                    if (self.extentSearch() === true) {
+                        var bounds = self.map.getBounds();
+                        var ll = bounds.getSouthWest().toArray();
+                        var ul = bounds.getNorthWest().toArray();
+                        var ur = bounds.getNorthEast().toArray();
+                        var lr = bounds.getSouthEast().toArray();
+                        var coordinates = [ll, ul, ur, lr, ll]
+                        var boundsFeature = {
+                          "type": "Feature",
+                          "properties": {},
+                          "geometry": {
+                            "type": "Polygon",
+                            "coordinates": coordinates
+                          }
+                        }
+                        self.value().features = [boundsFeature];
+                        self.value(self.value());
+                    } 
+                }
+
+                this.extentSearch.subscribe(function(){
+                    self.searchByExtent();
+                })
+
                 this.buffer.subscribe(function(val){
                     self.applySearchBuffer(val)
                 });
@@ -763,6 +793,19 @@ define([
                         self.hoverFeature(hoverFeature);
                     }
                 });
+
+                ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
+                    self.map.on(event, self.saveGeometries())
+                });
+                self.map.on('click', this.updateDrawMode())
+                self.map.on('draw.selectionchange', self.updateFeatureStyles());
+
+                if (this.context === 'search-filter'){
+                    self.map.on('moveend', this.searchByExtent)
+                } else {
+                    self.map.on('moveend', this.updateConfigs());
+                }
+
             }; //end setup map
 
             // preprocess relative paths for app tileserver
