@@ -678,7 +678,9 @@ define([
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
                             if (context === 'search-filter') {
-                                self.applySearchBuffer(self.buffer())
+                                if (self.buffer() > 0) {
+                                    self.applySearchBuffer(self.buffer())
+                                }
                             }
                         } else {
                             self.drawMode(self.draw.getMode());
@@ -732,15 +734,15 @@ define([
                             if (val > 0) {
                                 var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
                                 buffer.id = 'buffer-layer';
-                                self.value().features[0] = buffer
+                                self.prebufferFeature.properties.buffer = {width: val, unit: 'ft'}
+                                self.value().features[0] = self.prebufferFeature
                                 self.draw.add(buffer)
                             } else {
+                                self.prebufferFeature.properties.buffer = {width: 0, unit: 'ft'}
                                 self.value().features = [self.prebufferFeature]
                             }
                             self.value(self.value())
                             self.draw.changeMode(self.drawMode())
-                        } else {
-                            console.log('no features ')
                         }
                     }
 
@@ -758,6 +760,7 @@ define([
 
                 this.searchByExtent = function(){
                     if (self.extentSearch() === true) {
+                        self.prebufferFeature = undefined;
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -766,10 +769,10 @@ define([
                         var coordinates = [ll, ul, ur, lr, ll]
                         var boundsFeature = {
                           "type": "Feature",
-                          "properties": {},
+                          "properties": {"buffer":{"width":0,"unit":"ft"}},
                           "geometry": {
                             "type": "Polygon",
-                            "coordinates": coordinates
+                            "coordinates": [coordinates]
                           }
                         }
                         self.value().features = [boundsFeature];
