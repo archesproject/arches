@@ -4963,9 +4963,31 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-map {
-    margin-top: -50px;
-    margin-left: -18px;
-    margin-right: -33px;
+    position: absolute;
+    top: -60px;
+    left: -30px;
+    right: -30px;
+    height: 100vh;
+    transition-duration: .3s;
+}
+
+.expanded-resource-menu {
+    margin-left: -275px;
+    transition-duration: .3s;
+}
+
+.expanded-buttons {
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    transition-duration: .3s;
+}
+
+.expanded-buttons-shim {
+    position: absolute;
+    top: -10px;
+    left: -5px;
+    transition-duration: .3s;
 }
 
 .map-search-container.expanded-map {
@@ -5296,6 +5318,7 @@ span.basemap-unselected {
     padding: 5px 0px;
     margin: -5px 0px 15px 0px;
     background: #5393C8;
+    border: 1px solid #1561A1;
     display: inline-block;
     width: 100%;
 }
@@ -5308,6 +5331,13 @@ span.basemap-unselected {
 .href-button:focus {
     color: #fff;
     background: #1266AB;
+}
+
+.toggle-map-size {
+    width: 80px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 2px;
 }
 
 .left-column-message {
