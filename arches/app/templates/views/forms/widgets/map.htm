@@ -19,7 +19,8 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode & context !== 'search-filter' -->
+        <!--ko if: drawMode -->
+        <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning" role="alert">
@@ -51,6 +52,7 @@
                 </div>
             </div>
         </div>
+        <!-- /ko -->
         <!-- /ko -->
         <div class="overlay-selection-container scroll-y" data-bind="css : {'selector-closed': overlaySelectorClosed}">
           <!-- ko foreach: { data: [$data], as: 'self' } -->
