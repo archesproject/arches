@@ -53,7 +53,6 @@
     </div>
 
     <div class="flex">
-
         <div class="flex">
 
             <!--Form Listing -->
@@ -61,7 +60,7 @@
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div id="search-results-container">
-                    <span class="pull-right" style="margin-top: -35px;" data-bind="with:$parent.resourceTypeFilter"> 
+                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter"> 
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
                             </button>
@@ -72,33 +71,32 @@
                                 <!-- /ko -->
                             </ul>
                         </div>
-
                     </span>
                     {% include 'views/search/search-results.htm' %}
                 </div>
             </div>
-        </div>
 
-        <!-- Card Container -->
-        <div class="card-form-preview-container">
-            <div class="tab-content">
-                <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}, with: mapFilter">
-                    {% include 'views/search/map-filter.htm' %}
-                </div>
-                <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}, with: timeFilter">
-                    {% include 'views/search/time-filter.htm' %}
-                </div>
-                <div class="tab-pane" data-bind="css: {'active': selectedTab() === savedSearches}, with: savedSearches">
-                    <div>save my search</div>
-                </div>
-                <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
-                    <div>perform complex search</div>
-                </div>
-                <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}, with: searchRelatedResources">
-                    <div>search related resources</div>
+            <!-- Card Container -->
+            <div class="card-form-preview-container">
+                <div class="tab-content relative">
+                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}, with: mapFilter">
+                        {% include 'views/search/map-filter.htm' %}
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}, with: timeFilter">
+                        {% include 'views/search/time-filter.htm' %}
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === savedSearches}, with: savedSearches">
+                        <div>save my search</div>
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
+                        <div>perform complex search</div>
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}, with: searchRelatedResources">
+                        <div>search related resources</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div>  
     </div>
 </div>
 {% endblock main_content %}
