@@ -4964,9 +4964,18 @@ div.row.widget-wrapper.report-header:hover {
 
 .expanded-map {
     position: absolute;
+    top: 50px;
+    left: 0px;
+    right: 30px;
+    height: 100vh;
+    transition-duration: .3s;
+}
+
+.expanded-edit-map {
+    position: absolute;
     top: -60px;
-    left: -30px;
-    right: -30px;
+    left: -31px;
+    right: -32px;
     height: 100vh;
     transition-duration: .3s;
 }
@@ -5473,7 +5482,7 @@ span.basemap-unselected {
     display: none;
     position: absolute;
     top: 10px;
-    left: 2px;
+    left: 0px;
     width: 40px;
     height: 40px;
     background: #fafafa;
@@ -5524,7 +5533,11 @@ span.basemap-unselected {
 }
 
 .map-filter-panel {
-    margin-left: 10px;
+    /*margin-left: 10px;*/
+    position: absolute;
+    left: -5px;
+    right: -15px;
+    top: -25px;
 }
 
 
@@ -5567,6 +5580,16 @@ span.basemap-unselected {
 	font-weight: 500;
 	margin-top: 0px;
 }
+
+.resource-selector-button {
+    margin-top: -30px;
+    padding-bottom: 0px;
+}
+
+.search-results-container {
+
+}
+
 
 .calendar {
 	display: table-cell;
