@@ -11,14 +11,14 @@ define([
 
             selection.subscribe(function (value) {
                 searchbox.select2('data', value).trigger('change');
-                $(el).parent().find('.select2-search-choice').each(function(i, el) {
-                    if ($(el).data('select2-data').type === 'filter-flag') {
-                        $(el).addClass('filter-flag');
-                    }
-                    if ($(el).data('select2-data').inverted) {
-                        $(el).addClass('inverted');
-                    }
-                });
+                // $(el).parent().find('.select2-search-choice').each(function(i, el) {
+                //     if ($(el).data('select2-data').type === 'filter-flag') {
+                //         $(el).addClass('filter-flag');
+                //     }
+                //     if ($(el).data('select2-data').inverted) {
+                //         $(el).addClass('inverted');
+                //     }
+                // });
             });
 
             var searchbox = $(el).select2({
@@ -79,7 +79,7 @@ define([
                     if (result.inverted()) {
                         markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
                     }
-                    if (result.type === 'filter-flag') {
+                    if (result.type !== 'string' && result.type !== 'concept' && result.type !== 'term') {
                         $(container.prevObject).addClass('filter-flag');
                     }
                     return markup;
@@ -99,7 +99,6 @@ define([
             }).on('choice-selected', function(e, el) {
                 var selectedTerm = $(el).data('select2-data');
                 var terms = searchbox.select2('data');
-                
                 
                 if(!selectedTerm.inverted()){
                     $(el).find('.fa-minus').show();
