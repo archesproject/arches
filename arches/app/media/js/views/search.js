@@ -51,22 +51,18 @@ require([
                 return $.param(params).split('+').join('%20');
             }).extend({ deferred: true });
 
-            // this.filters.termFilter.filter.terms.subscribe(function(terms){
-            //     _.each(terms, function (term) {
-            //         var filtersAdded = filter.appendFilters(params);
-            //         if (filtersAdded) {
-            //             params.no_filters = false;
-            //         }
-            //     });
-            // }, this);
-
-            // this.filters.resourceTypeFilter.enabled.subscribe(function(enabled){
-            //     if(enabled){
-            //         this.filters.termFilter.addTag(this.filters.resourceTypeFilter.name, this.filters.resourceTypeFilter.inverted());
-            //     }else{
-            //         this.filters.termFilter.removeTag(this.filters.resourceTypeFilter.name);
-            //     }
-            // },this);
+            this.filters.termFilter.filter.terms.subscribe(function(terms){
+                _.each(this.filters, function(filter){
+                    if(filter.name !== 'Term Filter'){
+                        var found = _.find(terms, function(term){
+                           return filter.name === term.type;
+                        }, this)
+                        if(!found){
+                            filter.clear();
+                        }
+                    }
+                }, this);
+            }, this);
 
             this.restoreState();
 

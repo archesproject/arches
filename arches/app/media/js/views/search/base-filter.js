@@ -9,7 +9,6 @@ define([
             
             // the various filters managed by this widget
             this.filter = {};
-            this.enabled = ko.observable(false);
             this.inverted = ko.observable(false);
 
             // Call the original constructor

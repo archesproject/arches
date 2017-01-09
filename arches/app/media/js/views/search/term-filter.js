@@ -45,10 +45,10 @@ define([
             return terms.length > 0;
         },
 
-        addTag: function(term, inverted){
+        addTag: function(term, type, inverted){
             this.filter.terms.unshift({
                 inverted: inverted,
-                type: 'filter-flag',
+                type: type,
                 context: '',
                 context_label: '',
                 id: term,

@@ -9,14 +9,6 @@ define([
             this.name = 'Resource Type Filter';
             
             this.filter.types = ko.observableArray();
-            
-            this.enabled = ko.computed(function(){
-                return this.filter.types().length > 0;
-            }, this);
-
-            this.enabled.subscribe(function(enabled){
-                console.log(enabled)
-            })
         },
 
         restoreState: function(query) {
@@ -27,7 +19,7 @@ define([
                     this.filter.types(query.typeFilter.types);
                     this.inverted(query.typeFilter.inverted);
                     query.typeFilter.types.forEach(function(item){
-                        this.termFilter.addTag(item.name, this.inverted);
+                        this.termFilter.addTag(item.name, this.name, this.inverted);
                     }, this);
                 }
                 doQuery = true;
@@ -56,7 +48,7 @@ define([
                 this.termFilter.removeTag(item.name);
             }, this);
             if(!!item){
-                this.termFilter.addTag(item.name(), this.inverted);
+                this.termFilter.addTag(item.name(), this.name, this.inverted);
                 this.filter.types([{graphid:item.graphid, name: item.name()}]);
             }else{
                 this.clear();
