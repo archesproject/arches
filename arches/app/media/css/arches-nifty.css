@@ -4997,8 +4997,8 @@ div.row.widget-wrapper.report-header:hover {
 
 .expanded-buttons {
     position: absolute;
-    top: 10px;
-    left: -5px;
+    top: 60px;
+    left: 10px;
     transition-duration: .3s;
 }
 
@@ -5513,6 +5513,10 @@ span.basemap-unselected {
     padding-right: 8px;
 }
 
+.search-control-container.slide {
+    margin-left: -400px;
+    transition: all .5s;
+}
 
 .search-results-button {
     display: none;
