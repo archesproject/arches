@@ -35,7 +35,7 @@ from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index
 from arches.app.models import models
-import csv
+import csv, json
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from django.db import transaction
@@ -50,7 +50,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file'],
+            'create_mapping_file', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -84,11 +84,17 @@ class Command(BaseCommand):
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
             help='A path to a mapnik xml file to generate a tileserver layer from.')
 
+        parser.add_argument('-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
+            help='A path to a mapbox json file to generate a layer from.')
+
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
 
         parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
             help='An icon class to use for a tileserver layer.')
+
+        parser.add_argument('-b', '--is_basemap', action='store_true', dest='is_basemap',
+            help='Add to make the layer a basemap.')
 
 
     def handle(self, *args, **options):
@@ -147,7 +153,10 @@ class Command(BaseCommand):
             self.export_json(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'add_tilserver_layer':
-            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'])
+            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
+
+        if options['operation'] == 'add_mapbox_layer':
+            self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
 
         if options['operation'] == 'delete_tilserver_layer':
             self.delete_tilserver_layer(options['layer_name'])
@@ -417,7 +426,7 @@ class Command(BaseCommand):
 
         ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)
 
-    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe'):
+    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
         if layer_name != False and mapnik_xml_path != False:
             with transaction.atomic():
                 tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
@@ -436,12 +445,24 @@ class Command(BaseCommand):
                     "maxzoom": 22
                 }]
                 map_source = models.MapSources(name=layer_name, source=source_dict)
-                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=True, icon=layer_icon)
+                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
                 map_source.save()
                 map_layer.save()
                 tileserver_layer.map_layer = map_layer
                 tileserver_layer.map_source = map_source
                 tileserver_layer.save()
+
+
+    def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):
+        if layer_name != False and mapbox_json_path != False:
+            with open(mapbox_json_path) as data_file:
+                data = json.load(data_file)
+                with transaction.atomic():
+                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
+                    map_layer.save()
+                    for source_name, source_dict in data['sources'].iteritems():
+                        map_source = models.MapSources.objects.get_or_create(name=source_name, source=source_dict)
+
 
     def delete_tilserver_layer(self, layer_name=False):
         if layer_name != False:

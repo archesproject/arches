@@ -1,40 +1,38 @@
 require([
     'jquery',
+    'underscore',
     'knockout',
     'arches',
     'viewmodels/alert',
     'views/search/base-filter',
+    'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/resource-type-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, ko, arches, AlertViewModel, BaseFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
-
-            this.viewModel.termFilter = new TermFilter();
-            this.viewModel.timeFilter = new BaseFilter();
-            this.viewModel.mapFilter = new MapFilter();
-            this.viewModel.savedSearches = new BaseFilter();
-            this.viewModel.advancedFilter = new BaseFilter();
-            this.viewModel.searchRelatedResources = new BaseFilter();
-
-            this.filters = [
-                this.viewModel.termFilter,
-                this.viewModel.timeFilter,
-                this.viewModel.mapFilter,
-                this.viewModel.savedSearches,
-                this.viewModel.advancedFilter,
-                this.viewModel.searchRelatedResources
-            ];
+            this.filters = {
+                termFilter: new TermFilter(),
+                timeFilter: new TimeFilter(),
+                resourceTypeFilter: new ResourceTypeFilter(),
+                mapFilter: new MapFilter(),
+                savedSearches: new BaseFilter(),
+                advancedFilter: new BaseFilter(),
+                searchRelatedResources: new BaseFilter()
+            };
+            this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
+            _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
 
-            this.viewModel.selectedTab = ko.observable(this.viewModel.mapFilter);
+            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
 
             self.isNewQuery = true;
 
@@ -44,16 +42,29 @@ require([
                     include_ids: self.isNewQuery,
                     no_filters: true
                 };
-                self.filters.forEach(function(filter) {
+                _.each(self.filters, function (filter) {
                     var filtersAdded = filter.appendFilters(params);
                     if (filtersAdded) {
                         params.no_filters = false;
                     }
                 });
                 return $.param(params).split('+').join('%20');
-            });
+            }).extend({ deferred: true });
 
-            this.getSearchQuery();
+            this.filters.termFilter.filter.terms.subscribe(function(terms){
+                _.each(this.filters, function(filter){
+                    if(filter.name !== 'Term Filter'){
+                        var found = _.find(terms, function(term){
+                           return filter.name === term.type;
+                        }, this)
+                        if(!found){
+                            filter.clear();
+                        }
+                    }
+                }, this);
+            }, this);
+
+            this.restoreState();
 
             this.viewModel.searchResults.page.subscribe(function() {
                 self.doQuery();
@@ -71,9 +82,9 @@ require([
         doQuery: function() {
             var self = this;
             var queryString = this.queryString();
-            if (this.updateRequest) {
-                this.updateRequest.abort();
-            }
+            // if (this.updateRequest) {
+            //     this.updateRequest.abort();
+            // }
 
             this.viewModel.loading(true);
             window.history.pushState({}, '', '?' + queryString);
@@ -92,12 +103,12 @@ require([
                 },
                 complete: function(request, status) {
                     this.viewModel.loading(false);
+                    this.updateRequest = undefined;
                 }
             });
         },
 
-        getSearchQuery: function() {
-            var doQuery = false;
+        restoreState: function() {
             var query = _.chain(decodeURIComponent(location.search).slice(1).split('&'))
                 // Split each array item into [key, value]
                 // ignore empty string if search is empty
@@ -113,24 +124,21 @@ require([
 
             if ('page' in query) {
                 query.page = JSON.parse(query.page);
-                doQuery = true;
+            } else {
+                query.page = 1;
             }
             this.viewModel.searchResults.restoreState(query.page);
 
-            this.filters.forEach(function (filter) {
-                if (filter.restoreState(query)){
-                    doQuery = true;
-                }
+            _.each(this.filters, function (filter) {
+                filter.restoreState(query)
             });
 
-            if (doQuery) {
-                this.doQuery();
-            }
+            this.doQuery();
         },
 
         clear: function() {
-            this.filters.forEach(function(filter) {
-                filter.clear();;
+            _.each(this.filters, function (filter) {
+                filter.clear();
             });
         }
     });

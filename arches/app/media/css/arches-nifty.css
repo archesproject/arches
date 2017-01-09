@@ -64,7 +64,7 @@
 
 .main-navbar-item {
     width: 48px;
-    border-right-width: 0px; 
+    border-right-width: 0px;
 }
 
 .main-navbar-icon {
@@ -664,6 +664,10 @@ a.select2-choice {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.filter-flag {
+    background: #30ad24 !important;
 }
 
 .select2-container-multi .select2-choices li {
@@ -3285,7 +3289,7 @@ ul.jqtree_common li.jqtree-folder {
     border-right: none;
     border-left: 1px solid #ddd;
     font-size: 17px;
-    padding-left: 20px;
+    padding-left: 16px;
     padding-right: 20px;
     min-width: 50px;
     max-width: 50px;
@@ -3439,6 +3443,10 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-help-topic-content {
     display: none;
+}
+
+.ep-help-toggle div .ion-help {
+    padding-left: 3px;
 }
 
 .reloadable-img {
@@ -4206,6 +4214,14 @@ div.row.widget-wrapper {
     padding: 5px 5px 15px 5px;
 }
 
+.input-group .form-control {
+    position: relative;
+    z-index: 0;
+    float: left;
+    width: 100%;
+    margin-bottom: 0;
+}
+
 .widget-preview div.row.widget-wrapper:hover {
     background: #fafafa;
 }
@@ -4869,6 +4885,10 @@ div.row.widget-wrapper.report-header:hover {
     visibility: hidden;
 }
 
+.geocode-container input {
+    border-color: #aaa;
+}
+
 .geometry-editing-notifications {
     position: absolute;
     top: 0px;
@@ -4936,6 +4956,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 0px;
     height: 500px;
     background: #fbfbfb;
+    border: 1px solid #bbb;
 }
 
 .map-search-container {
@@ -4950,9 +4971,41 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-map {
-    margin-top: -50px;
-    margin-left: -18px;
-    margin-right: -33px;
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    right: 30px;
+    height: 100vh;
+    transition-duration: .3s;
+}
+
+.expanded-edit-map {
+    position: absolute;
+    border-width: 0px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 100vh;
+    transition-duration: .3s;
+}
+
+.expanded-resource-menu {
+    margin-left: -275px;
+    transition-duration: .3s;
+}
+
+.expanded-buttons {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    transition-duration: .3s;
+}
+
+.expanded-buttons-shim {
+    position: absolute;
+    top: -10px;
+    left: -5px;
+    transition-duration: .3s;
 }
 
 .map-search-container.expanded-map {
@@ -5283,6 +5336,7 @@ span.basemap-unselected {
     padding: 5px 0px;
     margin: -5px 0px 15px 0px;
     background: #5393C8;
+    border: 1px solid #1561A1;
     display: inline-block;
     width: 100%;
 }
@@ -5296,6 +5350,39 @@ span.basemap-unselected {
     color: #fff;
     background: #1266AB;
 }
+
+.toggle-map-size {
+    width: 80px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+/* Disable "Full Screen" button for map tools widget in card manager */
+.widget-preview div div div h4 .toggle-map-size {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.widget-preview div div div h4 .toggle-map-size:hover {
+    cursor: default;
+    background: #5393C8;
+}
+
+.widget-preview div div div h4 .toggle-map-size:focus {
+    background: #5393C8;
+}
+
+.widget-preview div div div h4 .toggle-map-size i:hover {
+    cursor: default;
+}
+/* End Disable "Full Screen" button for map tools widget in card manager */
+
 
 .left-column-message {
     padding: 10px 15px;
@@ -5408,7 +5495,7 @@ span.basemap-unselected {
     flex: 0 0 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
-    padding: 20px;
+    padding: 10px 20px 20px 20px;
     border-right: solid 1px #dddddd;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -5425,42 +5512,47 @@ span.basemap-unselected {
     padding-right: 8px;
 }
 
-.search-listing {
-    width: 370px;
-    background: #fff;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
+.search-control-container.slide {
+    margin-left: -400px;
+    transition: all .5s;
 }
+
+.search-results-button {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    width: 40px;
+    height: 40px;
+    background: #fafafa;
+    border: 1px solid #dddddd;
+    border-left-width: 0px; 
+    padding-left: 6px;
+    padding-top: 10px;
+    z-index: 1;
+}
+
+.search-results-panel-closed {
+    left: 10px;
+}
+
+.map-filter-panel div #map-widget-container .search-results-button {
+    display: block;
+}
+
+.search-results-button-icon {
+    font-size: 19px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
 .search-listing:hover {
     cursor: move;
 }
-.search-listing-title {
-    font-size: 17px;
-    font-weight: 500;
-    background: #fff;
-    color: #666;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 10px 5px 0px 10px;
-}
+
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 13px;
-}
-.search-listing-body {
-    max-height: 70px;
-    min-height: 70px;
-    font-size: 12px;
-    color: #888;
-    background: #fff;
-    padding: 5px 10px;
-}
-.search-listing-footer {
-    height: 30px;
-    font-size: 11px;
-    padding: 8px 10px;
-    background: #fafafa;
-    border-top: 1px solid #ddd;
 }
 
 .search-results-pagination {
@@ -5480,7 +5572,11 @@ span.basemap-unselected {
 }
 
 .map-filter-panel {
-    margin-left: 10px;
+    /*margin-left: 10px;*/
+    position: absolute;
+    left: -5px;
+    right: -15px;
+    top: -25px;
 }
 
 
@@ -5492,8 +5588,192 @@ span.basemap-unselected {
     margin-top: 3px;
 }
 
+.time-search-container {
+	padding: 20px;
+}
+
+.advanced-search-container {
+	padding: 20px;
+}
+
+.form-settings-container {
+	-ms-flex: 0 0 calc(100% - 650px);
+    -webkit-flex: 0 0 calc(100% - 650px);
+    flex: 0 0 calc(100% - 650px);
+    margin-bottom: 0px;
+    margin-left: -1px;
+    padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.dropdown-crud {
+	right: 0px;
+	padding-left: 15px;
+	min-height: 500px;
+	overflow-y: scroll;
+}
+
+.search-title {
+	font-size: 19px;
+	font-weight: 500;
+	margin-top: 0px;
+}
+
+.resource-selector-button {
+    margin-top: -30px;
+    padding-bottom: 0px;
+}
+
+.search-results-container {
+
+}
 
 
+.calendar {
+	display: table-cell;
+	width: 180px;
+	padding-left: 5px;
+}
+
+.datepicker-inline {
+	background: #fff;
+	border-width: 0px;
+}
+
+.search-label {
+	font-weight: 300;
+	font-size: 17px;
+	margin-bottom: 3px;
+}
+
+.search-date-picker {
+   	display: inline-block;
+   	padding-left: 20px;
+   	padding-right: 20px;
+    font-size: 16px;
+    color: #123;
+    background: azure;
+    height: 40px;
+    width: 235px;
+}
+
+.date-selector {
+	position: absolute;
+	top: 10px;
+	left: 20px;
+}
+
+#calendar .chosen-container-single .chosen-single {
+    height: 40px;
+    padding-top: 10px;
+}
+
+#calendar .chosen-container-single .chosen-single div b:before {
+	vertical-align: -70%;
+}
+
+.calendar-title {
+	color: #fff;
+	font-weight: 600;
+}
+
+.time-search-calendar-panel {
+	padding: 10px;
+	background: #9DCCF7;
+	font-size: 13px;
+	font-weight: 500;
+	display: table-cell;
+}
+
+.related-resources-title {
+	font-size: 19px;
+	font-weight: 500;
+}
+
+.related-resources-relationship {
+	margin-top: -25px;
+	margin-right: 10px;
+	float: right;
+}
+
+.related-reources-crud-link {
+	background: #ddd;
+	border: 1px solid #ccc;
+    padding: 4px 8px;
+    margin-top: -5px;
+}
+
+.search-filter {
+	transform: translate(0, -2px);
+    font-size: 21px;
+    padding: 6px;
+    margin-top: -10px;
+    color: #888;
+    border: 1px solid transparent;
+}
+
+.search-filter.active {
+	background: #f2f2f2;
+	color: #555;
+	border: 1px solid #ddd;
+}
+
+.search-filter:hover {
+	cursor: pointer;
+	background: #f2f2f2;
+	color: #555;
+	border: 1px solid #ddd;
+}
+
+.search-listing {
+	width: 360px;
+	background: #fff;
+	border: 1px solid #ddd;
+	margin-bottom: 10px;
+}
+
+.search-listing:hover {
+	cursor: move;
+}
+
+.search-listing-title {
+	font-size: 17px;
+	font-weight: 500;
+	background: #fff;
+	color: #666;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 10px 5px 0px 10px;
+}
+
+.search-listing-icon {
+	transform: translate(0, -2px);
+    font-size: 13px;
+}
+
+.search-listing-body {
+	max-height: 60px;
+    min-height: 60px;
+    font-size: 12px;
+    line-height: 1.35;
+	color: #888;
+	background: #fff;
+	padding: 5px 10px;
+}
+
+.search-listing-footer {
+	height: 40px;
+	font-size: 11px;
+	padding: 10px 10px 0px 10px;
+	background: #fafafa;
+	border-top: 1px solid #ddd;
+}
+
+.data-entry-container {
+	width: calc(100% - 810px);
+	background: #ebeef0;
+}
 
 @keyframes loader {
 	0% { background: #ddd; }

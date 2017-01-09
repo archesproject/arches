@@ -1,24 +1,30 @@
 define([
     'knockout',
+    'underscore',
     'views/search/base-filter',
     'bindings/term-search'
-], function(ko, BaseFilter) {
+], function(ko, _, BaseFilter, termSearchComponent) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
+            
+            this.name = 'Term Filter';
+            
             this.filter.terms = ko.observableArray();
         },
 
         restoreState: function(query) {
-            var self = this;
             var doQuery = false;
             if ('termFilter' in query) {
                 query.termFilter = JSON.parse(query.termFilter);
+                if (query.termFilter.length > 0) {
+                    query.termFilter.forEach(function(term){
+                        term.inverted = ko.observable(term.inverted);
+                    })
+                    this.filter.terms(query.termFilter);
+                }
+
                 doQuery = true;
-            }
-            var filters = query.termFilter;
-            if (typeof filters !== 'undefined' && filters.length > 0) {
-                self.filter.terms(filters);
             }
             return doQuery;
         },
@@ -28,8 +34,34 @@ define([
         },
 
         appendFilters: function(filterParams) {
-            filterParams.termFilter = ko.toJSON(this.filter.terms());
-            return this.filter.terms().length === 0;
+            var terms = _.filter(this.filter.terms(), function(term){
+                return term.type !== 'filter-flag';
+            }, this);
+
+            if(terms.length > 0){
+                filterParams.termFilter = ko.toJSON(terms);
+            }
+
+            return terms.length > 0;
+        },
+
+        addTag: function(term, type, inverted){
+            this.filter.terms.unshift({
+                inverted: inverted,
+                type: type,
+                context: '',
+                context_label: '',
+                id: term,
+                text: term,
+                value: term
+            });
+        },
+
+        removeTag: function(term){
+            this.filter.terms.remove(function(term_item){ 
+                return term_item.id == term && term_item.text == term && term_item.value == term; 
+            });
         }
+
     });
 });

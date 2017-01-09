@@ -229,4 +229,4 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertIsNotNone(response.content)
 
         imported_json = JSONDeserializer().deserialize(response.content)
-        self.assertEqual(imported_json, [])
+        self.assertEqual(imported_json[0], [])
