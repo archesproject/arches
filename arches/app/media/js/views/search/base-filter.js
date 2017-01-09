@@ -1,10 +1,19 @@
 define([
     'jquery',
-    'backbone'
-], function($, Backbone) {
+    'backbone',
+    'knockout'
+], function($, Backbone, ko) {
     return Backbone.View.extend({
-        // the various filters managed by this search filter widget
-        filter: {},
+        constructor: function() {
+            this.name = 'Base Filter';
+            
+            // the various filters managed by this widget
+            this.filter = {};
+            this.inverted = ko.observable(false);
+
+            // Call the original constructor
+            Backbone.View.apply(this, arguments);
+        },
 
         initialize: function(options) {
             $.extend(this, options);
