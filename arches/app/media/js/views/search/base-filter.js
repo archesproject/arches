@@ -9,7 +9,6 @@ define([
             
             // the various filters managed by this widget
             this.filter = {};
-            this.inverted = ko.observable(false);
 
             // Call the original constructor
             Backbone.View.apply(this, arguments);

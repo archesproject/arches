@@ -110,16 +110,21 @@ def search_results(request):
     return JSONResponse(ret)
 
 def get_doc_type(request):
-    doc_type = []
-    type_filter = JSONDeserializer().deserialize(request.GET.get('typeFilter', '{}'))
-    if 'types' in type_filter:
-        for modelType in type_filter['types']:
-            doc_type.append(modelType['graphid'])
-    if 'inverted' in type_filter and type_filter['inverted'] == True:
-        resource_model_ids = list(models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
-        resource_model_ids[:] = (str(value) for value in resource_model_ids if str(value) not in doc_type)
-        doc_type = resource_model_ids
-    return doc_type
+    doc_type = set()
+    type_filter = request.GET.get('typeFilter', '')
+    if type_filter != '':
+        resource_model_ids = set(str(graphid) for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
+        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
+            if resouceTypeFilter['inverted'] == True:
+                inverted_resource_model_ids = resource_model_ids - set([str(resouceTypeFilter['graphid'])])
+                if len(doc_type) > 0:
+                    doc_type = doc_type.intersection(inverted_resource_model_ids)
+                else:
+                    doc_type = inverted_resource_model_ids
+            else:
+                doc_type.add(str(resouceTypeFilter['graphid']))
+
+    return list(doc_type)
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
