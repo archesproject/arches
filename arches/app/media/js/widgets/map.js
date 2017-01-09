@@ -228,6 +228,14 @@ define([
             }
 
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
+            _.each(arches.mapLayers, function (layer) {
+                _.each(layer.layer_definitions, function(def) {
+                    def.id += '-'  + layer.name;
+                    if (def.ref) {
+                        def.ref += '-'  + layer.name;
+                    }
+                });
+            });
             this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
             this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
@@ -491,22 +499,31 @@ define([
 
                 this.removeMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        maplayer.layer_definitions.forEach(function(layer) {
-                            if (map.getLayer(layer.id) !== undefined) {
-                                map.removeLayer(layer.id)
-                            }
+                        var style = this.map.getStyle();
+                        maplayer.layer_definitions.forEach(function(def) {
+                            var layer = _.find(style.layers, function (layer) {
+                                return layer.id === def.id;
+                            });
+                            style.layers = _.without(style.layers, layer);
                         })
+                        style.sources = _.defaults(self.sources, style.sources);
+                        this.map.setStyle(style);
                     }
                 }
 
                 this.addMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        maplayer.layer_definitions.forEach(function(layer) {
-                            if (map.getLayer(layer.id) === undefined) {
-                                map.addLayer(layer, this.anchorLayerId);
-                                map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
-                            }
-                        }, this)
+                        var style = this.map.getStyle();
+                        var anchorIndex = _.findIndex(style.layers, function(layer) {
+                            return layer.id === self.anchorLayerId;
+                        });
+
+                        var l1 = style.layers.slice(0,anchorIndex);
+                        var l2 = style.layers.slice(anchorIndex);
+                        style.sources = _.defaults(self.sources, style.sources);
+                        style.layers = l1.concat(maplayer.layer_definitions, l2);
+                        this.map.setStyle(style);
+                        maplayer.updateOpacity(maplayer.opacity());
                     }
                 }
 
@@ -528,6 +545,25 @@ define([
                     }
                 });
 
+                var opacityTypes = [
+                    'background',
+                    'fill',
+                    'line',
+                    'text',
+                    'icon',
+                    'raster',
+                    'circle',
+                    'fill-extrusion'
+                ];
+                var multiplyStopValues = function(stops, multiplier) {
+                    _.each(stops, function(stop) {
+                        if (Array.isArray(stop[1])) {
+                            multiplyStopValues(stop[1], multiplier);
+                        } else {
+                            stop[1] = stop[1] * multiplier;
+                        }
+                    });
+                };
                 this.createOverlay = function(maplayer) {
                     var self = this;
                     var configMaplayer;
@@ -549,9 +585,39 @@ define([
                         },
                         updateOpacity: function(val) {
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
-                            this.layer_definitions.forEach(function(layer) {
-                                this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                            }, map)
+                            var opacityVal = Number(val) / 100.0;
+                            var style = map.getStyle();
+                            style.sources = _.defaults(self.sources, style.sources);
+
+                            this.layer_definitions.forEach(function(def) {
+                                var layer = _.find(style.layers, function (layer) {
+                                    return layer.id === def.id;
+                                });
+                                if (layer && layer.paint) {
+                                    _.each(opacityTypes, function (opacityType) {
+                                        var startVal = def.paint[opacityType+'-opacity'];
+
+                                        if (startVal) {
+                                            if (parseFloat(startVal)) {
+                                                layer.paint[opacityType+'-opacity'] = startVal * opacityVal;
+                                            } else {
+                                                layer.paint[opacityType+'-opacity'] = JSON.parse(JSON.stringify(startVal));
+                                                if (startVal.base) {
+                                                    layer.paint[opacityType+'-opacity'].base = startVal.base * opacityVal;
+                                                }
+                                                if (startVal.stops) {
+                                                    multiplyStopValues(layer.paint[opacityType+'-opacity'].stops, opacityVal);
+                                                }
+                                            }
+                                        } else if (layer.type === opacityType ||
+                                            (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon')) ) {
+                                            layer.paint[opacityType+'-opacity'] = opacityVal;
+                                        }
+                                    });
+                                }
+                            }, this)
+
+                            map.setStyle(style);
                         }
                     });
                     configMaplayer = _.findWhere(this.overlayConfigs(), {
@@ -566,9 +632,7 @@ define([
                         this.overlayConfigs().forEach(
                             function(overlayConfig) {
                                 if (maplayer.maplayerid === overlayConfig.maplayerid) {
-                                    // self.overlayConfigs.valueWillMutate();
                                     overlayConfig.opacity = value
-                                        // self.overlayConfigs.valueHasMutated();
                                 }
                             }, self)
                         maplayer.updateOpacity(value);
