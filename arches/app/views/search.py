@@ -83,7 +83,7 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    results = dsl.search(index='resource', doc_type='')
+    results = dsl.search(index='resource', doc_type=get_doc_type(request))
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
@@ -108,6 +108,18 @@ def search_results(request):
     ret['paginator']['end_index'] = page.end_index()
     ret['paginator']['pages'] = pages
     return JSONResponse(ret)
+
+def get_doc_type(request):
+    doc_type = []
+    type_filter = JSONDeserializer().deserialize(request.GET.get('typeFilter', '{}'))
+    if 'types' in type_filter:
+        for modelType in type_filter['types']:
+            doc_type.append(modelType['graphid'])
+    if 'inverted' in type_filter and type_filter['inverted'] == True:
+        resource_model_ids = list(models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
+        resource_model_ids[:] = (str(value) for value in resource_model_ids if str(value) not in doc_type)
+        doc_type = resource_model_ids
+    return doc_type
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
@@ -154,29 +166,27 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                #entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
-                bool_dsl = Bool()
-                #bool_dsl.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
-                bool_dsl.must(Match(field='strings', query=term['value'], type='phrase'))
+                term_filter = Bool()
+                term_filter.must(Match(field='strings', query=term['value'], type='phrase'))
                 if term['inverted']:
-                    boolfilter.must_not(bool_dsl)
+                    boolfilter.must_not(term_filter)
                 else:
-                    boolfilter.must(bool_dsl)
+                    boolfilter.must(term_filter)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
-                terms = Terms(field='domains.conceptid', terms=concept_ids)
+                conceptid_filter = Terms(field='domains.conceptid', terms=concept_ids)
                 if term['inverted']:
-                    boolfilter.must_not(terms)
+                    boolfilter.must_not(conceptid_filter)
                 else:
-                    boolfilter.must(terms)
+                    boolfilter.must(conceptid_filter)
             elif term['type'] == 'string':
-                boolfilter = Bool()
-                boolfilter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
-                boolfilter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
+                string_filter = Bool()
+                string_filter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
+                string_filter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
                 if term['inverted']:
-                    boolquery.must_not(boolfilter)
+                    boolfilter.must_not(string_filter)
                 else:
-                    boolquery.must(boolfilter)
+                    boolfilter.must(string_filter)
 
     if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:

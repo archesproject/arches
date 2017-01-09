@@ -2,12 +2,12 @@
 {% load i18n %}
 
 <!-- Content -->
-<div style="padding-top: 0px;">
+<div class="search-results-container">
     <div class="row" style="">
         <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading loading-mask" style="display: none;">
 
             <img src="{% static 'img/spinner.gif' %}" height="28" width="28" style="margin-top: 2px;">
-            <p class="map-loading-text">Loading results...</p>
+            <p class="map-loading-text">{% trans "Loading results..." %}</p>
 
         </div>
     </div>
@@ -25,10 +25,9 @@
                 </div>
 
                 <div class="search-listing-footer">
-                    {% if 'edit' in user.user_groups %}<a class="search-candidate-link" href=""><i class="ion-ios-refresh-empty"></i> Edit</a>{% endif %}
+                    {% if 'edit' in user.user_groups %}<a class="search-candidate-link" href=""><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
                     <a class="search-candidate-link" href="" data-bind="visible: geometries().length > 0, attr: { 'data-resourceinstanceid': resourceinstanceid, 'data-geometries': JSON.stringify(geometries()) }"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
-                    <a class="search-candidate-link pull-right" href=""><i class="fa fa-code-fork"></i> Related Resources</a>
-
+                    <a class="search-candidate-link pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                 </div>
             </div>
 

@@ -124,7 +124,7 @@ def prepare_search_index(resource_model_id, create=False):
                         "properties": {
                             "features": {
                                 "properties": {
-                                    "geometry": {'type': 'geo_shape'},
+                                    "geometry": {"type": "geo_shape"},
                                     "id": { 'type' : 'string', 'index' : 'not_analyzed'},
                                     "type": { 'type' : 'string', 'index' : 'not_analyzed'},
                                     "properties": {
