@@ -4957,6 +4957,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 0px;
     height: 500px;
     background: #fbfbfb;
+    border: 1px solid #bbb;
 }
 
 .map-search-container {
@@ -4981,6 +4982,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .expanded-edit-map {
     position: absolute;
+    border-width: 0px;
     top: 0px;
     left: 0px;
     right: 0px;
@@ -5356,6 +5358,32 @@ span.basemap-unselected {
     text-align: center;
     border-radius: 2px;
 }
+
+/* Disable "Full Screen" button for map tools widget in card manager */
+.widget-preview div div div h4 .toggle-map-size {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.widget-preview div div div h4 .toggle-map-size:hover {
+    cursor: default;
+    background: #5393C8;
+}
+
+.widget-preview div div div h4 .toggle-map-size:focus {
+    background: #5393C8;
+}
+
+.widget-preview div div div h4 .toggle-map-size i:hover {
+    cursor: default;
+}
+/* End Disable "Full Screen" button for map tools widget in card manager */
+
 
 .left-column-message {
     padding: 10px 15px;
