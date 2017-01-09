@@ -34,17 +34,6 @@ from tileserver import clean_resource_cache
 class TileData(View):
     action = 'update_tile'
 
-    def get(self, request):
-        from arches.app.models.graph import Graph
-        from arches.app.models.card import Card
-        from arches.app.models.forms import Form
-        if self.action == 'get_blank_tile':
-            ret = {}
-            nodeid = request.GET.get('nodeid', None)
-            ret = Form.get_blank_tile_from_nodeid(nodeid, resourceid=None)
-
-            return JSONResponse(ret)
-
     def post(self, request):
         if self.action == 'update_tile':
             json = request.POST.get('data', None)

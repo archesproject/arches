@@ -11,14 +11,6 @@ define([
 
             selection.subscribe(function (value) {
                 searchbox.select2('data', value).trigger('change');
-                // $(el).parent().find('.select2-search-choice').each(function(i, el) {
-                //     if ($(el).data('select2-data').type === 'filter-flag') {
-                //         $(el).addClass('filter-flag');
-                //     }
-                //     if ($(el).data('select2-data').inverted) {
-                //         $(el).addClass('inverted');
-                //     }
-                // });
             });
 
             var searchbox = $(el).select2({

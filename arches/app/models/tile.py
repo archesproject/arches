@@ -101,6 +101,8 @@ class Tile(models.TileModel):
                 pass
         for tiles in self.tiles.itervalues():
             for tile in tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
 
 
@@ -207,6 +209,7 @@ class Tile(models.TileModel):
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
             parent_tile = Tile()
+            parent_tile.tileid = None
             parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
             parent_tile.resourceinstance_id = resourceid
             parent_tile.tiles = {}
