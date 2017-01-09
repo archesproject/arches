@@ -284,6 +284,52 @@ define([
                 return resourceLayer;
             }
 
+            // var resourceinstance_ids = ['033361ab-d6a7-11e6-b8d3-c4b301baab9f']
+            var resourceinstance_ids = ['0f973238-a5fc-11e6-8c2d-6c4008b05c4c']
+            this.defineSearchResultsLayer = function() {
+                var resourceLayer = {
+                    name: "Search Results",
+                    maplayerid: "search_results",
+                    isResource: true,
+                    layer_definitions: [{
+                        "id": "resource-poly",
+                        "source": "resource",
+                        "type": "fill",
+                        "layout": {},
+                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(resourceinstance_ids)],
+                        "paint": {
+                            "fill-color": "#FF0000",
+                            "fill-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-point",
+                        "source": "resource",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(resourceinstance_ids)],
+                        "paint": {
+                            "circle-radius":  1.0,
+                            "circle-color": "#FF0000",
+                            "circle-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-line",
+                        "source": "resource",
+                        "type": "line",
+                        "layout": {},
+                        "filter": ["in", "resourceinstanceid"].concat(resourceinstance_ids),
+                        "paint": {
+                            "line-color": "#FF0000",
+                            "line-opacity": 0.8,
+                            "line-width": 1.5
+                        }
+                    }],
+                    isoverlay: false,
+                    icon: 'ion-search'
+                };
+                return resourceLayer;
+            }
+
             /**
              * creates an array of map layers available to the map when the map object is instantiated
              * @return {object}
@@ -292,6 +338,11 @@ define([
                 var initialLayers = [];
                 if (this.context === 'report-header') {
                     this.resourceLayer = this.defineResourceLayer();
+                    this.layers.unshift(this.resourceLayer);
+                }
+
+                if (this.context === 'search-filter') {
+                    this.resourceLayer = this.defineSearchResultsLayer();
                     this.layers.unshift(this.resourceLayer);
                 }
 
