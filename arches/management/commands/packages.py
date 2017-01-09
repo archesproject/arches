@@ -38,6 +38,7 @@ from arches.app.models import models
 import csv, json
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
+from arches.app.utils.data_management.csv_file_importer import CSVFileImporter
 from django.db import transaction
 
 
@@ -50,7 +51,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'add_mapbox_layer',],
+            'create_mapping_file', 'import_csv', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -163,6 +164,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
+
+        if options['operation'] == 'import_csv':
+            self.import_csv(options['source'])
 
     def setup(self, package_name):
         """
@@ -402,6 +406,28 @@ class Command(BaseCommand):
                 for file_path in file_paths:
                     ArchesFileImporter(os.path.join(path, file_path)).import_all()
 
+    def import_csv(self, data_source=''):
+        """
+        Imports objects from csv file.
+
+        """
+
+        if data_source == '':
+            # data_source = settings.RESOURCE_GRAPH_LOCATIONS
+            print '*'*80
+            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
+            print '*'*80
+
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        for path in data_source:
+            if os.path.isfile(os.path.join(path)):
+                CSVFileImporter(path).import_all()
+            else:
+                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.csv')]
+                for file_path in file_paths:
+                    CSVFileImporter(os.path.join(path, file_path)).import_all()
 
     def start_livereload(self):
         from livereload import Server
