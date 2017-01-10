@@ -588,14 +588,17 @@ define([
                             var opacityVal = Number(val) / 100.0;
                             var style = map.getStyle();
                             style.sources = _.defaults(self.sources, style.sources);
-
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function (layer) {
                                     return layer.id === def.id;
                                 });
-                                if (layer && layer.paint) {
+
+                                if (layer) {
+                                    if (layer.paint === undefined) {
+                                        layer.paint = {};
+                                    }
                                     _.each(opacityTypes, function (opacityType) {
-                                        var startVal = def.paint[opacityType+'-opacity'];
+                                        var startVal = def.paint ? def.paint[opacityType+'-opacity'] : null;
 
                                         if (startVal) {
                                             if (parseFloat(startVal)) {
