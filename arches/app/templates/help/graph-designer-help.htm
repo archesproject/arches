@@ -8,8 +8,8 @@
 
             <p>The interface is split into three sections, as shown in the image below.
             <p><img src="/media/img/help/graph-manager-panes.png"></img></p>
-            <p>The <strong>Node List</strong> and <strong>Graph</strong> sections both, in their own manner, show every node in this graph. The graph illustrates all nodes and their connections (called "properties"), showing the full branching strucure. Every graph will also have a "top node" in the center, to which all other nodes will be connected. Note that in either of these panes, you can click on a node to select it. This will cause the details for that particular node to show up in the middle panel.</p>
-            <p><strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new nodes, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:</p>
+            <p>The <strong>Node List</strong> and <strong>Graph</strong> sections both, in their own manner, show every node in this graph. The graph illustrates all nodes and their connections (called "properties"), showing the full branching structure. Every graph will have a "top node" in the center, to which all other nodes will be connected. Note that in either of these panes, you can click on a node to select it. This will cause the details for that particular node to show up in the middle panel.</p>
+            <p><strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new {% if graph.isresource %}branches{% else %}nodes{% endif %}, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:</p>
             
             <div class="col-xs-6">
                 <p><img src="/media/img/help/node-manager.png" style="border: 2px solid #eee"></img></p>
