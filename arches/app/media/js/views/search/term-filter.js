@@ -35,7 +35,7 @@ define([
 
         appendFilters: function(filterParams) {
             var terms = _.filter(this.filter.terms(), function(term){
-                return term.type !== 'filter-flag';
+                return term.type === 'string' || term.type === 'concept' || term.type === 'term';
             }, this);
 
             if(terms.length > 0){

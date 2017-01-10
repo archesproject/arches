@@ -8,19 +8,19 @@ define([
             
             this.name = 'Resource Type Filter';
             
-            this.filter.types = ko.observableArray();
+            this.filter = ko.observableArray();
         },
 
         restoreState: function(query) {
             var doQuery = false;
             if ('typeFilter' in query) {
                 query.typeFilter = JSON.parse(query.typeFilter);
-                if (query.typeFilter.types.length > 0) {
-                    this.filter.types(query.typeFilter.types);
-                    this.inverted(query.typeFilter.inverted);
-                    query.typeFilter.types.forEach(function(item){
-                        this.termFilter.addTag(item.name, this.name, this.inverted);
-                    }, this);
+                if (query.typeFilter.length > 0) {
+                    query.typeFilter.forEach(function(type){
+                        type.inverted = ko.observable(!!type.inverted);
+                        this.termFilter.addTag(type.name, this.name, type.inverted);
+                    }, this)
+                    this.filter(query.typeFilter);
                 }
                 doQuery = true;
             }
@@ -28,28 +28,25 @@ define([
         },
 
         clear: function() {
-            this.filter.types.removeAll();
+            this.filter.removeAll();
         },
 
         appendFilters: function(filterParams) {
-            if(this.filter.types().length !== 0){
-                filterParams.typeFilter = ko.toJSON({
-                    types: this.filter.types,
-                    inverted: this.inverted
-                });
+            if(this.filter().length > 0){
+                filterParams.typeFilter = ko.toJSON(this.filter);
             }
 
-            return this.filter.types().length !== 0;
+            return this.filter().length > 0;
         },
 
         selectModelType: function(item){
-            console.log(item);
-            this.filter.types().forEach(function(item){
+            this.filter().forEach(function(item){
                 this.termFilter.removeTag(item.name);
             }, this);
             if(!!item){
-                this.termFilter.addTag(item.name(), this.name, this.inverted);
-                this.filter.types([{graphid:item.graphid, name: item.name()}]);
+                var inverted = ko.observable(false)
+                this.termFilter.addTag(item.name(), this.name, inverted);
+                this.filter([{graphid:item.graphid, name: item.name(), inverted: inverted}]);
             }else{
                 this.clear();
             }

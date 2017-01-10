@@ -36,7 +36,7 @@ require([
 
             self.isNewQuery = true;
 
-            this.queryString = ko.pureComputed(function() {
+            this.queryString = ko.computed(function() {
                 var params = {
                     page: self.viewModel.searchResults.page(),
                     include_ids: self.isNewQuery,
@@ -66,13 +66,8 @@ require([
 
             this.restoreState();
 
-            this.viewModel.searchResults.page.subscribe(function() {
-                self.doQuery();
-            });
-
             this.queryString.subscribe(function() {
                 self.isNewQuery = true;
-                self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
 
