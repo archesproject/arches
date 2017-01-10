@@ -125,11 +125,11 @@ require([
                         cache: false,
                         contentType: false,
                         success: function(response) {
-                          if (response.length != 0) {
-                            if (typeof(response)) {
-                              response = response.join('<br />')
+                          if (response[0].length != 0) {
+                            if (typeof(response[0])) {
+                              response = response[0].join('<br />')
                             }
-                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response[0]));
                             }
                             else {
                               window.location.reload(true);

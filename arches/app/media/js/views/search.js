@@ -8,9 +8,10 @@ require([
     'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/resource-type-filter',
     'views/search/search-results',
     'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
@@ -18,11 +19,13 @@ require([
             this.filters = {
                 termFilter: new TermFilter(),
                 timeFilter: new TimeFilter(),
+                resourceTypeFilter: new ResourceTypeFilter(),
                 mapFilter: new MapFilter(),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
                 searchRelatedResources: new BaseFilter()
             };
+            this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
@@ -33,7 +36,7 @@ require([
 
             self.isNewQuery = true;
 
-            this.queryString = ko.pureComputed(function() {
+            this.queryString = ko.computed(function() {
                 var params = {
                     page: self.viewModel.searchResults.page(),
                     include_ids: self.isNewQuery,
@@ -46,17 +49,25 @@ require([
                     }
                 });
                 return $.param(params).split('+').join('%20');
-            });
+            }).extend({ deferred: true });
 
-            this.getSearchQuery();
+            this.filters.termFilter.filter.terms.subscribe(function(terms){
+                _.each(this.filters, function(filter){
+                    if(filter.name !== 'Term Filter'){
+                        var found = _.find(terms, function(term){
+                           return filter.name === term.type;
+                        }, this)
+                        if(!found){
+                            filter.clear();
+                        }
+                    }
+                }, this);
+            }, this);
 
-            this.viewModel.searchResults.page.subscribe(function() {
-                self.doQuery();
-            });
+            this.restoreState();
 
             this.queryString.subscribe(function() {
                 self.isNewQuery = true;
-                self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
 
@@ -66,9 +77,9 @@ require([
         doQuery: function() {
             var self = this;
             var queryString = this.queryString();
-            if (this.updateRequest) {
-                this.updateRequest.abort();
-            }
+            // if (this.updateRequest) {
+            //     this.updateRequest.abort();
+            // }
 
             this.viewModel.loading(true);
             window.history.pushState({}, '', '?' + queryString);
@@ -87,11 +98,12 @@ require([
                 },
                 complete: function(request, status) {
                     this.viewModel.loading(false);
+                    this.updateRequest = undefined;
                 }
             });
         },
 
-        getSearchQuery: function() {
+        restoreState: function() {
             var query = _.chain(decodeURIComponent(location.search).slice(1).split('&'))
                 // Split each array item into [key, value]
                 // ignore empty string if search is empty
