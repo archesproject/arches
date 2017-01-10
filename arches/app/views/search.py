@@ -45,7 +45,9 @@ class SearchView(BaseManagerView):
     def get(self, request):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
+        date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         context = self.get_context_data(
+            date_nodes=JSONSerializer().serialize(date_nodes),
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',

@@ -11,18 +11,18 @@
             <h3 class="search-label">Type</h3>
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="chosen:{ width: '100%' }">
                 <option>Search all dates</option>
-                <option>Birth dates</option>
-                <option>Death dates</option>
-                <option>Building dates</option>
-                <option>Publish dates</option>
+                <!-- ko foreach: graphs -->
+                <optgroup data-bind="attr: {label: name}, foreach: dateNodes">
+                    <option data-bind="text: name, value: nodeid"></option>
+                </optgroup>
+                <!-- /ko -->
             </select>
         </div>
 
         <!-- Date Selector -->
         <div class="calendar">
             <h3 class="search-label">Within</h3>
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="chosen:{ width: '100%' }, value: dateRangeType">
-                <!-- chosen: {width: '100%', disable_search_threshold: 15}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true -->
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
                 <option value="custom">{% trans "Custom date range" %}</option>
                 <option value="today">{% trans "Today" %}</option>
                 <option value="last-7">{% trans "Last 7 days" %}</option>

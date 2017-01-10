@@ -31,7 +31,7 @@
 
     <!-- Help Panel -->
     {% include 'help-panel-base.htm' %}
-    
+
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
@@ -60,7 +60,7 @@
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div id="search-results-container">
-                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter"> 
+                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
                             </button>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
     </div>
 </div>
 {% endblock main_content %}
@@ -107,7 +107,9 @@
 {{block.super}}
     <script>
         {% autoescape off %}define('search-data', [], function() {
-            return {};
+            return {
+                "date_nodes": {{date_nodes}}
+            };
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}
