@@ -33,6 +33,7 @@ require([
             });
 
             this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.filters.mapFilter.results = this.viewModel.searchResults;
 
             self.isNewQuery = true;
 

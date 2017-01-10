@@ -97,7 +97,15 @@ define([
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
+
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
+            if (this.context === 'search-filter') {
+                this.results = params.results;
+                this.resourceinstance_ids = ko.pureComputed(function(){
+                    return _.pluck(this.results.results(), 'resourceinstanceid');
+                }, this)
+            }
+
             this.buffer = ko.observable(0.0);
             this.prebufferFeature;
             this.extentSearch = ko.observable(false);
@@ -105,6 +113,7 @@ define([
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
+
             if (ko.unwrap(this.value) !== null) {
                 this.summaryDetails =  koMapping.toJS(this.value).features || [];
             }
@@ -114,8 +123,8 @@ define([
                 placeholder: this.geocodePlaceholder,
                 anchorLayerId: this.anchorLayerId
             });
-            this.hoverFeature = ko.observable(null);
 
+            this.hoverFeature = ko.observable(null);
 
             // TODO: This should be a system config rather than hard-coded here
             this.geocoderProviders = ko.observableArray([{
@@ -303,7 +312,7 @@ define([
                         "source-layer": "resources",
                         "type": "fill",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids)],
+                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
                         "paint": {
                             "fill-color": "#FF0000",
                             "fill-opacity": 0.8
@@ -314,19 +323,19 @@ define([
                         "source-layer": "resources",
                         "type": "circle",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids)],
+                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
                         "paint": {
-                            "circle-radius":  1.0,
+                            "circle-radius":  3.0,
                             "circle-color": "#FF0000",
                             "circle-opacity": 0.8
                         }
                     }, {
                         "id": "search_results_resource-line",
-                        "source": "resource",
+                        "source": "resources",
                         "source-layer": "resources",
                         "type": "line",
                         "layout": {},
-                        "filter": ["in", "resourceinstanceid"].concat(self.resourceinstance_ids),
+                        "filter": ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
                         "paint": {
                             "line-color": "#FF0000",
                             "line-opacity": 0.8,
@@ -441,6 +450,24 @@ define([
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
                             // self.addMaplayer(self.resourceLayer);
                         }
+
+                        if (self.context === 'search-filter') {
+                            self.results.results.subscribe(function(){
+                                var style = self.map.getStyle();
+                                style.sources = _.defaults(self.sources, style.sources);
+                                var layerDefs = self.defineSearchResultsLayer().layer_definitions
+                                style.layers.forEach(function(layer){
+                                    var filter;
+                                    var search_layer = _.find(layerDefs, {id:layer.id});
+                                    if (search_layer) {
+                                        layer.filter = search_layer.filter
+                                    }
+                                })
+                                // self.map.setStyle(style);
+                            })
+                        }
+
+
                         if (self.context === 'report-header' && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
@@ -857,6 +884,9 @@ define([
                                 self.prebufferFeature.properties.buffer = {width: 0, unit: 'ft'}
                                 self.value().features = [self.prebufferFeature]
                             }
+                            // var style = this.map.getStyle();
+                            // style.sources = _.defaults(self.sources, style.sources);
+                            // self.map.setStyle(style);
                             self.value(self.value())
                             self.draw.changeMode(self.drawMode())
                         }

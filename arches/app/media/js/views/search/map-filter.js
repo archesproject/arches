@@ -17,7 +17,8 @@ function(ko, BaseFilter) {
             var doQuery = false;
             if ('mapFilter' in query) {
                 query.mapFilter = JSON.parse(query.mapFilter);
-                if (query.mapFilter.length > 0) {
+                if (query.mapFilter.features.length > 0) {
+                    console.log('restore query')
                     this.filter.feature_collection(query.mapFilter);
                 }
                 doQuery = true;
