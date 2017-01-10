@@ -292,40 +292,41 @@ define([
                 return resourceLayer;
             }
 
-            // var resourceinstance_ids = ['033361ab-d6a7-11e6-b8d3-c4b301baab9f']
-            var resourceinstance_ids = ['0f973238-a5fc-11e6-8c2d-6c4008b05c4c']
             this.defineSearchResultsLayer = function() {
                 var resourceLayer = {
                     name: "Search Results",
-                    maplayerid: "search_results",
+                    maplayerid: "search_results_",
                     isResource: true,
                     layer_definitions: [{
-                        "id": "resource-poly",
-                        "source": "resource",
+                        "id": "search_results_resource-poly",
+                        "source": "resources",
+                        "source-layer": "resources",
                         "type": "fill",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(resourceinstance_ids)],
+                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids)],
                         "paint": {
                             "fill-color": "#FF0000",
                             "fill-opacity": 0.8
                         }
                     }, {
-                        "id": "resource-point",
-                        "source": "resource",
+                        "id": "search_results_resource-point",
+                        "source": "resources",
+                        "source-layer": "resources",
                         "type": "circle",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(resourceinstance_ids)],
+                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids)],
                         "paint": {
                             "circle-radius":  1.0,
                             "circle-color": "#FF0000",
                             "circle-opacity": 0.8
                         }
                     }, {
-                        "id": "resource-line",
+                        "id": "search_results_resource-line",
                         "source": "resource",
+                        "source-layer": "resources",
                         "type": "line",
                         "layout": {},
-                        "filter": ["in", "resourceinstanceid"].concat(resourceinstance_ids),
+                        "filter": ["in", "resourceinstanceid"].concat(self.resourceinstance_ids),
                         "paint": {
                             "line-color": "#FF0000",
                             "line-opacity": 0.8,
@@ -438,7 +439,7 @@ define([
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined) {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                            self.addMaplayer(self.resourceLayer);
+                            // self.addMaplayer(self.resourceLayer);
                         }
                         if (self.context === 'report-header' && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
