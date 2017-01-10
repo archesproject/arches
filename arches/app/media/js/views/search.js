@@ -67,13 +67,8 @@ require([
 
             this.restoreState();
 
-            this.viewModel.searchResults.page.subscribe(function() {
-                self.doQuery();
-            });
-
             this.queryString.subscribe(function() {
                 self.isNewQuery = true;
-                self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
 

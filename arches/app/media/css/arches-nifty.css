@@ -4923,12 +4923,17 @@ div.row.widget-wrapper.report-header:hover {
     top: 50px;
     width: 249px;
     height: 450px;
-    right: 0px;
+    overflow-y: scroll;
+    right: -1px;
     padding: 0px;
     background: transparent;
     box-shadow: none;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
+}
+
+.map-search-container div .map-widget-panel {
+    height: 100vh;
 }
 
 .map-widget-panel.map-panel-inactive {

@@ -484,10 +484,13 @@ class Command(BaseCommand):
             with open(mapbox_json_path) as data_file:
                 data = json.load(data_file)
                 with transaction.atomic():
+                    for layer in data['layers']:
+                        if 'source' in layer:
+                            layer['source'] = layer['source'] + '-' + layer_name
+                    for source_name, source_dict in data['sources'].iteritems():
+                        map_source = models.MapSources.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
                     map_layer = models.MapLayers(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
                     map_layer.save()
-                    for source_name, source_dict in data['sources'].iteritems():
-                        map_source = models.MapSources.objects.get_or_create(name=source_name, source=source_dict)
 
 
     def delete_tilserver_layer(self, layer_name=False):
