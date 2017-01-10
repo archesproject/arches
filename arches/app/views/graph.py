@@ -81,7 +81,9 @@ class GraphSettingsView(GraphBaseView):
             ontologies=JSONSerializer().serialize(ontologies),
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count()
+            node_count=models.Node.objects.filter(graph=self.graph).count(),
+            help_title='Defining Settings',
+            help_template='help/settings-help.htm',
         )
         return render(request, 'views/graph/graph-settings.htm', context)
 
@@ -106,9 +108,6 @@ class GraphSettingsView(GraphBaseView):
             'graph': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
-
-
-
 
 @method_decorator(group_required('edit'), name='dispatch')
 class GraphManagerView(GraphBaseView):
@@ -149,7 +148,9 @@ class GraphManagerView(GraphBaseView):
             branch_list={
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
-            }
+            },
+            help_title='Using the Graph Designer',
+            help_template='help/graph-designer-help.htm',
         )
 
         return render(request, 'views/graph/graph-manager.htm', context)

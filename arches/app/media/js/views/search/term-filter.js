@@ -1,220 +1,67 @@
-define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Backbone, arches, Select2, ko) {
-    return Backbone.View.extend({
-
+define([
+    'knockout',
+    'underscore',
+    'views/search/base-filter',
+    'bindings/term-search'
+], function(ko, _, BaseFilter, termSearchComponent) {
+    return BaseFilter.extend({
         initialize: function(options) {
-            $.extend(this, options);            
-            var self = this;
-
-            this.query = {
-                filter:  {
-                    terms: ko.observableArray()
-                },
-                isEmpty: function(){
-                    if (this.filter.terms.length === 0){
-                        return true;
-                    }
-                    return false;
-                },
-                changed: ko.pureComputed(function(){
-                    var ret = ko.toJSON(this.query.filter.terms());
-                    return ret;
-                }, this)
-            };
-
-        	this.render();
-
-            var resize = function() {
-                $('.resource_search_widget_dropdown .select2-results').css('maxHeight', $(window).height() - self.$el.offset().top - 100 + 'px');
-            };       
-            resize();
-            $(window).resize(resize);             
+            BaseFilter.prototype.initialize.call(this, options);
+            
+            this.name = 'Term Filter';
+            
+            this.filter.terms = ko.observableArray();
         },
 
-        render: function(){
-            var self = this;
-            this.searchbox = this.$el.select2({
-                dropdownCssClass: 'resource_search_widget_dropdown',
-                multiple: true,
-                minimumInputLength: 2,
-                ajax: {
-                    url: this.getUrl(),
-                    dataType: 'json',
-                    data: function (term, page) {
-                        return {
-                            q: term, // search term
-                            page_limit: 30
-                        };
-                    },
-                    results: function (data, page) {
-                        var value = $('div.resource_search_widget').find('.select2-input').val();
-
-                        // this result is being hidden by a style in arches.css 
-                        // .select2-results li:first-child{
-                        //     display:none;
-                        // } 
-                        var results = [{
-                            inverted: false,
-                            type: 'string',
-                            context: '',
-                            context_label: '',
-                            id: value,
-                            text: value,
-                            value: value
-                        }];
-                        $.each(data.hits.hits, function(){
-                            results.push({
-                                inverted: false,
-                                type: this._source.options.conceptid ? 'concept' : 'term',
-                                context: this._source.context,
-                                context_label: this._source.options.context_label,
-                                id: this._source.term + this._source.context,
-                                text: this._source.term,
-                                value: this._source.options.conceptid ? this._source.options.conceptid : this._source.term
-                            });
-                        }, this);
-                        return {results: results};
-                    }
-                },
-                formatResult:function(result, container, query, escapeMarkup){
-                    var markup=[];
-                    window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
-                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
-                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span>' + context;
-                    return formatedresult;
-                },
-                formatSelection: function(result){
-                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
-                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
-                    if(result.inverted){
-                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
-                    }
-                    return markup;
-                },
-                escapeMarkup: function(m) { return m; }
-            }).on('select2-selecting', function(e, el) {
-                self.trigger('select2-selecting', e, el);
-            }).on('change', function(e, el){
-                self.trigger('change', e, el);
-
-                if(e.added){
-                    if(e.added.type !== 'filter-flag'){
-                        self.query.filter.terms.push(e.added);                        
-                    }
-
+        restoreState: function(query) {
+            var doQuery = false;
+            if ('termFilter' in query) {
+                query.termFilter = JSON.parse(query.termFilter);
+                if (query.termFilter.length > 0) {
+                    query.termFilter.forEach(function(term){
+                        term.inverted = ko.observable(term.inverted);
+                    })
+                    this.filter.terms(query.termFilter);
                 }
-                if(e.removed){
-                    if(e.removed.type === 'filter-flag'){
-                        self.trigger('filter-removed', e.removed);
-                    }else{
-                        self.query.filter.terms.remove(function(item){
-                            return item.id === e.removed.id && item.context_label === e.removed.context_label;
-                        });                   
-                    }
-                }
-            }).on('choice-selected', function(e, el) {
-                var data = $(el).data('select2-data');
-                self.trigger('choice-selected', e, el);
 
-                if ($(el).hasClass('inverted')) {
-                    $(el).removeClass('inverted');
-                    $(el).find('.fa-minus').hide();
-                } else {
-                    $(el).addClass('inverted');
-                    $(el).find('.fa-minus').show();
-                }
-                data.inverted = $(el).hasClass('inverted');
-
-                // filter-flag types don't rebuild the array and hence don't trigger a an updated search
-                // instead they listen to choice-selected events and use that
-                if (data.type == 'string' || data.type == 'concept' || data.type == 'term') {
-                    self.query.filter.terms.removeAll();
-                    $.each(self.searchbox.select2('data'), function(index, term){
-                        self.query.filter.terms.push(term);
-                    });
-                }
-                if (data.type == 'filter-flag'){
-                    self.trigger('filter-inverted', data);
-                }
-            });    
+                doQuery = true;
+            }
+            return doQuery;
         },
 
-        getUrl: function(){
-            return arches.urls.search_terms;
+        clear: function() {
+            this.filter.terms.removeAll();
         },
 
-        addTag: function(term, inverted){
-            var terms = this.searchbox.select2('data');
-            terms.unshift({
+        appendFilters: function(filterParams) {
+            var terms = _.filter(this.filter.terms(), function(term){
+                return term.type === 'string' || term.type === 'concept' || term.type === 'term';
+            }, this);
+
+            if(terms.length > 0){
+                filterParams.termFilter = ko.toJSON(terms);
+            }
+
+            return terms.length > 0;
+        },
+
+        addTag: function(term, type, inverted){
+            this.filter.terms.unshift({
                 inverted: inverted,
-                type: 'filter-flag',
+                type: type,
                 context: '',
                 context_label: '',
                 id: term,
                 text: term,
                 value: term
             });
-
-            this.updateTerms(terms);
         },
 
         removeTag: function(term){
-            var terms = this.searchbox.select2('data');
-            for (var i=terms.length-1; i>=0; i--) {
-                if(terms[i].id == term && terms[i].text == term && terms[i].value == term){
-                    terms.splice(i, 1);
-                    break;
-                }
-            }
-
-            this.updateTerms(terms);
-        },
-
-        updateTerms: function(terms){
-            this.searchbox.select2('data', terms);
-
-            $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-                if ($(el).data('select2-data').type === 'filter-flag') {
-                    $(el).addClass('filter-flag');
-                }
-                if ($(el).data('select2-data').inverted) {
-                    $(el).addClass('inverted');
-                }
+            this.filter.terms.remove(function(term_item){ 
+                return term_item.id == term && term_item.text == term && term_item.value == term; 
             });
-        },
-
-        restoreState: function(filter){
-            var self = this;
-            if(typeof filter !== 'undefined' && filter.length > 0){
-                var results = [];
-                $.each(filter, function(){
-                    self.query.filter.terms.push(this);
-
-                    results.push({
-                        inverted: this.inverted,
-                        type: this.type,
-                        context: this.context,
-                        context_label: this.context_label,
-                        id: this.id,
-                        text: this.text,
-                        value: this.value
-                    });
-                });
-
-                this.searchbox.select2('data', results).trigger('change');
-
-                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-                    if ($(el).data('select2-data').inverted) {
-                        $(el).addClass('inverted');
-                    }
-                });
-            }
-        },
-
-        clear: function(){
-            this.query.filter.terms.removeAll();
-            this.searchbox.select2('data', []);
         }
 
     });
 });
-

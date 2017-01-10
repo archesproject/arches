@@ -22,42 +22,75 @@ from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.db import transaction
 
+class GraphImportReporter:
+    def __init__(self, graphs):
+        self.name = ''
+        self.resource_model = False
+        self.graphs = len(graphs)
+        self.graphs_saved = 0
+        self.reports_saved = 0
+        self.forms_saved = 0
+
+    def update_graphs_saved(self, count=1):
+        self.graphs_saved += count
+
+    def update_forms_saved(self, count=1):
+        self.forms_saved += count
+
+    def update_reports_saved(self, count=1):
+        self.reports_saved += count
+
+    def report_results(self):
+        if self.resource_model == True:
+            result = "Saved Resource Model: {0}, Forms: {1}, Reports: {2}"
+        else:
+            result = "Saved Branch: {0}"
+
+        print result.format(self.name, self.forms_saved, self.reports_saved)
+
 def import_graph(graphs):
-	with transaction.atomic():
-		errors = []
-		for resource in graphs:
-			graph = Graph(resource)
+    reporter = GraphImportReporter(graphs)
 
-			if not hasattr(graph, 'cards'):
-				errors.append('{0} graph has no attribute cards'.format(graph.name))
-			else:
-				if graph.cards == [] or graph.cards == {}:
-					errors.append('{0} graph has no cards'.format(graph.name))
-				else:
-					graph.save()
+    with transaction.atomic():
+        errors = []
+        for resource in graphs:
+            reporter.name = resource['name']
+            reporter.resource_model = resource['isresource']
+            graph = Graph(resource)
 
-			if not hasattr(graph, 'cards_x_nodes_x_widgets'):
-				errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
-			else:
-				for	card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
-					cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
+            if not hasattr(graph, 'cards'):
+                errors.append('{0} graph has no attribute cards'.format(graph.name))
+            else:
+                if graph.cards == [] or graph.cards == {}:
+                    errors.append('{0} graph has no cards'.format(graph.name))
+                else:
+                    graph.save()
+                    reporter.update_graphs_saved()
 
-			if not hasattr(graph, 'forms'):
-				errors.append('{0} graph has no attribute forms'.format)
-			else:
-				for form in graph.forms:
-					form = Form.objects.update_or_create(**form)
+            if not hasattr(graph, 'cards_x_nodes_x_widgets'):
+                errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
+            else:
+                for card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+                    cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
 
-			if not hasattr(graph, 'forms_x_cards'):
-				errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
-			else:
-				for form_x_card in graph.forms_x_cards:
-					formxcard = FormXCard.objects.update_or_create(**form_x_card)
+            if not hasattr(graph, 'forms'):
+                errors.append('{0} graph has no attribute forms'.format)
+            else:
+                for form in graph.forms:
+                    form = Form.objects.update_or_create(**form)
+                    reporter.update_forms_saved()
 
-			if not hasattr(graph, 'reports'):
-				errors.append('{0} graph has no attribute reports'.format(graph.name))
-			else:
-				for report in graph.reports:
-					report = Report.objects.update_or_create(**report)
+            if not hasattr(graph, 'forms_x_cards'):
+                errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
+            else:
+                for form_x_card in graph.forms_x_cards:
+                    formxcard = FormXCard.objects.update_or_create(**form_x_card)
 
-		return errors
+            if not hasattr(graph, 'reports'):
+                errors.append('{0} graph has no attribute reports'.format(graph.name))
+            else:
+                for report in graph.reports:
+                    report = Report.objects.update_or_create(**report)
+                    reporter.update_reports_saved()
+
+        return errors, reporter

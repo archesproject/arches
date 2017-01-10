@@ -43,7 +43,11 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
         context = self.get_context_data(
+            map_layers=map_layers,
+            map_sources=map_sources,
             main_script='views/search',
         )
         return render(request, 'views/search.htm', context)
@@ -79,7 +83,7 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    results = dsl.search(index='resource', doc_type='')
+    results = dsl.search(index='resource', doc_type=get_doc_type(request))
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
@@ -91,7 +95,7 @@ def search_results(request):
 
     paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
     page = paginator.page(page)
-    
+
     ret = {}
     ret['results'] = results
     ret['paginator'] = JSONSerializer().serializeToPython(page)
@@ -104,6 +108,23 @@ def search_results(request):
     ret['paginator']['end_index'] = page.end_index()
     ret['paginator']['pages'] = pages
     return JSONResponse(ret)
+
+def get_doc_type(request):
+    doc_type = set()
+    type_filter = request.GET.get('typeFilter', '')
+    if type_filter != '':
+        resource_model_ids = set(str(graphid) for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
+        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
+            if resouceTypeFilter['inverted'] == True:
+                inverted_resource_model_ids = resource_model_ids - set([str(resouceTypeFilter['graphid'])])
+                if len(doc_type) > 0:
+                    doc_type = doc_type.intersection(inverted_resource_model_ids)
+                else:
+                    doc_type = inverted_resource_model_ids
+            else:
+                doc_type.add(str(resouceTypeFilter['graphid']))
+
+    return list(doc_type)
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
@@ -150,29 +171,27 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                #entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
-                bool_dsl = Bool()
-                #bool_dsl.must(Terms(field='strings.entitytypeid', terms=[entitytype.pk]))
-                bool_dsl.must(Match(field='strings', query=term['value'], type='phrase'))
+                term_filter = Bool()
+                term_filter.must(Match(field='strings', query=term['value'], type='phrase'))
                 if term['inverted']:
-                    boolfilter.must_not(bool_dsl)
+                    boolfilter.must_not(term_filter)
                 else:
-                    boolfilter.must(bool_dsl)
+                    boolfilter.must(term_filter)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
-                terms = Terms(field='domains.conceptid', terms=concept_ids)
+                conceptid_filter = Terms(field='domains.conceptid', terms=concept_ids)
                 if term['inverted']:
-                    boolfilter.must_not(terms)
+                    boolfilter.must_not(conceptid_filter)
                 else:
-                    boolfilter.must(terms)
+                    boolfilter.must(conceptid_filter)
             elif term['type'] == 'string':
-                boolfilter = Bool()
-                boolfilter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
-                boolfilter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
+                string_filter = Bool()
+                string_filter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
+                string_filter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
                 if term['inverted']:
-                    boolquery.must_not(boolfilter)
+                    boolfilter.must_not(string_filter)
                 else:
-                    boolquery.must(boolfilter)
+                    boolfilter.must(string_filter)
 
     if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
         geojson = spatial_filter['geometry']
@@ -183,16 +202,16 @@ def build_search_results_dsl(request):
         else:
             buffer = spatial_filter['buffer']
             geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-            geoshape = GeoShape(field='geometries.value', type=geojson['type'], coordinates=geojson['coordinates'] )
-            nested = Nested(path='geometries', query=geoshape)
+            geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
+            #nested = Nested(path='geometries', query=geoshape)
 
         if 'inverted' not in spatial_filter:
             spatial_filter['inverted'] = False
 
         if spatial_filter['inverted']:
-            boolfilter.must_not(nested)
+            boolfilter.must_not(geoshape)
         else:
-            boolfilter.must(nested)
+            boolfilter.must(geoshape)
 
     if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)

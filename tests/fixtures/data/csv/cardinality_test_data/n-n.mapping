@@ -1,0 +1,3 @@
+sourceresourcemodelid,sourceResourceModelName,sourcenodeid,sourceNodeName,targetresourcemodelid,targetResourceModelName,targetnodeid,targetNodeName
+,,,Source Child 1,8e672ab0-c6e2-11e6-9725-685b3597724b,Target,8e6749ca-c6e2-11e6-817b-685b3597724b,child n-n
+,,,Source Child 2,8e672ab0-c6e2-11e6-9725-685b3597724b,Target,8e6749ca-c6e2-11e6-817b-685b3597724b,child n-n

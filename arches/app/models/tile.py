@@ -95,10 +95,16 @@ class Tile(models.TileModel):
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
         if index:
-            self.index()
+            try:
+                self.index()
+            except:
+                pass
         for tiles in self.tiles.itervalues():
             for tile in tiles:
+                tile.resourceinstance = self.resourceinstance
+                tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
+
 
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
@@ -130,7 +136,7 @@ class Tile(models.TileModel):
 
         for term in self.prepare_terms_for_search_index():
            se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
-     
+
     def prepare_documents_for_search_index(self):
         """
         Generates a list of specialized resource based documents to support resource search
@@ -151,7 +157,7 @@ class Tile(models.TileModel):
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
-        
+
         for tile in models.TileModel.objects.filter(resourceinstance=self.resourceinstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
@@ -203,6 +209,7 @@ class Tile(models.TileModel):
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
             parent_tile = Tile()
+            parent_tile.tileid = None
             parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
             parent_tile.resourceinstance_id = resourceid
             parent_tile.tiles = {}

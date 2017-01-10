@@ -1,8 +1,9 @@
 {% extends "views/forms/widgets/base.htm" %} {% load i18n %} {% block form %}
-<div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
+
+<div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container expanded-map relative" data-bind="mapboxgl: {
+    <div id='map' class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
             zoom: zoom,
@@ -16,7 +17,7 @@
         afterRender: function(map){
             setupMap(map);
         }
-    }">
+    }, css: getContextCss()">
 
         <!--ko if: drawMode -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
@@ -150,7 +151,12 @@
         </div>
         <!--/ko-->
 
-        <div id="map-widget-container relative">
+        <div id="map-widget-container" class="relative">
+
+            <div class="search-results-button">
+                <a class="" href="#"><i class="search-results-button-icon ion-arrow-left-b"></i></a>
+            </div>
+
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
             </div>
@@ -255,7 +261,7 @@
 
         <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
-                <h4 class="">{% trans "Map Tools" %}</h4>
+                <h4 class="">{% trans "Map Tools" %}<a class="href-button toggle-map-size pull-right" href="#"><i class="fa fa-arrows-alt"></i> Full screen</a></h4>
             </div>
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
@@ -318,7 +324,7 @@
 
 <div class="panel-group accordion" id="accordion">
 
-    <!--ko if: reportHeader -->
+    <!--ko if: context === 'report-header' -->
     <div class="panel">
         <div class="panel-heading">
             <h4 class="panel-title">
