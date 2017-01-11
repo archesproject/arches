@@ -453,9 +453,9 @@ define([
                     this.resizeOnChange.subscribe(function () {
                         var duration = self.resizeDuration;
                         var resize = function () {
-                            if (duration > 0) {
-                                map.resize();
-                                duration -= 1;
+                            map.resize();
+                            duration -= 1;
+                            if (duration >= 0) {
                                 _.defer(resize, 1);
                             }
                         }
