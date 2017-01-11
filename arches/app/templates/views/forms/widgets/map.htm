@@ -3,7 +3,7 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="relative" data-bind="mapboxgl: {
+    <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
             zoom: zoom,
@@ -259,7 +259,8 @@
 
         <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
-                <span><h4 class="tooltype" data-bind='text: toolType'></h4><a class="href-button toggle-map-size pull-right" href="#"><i class="fa fa-arrows-alt"></i> Full screen</a></span>
+                <span><h4 class="tooltype" data-bind='text: toolType'></h4><a class="href-button toggle-map-size pull-right" href="#" data-bind="click: function () {
+                    expanded(!expanded());}"><i class="fa fa-arrows-alt"></i><span data-bind="text: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}'"></span></a></span>
             </div>
 
             <!--ko if: context === 'search-filter' -->

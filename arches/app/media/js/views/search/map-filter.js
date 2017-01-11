@@ -7,9 +7,13 @@ function(ko, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
-            this.resizeOnChange = ko.computed(function() {
-                return ko.unwrap(options.resizeOnChange);
-            }).extend({ throttle: 500 });
+            this.resizeOnChange = ko.pureComputed(function () {
+                return {
+                    param: ko.unwrap(params.resizeOnChange),
+                    expanded: this.expanded()
+                }
+            }, this).extend({ throttle: 500 });
+          
             this.filter.feature_collection = ko.observable({
                   "type": "FeatureCollection",
                   "features": []
