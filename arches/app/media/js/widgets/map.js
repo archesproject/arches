@@ -77,7 +77,6 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
-            var result;
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function () {
                 return {
@@ -87,6 +86,7 @@ define([
             }, this).extend({ throttle: 500 });
             this.context = params.type;
             this.getContextCss = ko.pureComputed(function(){
+                var result;
                 var lookup = {
                     'report-header':'map-report-header-container',
                     'search-filter':'map-search-container',
