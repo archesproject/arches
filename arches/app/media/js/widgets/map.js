@@ -87,7 +87,8 @@ define([
             }, this).extend({ throttle: 500 });
             this.context = params.type;
             this.getContextCss = ko.pureComputed(function(){
-                    lookup = {'report-header':'map-report-header-container',
+                var lookup = {
+                    'report-header':'map-report-header-container',
                     'search-filter':'map-search-container',
                     'resource-editor':'map-crud-container'
                 };
