@@ -124,6 +124,18 @@ define(function() {
                   "circle-radius": resource.pointsize(),
                   "circle-color": resource.color(),
               }
+          },{
+              "id": "buffer-layer",
+              "type": "fill",
+              "filter": ["all", ["==", "$type", "Polygon"],
+                  ["!=", "mode", "static"],
+                  ["==", "id", "buffer-layer"]
+              ],
+              "paint": {
+                  "fill-color": resource.color(),
+                  "fill-outline-color": resource.color(),
+                  "fill-opacity": 0.1
+              }
           }
         ];
        }

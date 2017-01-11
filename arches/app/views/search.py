@@ -152,7 +152,7 @@ def get_paginator(request, results, total_count, page, count_per_page, all_ids):
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', '{}'))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
@@ -193,25 +193,30 @@ def build_search_results_dsl(request):
                 else:
                     boolfilter.must(string_filter)
 
-    if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
-        geojson = spatial_filter['geometry']
-        if geojson['type'] == 'bbox':
-            coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
-            geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
-            nested = Nested(path='geometries', query=geoshape)
-        else:
-            buffer = spatial_filter['buffer']
-            geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-            geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
-            #nested = Nested(path='geometries', query=geoshape)
+    if 'features' in spatial_filter:
+        if len(spatial_filter['features']) > 0:
+        # if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
+            geojson = spatial_filter['features'][0]['geometry']
+            if geojson['type'] == 'bbox':
+                coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
+                geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
+                nested = Nested(path='geometries', query=geoshape)
+            else:
+                feature_properties = spatial_filter['features'][0]['properties']
+                buffer = {'width':0,'unit':'ft'}
+                if 'buffer' in feature_properties:
+                    buffer = feature_properties['buffer']
+                geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
+                geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
+                # nested = Nested(path='geometries', query=geoshape)
 
-        if 'inverted' not in spatial_filter:
-            spatial_filter['inverted'] = False
+            if 'inverted' not in spatial_filter:
+                spatial_filter['inverted'] = False
 
-        if spatial_filter['inverted']:
-            boolfilter.must_not(geoshape)
-        else:
-            boolfilter.must(geoshape)
+            if spatial_filter['inverted']:
+                boolfilter.must_not(geoshape)
+            else:
+                boolfilter.must(geoshape)
 
     if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)
