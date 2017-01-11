@@ -113,9 +113,7 @@
 {{block.super}}
     <script>
         {% autoescape off %}define('search-data', [], function() {
-            return {
-                "date_nodes": {{date_nodes}}
-            };
+            return {};
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

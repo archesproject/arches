@@ -11,11 +11,17 @@
             <h3 class="search-label">Type</h3>
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="chosen:{ width: '100%' }">
                 <option>Search all dates</option>
-                <!-- ko foreach: graphs -->
-                <optgroup data-bind="attr: {label: name}, foreach: dateNodes">
-                    <option data-bind="text: name, value: nodeid"></option>
-                </optgroup>
-                <!-- /ko -->
+                {% for graph in graph_models %}
+                    {% if graph.isresource and graph.isactive %}
+                    <optgroup label="{{ graph.name }}">
+                        {% for node in date_nodes %}
+                            {% if graph.graphid == node.graph_id %}
+                            <option value="{{ node.nodeid }}">{{ node.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </optgroup>
+                    {% endif %}
+                {% endfor %}
             </select>
         </div>
 

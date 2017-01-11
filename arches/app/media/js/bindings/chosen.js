@@ -15,8 +15,6 @@ define([
     ko.bindingHandlers.chosen = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
             var $element = $(element);
-            ko.applyBindingsToDescendants(bindingContext, element);
-
             var options = ko.unwrap(valueAccessor());
             var defaults = {
                 search_contains: true
@@ -50,8 +48,6 @@ define([
                     }
                 }
             });
-
-            return { controlsDescendantBindings: true };
         }
     };
 
