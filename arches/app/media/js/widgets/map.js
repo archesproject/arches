@@ -6,6 +6,7 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
+    'turf',
     'knockout-mapping',
     'geojson-extent',
     'views/list',
@@ -18,7 +19,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -52,17 +53,6 @@ define([
     return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
-            var result;
-            this.context = params.type
-            this.getContextCss = ko.pureComputed(function(){
-                lookup = {'report-header':'map-report-header-container',
-                          'search-filter':'map-search-container',
-                          'resource-editor':'map-crud-container'
-                        };
-                result = lookup[this.context] || 'map-crud-container';
-                return result;
-            }, this)
-            this.configType = params.reportHeader || 'header';
             params.configKeys = [
                 'zoom',
                 'centerX',
@@ -86,6 +76,29 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+
+            var result;
+            this.configType = params.reportHeader || 'header';
+            this.resizeOnChange = ko.pureComputed(function () {
+                return {
+                    param: ko.unwrap(params.resizeOnChange),
+                    expanded: this.expanded()
+                }
+            }, this).extend({ throttle: 500 });
+            this.context = params.type;
+            this.getContextCss = ko.pureComputed(function(){
+                var lookup = {
+                    'report-header':'map-report-header-container',
+                    'search-filter':'map-search-container',
+                    'resource-editor':'map-crud-container'
+                };
+                result = lookup[this.context] || 'map-crud-container';
+                if (this.expanded()) {
+                    result += ' expanded-edit-map';
+                }
+                return result;
+            }, this)
+
             this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.selectedBasemap = this.basemap;
@@ -96,9 +109,23 @@ define([
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
+
+            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
+            if (this.context === 'search-filter') {
+                this.results = params.results;
+                this.resourceinstance_ids = ko.pureComputed(function(){
+                    return _.pluck(this.results.results(), 'resourceinstanceid');
+                }, this)
+            }
+
+            this.buffer = ko.observable(0.0);
+            this.prebufferFeature;
+            this.extentSearch = ko.observable(false);
+
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
+
             if (ko.unwrap(this.value) !== null) {
                 this.summaryDetails =  koMapping.toJS(this.value).features || [];
             }
@@ -108,8 +135,8 @@ define([
                 placeholder: this.geocodePlaceholder,
                 anchorLayerId: this.anchorLayerId
             });
-            this.hoverFeature = ko.observable(null);
 
+            this.hoverFeature = ko.observable(null);
 
             // TODO: This should be a system config rather than hard-coded here
             this.geocoderProviders = ko.observableArray([{
@@ -228,14 +255,18 @@ define([
             }
 
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
-            _.each(arches.mapLayers, function (layer) {
-                _.each(layer.layer_definitions, function(def) {
-                    def.id += '-'  + layer.name;
-                    if (def.ref) {
-                        def.ref += '-'  + layer.name;
-                    }
+
+            if (!this.configForm) {
+                _.each(arches.mapLayers, function (layer) {
+                    _.each(layer.layer_definitions, function(def) {
+                        def.id += '-'  + layer.name;
+                        if (def.ref) {
+                            def.ref += '-'  + layer.name;
+                        }
+                    });
                 });
-            });
+            }
+
             this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
             this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
@@ -286,6 +317,53 @@ define([
                 return resourceLayer;
             }
 
+            this.defineSearchResultsLayer = function() {
+                var resourceLayer = {
+                    name: "Search Results",
+                    maplayerid: "search_results_",
+                    isResource: true,
+                    layer_definitions: [{
+                        "id": "search_results_resource-poly",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "fill",
+                        "layout": {},
+                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
+                        "paint": {
+                            "fill-color": "#FF0000",
+                            "fill-opacity": 0.8
+                        }
+                    }, {
+                        "id": "search_results_resource-point",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
+                        "paint": {
+                            "circle-radius":  3.0,
+                            "circle-color": "#FF0000",
+                            "circle-opacity": 0.8
+                        }
+                    }, {
+                        "id": "search_results_resource-line",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "line",
+                        "layout": {},
+                        "filter": ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
+                        "paint": {
+                            "line-color": "#FF0000",
+                            "line-opacity": 0.8,
+                            "line-width": 1.5
+                        }
+                    }],
+                    isoverlay: false,
+                    icon: 'ion-search'
+                };
+                return resourceLayer;
+            }
+
             /**
              * creates an array of map layers available to the map when the map object is instantiated
              * @return {object}
@@ -294,6 +372,11 @@ define([
                 var initialLayers = [];
                 if (this.context === 'report-header') {
                     this.resourceLayer = this.defineResourceLayer();
+                    this.layers.unshift(this.resourceLayer);
+                }
+
+                if (this.context === 'search-filter') {
+                    this.resourceLayer = this.defineSearchResultsLayer();
                     this.layers.unshift(this.resourceLayer);
                 }
 
@@ -365,6 +448,11 @@ define([
                 });
 
                 this.map = map;
+                if (this.resizeOnChange && this.resizeOnChange.subscribe) {
+                    this.resizeOnChange.subscribe(function () {
+                        map.resize();
+                    });
+                }
                 this.geocoder.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
@@ -381,8 +469,26 @@ define([
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined) {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                            self.addMaplayer(self.resourceLayer);
+                            // self.addMaplayer(self.resourceLayer);
                         }
+
+                        if (self.context === 'search-filter') {
+                            self.results.results.subscribe(function(){
+                                var style = self.map.getStyle();
+                                style.sources = _.defaults(self.sources, style.sources);
+                                var layerDefs = self.defineSearchResultsLayer().layer_definitions
+                                style.layers.forEach(function(layer){
+                                    var filter;
+                                    var search_layer = _.find(layerDefs, {id:layer.id});
+                                    if (search_layer) {
+                                        layer.filter = search_layer.filter
+                                    }
+                                })
+                                // self.map.setStyle(style);
+                            })
+                        }
+
+
                         if (self.context === 'report-header' && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
@@ -468,6 +574,11 @@ define([
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
+                    if (this.context === 'search-filter') {
+                        this.extentSearch(false);
+                        this.draw.deleteAll();
+                        this.prebufferFeature = undefined;
+                    }
                     if (this.form) {
                       this.featureColor(this.featureColorCache);
                     }
@@ -478,7 +589,6 @@ define([
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
-
                     if (self.geometryTypeDetails[selectedDrawTool] === undefined) { //it has no geom type, so must be trash
                         self.draw.trash();
                         self.drawMode(null);
@@ -717,24 +827,39 @@ define([
                         } else {
                             self.value(currentDrawing)
                         }
+                        self.prebufferFeature = currentDrawing.features[currentDrawing.features.length - 1];
                     }
                 }
 
                 this.updateDrawMode = function(e) {
                     var self = this;
+                    var context = this.context
                     return function(e) {
                         var selectedFeatureType;
+                        var featureCount = self.draw.getAll().features.length;
+                        if (context === 'search-filter' && featureCount > 1) {
+                            _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature){
+                                self.draw.delete(feature.id)
+                            }, self)
+                        }
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
+                            if (context === 'search-filter') {
+                                if (self.buffer() > 0) {
+                                    self.applySearchBuffer(self.buffer())
+                                }
+                            }
                         } else {
                             self.drawMode(self.draw.getMode());
-                            if (self.draw.getSelectedIds().length > 0) {
-                                selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
-                                self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
-                            } else {
-                                if (self.draw.getMode().endsWith("select")) {
-                                    self.drawMode(undefined);
-                                };
+                            if (context !== 'search-filter') {
+                                if (self.draw.getSelectedIds().length > 0) {
+                                    selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                    self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                                } else {
+                                    if (self.draw.getMode().endsWith("select")) {
+                                        self.drawMode(undefined);
+                                    };
+                                }
                             }
                         }
                     }
@@ -750,13 +875,6 @@ define([
                     }
                   };
                 };
-
-                this.map.on('moveend', this.updateConfigs());
-                ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
-                    self.map.on(event, self.saveGeometries())
-                });
-                this.map.on('click', this.updateDrawMode())
-                this.map.on('draw.selectionchange', self.updateFeatureStyles());
 
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
@@ -776,6 +894,70 @@ define([
                     this.geocoder.redrawLayer();
                 }, this)
 
+                this.applySearchBuffer = function(val) {
+                        if (self.value().features.length > 0 && self.prebufferFeature !== undefined) {
+                            var feature = self.value().features[0]
+                            self.draw.delete('buffer-layer');
+                            if (val > 0) {
+                                var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
+                                buffer.id = 'buffer-layer';
+                                self.prebufferFeature.properties.buffer = {width: val, unit: 'ft'}
+                                self.value().features[0] = self.prebufferFeature
+                                self.draw.add(buffer)
+                            } else {
+                                self.prebufferFeature.properties.buffer = {width: 0, unit: 'ft'}
+                                self.value().features = [self.prebufferFeature]
+                            }
+                            // var style = this.map.getStyle();
+                            // style.sources = _.defaults(self.sources, style.sources);
+                            // self.map.setStyle(style);
+                            self.value(self.value())
+                            self.draw.changeMode(self.drawMode())
+                        }
+                    }
+
+                this.toggleExtentSearch = function(val) {
+                    this.extentSearch(!this.extentSearch())
+                    if (this.extentSearch() === true){
+                        self.draw.deleteAll();
+                        self.draw.changeMode('simple_select');
+                        self.drawMode(undefined);
+                        _.each(self.geometryTypeDetails, function(geomtype){
+                            geomtype.active(false);
+                        })
+                    }
+                }
+
+                this.searchByExtent = function(){
+                    if (self.extentSearch() === true) {
+                        self.prebufferFeature = undefined;
+                        var bounds = self.map.getBounds();
+                        var ll = bounds.getSouthWest().toArray();
+                        var ul = bounds.getNorthWest().toArray();
+                        var ur = bounds.getNorthEast().toArray();
+                        var lr = bounds.getSouthEast().toArray();
+                        var coordinates = [ll, ul, ur, lr, ll]
+                        var boundsFeature = {
+                          "type": "Feature",
+                          "properties": {"buffer":{"width":0,"unit":"ft"}},
+                          "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [coordinates]
+                          }
+                        }
+                        self.value().features = [boundsFeature];
+                        self.value(self.value());
+                    }
+                }
+
+                this.extentSearch.subscribe(function(){
+                    self.searchByExtent();
+                })
+
+                this.buffer.subscribe(function(val){
+                    self.applySearchBuffer(val)
+                });
+
                 self.map.on('mousemove', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var hoverFeature = _.find(features, function (feature) {
@@ -785,6 +967,19 @@ define([
                         self.hoverFeature(hoverFeature);
                     }
                 });
+
+                ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
+                    self.map.on(event, self.saveGeometries())
+                });
+                self.map.on('click', this.updateDrawMode())
+                self.map.on('draw.selectionchange', self.updateFeatureStyles());
+
+                if (this.context === 'search-filter'){
+                    self.map.on('moveend', this.searchByExtent)
+                } else {
+                    self.map.on('moveend', this.updateConfigs());
+                }
+
             }; //end setup map
 
             // preprocess relative paths for app tileserver

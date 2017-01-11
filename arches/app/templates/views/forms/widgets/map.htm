@@ -3,7 +3,7 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="relative" data-bind="mapboxgl: {
+    <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
             zoom: zoom,
@@ -20,6 +20,7 @@
     }, css: getContextCss()">
 
         <!--ko if: drawMode -->
+        <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning" role="alert">
@@ -51,6 +52,7 @@
                 </div>
             </div>
         </div>
+        <!-- /ko -->
         <!-- /ko -->
         <div class="overlay-selection-container scroll-y" data-bind="css : {'selector-closed': overlaySelectorClosed}">
           <!-- ko foreach: { data: [$data], as: 'self' } -->
@@ -153,10 +155,6 @@
 
         <div id="map-widget-container" class="relative">
 
-            <div class="search-results-button">
-                <a class="" href="#"><i class="search-results-button-icon ion-arrow-left-b"></i></a>
-            </div>
-
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
             </div>
@@ -171,7 +169,7 @@
                 </li>
                 <!-- ko ifnot: featureEditingDisabled -->
                 <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('maptools')}, css : {'active': !mapControls.mapControlPanels.maptools() }">
-                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
+                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans toolType %}', placement: 'bottom' }"></i></a>
                 </li>
                 <!-- /ko -->
                 <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
@@ -261,13 +259,25 @@
 
         <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
             <div class="map-widget-panel-title">
-                <h4 class="">{% trans "Map Tools" %}<a class="href-button toggle-map-size pull-right" href="#"><i class="fa fa-arrows-alt"></i> Full screen</a></h4>
+                <span><h4 class="tooltype" data-bind='text: toolType'></h4><a class="href-button toggle-map-size pull-right" href="#" data-bind="click: function () {
+                    expanded(!expanded());}"><i class="fa fa-arrows-alt"></i><span data-bind="text: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}'"></span></a></span>
             </div>
+
+            <!--ko if: context === 'search-filter' -->
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: toggleExtentSearch, css:{'map-draw-tools-active': extentSearch}">
+                <div class="map-draw-tools-item-icon text-center">
+                    <i class="ion-checkmark-circled"></i>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span>{% trans "Search Map Extent" %}<span></a>
+                </div>
+            </div>
+            <!-- /ko -->
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
             <!-- ko foreach: geometryTypes -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
-                <div class="map-overlay-vis-toogle text-center">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
+                <div class="map-draw-tools-item-icon text-center">
                     <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
                 </div>
                 <div class="map-overlay-name">
@@ -276,14 +286,30 @@
             </div>
             <!-- /ko -->
             <!-- /ko -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
-                <div class="map-overlay-vis-toogle text-center">
+
+            <!--ko if: context !== 'search-filter' -->
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+                <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
                 </div>
                 <div class="map-overlay-name">
                     <a id="" class="" href=""><span>{% trans "Delete" %}<span></a>
                 </div>
             </div>
+            <!-- /ko -->
+
+            <!--ko if: context === 'search-filter' -->
+            <div class="map-draw-tools-item relative query-tool">
+                <div class="map-query-tool">
+                    <div class="map-query-tool-name">
+                        <a id="" class="" href=""><span>{% trans "Buffer(ft)" %}<span></a>
+                    </div>
+                    <div>
+                        <input type="number" min=0.0 id="" placeholder="{% trans " buffer " %}" class="form-control input-md widget-input map-query-tool-input" data-bind="value: buffer, valueUpdate: 'keyup'">
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
 
         </div>
 

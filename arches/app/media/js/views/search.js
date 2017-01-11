@@ -16,11 +16,14 @@ require([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
+            this.viewModel.resultsExpanded = ko.observable(true);
             this.filters = {
                 termFilter: new TermFilter(),
                 timeFilter: new TimeFilter(),
                 resourceTypeFilter: new ResourceTypeFilter(),
-                mapFilter: new MapFilter(),
+                mapFilter: new MapFilter({
+                    resizeOnChange: this.viewModel.resultsExpanded
+                }),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
                 searchRelatedResources: new BaseFilter()
@@ -33,6 +36,7 @@ require([
             });
 
             this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.filters.mapFilter.results = this.viewModel.searchResults;
 
             self.isNewQuery = true;
 

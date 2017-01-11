@@ -20,6 +20,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;
+            this.expanded = (options.expanded || ko.observable(false));
             this.node = (options.node || null);
             this.card = (options.card || null);
             this.datatype = (options.datatype || null);

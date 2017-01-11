@@ -84,6 +84,7 @@
                                                     label: widget.get("label")(),
                                                     value: tile.data[widget.get("node_id")()],
                                                     node: widget.node,
+                                                    expanded: widget.expanded,
                                                     disabled: false,
                                                     graph: form.graph,
                                                     type: "resource-editor"
@@ -96,7 +97,7 @@
                                         <!-- Save/Add Buttons -->
                                         <!-- ko if: tile.dirty -->
                                             <!-- ko if: forceBlank -->
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': card.expanded() }" style="display: none;">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
@@ -105,7 +106,7 @@
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
-                                            <div class="install-buttons">
+                                            <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                             </div>
@@ -195,8 +196,10 @@
                                                         label: widget.get("label")(),
                                                         value: innerTile.data[widget.get("node_id")()],
                                                         node: widget.node,
+                                                        expanded: widget.expanded,
                                                         disabled: false,
-                                                        graph: form.graph
+                                                        graph: form.graph,
+                                                        type: "resource-editor"
                                                     }
                                                 }'></div>
                                             </form>
@@ -205,7 +208,7 @@
 
                                         <!-- Save/Add Button -->
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
-                                        <div class="install-buttons">
+                                        <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
                                             <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>

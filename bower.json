@@ -44,7 +44,8 @@
     "datatables.net-responsive-bs": "~2.1.0",
     "geojson-extent": "mapbox/geojson-extent#0.3.2",
     "bootstrap-colorpicker": "^2.3.6",
-    "uuid.js": "^3.3.0"
+    "uuid.js": "^3.3.0",
+    "turf": "https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

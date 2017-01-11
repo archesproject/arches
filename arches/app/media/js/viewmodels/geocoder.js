@@ -9,7 +9,7 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
     var GeocoderViewModel = function(params) {
         var self = this;
         this.provider = params.provider || ko.observable('MapzenGeocoder');
-        this.placeholder = params.placeholder || ko.observable('Search');
+        this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
         this.anchorLayerId = params.anchorLayerId;
         this.map = params.map;
         this.pointstyle = {
