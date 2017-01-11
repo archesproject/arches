@@ -31,7 +31,7 @@
 
     <!-- Help Panel -->
     {% include 'help-panel-base.htm' %}
-    
+
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
@@ -56,11 +56,11 @@
         <div class="flex">
 
             <!--Form Listing -->
-            <div class="left-column-crud-container search-control-container" data-bind="with: searchResults">
+            <div class="left-column-crud-container search-control-container" data-bind="with: searchResults, css: { 'slide': !resultsExpanded() }">
                 <!-- Title Block -->
                 <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
                 <div id="search-results-container">
-                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter"> 
+                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
                         <div class="btn-group btn-group-xs">
                             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
                             </button>
@@ -79,8 +79,14 @@
             <!-- Card Container -->
             <div class="card-form-preview-container">
                 <div class="tab-content relative">
-                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}, with: mapFilter">
+                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}">
+
+                        <div class="search-results-button" data-bind="click: function () { resultsExpanded(!resultsExpanded()); }">
+                            <a class="" href="#"><i class="search-results-button-icon" data-bind="css: resultsExpanded() ? 'ion-arrow-left-b': 'ion-arrow-right-b'"></i></a>
+                        </div>
+                        <!-- ko with: mapFilter -->
                         {% include 'views/search/map-filter.htm' %}
+                        <!-- /ko -->
                     </div>
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}, with: timeFilter">
                         {% include 'views/search/time-filter.htm' %}
@@ -96,7 +102,7 @@
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
     </div>
 </div>
 {% endblock main_content %}
