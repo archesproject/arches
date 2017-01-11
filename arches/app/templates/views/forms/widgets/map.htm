@@ -259,7 +259,7 @@
             <div class="map-widget-panel-title">
                 <h4 class="">{% trans "Map Tools" %}<a class="href-button toggle-map-size pull-right" href="#" data-bind="click: function () {
                     expanded(!expanded());
-                }"><i class="fa fa-arrows-alt"></i> Full screen</a></h4>
+                }"><i class="fa fa-arrows-alt"></i> <span data-bind="text: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}'"></span></a></h4>
             </div>
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
