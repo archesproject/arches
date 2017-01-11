@@ -243,14 +243,18 @@ define([
             }
 
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
-            _.each(arches.mapLayers, function (layer) {
-                _.each(layer.layer_definitions, function(def) {
-                    def.id += '-'  + layer.name;
-                    if (def.ref) {
-                        def.ref += '-'  + layer.name;
-                    }
+
+            if (!this.configForm) {
+                _.each(arches.mapLayers, function (layer) {
+                    _.each(layer.layer_definitions, function(def) {
+                        def.id += '-'  + layer.name;
+                        if (def.ref) {
+                            def.ref += '-'  + layer.name;
+                        }
+                    });
                 });
-            });
+            }
+
             this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
             this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
