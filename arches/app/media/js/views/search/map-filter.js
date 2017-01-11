@@ -7,17 +7,15 @@ function(ko, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
-            this.resizeOnChange = ko.pureComputed(function () {
-                return {
-                    param: ko.unwrap(this.resizeOnChange),
-                    expanded: false
-                }
-            }, this).extend({ throttle: 500 });
+
+            this.resizeOnChange = ko.computed(function() {
+                return ko.unwrap(options.resizeOnChange);
+            });
 
             this.filter.feature_collection = ko.observable({
-                  "type": "FeatureCollection",
-                  "features": []
-                });
+              "type": "FeatureCollection",
+              "features": []
+            });
         },
 
         restoreState: function(query) {
@@ -35,9 +33,9 @@ function(ko, BaseFilter) {
 
         clear: function() {
             this.filter.feature_collection({
-                  "type": "FeatureCollection",
-                  "features": []
-                });
+              "type": "FeatureCollection",
+              "features": []
+            });
         },
 
         appendFilters: function(filterParams) {
