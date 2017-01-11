@@ -484,7 +484,9 @@ define([
                                         layer.filter = search_layer.filter
                                     }
                                 })
-                                // self.map.setStyle(style);
+                                if (self.results.total() === self.resourceinstance_ids().length) {
+                                    self.map.setStyle(style);
+                                }
                             })
                         }
 

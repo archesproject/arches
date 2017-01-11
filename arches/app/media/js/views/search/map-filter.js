@@ -9,11 +9,11 @@ function(ko, BaseFilter) {
             BaseFilter.prototype.initialize.call(this, options);
             this.resizeOnChange = ko.pureComputed(function () {
                 return {
-                    param: ko.unwrap(params.resizeOnChange),
-                    expanded: this.expanded()
+                    param: ko.unwrap(this.resizeOnChange),
+                    expanded: false
                 }
             }, this).extend({ throttle: 500 });
-          
+
             this.filter.feature_collection = ko.observable({
                   "type": "FeatureCollection",
                   "features": []
