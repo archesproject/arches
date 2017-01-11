@@ -10,7 +10,7 @@ function(ko, BaseFilter) {
 
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);
-            }).extend({ throttle: 500 });
+            });
         }
     });
 });

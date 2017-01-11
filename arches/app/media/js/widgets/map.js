@@ -52,18 +52,6 @@ define([
     return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
-            var result;
-            this.resizeOnChange = params.resizeOnChange;
-            this.context = params.type
-            this.getContextCss = ko.pureComputed(function(){
-                lookup = {'report-header':'map-report-header-container',
-                          'search-filter':'map-search-container',
-                          'resource-editor':'map-crud-container'
-                        };
-                result = lookup[this.context] || 'map-crud-container';
-                return result;
-            }, this)
-            this.configType = params.reportHeader || 'header';
             params.configKeys = [
                 'zoom',
                 'centerX',
@@ -87,6 +75,28 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+
+            var result;
+            this.configType = params.reportHeader || 'header';
+            this.resizeOnChange = ko.pureComputed(function () {
+                return {
+                    param: ko.unwrap(params.resizeOnChange),
+                    expanded: this.expanded()
+                }
+            }, this).extend({ throttle: 500 });
+            this.context = params.type;
+            this.getContextCss = ko.pureComputed(function(){
+                    lookup = {'report-header':'map-report-header-container',
+                    'search-filter':'map-search-container',
+                    'resource-editor':'map-crud-container'
+                };
+                result = lookup[this.context] || 'map-crud-container';
+                if (this.expanded()) {
+                    result += ' expanded-edit-map';
+                }
+                return result;
+            }, this)
+
             this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.selectedBasemap = this.basemap;
