@@ -114,6 +114,7 @@ define([
             if (this.context === 'search-filter') {
                 this.results = params.results;
                 this.resourceinstance_ids = ko.pureComputed(function(){
+                    console.log(_.pluck(this.results.results(), 'resourceinstanceid'));
                     return _.pluck(this.results.results(), 'resourceinstanceid');
                 }, this)
             }
@@ -484,7 +485,9 @@ define([
                                         layer.filter = search_layer.filter
                                     }
                                 })
-                                // self.map.setStyle(style);
+                                if (self.results.total() === self.resourceinstance_ids().length) {
+                                    self.map.setStyle(style);
+                                }
                             })
                         }
 
