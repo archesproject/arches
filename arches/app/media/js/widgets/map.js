@@ -53,6 +53,7 @@ define([
         viewModel: function(params) {
             var self = this;
             var result;
+            this.resizeOnChange = params.resizeOnChange;
             this.context = params.type
             this.getContextCss = ko.pureComputed(function(){
                 lookup = {'report-header':'map-report-header-container',
@@ -365,6 +366,11 @@ define([
                 });
 
                 this.map = map;
+                if (this.resizeOnChange && this.resizeOnChange.subscribe) {
+                    this.resizeOnChange.subscribe(function () {
+                        map.resize();
+                    });
+                }
                 this.geocoder.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
