@@ -78,7 +78,7 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             this.configType = params.reportHeader || 'header';
-            this.resizeOnChange = ko.pureComputed(function () {
+            this.resizeOnChange = ko.pureComputed(function() {
                 return {
                     param: ko.unwrap(params.resizeOnChange),
                     expanded: this.expanded()
@@ -86,12 +86,12 @@ define([
             }, this);
             this.resizeDuration = params.resizeDuration || 500;
             this.context = params.type;
-            this.getContextCss = ko.pureComputed(function(){
+            this.getContextCss = ko.pureComputed(function() {
                 var result;
                 var lookup = {
-                    'report-header':'map-report-header-container',
-                    'search-filter':'map-search-container',
-                    'resource-editor':'map-crud-container'
+                    'report-header': 'map-report-header-container',
+                    'search-filter': 'map-search-container',
+                    'resource-editor': 'map-crud-container'
                 };
                 result = lookup[this.context] || 'map-crud-container';
                 if (this.expanded()) {
@@ -114,7 +114,7 @@ define([
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
             if (this.context === 'search-filter') {
                 this.results = params.results;
-                this.resourceinstance_ids = ko.pureComputed(function(){
+                this.resourceinstance_ids = ko.pureComputed(function() {
                     return _.pluck(this.results.results(), 'resourceinstanceid');
                 }, this)
             }
@@ -128,7 +128,7 @@ define([
             this.summaryDetails = []
 
             if (ko.unwrap(this.value) !== null) {
-                this.summaryDetails =  koMapping.toJS(this.value).features || [];
+                this.summaryDetails = koMapping.toJS(this.value).features || [];
             }
 
             this.geocoder = new GeocoderViewModel({
@@ -165,33 +165,33 @@ define([
             };
 
             if (ko.isObservable(this.value)) {
-              this.value.subscribe(this.clearGeometries)
+                this.value.subscribe(this.clearGeometries)
             }
 
             if (this.form) {
                 var dc = '';
                 var resourceSourceId = 'resources';
                 this.form.on('after-update', function(req, tile) {
-                   if (self.map) {
-                       var style = self.map.getStyle();
-                       var oldDc = dc;
-                       dc = '-' + new Date().getTime();
-                       style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
-                       delete style.sources[resourceSourceId + oldDc];
-                       _.each(style.layers, function(layer) {
-                          if (layer.source === resourceSourceId + oldDc) {
-                              layer.source = resourceSourceId + dc;
-                          }
-                       });
-                       style.sources = _.defaults(self.sources, style.sources);
-                       self.map.setStyle(style);
-                   }
+                    if (self.map) {
+                        var style = self.map.getStyle();
+                        var oldDc = dc;
+                        dc = '-' + new Date().getTime();
+                        style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
+                        delete style.sources[resourceSourceId + oldDc];
+                        _.each(style.layers, function(layer) {
+                            if (layer.source === resourceSourceId + oldDc) {
+                                layer.source = resourceSourceId + dc;
+                            }
+                        });
+                        style.sources = _.defaults(self.sources, style.sources);
+                        self.map.setStyle(style);
+                    }
 
-                   if (self.draw !== undefined) {
-                     self.draw.changeMode('simple_select')
-                     self.featureColor(self.resourceColor)
-                     self.loadGeometriesIntoDrawLayer();
-                   }
+                    if (self.draw !== undefined) {
+                        self.draw.changeMode('simple_select')
+                        self.featureColor(self.resourceColor)
+                        self.loadGeometriesIntoDrawLayer();
+                    }
 
                 });
                 this.form.on('tile-reset', self.loadGeometriesIntoDrawLayer);
@@ -238,31 +238,32 @@ define([
             });
 
             this.createResouceModelOverlays = function(resources) {
-              var resourceLayers = [];
-              function MapLayer(resource) {
-                var maplayer = {
-                    icon: resource.icon,
-                    layer_definitions: mapStyles.getResourceModelStyles(resource),
-                    maplayerid: resource.maplayerid,
-                    name: resource.name,
-                    isoverlay: true
+                var resourceLayers = [];
+
+                function MapLayer(resource) {
+                    var maplayer = {
+                        icon: resource.icon,
+                        layer_definitions: mapStyles.getResourceModelStyles(resource),
+                        maplayerid: resource.maplayerid,
+                        name: resource.name,
+                        isoverlay: true
+                    }
+                    return maplayer
                 }
-                return maplayer
-              }
-              resources.forEach(function(resource){
-                resourceLayers.push(MapLayer(resource))
-              })
-              return resourceLayers;
+                resources.forEach(function(resource) {
+                    resourceLayers.push(MapLayer(resource))
+                })
+                return resourceLayers;
             }
 
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
 
             if (!this.configForm) {
-                _.each(arches.mapLayers, function (layer) {
+                _.each(arches.mapLayers, function(layer) {
                     _.each(layer.layer_definitions, function(def) {
-                        def.id += '-'  + layer.name;
+                        def.id += '-' + layer.name;
                         if (def.ref) {
-                            def.ref += '-'  + layer.name;
+                            def.ref += '-' + layer.name;
                         }
                     });
                 });
@@ -271,7 +272,7 @@ define([
             this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
             this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
-            this.defineSearchQueryLayer = function(){
+            this.defineSearchQueryLayer = function() {
                 var searchQueryLayer = {
                     name: 'search_query_layer',
                     maplayerid: 'search-query',
@@ -281,6 +282,16 @@ define([
                     icon: ''
                 }
                 return searchQueryLayer
+            }
+
+            this.updateSearchQueryLayer = function(geojson_features) {
+                var style = self.map.getStyle();
+                style.sources = _.defaults(self.sources, style.sources);
+                style.sources['search-query'].data = {
+                    "type": "FeatureCollection",
+                    "features": geojson_features
+                };
+                self.map.setStyle(style);
             }
 
             /**
@@ -341,7 +352,9 @@ define([
                         "source-layer": "resources",
                         "type": "fill",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
+                        "filter": ['all', ["!in", "$type", "LineString"],
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                        ],
                         "paint": {
                             "fill-color": "#FF0000",
                             "fill-opacity": 0.8
@@ -352,9 +365,11 @@ define([
                         "source-layer": "resources",
                         "type": "circle",
                         "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"], ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())],
+                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"],
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                        ],
                         "paint": {
-                            "circle-radius":  3.0,
+                            "circle-radius": 3.0,
                             "circle-color": "#FF0000",
                             "circle-opacity": 0.8
                         }
@@ -464,9 +479,9 @@ define([
 
                 this.map = map;
                 if (this.resizeOnChange && this.resizeOnChange.subscribe) {
-                    this.resizeOnChange.subscribe(function () {
+                    this.resizeOnChange.subscribe(function() {
                         var duration = self.resizeDuration;
-                        var resize = function () {
+                        var resize = function() {
                             if (duration > 0) {
                                 map.resize();
                                 duration -= 1;
@@ -498,13 +513,15 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.results.results.subscribe(function(){
+                            self.results.results.subscribe(function() {
                                 var style = self.map.getStyle();
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                                style.layers.forEach(function(layer){
+                                style.layers.forEach(function(layer) {
                                     var filter;
-                                    var search_layer = _.find(layerDefs, {id:layer.id});
+                                    var search_layer = _.find(layerDefs, {
+                                        id: layer.id
+                                    });
                                     if (search_layer) {
                                         layer.filter = search_layer.filter
                                     }
@@ -558,7 +575,9 @@ define([
                             }
                         }
                     }
-                    window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 30)
+                    window.setTimeout(function() {
+                        window.dispatchEvent(new Event('resize'))
+                    }, 30)
                 });
 
                 /**
@@ -571,14 +590,14 @@ define([
                         var paint = this.map.getLayer(style.id).paint
                         var self = this;
                         paintProperties.forEach(function(prop) {
-                          if (paint.hasOwnProperty(prop)) {
-                            if (!style.id.includes('halo')) {
-                                  self.map.setPaintProperty(style.id, prop, val)
-                              }
-                            if (style.id.includes('halo') && !prop.includes('color')) {
-                                self.map.setPaintProperty(style.id, prop, val * 1.25)
-                              }
-                          }
+                            if (paint.hasOwnProperty(prop)) {
+                                if (!style.id.includes('halo')) {
+                                    self.map.setPaintProperty(style.id, prop, val)
+                                }
+                                if (style.id.includes('halo') && !prop.includes('color')) {
+                                    self.map.setPaintProperty(style.id, prop, val * 1.25)
+                                }
+                            }
                         })
                     }, this)
                 }
@@ -607,7 +626,7 @@ define([
                         this.prebufferFeature = undefined;
                     }
                     if (this.form) {
-                      this.featureColor(this.featureColorCache);
+                        this.featureColor(this.featureColorCache);
                     }
                     _.each(self.geometryTypeDetails, function(geomtype) {
                         if (geomtype.name === selectedDrawTool) {
@@ -638,7 +657,7 @@ define([
                     if (maplayer !== undefined) {
                         var style = this.map.getStyle();
                         maplayer.layer_definitions.forEach(function(def) {
-                            var layer = _.find(style.layers, function (layer) {
+                            var layer = _.find(style.layers, function(layer) {
                                 return layer.id === def.id;
                             });
                             style.layers = _.without(style.layers, layer);
@@ -655,7 +674,7 @@ define([
                             return layer.id === self.anchorLayerId;
                         });
 
-                        var l1 = style.layers.slice(0,anchorIndex);
+                        var l1 = style.layers.slice(0, anchorIndex);
                         var l2 = style.layers.slice(anchorIndex);
                         style.sources = _.defaults(self.sources, style.sources);
                         style.layers = l1.concat(maplayer.layer_definitions, l2);
@@ -726,7 +745,7 @@ define([
                             var style = map.getStyle();
                             style.sources = _.defaults(self.sources, style.sources);
                             this.layer_definitions.forEach(function(def) {
-                                var layer = _.find(style.layers, function (layer) {
+                                var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
                                 });
 
@@ -734,24 +753,24 @@ define([
                                     if (layer.paint === undefined) {
                                         layer.paint = {};
                                     }
-                                    _.each(opacityTypes, function (opacityType) {
-                                        var startVal = def.paint ? def.paint[opacityType+'-opacity'] : null;
+                                    _.each(opacityTypes, function(opacityType) {
+                                        var startVal = def.paint ? def.paint[opacityType + '-opacity'] : null;
 
                                         if (startVal) {
                                             if (parseFloat(startVal)) {
-                                                layer.paint[opacityType+'-opacity'] = startVal * opacityVal;
+                                                layer.paint[opacityType + '-opacity'] = startVal * opacityVal;
                                             } else {
-                                                layer.paint[opacityType+'-opacity'] = JSON.parse(JSON.stringify(startVal));
+                                                layer.paint[opacityType + '-opacity'] = JSON.parse(JSON.stringify(startVal));
                                                 if (startVal.base) {
-                                                    layer.paint[opacityType+'-opacity'].base = startVal.base * opacityVal;
+                                                    layer.paint[opacityType + '-opacity'].base = startVal.base * opacityVal;
                                                 }
                                                 if (startVal.stops) {
-                                                    multiplyStopValues(layer.paint[opacityType+'-opacity'].stops, opacityVal);
+                                                    multiplyStopValues(layer.paint[opacityType + '-opacity'].stops, opacityVal);
                                                 }
                                             }
                                         } else if (layer.type === opacityType ||
-                                            (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon')) ) {
-                                            layer.paint[opacityType+'-opacity'] = opacityVal;
+                                            (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
+                                            layer.paint[opacityType + '-opacity'] = opacityVal;
                                         }
                                     });
                                 }
@@ -809,7 +828,7 @@ define([
                         return basemap.name === basemapType.name;
                     });
                     var basemapIds = _.map(this.basemaps, function(basemap) {
-                        return _.map(basemap.layer_definitions, function (layer) {
+                        return _.map(basemap.layer_definitions, function(layer) {
                             return layer.id;
                         });
                     }).reduce(function(ids1, ids2) {
@@ -824,19 +843,19 @@ define([
                 this.updateConfigs = function() {
                     var self = this;
                     if (this.form === null && this.context !== 'report-header') {
-                      return function() {
-                          var mapCenter = this.getCenter()
-                          var zoom = self.map.getZoom()
-                          if (self.zoom() !== zoom) {
-                              self.zoom(zoom);
-                          };
-                          self.centerX(mapCenter.lng);
-                          self.centerY(mapCenter.lat);
-                          self.bearing(this.getBearing());
-                          self.pitch(this.getPitch());
-                      }
+                        return function() {
+                            var mapCenter = this.getCenter()
+                            var zoom = self.map.getZoom()
+                            if (self.zoom() !== zoom) {
+                                self.zoom(zoom);
+                            };
+                            self.centerX(mapCenter.lng);
+                            self.centerY(mapCenter.lat);
+                            self.bearing(this.getBearing());
+                            self.pitch(this.getPitch());
+                        }
                     } else {
-                      return function() {}
+                        return function() {}
                     }
                 }
 
@@ -855,10 +874,7 @@ define([
                             self.value(currentDrawing)
                         }
                         self.prebufferFeature = currentDrawing.features[currentDrawing.features.length - 1];
-                        var style = self.map.getStyle();
-                        style.sources = _.defaults(self.sources, style.sources);
-                        style.sources['search-query'].data = self.prebufferFeature;
-                        self.map.setStyle(style);
+                        self.updateSearchQueryLayer([self.prebufferFeature])
                     }
                 }
 
@@ -869,7 +885,7 @@ define([
                         var selectedFeatureType;
                         var featureCount = self.draw.getAll().features.length;
                         if (context === 'search-filter' && featureCount > 1) {
-                            _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature){
+                            _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature) {
                                 self.draw.delete(feature.id)
                             }, self)
                         }
@@ -896,15 +912,15 @@ define([
                     }
                 }
 
-                this.updateFeatureStyles = function(){
-                  var self = this;
-                  return function(){
-                    if (self.form) {
-                      self.featureColor() === self.featureColorCache || self.featureColor(self.featureColorCache);
-                      self.featurePointSize() === self.featurePointSizeCache || self.featurePointSize(self.featurePointSizeCache);
-                      self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
-                    }
-                  };
+                this.updateFeatureStyles = function() {
+                    var self = this;
+                    return function() {
+                        if (self.form) {
+                            self.featureColor() === self.featureColorCache || self.featureColor(self.featureColorCache);
+                            self.featurePointSize() === self.featurePointSizeCache || self.featurePointSize(self.featurePointSizeCache);
+                            self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
+                        }
+                    };
                 };
 
                 this.overlays.subscribe(function(overlays) {
@@ -926,44 +942,45 @@ define([
                 }, this)
 
                 this.applySearchBuffer = function(val) {
-                        if (self.value().features.length > 0 && self.prebufferFeature !== undefined) {
-                            var feature = self.value().features[0]
-                            if (val > 0) {
-                                var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
-                                buffer.id = 'buffer-layer';
-                                self.prebufferFeature.properties.buffer = {width: val, unit: 'ft'}
-                                self.value().features[0] = self.prebufferFeature
-                                var style = self.map.getStyle();
-                                style.sources = _.defaults(self.sources, style.sources);
-                                style.sources['search-query'].data = {
-                                                          "type": "FeatureCollection",
-                                                          "features": [buffer, self.prebufferFeature]
-                                                        };
-                                self.map.setStyle(style);
-                            } else {
-                                self.prebufferFeature.properties.buffer = {width: 0, unit: 'ft'}
-                                self.value().features = [self.prebufferFeature]
+                    var buffer;
+                    if (self.value().features.length > 0 && self.prebufferFeature !== undefined) {
+                        if (val > 0) {
+                            buffer = turf.buffer(self.prebufferFeature, val / 5280, 'miles');
+                            buffer.id = 'buffer-layer';
+                            self.prebufferFeature.properties.buffer = {
+                                width: val,
+                                unit: 'ft'
                             }
-                            self.value(self.value())
-                            self.draw.changeMode(self.drawMode())
+                            self.value().features[0] = self.prebufferFeature
+                            self.updateSearchQueryLayer([buffer, self.prebufferFeature])
+                        } else {
+                            self.prebufferFeature.properties.buffer = {
+                                width: 0,
+                                unit: 'ft'
+                            }
+                            self.value().features = [self.prebufferFeature]
                         }
+                        self.value(self.value())
+                        self.draw.changeMode(self.drawMode())
                     }
+                }
 
                 this.toggleExtentSearch = function(val) {
                     this.extentSearch(!this.extentSearch())
-                    if (this.extentSearch() === true){
+                    if (this.extentSearch() === true) {
                         self.draw.deleteAll();
                         self.draw.changeMode('simple_select');
                         self.drawMode(undefined);
-                        _.each(self.geometryTypeDetails, function(geomtype){
+                        _.each(self.geometryTypeDetails, function(geomtype) {
                             geomtype.active(false);
                         })
                     }
                 }
 
-                this.searchByExtent = function(){
+                this.searchByExtent = function() {
                     if (self.extentSearch() === true) {
                         self.prebufferFeature = undefined;
+                        self.updateSearchQueryLayer([])
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -971,29 +988,34 @@ define([
                         var lr = bounds.getSouthEast().toArray();
                         var coordinates = [ll, ul, ur, lr, ll]
                         var boundsFeature = {
-                          "type": "Feature",
-                          "properties": {"buffer":{"width":0,"unit":"ft"}},
-                          "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [coordinates]
-                          }
+                            "type": "Feature",
+                            "properties": {
+                                "buffer": {
+                                    "width": 0,
+                                    "unit": "ft"
+                                }
+                            },
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [coordinates]
+                            }
                         }
                         self.value().features = [boundsFeature];
                         self.value(self.value());
                     }
                 }
 
-                this.extentSearch.subscribe(function(){
+                this.extentSearch.subscribe(function() {
                     self.searchByExtent();
                 })
 
-                this.buffer.subscribe(function(val){
+                this.buffer.subscribe(function(val) {
                     self.applySearchBuffer(val)
                 });
 
-                self.map.on('mousemove', function (e) {
+                self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoverFeature = _.find(features, function (feature) {
+                    var hoverFeature = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0;
                     }) || null;
                     if (self.hoverFeature() !== hoverFeature) {
@@ -1007,7 +1029,7 @@ define([
                 self.map.on('click', this.updateDrawMode())
                 self.map.on('draw.selectionchange', self.updateFeatureStyles());
 
-                if (this.context === 'search-filter'){
+                if (this.context === 'search-filter') {
                     self.map.on('moveend', this.searchByExtent)
                 } else {
                     self.map.on('moveend', this.updateConfigs());
@@ -1017,9 +1039,9 @@ define([
 
             // preprocess relative paths for app tileserver
             // see: https://github.com/mapbox/mapbox-gl-js/issues/3636#issuecomment-261119004
-            _.each(arches.mapSources, function (sourceConfig, name) {
+            _.each(arches.mapSources, function(sourceConfig, name) {
                 if (sourceConfig.tiles) {
-                    sourceConfig.tiles.forEach(function (url, i) {
+                    sourceConfig.tiles.forEach(function(url, i) {
                         if (url.startsWith('/')) {
                             sourceConfig.tiles[i] = window.location.origin + url;
                         }
