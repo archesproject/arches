@@ -77,16 +77,17 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
-            var result;
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function () {
                 return {
                     param: ko.unwrap(params.resizeOnChange),
                     expanded: this.expanded()
                 }
-            }, this).extend({ throttle: 500 });
+            }, this);
+            this.resizeDuration = params.resizeDuration || 500;
             this.context = params.type;
             this.getContextCss = ko.pureComputed(function(){
+                var result;
                 var lookup = {
                     'report-header':'map-report-header-container',
                     'search-filter':'map-search-container',
@@ -450,7 +451,15 @@ define([
                 this.map = map;
                 if (this.resizeOnChange && this.resizeOnChange.subscribe) {
                     this.resizeOnChange.subscribe(function () {
-                        map.resize();
+                        var duration = self.resizeDuration;
+                        var resize = function () {
+                            if (duration > 0) {
+                                map.resize();
+                                duration -= 1;
+                                _.defer(resize, 1);
+                            }
+                        }
+                        _.defer(resize, 1);
                     });
                 }
                 this.geocoder.setMap(map);
