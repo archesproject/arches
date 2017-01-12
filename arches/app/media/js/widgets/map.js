@@ -274,12 +274,12 @@ define([
 
             this.defineSearchQueryLayer = function() {
                 var searchQueryLayer = {
-                    name: 'search_query_layer',
+                    name: 'Map Query',
                     maplayerid: 'search-query',
                     isResource: false,
                     layer_definitions: mapStyles.getSearchQueryStyles(),
                     isoverlay: false,
-                    icon: ''
+                    icon: 'ion-map'
                 }
                 return searchQueryLayer
             }
