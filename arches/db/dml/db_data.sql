@@ -2176,6 +2176,15 @@ INSERT INTO map_sources(name, source)
       }
   }');
 
+INSERT INTO map_sources(name, source)
+VALUES ('search-query', '{
+    "type": "geojson",
+    "data": {
+        "type": "FeatureCollection",
+        "features": []
+    }
+}');
+
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",

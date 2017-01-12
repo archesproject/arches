@@ -271,6 +271,18 @@ define([
             this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
             this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
 
+            this.defineSearchQueryLayer = function(){
+                var searchQueryLayer = {
+                    name: 'search_query_layer',
+                    maplayerid: 'search-query',
+                    isResource: false,
+                    layer_definitions: mapStyles.getSearchQueryStyles(),
+                    isoverlay: false,
+                    icon: ''
+                }
+                return searchQueryLayer
+            }
+
             /**
              * Creates the map layer for the resource with widget configs
              * @return {object}
@@ -377,8 +389,10 @@ define([
                 }
 
                 if (this.context === 'search-filter') {
-                    this.resourceLayer = this.defineSearchResultsLayer();
-                    this.layers.unshift(this.resourceLayer);
+                    this.searchResultsLayer = this.defineSearchResultsLayer();
+                    this.searchQueryLayer = this.defineSearchQueryLayer();
+                    this.layers.unshift(this.searchQueryLayer);
+                    this.layers.unshift(this.searchResultsLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -476,12 +490,14 @@ define([
                         };
                         var data = null;
                         self.overlayLibrary(self.createOverlays())
-                        if (self.resourceLayer !== undefined) {
+                        if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
                             // self.addMaplayer(self.resourceLayer);
                         }
 
                         if (self.context === 'search-filter') {
+                            self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
+                            self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.results.results.subscribe(function(){
                                 var style = self.map.getStyle();
                                 style.sources = _.defaults(self.sources, style.sources);
@@ -839,6 +855,10 @@ define([
                             self.value(currentDrawing)
                         }
                         self.prebufferFeature = currentDrawing.features[currentDrawing.features.length - 1];
+                        var style = self.map.getStyle();
+                        style.sources = _.defaults(self.sources, style.sources);
+                        style.sources['search-query'].data = self.prebufferFeature;
+                        self.map.setStyle(style);
                     }
                 }
 
@@ -908,20 +928,22 @@ define([
                 this.applySearchBuffer = function(val) {
                         if (self.value().features.length > 0 && self.prebufferFeature !== undefined) {
                             var feature = self.value().features[0]
-                            self.draw.delete('buffer-layer');
                             if (val > 0) {
                                 var buffer = turf.buffer(self.prebufferFeature, val/5280, 'miles');
                                 buffer.id = 'buffer-layer';
                                 self.prebufferFeature.properties.buffer = {width: val, unit: 'ft'}
                                 self.value().features[0] = self.prebufferFeature
-                                self.draw.add(buffer)
+                                var style = self.map.getStyle();
+                                style.sources = _.defaults(self.sources, style.sources);
+                                style.sources['search-query'].data = {
+                                                          "type": "FeatureCollection",
+                                                          "features": [buffer, self.prebufferFeature]
+                                                        };
+                                self.map.setStyle(style);
                             } else {
                                 self.prebufferFeature.properties.buffer = {width: 0, unit: 'ft'}
                                 self.value().features = [self.prebufferFeature]
                             }
-                            // var style = this.map.getStyle();
-                            // style.sources = _.defaults(self.sources, style.sources);
-                            // self.map.setStyle(style);
                             self.value(self.value())
                             self.draw.changeMode(self.drawMode())
                         }
