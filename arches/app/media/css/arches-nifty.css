@@ -3681,9 +3681,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .menu-title-shim-right {
     top: 60px;
 }
-.ep-menu-list-title {
-    border-right: 1px solid #ddd;
-}
+
 .edit-menu-item-right {
     height: 60px;
     width: 250px;
@@ -3727,7 +3725,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 .clear-node-search {
     position: absolute;
-    top: 9px;
+    top: 6px;
     right: 10px;
     font-size: 14px;
 }
@@ -4924,7 +4922,7 @@ div.row.widget-wrapper.report-header:hover {
     width: 249px;
     height: 450px;
     overflow-y: scroll;
-    right: -1px;
+    right: 0px;
     padding: 0px;
     background: transparent;
     box-shadow: none;
@@ -4942,7 +4940,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel-title {
     height: 50px;
-    width: 248px;
+    width: 249px;
     padding: 8px;
     background: #fff;
     border-bottom: 1px solid #ddd;
@@ -5086,6 +5084,14 @@ div.row.widget-wrapper.report-header:hover {
     background: steelblue;
 }
 
+.map-widget-toolbar-item.active:focus{
+    color: #fff;
+}
+
+.map-widget-toolbar-item.active:active{
+    color: #fff;
+}
+
 .map-widget-icon {
     color: #fff;
 }
@@ -5102,7 +5108,7 @@ span.basemap-unselected {
 }
 
 .map-widget-overlay-item {
-    width: 248px;
+    width: 249px;
     height: 50px;
     padding: 7px;
     background: #fff;
@@ -5397,7 +5403,8 @@ span.basemap-unselected {
 
 .href-toolbar {
     text-align: center;
-    padding-top: 5px;
+    margin-top: -10px;
+    padding-bottom: 10px;
 }
 
 .tooltype {
@@ -5426,14 +5433,15 @@ span.basemap-unselected {
 }
 
 .toggle-map-size {
-    width: 80px;
+    width: 90px;
     font-size: 11px;
     text-align: center;
     border-radius: 2px;
 }
 
-/* Disable "Full Screen" button for map tools widget in card manager */
-.widget-preview div div div h4 .toggle-map-size {
+/* Hide "Full Screen" button for map tools widget in card manager */
+.widget-preview div div div div span .toggle-map-size {
+    display: none;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */
      -khtml-user-select: none; /* Konqueror */
@@ -5593,7 +5601,7 @@ span.basemap-unselected {
 
 .search-results-button {
     position: absolute;
-    top: 40px;
+    top: 33px;
     left: 0px;
     width: 40px;
     height: 40px;
@@ -5615,7 +5623,7 @@ span.basemap-unselected {
 
 .search-results-button-icon {
     font-size: 19px;
-    margin-left: 10px;
+    margin-left: 12px;
     margin-top: 10px;
 }
 
