@@ -9,8 +9,8 @@
         <!-- Date Type -->
         <div class="calendar">
             <h3 class="search-label">Type</h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: dateNode, chosen:{ width: '100%' }">
-                <option value="all">Search all dates</option>
+            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: dateNodeId, chosen:{ width: '100%' }">
+                <option value="all">{% trans "Search all dates" %}</option>
                 {% for graph in graph_models %}
                     {% if graph.isresource and graph.isactive %}
                     <optgroup label="{{ graph.name }}">
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div class="pull-right" style="margin:-32px 20px 0 0" data-bind="if: fromDate() || toDate() || dateNode() !== 'all'">
+        <div class="pull-right" style="margin:-32px 20px 0 0; cursor:pointer;" data-bind="if: fromDate() || toDate() || dateNodeId() !== 'all'">
             <a href="#" data-bind="click: function () { clear(); }"><i class="fa fa-close"></i></a>
         </div>
     </div>

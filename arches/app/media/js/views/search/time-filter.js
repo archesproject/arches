@@ -13,7 +13,7 @@ function(_, ko, moment, BaseFilter) {
             this.fromDate = ko.observable(null);
             this.toDate = ko.observable(null);
             this.dateRangeType = ko.observable('custom');
-            this.dateNode = ko.observable('all');
+            this.dateNodeId = ko.observable('all');
             this.format = 'YYYY-MM-DD';
 
             this.dateRangeType.subscribe(function(value) {
@@ -60,7 +60,7 @@ function(_, ko, moment, BaseFilter) {
         appendFilters: function(filterParams) {
             var from = this.fromDate();
             var to = this.toDate();
-            var node = this.dateNode();
+            var node = this.dateNodeId();
             if (from || to) {
                 filterParams.fromDate = this.fromDate();
                 filterParams.toDate = this.toDate();
@@ -74,7 +74,7 @@ function(_, ko, moment, BaseFilter) {
 
         restoreState: function(query) {
             var self = this;
-            ['fromDate', 'toDate', 'dateNode'].forEach(function(key) {
+            ['fromDate', 'toDate', 'dateNodeId'].forEach(function(key) {
                 if (key in query) {
                     self[key](query[key]);
                 }
@@ -86,7 +86,7 @@ function(_, ko, moment, BaseFilter) {
             this.toDate(null);
             this.fromDate(null);
             this.dateRangeType('custom');
-            this.dateNode('all');
+            this.dateNodeId('all');
             return;
         }
     });
