@@ -13,7 +13,6 @@ def column_names_to_targetids(row, mapping):
     for key, value in row.iteritems():
         if value != '':
             for row in mapping['nodes']:
-                print row
                 if key.upper() == row['field_name'].upper():
                     new_row.append({row['nodeid']: value})
     return new_row
