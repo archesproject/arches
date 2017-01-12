@@ -504,6 +504,6 @@ class Command(BaseCommand):
 
     def create_mapping_file(self, dest_dir=None, graphs=None):
         if graphs != False:
-            graphs = [x.strip(' ') for x in graphs.split(",")]
+            graph = [x.strip(' ') for x in graphs.split(",")]
 
         graph_exporter.create_mapping_configuration_file(graphs, dest_dir)

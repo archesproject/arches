@@ -4,6 +4,7 @@ import csv
 from pprint import pprint as pp
 import os
 import json
+import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -87,14 +88,15 @@ def get_graphs_for_export(graphids=None):
         graphs['graph'].append(resource_graph)
     return graphs
 
-def create_mapping_configuration_file(graphid, data_dir):
+def create_mapping_configuration_file(graphid, data_dir=None):
+    graphid = uuid.UUID(graphid)
     nodes = []
     export_json = {}
     if graphid != False:
-        if graphid == None or graphid[0] == 'all' or graphid == ['']:
+        if graphid == None or graphid == 'all' or graphid == ['']:
             node_query = Node.objects.filter(graph_id__isresource=True).exclude(graph_id='22000000-0000-0000-0000-000000000002')
         else:
-            node_query = Node.objects.filter(graph_id__in=graphid).exclude(datatype='semantic')
+            node_query = Node.objects.filter(graph_id=graphid).exclude(datatype='semantic')
 
         export_json['resource_model_id'] = str(node_query[0].graph_id)
         export_json['resource_model_name'] = JSONSerializer().serializeToPython(Graph.objects.filter(graphid=export_json['resource_model_id']))[0]['name']
@@ -112,5 +114,8 @@ def create_mapping_configuration_file(graphid, data_dir):
 
             export_json['nodes'].append(export_node)
 
-    with open(os.path.join(data_dir), 'w') as config_file:
-        json.dump(export_json, config_file, sort_keys=True, indent=4)
+    if data_dir != None:
+        with open(os.path.join(data_dir), 'w') as config_file:
+            json.dump(export_json, config_file, sort_keys=True, indent=4)
+    else:
+        return export_json
