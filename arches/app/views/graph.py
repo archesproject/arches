@@ -170,7 +170,7 @@ class GraphDataView(View):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
             graph['metadata'] = ArchesFileExporter().export_metadata()
-            f = JSONSerializer().serialize(graph)
+            f = JSONSerializer().serialize(graph, indent=4)
             graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 
             response = HttpResponse(f, content_type='json/plain')
@@ -179,7 +179,7 @@ class GraphDataView(View):
         elif self.action == 'export_mapping_file':
             mapping = create_mapping_configuration_file(graphid)
             graph_name = mapping['resource_model_name']
-            f = JSONSerializer().serialize(mapping)
+            f = JSONSerializer().serialize(mapping, indent=4)
 
             response = HttpResponse(f, content_type='json/plain')
             response['Content-Disposition'] = 'attachment; filename="%s.mapping"' %(graph_name)
