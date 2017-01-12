@@ -1,51 +1,92 @@
 define([
     'underscore',
     'knockout',
+    'moment',
     'views/search/base-filter',
     'bindings/datepicker',
     'bindings/chosen'
 ],
-function(_, ko, BaseFilter) {
+function(_, ko, moment, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {
+            var self = this;
             this.fromDate = ko.observable(null);
             this.toDate = ko.observable(null);
-            // this.dateRangeType = ko.observable('today');
+            this.dateRangeType = ko.observable('custom');
+            this.dateNode = ko.observable('all');
+            this.format = 'YYYY-MM-DD';
 
-            this.dateRangeType = ko.pureComputed({
-                read: function() {
-                    return 'today';
-                },
-                write: function(value) {
-                    if (value !== 'custom'){
-
-                    }
-                    // set date range value based on selection
-                },
-                owner: this
-            });
             this.dateRangeType.subscribe(function(value) {
-                if (value !== 'custom'){
-                    updatingDateRange = true;
-                    // TODO: update from & to dates
-
+                var today = moment();
+                var from = today.format(self.format);
+                var to = today.format(self.format);
+                switch (value) {
+                    case "today":
+                        break;
+                    case "last-7":
+                        from = today.subtract(7, 'days').format(self.format);
+                        break;
+                    case "last-30":
+                        from = today.subtract(30, 'days').format(self.format);
+                        break;
+                    case "this-week":
+                        from = today.day(0).format(self.format);
+                        to = today.day(6).format(self.format);
+                        break;
+                    case "this-month":
+                        from = today.date(1).format(self.format);
+                        to = moment().month(today.month()+1).date(0).format(self.format);
+                        break;
+                    case "this-quarter":
+                        from = moment().date(1).quarter(today.quarter()).format(self.format);
+                        to = moment().date(1).quarter(today.quarter()+1).format(self.format);
+                        break;
+                    case "this-year":
+                        var first = today.dayOfYear(1);
+                        from = first.format(self.format);
+                        to = first.add(1, 'years').subtract(1, 'days').format(self.format);
+                        break;
+                    default:
+                        return;
                 }
-                updatingDateRange = false;
+                self.toDate(to);
+                self.fromDate(from);
             });
 
 
             BaseFilter.prototype.initialize.call(this, options);
         },
 
-        appendFilters: function(queryStringObject) {
+        appendFilters: function(filterParams) {
+            var from = this.fromDate();
+            var to = this.toDate();
+            var node = this.dateNode();
+            if (from || to) {
+                filterParams.fromDate = this.fromDate();
+                filterParams.toDate = this.toDate();
+                if (node !== 'all') {
+                    filterParams.dateNodeId = node;
+                }
+                return true;
+            }
             return false;
         },
 
-        restoreState: function(filter) {
-            return;
+        restoreState: function(query) {
+            var self = this;
+            ['fromDate', 'toDate', 'dateNode'].forEach(function(key) {
+                if (key in query) {
+                    self[key](query[key]);
+                }
+            });
+            return (this.fromDate() || this.toDate());
         },
 
         clear: function() {
+            this.toDate(null);
+            this.fromDate(null);
+            this.dateRangeType('custom');
+            this.dateNode('all');
             return;
         }
     });

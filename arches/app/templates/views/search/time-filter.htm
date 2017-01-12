@@ -9,8 +9,8 @@
         <!-- Date Type -->
         <div class="calendar">
             <h3 class="search-label">Type</h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="chosen:{ width: '100%' }">
-                <option>Search all dates</option>
+            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: dateNode, chosen:{ width: '100%' }">
+                <option value="all">Search all dates</option>
                 {% for graph in graph_models %}
                     {% if graph.isresource and graph.isactive %}
                     <optgroup label="{{ graph.name }}">
@@ -44,7 +44,7 @@
         <div class="calendar">
             <h3 class="search-label">From</h3>
             <div id="search-from-c">
-                <input class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: 'YYYY-MM-DD'}">
+                <input class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: format, maxDate: toDate}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
@@ -52,8 +52,12 @@
         <div class="calendar">
             <h3 class="search-label">To</h3>
             <div id="search-from-b">
-                <input class="form-control input-lg" data-bind="value: toDate, datepicker: {format: 'YYYY-MM-DD'}">
+                <input class="form-control input-lg" data-bind="value: toDate, datepicker: {format: format, minDate: fromDate}, disable: dateRangeType() !== 'custom'">
             </div>
+        </div>
+
+        <div class="pull-right" style="margin:-32px 20px 0 0" data-bind="if: fromDate() || toDate() || dateNode() !== 'all'">
+            <a href="#" data-bind="click: function () { clear(); }"><i class="fa fa-close"></i></a>
         </div>
     </div>
 
