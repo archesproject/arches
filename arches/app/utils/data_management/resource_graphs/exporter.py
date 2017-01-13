@@ -112,7 +112,6 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             export_node['data_type'] = ""
             export_node['export'] = False
 
-            print export_node
             export_json['nodes'].append(export_node)
 
     if data_dir != None:
