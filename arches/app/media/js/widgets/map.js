@@ -555,7 +555,9 @@ define([
                                     self.map.setStyle(style);
                                 }
                             })
-                            self.restoreSearchState();
+                            if (this.query !== undefined) {
+                                self.restoreSearchState();
+                            }
                         }
 
 

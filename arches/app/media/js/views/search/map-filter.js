@@ -8,10 +8,10 @@ function(ko, BaseFilter) {
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
             this.name = "Map Filter";
-            // this.query = ko.observable()
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);
             });
+            this.filter.inverted = false;
             this.filter.feature_collection = ko.observable({
               "type": "FeatureCollection",
               "features": []
@@ -20,16 +20,17 @@ function(ko, BaseFilter) {
 
         restoreState: function(query) {
             var doQuery = false;
-            var inverted = false;
             if ('mapFilter' in query) {
                 query.mapFilter = JSON.parse(query.mapFilter);
                 this.query = query.mapFilter;
                 if (query.mapFilter.features.length > 0) {
                     this.filter.feature_collection(query.mapFilter);
-                    inverted = query.mapFilter.features[0].inverted
-                    this.termFilter.addTag('Map Filter Enabled', this.name, ko.observable(inverted));
+                    inverted = query.mapFilter.inverted
+                    this.termFilter.addTag('Map Filter Enabled', this.name, ko.observable(true));
                 }
                 doQuery = true;
+            } else {
+                this.query = undefined;
             }
             return doQuery;
         },
