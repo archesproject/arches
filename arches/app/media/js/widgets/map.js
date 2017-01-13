@@ -160,7 +160,6 @@ define([
             };
 
             this.clearGeometries = function(val, key) {
-                console.log('clearing geoms', val)
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
@@ -930,7 +929,6 @@ define([
                             }
                         } else {
                             self.drawMode(self.draw.getMode());
-                            console.log(drawMode);
                             if (context !== 'search-filter') {
                                 if (self.draw.getSelectedIds().length > 0) {
                                     selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;

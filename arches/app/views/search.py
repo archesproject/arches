@@ -195,25 +195,19 @@ def build_search_results_dsl(request):
 
     if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:
-        # if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
-            geojson = spatial_filter['features'][0]['geometry']
-            if geojson['type'] == 'bbox':
-                coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
-                geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
-                nested = Nested(path='geometries', query=geoshape)
-            else:
-                feature_properties = spatial_filter['features'][0]['properties']
-                buffer = {'width':0,'unit':'ft'}
-                if 'buffer' in feature_properties:
-                    buffer = feature_properties['buffer']
-                geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-                geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
-                # nested = Nested(path='geometries', query=geoshape)
+            feature_geom = spatial_filter['features'][0]['geometry']
+            feature_properties = spatial_filter['features'][0]['properties']
+            buffer = {'width':0,'unit':'ft'}
+            if 'buffer' in feature_properties:
+                buffer = feature_properties['buffer']
+            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
+            geoshape = GeoShape(field='geometries.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
-            if 'inverted' not in spatial_filter:
-                spatial_filter['inverted'] = False
+            invert_spatial_search = False
+            if 'inverted' in feature_properties:
+                invert_spatial_search = feature_properties['inverted']
 
-            if spatial_filter['inverted']:
+            if invert_spatial_search == True:
                 boolfilter.must_not(geoshape)
             else:
                 boolfilter.must(geoshape)
