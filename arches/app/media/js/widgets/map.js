@@ -186,6 +186,7 @@ define([
                                 layer.source = resourceSourceId + dc;
                             }
                         });
+                        console.log('setting style 1')
                         style.sources = _.defaults(self.sources, style.sources);
                         self.map.setStyle(style);
                     }
@@ -289,6 +290,7 @@ define([
 
             this.updateSearchQueryLayer = function(geojson_features) {
                 var style = self.map.getStyle();
+                console.log('setting style 2')
                 style.sources = _.defaults(self.sources, style.sources);
                 style.sources['search-query'].data = {
                     "type": "FeatureCollection",
@@ -549,6 +551,7 @@ define([
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.results.results.subscribe(function() {
                                 var style = self.map.getStyle();
+                                console.log('setting style 3')
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
                                 style.layers.forEach(function(layer) {
@@ -700,6 +703,7 @@ define([
                             });
                             style.layers = _.without(style.layers, layer);
                         })
+                        console.log('setting style 4')
                         style.sources = _.defaults(self.sources, style.sources);
                         this.map.setStyle(style);
                     }
@@ -714,6 +718,7 @@ define([
 
                         var l1 = style.layers.slice(0, anchorIndex);
                         var l2 = style.layers.slice(anchorIndex);
+                        console.log('setting style 5')
                         style.sources = _.defaults(self.sources, style.sources);
                         style.layers = l1.concat(maplayer.layer_definitions, l2);
                         this.map.setStyle(style);
@@ -781,6 +786,7 @@ define([
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
                             var style = map.getStyle();
+                            console.log('setting style 6')
                             style.sources = _.defaults(self.sources, style.sources);
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
@@ -861,6 +867,7 @@ define([
 
                 this.setBasemap = function(basemapType) {
                     var style = this.map.getStyle();
+                    console.log('setting style 7')
                     style.sources = _.defaults(self.sources, style.sources);
                     var basemapToAdd = _.find(this.basemaps, function(basemap) {
                         return basemap.name === basemapType.name;
@@ -912,7 +919,9 @@ define([
                             self.value(currentDrawing)
                         }
                         self.prebufferFeature = currentDrawing.features[currentDrawing.features.length - 1];
-                        self.updateSearchQueryLayer([self.prebufferFeature])
+                        if (self.context === 'search-filter') {
+                            self.updateSearchQueryLayer([self.prebufferFeature])
+                        }
                     }
                 }
 
