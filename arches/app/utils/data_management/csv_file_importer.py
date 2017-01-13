@@ -51,8 +51,7 @@ class CSVFileImporter(object):
         for path in mapping_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    mapping = csv.DictReader(open(mapping_file[0], 'r'))
-                    self.mapping = list(mapping)
+                    self.mapping = json.load(open(mapping_file[0], 'r'))
                 else:
                     self.mapping = None
 

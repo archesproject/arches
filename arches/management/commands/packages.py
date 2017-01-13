@@ -145,10 +145,10 @@ class Command(BaseCommand):
             self.index_database(package_name)
 
         if options['operation'] == 'export_resources':
-            self.export_resources(package_name, options['dest_dir'], options['resources'])
+            self.export_resources(options['dest_dir'], options['resources'], options['format'])
 
         if options['operation'] == 'import_json':
-            self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
+            self.import_json(options['source'], options['graphs'], options['resources'])
 
         if options['operation'] == 'export_json':
             self.export_json(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
@@ -368,9 +368,9 @@ class Command(BaseCommand):
         index_database.index_db()
 
 
-    def export_resources(self, package_name, data_dest=None, resources=''):
+    def export_resources(self, data_dest=None, resources='', file_format=None):
         """
-        Exports resources to archesjson
+        Exports resources to specified format.
         """
     #     resource_exporter = ResourceExporter('json')
     #     resource_exporter.export(search_results=False, dest_dir=data_dest)
@@ -382,11 +382,11 @@ class Command(BaseCommand):
     #         for csv_record in related_resources:
     #             csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
 
-        resource_exporter = ResourceExporter('json')
+        resource_exporter = ResourceExporter(file_format)
         resource_exporter.export(resources=resources, dest_dir=data_dest)
 
 
-    def import_json(self, data_source='', graphs=None, resources=None, concepts=None):
+    def import_json(self, data_source='', graphs=None, resources=None):
         """
         Imports objects from arches.json.
 
@@ -504,6 +504,6 @@ class Command(BaseCommand):
 
     def create_mapping_file(self, dest_dir=None, graphs=None):
         if graphs != False:
-            graphs = [x.strip(' ') for x in graphs.split(",")]
+            graph = [x.strip(' ') for x in graphs.split(",")]
 
         graph_exporter.create_mapping_configuration_file(graphs, dest_dir)

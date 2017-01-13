@@ -155,10 +155,10 @@ def import_business_data(business_data, mapping=None):
                 for tile in tiles:
                     new_data = []
                     for sourcekey in tile['data'].keys():
-                        for row in mapping:
-                            if row['sourcenodeid'] == sourcekey:
+                        for row in mapping['nodes']:
+                            if row['file_field_name'] == sourcekey:
                                 d = {}
-                                d[row['targetnodeid']] =  tile['data'][sourcekey]
+                                d[row['arches_nodeid']] =  tile['data'][sourcekey]
                                 new_data.append(d)
                                 # tile['data'][row['targetnodeid']] = tile['data'][sourcekey]
                                 # del tile['data'][sourcekey]
@@ -181,9 +181,7 @@ def import_business_data(business_data, mapping=None):
                 resourceinstanceid = uuid.uuid4()
                 populated_nodegroups = []
 
-                for row in mapping:
-                    if resource['resourceinstance']['graph_id'] == row['sourceresourcemodelid']:
-                        target_resource_model = row['targetresourcemodelid']
+                target_resource_model = mapping['resource_model_id']
 
                 for tile in resource['tiles']:
                     if tile['data'] != {}:
@@ -319,7 +317,6 @@ def import_business_data(business_data, mapping=None):
                 for populated_tile in populated_tiles:
                     populated_tile.resourceinstance = newresourceinstance
                     saved_tile = populated_tile.save()
-                    # print saved_tile
                     # tile_saved = count parent tile and count of tile array if tile array != {}
                     # reporter.update_tiles_saved(tile_saved)
 
