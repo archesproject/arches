@@ -655,6 +655,7 @@ define([
                         this.extentSearch(false);
                         this.draw.deleteAll();
                         this.prebufferFeature = undefined;
+                        this.updateSearchQueryLayer([]);
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -929,6 +930,7 @@ define([
                             }
                         } else {
                             self.drawMode(self.draw.getMode());
+                            console.log(drawMode);
                             if (context !== 'search-filter') {
                                 if (self.draw.getSelectedIds().length > 0) {
                                     selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
