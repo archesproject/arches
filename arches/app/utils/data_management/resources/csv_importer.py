@@ -15,9 +15,9 @@ def column_names_to_targetids(row, mapping):
     new_row = []
     for key, value in row.iteritems():
         if value != '':
-            for row in mapping:
-                if key.upper() == row['sourceNodeName'].upper():
-                    new_row.append({row['targetnodeid']: value})
+            for row in mapping['nodes']:
+                if key.upper() == row['file_field_name'].upper():
+                    new_row.append({row['arches_nodeid']: value})
     return new_row
 
 def import_business_data(business_data, mapping=None):
