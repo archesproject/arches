@@ -92,7 +92,7 @@ def get_graphs_for_export(graphids=None):
 def create_mapping_configuration_file(graphid, data_dir=None):
     graphid = uuid.UUID(graphid)
     nodes = []
-    export_json = {}
+    export_json = OrderedDict()
     if graphid != False:
         if graphid == None or graphid == 'all' or graphid == ['']:
             node_query = Node.objects.filter(graph_id__isresource=True).exclude(graph_id='22000000-0000-0000-0000-000000000002')
@@ -101,7 +101,6 @@ def create_mapping_configuration_file(graphid, data_dir=None):
 
         export_json['resource_model_id'] = str(node_query[0].graph_id)
         export_json['resource_model_name'] = JSONSerializer().serializeToPython(Graph.objects.filter(graphid=export_json['resource_model_id']))[0]['name']
-        export_json['filetype'] = ''
         export_json['nodes'] = []
         for node in node_query:
             export_node = OrderedDict()
