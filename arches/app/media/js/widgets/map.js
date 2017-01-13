@@ -186,7 +186,6 @@ define([
                                 layer.source = resourceSourceId + dc;
                             }
                         });
-                        console.log('setting style 1')
                         style.sources = _.defaults(self.sources, style.sources);
                         self.map.setStyle(style);
                     }
@@ -262,7 +261,8 @@ define([
 
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
 
-            if (!this.configForm) {
+            if (!this.configForm && this.context === 'report-header') {
+                console.log('doing this once')
                 _.each(arches.mapLayers, function(layer) {
                     _.each(layer.layer_definitions, function(def) {
                         def.id += '-' + layer.name;
@@ -290,7 +290,6 @@ define([
 
             this.updateSearchQueryLayer = function(geojson_features) {
                 var style = self.map.getStyle();
-                console.log('setting style 2')
                 style.sources = _.defaults(self.sources, style.sources);
                 style.sources['search-query'].data = {
                     "type": "FeatureCollection",
@@ -334,7 +333,7 @@ define([
                     maplayerid: this.graphId,
                     isResource: true,
                     layer_definitions: [{
-                        "id": "resource-poly",
+                        "id": "resource-poly" + this.graphId,
                         "source": "resource",
                         "type": "fill",
                         "layout": {},
@@ -344,7 +343,7 @@ define([
                             "fill-opacity": 0.8
                         }
                     }, {
-                        "id": "resource-point",
+                        "id": "resource-point" + this.graphId,
                         "source": "resource",
                         "type": "circle",
                         "layout": {},
@@ -355,7 +354,7 @@ define([
                             "circle-opacity": 0.8
                         }
                     }, {
-                        "id": "resource-line",
+                        "id": "resource-line" + this.graphId,
                         "source": "resource",
                         "type": "line",
                         "layout": {},
@@ -551,7 +550,6 @@ define([
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.results.results.subscribe(function() {
                                 var style = self.map.getStyle();
-                                console.log('setting style 3')
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
                                 style.layers.forEach(function(layer) {
@@ -583,7 +581,7 @@ define([
                             }, self)
                             data = result;
                             source.setData(data)
-                            _.each(['resource-poly', 'resource-line', 'resource-point'], function(layerId) { //clear and add resource layers so that they are on top of map
+                            _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                                 var cacheLayer = self.map.getLayer(layerId);
                                 self.map.moveLayer(layerId, self.anchorLayerId)
                             }, self)
@@ -703,7 +701,6 @@ define([
                             });
                             style.layers = _.without(style.layers, layer);
                         })
-                        console.log('setting style 4')
                         style.sources = _.defaults(self.sources, style.sources);
                         this.map.setStyle(style);
                     }
@@ -718,7 +715,6 @@ define([
 
                         var l1 = style.layers.slice(0, anchorIndex);
                         var l2 = style.layers.slice(anchorIndex);
-                        console.log('setting style 5')
                         style.sources = _.defaults(self.sources, style.sources);
                         style.layers = l1.concat(maplayer.layer_definitions, l2);
                         this.map.setStyle(style);
@@ -786,9 +782,9 @@ define([
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
                             var style = map.getStyle();
-                            console.log('setting style 6')
                             style.sources = _.defaults(self.sources, style.sources);
                             style.sources['resource'].data = self.map.getSource('resource')._data
+                            style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
@@ -868,8 +864,9 @@ define([
 
                 this.setBasemap = function(basemapType) {
                     var style = this.map.getStyle();
-                    console.log('setting style 7')
                     style.sources = _.defaults(self.sources, style.sources);
+                    style.sources['resource'].data = self.map.getSource('resource')._data
+                    style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
                     var basemapToAdd = _.find(this.basemaps, function(basemap) {
                         return basemap.name === basemapType.name;
                     });
