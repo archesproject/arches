@@ -49,8 +49,11 @@ function(ko, BaseFilter) {
                     this.termFilter.addTag('Map Filter Enabled', this.name, this.filter.inverted);
                 };
                 this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted()
+                filterParams.mapFilter = ko.toJSON(this.filter.feature_collection());
+            } else {
+                this.clear();
             };
-            filterParams.mapFilter = ko.toJSON(this.filter.feature_collection());
+
             return this.filter.feature_collection().features.length === 0;
         }
 
