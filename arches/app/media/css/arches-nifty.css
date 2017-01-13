@@ -5205,7 +5205,7 @@ span.basemap-unselected {
     width: 248px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fbfbfb;
     color: #aaa;
     border-bottom: 1px solid #ddd;
 }
@@ -5221,6 +5221,11 @@ span.basemap-unselected {
 .map-draw-tools-item.map-draw-tools-active {
   background-color: #fff;
   color: #666;
+}
+
+.map-draw-tools-item.map-draw-tools-active:hover {
+  background-color: #fff;
+  cursor: default;
 }
 
 .map-draw-tools-item:hover {
