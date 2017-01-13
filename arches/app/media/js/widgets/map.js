@@ -309,7 +309,9 @@ define([
                 if (features.length > 0) {
                     this.prebufferFeature = features[0];
                     if (this.prebufferFeature.properties.extent_search === true) {
+                        var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.prebufferFeature));
                         this.toggleExtentSearch()
+                        this.map.fitBounds(bounds);
                     } else {
                         drawMode = geojsonToDrawMode[this.prebufferFeature.geometry.type]
                         this.draw.changeMode(drawMode.drawMode)
@@ -566,9 +568,6 @@ define([
                                     self.map.setStyle(style);
                                 }
                             })
-                            if (self.query !== undefined) {
-                                self.restoreSearchState();
-                            }
                         }
 
 
@@ -616,6 +615,9 @@ define([
                     }
                     window.setTimeout(function() {
                         window.dispatchEvent(new Event('resize'))
+                        if (self.query !== undefined && self.context === 'search-filter') {
+                            self.restoreSearchState();
+                        }
                     }, 30)
                 });
 
