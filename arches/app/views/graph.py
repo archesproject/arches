@@ -179,7 +179,8 @@ class GraphDataView(View):
         elif self.action == 'export_mapping_file':
             mapping = create_mapping_configuration_file(graphid)
             graph_name = mapping['resource_model_name']
-            f = JSONSerializer().serialize(mapping, indent=4)
+            f = json.dumps(mapping, indent=4)
+            # Use json.dumps above to preserve key order for mapping file.
 
             response = HttpResponse(f, content_type='json/plain')
             response['Content-Disposition'] = 'attachment; filename="%s.mapping"' %(graph_name)

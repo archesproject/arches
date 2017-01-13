@@ -8,6 +8,7 @@ import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from collections import OrderedDict
 
 def export(export_dir):
     """
@@ -103,19 +104,20 @@ def create_mapping_configuration_file(graphid, data_dir=None):
         export_json['filetype'] = ''
         export_json['nodes'] = []
         for node in node_query:
-            export_node = {}
-            export_node['nodeid'] = str(node.nodeid)
-            export_node['node_name'] = node.name
-            export_node['field_name'] = ""
+            export_node = OrderedDict()
+            export_node['arches_nodeid'] = str(node.nodeid)
+            export_node['arches_node_name'] = node.name
+            export_node['file_field_name'] = ""
             export_node['value_type'] = ""
             export_node['data_length'] = ""
             export_node['data_type'] = ""
-            export_node['export'] = ""
+            export_node['export'] = False
 
+            print export_node
             export_json['nodes'].append(export_node)
 
     if data_dir != None:
         with open(os.path.join(data_dir), 'w') as config_file:
-            json.dump(export_json, config_file, sort_keys=True, indent=4)
+            json.dump(export_json, config_file, indent=4)
     else:
         return export_json
