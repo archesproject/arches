@@ -160,10 +160,13 @@ define([
             };
 
             this.clearGeometries = function(val, key) {
+                console.log('clearing geoms', val)
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
-                }
-            };
+                } else if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.updateSearchQueryLayer([]);
+                    }
+                };
 
             if (ko.isObservable(this.value)) {
                 this.value.subscribe(this.clearGeometries)
