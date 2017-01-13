@@ -27,6 +27,7 @@ class BaseManagerView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
-        context['graphs'] = JSONSerializer().serialize(models.GraphModel.objects.all())
+        context['graph_models'] = models.GraphModel.objects.all()
+        context['graphs'] = JSONSerializer().serialize(context['graph_models'])
 
         return context
