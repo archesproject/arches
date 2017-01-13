@@ -1,2 +1,16 @@
-sourceresourcemodelid,sourceResourceModelName,sourcenodeid,sourceNodeName,targetresourcemodelid,targetResourceModelName,targetnodeid,targetNodeName
-316d5523-c6f2-11e6-8705-685b3597724b,Source,316d7cfd-c6f2-11e6-8728-685b3597724b,child 1-n,8e672ab0-c6e2-11e6-9725-685b3597724b,Target,8e673623-c6e2-11e6-92cf-685b3597724b,child 1-1
+{
+  "filetype": "archesjson",
+  "resource_model_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+  "nodes": [
+    {
+      "data_type": "",
+      "data_length": "",
+      "arches_nodeid": "8e673623-c6e2-11e6-92cf-685b3597724b",
+      "arches_node_name": "child 1-1",
+      "value_type": "",
+      "export": "",
+      "file_field_name": "316d7cfd-c6f2-11e6-8728-685b3597724b"
+    }
+  ],
+  "resource_model_name": "Target"
+}

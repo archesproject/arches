@@ -56,8 +56,7 @@ class ArchesFileImporter(object):
         for path in mapping_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    mapping = csv.DictReader(open(mapping_file[0], 'r'))
-                    self.mapping = list(mapping)
+                    self.mapping = json.load(open(path, 'r'))
                 else:
                     self.mapping = None
 
