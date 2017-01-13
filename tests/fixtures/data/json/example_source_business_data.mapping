@@ -1,7 +1,7 @@
 {
   "filetype": "csv",
-  "resource_model_id": "6e77a868-bbe0-11e6-973a-685b3597724b",
-  "resource_model_name": "Example Source Resource",
+  "resource_model_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+  "resource_model_name": "Heritage Resource",
   "nodes": [
     {
       "nodeid": "4211c761-b8fb-11e6-84a5-026d961c88e6",
