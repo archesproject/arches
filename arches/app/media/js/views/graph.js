@@ -70,6 +70,9 @@ require([
                 graph.exportGraph = function(model) {
                     window.open(graph.graphid + '/export', '_blank');
                 };
+                graph.exportMappingFile = function(model) {
+                    window.open(graph.graphid + '/export_mapping_file', '_blank');
+                };
                 graph.deleteGraph = function () {
                     self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                         return;
