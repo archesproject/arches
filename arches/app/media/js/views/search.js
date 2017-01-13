@@ -29,6 +29,7 @@ require([
                 searchRelatedResources: new BaseFilter()
             };
             this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
+            this.filters.mapFilter.termFilter = this.filters.termFilter;
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({

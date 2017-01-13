@@ -114,6 +114,7 @@ define([
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
             if (this.context === 'search-filter') {
                 this.results = params.results;
+                this.query = params.query;
                 this.resourceinstance_ids = ko.pureComputed(function() {
                     return _.pluck(this.results.results(), 'resourceinstanceid');
                 }, this)
@@ -292,6 +293,31 @@ define([
                     "features": geojson_features
                 };
                 self.map.setStyle(style);
+            }
+
+            this.restoreSearchState = function() {
+                var features = this.query.features;
+                var drawMode;
+                var geojsonToDrawMode = {
+                    'Point': {'drawMode': 'draw_point', 'name':'Point'},
+                    'LineString': {'drawMode':'draw_line_string', 'name':'Line'},
+                    'Polygon': {'drawMode': 'draw_polygon', 'name': 'Polygon'}
+                }
+                if (features.length > 0) {
+                    this.prebufferFeature = features[0];
+                    if (this.prebufferFeature.properties.extent_search === true) {
+                        this.toggleExtentSearch()
+                    } else {
+                        drawMode = geojsonToDrawMode[this.prebufferFeature.geometry.type]
+                        this.draw.changeMode(drawMode.drawMode)
+                        this.drawMode(drawMode.drawMode)
+                        this.geometryTypeDetails[drawMode.name].active(true);
+                        this.updateSearchQueryLayer([this.prebufferFeature]);
+                        if (this.prebufferFeature.properties.buffer) {
+                            this.buffer(this.prebufferFeature.properties.buffer.width)
+                        }
+                    }
+                }
             }
 
             /**
@@ -507,7 +533,6 @@ define([
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                            // self.addMaplayer(self.resourceLayer);
                         }
 
                         if (self.context === 'search-filter') {
@@ -530,6 +555,7 @@ define([
                                     self.map.setStyle(style);
                                 }
                             })
+                            self.restoreSearchState();
                         }
 
 
@@ -993,7 +1019,8 @@ define([
                                 "buffer": {
                                     "width": 0,
                                     "unit": "ft"
-                                }
+                                },
+                                "extent_search": true
                             },
                             "geometry": {
                                 "type": "Polygon",
