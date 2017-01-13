@@ -788,6 +788,7 @@ define([
                             var style = map.getStyle();
                             console.log('setting style 6')
                             style.sources = _.defaults(self.sources, style.sources);
+                            style.sources['resource'].data = self.map.getSource('resource')._data
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
