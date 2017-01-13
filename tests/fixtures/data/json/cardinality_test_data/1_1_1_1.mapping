@@ -4,9 +4,9 @@
   "resource_model_name": "Target",
   "nodes": [
     {
-      "nodeid": "8e673623-c6e2-11e6-92cf-685b3597724b",
-      "node_name": "child 1-1",
-      "field_name": "316d743a-c6f2-11e6-a8f0-685b3597724b",
+      "arches_nodeid": "8e673623-c6e2-11e6-92cf-685b3597724b",
+      "arches_node_name": "child 1-1",
+      "file_field_name": "316d743a-c6f2-11e6-a8f0-685b3597724b",
       "value_type": "",
       "data_length": "",
       "data_type": "",

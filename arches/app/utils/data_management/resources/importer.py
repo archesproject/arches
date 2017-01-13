@@ -156,9 +156,9 @@ def import_business_data(business_data, mapping=None):
                     new_data = []
                     for sourcekey in tile['data'].keys():
                         for row in mapping['nodes']:
-                            if row['field_name'] == sourcekey:
+                            if row['file_field_name'] == sourcekey:
                                 d = {}
-                                d[row['nodeid']] =  tile['data'][sourcekey]
+                                d[row['arches_nodeid']] =  tile['data'][sourcekey]
                                 new_data.append(d)
                                 # tile['data'][row['targetnodeid']] = tile['data'][sourcekey]
                                 # del tile['data'][sourcekey]
