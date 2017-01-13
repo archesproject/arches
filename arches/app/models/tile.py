@@ -126,16 +126,10 @@ class Tile(models.TileModel):
         for document in search_documents:
             se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
 
-        #     report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
-        #     for report_document in report_documents:
-        #         se.index_data('resource', self.entitytypeid, report_document, id=self.entityid)
-
-        #     geojson_documents = self.prepare_documents_for_map_index(geom_entities=document['geometries'])
-        #     for geojson in geojson_documents:
-        #         se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
-
         for term in self.prepare_terms_for_search_index():
-           se.index_term(term['term'], term['nodeid'], term['context'], term['options'])
+            term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
+            se.delete_terms(term_id)
+            se.index_term(term['term'], term_id, term['context'], term['options'])
 
     def prepare_documents_for_search_index(self):
         """

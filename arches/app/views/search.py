@@ -45,7 +45,9 @@ class SearchView(BaseManagerView):
     def get(self, request):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
+        date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         context = self.get_context_data(
+            date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',
@@ -110,16 +112,21 @@ def search_results(request):
     return JSONResponse(ret)
 
 def get_doc_type(request):
-    doc_type = []
-    type_filter = JSONDeserializer().deserialize(request.GET.get('typeFilter', '{}'))
-    if 'types' in type_filter:
-        for modelType in type_filter['types']:
-            doc_type.append(modelType['graphid'])
-    if 'inverted' in type_filter and type_filter['inverted'] == True:
-        resource_model_ids = list(models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
-        resource_model_ids[:] = (str(value) for value in resource_model_ids if str(value) not in doc_type)
-        doc_type = resource_model_ids
-    return doc_type
+    doc_type = set()
+    type_filter = request.GET.get('typeFilter', '')
+    if type_filter != '':
+        resource_model_ids = set(str(graphid) for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True))
+        for resouceTypeFilter in JSONDeserializer().deserialize(type_filter):
+            if resouceTypeFilter['inverted'] == True:
+                inverted_resource_model_ids = resource_model_ids - set([str(resouceTypeFilter['graphid'])])
+                if len(doc_type) > 0:
+                    doc_type = doc_type.intersection(inverted_resource_model_ids)
+                else:
+                    doc_type = inverted_resource_model_ids
+            else:
+                doc_type.add(str(resouceTypeFilter['graphid']))
+
+    return list(doc_type)
 
 def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
@@ -147,7 +154,7 @@ def get_paginator(request, results, total_count, page, count_per_page, all_ids):
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', '{}'))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('mapFilter', '{}'))
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
@@ -188,25 +195,24 @@ def build_search_results_dsl(request):
                 else:
                     boolfilter.must(string_filter)
 
-    if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
-        geojson = spatial_filter['geometry']
-        if geojson['type'] == 'bbox':
-            coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
-            geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
-            nested = Nested(path='geometries', query=geoshape)
-        else:
-            buffer = spatial_filter['buffer']
-            geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
-            geoshape = GeoShape(field='geometries.features.geometry', type=geojson['type'], coordinates=geojson['coordinates'] )
-            #nested = Nested(path='geometries', query=geoshape)
+    if 'features' in spatial_filter:
+        if len(spatial_filter['features']) > 0:
+            feature_geom = spatial_filter['features'][0]['geometry']
+            feature_properties = spatial_filter['features'][0]['properties']
+            buffer = {'width':0,'unit':'ft'}
+            if 'buffer' in feature_properties:
+                buffer = feature_properties['buffer']
+            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
+            geoshape = GeoShape(field='geometries.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
-        if 'inverted' not in spatial_filter:
-            spatial_filter['inverted'] = False
+            invert_spatial_search = False
+            if 'inverted' in feature_properties:
+                invert_spatial_search = feature_properties['inverted']
 
-        if spatial_filter['inverted']:
-            boolfilter.must_not(geoshape)
-        else:
-            boolfilter.must(geoshape)
+            if invert_spatial_search == True:
+                boolfilter.must_not(geoshape)
+            else:
+                boolfilter.must(geoshape)
 
     if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)

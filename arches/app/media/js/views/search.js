@@ -16,16 +16,20 @@ require([
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
+            this.viewModel.resultsExpanded = ko.observable(true);
             this.filters = {
                 termFilter: new TermFilter(),
                 timeFilter: new TimeFilter(),
                 resourceTypeFilter: new ResourceTypeFilter(),
-                mapFilter: new MapFilter(),
+                mapFilter: new MapFilter({
+                    resizeOnChange: this.viewModel.resultsExpanded
+                }),
                 savedSearches: new BaseFilter(),
                 advancedFilter: new BaseFilter(),
                 searchRelatedResources: new BaseFilter()
             };
             this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
+            this.filters.mapFilter.termFilter = this.filters.termFilter;
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
@@ -33,10 +37,11 @@ require([
             });
 
             this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.filters.mapFilter.results = this.viewModel.searchResults;
 
             self.isNewQuery = true;
 
-            this.queryString = ko.pureComputed(function() {
+            this.queryString = ko.computed(function() {
                 var params = {
                     page: self.viewModel.searchResults.page(),
                     include_ids: self.isNewQuery,
@@ -66,13 +71,8 @@ require([
 
             this.restoreState();
 
-            this.viewModel.searchResults.page.subscribe(function() {
-                self.doQuery();
-            });
-
             this.queryString.subscribe(function() {
                 self.isNewQuery = true;
-                self.viewModel.searchResults.page(1);
                 self.doQuery();
             });
 

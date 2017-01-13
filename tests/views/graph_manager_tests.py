@@ -228,5 +228,6 @@ class GraphManagerViewTests(ArchesTestCase):
             response = self.client.post(url, {'importedGraph': f})
         self.assertIsNotNone(response.content)
 
+        #Note: If you change the imported_json array to make this test work you should also change the expected response in the import_graph method in arches.app.media.js.views.graph.js
         imported_json = JSONDeserializer().deserialize(response.content)
         self.assertEqual(imported_json[0], [])

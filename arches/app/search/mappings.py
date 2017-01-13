@@ -41,18 +41,18 @@ def prepare_term_index(create=False):
                 'properties': {
                     'ids':{'type': 'string', 'index' : 'not_analyzed'},
                     'context':{'type': 'string', 'index' : 'not_analyzed'},
-                    'term': { 
+                    'term': {
                         'type': 'string',
                         'analyzer': 'standard',
                         'fields': {
-                            'folded': { 
+                            'folded': {
                                 'type': 'string',
                                 'analyzer': 'folding'
                             }
                         }
                     }
-                }            
-            }            
+                }
+            }
         }
     }
 
@@ -72,7 +72,7 @@ def prepare_search_index(resource_model_id, create=False):
 
     """
 
-    index_settings = { 
+    index_settings = {
         'settings':{
             'analysis': {
                 'analyzer': {
@@ -89,7 +89,7 @@ def prepare_search_index(resource_model_id, create=False):
                     'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'tiles' : { 
+                    'tiles' : {
                         'type' : 'nested',
                         'properties' : {
                             "tiles": {'enabled': False},
@@ -107,7 +107,7 @@ def prepare_search_index(resource_model_id, create=False):
                             'folded': { 'type': 'string', 'analyzer': 'folding'}
                         }
                     },
-                    'domains' : { 
+                    'domains' : {
                         'properties' : {
                             'value' : {
                                 'type' : 'string',
@@ -135,98 +135,19 @@ def prepare_search_index(resource_model_id, create=False):
                             "type": { 'type' : 'string', 'index' : 'not_analyzed'}
                         }
                     },
-                    'dates' : { 
+                    'dates' : {
                         "type" : "date"
                     },
-                    'numbers' : { 
+                    'numbers' : {
                         "type" : "double"
                     }
                 }
             }
         }
     }
-    #                 'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'value' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
-    #                 'child_entities' : { 
-    #                     'type' : 'nested',
-    #                     'properties' : {
-    #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'value' : {
-    #                             'type' : 'string',
-    #                             'index' : 'analyzed',
-    #                             'fields' : {
-    #                                 'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
-    #                                 'folded': { 'type': 'string', 'analyzer': 'folding'}
-    #                             }
-    #                         }
-    #                     }
-    #                 },
-    #                 'domains' : { 
-    #                     'type' : 'nested',
-    #                     'properties' : {
-    #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'value' : {
-    #                             'type' : 'string',
-    #                             'index' : 'analyzed',
-    #                             'fields' : {
-    #                                 'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
-    #                             }
-    #                         },
-    #                         'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                     }
-    #                 },
-    #                 'geometries' : { 
-    #                     'type' : 'nested',
-    #                     'properties' : {
-    #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'value' : {
-    #                             "type": "geo_shape"
-    #                         }
-    #                     }
-    #                 },
-    #                 'dates' : { 
-    #                     'type' : 'nested',
-    #                     'properties' : {
-    #                         'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-    #                         'value' : {
-    #                             "type" : "date"
-    #                         }
-    #                     }
-    #                 }
-    #             }
-    #         }
-    #     }
-    # }
 
     if create:
         se = SearchEngineFactory().create()
-        #print JSONSerializer().serialize(index_settings)
         try:
             se.create_index(index='resource', body=index_settings)
         except:

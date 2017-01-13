@@ -7,9 +7,9 @@ define([
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
-            
+
             this.name = 'Term Filter';
-            
+
             this.filter.terms = ko.observableArray();
         },
 
@@ -35,7 +35,7 @@ define([
 
         appendFilters: function(filterParams) {
             var terms = _.filter(this.filter.terms(), function(term){
-                return term.type !== 'filter-flag';
+                return term.type === 'string' || term.type === 'concept' || term.type === 'term';
             }, this);
 
             if(terms.length > 0){
@@ -58,9 +58,19 @@ define([
         },
 
         removeTag: function(term){
-            this.filter.terms.remove(function(term_item){ 
-                return term_item.id == term && term_item.text == term && term_item.value == term; 
+            this.filter.terms.remove(function(term_item){
+                return term_item.id == term && term_item.text == term && term_item.value == term;
             });
+        },
+
+        hasTag: function(tag_text){
+            var has_tag = false;
+            this.filter.terms().forEach(function(term_item){
+                if (term_item.text == tag_text) {
+                    has_tag = true;
+                };
+            });
+            return has_tag;
         }
 
     });

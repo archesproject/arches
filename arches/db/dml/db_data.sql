@@ -2176,6 +2176,15 @@ INSERT INTO map_sources(name, source)
       }
   }');
 
+INSERT INTO map_sources(name, source)
+VALUES ('search-query', '{
+    "type": "geojson",
+    "data": {
+        "type": "FeatureCollection",
+        "features": []
+    }
+}');
+
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
@@ -3357,6 +3366,35 @@ INSERT INTO map_sources(name, source)
         "type": "vector",
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
+
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[
+         {
+             "id": "building-extrusion",
+             "type": "fill-extrusion",
+             "source": "mapbox-streets",
+             "source-layer": "building",
+             "filter": [
+                 "==",
+                 "$type",
+                 "Polygon"
+             ],
+             "layout": {},
+             "paint": {
+                 "fill-extrusion-color": "hsl(0, 0%, 78%)",
+                 "fill-extrusion-opacity": 0.4,
+                 "fill-extrusion-height": {
+                     "type": "identity",
+                     "property": "height"
+                 },
+                 "fill-extrusion-base": {
+                     "type": "identity",
+                     "property": "min_height"
+                 }
+             }
+         }
+     ]', TRUE, 'fa fa-building-o');
 
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
