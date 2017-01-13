@@ -379,39 +379,46 @@ define([
                         "source": "resources",
                         "source-layer": "resources",
                         "type": "fill",
-                        "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString"],
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "Polygon"],
                             ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
                         ],
                         "paint": {
-                            "fill-color": "#FF0000",
-                            "fill-opacity": 0.8
+                            "fill-color": "rgba(255, 0, 0, 0.7)"
                         }
-                    }, {
-                        "id": "search_results_resource-point",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "circle",
-                        "layout": {},
-                        "filter": ['all', ["!in", "$type", "LineString", "Polygon"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "circle-radius": 3.0,
-                            "circle-color": "#FF0000",
-                            "circle-opacity": 0.8
-                        }
-                    }, {
+                    },
+                    {
                         "id": "search_results_resource-line",
                         "source": "resources",
                         "source-layer": "resources",
                         "type": "line",
-                        "layout": {},
-                        "filter": ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "LineString"],
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                        ],
                         "paint": {
-                            "line-color": "#FF0000",
-                            "line-opacity": 0.8,
+                            "line-color": "rgba(255, 0, 0, 0.7)",
                             "line-width": 1.5
+                        }
+                    },
+                    {
+                        "id": "search_results_resource-point",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "circle",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "Point"],
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                        ],
+                        "paint": {
+                            "circle-radius": 3.0,
+                            "circle-color": "rgba(255, 0, 0, 1)"
                         }
                     }],
                     isoverlay: false,
