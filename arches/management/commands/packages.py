@@ -151,7 +151,7 @@ class Command(BaseCommand):
             self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'export_json':
-            self.export_json(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
+            self.export_json(options['dest_dir'], options['graphs'], options['resources'])
 
         if options['operation'] == 'add_tilserver_layer':
             self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
@@ -438,19 +438,17 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def export_json(self, data_dest=None, graphs=None, resources=None, concepts=None):
+    def export_json(self, data_dest=None, graphs=None, resources=None):
         """
         Export objects to arches.json.
         """
 
         if graphs != False:
             graphs = [x.strip(' ') for x in graphs.split(",")]
-        if concepts != False:
-            concepts = [x.strip(' ') for x in concepts.split(",")]
         if resources != False:
             resources = [x.strip(' ') for x in resources.split(",")]
 
-        ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)
+        ArchesFileExporter().export_all(data_dest, graphs, resources)
 
     def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
         if layer_name != False and mapnik_xml_path != False:

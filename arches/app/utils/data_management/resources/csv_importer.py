@@ -1,12 +1,15 @@
 import csv
 import uuid
+import cPickle
+import json
+from copy import deepcopy
+from django.db.models import Q
+from django.contrib.gis.geos import GEOSGeometry
 from arches.app.models.tile import Tile
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import NodeGroup
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from copy import deepcopy
-import cPickle
 
 def column_names_to_targetids(row, mapping):
     new_row = []
@@ -18,13 +21,14 @@ def column_names_to_targetids(row, mapping):
     return new_row
 
 def import_business_data(business_data, mapping=None):
-    blanktilecache = {}
-    single_cardinality_nodegroups = []
-    single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
-    previous_row_resourceid = business_data[0]['ResourceID']
     resourceinstanceid = uuid.uuid4()
+    blanktilecache = {}
     populated_nodegroups = {}
     populated_nodegroups[resourceinstanceid] = []
+    single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
+    node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
+
+    previous_row_resourceid = business_data[0]['ResourceID']
 
     def cache(blank_tile):
         if blank_tile.data != None:
@@ -36,6 +40,34 @@ def import_business_data(business_data, mapping=None):
                 for key in tile[0].data.keys():
                     if key not in blanktilecache:
                         blanktilecache[str(key)] = blank_tile
+
+    def transform_value(datatype, value):
+        '''
+        Transforms values from probably string/wkt representation to specified datatype in arches.
+        This code could probably move to somehwere where it can be accessed by other importers.
+        '''
+        if datatype != '':
+            if datatype == 'geojson-feature-collection':
+                arches_geojson = {}
+                arches_geojson['type'] = "FeatureCollection"
+                arches_geojson['features'] = []
+
+                arches_json_geometry = {}
+                arches_json_geometry['type'] = "Feature"
+                arches_json_geometry['id'] = str(uuid.uuid4())
+                arches_json_geometry['properties'] = {}
+                arches_json_geometry['geometry'] = JSONDeserializer().deserialize(GEOSGeometry(value, srid=4326).json)
+                arches_geojson['features'].append(arches_json_geometry)
+
+                value = arches_geojson
+            elif datatype == 'concept-list' or datatype == 'domain-value-list':
+                value = value.split(',')
+            elif datatype == 'file-list':
+                pass
+        else:
+            print 'No datatype detected for {0}'.format(value)
+
+        return value
 
     def get_blank_tile(source_data):
         if len(source_data) > 0:
@@ -81,7 +113,8 @@ def import_business_data(business_data, mapping=None):
                             for source_key in source_tile.keys():
                                 if source_key == target_key:
                                     if target_tile.data[source_key] == '':
-                                        target_tile.data[source_key] = source_tile[source_key]
+                                        value = transform_value(node_datatypes[source_key], source_tile[source_key])
+                                        target_tile.data[source_key] = value
                                         del source_tile[source_key]
 
                     source_data[:] = [item for item in source_data if item != {}]
@@ -104,7 +137,8 @@ def import_business_data(business_data, mapping=None):
                                         for source_key in source_column.keys():
                                             if source_key == target_key:
                                                 if prototype_tile_copy.data[source_key] == '':
-                                                    prototype_tile_copy.data[source_key] = source_column[source_key]
+                                                    value = transform_value(node_datatypes[source_key], source_column[source_key])
+                                                    prototype_tile_copy.data[source_key] = value
                                                     del source_column[source_key]
                                                 else:
                                                     populate_child_tiles(source_data)
