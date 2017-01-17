@@ -164,6 +164,11 @@ define([
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
                         self.updateSearchQueryLayer([]);
+                        if (self.extentSearch() === true) {
+                            self.toggleExtentSearch();
+                        }
+                        self.draw.changeMode('simple_select');
+                        self.drawMode(undefined);
                     }
                 };
 
