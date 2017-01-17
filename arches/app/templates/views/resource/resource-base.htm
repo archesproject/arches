@@ -28,62 +28,61 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <!-- Page Header -->
 {% block header %}
-<div class="ep-toolbar">
-
-    <!-- Tools Menu -->
-    <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-        <div class="">{% trans "Manage" %}
-            <i class="ion-more"></i>
-        </div>
-    </a>
-
-    <!-- Title Bar -->
-    <div class="ep-tools-title">
-        <h1 class="page-header text-overflow ep-graph-title">
-            <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-            <span>
-                {{resource_type}}
-            </span>
-        </h1>
-    </div>
-
-    <!-- Recently Addedd -->
-    <ul class="nav navbar-top-links pull-left">
-        <li class="mega-dropdown open">
-            <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
-                <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent edits"></i>
-            </a>
-            <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
-                
-                <!-- Resource Records Table -->
-                <div class="pad-all">
-                    Table of recently added resource instances will go here.
-                </div>
-
-            </div>
-        </li>
-    </ul>
-
-    <!-- Search Bar -->
-    <a href="#" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
-        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
-          <i class="ion-search"></i>
-        </div>
-    </a>
-
-    <!-- Help Bar -->
-    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
-        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
-          <i class="ion-help"></i>
-        </div>
-    </a>
-</div>
 {% endblock header %}
 
-
 {% block main_content %}
-
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <div class="ep-toolbar">
+
+        <!-- Tools Menu -->
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+            <div class="">{% trans "Manage" %}
+                <i class="ion-more"></i>
+            </div>
+        </a>
+
+        <!-- Title Bar -->
+        <div class="ep-tools-title">
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span>
+                    {{resource_type}}
+                </span>
+            </h1>
+        </div>
+
+        <!-- Recently Addedd -->
+        <ul class="nav navbar-top-links pull-left">
+            <li class="mega-dropdown open">
+                <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
+                    <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent edits"></i>
+                </a>
+                <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
+                    
+                    <!-- Resource Records Table -->
+                    <div class="pad-all">
+                        Table of recently added resource instances will go here.
+                    </div>
+
+                </div>
+            </li>
+        </ul>
+
+        <!-- Search Bar -->
+        <a href="#" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+              <i class="ion-search"></i>
+            </div>
+        </a>
+
+        <!-- Help Bar -->
+        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+              <i class="ion-help"></i>
+            </div>
+        </a>
+    </div>
 
     <!-- Menu -->
     <div id="menu-panel" class="ep-menu-editor" style="display: none;" data-bind="visible:menuActive()">
