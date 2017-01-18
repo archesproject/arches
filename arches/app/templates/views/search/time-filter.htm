@@ -8,7 +8,7 @@
 
         <!-- Date Type -->
         <div class="calendar">
-            <h3 class="search-label">Type</h3>
+            <h3 class="search-label">{% trans "Type" %}</h3>
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: dateNodeId, chosen:{ width: '100%' }">
                 <option value="all">{% trans "Search all dates" %}</option>
                 {% for graph in graph_models %}
@@ -27,7 +27,7 @@
 
         <!-- Date Selector -->
         <div class="calendar">
-            <h3 class="search-label">Within</h3>
+            <h3 class="search-label">{% trans "Within" %}</h3>
             <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
                 <option value="custom">{% trans "Custom date range" %}</option>
                 <option value="today">{% trans "Today" %}</option>
@@ -42,7 +42,7 @@
 
         <!-- From Date -->
         <div class="calendar">
-            <h3 class="search-label">From</h3>
+            <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c">
                 <input class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: format, maxDate: toDate}, disable: dateRangeType() !== 'custom'">
             </div>
@@ -50,7 +50,7 @@
 
         <!-- To Date -->
         <div class="calendar">
-            <h3 class="search-label">To</h3>
+            <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b">
                 <input class="form-control input-lg" data-bind="value: toDate, datepicker: {format: format, minDate: fromDate}, disable: dateRangeType() !== 'custom'">
             </div>
@@ -65,7 +65,7 @@
         <div class="sequence"></div>
         <div class="chart" class="">
             <div class="explanation" style="">
-                <span class="percentage"></span><br/>
+                <span class="count"></span><br/>
                 {% trans "resources fall within this period" %}
             </div>
         </div>

@@ -56,14 +56,12 @@ define([
                 .attr("r", radius)
                 .style("opacity", 0);
 
-            // For efficiency, filter nodes to keep only those large enough to see.
-            var nodes = partition.nod
             // Add the svg area.
             var trail = d3.select($el.find('.sequence')[0]).append("svg:svg")
                 .attr("width", width)
                 .attr("height", 50)
                 .attr("class", "trail");
-            // Add the label at the end, for the percentage.
+            // Add the label at the end, for the count.
             trail.append("svg:text")
                 .attr("class", "endlabel")
                 .style("fill", "#000");
@@ -121,24 +119,19 @@ define([
 
 
             // Set default count value
-            var percentage = "86425";
-            var percentageString = percentage;
-
-            d3.select($el.find('.percentage')[0])
-                .text(percentageString);
-
+            var count = "86425";
+            d3.select($el.find('.count')[0])
+                .text(count);
 
             // Fade all but the current sequence, and show it in the breadcrumb trail.
             function mouseover(d) {
-
-                percentage = (d.value);
-                percentageString = percentage;
-                if (percentage < 1) {
-                    percentageString = "< 1";
+                count = d.value;
+                if (d.value < 1) {
+                    count = "< 1";
                 }
 
-                d3.select($el.find('.percentage')[0])
-                    .text(percentageString);
+                d3.select($el.find('.count')[0])
+                    .text(count);
 
                 d3.select($el.find('.explanation')[0])
                     .style("visibility", "");
