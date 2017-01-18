@@ -46,6 +46,7 @@ define([
                         var picker = $(element).data("DateTimePicker");
                         if (picker) {
                             picker.options(options);
+                            picker.date(allBindingsAccessor().value());
                         }
                     });
 
@@ -59,7 +60,7 @@ define([
                 var value = allBindingsAccessor().value;
                 var picker = $(element).data("DateTimePicker");
                 if (ko.isObservable(value)) {
-                    if (event.date != null) {
+                    if (event.date) {
                         value(event.date.format(picker.format()));
                     }
                 }
