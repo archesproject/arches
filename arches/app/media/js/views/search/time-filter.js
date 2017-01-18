@@ -4,7 +4,8 @@ define([
     'moment',
     'views/search/base-filter',
     'bindings/datepicker',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/time-wheel'
 ],
 function(_, ko, moment, BaseFilter) {
     return BaseFilter.extend({
@@ -52,7 +53,6 @@ function(_, ko, moment, BaseFilter) {
                 self.toDate(to);
                 self.fromDate(from);
             });
-
 
             BaseFilter.prototype.initialize.call(this, options);
         },
