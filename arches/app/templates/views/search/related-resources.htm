@@ -1,0 +1,165 @@
+{% load i18n %}
+<div id="related-resoureces-drag-panel" class="search-container related-resources-container hidden">
+
+    <!-- Drag Panel -->
+    <div class="relative">
+
+        <!-- Target -->
+        <div class="relative rr-drag-panel-target">
+
+            <h3 class="related-resources-title"> Related Resources </h3>
+
+            <div class="relative">
+
+                <div class="btn-group rr-display-toggle">
+                    <button class="btn btn-default btn-display-toggle selected add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid"><i class="ion-grid"></i></button>
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph"><i class="ion-asterisk"></i></button>
+                </div>
+
+
+                <!--Documentation dropdown-->
+                <div class="related-resources-relationship">
+                    <ul class="" style="list-style: none;">
+                        <li class="mega-dropdown related-reources-crud-link">
+                            <a href="#" class="mega-dropdown-toggle">
+                                <i class="ion-wrench icon-lg"></i> relation properties
+                            </a>
+                            <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;">
+                                <div class="clearfix">
+                                    <div class="settings-config-panel">
+
+                                        <h3 class="search-title">Relationship details</h3>
+
+                                        <!-- Relationship participants -->
+                                        <div class="resource-relation-description">
+                                            <div class="target-resource">
+                                                <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                            </div>
+                                            <div class="selected-resource">
+                                                <br><i class="fa fa-university"></i> Brauerei Paulaner
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-crud-panel">
+                                            <div class="col-xs-12 no-instructions-shim">
+                                                <form class="widgets">
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative">
+                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                            </div>
+
+                                                            <div class="col-xs-12">
+                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative" style="">
+                                                                <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                        </label>
+                                                                <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                        </label>
+                                                            </div>
+
+                                                            <div class="relative">
+                                                                <div class="col-xs-6">
+                                                                    <input type="" placeholder="" id="" class="form-control input-lg widget-input">
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <input type="" placeholder="" id="" class="form-control input-lg widget-input">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative">
+                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
+                                                            </div>
+
+                                                            <div class="col-xs-12">
+                                                                <div id="editor1" class=""></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!--Documentation dropdown-->
+            </div>
+
+
+            <div class="rr-card-icon-placement">
+                <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
+                                            <i class="add-card-icon fa fa-code-fork fa-4x"></i>
+                                        </span>
+            </div>
+
+            <!-- Message -->
+            <div class="rr-card-message-placement">
+                <p class="text-center">
+                    Drag&amp;Drop resources onto this area and describe how they relate to one another
+                </p>
+            </div>
+        </div>
+
+        <div id="report-image-grid" class="report-image-grid rr-grid hidden" style="top: 60px; left: 25px;">
+
+            <!-- Resource -->
+            <div class="rr-grid-item selected" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-university"></i> Brauerei Paulaner</h3>
+
+                    <div class="search-listing-body">
+                        Brewery where the first Doppel Bock was created in the year 1396
+                    </div>
+
+                    <div class="search-listing-footer">
+                        Yo, footer
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource -->
+            <div class="rr-grid-item" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-calendar"></i> Oktoberfest</h3>
+
+                    <div class="search-listing-body">
+                        Annual beer drinking activity that takes place in Munich
+                    </div>
+
+                    <div class="search-listing-footer">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource -->
+            <div class="rr-grid-item" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-university"></i> Hofbrau Tent</h3>
+
+                    <div class="search-listing-body">
+                        A place for Australians to congregate during Oktoberfest.
+                    </div>
+
+                    <div class="search-listing-footer">
+                        Yo, footer
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

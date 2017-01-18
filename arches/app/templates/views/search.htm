@@ -98,7 +98,7 @@
                         <div>perform complex search</div>
                     </div>
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}, with: searchRelatedResources">
-                        <div>search related resources</div>
+                        {% include 'views/search/related-resources.htm' %}
                     </div>
                 </div>
             </div>
