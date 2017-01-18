@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Match, Query
+from arches.app.search.elasticsearch_dsl_builder import Term, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
@@ -913,8 +913,8 @@ class ConceptValue(object):
     def delete_index(self):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
-        phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
-        query.add_query(phrase)
+        term = Term(field='conceptid', term=self.conceptid)
+        query.add_query(term)
         query.delete(index='concept_labels')
         se.delete_terms(self.id)
 
