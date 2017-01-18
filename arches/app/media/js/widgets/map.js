@@ -168,8 +168,6 @@ define([
                         if (self.extentSearch() === true) {
                             self.toggleExtentSearch();
                         }
-                        self.draw.changeMode('simple_select');
-                        self.drawMode(undefined);
                     }
                 };
 
@@ -268,7 +266,6 @@ define([
             this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
 
             if (!this.configForm && this.context === 'report-header') {
-                console.log('doing this once')
                 _.each(arches.mapLayers, function(layer) {
                     _.each(layer.layer_definitions, function(def) {
                         def.id += '-' + layer.name;
@@ -672,6 +669,10 @@ define([
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
                         this.updateSearchQueryLayer([]);
+                        this.value({
+                          "type": "FeatureCollection",
+                          "features": []
+                        });
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -1053,6 +1054,11 @@ define([
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             geomtype.active(false);
                         })
+                    } else {
+                        this.value({
+                          "type": "FeatureCollection",
+                          "features": []
+                        });
                     }
                 }
 
