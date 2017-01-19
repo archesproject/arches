@@ -9,9 +9,10 @@ require([
     'views/search/term-filter',
     'views/search/map-filter',
     'views/search/resource-type-filter',
+    'views/resource/related-resources-manager',
     'views/search/search-results',
     'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, BaseManagerView) {
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
@@ -25,8 +26,7 @@ require([
                     resizeOnChange: this.viewModel.resultsExpanded
                 }),
                 savedSearches: new BaseFilter(),
-                advancedFilter: new BaseFilter(),
-                searchRelatedResources: new BaseFilter()
+                advancedFilter: new BaseFilter()
             };
             this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
             this.filters.mapFilter.termFilter = this.filters.termFilter;
@@ -35,8 +35,13 @@ require([
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
+            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
+                searchResults: this.viewModel.searchResults,
+                context: 'search' //as opposed to resource editing
+            })
 
-            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            // this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.viewModel.selectedTab = ko.observable(this.viewModel.relatedResourcesManager);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             self.isNewQuery = true;

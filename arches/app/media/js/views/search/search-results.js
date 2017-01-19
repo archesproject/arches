@@ -1,16 +1,15 @@
-define(['jquery', 
+define(['jquery',
     'underscore',
     'backbone',
     'bootstrap',
-    'arches', 
+    'arches',
     'select2',
     'knockout',
     'knockout-mapping',
-    'views/related-resources-graph',
     'view-data',
     'bootstrap-datetimepicker',
-    'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, RelatedResourcesGraph, viewdata) {
+    'plugins/knockout-select2'],
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
 
         return Backbone.View.extend({
 
@@ -21,7 +20,7 @@ define(['jquery',
                 'mouseout .arches-search-item': 'itemMouseout'
             },
 
-            initialize: function(options) { 
+            initialize: function(options) {
                 var self = this;
                 _.extend(this, options);
 
@@ -33,30 +32,19 @@ define(['jquery',
 
             },
 
-            showRelatedResouresGraph: function (e) {
-                var resourceId = $(e.target).data('resourceid');
-                var primaryName = $(e.target).data('primaryname');
-                var typeId = $(e.target).data('entitytypeid');
-                var searchItem = $(e.target).closest('.arches-search-item');
-                var graphPanel = searchItem.find('.arches-related-resource-panel');
-                var nodeInfoPanel = graphPanel.find('.node_info');
-                if (!graphPanel.hasClass('view-created')) {
-                    new RelatedResourcesGraph({
-                        el: graphPanel[0],
-                        resourceId: resourceId,
-                        resourceName: primaryName,
-                        resourceTypeId: typeId
-                    });
-                }
-                nodeInfoPanel.hide();
-                $(e.target).closest('li').toggleClass('graph-active');
-                graphPanel.slideToggle(500);
-            },
-
-            newPage: function(page, e){  
+            newPage: function(page, e){
                 if(page){
                     this.page(page);
-                }       
+                }
+            },
+
+            showRelationships: ko.observable(),
+
+            showRelatedResources: function(resourceinstanceid) {
+                var self = this;
+                return function(resourceinstanceid){
+                    self.showRelationships(resourceinstanceid)
+                }
             },
 
             updateResults: function(response){
@@ -64,10 +52,10 @@ define(['jquery',
                 koMapping.fromJS(response.paginator, this.paginator);
                 this.showPaginator(true);
                 var data = $('div[name="search-result-data"]').data();
-                
+
                 this.total(response.results.hits.total);
                 this.results.removeAll();
-                
+
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";
 
@@ -80,7 +68,8 @@ define(['jquery',
                         resourceinstanceid: result._source.resourceinstanceid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata ? graphdata.iconclass : ''
+                        iconclass: graphdata ? graphdata.iconclass : '',
+                        showrelated: this.showRelatedResources(result._source.resourceinstanceid)
                     });
                 }, this);
 
@@ -104,10 +93,10 @@ define(['jquery',
             itemMouseover: function(evt){
                 if(this.currentTarget !== evt.currentTarget){
                     var data = $(evt.currentTarget).data();
-                    this.trigger('mouseover', data.resourceid);    
-                    this.currentTarget = evt.currentTarget;              
+                    this.trigger('mouseover', data.resourceid);
+                    this.currentTarget = evt.currentTarget;
                 }
-                return false;    
+                return false;
             },
 
             itemMouseout: function(evt){
@@ -118,7 +107,7 @@ define(['jquery',
 
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
-                this.trigger('find_on_map', data.resourceid, data);   
+                this.trigger('find_on_map', data.resourceid, data);
             }
 
         });

@@ -27,7 +27,7 @@
                 <div class="search-listing-footer">
                     {% if 'edit' in user.user_groups %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
                     <a class="search-candidate-link" href="" data-bind="visible: geometries().length > 0, attr: { 'data-resourceinstanceid': resourceinstanceid, 'data-geometries': JSON.stringify(geometries()) }"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
-                    <a class="search-candidate-link pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
+                    <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                 </div>
             </div>
 

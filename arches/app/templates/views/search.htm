@@ -47,7 +47,7 @@
                 <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="time filter" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}"><i class="fa fa-calendar"></i></a>
                 <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="saved searches" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}"><i class="ion-ios-heart"></i></a>
                 <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="advanced" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}"><i class="ion-plus-round"></i></a>
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources" data-bind="css: {'active': selectedTab() === searchRelatedResources}, click: function(){selectedTab(searchRelatedResources)}"><i class="fa fa-code-fork"></i></a>
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}"><i class="fa fa-code-fork"></i></a>
             </div>
         </div>
     </div>
@@ -97,8 +97,8 @@
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
                         <div>perform complex search</div>
                     </div>
-                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === searchRelatedResources}, with: searchRelatedResources">
-                        {% include 'views/search/related-resources.htm' %}
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, with: relatedResourcesManager">
+                        {% include 'views/resource/related-resources/related-resources-manager.htm' %}
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 {% load i18n %}
-<div id="related-resoureces-drag-panel" class="search-container related-resources-container hidden">
+<div id="related-resources-drag-panel" class="search-container related-resources-container">
+    <!-- <div data-bind="text: test, click: function(){toggleShowRelatedProperties()}"></div> -->
 
     <!-- Drag Panel -->
     <div class="relative">
@@ -7,7 +8,7 @@
         <!-- Target -->
         <div class="relative rr-drag-panel-target">
 
-            <h3 class="related-resources-title"> Related Resources </h3>
+            <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
             <div class="relative">
 
@@ -18,15 +19,17 @@
 
 
                 <!--Documentation dropdown-->
+                <!--ko if: context === 'resource-editor'-->
                 <div class="related-resources-relationship">
                     <ul class="" style="list-style: none;">
                         <li class="mega-dropdown related-reources-crud-link">
-                            <a href="#" class="mega-dropdown-toggle">
-                                <i class="ion-wrench icon-lg"></i> relation properties
+                            <a href="#" class="mega-dropdown-toggle" data-toggle="dropdown">
+                                <i class="ion-wrench icon-lg"></i>{% trans "relation properties" %}
                             </a>
                             <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;">
                                 <div class="clearfix">
                                     <div class="settings-config-panel">
+
 
                                         <h3 class="search-title">Relationship details</h3>
 
@@ -41,7 +44,7 @@
                                         </div>
 
                                         <div class="settings-crud-panel">
-                                            <div class="col-xs-12 no-instructions-shim">
+                                            <div class="col-xs-12">
                                                 <form class="widgets">
                                                     <div class="row widget-container">
                                                         <div class="form-group">
@@ -95,71 +98,42 @@
                         </li>
                     </ul>
                 </div>
+                <!-- /ko -->
                 <!--Documentation dropdown-->
             </div>
 
 
             <div class="rr-card-icon-placement">
                 <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
-                                            <i class="add-card-icon fa fa-code-fork fa-4x"></i>
-                                        </span>
+                    <i class="add-card-icon fa fa-code-fork fa-4x"></i>
+                </span>
             </div>
 
+            <div class="rr-result-grid-container">
+                {% include 'views/resource/related-resources/related-resources-grid.htm' %}
+            </div>
             <!-- Message -->
+            <!--ko if: context === 'resource-editor'-->
             <div class="rr-card-message-placement">
                 <p class="text-center">
                     Drag&amp;Drop resources onto this area and describe how they relate to one another
                 </p>
             </div>
+            <!--/ko-->
         </div>
 
-        <div id="report-image-grid" class="report-image-grid rr-grid hidden" style="top: 60px; left: 25px;">
-
-            <!-- Resource -->
-            <div class="rr-grid-item selected" data-bind="">
-                <div class="rr-listing">
-                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-university"></i> Brauerei Paulaner</h3>
-
-                    <div class="search-listing-body">
-                        Brewery where the first Doppel Bock was created in the year 1396
-                    </div>
-
-                    <div class="search-listing-footer">
-                        Yo, footer
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resource -->
+        <!-- ko if: context === 'resource-editor' -->
+        <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
+            <!-- ko foreach: { data: searchResults.results, as: 'result' } -->
             <div class="rr-grid-item" data-bind="">
                 <div class="rr-listing">
-                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-calendar"></i> Oktoberfest</h3>
-
-                    <div class="search-listing-body">
-                        Annual beer drinking activity that takes place in Munich
-                    </div>
-
-                    <div class="search-listing-footer">
-
-                    </div>
+                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>
+                    <div class="search-listing-body">TODO: Primary description goes here</div>
+                    <div class="search-listing-footer">Footer details here</div>
                 </div>
             </div>
-
-            <!-- Resource -->
-            <div class="rr-grid-item" data-bind="">
-                <div class="rr-listing">
-                    <h3 class="search-listing-title"><i class="search-listing-icon fa fa-university"></i> Hofbrau Tent</h3>
-
-                    <div class="search-listing-body">
-                        A place for Australians to congregate during Oktoberfest.
-                    </div>
-
-                    <div class="search-listing-footer">
-                        Yo, footer
-                    </div>
-                </div>
-            </div>
-
+            <!-- /ko -->
         </div>
+        <!-- /ko -->
     </div>
 </div>
