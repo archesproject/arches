@@ -4373,6 +4373,11 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.related-resources-editor-container {
+    position: absolute;
+    width: 100%;
+}
+
 .rr-drag-panel-target {
     height: 100vh;
     background: #ebeef0;
@@ -4380,9 +4385,11 @@ div.row.widget-wrapper {
     border-radius: 2px;
     padding: 0px 25px;
 }
+
 .settings-config-panel {
     padding: 5px;
 }
+
 .rr-grid {
     position: absolute;
     top: 50px;
