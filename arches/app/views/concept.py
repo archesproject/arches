@@ -83,8 +83,6 @@ def rdm(request, conceptid):
             'CORE_CONCEPTS': CORE_CONCEPTS
         })
 
-
-
 @group_required('edit')
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
@@ -461,3 +459,16 @@ def get_preflabel_from_conceptid(conceptid, lang):
         if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
             ret = preflabel['_source']
     return default if ret == None else ret
+
+def concept_value(request):
+    if request.method == 'DELETE':
+        data = JSONDeserializer().deserialize(request.body)
+
+        if data:
+            with transaction.atomic():
+                value = ConceptValue(data)
+                value.delete_index()
+                value.delete()
+                return JSONResponse(value)
+
+    return HttpResponseNotFound
