@@ -95,10 +95,7 @@ class Tile(models.TileModel):
         self.__preSave(request)
         super(Tile, self).save(*args, **kwargs)
         if index:
-            try:
-                self.index()
-            except:
-                pass
+            self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.resourceinstance = self.resourceinstance
@@ -138,21 +135,14 @@ class Tile(models.TileModel):
         """
 
         document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
-        tile = Tile()
-        tile.tileid = self.tileid
-        tile.resourceinstance = self.resourceinstance
-        tile.parenttile = self.parenttile
-        tile.data = self.data
-        tile.nodegroup = self.nodegroup
-        tile.sortorder = self.sortorder
-        document['tiles'].append(tile)
+        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self.resourceinstance)
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
 
-        for tile in models.TileModel.objects.filter(resourceinstance=self.resourceinstance):
+        for tile in document['tiles']:
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
@@ -203,6 +193,7 @@ class Tile(models.TileModel):
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
             parent_tile = Tile()
+            parent_tile.data = {}
             parent_tile.tileid = None
             parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
             parent_tile.resourceinstance_id = resourceid

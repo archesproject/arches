@@ -203,7 +203,7 @@ def import_business_data(business_data, mapping=None):
                 target_tile_cardinality = 'n'
             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
-                if target_tile.data != None:
+                if target_tile.data != {}:
                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
                     # The idea is to populate as much of the target_tile as possible, before moving on to the next target_tile.
                     for target_key in target_tile.data.keys():
