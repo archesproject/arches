@@ -112,6 +112,15 @@
       "export": ""
     },
     {
+        "arches_nodeid": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
+        "arches_node_name": "Spatial Coordinates Geometry",
+        "file_field_name": "Geometry",
+        "value_type": "",
+        "data_length": "",
+        "data_type": "",
+        "export": false
+    },
+    {
       "arches_nodeid": "f743547b-b8fa-11e6-84a5-026d961c88e6",
       "arches_node_name": "External XRef",
       "file_field_name": "Source System ID",
