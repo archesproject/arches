@@ -148,3 +148,51 @@ class ResourceReportView(BaseManagerView):
          )
 
         return render(request, 'views/resource/report.htm', context)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class RelatedResourcesView(BaseManagerView):
+    def get(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        start = request.GET.get('start', 0)
+        return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
+
+    def delete(self, request, resourceid=None):
+        se = SearchEngineFactory().create()
+        data = JSONDeserializer().deserialize(request.body)
+        entityid1 = data.get('entityid1')
+        entityid2 = data.get('entityid2')
+        resourcexid = data.get('resourcexid')
+        realtionshiptype = data.get('realtionshiptype')
+        resource = Resource(entityid1)
+        resource.delete_resource_relationship(entityid2, realtionshiptype)
+        se.delete(index='resource_relations', doc_type='all', id=resourcexid)
+        return JSONResponse({ 'success': True })
+
+    def get_related_resources(resourceid, lang, limit=1000, start=0):
+        ret = {
+            'resource_relationships': [],
+            'related_resources': []
+        }
+        se = SearchEngineFactory().create()
+
+        query = Query(se, limit=limit, start=start)
+        query.add_filter(Terms(field='entityid1', terms=resourceid).dsl, operator='or')
+        query.add_filter(Terms(field='entityid2', terms=resourceid).dsl, operator='or')
+        resource_relations = query.search(index='resource_relations', doc_type='all')
+        ret['total'] = resource_relations['hits']['total']
+
+        entityids = set()
+        for relation in resource_relations['hits']['hits']:
+            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            ret['resource_relationships'].append(relation['_source'])
+            entityids.add(relation['_source']['entityid1'])
+            entityids.add(relation['_source']['entityid2'])
+        if len(entityids) > 0:
+            entityids.remove(resourceid)
+
+        related_resources = se.search(index='entity', doc_type='_all', id=list(entityids))
+        if related_resources:
+            for resource in related_resources['docs']:
+                ret['related_resources'].append(resource['_source'])
+
+        return ret
