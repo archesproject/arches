@@ -46,6 +46,13 @@ class SearchView(BaseManagerView):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+        
+        nav = self.get_default_nav()
+        nav['page_title'] = 'Search'
+        nav['page_icon'] = 'fa-search'
+        nav['search'] = False
+        nav['help_title'] = 'Searching the Arches Database'
+
         context = self.get_context_data(
             date_nodes=date_nodes,
             map_layers=map_layers,

@@ -72,6 +72,13 @@ class ResourceEditorView(BaseManagerView):
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+ 
+            nav = self.get_default_nav()
+            nav['page_title'] = graph.name
+            nav['resource_manage_menu'] = True
+            nav['edit_history'] = True
+            nav['help_title'] = 'Creating and Editing Resources'
+
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -86,6 +93,7 @@ class ResourceEditorView(BaseManagerView):
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
+                nav=nav,
             )
             return render(request, 'views/resource/editor.htm', context)
 
