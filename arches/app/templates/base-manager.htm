@@ -20,9 +20,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+
 {% block body %}
 
     <div class="wrapper">
+
         <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
 
             {% block navheader %}
@@ -201,6 +203,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endblock login_header %}
 
                     {% block header %}
+                        {% include 'navbar/nav-base.htm' %}
                     {% endblock header %}
 
                     {% block main_content %}
