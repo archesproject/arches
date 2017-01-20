@@ -172,11 +172,11 @@ class RelatedResourcesView(BaseManagerView):
     def post(self, request, resourceid=None):
         res = dict(request.POST)
         relationshiptype = res['relationship_type']
-        target_resourceinstanceid = res['target_resourceinstanceid']
+        root_resourceinstanceid = res['root_resourceinstanceid']
         instances_to_relate = res['instances_to_relate[]']
         for instanceid in instances_to_relate:
             rr = models.ResourceXResource.objects.create(
-                resourceinstanceidfrom = Resource(target_resourceinstanceid[0]),
+                resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
                 resourceinstanceidto = Resource(instanceid),
                 notes = 'testing',
                 relationshiptype = models.Value('cb51db61-bbdd-4480-93b6-f5abe9c84d4b')

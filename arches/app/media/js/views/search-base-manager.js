@@ -37,7 +37,8 @@ define([
             });
             this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
                 searchResults: this.viewModel.searchResults,
-                context: this.viewModel.searchContext //as opposed to resource editing
+                context: this.viewModel.searchContext,
+                editing_instance_id: this.viewModel.editingInstanceId
             })
 
             // this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);

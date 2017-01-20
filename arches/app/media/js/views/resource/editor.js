@@ -56,6 +56,7 @@ require([
     var pageView = new SearchBaseManagerView({
         viewModel:{
             searchContext: 'resource-editor',
+            editingInstanceId: data.resourceid,
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),
