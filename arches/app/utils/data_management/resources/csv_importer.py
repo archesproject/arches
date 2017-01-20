@@ -75,7 +75,7 @@ def import_business_data(business_data, mapping=None):
             else:
                 target_tile_cardinality = 'n'
             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
-                if target_tile.data != None:
+                if target_tile.data != {}:
                     for target_key in target_tile.data.keys():
                         for source_tile in source_data:
                             for source_key in source_tile.keys():

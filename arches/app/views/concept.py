@@ -83,8 +83,6 @@ def rdm(request, conceptid):
             'CORE_CONCEPTS': CORE_CONCEPTS
         })
 
-
-
 @group_required('edit')
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
@@ -207,9 +205,10 @@ def concept(request, conceptid):
                 return JSONResponse(value)
 
             elif skosfile:
+                overwrite_options = request.POST.get('overwrite_options', None)
                 skos = SKOSReader()
                 rdf = skos.read_file(skosfile)
-                ret = skos.save_concepts_from_skos(rdf)
+                ret = skos.save_concepts_from_skos(rdf, overwrite_options)
                 return JSONResponse(ret)
 
         else:
@@ -460,3 +459,16 @@ def get_preflabel_from_conceptid(conceptid, lang):
         if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
             ret = preflabel['_source']
     return default if ret == None else ret
+
+def concept_value(request):
+    if request.method == 'DELETE':
+        data = JSONDeserializer().deserialize(request.body)
+
+        if data:
+            with transaction.atomic():
+                value = ConceptValue(data)
+                value.delete_index()
+                value.delete()
+                return JSONResponse(value)
+
+    return HttpResponseNotFound
