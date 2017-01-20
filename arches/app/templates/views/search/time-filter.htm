@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: wheelConfig">
+    <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod }">
         <div class="sequence"></div>
         <div class="chart" class="">
             <div class="explanation" style="">
