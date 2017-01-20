@@ -188,6 +188,7 @@ def import_business_data(business_data, mapping=None):
         def populate_tile(source_data, target_tile):
             '''
             source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
+            All nodes in source_data belong to the same resource.
             A dictionary of nodeids would not allow for multiple values for the same nodeid.
             Grouping is enforced by having all grouped attributes in the same row.
             '''
@@ -195,8 +196,7 @@ def import_business_data(business_data, mapping=None):
             # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
             target_tile.tileid = None
             # Check the cardinality of the tile and check if it has been populated.
-            # If cardinality is one we want to know when the tile has been populated
-            # because that will be the only occurence of this tile in this resource.
+            # If cardinality is one and the tile is populated the tile should not be populated again.
             if str(target_tile.nodegroup_id) in single_cardinality_nodegroups:
                 target_tile_cardinality = '1'
             else:
