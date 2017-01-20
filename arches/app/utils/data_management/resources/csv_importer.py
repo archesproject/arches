@@ -65,7 +65,7 @@ def import_business_data(business_data, mapping=None):
                 pass
             elif datatype == 'boolean':
                 value = bool(distutils.util.strtobool(value))
-            elif datatype == 'concept' or datatype = 'domain value':
+            elif datatype == 'concept' or datatype == 'domain value':
                 pass
             elif datatype == 'concept-list' or datatype == 'domain-value-list':
                 value = value.split(',')
