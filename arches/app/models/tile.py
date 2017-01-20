@@ -226,7 +226,7 @@ class Tile(models.TileModel):
 
         return tile
 
-    def __preSave(self, request):
+    def __preSave(self, request=None):
         for function in self.__getFunctionClassInstances():
             try:
                 function.save(self, request)
