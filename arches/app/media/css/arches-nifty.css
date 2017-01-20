@@ -3200,10 +3200,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-menu {
     position: absolute;
-    top: 49px;
-    left: 0px;
+    top: 50px;
     bottom: 0;
-    border: 1px solid #ddd;
     z-index: 4000;
 }
 .ep-menu-editor {
