@@ -47,9 +47,12 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph):
+    def save_concepts_from_skos(self, graph, overwrite_options=None):
         """
         given an RDF graph, tries to save the concpets to the system
+
+        Keyword arguments: 
+        overwrite_options -- 'overwrite', 'ignore', 'stage'
 
         """
 
@@ -147,7 +150,15 @@ class SKOSReader(object):
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
-                    node.save()
+                    if overwrite_options == 'overwrite':
+                        node.save()
+                    elif overwrite_options == 'ignore':
+                        try:
+                            models.Concept.objects.get(pk=node.id)
+                        except:
+                            node.save()
+                    else: # 'stage'
+                        pass
 
                 # insert the concept relations
                 for relation in self.relations:
@@ -178,8 +189,6 @@ class SKOSReader(object):
             ret['value'] = jsonLiteralValue['value']
         except:
             pass
-
-        print ret['value_id']
 
         return ret
 
