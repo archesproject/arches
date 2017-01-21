@@ -108,7 +108,7 @@ class CsvWriter(Writer):
                 other_group_records.append(other_group_record)
 
 
-        csv_name_prefix = 'taco'
+        csv_name_prefix = resource_export_configs['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
         dest = StringIO()
