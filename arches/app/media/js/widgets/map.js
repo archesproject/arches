@@ -121,7 +121,7 @@ define([
                 }, this)
             }
 
-            this.buffer = ko.observable(0.0);
+            this.buffer = ko.observable(100.0);
             this.queryFeature;
             this.extentSearch = ko.observable(false);
 
