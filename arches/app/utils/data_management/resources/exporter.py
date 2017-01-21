@@ -13,6 +13,8 @@ from formats.archesjson import JsonWriter #Writes full resource instances rather
 from django.http import HttpResponse
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 
 try:
     from cStringIO import StringIO
@@ -26,16 +28,33 @@ class ResourceExporter(object):
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
-        result=None
-        if search_results == True and dest_dir is not None:
-            result = self.writer.write_resources(resources, dest_dir)
-        elif search_results == True:
-            configs = self.read_export_configs()
-            result = self.writer.write_resources(resources, configs)
+    # def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
+    #     result=None
+    #     if search_results == True and dest_dir is not None:
+    #         result = self.writer.write_resources(resources, dest_dir)
+    #     elif search_results == True:
+    #         configs = self.read_export_configs()
+    #         result = self.writer.write_resources(resources, configs)
+    #     else:
+    #         self.writer.write_resources(dest_dir)
+    #     return result
+
+    def export(self, query=None, configs=None):
+        configs = self.read_csv_export_configs(configs)
+        business_data = self.get_search_results_for_export()
+        self.writer.write_resources(business_data, configs)
+
+    def read_csv_export_configs(self, configs):
+        '''
+        Reads the export configuration file or object and adds an array for records to store property data
+        '''
+        if configs != '':
+            resource_export_configs = json.load(open(configs, 'r'))
+            configs = resource_export_configs
         else:
-            self.writer.write_resources(dest_dir)
-        return result
+            configs = ''
+
+        return configs
 
     def read_export_configs(self):
         '''
@@ -102,3 +121,12 @@ class ResourceExporter(object):
         business_data_dict['business_data']['relations'] = relations
 
         return business_data_dict
+
+    def get_search_results_for_export(self, query=None):
+        se = SearchEngineFactory().create()
+        query = Query(se, start=0, limit=10)
+        results = query.search(index='resource', doc_type='')
+        # return results['hits']['hits']
+
+
+        return self.get_resources_for_export(results['hits']['hits'])
