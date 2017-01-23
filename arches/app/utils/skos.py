@@ -55,7 +55,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options=None):
+    def save_concepts_from_skos(self, graph, overwrite_options=None, stage_options=False, make_collections=True):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -112,8 +112,20 @@ class SKOSReader(object):
                             pass
 
                     if str(SKOS) in predicate:
+                        print predicate
                         if predicate == SKOS.hasTopConcept:
-                            self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': self.generate_uuid_from_subject(baseuuid, object)})
+                            top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
+                            self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
+                            # if make_collections:
+                            #     collector_concept = Concept({
+                            #         'id': str(uuid.uuid4()),
+                            #         'legacyoid': "%s_%s" % (str(scheme), 'Collection'),
+                            #         'nodetype': 'Collection'
+                            #     })
+                            #     val = self.unwrapJsonLiteral(object)
+                            #     collector_concept.addvalue({'value':val['value'], 'language': object.language, 'type': 'prefLabel', 'category': 'label'})
+                            #     self.relations.append({'source': '00000000-0000-0000-0000-000000000003', 'type': 'hasCollection', 'target': collector_concept.id})
+                            #     self.nodes.append(collector_concept)
 
                 self.nodes.append(concept_scheme)
 
@@ -235,7 +247,6 @@ class SKOSWriter(object):
             scheme_id = concept_graph.id
 
             def build_skos(node):
-
                 if node.nodetype == 'Concept':
                     rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
 
@@ -263,5 +274,26 @@ class SKOSWriter(object):
 
             concept_graph.traverse(build_skos)
             return rdf_graph.serialize(format=format)
+
+        elif concept_graph.nodetype == 'GroupingNode':
+            scheme_id = concept_graph.id
+
+            def build_skos(node):
+                if node.nodetype == 'Concept':
+                    rdf_graph.add((ARCHES[node.id], SKOS.member, ARCHES[scheme_id]))
+
+                for subconcept in node.subconcepts:
+                    rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
+
+                # for value in node.values:
+                #     jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
+                #     if value.category == 'label' or value.category == 'note':
+                #         rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+
+                rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
+
+
+            concept_graph.traverse(build_skos)
+            return rdf_graph.serialize(format=format)
         else:
-            raise Exception('Only ConceptSchemes can be written to SKOS RDF files.')
+            raise Exception('Only ConceptSchemes and Collections can be written to SKOS RDF files.')

@@ -119,7 +119,7 @@ class Concept(object):
         if semantic == True:
             pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
         else:
-            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member') | Q(relationtype = 'hasCollection')
 
         if self.id != '':
             nodetype = kwargs.pop('nodetype', self.nodetype)
