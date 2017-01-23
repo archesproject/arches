@@ -38,6 +38,7 @@ class BaseManagerView(TemplateView):
             'graph_manage_menu':False,
             'search':True,
             'edit_history':False,
+            'login':True,
         }
 
     def get_context_data(self, **kwargs):
