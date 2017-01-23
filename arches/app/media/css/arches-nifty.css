@@ -3297,6 +3297,13 @@ ul.jqtree_common li.jqtree-folder {
     margin: auto;
 }
 
+.ep-tools-login {
+    border: none;
+    padding-left: 16px;
+    padding-right: 20px;
+    vertical-align: middle
+}
+
 .ep-tool-title {
     font-size: 14px;
     font-weight: 600;
