@@ -21,6 +21,7 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
             this.selectPeriod = function (d) {
                 var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
                 var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
+                self.dateRangeType('custom');
                 self.fromDate(start);
                 self.toDate(end);
             }
