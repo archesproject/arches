@@ -31,20 +31,30 @@
         </h1>
     </div>
 
+    {% if nav.login %}
+    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+            {% if user.username == 'anonymous' %}
+            <h5 class="hidden-xs">{% trans "Login" %}</h5>
+            {% else %}
+            <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.username }}</h5>
+            {% endif %}
+        </div>
+    </a>
+    {% endif %}
+
     {% if nav.edit_history %}
     <!-- Recently Added -->
     <ul class="nav navbar-top-links pull-left">
         <li class="mega-dropdown open">
             <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
-                <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent edits"></i>
+                <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
             </a>
             <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
-                
                 <!-- Resource Records Table, this should probably be split out into a separate .htm-->
                 <div class="pad-all">
                     Table of recently added resource instances will go here.
                 </div>
-
             </div>
         </li>
     </ul>
