@@ -58,6 +58,7 @@ class SearchView(BaseManagerView):
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',
+            nav=nav,
         )
         return render(request, 'views/search.htm', context)
 
