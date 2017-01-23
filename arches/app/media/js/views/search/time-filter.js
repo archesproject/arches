@@ -22,8 +22,9 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                 var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
                 var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
                 self.dateRangeType('custom');
-                self.fromDate(start);
+                self.fromDate(end);
                 self.toDate(end);
+                self.fromDate(start);
             }
 
             this.dateRangeType.subscribe(function(value) {

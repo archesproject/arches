@@ -25,10 +25,10 @@ define([
                 t: 10
             };
 
-            var vis = d3.select($el.find('.chart')[0]).append("svg:svg")
+            var vis = d3.select($el.find('.chart')[0]).append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                .append("svg:g")
+                .append("g")
                 .attr("class", "container")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
@@ -57,23 +57,19 @@ define([
 
             // Bounding circle underneath the sunburst, to make it easier to detect
             // when the mouse leaves the parent g.
-            vis.append("svg:circle")
+            vis.append("circle")
                 .attr("r", radius)
                 .style("opacity", 0);
 
             // Add the svg area.
-            var trail = d3.select($el.find('.sequence')[0]).append("svg:svg")
+            var trail = d3.select($el.find('.sequence')[0]).append("svg")
                 .attr("width", width)
                 .attr("height", 50)
                 .attr("class", "trail");
-            // Add the label at the end, for the count.
-            trail.append("svg:text")
-                .attr("class", "endlabel")
-                .style("fill", "#000");
 
             // Bounding circle underneath the sunburst, to make it easier to detect
             // when the mouse leaves the parent g.
-            vis.append("svg:circle")
+            vis.append("circle")
                 .attr("r", radius)
                 .style("opacity", 0);
 
@@ -85,7 +81,7 @@ define([
 
             var path = vis.data([configJSON]).selectAll("path")
                 .data(nodes)
-                .enter().append("svg:path")
+                .enter().append("path")
                 .attr("display", function(d) {
                     return d.depth ? null : "none";
                 })
@@ -102,8 +98,7 @@ define([
                     }
                 })
                 .on("dblclick", function(d) {
-                    d3.selectAll("path")
-                        .transition()
+                    vis.transition()
                         .duration(750)
                         .tween("scale", function() {
                             var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
@@ -114,11 +109,12 @@ define([
                                 y.domain(yd(t)).range(yr(t));
                             };
                         })
-                        .attrTween("d", function(d) {
-                            return function() {
-                                return arc(d);
-                            };
-                        });
+                        .selectAll("path")
+                            .attrTween("d", function(d) {
+                                return function() {
+                                    return arc(d);
+                                };
+                            });
                 });
 
             // Add the mouseleave handler to the bounding circle.
@@ -180,9 +176,9 @@ define([
                     });
 
                 // Add breadcrumb and label for entering nodes.
-                var entering = g.enter().append("svg:g");
+                var entering = g.enter().append("g");
 
-                entering.append("svg:text")
+                entering.append("text")
                     .attr("x", (b.w + b.t) / 2)
                     .attr("y", b.h / 2)
                     .attr("dy", "0.35em")
