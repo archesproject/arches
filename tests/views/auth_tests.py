@@ -26,11 +26,12 @@ Replace this with more appropriate tests for your application.
 from tests.base_test import ArchesTestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
 from arches.app.views.main import auth
-from arches.app.views.concept import rdm
+from arches.app.views.concept import RDMView
 from arches.app.views.resources import resource_manager
-from django.contrib.sessions.middleware import SessionMiddleware
 from arches.app.utils.set_anonymous_user import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
 
@@ -92,7 +93,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.get(reverse('rdm', args=['']))
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
@@ -102,7 +104,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.get(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}))
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
@@ -143,7 +146,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.post(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}), concept)
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
