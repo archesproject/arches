@@ -147,7 +147,7 @@ class GraphManagerView(GraphBaseView):
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
         nav['help_title'] = 'Using the Graph Manager'
-        nav['help_template'] = 'help/graph-manager-help.htm'
+        nav['help_template'] = 'help/graph-designer-help.htm'
         nav['graph_manage_menu'] = True
 
         context = self.get_context_data(
