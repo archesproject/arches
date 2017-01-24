@@ -83,7 +83,7 @@ class ResourceEditorView(BaseManagerView):
  
             nav = self.get_default_nav()
             nav['page_title'] = graph.name
-            nav['resource_manage_menu'] = True
+            nav['menu'] = True
             nav['edit_history'] = True
             nav['help_title'] = 'Creating and Editing Resources'
 

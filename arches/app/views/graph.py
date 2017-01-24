@@ -76,7 +76,7 @@ class GraphSettingsView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Defining Settings'
         nav['help_template'] = 'help/settings-help.htm'
 
@@ -148,7 +148,7 @@ class GraphManagerView(GraphBaseView):
         nav['page_title'] = self.graph.name
         nav['help_title'] = 'Using the Graph Manager'
         nav['help_template'] = 'help/graph-designer-help.htm'
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -271,7 +271,7 @@ class CardManagerView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Managing Cards'
 
         context = self.get_context_data(
@@ -305,7 +305,7 @@ class CardView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Configuring Cards and Widgets'
 
         context = self.get_context_data(
@@ -345,7 +345,7 @@ class FormManagerView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Using the Form Manager'
 
         context = self.get_context_data(
@@ -385,7 +385,7 @@ class FormView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Configuring Forms'
 
         context = self.get_context_data(
@@ -442,7 +442,7 @@ class ReportManagerView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Managing Reports'
 
         context = self.get_context_data(
@@ -484,7 +484,7 @@ class ReportEditorView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Editing Reports'
 
         context = self.get_context_data(
@@ -536,7 +536,7 @@ class FunctionManagerView(GraphBaseView):
 
         nav = self.get_default_nav()
         nav['page_title'] = self.graph.name
-        nav['graph_manage_menu'] = True
+        nav['menu'] = True
         nav['help_title'] = 'Managing Functions'
 
         context = self.get_context_data(
