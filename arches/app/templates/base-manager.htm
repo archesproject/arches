@@ -203,7 +203,115 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endblock login_header %}
 
                     {% block header %}
-                        {% include 'navbar/nav-base.htm' %}
+                    <div class="ep-toolbar">
+
+                        <!-- Tools Menu -->
+                        {% if nav.menu %}
+                        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+                            <div class="">{% trans "Manage" %}
+                                <i class="ion-more"></i>
+                            </div>
+                        </a>
+                            {% if main_script == 'views/resource/editor' %}
+                                {% include 'navbar/resource-manage-menu.htm' %}
+                            {% else %}
+                                {% include 'navbar/graph-manage-menu.htm' %}
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Page Title and Icon -->
+                        <div class="ep-tools-title">
+                            <h1 class="page-header text-overflow ep-graph-title">
+                                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                                <span>{{ nav.title }}</span>
+                            </h1>
+                        </div>
+
+                        {% if nav.login %}
+                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                                {% if user.username == 'anonymous' %}
+                                <h5 class="hidden-xs">{% trans "Login" %}</h5>
+                                {% else %}
+                                <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.username }}</h5>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.edit_history %}
+                        <!-- Recently Added -->
+                        <ul class="nav navbar-top-links pull-left">
+                            <li class="mega-dropdown open">
+                                <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
+                                    <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
+                                </a>
+                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
+                                    <!-- Resource Records Table, this should probably be split out into a separate .htm-->
+                                    <div class="pad-all">
+                                        Table of recently added resource instances will go here.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        {% endif %}
+
+                        <!-- Search Bar -->
+                        {% if nav.search %}
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+                              <i class="ion-search"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        <!-- cursory implementation of this button, need to fix the permissions test -->
+                        {% if nav.res_edit and user.username != 'anonymous' %}
+                        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
+                              <i class="ion-edit"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.print %}
+                        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Print">
+                              <i class="ion-printer"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.help.0 != '' %}
+                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+                              <i class="ion-help"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div id="ep-help-panel" class="ep-help" style="display:none">
+                        <div class="ep-help-header" style="padding-right:0px">
+                            <div class="ep-help-title">
+                                <span>{{ nav.help.0 }}</span>
+                            </div>
+                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
+                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Close Help">
+                                  <i class="fa fa-times-circle fa-lg"></i>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- help content loaded from contextually referenced template -->
+                        <div class="ep-help-body" style="float:left">
+                            {% if nav.help.1 %}
+                                {% include nav.help.1 %}
+                            {% endif %}
+                            <h5>for more documentation, visit <a href="https://arches4.readthedocs.io/en/latest/">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                        </div>
+                    </div>
                     {% endblock header %}
 
                     {% block main_content %}
