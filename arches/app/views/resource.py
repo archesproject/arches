@@ -46,9 +46,17 @@ class ResourceListView(BaseManagerView):
                 'public': '',
                 'editor': ''
             })
+
+        nav = self.get_default_nav()
+        nav['page_title'] = "Resource Editor"
+        nav['edit_history'] = True
+        nav['login'] = True
+        nav['help_title'] = 'Creating and Editing Resources'
+
         context = self.get_context_data(
             main_script='views/resource',
-            instance_summaries=instance_summaries
+            instance_summaries=instance_summaries,
+            nav=nav,
         )
         return render(request, 'views/resource.htm', context)
 
@@ -136,6 +144,11 @@ class ResourceReportView(BaseManagerView):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
         templates = models.ReportTemplate.objects.all()
+
+        nav = self.get_default_nav()
+        nav['page_title'] = "use graph name or primary name here"
+        nav['help_title'] = 'Does this really need a help page?'
+
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
@@ -152,7 +165,8 @@ class ResourceReportView(BaseManagerView):
             resource_graphs=resource_graphs,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name,
-            graph_json = JSONSerializer().serialize(graph)
+            graph_json = JSONSerializer().serialize(graph),
+            nav=nav,
          )
 
         return render(request, 'views/resource/report.htm', context)
