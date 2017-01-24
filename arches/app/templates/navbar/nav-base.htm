@@ -63,12 +63,30 @@
     </a>
     {% endif %}
 
+    {% if nav.edit_resource and user.username != 'anonymous' %}
+    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
+          <i class="ion-edit"></i>
+        </div>
+    </a>
+    {% endif %}
+
+    {% if nav.print %}
+    <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Print">
+          <i class="ion-printer"></i>
+        </div>
+    </a>
+    {% endif %}
+
     <!-- Help Bar -->
+    {% if nav.help_title %}
     <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
           <i class="ion-help"></i>
         </div>
     </a>
+    {% endif %}
 </div>
 
 <!-- Help Panel -->
