@@ -116,9 +116,7 @@ define([
             if (this.context === 'search-filter') {
                 this.results = params.results;
                 this.query = params.query;
-                this.resourceinstance_ids = ko.pureComputed(function() {
-                    return _.pluck(this.results.results(), 'resourceinstanceid');
-                }, this)
+                this.resourceinstance_ids = this.results.all_result_ids;
             }
 
             this.buffer = ko.observable(100.0);
