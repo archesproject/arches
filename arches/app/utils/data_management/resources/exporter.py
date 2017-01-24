@@ -39,7 +39,8 @@ class ResourceExporter(object):
     #         self.writer.write_resources(dest_dir)
     #     return result
 
-    def export(self, query=None, configs=None):
+    def export(self, resources=None, configs=None):
+        #resources should be changed to query
         configs = self.read_csv_export_configs(configs)
         business_data = self.get_search_results_for_export()
         self.writer.write_resources(business_data, configs)
@@ -126,7 +127,4 @@ class ResourceExporter(object):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10)
         results = query.search(index='resource', doc_type='')
-        # return results['hits']['hits']
-
-
-        return self.get_resources_for_export(results['hits']['hits'])
+        return results['hits']['hits']

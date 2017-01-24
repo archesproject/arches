@@ -2,9 +2,13 @@ from django.conf import settings
 import csv
 import os
 import datetime
+import json
 from arches.app.models.concept import Concept
 import codecs
 from format import Writer
+from django.db.models import Q
+from arches.app.models.models import Node
+from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 try:
     from cStringIO import StringIO
@@ -15,6 +19,7 @@ class CsvWriter(Writer):
 
     def __init__(self):
         super(CsvWriter, self).__init__()
+        self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
     # def old_write_resources(self, resources, resource_export_configs):
     #     """Using resource_export_configs from either a resource_export_mappings.json
@@ -61,6 +66,14 @@ class CsvWriter(Writer):
     #         csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
     #     return csvs_for_export
 
+    def transform_value_for_export(self, datatype, value):
+        if datatype == 'geojson-feature-collection':
+            wkt_geoms = []
+            for feature in value['features']:
+                wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
+            value = GeometryCollection(wkt_geoms)
+        return value
+
     def write_resources(self, resources, resource_export_configs=None):
         csv_records = []
         other_group_records = []
@@ -71,38 +84,28 @@ class CsvWriter(Writer):
         csv_header.append('ResourceID')
         csvs_for_export = []
 
-        for resource in resources['business_data']['resources']:
-        # for resource in resources:
+        for resource in resources:
             csv_record = {}
             other_group_record = {}
-            # resourceid = resource['_source']['resourceinstanceid']
-            resourceid = resource['resourceinstance'].resourceinstanceid
-        #     resource_graphid = resource['_source']['graph_id']
-            resource_graphid = resource['resourceinstance'].graph_id
-        #     resource_security = resource['_source']['resourceinstancesecurity']
+            resourceid = resource['_source']['resourceinstanceid']
+            resource_graphid = resource['_source']['graph_id']
+            resource_security = resource['_source']['resourceinstancesecurity']
             csv_record['ResourceID'] = resourceid
             other_group_record['ResourceID'] = resourceid
 
-        #     for tile in resource['_source']['tiles']:
-            for tile in resource['tiles']:
-                # if tile['data'] != {}:
-                if tile.data != {}:
-                    # for k in tile['data'].keys():
-                    for k in tile.data.keys():
-                            # if tile['data'][k] != '' and k in mapping:
-                            if tile.data[k] != '' and k in mapping:
+            for tile in resource['_source']['tiles']:
+                if tile['data'] != {}:
+                    for k in tile['data'].keys():
+                            if tile['data'][k] != '' and k in mapping:
                                 if mapping[k] not in csv_record:
-                                    # csv_record[mapping[k]] = tile['data'][k]
-                                    csv_record[mapping[k]] = tile.data[k]
-                                    # del tile['data'][k]
-                                    del tile.data[k]
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k])
+                                    csv_record[mapping[k]] = value
+                                    del tile['data'][k]
                                 else:
-                                    # other_group_record[mapping[k]] = tile['data'][k]
-                                    other_group_record[mapping[k]] = tile.data[k]
+                                    other_group_record[mapping[k]] = tile['data'][k]
                             else:
-                                # del tile['data'][k]
-                                del tile.data[k]
-        #
+                                del tile['data'][k]
+
             csv_records.append(csv_record)
             if other_group_record != {}:
                 other_group_records.append(other_group_record)

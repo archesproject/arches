@@ -79,8 +79,8 @@ class Command(BaseCommand):
         parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
             help='A comma separated list of the graphids of the resources you would like to import/export.')
 
-        parser.add_argument('-c', '--concepts', action='store', dest='concepts', default=False,
-            help='A comma separated list of the conceptids of the concepts you would like to import/export.')
+        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=False,
+            help='Usually an export mapping file.')
 
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
             help='A path to a mapnik xml file to generate a tileserver layer from.')
@@ -145,7 +145,7 @@ class Command(BaseCommand):
             self.index_database(package_name)
 
         if options['operation'] == 'export_resources':
-            self.export_resources(options['dest_dir'], options['resources'], options['format'])
+            self.export_resources(options['dest_dir'], options['resources'], options['format'], options['config_file'])
 
         if options['operation'] == 'import_json':
             self.import_json(options['source'], options['graphs'], options['resources'])
@@ -368,7 +368,7 @@ class Command(BaseCommand):
         index_database.index_db()
 
 
-    def export_resources(self, data_dest=None, resources='', file_format=None):
+    def export_resources(self, data_dest=None, resources=None, file_format=None, config_file=None):
         """
         Exports resources to specified format.
         """
@@ -383,7 +383,7 @@ class Command(BaseCommand):
     #             csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
 
         resource_exporter = ResourceExporter(file_format)
-        resource_exporter.export(resources=resources, dest_dir=data_dest)
+        resource_exporter.export(resources=resources, configs=config_file)
 
 
     def import_json(self, data_source='', graphs=None, resources=None):
