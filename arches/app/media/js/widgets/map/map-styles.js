@@ -225,9 +225,10 @@ define(function() {
         }]
     }
 
-    var mouseoverSearchResult = function(resourceinstanceid) {
-        return [{
-            "id": "mouseover_search_result_resource-poly",
+    var getSearchResultStyles = function(results) {
+        return [
+            {
+            "id": "search_results_resource-poly",
             "source": "resources",
             "source-layer": "resources",
             "type": "fill",
@@ -235,14 +236,15 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "Polygon"],
-                ["==", "resourceinstanceid", resourceinstanceid]
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
             ],
             "paint": {
-                "fill-color": "rgba(0, 255, 0, 0.7)"
+                "fill-color": "rgba(255, 0, 0, 0.7)"
             }
         },
         {
-            "id": "mouseover_search_result_resource-line",
+            "id": "search_results_resource-line",
             "source": "resources",
             "source-layer": "resources",
             "type": "line",
@@ -250,15 +252,16 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "LineString"],
-                ["==", "resourceinstanceid", resourceinstanceid]
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
             ],
             "paint": {
-                "line-color": "rgba(0, 255, 0, 0.7)",
+                "line-color": "rgba(255, 0, 0, 0.7)",
                 "line-width": 1.5
             }
         },
         {
-            "id": "mouseover_search_result_resource-point",
+            "id": "search_results_resource-point",
             "source": "resources",
             "source-layer": "resources",
             "type": "circle",
@@ -266,19 +269,67 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "Point"],
-                ["==", "resourceinstanceid", resourceinstanceid]
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
             ],
             "paint": {
                 "circle-radius": 3.0,
-                "circle-color": "rgba(0, 255, 0, 1)"
+                "circle-color": "rgba(255, 0, 0, 1)"
             }
-        }]
+        },
+        {
+            "id": "search_results_highlight_resource-poly",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "fill",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Polygon"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "fill-color": "rgba(5, 155, 3, 0.7)"
+            }
+        },
+        {
+            "id": "search_results_highlight_resource-line",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "line",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "LineString"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "line-color": "rgba(5, 155, 3, 0.7)",
+                "line-width": 1.5
+            }
+        },
+        {
+            "id": "search_results_highlight_resource-point",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "circle",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Point"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "circle-radius": 3.0,
+                "circle-color": "rgba(5, 155, 3, 1)"
+            }
+        }];
     }
 
     return {
         getDrawStyles: getDrawStyles,
         getResourceModelStyles: getResourceModelStyles,
         getSearchQueryStyles: getSearchQueryStyles,
-        mouseoverSearchResult: mouseoverSearchResult
+        getSearchResultStyles: getSearchResultStyles
     };
 });
