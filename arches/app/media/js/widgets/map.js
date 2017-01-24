@@ -506,7 +506,7 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.results.all_result_ids.subscribe(function() {
+                            self.updateSearchResultsLayer = function() {
                                 var style = self.map.getStyle();
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
@@ -522,24 +522,9 @@ define([
                                 if (self.results.total() === self.results.all_result_ids().length) {
                                     self.map.setStyle(style);
                                 }
-                            });
-                            self.results.mouseoverInstanceId.subscribe(function() {
-                                var style = self.map.getStyle();
-                                style.sources = _.defaults(self.sources, style.sources);
-                                var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                                style.layers.forEach(function(layer) {
-                                    var filter;
-                                    var search_layer = _.find(layerDefs, {
-                                        id: layer.id
-                                    });
-                                    if (search_layer) {
-                                        layer.filter = search_layer.filter
-                                    }
-                                })
-                                if (self.results.total() === self.results.all_result_ids().length) {
-                                    self.map.setStyle(style);
-                                }
-                            });
+                            }
+                            self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
                         }
 
 
@@ -738,9 +723,10 @@ define([
                         }
                     });
                 };
-                this.createOverlay = function(maplayer) {
+                this.createOverlay = function(maplayer, options={}) {
                     var self = this;
                     var configMaplayer;
+                    var checkedOutOfLibrary = options.checkedOutOfLibrary !== undefined ? options.checkedOutOfLibrary : false;
                     _.extend(maplayer, {
                         opacity: ko.observable(100),
                         color: _.filter(maplayer.layer_definitions[0].paint, function(prop, key) {
@@ -820,10 +806,15 @@ define([
                 };
 
                 this.createOverlays = function() {
-                    var overlays =
-                        _.each(_.where(this.layers, {
-                            isoverlay: true
-                        }), self.createOverlay, self);
+                    var overlays = [];
+                    this.layers.forEach(function(layer){
+                        var options = {};
+                        if (layer.isoverlay === true) {
+                            options = layer.name === 'All Resources' ? {'checkedOutOfLibrary': true} : {};
+                            overlay = self.createOverlay(layer, options)
+                            overlays.push(overlay);
+                        }
+                    })
                     return overlays;
                 }
 
