@@ -74,12 +74,6 @@ class GraphSettingsView(GraphBaseView):
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Defining Settings'
-        nav['help_template'] = 'help/settings-help.htm'
-
         context = self.get_context_data(
             main_script='views/graph/graph-settings',
             icons=JSONSerializer().serialize(icons),
@@ -88,8 +82,11 @@ class GraphSettingsView(GraphBaseView):
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
             node_count=models.Node.objects.filter(graph=self.graph).count(),
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help_title'] = ('Defining Settings','help/settings-help.htm')
         
         return render(request, 'views/graph/graph-settings.htm', context)
 
@@ -121,16 +118,15 @@ class GraphManagerView(GraphBaseView):
         if graphid is None or graphid == '':
             root_nodes = models.Node.objects.filter(istopnode=True)
 
-            nav = self.get_default_nav()
-            nav['page_title'] = 'Arches Designer'
-            nav['page_icon'] = 'fa-bookmark'
-            nav['help_title'] = 'About the Arches Designer'
-
             context = self.get_context_data(
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),
-                nav=nav,
             )
+
+            context['nav']['title'] = 'Arches Designer'
+            context['nav']['icon'] = 'fa-bookmark'
+            context['nav']['help'] = ('About the Arches Designer','')
+
             return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)
@@ -143,12 +139,6 @@ class GraphManagerView(GraphBaseView):
         for concept in top_concepts:
             if concept.label == 'Dropdown Lists':
                 concept_collections = concept.children
-
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['help_title'] = 'Using the Graph Manager'
-        nav['help_template'] = 'help/graph-designer-help.htm'
-        nav['menu'] = True
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -168,8 +158,11 @@ class GraphManagerView(GraphBaseView):
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
             },
-            nav=nav
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['help'] = ('Using the Graph Manager','help/graph-designer-help.htm')
+        context['nav']['menu'] = True
 
         return render(request, 'views/graph/graph-manager.htm', context)
 
@@ -269,16 +262,14 @@ class CardManagerView(GraphBaseView):
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Managing Cards'
-
         context = self.get_context_data(
             main_script='views/graph/card-manager',
             branches=JSONSerializer().serialize(branch_graphs),
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Cards','')
 
         return render(request, 'views/graph/card-manager.htm', context)
 
@@ -303,11 +294,6 @@ class CardView(GraphBaseView):
             if concept.label == 'Dropdown Lists':
                 concept_collections = concept.children
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Configuring Cards and Widgets'
-
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
             graph_id=self.graph.pk,
@@ -321,8 +307,11 @@ class CardView(GraphBaseView):
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Configuring Cards and Widgets','')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -342,19 +331,16 @@ class FormManagerView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Using the Form Manager'
-
         context = self.get_context_data(
             main_script='views/graph/form-manager',
             forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
 			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Using the Form Manager','')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -383,11 +369,6 @@ class FormView(GraphBaseView):
         icons = models.Icon.objects.order_by('name')
         cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Configuring Forms'
-
         context = self.get_context_data(
             main_script='views/graph/form-configuration',
             graph_id=self.graph.pk,
@@ -396,8 +377,11 @@ class FormView(GraphBaseView):
             forms=JSONSerializer().serialize(self.graph.form_set.all()),
             cards=JSONSerializer().serialize(cards),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Configuring Forms','')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
@@ -440,11 +424,6 @@ class ReportManagerView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Managing Reports'
-
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
@@ -454,8 +433,11 @@ class ReportManagerView(GraphBaseView):
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
-            nav=nav,
          )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Reports','')
 
         return render(request, 'views/graph/report-manager.htm', context)
 
@@ -482,11 +464,6 @@ class ReportEditorView(GraphBaseView):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Editing Reports'
-
         context = self.get_context_data(
             main_script='views/graph/report-editor',
             report=JSONSerializer().serialize(report),
@@ -502,8 +479,11 @@ class ReportEditorView(GraphBaseView):
             graph_id=self.graph.pk,
             map_layers=map_layers,
             map_sources=map_sources,
-            nav=nav,
          )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Editing Reports','')
 
         return render(request, 'views/graph/report-editor.htm', context)
 
@@ -534,18 +514,16 @@ class FunctionManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
-        nav = self.get_default_nav()
-        nav['page_title'] = self.graph.name
-        nav['menu'] = True
-        nav['help_title'] = 'Managing Functions'
-
         context = self.get_context_data(
             main_script='views/graph/function-manager',
             functions=JSONSerializer().serialize(models.Function.objects.all()),
             applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
             function_templates=models.Function.objects.exclude(component__isnull=True),
-            nav=nav,
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Functions','')
 
         return render(request, 'views/graph/function-manager.htm', context)
 
