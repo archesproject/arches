@@ -3,10 +3,12 @@ define([
     'knockout',
     'moment',
     'views/search/base-filter',
+    'views/search/time-wheel-config',
     'bindings/datepicker',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/time-wheel'
 ],
-function(_, ko, moment, BaseFilter) {
+function(_, ko, moment, BaseFilter, wheelConfig) {
     return BaseFilter.extend({
         initialize: function(options) {
             var self = this;
@@ -15,6 +17,15 @@ function(_, ko, moment, BaseFilter) {
             this.dateRangeType = ko.observable('custom');
             this.dateNodeId = ko.observable('all');
             this.format = 'YYYY-MM-DD';
+            this.wheelConfig = wheelConfig;
+            this.selectPeriod = function (d) {
+                var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
+                var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
+                self.dateRangeType('custom');
+                self.fromDate(end);
+                self.toDate(end);
+                self.fromDate(start);
+            }
 
             this.dateRangeType.subscribe(function(value) {
                 var today = moment();
@@ -49,10 +60,10 @@ function(_, ko, moment, BaseFilter) {
                     default:
                         return;
                 }
+                self.fromDate(to);
                 self.toDate(to);
                 self.fromDate(from);
             });
-
 
             BaseFilter.prototype.initialize.call(this, options);
         },

@@ -36,7 +36,7 @@ from arches.app.utils.set_anonymous_user import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
 
 # these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests/views/auth_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class AuthTests(ArchesTestCase):

@@ -41,6 +41,7 @@ function(ko, BaseFilter) {
               "type": "FeatureCollection",
               "features": []
             });
+            this.termFilter.removeTag('Map Filter Enabled');
         },
 
         appendFilters: function(filterParams) {
@@ -53,7 +54,6 @@ function(ko, BaseFilter) {
             } else {
                 this.clear();
             };
-
             return this.filter.feature_collection().features.length === 0;
         }
 
