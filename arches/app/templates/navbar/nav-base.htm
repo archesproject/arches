@@ -63,8 +63,9 @@
     </a>
     {% endif %}
 
-    {% if nav.edit_resource and user.username != 'anonymous' %}
-    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+    <!-- cursory implementation of this button, need to fix the permissions test -->
+    {% if nav.res_edit and user.username != 'anonymous' %}
+    <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
           <i class="ion-edit"></i>
         </div>
