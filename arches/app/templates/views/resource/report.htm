@@ -24,34 +24,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Resource Report" %}
 {% endblock title %}
 
-{% block content_container_style %}padding:0;{% endblock content_container_style %}
-
 {% block login_header %}{% endblock login_header %}
-
 
 {% block main_content %}
 <div class='scroll-y'>
-    <div class="ep-toolbar relative">
-        <!-- Title Bar -->
-        <div class="ep-tools-title">
-          <h1 class="page-header text-overflow ep-graph-title">
-              <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graph.iconclass || 'fa fa-question'"></i>
-              <span data-bind="text:graph.name"></span>
-          </h1>
-        </div>
-
-        <a href="{% url 'home' %}" class="ep-tools ep-tools-right">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Home">
-              <i class="ion-home"></i>
-            </div>
-        </a>
-
-        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Print">
-              <i class="ion-printer"></i>
-            </div>
-        </a>
-    </div>
 
     <!-- ko if: report -->
     <div class='resource-report' data-bind='component: {
