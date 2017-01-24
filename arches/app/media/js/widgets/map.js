@@ -289,6 +289,18 @@ define([
                 return searchQueryLayer
             }
 
+            // this.defineSearchMouseoverLayer = function() {
+            //     var searchMouseoverLayer = {
+            //         name: 'Map Query',
+            //         maplayerid: 'search-mouseover-layer',
+            //         isResource: false,
+            //         layer_definitions: mapStyles.getSearchQueryStyles(),
+            //         isoverlay: false,
+            //         icon: 'ion-map'
+            //     }
+            //     return searchQueryLayer
+            // }
+
             this.updateSearchQueryLayer = function(geojson_features) {
                 var style = self.map.getStyle();
                 style.sources = _.defaults(self.sources, style.sources);
@@ -378,7 +390,9 @@ define([
                     name: "Search Results",
                     maplayerid: "search_results_",
                     isResource: true,
-                    layer_definitions: [{
+                    layer_definitions: [
+
+                    {
                         "id": "search_results_resource-poly",
                         "source": "resources",
                         "source-layer": "resources",
@@ -387,7 +401,8 @@ define([
                             "visibility": "visible"
                         },
                         "filter": ['all', ["==", "$type", "Polygon"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
+                            ["!=", "resourceinstanceid", this.results.mouseoverInstanceId()]
                         ],
                         "paint": {
                             "fill-color": "rgba(255, 0, 0, 0.7)"
@@ -402,7 +417,8 @@ define([
                             "visibility": "visible"
                         },
                         "filter": ['all', ["==", "$type", "LineString"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
+                            ["!=", "resourceinstanceid", this.results.mouseoverInstanceId()]
                         ],
                         "paint": {
                             "line-color": "rgba(255, 0, 0, 0.7)",
@@ -418,13 +434,63 @@ define([
                             "visibility": "visible"
                         },
                         "filter": ['all', ["==", "$type", "Point"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
+                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids()),
+                            ["!=", "resourceinstanceid", this.results.mouseoverInstanceId()]
                         ],
                         "paint": {
                             "circle-radius": 3.0,
                             "circle-color": "rgba(255, 0, 0, 1)"
                         }
-                    }],
+                    },
+                    {
+                        "id": "search_results_highlight_resource-poly",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "fill",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "Polygon"],
+                            ["==", "resourceinstanceid", this.results.mouseoverInstanceId()]
+                        ],
+                        "paint": {
+                            "fill-color": "rgba(0, 255, 0, 0.7)"
+                        }
+                    },
+                    {
+                        "id": "search_results_highlight_resource-line",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "line",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "LineString"],
+                            ["==", "resourceinstanceid", this.results.mouseoverInstanceId()]
+                        ],
+                        "paint": {
+                            "line-color": "rgba(0, 255, 0, 0.7)",
+                            "line-width": 1.5
+                        }
+                    },
+                    {
+                        "id": "search_results_highlight_resource-point",
+                        "source": "resources",
+                        "source-layer": "resources",
+                        "type": "circle",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "filter": ['all', ["==", "$type", "Point"],
+                            ["==", "resourceinstanceid", this.results.mouseoverInstanceId()]
+                        ],
+                        "paint": {
+                            "circle-radius": 3.0,
+                            "circle-color": "rgba(0, 255, 0, 1)"
+                        }
+                    }
+
+                ],
                     isoverlay: false,
                     icon: 'ion-search'
                 };
@@ -445,6 +511,8 @@ define([
                 if (this.context === 'search-filter') {
                     this.searchResultsLayer = this.defineSearchResultsLayer();
                     this.searchQueryLayer = this.defineSearchQueryLayer();
+                    // this.mouseoverSearchResult = mapStyles.mouseoverSearchResult(this.results.mouseoverInstanceId());
+
                     this.layers.unshift(this.searchQueryLayer);
                     this.layers.unshift(this.searchResultsLayer);
                 }
@@ -552,7 +620,7 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.results.results.subscribe(function() {
+                            self.resourceinstance_ids.subscribe(function() {
                                 var style = self.map.getStyle();
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
@@ -568,7 +636,24 @@ define([
                                 if (self.results.total() === self.resourceinstance_ids().length) {
                                     self.map.setStyle(style);
                                 }
-                            })
+                            });
+                            self.results.mouseoverInstanceId.subscribe(function() {
+                                var style = self.map.getStyle();
+                                style.sources = _.defaults(self.sources, style.sources);
+                                var layerDefs = self.defineSearchResultsLayer().layer_definitions
+                                style.layers.forEach(function(layer) {
+                                    var filter;
+                                    var search_layer = _.find(layerDefs, {
+                                        id: layer.id
+                                    });
+                                    if (search_layer) {
+                                        layer.filter = search_layer.filter
+                                    }
+                                })
+                                if (self.results.total() === self.resourceinstance_ids().length) {
+                                    self.map.setStyle(style);
+                                }
+                            });
                         }
 
 

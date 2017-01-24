@@ -31,7 +31,15 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
+                self.mouseoverInstanceId = ko.observable();
+            },
 
+            mouseoverInstance: function(resourceinstance) {
+                var self = this;
+                return function(resourceinstance){
+                    var resourceinstanceid = resourceinstance.resourceinstanceid || ''
+                    self.mouseoverInstanceId(resourceinstanceid);
+                }
             },
 
             showRelatedResouresGraph: function (e) {
@@ -82,7 +90,8 @@ define(['jquery',
                         resourceinstanceid: result._source.resourceinstanceid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata ? graphdata.iconclass : ''
+                        iconclass: graphdata ? graphdata.iconclass : '',
+                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid)
                     });
                 }, this);
 
