@@ -1,5 +1,9 @@
 # initially from
 # https://github.com/Victory/django-travis-saucelabs/blob/master/mysite/saucetests/tests.py
+
+# these tests can be run from the command line via
+# python manage.py test tests/ui/page_tests.py --pattern="*.py" --settings="tests.test_settings"
+
 import os
 import sys
 import uuid
