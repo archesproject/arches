@@ -4,23 +4,17 @@
 <div class="ep-toolbar">
 
     <!-- Tools Menu -->
-    {% if nav.resource_manage_menu %}
+    {% if nav.menu %}
     <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
         <div class="">{% trans "Manage" %}
             <i class="ion-more"></i>
         </div>
     </a>
-    {% include 'navbar/resource-manage-menu.htm' %}
-    {% endif %}
-
-    <!-- Tools Menu -->
-    {% if nav.graph_manage_menu %}
-    <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-        <div class="">{% trans "Manage" %}
-            <i class="ion-more"></i>
-        </div>
-    </a>
-    {% include 'navbar/graph-manage-menu.htm' %}
+        {% if main_script == 'views/resource/editor' %}
+            {% include 'navbar/resource-manage-menu.htm' %}
+        {% else %}
+            {% include 'navbar/graph-manage-menu.htm' %}
+        {% endif %}
     {% endif %}
 
     <!-- Page Title -->

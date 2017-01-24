@@ -27,18 +27,20 @@ class BaseManagerView(TemplateView):
 
     def get_default_nav(self):
         ''' returns a default set values to configure the nav bar. some of
-        these values will be overwritten at the individual view level.'''
+        these values will be overwritten at the individual view level in
+        order to dynamically configure the navbar contents.'''
 
         return  {
             'page_icon':'fa-question',
             'page_title':'',
             'help_title':'',
             'help_template':'',
-            'resource_manage_menu':False,
-            'graph_manage_menu':False,
+            'menu':False,
             'search':True,
+            'edit_resource':False,
             'edit_history':False,
             'login':True,
+            'print':False,
         }
 
     def get_context_data(self, **kwargs):
