@@ -146,8 +146,9 @@ class ResourceReportView(BaseManagerView):
         templates = models.ReportTemplate.objects.all()
 
         nav = self.get_default_nav()
-        nav['page_title'] = "use graph name or primary name here"
-        nav['help_title'] = 'Does this really need a help page?'
+        nav['page_title'] = graph.name
+        nav['edit_resource'] = True
+        nav['print'] = True
 
         context = self.get_context_data(
             main_script='views/resource/report',
