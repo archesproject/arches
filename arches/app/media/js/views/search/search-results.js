@@ -29,7 +29,7 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
-
+                this.showRelationships: ko.observable();
             },
 
             newPage: function(page, e){
@@ -37,8 +37,6 @@ define(['jquery',
                     this.page(page);
                 }
             },
-
-            showRelationships: ko.observable(),
 
             showRelatedResources: function(resourceinstanceid) {
                 var self = this;
