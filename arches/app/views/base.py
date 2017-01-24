@@ -25,27 +25,20 @@ class BaseManagerView(TemplateView):
 
     template_name = ''
 
-    def get_default_nav(self):
-        ''' returns a default set values to configure the nav bar. some of
-        these values will be overwritten at the individual view level in
-        order to dynamically configure the navbar contents.'''
-
-        return  {
-            'page_icon':'fa-question',
-            'page_title':'',
-            'help_title':'',
-            'help_template':'',
-            'menu':False,
-            'search':True,
-            'edit_resource':False,
-            'edit_history':False,
-            'login':True,
-            'print':False,
-        }
-
     def get_context_data(self, **kwargs):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['graph_models'] = models.GraphModel.objects.all()
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
+        context['nav'] = {
+            'icon':'fa-question',
+            'title':'',
+            'help':('',''),
+            'menu':False,
+            'search':True,
+            'res_edit':False,
+            'edit_history':False,
+            'login':True,
+            'print':False,
+        }
 
         return context
