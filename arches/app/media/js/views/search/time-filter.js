@@ -60,6 +60,7 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                     default:
                         return;
                 }
+                self.fromDate(to);
                 self.toDate(to);
                 self.fromDate(from);
             });

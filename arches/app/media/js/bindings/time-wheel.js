@@ -33,7 +33,6 @@ define([
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
             var partition = d3.layout.partition()
-                .size([2 * Math.PI, radius * radius])
                 .value(function(d) {
                     return d.size;
                 })
@@ -43,43 +42,46 @@ define([
 
             var arc = d3.svg.arc()
                 .startAngle(function(d) {
-                    return d.x;
+                    return Math.max(0, Math.min(2 * Math.PI, x(d.x)));
                 })
                 .endAngle(function(d) {
-                    return d.x + d.dx;
+                    return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx)));
                 })
                 .innerRadius(function(d) {
-                    return Math.sqrt(d.y);
+                    return Math.max(0, y(d.y));
                 })
                 .outerRadius(function(d) {
-                    return Math.sqrt(d.y + d.dy);
+                    return Math.max(0, y(d.y + d.dy));
                 });
 
-            // Bounding circle underneath the sunburst, to make it easier to detect
-            // when the mouse leaves the parent g.
-            vis.append("circle")
-                .attr("r", radius)
-                .style("opacity", 0);
-
-            // Add the svg area.
             var trail = d3.select($el.find('.sequence')[0]).append("svg")
                 .attr("width", width)
                 .attr("height", 50)
                 .attr("class", "trail");
 
-            // Bounding circle underneath the sunburst, to make it easier to detect
-            // when the mouse leaves the parent g.
-            vis.append("circle")
+            vis.append("svg:circle")
                 .attr("r", radius)
                 .style("opacity", 0);
 
-            // For efficiency, filter nodes to keep only those large enough to see.
-            var nodes = partition.nodes(configJSON)
-                .filter(function(d) {
-                    return (d.dx > 0.0005); // 0.005 radians = 0.29 degrees
-                });
+            var nodes = partition.nodes(configJSON);
+            var arcTweenZoom = function(d) {
+                var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+                    yd = d3.interpolate(y.domain(), [d.y, 1]),
+                    yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+                return function(d, i) {
+                    return i ?
+                        function(t) {
+                            return arc(d);
+                        } :
+                        function(t) {
+                            x.domain(xd(t));
+                            y.domain(yd(t)).range(yr(t));
+                            return arc(d);
+                        };
+                };
+            };
 
-            var path = vis.data([configJSON]).selectAll("path")
+            var path = vis.selectAll("path")
                 .data(nodes)
                 .enter().append("path")
                 .attr("display", function(d) {
@@ -98,23 +100,9 @@ define([
                     }
                 })
                 .on("dblclick", function(d) {
-                    vis.transition()
-                        .duration(750)
-                        .tween("scale", function() {
-                            var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
-                                yd = d3.interpolate(y.domain(), [d.y, 1]),
-                                yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
-                            return function(t) {
-                                x.domain(xd(t));
-                                y.domain(yd(t)).range(yr(t));
-                            };
-                        })
-                        .selectAll("path")
-                            .attrTween("d", function(d) {
-                                return function() {
-                                    return arc(d);
-                                };
-                            });
+                    path.transition()
+                        .duration(1000)
+                        .attrTween("d", arcTweenZoom(d));
                 });
 
             // Add the mouseleave handler to the bounding circle.
@@ -138,15 +126,6 @@ define([
                 d3.select($el.find('.explanation')[0])
                     .style("visibility", "hidden");
             });
-
-            // Get total size of the tree = value of root node from partition.
-            var totalSize = path.node().__data__.value;
-
-
-            // Set default count value
-            var count = "86425";
-            d3.select($el.find('.count')[0])
-                .text(count);
 
             // Fade all but the current sequence, and show it in the breadcrumb trail.
             function mouseover(d) {

@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <h3 class="search-title">Time Filter</h3>
+    <h3 class="search-title">{% trans "Time Filter" %}</h3>
 
     <!-- Calendar Search -->
     <div id="calendar" class="time-search-subcontainer">
@@ -63,7 +63,7 @@
 
 
     <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod }">
-        <h3 class="search-title"> Time Wheel <span class="text-xs text-muted text-thin">(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)</span></h3>
+        <h3 class="search-title">{% trans "Time Wheel" %} <span class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</span></h3>
         <div class="sequence"></div>
         <div class="chart" class="">
             <div class="explanation" style="visibility: hidden;">
