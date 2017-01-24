@@ -40,8 +40,11 @@ define([
         showRelatedResourcesGrid: function(resourceinstance) {
             this.currentResource(resourceinstance.resourceinstanceid);
         },
+        addRelationCandidate: function(resourceinstance) {
+            this.relationshipCandidates.push(resourceinstance);
+        },
         saveRelationships: function() {
-            this.relationshipCandidates(_.pluck(this.searchResults.results(), 'resourceinstanceid'));
+            // this.relationshipCandidates(_.pluck(this.searchResults.results(), 'resourceinstanceid'));
             var root_resourceinstanceid = this.currentResource();
             var instances_to_relate = this.relationshipCandidates();
             //TODO Create a resource_x_resource model rather than calling jQuery here
