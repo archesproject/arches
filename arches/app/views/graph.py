@@ -86,7 +86,7 @@ class GraphSettingsView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help_title'] = ('Defining Settings','help/settings-help.htm')
+        context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
         
         return render(request, 'views/graph/graph-settings.htm', context)
 
