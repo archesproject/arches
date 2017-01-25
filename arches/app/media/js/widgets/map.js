@@ -525,6 +525,7 @@ define([
                             }
                             self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
                             self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.overlays.push(_.filter(self.layers, {'name': 'All Resources'})[0]);
                         }
 
 
@@ -736,7 +737,7 @@ define([
                         })[0],
                         showingTools: ko.observable(false),
                         invisible: ko.observable(false),
-                        checkedOutOfLibrary: ko.observable(false),
+                        checkedOutOfLibrary: ko.observable(checkedOutOfLibrary),
                         toggleOverlayTools: function(e) {
                             this.showingTools(!this.showingTools());
                         },
