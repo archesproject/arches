@@ -13,7 +13,7 @@ shapely
 python-memcached
 mapbox-vector-tile==0.5.0
 mapnik
-dateutil
+python-dateutil
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
