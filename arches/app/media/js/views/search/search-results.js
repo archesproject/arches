@@ -76,8 +76,8 @@ define(['jquery',
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
+                this.all_result_ids.removeAll();
                 this.all_result_ids(response.all_result_ids);
-
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";
 
