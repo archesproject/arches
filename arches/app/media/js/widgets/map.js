@@ -290,8 +290,7 @@ define([
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
-                var style = self.map.getStyle();
-                style.sources = _.defaults(self.sources, style.sources);
+                var style = self.getMapStyle();
                 style.sources['search-query'].data = {
                     "type": "FeatureCollection",
                     "features": geojson_features
@@ -499,6 +498,21 @@ define([
                         };
                         var data = null;
                         var all_resources_layer;
+
+                        self.getMapStyle = function() {
+                            var style = map.getStyle();
+                            style.sources = _.defaults(self.sources, style.sources);
+                            var updateGeoJsonSource = function(){
+                                return function(source, key) {
+                                    if (source.type === 'geojson') {
+                                        style.sources[key].data = self.map.getSource(key)._data
+                                    }
+                                }
+                            }
+                            _.each(style.sources, updateGeoJsonSource(), this)
+                            return style
+                        };
+
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
@@ -508,8 +522,7 @@ define([
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.updateSearchResultsLayer = function() {
-                                var style = self.map.getStyle();
-                                style.sources = _.defaults(self.sources, style.sources);
+                                var style = self.getMapStyle();
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
                                 style.layers.forEach(function(layer) {
                                     var filter;
@@ -663,28 +676,25 @@ define([
 
                 this.removeMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        var style = this.map.getStyle();
+                        var style = this.getMapStyle();
                         maplayer.layer_definitions.forEach(function(def) {
                             var layer = _.find(style.layers, function(layer) {
                                 return layer.id === def.id;
                             });
                             style.layers = _.without(style.layers, layer);
                         })
-                        style.sources = _.defaults(self.sources, style.sources);
                         this.map.setStyle(style);
                     }
                 }
 
                 this.addMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        var style = this.map.getStyle();
+                        var style = this.getMapStyle();
                         var anchorIndex = _.findIndex(style.layers, function(layer) {
                             return layer.id === self.anchorLayerId;
                         });
-
                         var l1 = style.layers.slice(0, anchorIndex);
                         var l2 = style.layers.slice(anchorIndex);
-                        style.sources = _.defaults(self.sources, style.sources);
                         style.layers = l1.concat(maplayer.layer_definitions, l2);
                         this.map.setStyle(style);
                         maplayer.updateOpacity(maplayer.opacity());
@@ -750,10 +760,7 @@ define([
                         updateOpacity: function(val) {
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
-                            var style = map.getStyle();
-                            style.sources = _.defaults(self.sources, style.sources);
-                            style.sources['resource'].data = self.map.getSource('resource')._data
-                            style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
+                            var style = self.getMapStyle();
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
@@ -835,10 +842,7 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var style = this.map.getStyle();
-                    style.sources = _.defaults(self.sources, style.sources);
-                    style.sources['resource'].data = self.map.getSource('resource')._data
-                    style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
+                    var style = this.getMapStyle();
                     var basemapToAdd = _.find(this.basemaps, function(basemap) {
                         return basemap.name === basemapType.name;
                     });
