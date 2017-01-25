@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from datetime import date
+
+from dateutil import parser
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -214,23 +215,24 @@ def build_search_results_dsl(request):
             else:
                 boolfilter.must(geoshape)
 
-    if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
-        start_date = date(temporal_filter['year_min_max'][0], 1, 1)
-        end_date = date(temporal_filter['year_min_max'][1], 12, 31)
+    if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
+        start_date = temporal_filter['fromDate']
+        end_date = temporal_filter['toDate']
         if start_date:
+            start_date = parser.parse(start_date)
             start_date = start_date.isoformat()
         if end_date:
+            end_date = parser.parse(end_date)
             end_date = end_date.isoformat()
-        range = Range(field='dates.value', gte=start_date, lte=end_date)
-        nested = Nested(path='dates', query=range)
+        range_query = Range(field='dates', gte=start_date, lte=end_date)
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
-            boolfilter.must_not(nested)
+            boolfilter.must_not(range_query)
         else:
-            boolfilter.must(nested)
+            boolfilter.must(range_query)
 
     if not boolquery.empty:
         query.add_query(boolquery)

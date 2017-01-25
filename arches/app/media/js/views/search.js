@@ -30,6 +30,8 @@ require([
             };
             this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
             this.filters.mapFilter.termFilter = this.filters.termFilter;
+            this.filters.timeFilter.termFilter = this.filters.termFilter;
+            
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
