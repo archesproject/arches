@@ -15,7 +15,6 @@ require([
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
-            var self = this;
             this.viewModel.resultsExpanded = ko.observable(true);
             
             this.filters = {};
@@ -43,22 +42,27 @@ require([
             this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
-            self.isNewQuery = true;
+            this.isNewQuery = true;
+            this.pageChanged = false;
+
+            this.viewModel.searchResults.page.subscribe(function(){
+                this.pageChanged = true;
+            }, this)
 
             this.queryString = ko.computed(function() {
                 var params = {
-                    page: self.viewModel.searchResults.page(),
-                    include_ids: self.isNewQuery,
+                    page: this.viewModel.searchResults.page(),
+                    include_ids: this.isNewQuery,
                     no_filters: true
                 };
-                _.each(self.filters, function (filter) {
+                _.each(this.filters, function (filter) {
                     var filtersAdded = filter.appendFilters(params);
                     if (filtersAdded) {
                         params.no_filters = false;
                     }
                 });
                 return $.param(params).split('+').join('%20');
-            }).extend({ deferred: true });
+            }, this).extend({ deferred: true });
 
             this.filters.termFilter.filter.terms.subscribe(function(terms){
                 _.each(this.filters, function(filter){
@@ -76,15 +80,19 @@ require([
             this.restoreState();
 
             this.queryString.subscribe(function() {
-                self.isNewQuery = true;
-                self.doQuery();
-            });
+                if(this.pageChanged){
+                    this.pageChanged = false;
+                }else{
+                    this.viewModel.searchResults.page(1);
+                    this.isNewQuery = true;
+                }
+                this.doQuery();
+            }, this);
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
-            var self = this;
             var queryString = this.queryString();
             // if (this.updateRequest) {
             //     this.updateRequest.abort();
