@@ -498,6 +498,7 @@ define([
                             "features": []
                         };
                         var data = null;
+                        var all_resources_layer;
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
@@ -525,7 +526,10 @@ define([
                             }
                             self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
                             self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
-                            self.overlays.push(_.filter(self.layers, {'name': 'All Resources'})[0]);
+
+                            all_resources_layer = _.filter(self.layers, {'name': 'All Resources'})[0]
+                            all_resources_layer.checkedOutOfLibrary(true);
+                            self.overlays.push(all_resources_layer);
                         }
 
 
@@ -724,10 +728,9 @@ define([
                         }
                     });
                 };
-                this.createOverlay = function(maplayer, options={}) {
+                this.createOverlay = function(maplayer) {
                     var self = this;
                     var configMaplayer;
-                    var checkedOutOfLibrary = options.checkedOutOfLibrary !== undefined ? options.checkedOutOfLibrary : false;
                     _.extend(maplayer, {
                         opacity: ko.observable(100),
                         color: _.filter(maplayer.layer_definitions[0].paint, function(prop, key) {
@@ -737,7 +740,7 @@ define([
                         })[0],
                         showingTools: ko.observable(false),
                         invisible: ko.observable(false),
-                        checkedOutOfLibrary: ko.observable(checkedOutOfLibrary),
+                        checkedOutOfLibrary: ko.observable(false),
                         toggleOverlayTools: function(e) {
                             this.showingTools(!this.showingTools());
                         },
@@ -809,10 +812,8 @@ define([
                 this.createOverlays = function() {
                     var overlays = [];
                     this.layers.forEach(function(layer){
-                        var options = {};
                         if (layer.isoverlay === true) {
-                            options = layer.name === 'All Resources' ? {'checkedOutOfLibrary': true} : {};
-                            overlay = self.createOverlay(layer, options)
+                            overlay = self.createOverlay(layer)
                             overlays.push(overlay);
                         }
                     })
