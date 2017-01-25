@@ -216,14 +216,18 @@ def build_search_results_dsl(request):
                 boolfilter.must(geoshape)
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
-        start_date = temporal_filter['fromDate']
-        end_date = temporal_filter['toDate']
-        if start_date:
-            start_date = parser.parse(start_date)
+        start_date = None
+        end_date = None
+        try:
+            start_date = parser.parse(temporal_filter['fromDate'])
             start_date = start_date.isoformat()
-        if end_date:
-            end_date = parser.parse(end_date)
+        except:
+            pass
+        try:
+            end_date = parser.parse(temporal_filter['toDate'])
             end_date = end_date.isoformat()
+        except:
+            pass
         range_query = Range(field='dates', gte=start_date, lte=end_date)
 
         if 'inverted' not in temporal_filter:

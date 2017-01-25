@@ -66,9 +66,15 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                 }
                 this.filter.toDate(to);
                 this.filter.fromDate(from);
-                this.termFilter.addTag(this.name, this.name, this.filter.inverted);
             }, this);
 
+            this.filterChanged = ko.computed(function(){
+                if(!!this.filter.fromDate() || !!this.filter.toDate()){
+                    this.termFilter.addTag(this.name, this.name, this.filter.inverted);
+                }
+                return ko.toJSON(this.filter);
+            }, this).extend({ deferred: true });
+            
             BaseFilter.prototype.initialize.call(this, options);
         },
 

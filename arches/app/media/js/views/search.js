@@ -17,21 +17,23 @@ require([
         initialize: function(options) {
             var self = this;
             this.viewModel.resultsExpanded = ko.observable(true);
-            this.filters = {
-                termFilter: new TermFilter(),
-                timeFilter: new TimeFilter(),
-                resourceTypeFilter: new ResourceTypeFilter(),
-                mapFilter: new MapFilter({
-                    resizeOnChange: this.viewModel.resultsExpanded
-                }),
-                savedSearches: new BaseFilter(),
-                advancedFilter: new BaseFilter(),
-                searchRelatedResources: new BaseFilter()
-            };
-            this.filters.resourceTypeFilter.termFilter = this.filters.termFilter;
-            this.filters.mapFilter.termFilter = this.filters.termFilter;
-            this.filters.timeFilter.termFilter = this.filters.termFilter;
             
+            this.filters = {};
+            this.filters.termFilter = new TermFilter();
+            this.filters.timeFilter = new TimeFilter({
+                termFilter: this.filters.termFilter
+            });
+            this.filters.resourceTypeFilter = new ResourceTypeFilter({
+                termFilter: this.filters.termFilter
+            });
+            this.filters.mapFilter = new MapFilter({
+                resizeOnChange: this.viewModel.resultsExpanded,
+                termFilter: this.filters.termFilter
+            });
+            this.filters.savedSearches = new BaseFilter();
+            this.filters.advancedFilter = new BaseFilter();
+            this.filters.searchRelatedResources = new BaseFilter()
+
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
