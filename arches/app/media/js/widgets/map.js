@@ -116,9 +116,7 @@ define([
             if (this.context === 'search-filter') {
                 this.results = params.results;
                 this.query = params.query;
-                this.resourceinstance_ids = ko.pureComputed(function() {
-                    return _.pluck(this.results.results(), 'resourceinstanceid');
-                }, this)
+                this.results.all_result_ids = this.results.all_result_ids;
             }
 
             this.buffer = ko.observable(100.0);
@@ -380,53 +378,7 @@ define([
                     name: "Search Results",
                     maplayerid: "search_results_",
                     isResource: true,
-                    layer_definitions: [{
-                        "id": "search_results_resource-poly",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "fill",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "Polygon"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "fill-color": "rgba(255, 0, 0, 0.7)"
-                        }
-                    },
-                    {
-                        "id": "search_results_resource-line",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "line",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "LineString"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "line-color": "rgba(255, 0, 0, 0.7)",
-                            "line-width": 1.5
-                        }
-                    },
-                    {
-                        "id": "search_results_resource-point",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "circle",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "Point"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "circle-radius": 3.0,
-                            "circle-color": "rgba(255, 0, 0, 1)"
-                        }
-                    }],
+                    layer_definitions: mapStyles.getSearchResultStyles(self.results),
                     isoverlay: false,
                     icon: 'ion-search'
                 };
@@ -546,6 +498,7 @@ define([
                             "features": []
                         };
                         var data = null;
+                        var all_resources_layer;
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
@@ -554,7 +507,7 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.results.results.subscribe(function() {
+                            self.updateSearchResultsLayer = function() {
                                 var style = self.map.getStyle();
                                 style.sources = _.defaults(self.sources, style.sources);
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
@@ -567,10 +520,16 @@ define([
                                         layer.filter = search_layer.filter
                                     }
                                 })
-                                if (self.results.total() === self.resourceinstance_ids().length) {
+                                if (self.results.total() === self.results.all_result_ids().length) {
                                     self.map.setStyle(style);
                                 }
-                            })
+                            }
+                            self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+
+                            all_resources_layer = _.filter(self.layers, {'name': 'All Resources'})[0]
+                            all_resources_layer.checkedOutOfLibrary(true);
+                            self.overlays.push(all_resources_layer);
                         }
 
 
@@ -851,10 +810,13 @@ define([
                 };
 
                 this.createOverlays = function() {
-                    var overlays =
-                        _.each(_.where(this.layers, {
-                            isoverlay: true
-                        }), self.createOverlay, self);
+                    var overlays = [];
+                    this.layers.forEach(function(layer){
+                        if (layer.isoverlay === true) {
+                            overlay = self.createOverlay(layer)
+                            overlays.push(overlay);
+                        }
+                    })
                     return overlays;
                 }
 
