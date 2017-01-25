@@ -10,7 +10,6 @@ define(['jquery',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
     function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
-
         return Backbone.View.extend({
 
             events: {
@@ -26,10 +25,20 @@ define(['jquery',
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
+                this.all_result_ids = ko.observableArray();
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
                 this.showRelationships: ko.observable();
+                self.mouseoverInstanceId = ko.observable();
+            },
+
+            mouseoverInstance: function(resourceinstance) {
+                var self = this;
+                return function(resourceinstance){
+                    var resourceinstanceid = resourceinstance.resourceinstanceid || ''
+                    self.mouseoverInstanceId(resourceinstanceid);
+                }
             },
 
             newPage: function(page, e){
@@ -45,6 +54,12 @@ define(['jquery',
                 }
             },
 
+            newPage: function(page, e){
+                if(page){
+                    this.page(page);
+                }
+            },
+
             updateResults: function(response){
                 var self = this;
                 koMapping.fromJS(response.paginator, this.paginator);
@@ -53,7 +68,8 @@ define(['jquery',
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
-
+                this.all_result_ids.removeAll();
+                this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";
 
@@ -67,7 +83,8 @@ define(['jquery',
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
-                        showrelated: this.showRelatedResources(result._source.resourceinstanceid)
+                        showrelated: this.showRelatedResources(result._source.resourceinstanceid),
+                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid)
                     });
                 }, this);
 

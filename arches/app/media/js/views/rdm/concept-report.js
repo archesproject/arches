@@ -257,14 +257,15 @@ define([
 
                     if (data.action === 'delete-value') {
                         model = new ValueModel(data);
-                        self.model.set('values', [model]);
+                        model.delete();
+                        self.render();
                     }
                     if (data.action === 'delete-relationship') {
                         model = new ConceptModel(data);
                         self.model.set('relatedconcepts', [model]);
+                        self.model.delete();
                     }
 
-                    self.model.delete();
                 });
                 modal.modal('hide');                
             }            

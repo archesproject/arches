@@ -9,8 +9,13 @@ define([
             var height = 600;
             var radius = Math.min(width, height) / 2;
             var colortheme = d3.scale.category20c();
+            var x = d3.scale.linear()
+                .range([0, 2 * Math.PI]);
+            var y = d3.scale.sqrt()
+                .range([0, radius]);
             var $el = $(element);
-            var configJSON = ko.unwrap(valueAccessor());
+            var opts = ko.unwrap(valueAccessor());
+            var configJSON = opts.config;
 
             // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
             var b = {
@@ -20,67 +25,65 @@ define([
                 t: 10
             };
 
-            var vis = d3.select($el.find('.chart')[0]).append("svg:svg")
+            var vis = d3.select($el.find('.chart')[0]).append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                .append("svg:g")
+                .append("g")
                 .attr("class", "container")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
             var partition = d3.layout.partition()
-                .size([2 * Math.PI, radius * radius])
                 .value(function(d) {
                     return d.size;
                 })
                 .sort(function(d) {
-                    return d3.descending(d.hits);
+                    return d3.descending(d.start);
                 });
 
             var arc = d3.svg.arc()
                 .startAngle(function(d) {
-                    return d.x;
+                    return Math.max(0, Math.min(2 * Math.PI, x(d.x)));
                 })
                 .endAngle(function(d) {
-                    return d.x + d.dx;
+                    return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx)));
                 })
                 .innerRadius(function(d) {
-                    return Math.sqrt(d.y);
+                    return Math.max(0, y(d.y));
                 })
                 .outerRadius(function(d) {
-                    return Math.sqrt(d.y + d.dy);
+                    return Math.max(0, y(d.y + d.dy));
                 });
 
-            // Bounding circle underneath the sunburst, to make it easier to detect
-            // when the mouse leaves the parent g.
-            vis.append("svg:circle")
-                .attr("r", radius)
-                .style("opacity", 0);
-
-            // Add the svg area.
-            var trail = d3.select($el.find('.sequence')[0]).append("svg:svg")
+            var trail = d3.select($el.find('.sequence')[0]).append("svg")
                 .attr("width", width)
                 .attr("height", 50)
                 .attr("class", "trail");
-            // Add the label at the end, for the count.
-            trail.append("svg:text")
-                .attr("class", "endlabel")
-                .style("fill", "#000");
 
-            // Bounding circle underneath the sunburst, to make it easier to detect
-            // when the mouse leaves the parent g.
             vis.append("svg:circle")
                 .attr("r", radius)
                 .style("opacity", 0);
 
-            // For efficiency, filter nodes to keep only those large enough to see.
-            var nodes = partition.nodes(configJSON)
-                .filter(function(d) {
-                    return (d.dx > 0.0005); // 0.005 radians = 0.29 degrees
-                });
+            var nodes = partition.nodes(configJSON);
+            var arcTweenZoom = function(d) {
+                var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+                    yd = d3.interpolate(y.domain(), [d.y, 1]),
+                    yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+                return function(d, i) {
+                    return i ?
+                        function(t) {
+                            return arc(d);
+                        } :
+                        function(t) {
+                            x.domain(xd(t));
+                            y.domain(yd(t)).range(yr(t));
+                            return arc(d);
+                        };
+                };
+            };
 
-            var path = vis.data([configJSON]).selectAll("path")
+            var path = vis.selectAll("path")
                 .data(nodes)
-                .enter().append("svg:path")
+                .enter().append("path")
                 .attr("display", function(d) {
                     return d.depth ? null : "none";
                 })
@@ -90,7 +93,17 @@ define([
                     return colortheme((d.children ? d : d.parent).name);
                 })
                 .style("opacity", 1)
-                .on("mouseover", mouseover);
+                .on("mouseover", mouseover)
+                .on("click", function(d) {
+                    if (typeof opts.onClick === 'function') {
+                        opts.onClick(d);
+                    }
+                })
+                .on("dblclick", function(d) {
+                    path.transition()
+                        .duration(1000)
+                        .attrTween("d", arcTweenZoom(d));
+                });
 
             // Add the mouseleave handler to the bounding circle.
             d3.select($el.find('.container')[0]).on("mouseleave", function(d) {
@@ -113,15 +126,6 @@ define([
                 d3.select($el.find('.explanation')[0])
                     .style("visibility", "hidden");
             });
-
-            // Get total size of the tree = value of root node from partition.
-            var totalSize = path.node().__data__.value;
-
-
-            // Set default count value
-            var count = "86425";
-            d3.select($el.find('.count')[0])
-                .text(count);
 
             // Fade all but the current sequence, and show it in the breadcrumb trail.
             function mouseover(d) {
@@ -151,9 +155,9 @@ define([
                     });
 
                 // Add breadcrumb and label for entering nodes.
-                var entering = g.enter().append("svg:g");
+                var entering = g.enter().append("g");
 
-                entering.append("svg:text")
+                entering.append("text")
                     .attr("x", (b.w + b.t) / 2)
                     .attr("y", b.h / 2)
                     .attr("dy", "0.35em")

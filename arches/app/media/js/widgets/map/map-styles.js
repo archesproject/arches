@@ -225,9 +225,111 @@ define(function() {
         }]
     }
 
+    var getSearchResultStyles = function(results) {
+        return [
+            {
+            "id": "search_results_resource-poly",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "fill",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Polygon"],
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "fill-color": "rgba(255, 0, 0, 0.7)"
+            }
+        },
+        {
+            "id": "search_results_resource-line",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "line",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "LineString"],
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "line-color": "rgba(255, 0, 0, 0.7)",
+                "line-width": 1.5
+            }
+        },
+        {
+            "id": "search_results_resource-point",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "circle",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Point"],
+                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "circle-radius": 3.0,
+                "circle-color": "rgba(255, 0, 0, 1)"
+            }
+        },
+        {
+            "id": "search_results_highlight_resource-poly",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "fill",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Polygon"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "fill-color": "rgba(5, 155, 3, 0.7)"
+            }
+        },
+        {
+            "id": "search_results_highlight_resource-line",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "line",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "LineString"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "line-color": "rgba(5, 155, 3, 0.7)",
+                "line-width": 1.5
+            }
+        },
+        {
+            "id": "search_results_highlight_resource-point",
+            "source": "resources",
+            "source-layer": "resources",
+            "type": "circle",
+            "layout": {
+                "visibility": "visible"
+            },
+            "filter": ['all', ["==", "$type", "Point"],
+                ["==", "resourceinstanceid", results.mouseoverInstanceId()]
+            ],
+            "paint": {
+                "circle-radius": 3.0,
+                "circle-color": "rgba(5, 155, 3, 1)"
+            }
+        }];
+    }
+
     return {
         getDrawStyles: getDrawStyles,
         getResourceModelStyles: getResourceModelStyles,
-        getSearchQueryStyles: getSearchQueryStyles
+        getSearchQueryStyles: getSearchQueryStyles,
+        getSearchResultStyles: getSearchResultStyles
     };
 });

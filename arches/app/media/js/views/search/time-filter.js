@@ -18,6 +18,14 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
             this.dateNodeId = ko.observable('all');
             this.format = 'YYYY-MM-DD';
             this.wheelConfig = wheelConfig;
+            this.selectPeriod = function (d) {
+                var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
+                var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
+                self.dateRangeType('custom');
+                self.fromDate(end);
+                self.toDate(end);
+                self.fromDate(start);
+            }
 
             this.dateRangeType.subscribe(function(value) {
                 var today = moment();
@@ -52,6 +60,7 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                     default:
                         return;
                 }
+                self.fromDate(to);
                 self.toDate(to);
                 self.fromDate(from);
             });

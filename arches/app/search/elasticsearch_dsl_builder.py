@@ -41,7 +41,7 @@ class Dsl(object):
 
 class Query(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
 
     """
 
@@ -126,7 +126,7 @@ class Query(Dsl):
 
 class Bool(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
     
     """
     
@@ -177,7 +177,7 @@ class Bool(Dsl):
 
 class Match(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
     
     """
 
@@ -205,7 +205,7 @@ class Match(Dsl):
 
 class Nested(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html
 
     Note:
         score_mode can only be used when the nested dsl is used within a query but not within a filter
@@ -234,9 +234,27 @@ class Nested(Dsl):
             dsl = Dsl(dsl).dsl
             self.dsl['nested']['query'] = dsl
 
+
+class Term(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop('field', '_all')
+        self.term = kwargs.pop('term', '')
+
+        self.dsl = {
+            'term' : {
+                self.field : self.term
+            }
+        }
+
+
 class Terms(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
 
     """
 
@@ -256,8 +274,8 @@ class Terms(Dsl):
 
 class GeoShape(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geo-shape-query.html
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-shape-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html
 
     """
 
@@ -280,7 +298,7 @@ class GeoShape(Dsl):
 
 class Range(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
 
     """
 
@@ -323,7 +341,7 @@ class Range(Dsl):
 
 class SimpleQueryString(Dsl):
     """
-    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
 
     """
 

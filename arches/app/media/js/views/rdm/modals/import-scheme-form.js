@@ -13,7 +13,8 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
             this.modal.validate({
                 ignore: null,
                 rules: {
-                    skosfile: "required"
+                    skosfile: "required",
+                    overwrite_options: "required"
                 },
                 submitHandler: function(form) {
                     var data = new FormData(form);
