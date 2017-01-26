@@ -184,19 +184,17 @@ class RelatedResourcesView(BaseManagerView):
                 notes = 'testing',
                 relationshiptype = models.Value('cb51db61-bbdd-4480-93b6-f5abe9c84d4b')
             )
-            print rr.relationshiptype.valueid, 'value'
-            document = {
-                'dateended': rr.dateended,
-                'datestarted': rr.datestarted,
-                'notes': rr.notes,
-                'relationshiptype': rr.relationshiptype.value,
-                'resourceinstanceidfrom':rr.resourceinstanceidfrom.resourceinstanceid,
-                'resourceinstanceidto':rr.resourceinstanceidto.resourceinstanceid,
-                'resourcexid':rr.resourcexid
-             }
-
+            document = model_to_dict(rr)
+            # {
+            #     'dateended': rr.dateended,
+            #     'datestarted': rr.datestarted,
+            #     'notes': rr.notes,
+            #     'relationshiptype': rr.relationshiptype.value,
+            #     'resourceinstanceidfrom':rr.resourceinstanceidfrom.resourceinstanceid,
+            #     'resourceinstanceidto':rr.resourceinstanceidto.resourceinstanceid,
+            #     'resourcexid':rr.resourcexid
+            #  }
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
-
         return JSONResponse({ 'success': True })
 
     def get_related_resources(self):
