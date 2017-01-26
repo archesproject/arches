@@ -230,15 +230,20 @@ def build_search_results_dsl(request):
             end_date = end_date.isoformat()
         except:
             pass
-        range_query = Range(field='dates', gte=start_date, lte=end_date)
+
+        if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+            range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
+            time_query_dsl = Nested(path='tiles', query=range)
+        else:
+            time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
-            boolfilter.must_not(range_query)
+            boolfilter.must_not(time_query_dsl)
         else:
-            boolfilter.must(range_query)
+            boolfilter.must(time_query_dsl)
 
     if not boolquery.empty:
         query.add_query(boolquery)
