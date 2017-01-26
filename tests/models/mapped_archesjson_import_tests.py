@@ -25,7 +25,7 @@ from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands.package_utils import authority_files
-from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
+from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
 
 
 # these tests can be run from the command line via

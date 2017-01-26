@@ -39,11 +39,11 @@ class ResourceExporter(object):
     #         self.writer.write_resources(dest_dir)
     #     return result
 
-    def export(self, resources=None, configs=None):
+    def export(self, data_dest=None, resources=None, configs=None):
         #resources should be changed to query
         configs = self.read_csv_export_configs(configs)
         business_data = self.get_search_results_for_export()
-        self.writer.write_resources(business_data, configs)
+        csv_files = self.writer.write_resources(business_data, configs)
 
     def read_csv_export_configs(self, configs):
         '''

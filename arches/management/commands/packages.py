@@ -36,9 +36,10 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index
 from arches.app.models import models
 import csv, json
-from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
+from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
-from arches.app.utils.data_management.csv_file_importer import CSVFileImporter
+from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
+from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from django.db import transaction
 
 
@@ -50,8 +51,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_csv', 'add_mapbox_layer',],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
+            'create_mapping_file', 'import_csv', 'import_business_data', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -144,11 +145,14 @@ class Command(BaseCommand):
         if options['operation'] == 'index_database':
             self.index_database(package_name)
 
-        if options['operation'] == 'export_resources':
-            self.export_resources(options['dest_dir'], options['resources'], options['format'], options['config_file'])
+        if options['operation'] == 'export_business_data':
+            self.export_business_data(options['dest_dir'], options['resources'], options['format'], options['config_file'])
 
         if options['operation'] == 'import_json':
             self.import_json(options['source'], options['graphs'], options['resources'])
+
+        if options['operation'] == 'import_business_data':
+            self.import_business_data(options['source'])
 
         if options['operation'] == 'export_json':
             self.export_json(options['dest_dir'], options['graphs'], options['resources'])
@@ -368,7 +372,7 @@ class Command(BaseCommand):
         index_database.index_db()
 
 
-    def export_resources(self, data_dest=None, resources=None, file_format=None, config_file=None):
+    def export_business_data(self, data_dest=None, resources=None, file_format=None, config_file=None):
         """
         Exports resources to specified format.
         """
@@ -384,6 +388,30 @@ class Command(BaseCommand):
 
         resource_exporter = ResourceExporter(file_format)
         resource_exporter.export(resources=resources, configs=config_file)
+
+
+    def export_business_data(self, file_format, data_dest=None, resources=None, config_file=None):
+        if file_format in ['csv', 'json', 'shp']:
+            resource_exporter = ResourceExporter(file_format)
+            resource_exporter.export(data_dest=data_dest, resource=resources, configs=config_file)
+        else:
+            print '{0} is not a valid export file format.'.format(file_format)
+
+    def import_business_data(self, data_source):
+        """
+        Imports business data from all formats
+        """
+        if data_source == '':
+            print '*'*80
+            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
+            print '*'*80
+
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        for path in data_source:
+            if os.path.isfile(os.path.join(path)):
+                BusinessDataImporter(path)
 
 
     def import_json(self, data_source='', graphs=None, resources=None):
