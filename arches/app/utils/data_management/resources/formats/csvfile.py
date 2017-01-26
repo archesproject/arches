@@ -55,11 +55,12 @@ class CsvWriter(Writer):
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
-        for node in resource_export_configs['nodes']:
-            if node['file_field_name'] != '':
-                mapping[node['arches_nodeid']] = node['file_field_name']
-            if 'concept_export_value' in node:
-                concept_export_value_lookup[node['arches_nodeid']] = node['concept_export_value']
+        for resource_export_config in resource_export_configs:
+            for node in resource_export_config['nodes']:
+                if node['file_field_name'] != '':
+                    mapping[node['arches_nodeid']] = node['file_field_name']
+                if 'concept_export_value' in node:
+                    concept_export_value_lookup[node['arches_nodeid']] = node['concept_export_value']
         csv_header = ['ResourceID'] + mapping.values()
         csvs_for_export = []
 
@@ -93,7 +94,8 @@ class CsvWriter(Writer):
                 other_group_records.append(other_group_record)
 
 
-        csv_name_prefix = resource_export_configs['resource_model_name']
+        # csv_name_prefix = resource_export_configs['resource_model_name']
+        csv_name_prefix = ''
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
         dest = StringIO()

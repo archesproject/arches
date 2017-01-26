@@ -397,7 +397,7 @@ class Command(BaseCommand):
     def export_business_data(self, file_format, data_dest=None, resources=None, config_file=None):
         if file_format in ['csv', 'json', 'shp']:
             resource_exporter = ResourceExporter(file_format)
-            resource_exporter.export(data_dest=data_dest, resource=resources, configs=config_file)
+            resource_exporter.export(data_dest=data_dest, resources=resources, configs=config_file)
         else:
             print '{0} is not a valid export file format.'.format(file_format)
 
@@ -415,7 +415,7 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path)
+                BusinessDataImporter(path).import_business_data()
 
 
     def import_json(self, data_source='', graphs=None, resources=None):

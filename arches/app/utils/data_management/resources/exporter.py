@@ -15,7 +15,6 @@ from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
-
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -49,11 +48,16 @@ class ResourceExporter(object):
         '''
         Reads the export configuration file or object and adds an array for records to store property data
         '''
-        if configs != '':
+        if configs:
             resource_export_configs = json.load(open(configs, 'r'))
-            configs = resource_export_configs
+            resource_configs = [resource_export_configs]
+            configs = resource_configs
         else:
-            configs = ''
+            resource_configs = []
+            configs = models.GraphXMapping.objects.values('mapping')
+            for val in configs:
+                resource_configs.append(val['mapping'])
+            configs = resource_configs
 
         return configs
 
