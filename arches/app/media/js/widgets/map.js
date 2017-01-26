@@ -116,9 +116,7 @@ define([
             if (this.context === 'search-filter') {
                 this.results = params.results;
                 this.query = params.query;
-                this.resourceinstance_ids = ko.pureComputed(function() {
-                    return _.pluck(this.results.results(), 'resourceinstanceid');
-                }, this)
+                this.results.all_result_ids = this.results.all_result_ids;
             }
 
             this.buffer = ko.observable(100.0);
@@ -292,8 +290,7 @@ define([
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
-                var style = self.map.getStyle();
-                style.sources = _.defaults(self.sources, style.sources);
+                var style = self.getMapStyle();
                 style.sources['search-query'].data = {
                     "type": "FeatureCollection",
                     "features": geojson_features
@@ -380,53 +377,7 @@ define([
                     name: "Search Results",
                     maplayerid: "search_results_",
                     isResource: true,
-                    layer_definitions: [{
-                        "id": "search_results_resource-poly",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "fill",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "Polygon"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "fill-color": "rgba(255, 0, 0, 0.7)"
-                        }
-                    },
-                    {
-                        "id": "search_results_resource-line",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "line",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "LineString"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "line-color": "rgba(255, 0, 0, 0.7)",
-                            "line-width": 1.5
-                        }
-                    },
-                    {
-                        "id": "search_results_resource-point",
-                        "source": "resources",
-                        "source-layer": "resources",
-                        "type": "circle",
-                        "layout": {
-                            "visibility": "visible"
-                        },
-                        "filter": ['all', ["==", "$type", "Point"],
-                            ["in", "resourceinstanceid"].concat(self.resourceinstance_ids())
-                        ],
-                        "paint": {
-                            "circle-radius": 3.0,
-                            "circle-color": "rgba(255, 0, 0, 1)"
-                        }
-                    }],
+                    layer_definitions: mapStyles.getSearchResultStyles(self.results),
                     isoverlay: false,
                     icon: 'ion-search'
                 };
@@ -546,6 +497,22 @@ define([
                             "features": []
                         };
                         var data = null;
+                        var all_resources_layer;
+
+                        self.getMapStyle = function() {
+                            var style = map.getStyle();
+                            style.sources = _.defaults(self.sources, style.sources);
+                            var updateGeoJsonSource = function(){
+                                return function(source, key) {
+                                    if (source.type === 'geojson') {
+                                        style.sources[key].data = self.map.getSource(key)._data
+                                    }
+                                }
+                            }
+                            _.each(style.sources, updateGeoJsonSource(), this)
+                            return style
+                        };
+
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined && self.context === 'report-header') {
                             self.overlays.unshift(self.createOverlay(self.resourceLayer));
@@ -554,9 +521,8 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.results.results.subscribe(function() {
-                                var style = self.map.getStyle();
-                                style.sources = _.defaults(self.sources, style.sources);
+                            self.updateSearchResultsLayer = function() {
+                                var style = self.getMapStyle();
                                 var layerDefs = self.defineSearchResultsLayer().layer_definitions
                                 style.layers.forEach(function(layer) {
                                     var filter;
@@ -567,10 +533,16 @@ define([
                                         layer.filter = search_layer.filter
                                     }
                                 })
-                                if (self.results.total() === self.resourceinstance_ids().length) {
+                                if (self.results.total() === self.results.all_result_ids().length) {
                                     self.map.setStyle(style);
                                 }
-                            })
+                            }
+                            self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+
+                            all_resources_layer = _.filter(self.layers, {'name': 'All Resources'})[0]
+                            all_resources_layer.checkedOutOfLibrary(true);
+                            self.overlays.push(all_resources_layer);
                         }
 
 
@@ -704,28 +676,25 @@ define([
 
                 this.removeMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        var style = this.map.getStyle();
+                        var style = this.getMapStyle();
                         maplayer.layer_definitions.forEach(function(def) {
                             var layer = _.find(style.layers, function(layer) {
                                 return layer.id === def.id;
                             });
                             style.layers = _.without(style.layers, layer);
                         })
-                        style.sources = _.defaults(self.sources, style.sources);
                         this.map.setStyle(style);
                     }
                 }
 
                 this.addMaplayer = function(maplayer) {
                     if (maplayer !== undefined) {
-                        var style = this.map.getStyle();
+                        var style = this.getMapStyle();
                         var anchorIndex = _.findIndex(style.layers, function(layer) {
                             return layer.id === self.anchorLayerId;
                         });
-
                         var l1 = style.layers.slice(0, anchorIndex);
                         var l2 = style.layers.slice(anchorIndex);
-                        style.sources = _.defaults(self.sources, style.sources);
                         style.layers = l1.concat(maplayer.layer_definitions, l2);
                         this.map.setStyle(style);
                         maplayer.updateOpacity(maplayer.opacity());
@@ -791,10 +760,7 @@ define([
                         updateOpacity: function(val) {
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
-                            var style = map.getStyle();
-                            style.sources = _.defaults(self.sources, style.sources);
-                            style.sources['resource'].data = self.map.getSource('resource')._data
-                            style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
+                            var style = self.getMapStyle();
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
@@ -851,10 +817,13 @@ define([
                 };
 
                 this.createOverlays = function() {
-                    var overlays =
-                        _.each(_.where(this.layers, {
-                            isoverlay: true
-                        }), self.createOverlay, self);
+                    var overlays = [];
+                    this.layers.forEach(function(layer){
+                        if (layer.isoverlay === true) {
+                            overlay = self.createOverlay(layer)
+                            overlays.push(overlay);
+                        }
+                    })
                     return overlays;
                 }
 
@@ -873,10 +842,7 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var style = this.map.getStyle();
-                    style.sources = _.defaults(self.sources, style.sources);
-                    style.sources['resource'].data = self.map.getSource('resource')._data
-                    style.sources['geocode-point'].data = self.map.getSource('geocode-point')._data
+                    var style = this.getMapStyle();
                     var basemapToAdd = _.find(this.basemaps, function(basemap) {
                         return basemap.name === basemapType.name;
                     });

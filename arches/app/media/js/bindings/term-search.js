@@ -6,11 +6,21 @@ define([
 ], function($, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var self = allBindingsAccessor.termSearch;
-            var selection = valueAccessor();
+            var allBindings = allBindingsAccessor();
+            var terms = valueAccessor().terms;
+            var tags = valueAccessor().tags;
 
-            selection.subscribe(function (value) {
-                searchbox.select2('data', value).trigger('change');
+            var notifyValueChange = function(value){
+                var val = terms().concat(tags());
+                searchbox.select2('data', val)//.trigger('change');
+            }
+
+            terms.subscribe(function (value) {
+                notifyValueChange(value);
+            });
+
+            tags.subscribe(function (value) {
+                notifyValueChange(value);
             });
 
             var searchbox = $(el).select2({
@@ -81,10 +91,13 @@ define([
                 }
             }).on('change', function(e, el) {
                 if (e.added) {
-                    selection.push(e.added);
+                    terms.push(e.added);
                 }
                 if (e.removed) {
-                    selection.remove(function(item) {
+                    terms.remove(function(item) {
+                        return item.id === e.removed.id && item.context_label === e.removed.context_label;
+                    });
+                    tags.remove(function(item) {
                         return item.id === e.removed.id && item.context_label === e.removed.context_label;
                     });
                 }
@@ -100,10 +113,10 @@ define([
 
                 selectedTerm.inverted(!selectedTerm.inverted());
                 
-                //selection(terms);
+                //terms(terms);
 
             });
-            searchbox.select2('data', ko.unwrap(selection)).trigger('change');            
+            searchbox.select2('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');            
         }
     };
 

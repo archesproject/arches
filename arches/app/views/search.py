@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from datetime import date
+
+from dateutil import parser
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -83,23 +84,25 @@ def build_search_terms_dsl(request):
 
     return query
 
+
 def search_results(request):
     dsl = build_search_results_dsl(request)
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    all_entity_ids = ['_all']
+    all_result_ids = []
     if request.GET.get('include_ids', 'false') == 'false':
-        all_entity_ids = ['_none']
-    elif request.GET.get('no_filters', '') == '':
-        full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
-        all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
+        all_result_ids = ['_none']
+    full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
+    all_result_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-    paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
+    paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_result_ids)
     page = paginator.page(page)
 
     ret = {}
     ret['results'] = results
+    ret['all_result_ids'] = all_result_ids
+
     ret['paginator'] = JSONSerializer().serializeToPython(page)
     ret['paginator']['has_next'] = page.has_next()
     ret['paginator']['has_previous'] = page.has_previous()
@@ -142,7 +145,7 @@ def get_paginator(request, results, total_count, page, count_per_page, all_ids):
         # if len(after) > ct_after:
         #     after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = [page for page in paginator.page_range]
-
+    print paginator.page_range, pages
     return paginator, pages
 
     return render(request, 'pagination.htm', {
@@ -214,23 +217,33 @@ def build_search_results_dsl(request):
             else:
                 boolfilter.must(geoshape)
 
-    if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
-        start_date = date(temporal_filter['year_min_max'][0], 1, 1)
-        end_date = date(temporal_filter['year_min_max'][1], 12, 31)
-        if start_date:
+    if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
+        start_date = None
+        end_date = None
+        try:
+            start_date = parser.parse(temporal_filter['fromDate'])
             start_date = start_date.isoformat()
-        if end_date:
+        except:
+            pass
+        try:
+            end_date = parser.parse(temporal_filter['toDate'])
             end_date = end_date.isoformat()
-        range = Range(field='dates.value', gte=start_date, lte=end_date)
-        nested = Nested(path='dates', query=range)
+        except:
+            pass
+
+        if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+            range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
+            time_query_dsl = Nested(path='tiles', query=range)
+        else:
+            time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
-            boolfilter.must_not(nested)
+            boolfilter.must_not(time_query_dsl)
         else:
-            boolfilter.must(nested)
+            boolfilter.must(time_query_dsl)
 
     if not boolquery.empty:
         query.add_query(boolquery)
