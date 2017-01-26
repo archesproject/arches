@@ -17,9 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import sys
+import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.models import GraphXMapping
 from django.db import transaction
 
 class GraphImportReporter:
@@ -94,3 +96,11 @@ def import_graph(graphs):
                     reporter.update_reports_saved()
 
         return errors, reporter
+
+def import_mapping_file(mapping_file):
+    resource_model_id = mapping_file['resource_model_id']
+    mapping = mapping_file
+
+    GraphXMapping.objects.update_or_create(
+        graph_id=uuid.UUID(str(resource_model_id)),
+        mapping=mapping)

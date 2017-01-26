@@ -28,6 +28,7 @@ from arches.db.install import truncate_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
+import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
@@ -52,7 +53,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_csv', 'import_business_data', 'add_mapbox_layer',],
+            'create_mapping_file', 'import_csv', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -153,6 +154,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'])
+
+        if options['operation'] == 'import_mapping_file':
+            self.import_mapping_file(options['source'])
 
         if options['operation'] == 'export_json':
             self.export_json(options['dest_dir'], options['graphs'], options['resources'])
@@ -533,3 +537,21 @@ class Command(BaseCommand):
             graph = [x.strip(' ') for x in graphs.split(",")]
 
         graph_exporter.create_mapping_configuration_file(graphs, dest_dir)
+
+    def import_mapping_file(self, source=None):
+        """
+        Imports export mapping files for resource models.
+        """
+        if source == '':
+            print '*'*80
+            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
+            print '*'*80
+
+        if isinstance(source, basestring):
+            source = [source]
+
+        for path in source:
+            if os.path.isfile(os.path.join(path)):
+                with open(path, 'rU') as f:
+                    mapping_file = json.load(f)
+                    graph_importer.import_mapping_file(mapping_file)

@@ -658,3 +658,12 @@ class TileserverLayers(models.Model):
     class Meta:
         managed = True
         db_table = 'tileserver_layers'
+
+class GraphXMapping(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    graph = models.ForeignKey('GraphModel', db_column='graphid')
+    mapping = JSONField(blank=True, null=False)
+
+    class Meta:
+        managed = True
+        db_table = 'graphs_x_mapping_file'
