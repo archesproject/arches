@@ -31,7 +31,10 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from django.forms.models import model_to_dict
+from arches.app.views.concept import get_preflabel_from_valueid
+
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -155,9 +158,9 @@ class ResourceReportView(BaseManagerView):
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        # start = request.GET.get('start', 0)
-        return JSONResponse(self.get_related_resources(), indent=4)
-        # return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
+        start = request.GET.get('start', 0)
+        # return JSONResponse(self.get_related_resources(), indent=4)
+        return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
 
     def delete(self, request, resourceid=None):
         se = SearchEngineFactory().create()
@@ -185,49 +188,32 @@ class RelatedResourcesView(BaseManagerView):
                 relationshiptype = models.Value('cb51db61-bbdd-4480-93b6-f5abe9c84d4b')
             )
             document = model_to_dict(rr)
-            # {
-            #     'dateended': rr.dateended,
-            #     'datestarted': rr.datestarted,
-            #     'notes': rr.notes,
-            #     'relationshiptype': rr.relationshiptype.value,
-            #     'resourceinstanceidfrom':rr.resourceinstanceidfrom.resourceinstanceid,
-            #     'resourceinstanceidto':rr.resourceinstanceidto.resourceinstanceid,
-            #     'resourcexid':rr.resourcexid
-            #  }
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         return JSONResponse({ 'success': True })
 
-    def get_related_resources(self):
+    def get_related_resources(self, resourceid, lang, limit=1000, start=0):
         ret = {
             'resource_relationships': [],
             'related_resources': []
         }
+        se = SearchEngineFactory().create()
+        query = Query(se, limit=limit, start=start)
+        query.add_filter(Terms(field='resourceinstanceidfrom', terms=resourceid).dsl, operator='or')
+        query.add_filter(Terms(field='resourceinstanceidto', terms=resourceid).dsl, operator='or')
+        resource_relations = query.search(index='resource_relations', doc_type='all')
+        ret['total'] = resource_relations['hits']['total']
+        instanceids = set()
+        for relation in resource_relations['hits']['hits']:
+            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            ret['resource_relationships'].append(relation['_source'])
+            instanceids.add(relation['_source']['resourceinstanceidto'])
+            instanceids.add(relation['_source']['resourceinstanceidfrom'])
+        if len(instanceids) > 0:
+            instanceids.remove(resourceid)
 
-    # def get_related_resources(self, resourceid, lang, limit=1000, start=0):
-    #     ret = {
-    #         'resource_relationships': [],
-    #         'related_resources': []
-    #     }
-        # se = SearchEngineFactory().create()
-        #
-        # query = Query(se, limit=limit, start=start)
-        # query.add_filter(Terms(field='entityid1', terms=resourceid).dsl, operator='or')
-        # query.add_filter(Terms(field='entityid2', terms=resourceid).dsl, operator='or')
-        # resource_relations = query.search(index='resource_relations', doc_type='all')
-        # ret['total'] = resource_relations['hits']['total']
-        #
-        # entityids = set()
-        # for relation in resource_relations['hits']['hits']:
-        #     relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
-        #     ret['resource_relationships'].append(relation['_source'])
-        #     entityids.add(relation['_source']['entityid1'])
-        #     entityids.add(relation['_source']['entityid2'])
-        # if len(entityids) > 0:
-        #     entityids.remove(resourceid)
-        #
-        # related_resources = se.search(index='entity', doc_type='_all', id=list(entityids))
-        # if related_resources:
-        #     for resource in related_resources['docs']:
-        #         ret['related_resources'].append(resource['_source'])
+        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
+        if related_resources:
+            for resource in related_resources['docs']:
+                ret['related_resources'].append(resource['_source'])
 
         return ret

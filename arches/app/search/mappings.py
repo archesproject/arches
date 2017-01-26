@@ -175,8 +175,8 @@ def prepare_resource_relations_index(create=False):
                     'resourcexid': {'type': 'string', 'index' : 'not_analyzed'},
                     'notes': { 'type': 'string'},
                     'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
-                    'entityid2': {'type': 'string', 'index' : 'not_analyzed'},
-                    'entityid1': {'type': 'string', 'index' : 'not_analyzed'}
+                    'resourceinstanceidfrom': {'type': 'string', 'index' : 'not_analyzed'},
+                    'resourceinstanceidto': {'type': 'string', 'index' : 'not_analyzed'}
                 }
             }
         }
