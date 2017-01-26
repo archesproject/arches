@@ -1,15 +1,15 @@
-define(['jquery', 
+define(['jquery',
     'underscore',
     'backbone',
     'bootstrap',
-    'arches', 
+    'arches',
     'select2',
     'knockout',
     'knockout-mapping',
     'views/related-resources-graph',
     'view-data',
     'bootstrap-datetimepicker',
-    'plugins/knockout-select2'], 
+    'plugins/knockout-select2'],
     function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, RelatedResourcesGraph, viewdata) {
 
         return Backbone.View.extend({
@@ -21,16 +21,26 @@ define(['jquery',
                 'mouseout .arches-search-item': 'itemMouseout'
             },
 
-            initialize: function(options) { 
+            initialize: function(options) {
                 var self = this;
                 _.extend(this, options);
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
+                this.all_result_ids = ko.observableArray();
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
                 this.userRequestedNewPage = ko.observable(false);
+                self.mouseoverInstanceId = ko.observable();
+            },
+
+            mouseoverInstance: function(resourceinstance) {
+                var self = this;
+                return function(resourceinstance){
+                    var resourceinstanceid = resourceinstance.resourceinstanceid || ''
+                    self.mouseoverInstanceId(resourceinstanceid);
+                }
             },
 
             showRelatedResouresGraph: function (e) {
@@ -53,11 +63,11 @@ define(['jquery',
                 graphPanel.slideToggle(500);
             },
 
-            newPage: function(page, e){  
+            newPage: function(page, e){
                 if(page){
                     this.userRequestedNewPage(true);
                     this.page(page);
-                }       
+                }
             },
 
             updateResults: function(response){
@@ -65,11 +75,13 @@ define(['jquery',
                 koMapping.fromJS(response.paginator, this.paginator);
                 this.showPaginator(true);
                 var data = $('div[name="search-result-data"]').data();
-                
+
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
                 
+                this.all_result_ids.removeAll();
+                this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";
 
@@ -82,7 +94,8 @@ define(['jquery',
                         resourceinstanceid: result._source.resourceinstanceid,
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
-                        iconclass: graphdata ? graphdata.iconclass : ''
+                        iconclass: graphdata ? graphdata.iconclass : '',
+                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid)
                     });
                 }, this);
 
@@ -106,10 +119,10 @@ define(['jquery',
             itemMouseover: function(evt){
                 if(this.currentTarget !== evt.currentTarget){
                     var data = $(evt.currentTarget).data();
-                    this.trigger('mouseover', data.resourceid);    
-                    this.currentTarget = evt.currentTarget;              
+                    this.trigger('mouseover', data.resourceid);
+                    this.currentTarget = evt.currentTarget;
                 }
-                return false;    
+                return false;
             },
 
             itemMouseout: function(evt){
@@ -120,7 +133,7 @@ define(['jquery',
 
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
-                this.trigger('find_on_map', data.resourceid, data);   
+                this.trigger('find_on_map', data.resourceid, data);
             }
 
         });

@@ -40,6 +40,7 @@ def get_tileserver_config():
                                         graphid::text,
                                         node_name,
                                         graph_name,
+                                        false AS poly_outline,
                                         geom AS __geometry__,
                                         row_number() over () as __id__
                                     FROM vw_getgeoms
@@ -50,6 +51,7 @@ def get_tileserver_config():
                                         graphid::text,
                                         node_name,
                                         graph_name,
+                                        true AS poly_outline,
                                         ST_ExteriorRing(geom) AS __geometry__,
                                         row_number() over () as __id__
                                     FROM vw_getgeoms
