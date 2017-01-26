@@ -30,7 +30,7 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
-
+                this.userRequestedNewPage = ko.observable(false);
             },
 
             showRelatedResouresGraph: function (e) {
@@ -55,6 +55,7 @@ define(['jquery',
 
             newPage: function(page, e){  
                 if(page){
+                    this.userRequestedNewPage(true);
                     this.page(page);
                 }       
             },
@@ -67,6 +68,7 @@ define(['jquery',
                 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
+                this.userRequestedNewPage(false);
                 
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";

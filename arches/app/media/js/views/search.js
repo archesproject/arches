@@ -13,8 +13,29 @@ require([
     'views/base-manager'
 ], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, SearchResults, BaseManagerView) {
 
+    // a method to track the old and new values of a subscribable
+    // from https://github.com/knockout/knockout/issues/914
+    //
+    // use case:
+    // var sub1 = this.FirstName.subscribeChanged(function (newValue, oldValue) {
+    //     this.NewValue1(newValue);
+    //     this.OldValue1(oldValue);
+    // }, this);
+
+    ko.subscribable.fn.subscribeChanged = function (callback, context) {
+        var savedValue = this.peek();
+        return this.subscribe(function (latestValue) {
+            var oldValue = savedValue;
+            savedValue = latestValue;
+            callback.call(context, latestValue, oldValue);
+        });
+    };
+
+
+
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
+            this.isNewQuery = true;
             this.viewModel.resultsExpanded = ko.observable(true);
             
             this.filters = {};
@@ -42,50 +63,53 @@ require([
             this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
-            this.isNewQuery = true;
-            this.pageChanged = false;
-
-            this.viewModel.searchResults.page.subscribe(function(){
-                this.pageChanged = true;
-            }, this)
-
             this.queryString = ko.computed(function() {
-                var params = {
-                    page: this.viewModel.searchResults.page(),
-                    include_ids: this.isNewQuery,
-                    no_filters: true
-                };
-                _.each(this.filters, function (filter) {
-                    var filtersAdded = filter.appendFilters(params);
-                    if (filtersAdded) {
-                        params.no_filters = false;
-                    }
-                });
-                return $.param(params).split('+').join('%20');
-            }, this).extend({ deferred: true });
+                // we used to loop through all the filters but 
+                // that caused this computed to be triggered multiple times
+                var params = {};
+                
+                this.filters.termFilter.appendFilters(params);
+                this.filters.timeFilter.appendFilters(params);
+                this.filters.resourceTypeFilter.appendFilters(params);
+                this.filters.mapFilter.appendFilters(params);
 
-            this.filters.termFilter.filter.terms.subscribe(function(terms){
-                _.each(this.filters, function(filter){
-                    if(filter.name !== 'Term Filter'){
-                        var found = _.find(terms, function(term){
-                           return filter.name === term.type;
+                params.no_filters = !Object.keys(params).length;
+                return params;
+            }, this);
+
+            this.filters.termFilter.filter.tags.subscribe(function(tags){
+                _.each(tags, function(tag){
+                    if(tag.status === 'deleted'){
+                        var found = _.find(this.filters.termFilter.filter.tags, function(currentTag){
+                           return tag.value.type === currentTag.type;
                         }, this)
                         if(!found){
-                            filter.clear();
+                            _.each(this.filters, function(filter){
+                                if(filter.name === tag.value.type){
+                                    filter.clear();
+                                }
+                            }, this);
                         }
+                        
                     }
-                }, this);
-            }, this);
+                }, this)
+            }, this, "arrayChange");
 
             this.restoreState();
 
-            this.queryString.subscribe(function() {
-                if(this.pageChanged){
-                    this.pageChanged = false;
-                }else{
-                    this.viewModel.searchResults.page(1);
-                    this.isNewQuery = true;
+            this.viewModel.searchResults.page.subscribe(function(){
+                if(this.viewModel.searchResults.userRequestedNewPage()){
+                    this.isNewQuery = false;
+                    this.viewModel.searchResults.userRequestedNewPage(false);
+                    console.log('user requested new page')
+                    this.doQuery();
                 }
+            }, this)
+
+            this.queryString.subscribe(function() {
+                console.log('user updated a filter')
+                this.isNewQuery = true;
+                this.viewModel.searchResults.page(1);
                 this.doQuery();
             }, this);
 
@@ -93,13 +117,15 @@ require([
         },
 
         doQuery: function() {
+            console.log('in doQuery');
             var queryString = this.queryString();
-            // if (this.updateRequest) {
-            //     this.updateRequest.abort();
-            // }
+            queryString.page = this.viewModel.searchResults.page();
+            queryString.include_ids = this.isNewQuery;
+            if (this.updateRequest) {
+                this.updateRequest.abort();
+            }
 
             this.viewModel.loading(true);
-            window.history.pushState({}, '', '?' + queryString);
 
             this.updateRequest = $.ajax({
                 type: "GET",
@@ -108,14 +134,17 @@ require([
                 context: this,
                 success: function(response) {
                     var data = this.viewModel.searchResults.updateResults(response);
-                    this.isNewQuery = false;
+                    //this.isNewQuery = true;
                 },
                 error: function(response, status, error) {
-                    this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                    if(this.updateRequest.statusText !== 'abort'){
+                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                    }
                 },
                 complete: function(request, status) {
                     this.viewModel.loading(false);
                     this.updateRequest = undefined;
+                    window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }
             });
         },
