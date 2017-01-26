@@ -26,6 +26,8 @@ from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+# these tests can be run from the command line via
+# python manage.py test tests/views/graph_manager_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 class GraphManagerViewTests(ArchesTestCase):
 

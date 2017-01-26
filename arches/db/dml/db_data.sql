@@ -3409,7 +3409,21 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            },
            "filter": ["all", ["==", "$type", "Polygon"]],
            "paint": {
-               "fill-color": "rgba(251, 96, 23, 0.5)"
+               "fill-color": "rgba(130, 130, 130, 0.5)"
+           }
+       },
+       {
+           "id": "resources-line-halo",
+           "type": "line",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "paint": {
+               "line-width": 3,
+               "line-color": "rgba(200, 200, 200, .55)"
            }
        },
        {
@@ -3420,9 +3434,38 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
            "paint": {
-               "line-color": "rgba(251, 96, 23, 1)"
+               "line-width": 1,
+               "line-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-poly-outline",
+           "type": "line",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true]],
+           "paint": {
+               "line-width": 1.5,
+               "line-color": "rgba(200, 200, 200, 1)"
+           }
+       },
+       {
+           "id": "resources-point-halo",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"]],
+           "paint": {
+               "circle-radius": 5,
+               "circle-color": "rgba(200, 200, 200, 1)"
            }
        },
        {
@@ -3435,8 +3478,8 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            },
            "filter": ["all", ["==", "$type", "Point"]],
            "paint": {
-               "circle-radius": 5,
-               "circle-color": "rgba(251, 96, 23, 1)"
+               "circle-radius": 3,
+               "circle-color": "rgba(130, 130, 130, 1)"
            }
        }
    ]', TRUE, 'fa fa-globe');

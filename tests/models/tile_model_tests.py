@@ -31,7 +31,7 @@ from arches.app.models import models
 
 
 # these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 class TileTests(ArchesTestCase):
 
