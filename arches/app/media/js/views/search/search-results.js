@@ -31,6 +31,7 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
+                this.userRequestedNewPage = ko.observable(false);
                 self.mouseoverInstanceId = ko.observable();
             },
 
@@ -64,6 +65,7 @@ define(['jquery',
 
             newPage: function(page, e){
                 if(page){
+                    this.userRequestedNewPage(true);
                     this.page(page);
                 }
             },
@@ -76,6 +78,8 @@ define(['jquery',
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
+                this.userRequestedNewPage(false);
+                
                 this.all_result_ids.removeAll();
                 this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
