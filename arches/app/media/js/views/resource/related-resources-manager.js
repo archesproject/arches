@@ -11,13 +11,13 @@ define([
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.context = options.context;
-            this.relationshipCandidates = ko.observableArray()
             this.showRelatedProperties = ko.observable(false);
             this.searchResults.showRelationships.subscribe(function(val){
                 self.showRelatedResourcesGrid(val);
             })
             this.currentResource = ko.observable(this.editingInstanceId)
         },
+
         showRelatedResourcesGraph: function(e) {
             var resourceId = $(e.target).data('resourceid');
             var primaryName = $(e.target).data('primaryname');
@@ -37,20 +37,27 @@ define([
             $(e.target).closest('li').toggleClass('graph-active');
             graphPanel.slideToggle(500);
         },
+
         showRelatedResourcesGrid: function(resourceinstance) {
             this.currentResource(resourceinstance.resourceinstanceid);
         },
-        addRelationCandidate: function(resourceinstance) {
-            this.relationshipCandidates.push(resourceinstance);
-        },
+
         saveRelationships: function() {
-            // this.relationshipCandidates(_.pluck(this.searchResults.results(), 'resourceinstanceid'));
+            var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
             var root_resourceinstanceid = this.currentResource();
-            var instances_to_relate = this.relationshipCandidates();
+            var self = this;
+            var clearCandidates = function(self) {
+                return function(data){
+                    console.log(data);
+                    self.searchResults.relationshipCandidates.removeAll();
+                };
+            }
+            var successFunction = clearCandidates(self);
+
             //TODO Create a resource_x_resource model rather than calling jQuery here
             var payload = {
                 relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
-                instances_to_relate: instances_to_relate,
+                instances_to_relate: candidateIds,
                 root_resourceinstanceid: root_resourceinstanceid
             }
             $.ajax({
@@ -59,9 +66,7 @@ define([
                 type: 'POST',
                 dataType: 'json'
             })
-            .done(function(data) {
-                console.log('success', data);
-            })
+            .done(successFunction)
             .fail(function(data){
                 console.log('failed', data)
             });

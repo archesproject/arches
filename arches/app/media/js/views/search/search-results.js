@@ -29,8 +29,9 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
-                this.showRelationships: ko.observable();
-                self.mouseoverInstanceId = ko.observable();
+                this.showRelationships = ko.observable();
+                this.mouseoverInstanceId = ko.observable();
+                this.relationshipCandidates = ko.observableArray();
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -51,6 +52,18 @@ define(['jquery',
                 var self = this;
                 return function(resourceinstanceid){
                     self.showRelationships(resourceinstanceid)
+                }
+            },
+
+            toggleRelationshipCandidacy: function(resourceinstanceid) {
+                var self = this;
+                return function(resourceinstanceid){
+                    var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid)
+                    if (candidate) {
+                        self.relationshipCandidates.remove(resourceinstanceid)
+                    } else {
+                        self.relationshipCandidates.push(resourceinstanceid)
+                    }
                 }
             },
 
@@ -84,7 +97,8 @@ define(['jquery',
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid)
+                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
+                        relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid)
                     });
                 }, this);
 

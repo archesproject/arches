@@ -30,6 +30,8 @@ from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.forms.models import model_to_dict
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -170,6 +172,7 @@ class RelatedResourcesView(BaseManagerView):
         return JSONResponse({ 'success': True })
 
     def post(self, request, resourceid=None):
+        se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationshiptype = res['relationship_type']
         root_resourceinstanceid = res['root_resourceinstanceid']
@@ -181,6 +184,19 @@ class RelatedResourcesView(BaseManagerView):
                 notes = 'testing',
                 relationshiptype = models.Value('cb51db61-bbdd-4480-93b6-f5abe9c84d4b')
             )
+            print rr.relationshiptype.valueid, 'value'
+            document = {
+                'dateended': rr.dateended,
+                'datestarted': rr.datestarted,
+                'notes': rr.notes,
+                'relationshiptype': rr.relationshiptype.value,
+                'resourceinstanceidfrom':rr.resourceinstanceidfrom.resourceinstanceid,
+                'resourceinstanceidto':rr.resourceinstanceidto.resourceinstanceid,
+                'resourcexid':rr.resourcexid
+             }
+
+            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+
         return JSONResponse({ 'success': True })
 
     def get_related_resources(self):

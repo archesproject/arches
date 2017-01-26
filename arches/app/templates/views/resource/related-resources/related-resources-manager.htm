@@ -125,7 +125,7 @@
 
         <!-- ko if: context == 'resource-editor' -->
         <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
-            <!-- ko foreach: { data: relationshipCandidates, as: 'candidate' } -->
+            <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
             <div class="rr-grid-item" data-bind="">
                 <div class="rr-listing">
                     <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>

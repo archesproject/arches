@@ -160,3 +160,34 @@ def prepare_search_index(resource_model_id, create=False):
 def delete_search_index():
     se = SearchEngineFactory().create()
     se.delete_index(index='resource')
+
+
+def prepare_resource_relations_index(create=False):
+    """
+    Creates the settings and mappings in Elasticsearch to support related resources
+
+    """
+
+    index_settings = {
+        'mappings':{
+            'all': {
+                'properties': {
+                    'resourcexid': {'type': 'string', 'index' : 'not_analyzed'},
+                    'notes': { 'type': 'string'},
+                    'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
+                    'entityid2': {'type': 'string', 'index' : 'not_analyzed'},
+                    'entityid1': {'type': 'string', 'index' : 'not_analyzed'}
+                }
+            }
+        }
+    }
+
+    if create:
+        se = SearchEngineFactory().create()
+        se.create_index(index='resource_relations', body=index_settings, ignore=400)
+
+    return index_settings
+
+def delete_resource_relations_index():
+    se = SearchEngineFactory().create()
+    se.delete_index(index='resource_relations')
