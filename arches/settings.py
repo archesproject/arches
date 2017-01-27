@@ -20,7 +20,7 @@ import os
 import inspect
 # Django settings for Arches project.
 
-MODE = 'DEV' #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
+MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
 
