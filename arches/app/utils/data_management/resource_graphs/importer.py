@@ -95,6 +95,16 @@ def import_graph(graphs):
                     report = Report.objects.update_or_create(**report)
                     reporter.update_reports_saved()
 
+            # try/except block here until all graphs have a resource_2_resource_constraints object.
+            try:
+                if not hasattr(graph, 'resource_2_resource_constraints'):
+                    errors.append('{0} graph has no attribute resource_2_resource_constraints'.format(graph.resource_2_resource_constraints))
+                else:
+                    for resource_2_resource_constraint in graph.resource_2_resource_constraints:
+                        resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
+            else:
+                pass
+
         return errors, reporter
 
 def import_mapping_file(mapping_file):

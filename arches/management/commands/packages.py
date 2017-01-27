@@ -380,15 +380,6 @@ class Command(BaseCommand):
         """
         Exports resources to specified format.
         """
-    #     resource_exporter = ResourceExporter('json')
-    #     resource_exporter.export(search_results=False, dest_dir=data_dest)
-    #     related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
-    #     relations_file = os.path.splitext(data_dest)[0] + '.relations'
-    #     with open(relations_file, 'w') as f:
-    #         csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
-    #         csvwriter.writeheader()
-    #         for csv_record in related_resources:
-    #             csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
 
         resource_exporter = ResourceExporter(file_format)
         resource_exporter.export(resources=resources, configs=config_file)
