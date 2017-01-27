@@ -230,7 +230,7 @@ def import_business_data(business_data, mapping=None):
                                 need_new_tile = False
                                 target_tile_cardinality = target_nodegroup_cardinalities[str(target_tile.nodegroup_id)]
                                 if str(target_tile.nodegroup_id) not in populated_nodegroups:
-                                    if target_tile.data != None:
+                                    if target_tile.data != {}:
                                         for source_tile in sourcetilegroup:
                                             for tiledata in source_tile['data']:
                                                 for nodeid in tiledata.keys():

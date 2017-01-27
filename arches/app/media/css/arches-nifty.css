@@ -84,11 +84,20 @@
 
 
 .navbar-top-links>.mega-dropdown>.dropdown-menu.mega-dropdown-menu {
-    left: 50px;
+    left: 0px;
     max-width: 100%;
     top: 39px;
     right: -10px;
     height: 100vh;
+}
+
+/*Remove pointer from Mega drop panel button*/
+.open.mega-dropdown>.mega-dropdown-toggle:before {
+    display: none;
+}
+
+.open.mega-dropdown>.mega-dropdown-toggle:after {
+    display: none;
 }
 
 
@@ -3206,7 +3215,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-menu-editor {
     position: absolute;
-    top: -1px;
+    top: 49px;
     left: 0px;
     bottom: 0;
     border: 1px solid #ddd;
@@ -3245,6 +3254,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools {
     cursor: pointer;
     border-right: 1px solid #ddd;
+    border-bottom: 1px solid transparent;
     height: 50px;
     display: -ms-flexbox;
     display: -webkit-flex;
@@ -3258,6 +3268,7 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-tools:hover {
     background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
 }
 
 .navbar-top-links>li>a.navbar-button {
@@ -5206,7 +5217,7 @@ span.basemap-unselected {
 }
 
 .map-draw-tools-item {
-    width: 248px;
+    width: 249px;
     height: 50px;
     padding: 7px;
     background: #fbfbfb;
@@ -5229,7 +5240,6 @@ span.basemap-unselected {
 
 .map-draw-tools-item.map-draw-tools-active:hover {
   background-color: #fff;
-  cursor: default;
 }
 
 .map-draw-tools-item:hover {
@@ -5450,6 +5460,17 @@ span.basemap-unselected {
 
 /* Hide "Full Screen" button for map tools widget in card manager */
 .widget-preview div div div div span .toggle-map-size {
+    display: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.map-filter-panel div div div div span .toggle-map-size {
     display: none;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */
@@ -5726,6 +5747,12 @@ span.basemap-unselected {
 	padding-left: 5px;
 }
 
+.calendar div .form-control[disabled] {
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    color: #777;
+}
+
 .datepicker-inline {
 	background: #fff;
 	border-width: 0px;
@@ -5863,6 +5890,48 @@ span.basemap-unselected {
 .data-entry-container {
 	width: calc(100% - 810px);
 	background: #ebeef0;
+}
+
+.time-wheel-wrap {
+  float: left;
+  width: 750px;
+  margin-top: 25px;
+}
+
+.time-wheel-wrap .sequence {
+  width: 600px;
+  height: 50px;
+}
+
+.time-wheel-wrap .sequence text {
+  font-weight: 600;
+  fill: #123;
+}
+
+.time-wheel-wrap .chart {
+  position: relative;
+}
+
+.time-wheel-wrap .chart path {
+  stroke: #fff;
+}
+
+.time-wheel-wrap .trail {
+	height: 30px;
+}
+
+.time-wheel-wrap .explanation {
+  position: absolute;
+  top: 260px;
+  left: 305px;
+  width: 140px;
+  text-align: center;
+  color: #666;
+  z-index: 1;
+}
+
+.time-wheel-wrap .percentage {
+  font-size: 2.5em;
 }
 
 @keyframes loader {

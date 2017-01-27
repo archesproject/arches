@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Match, Query
+from arches.app.search.elasticsearch_dsl_builder import Term, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
@@ -493,19 +493,25 @@ class Concept(object):
 
     def delete_index(self, delete_self=False):
 
-        def deleteconcepts(concepts_to_delete):
-            for key, concept in concepts_to_delete.iteritems():
+        def delete_concept_values_index(concepts_to_delete):
+            se = SearchEngineFactory().create()
+            for concept in concepts_to_delete.itervalues():
+                query = Query(se, start=0, limit=10000)
+                term = Term(field='conceptid', term=concept.id)
+                query.add_query(term)
+                query.delete(index='concept_labels')
                 for conceptvalue in concept.values:
-                    conceptvalue.delete_index()
+                    se.delete_terms(conceptvalue.id)
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
-            deleteconcepts(concepts_to_delete)
+            delete_concept_values_index(concepts_to_delete)
 
         else:
+            delete_concept_values_index({self.id: self})
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
-                deleteconcepts(concepts_to_delete)
+                delete_concept_values_index(concepts_to_delete)
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
         class concept(object):
@@ -672,19 +678,20 @@ class Concept(object):
             return self
 
     def check_if_concept_in_use(self):
-        """Checks  if a concept or any of its subconcepts is in use by a resource"""
+        """Checks  if a concept or any of its subconcepts is in use by a resource instance"""
 
         in_use = False
+        cursor = connection.cursor()
         for value in self.values:
-            try:
-                recs = models.Domains.objects.filter(val=value.id)
-                if len(recs) > 0:
-                    in_use = True
-                    break
-                else:
-                    pass
-            except Exception, e:
-                print e
+            sql = """
+                SELECT count(*) from tiles t, jsonb_each_text(t.tiledata) as json_data
+                WHERE json_data.value = '%s'
+            """ % value.id
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            if rows[0][0] > 0:
+                in_use = True
+                break
         if in_use != True:
             for subconcept in self.subconcepts:
                 in_use = subconcept.check_if_concept_in_use()
@@ -905,6 +912,9 @@ class ConceptValue(object):
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
 
             se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
+            se.create_mapping('concept_labels', scheme.id, fieldname='id', fieldtype='string', fieldindex='not_analyzed')
+            se.create_mapping('concept_labels', scheme.id, fieldname='type', fieldtype='string', fieldindex='not_analyzed')
+            se.create_mapping('concept_labels', scheme.id, fieldname='category', fieldtype='string', fieldindex='not_analyzed')
             se.index_data('concept_labels', scheme.id, data, 'id')
             # don't create terms for entity type concepts
             if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
@@ -913,8 +923,8 @@ class ConceptValue(object):
     def delete_index(self):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
-        phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
-        query.add_query(phrase)
+        term = Term(field='id', term=self.id)
+        query.add_query(term)
         query.delete(index='concept_labels')
         se.delete_terms(self.id)
 

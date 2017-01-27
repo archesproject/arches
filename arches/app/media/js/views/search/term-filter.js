@@ -11,6 +11,7 @@ define([
             this.name = 'Term Filter';
 
             this.filter.terms = ko.observableArray();
+            this.filter.tags = ko.observableArray();
         },
 
         restoreState: function(query) {
@@ -42,11 +43,12 @@ define([
                 filterParams.termFilter = ko.toJSON(terms);
             }
 
+            console.log(terms.length);
             return terms.length > 0;
         },
 
         addTag: function(term, type, inverted){
-            this.filter.terms.unshift({
+            this.filter.tags.unshift({
                 inverted: inverted,
                 type: type,
                 context: '',
@@ -58,7 +60,7 @@ define([
         },
 
         removeTag: function(term){
-            this.filter.terms.remove(function(term_item){
+            this.filter.tags.remove(function(term_item){
                 return term_item.id == term && term_item.text == term && term_item.value == term;
             });
         },

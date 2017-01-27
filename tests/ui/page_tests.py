@@ -1,5 +1,9 @@
 # initially from
 # https://github.com/Victory/django-travis-saucelabs/blob/master/mysite/saucetests/tests.py
+
+# these tests can be run from the command line via
+# python manage.py test tests/ui/page_tests.py --pattern="*.py" --settings="tests.test_settings"
+
 import os
 import sys
 import uuid
@@ -214,7 +218,7 @@ class UITest(StaticLiveServerTestCase):
             uuid.UUID(form_id)
         except:
             form_id_is_valid = False
-        form_page.configure_form("Form A")
+        form_page.configure_form("FormA")
 
         self.assertTrue(form_id_is_valid)
 
@@ -258,7 +262,7 @@ class UITest(StaticLiveServerTestCase):
             if v != True:
                 map_tools_working = False
         print 'map tools results in report manager', results
-        report_editor_page.save_report("Report A")
+        report_editor_page.save_report("ReportA")
 
         self.assertTrue(map_tools_working)
 
@@ -281,7 +285,7 @@ class UITest(StaticLiveServerTestCase):
         #Navigate to the report manager and click on the correspoding card for the node created above
         form_page = FormPage(self.driver, self.live_server_url, resource_graph_id)
         form_id = form_page.add_new_form()
-        form_page.configure_form("Form B")
+        form_page.configure_form("FormB")
 
         report_manager_page = ReportManagerPage(self.driver, self.live_server_url, resource_graph_id)
         report_id = report_manager_page.add_new_report()
@@ -291,7 +295,7 @@ class UITest(StaticLiveServerTestCase):
         map_widget = report_editor_page.add_widget(MapWidget)
         map_widget.open_tools()
         map_widget.add_overlay(2)
-        report_editor_page.save_report("Report B")
+        report_editor_page.save_report("ReportB")
 
         resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
         resource_instance_id = resource_manager_page.add_new_resource()
