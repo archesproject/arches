@@ -1,10 +1,21 @@
 <div>
 <!--ko if: $data.relatedresourceslist -->
-  <div data-bind="with: relatedresourceslist.relatedList">
-      <div style="position: relative;" data-bind="foreach: {data: items, as: 'item'}">
-          <div data-bind="text: item.resourceinstanceidto"></div>
-      </div>
-  </div>
+<div data-bind="with: relatedresourceslist.relatedList">
+    <div style="position: relative;" data-bind="foreach: {data: items, as: 'item'}">
+        <div class="required-node-card" style="" data-bind="visible: item.filtered() == false, click: function(){item.selected(!item.selected())}">
+            <div class="required-node-card-item">
+                <div class="required-node-card-vis-toggle">
+                    <i data-bind="css: {'ion-checkmark-circled': item.selected}"></i>
+                </div>
+                <div class="required-node-card-main" style="">
+                    <a class="" style="" href="#">
+                      <span data-bind="text: item.resource.primaryname"></span>
+                   </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
  <!--/ko -->
 
  <!--ko ifnot: $data.relatedresourceslist -->

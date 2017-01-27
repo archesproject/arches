@@ -164,13 +164,10 @@ class RelatedResourcesView(BaseManagerView):
     def delete(self, request, resourceid=None):
         se = SearchEngineFactory().create()
         data = JSONDeserializer().deserialize(request.body)
-        entityid1 = data.get('entityid1')
-        entityid2 = data.get('entityid2')
         resourcexid = data.get('resourcexid')
-        realtionshiptype = data.get('realtionshiptype')
-        resource = Resource(entityid1)
-        resource.delete_resource_relationship(entityid2, realtionshiptype)
-        se.delete(index='resource_relations', doc_type='all', id=resourcexid)
+        print 'deleting', resourcexid
+        # ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
+        # se.delete(index='resource_relations', doc_type='all', id=resourcexid)
         return JSONResponse({ 'success': True })
 
     def post(self, request, resourceid=None):
