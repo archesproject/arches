@@ -27,7 +27,7 @@ def forwards_func(apps, schema_editor):
     # if we directly import it, it'll be the wrong version
 
     path_to_ontologies = os.path.join(settings.ROOT_DIR, *settings.ONTOLOGY_PATH)
-    extensions = settings.ONTOLOGY_EXT
+    extensions = [os.path.join(path_to_ontologies, x) for x in settings.ONTOLOGY_EXT]
     management.call_command('load_ontology', source=os.path.join(path_to_ontologies, settings.ONTOLOGY_BASE),
         version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions))
 
