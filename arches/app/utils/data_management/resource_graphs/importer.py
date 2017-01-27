@@ -102,7 +102,7 @@ def import_graph(graphs):
                 else:
                     for resource_2_resource_constraint in graph.resource_2_resource_constraints:
                         resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
-            else:
+            except:
                 pass
 
         return errors, reporter
