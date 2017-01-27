@@ -119,21 +119,6 @@ define(['jquery',
                 window.open(arches.urls.resource_editor + resourceinstance.resourceinstanceid);
             },
 
-            itemMouseover: function(evt){
-                if(this.currentTarget !== evt.currentTarget){
-                    var data = $(evt.currentTarget).data();
-                    this.trigger('mouseover', data.resourceid);
-                    this.currentTarget = evt.currentTarget;
-                }
-                return false;
-            },
-
-            itemMouseout: function(evt){
-                this.trigger('mouseout');
-                delete this.currentTarget;
-                return false;
-            },
-
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
                 this.trigger('find_on_map', data.resourceid, data);

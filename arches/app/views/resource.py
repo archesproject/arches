@@ -159,7 +159,6 @@ class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
-        # return JSONResponse(self.get_related_resources(), indent=4)
         return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
 
     def delete(self, request, resourceid=None):
@@ -189,7 +188,9 @@ class RelatedResourcesView(BaseManagerView):
             )
             document = model_to_dict(rr)
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
-        return JSONResponse({ 'success': True })
+
+        start = request.GET.get('start', 0)
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
 
     def get_related_resources(self, resourceid, lang, limit=1000, start=0):
         ret = {

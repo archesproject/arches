@@ -3,8 +3,8 @@ define([
     'backbone',
     'knockout',
     'arches',
-    'views/resource/related-resources-graph'
-], function($, Backbone, ko, arches, RelatedResourcesGraph) {
+    'views/resource/related-resources-list'
+], function($, Backbone, ko, arches, RelatedResourcesList) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -12,64 +12,84 @@ define([
             this.editingInstanceId = options.editing_instance_id;
             this.context = options.context;
             this.showRelatedProperties = ko.observable(false);
+            this.searchResults.relationshipCandidates.subscribe(function(changes) {
+               console.log(changes);
+            }, null, "arrayChange");
+            this.relatedresources = ko.observableArray()
+            this.relationships = ko.observableArray()
+            this.relatedresourceslist = new RelatedResourcesList({related:this.relatedresources, relationships:this.relationships});
+
+            this.createResource = function(resourceinstanceid) {
+              return {
+                resourceinstanceid: resourceinstanceid,
+                relatedresources: ko.observableArray(),
+                relationships: ko.observableArray(),
+                parse: function() {
+                    var self = this;
+                    return function(data) {
+                        self.relatedresources(data.related_resources);
+                        self.relationships(data.resource_relationships);
+                    }
+                },
+                getRelatedResources: function() {
+                    $.ajax({
+                        url: arches.urls.related_resources + resourceinstanceid,
+                        dataType: 'json'
+                    })
+                    .done(this.parse())
+                    .fail(function(data){console.log('failed', data)});
+                },
+                saveRelationships: function(candidateIds) {
+                    var root_resourceinstanceid = resourceinstanceid;
+                    var self = this;
+                    var payload = {
+                        relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
+                        instances_to_relate: candidateIds,
+                        root_resourceinstanceid: resourceinstanceid
+                    }
+                    $.ajax({
+                        url: arches.urls.related_resources,
+                        data: payload,
+                        type: 'POST',
+                        dataType: 'json'
+                    })
+                    .done(this.parse())
+                    .fail(function(data){
+                        console.log('failed', data)
+                    });
+                }};
+            };
+
+            this.currentResourceInstanceId = ko.observable(this.editingInstanceId)
+            this.currentResource = ko.observable(self.createResource(this.editingInstanceId));
             this.searchResults.showRelationships.subscribe(function(val){
+                self.currentResourceInstanceId(val.resourceinstanceid)
                 self.showRelatedResourcesGrid(val);
             })
-            this.currentResource = ko.observable(this.editingInstanceId)
+
+            this.currentResourceInstanceId.subscribe(function(val){
+                self.currentResource(self.createResource(val))
+            });
+
+            if (this.editingInstanceId) {
+                self.showRelatedResourcesGrid();
+            }
         },
 
-        showRelatedResourcesGraph: function(e) {
-            var resourceId = $(e.target).data('resourceid');
-            var primaryName = $(e.target).data('primaryname');
-            var typeId = $(e.target).data('entitytypeid');
-            var searchItem = $(e.target).closest('.arches-search-item');
-            var graphPanel = searchItem.find('.arches-related-resource-panel');
-            var nodeInfoPanel = graphPanel.find('.node_info');
-            if (!graphPanel.hasClass('view-created')) {
-                new RelatedResourcesGraph({
-                    el: graphPanel[0],
-                    resourceId: resourceId,
-                    resourceName: primaryName,
-                    resourceTypeId: typeId
-                });
-            }
-            nodeInfoPanel.hide();
-            $(e.target).closest('li').toggleClass('graph-active');
-            graphPanel.slideToggle(500);
+        saveRelationships: function(){
+            var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
+            var resource = this.currentResource()
+            resource.saveRelationships(candidateIds);
+            this.searchResults.relationshipCandidates.removeAll()
         },
 
         showRelatedResourcesGrid: function(resourceinstance) {
-            this.currentResource(resourceinstance.resourceinstanceid);
-        },
-
-        saveRelationships: function() {
-            var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
-            var root_resourceinstanceid = this.currentResource();
-            var self = this;
-            var clearCandidates = function(self) {
-                return function(data){
-                    console.log(data);
-                    self.searchResults.relationshipCandidates.removeAll();
-                };
-            }
-            var successFunction = clearCandidates(self);
-
-            //TODO Create a resource_x_resource model rather than calling jQuery here
-            var payload = {
-                relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
-                instances_to_relate: candidateIds,
-                root_resourceinstanceid: root_resourceinstanceid
-            }
-            $.ajax({
-                url: arches.urls.related_resources,
-                data: payload,
-                type: 'POST',
-                dataType: 'json'
-            })
-            .done(successFunction)
-            .fail(function(data){
-                console.log('failed', data)
-            });
+            var resource = this.currentResource();
+            var relatedresourceslist = ko.observable();
+            resource.getRelatedResources();
+            resource.relationships.subscribe(function(val){
+                this.relationships(val);
+            }, this)
         }
     });
 });
