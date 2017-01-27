@@ -26,16 +26,10 @@ def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
 
-    path_to_ontologies = os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
-    extensions = [
-        os.path.join(path_to_ontologies, 'CRMsci_v1.2.3.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMarchaeo_v1.4.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMgeo_v1.2.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMdig_v3.2.1.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMinf_v0.7.rdfs.xml')
-    ]
-    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'),
-        version='6.2', ontology_name='CIDOC CRM v6.2', id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions))
+    path_to_ontologies = os.path.join(settings.ROOT_DIR, *settings.ONTOLOGY_PATH)
+    extensions = settings.ONTOLOGY_EXT
+    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, settings.ONTOLOGY_BASE),
+        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions))
 
 def reverse_func(apps, schema_editor):
     Ontology = apps.get_model("models", "Ontology")

@@ -20,7 +20,7 @@ import os
 import inspect
 # Django settings for Arches project.
 
-MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
+MODE = 'DEV' #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -143,6 +143,20 @@ APP_NAME = 'Arches'
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
+
+ONTOLOGY_PATH = ['db', 'ontologies', 'cidoc_crm']
+ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
+ONTOLOGY_BASE_VERSION = '6.2'
+ONTOLOGY_BASE_NAME = 'CIDOC CRM v6.2'
+ONTOLOGY_BASE_ID = 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd'
+ONTOLOGY_EXT = [
+    'CRMsci_v1.2.3.rdfs.xml',
+    'CRMarchaeo_v1.4.rdfs.xml',
+    'CRMgeo_v1.2.rdfs.xml',
+    'CRMdig_v3.2.1.rdfs.xml',
+    'CRMinf_v0.7.rdfs.xml'
+]
+
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
