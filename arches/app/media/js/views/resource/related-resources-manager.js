@@ -8,6 +8,7 @@ define([
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
+            this.propertiesDialogOpen = ko.observable(false);
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.currentResource = ko.observable();

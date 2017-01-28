@@ -23,10 +23,10 @@
                 <div class="related-resources-relationship">
                     <ul class="" style="list-style: none;">
                         <li class="mega-dropdown related-reources-crud-link">
-                            <a href="#" class="mega-dropdown-toggle" data-toggle="dropdown">
+                            <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
                                 <i class="ion-wrench icon-lg"></i>{% trans "relation properties" %}
                             </a>
-                            <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;">
+                            <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
                                 <div class="clearfix">
                                     <div class="settings-config-panel">
 
@@ -34,14 +34,18 @@
                                         <h3 class="search-title">Relationship details</h3>
 
                                         <!-- Relationship participants -->
-                                        <div class="resource-relation-description">
-                                            <div class="target-resource">
-                                                <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+
+                                            <div class="resource-relation-description">
+                                                <div class="target-resource">
+                                                    <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                                </div>
+                                                <div style="position: relative;" data-bind="foreach: {data: selected, as: 'item'}">
+                                                    <div class="selected-resource">
+                                                        <br><i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                                    </div>
+
+                                                </div>
                                             </div>
-                                            <div class="selected-resource">
-                                                <br><i class="fa fa-university"></i> Brauerei Paulaner
-                                            </div>
-                                        </div>
 
                                         <div class="settings-crud-panel">
                                             <div class="col-xs-12">
@@ -117,7 +121,7 @@
             <!--ko if: context == 'resource-editor'-->
             <div class="rr-card-message-placement">
                 <p class="text-center">
-                    Drag&amp;Drop resources onto this area and describe how they relate to one another
+                    <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
                 </p>
             </div>
             <!--/ko-->

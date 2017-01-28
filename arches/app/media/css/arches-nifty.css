@@ -4384,6 +4384,10 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
+    display: block;
+}
+
 .related-resources-editor-container {
     position: absolute;
     width: 100%;
