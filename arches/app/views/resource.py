@@ -34,6 +34,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from django.forms.models import model_to_dict
 from arches.app.views.concept import get_preflabel_from_valueid
+from elasticsearch import Elasticsearch
 
 
 
@@ -157,20 +158,30 @@ class ResourceReportView(BaseManagerView):
 @method_decorator(group_required('edit'), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
+        print 'GETTING' * 3
+
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
 
     def delete(self, request, resourceid=None):
+        es = Elasticsearch()
         se = SearchEngineFactory().create()
-        data = JSONDeserializer().deserialize(request.body)
-        resourcexid = data.get('resourcexid')
-        print 'deleting', resourcexid
-        # ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
-        # se.delete(index='resource_relations', doc_type='all', id=resourcexid)
-        return JSONResponse({ 'success': True })
+        req = dict(request.GET)
+        ids_to_delete = req['resourcexids[]']
+        root_resourceinstanceid = req['root_resourceinstanceid']
+        for resourcexid in ids_to_delete:
+            try:
+                ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
+            except:
+                print 'no such model'
+            se.delete(index='resource_relations', doc_type='all', id=resourcexid)
+        start = request.GET.get('start', 0)
+        es.indices.refresh(index="resource_relations")
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
 
     def post(self, request, resourceid=None):
+        es = Elasticsearch()
         se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationshiptype = res['relationship_type']
@@ -185,8 +196,8 @@ class RelatedResourcesView(BaseManagerView):
             )
             document = model_to_dict(rr)
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
-
         start = request.GET.get('start', 0)
+        es.indices.refresh(index="resource_relations")
         return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
 
     def get_related_resources(self, resourceid, lang, limit=1000, start=0):
