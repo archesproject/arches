@@ -2,9 +2,12 @@ define([
     'jquery',
     'backbone',
     'knockout',
+    'knockout-mapping',
     'arches',
-    'views/resource/related-resources-list'
-], function($, Backbone, ko, arches, RelatedResourcesList) {
+    'views/resource/related-resources-list',
+    'bindings/datepicker',
+    'bindings/summernote',
+], function($, Backbone, ko, koMapping, arches, RelatedResourcesList, datepicker) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -14,6 +17,17 @@ define([
             this.currentResource = ko.observable();
             this.context = options.context;
             this.showRelatedProperties = ko.observable(false);
+            this.relatedProperties = koMapping.fromJS({
+                datefrom: '',
+                dateto: '',
+                relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
+                notes: ''
+            });
+            _.each(this.relatedProperties, function(prop, key){
+                if (ko.isObservable(prop)) {
+                    prop.subscribe(function(val){console.log(key, prop())});
+                };
+            });
             this.searchResults.relationshipCandidates.subscribe(function(val) {
                self.saveRelationships(val)
            }, self);

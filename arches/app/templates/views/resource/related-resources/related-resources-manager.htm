@@ -57,7 +57,7 @@
                                                             </div>
 
                                                             <div class="col-xs-12">
-                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input">
+                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.relationship_type">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -73,10 +73,10 @@
 
                                                             <div class="relative">
                                                                 <div class="col-xs-6">
-                                                                    <input type="" placeholder="" id="" class="form-control input-lg widget-input">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'MM/DD/YYYY'}, value: relatedProperties.datefrom">
                                                                 </div>
                                                                 <div class="col-xs-6">
-                                                                    <input type="" placeholder="" id="" class="form-control input-lg widget-input">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'MM/DD/YYYY'}, value: relatedProperties.dateto">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -89,7 +89,7 @@
                                                             </div>
 
                                                             <div class="col-xs-12">
-                                                                <div id="editor1" class=""></div>
+                                                                <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
                                                             </div>
                                                         </div>
                                                     </div>
