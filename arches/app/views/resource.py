@@ -184,15 +184,22 @@ class RelatedResourcesView(BaseManagerView):
         es = Elasticsearch()
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationshiptype = res['relationship_type']
+        relationship_type = res['relationship_properties[relationship_type]'][0]
+        datefrom = res['relationship_properties[datefrom]'][0]
+        dateto = res['relationship_properties[dateto]'][0]
+        dateto = None if dateto == '' else dateto
+        datefrom = None if datefrom == '' else datefrom
+        notes = res['relationship_properties[notes]'][0]
         root_resourceinstanceid = res['root_resourceinstanceid']
         instances_to_relate = res['instances_to_relate[]']
         for instanceid in instances_to_relate:
             rr = models.ResourceXResource.objects.create(
                 resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
                 resourceinstanceidto = Resource(instanceid),
-                notes = 'testing',
-                relationshiptype = models.Value('cb51db61-bbdd-4480-93b6-f5abe9c84d4b')
+                notes = notes,
+                relationshiptype = models.Value(relationship_type),
+                datestarted = datefrom,
+                dateended = dateto
             )
             document = model_to_dict(rr)
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')

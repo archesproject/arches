@@ -78,11 +78,11 @@ define([
                         .done(function(data){this.parse(data)})
                         .fail(function(data){console.log('failed', data)});
                     },
-                    save: function(candidateIds) {
+                    save: function(candidateIds, relationshipProperties) {
                         var root_resourceinstanceid = resourceinstanceid;
                         var self = this;
                         var payload = {
-                            relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
+                            relationship_properties: relationshipProperties,
                             instances_to_relate: candidateIds,
                             root_resourceinstanceid: resourceinstanceid
                         }
@@ -145,7 +145,7 @@ define([
             var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
             if (candidateIds.length > 0) {
                 var resource = this.currentResource()
-                resource.save(candidateIds);
+                resource.save(candidateIds, koMapping.toJS(this.relatedProperties));
                 this.searchResults.relationshipCandidates.removeAll()
             }
         },
