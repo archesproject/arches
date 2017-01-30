@@ -3,7 +3,7 @@ require([
     'underscore',
     'knockout',
     'arches',
-    'views/base-manager',
+    'views/search-base-manager',
     'views/resource/editor/form-list',
     'views/resource/editor/form',
     'models/card',
@@ -11,7 +11,7 @@ require([
     'resource-editor-data',
     'bindings/sortable',
     'bindings/let'
-], function($, _, ko, arches, BaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
+], function($, _, ko, arches, SearchBaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
     var self = this;
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
@@ -53,10 +53,13 @@ require([
     /**
     * a PageView representing the resource listing and recent edits page
     */
-    var pageView = new BaseManagerView({
+    var pageView = new SearchBaseManagerView({
         viewModel:{
+            searchContext: 'resource-editor',
+            editingInstanceId: data.resourceid,
             formList: formList,
             formView: formView,
+            openRelatedResources: ko.observable(false),
             deleteResource: function(){
                 pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
                     return;

@@ -1,0 +1,145 @@
+{% load i18n %}
+<div id="related-resources-drag-panel" class="search-container related-resources-container">
+    <!-- <div data-bind="text: test, click: function(){toggleShowRelatedProperties()}"></div> -->
+
+    <!-- Drag Panel -->
+    <div class="relative">
+
+        <!-- Target -->
+        <div class="relative rr-drag-panel-target">
+
+            <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+
+            <div class="relative">
+
+                <div class="btn-group rr-display-toggle">
+                    <button class="btn btn-default btn-display-toggle selected add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid"><i class="ion-grid"></i></button>
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph"><i class="ion-asterisk"></i></button>
+                </div>
+
+
+                <!--Documentation dropdown-->
+                <!--ko if: context == 'resource-editor'-->
+                <div class="related-resources-relationship">
+                    <ul class="" style="list-style: none;">
+                        <li class="mega-dropdown related-reources-crud-link">
+                            <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
+                                <i class="ion-wrench icon-lg"></i>{% trans "relation properties" %}
+                            </a>
+                            <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
+                                <div class="clearfix">
+                                    <div class="settings-config-panel">
+
+                                        <div class="related-resources-title-container">
+                                        <h3 class="search-title">Relationship details</h3>
+                                        <button class="btn btn-sm btn-mint save-relationships" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save Details to Selected</button>
+                                        </div>
+                                        <!-- Relationship participants -->
+
+                                            <div class="resource-relation-description">
+                                                <div class="target-resource">
+                                                    <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                                </div>
+                                                <div style="position: relative;" data-bind="foreach: {data: selected, as: 'item'}">
+                                                    <div class="selected-resource">
+                                                        <br><i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        <div class="settings-crud-panel">
+                                            <div class="col-xs-12">
+                                                <form class="widgets">
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative">
+                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                            </div>
+
+                                                            <div class="col-xs-12">
+                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.relationship_type">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative" style="">
+                                                                <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                        </label>
+                                                                <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                        </label>
+                                                            </div>
+
+                                                            <div class="relative">
+                                                                <div class="col-xs-6">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative">
+                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
+                                                            </div>
+
+                                                            <div class="col-xs-12">
+                                                                <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
+                <!-- /ko -->
+                <!--Documentation dropdown-->
+            </div>
+
+
+            <div class="rr-card-icon-placement">
+                <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
+                    <i class="add-card-icon fa fa-code-fork fa-4x"></i>
+                </span>
+            </div>
+
+            <div class="rr-result-grid-container">
+                {% include 'views/resource/related-resources/related-resources-grid.htm' %}
+            </div>
+            <!-- Message -->
+            <!--ko if: context == 'resource-editor'-->
+            <div class="rr-card-message-placement">
+                <p class="text-center">
+                    <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
+                </p>
+            </div>
+            <!--/ko-->
+        </div>
+
+        <!-- ko if: context == 'resource-editor' -->
+        <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
+            <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
+            <div class="rr-grid-item" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>
+                    <div class="search-listing-body">TODO: Primary description goes here</div>
+                    <div class="search-listing-footer">Footer details here</div>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+</div>

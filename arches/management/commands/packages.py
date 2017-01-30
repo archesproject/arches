@@ -34,7 +34,7 @@ import arches.management.commands.package_utils.resource_graphs as resource_grap
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index
+from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from arches.app.models import models
 import csv, json
 from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
@@ -277,10 +277,12 @@ class Command(BaseCommand):
 
     def setup_indexes(self, package_name):
         prepare_term_index(create=True)
+        prepare_resource_relations_index(create=True)
 
     def delete_indexes(self, package_name):
         delete_term_index()
         delete_search_index()
+        delete_resource_relations_index()
 
     def generate_procfile(self, package_name):
         """
