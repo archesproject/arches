@@ -32,6 +32,7 @@ define(['jquery',
                 this.showRelationships = ko.observable();
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
+                this.userRequestedNewPage = ko.observable(false);
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -69,6 +70,7 @@ define(['jquery',
 
             newPage: function(page, e){
                 if(page){
+                    this.userRequestedNewPage(true);
                     this.page(page);
                 }
             },
@@ -81,6 +83,8 @@ define(['jquery',
 
                 this.total(response.results.hits.total);
                 this.results.removeAll();
+                this.userRequestedNewPage(false);
+
                 this.all_result_ids.removeAll();
                 this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){

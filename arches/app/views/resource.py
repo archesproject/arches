@@ -160,7 +160,7 @@ class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
-        return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(resourceid, lang="en-US", start=start, limit=15), indent=4)
 
     def delete(self, request, resourceid=None):
         es = Elasticsearch()
@@ -176,7 +176,7 @@ class RelatedResourcesView(BaseManagerView):
             se.delete(index='resource_relations', doc_type='all', id=resourcexid)
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
     def post(self, request, resourceid=None):
         es = Elasticsearch()
@@ -219,7 +219,7 @@ class RelatedResourcesView(BaseManagerView):
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
     def get_related_resources(self, resourceid, lang, limit=1000, start=0):
         ret = {

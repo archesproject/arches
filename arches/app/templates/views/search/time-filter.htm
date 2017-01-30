@@ -9,8 +9,8 @@
         <!-- Date Type -->
         <div class="calendar">
             <h3 class="search-label">{% trans "Type" %}</h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: dateNodeId, chosen:{ width: '100%' }">
-                <option value="all">{% trans "Search all dates" %}</option>
+            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }">
+                <option value="">{% trans "Search all dates" %}</option>
                 {% for graph in graph_models %}
                     {% if graph.isresource and graph.isactive %}
                     <optgroup label="{{ graph.name }}">
@@ -44,7 +44,7 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "From" %}</h3>
             <div id="search-from-c">
-                <input class="form-control input-lg" data-bind="value: fromDate, datepicker: {format: format, maxDate: toDate}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-lg" data-bind="value: filter.fromDate, datepicker: {format: format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
@@ -52,11 +52,11 @@
         <div class="calendar">
             <h3 class="search-label">{% trans "To" %}</h3>
             <div id="search-from-b">
-                <input class="form-control input-lg" data-bind="value: toDate, datepicker: {format: format, minDate: fromDate}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-lg" data-bind="value: filter.toDate, datepicker: {format: format, minDate: !!filter.fromDate() ? filter.fromDate : null}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
-        <div class="pull-right" style="margin:-32px 20px 0 0; cursor:pointer;" data-bind="if: fromDate() || toDate() || dateNodeId() !== 'all'">
+        <div class="pull-right" style="margin:-32px 20px 0 0; cursor:pointer;" data-bind="if: filter.fromDate() || filter.toDate() || filter.dateNodeId() !== 'all'">
             <a href="#" data-bind="click: function () { clear(); }"><i class="fa fa-close"></i></a>
         </div>
     </div>

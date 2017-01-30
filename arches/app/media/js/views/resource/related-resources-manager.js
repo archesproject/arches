@@ -7,6 +7,7 @@ define([
     'views/resource/related-resources-list',
     'bindings/datepicker',
     'bindings/summernote',
+    'plugins/knockout-select2',
 ], function($, Backbone, ko, koMapping, arches, RelatedResourcesList, datepicker) {
     return Backbone.View.extend({
         initialize: function(options) {
