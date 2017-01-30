@@ -13,6 +13,23 @@ define([
     'views/search/search-results',
     'views/base-manager'
 ], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, BaseManagerView) {
+    // a method to track the old and new values of a subscribable
+    // from https://github.com/knockout/knockout/issues/914
+    //
+    // use case:
+    // var sub1 = this.FirstName.subscribeChanged(function (newValue, oldValue) {
+    //     this.NewValue1(newValue);
+    //     this.OldValue1(oldValue);
+    // }, this);
+
+    ko.subscribable.fn.subscribeChanged = function (callback, context) {
+        var savedValue = this.peek();
+        return this.subscribe(function (latestValue) {
+            var oldValue = savedValue;
+            savedValue = latestValue;
+            callback.call(context, latestValue, oldValue);
+        });
+    };
 
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
@@ -190,5 +207,6 @@ define([
         }
     });
 
+
     return SearchBaseManagerView;
-})
+});
