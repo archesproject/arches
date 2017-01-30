@@ -15,7 +15,7 @@ class ReportEditorPage(BaseWidgetPage):
     def save_report(self, report_name):
         self.driver.find_element(*locators.ACTIVATE_REPORT_BUTTON).click()
         report_name_input = self.driver.find_element(*locators.REPORT_NAME_INPUT)
+        report_name_input.clear()
         report_name_input.send_keys(report_name)
         self.driver.find_element(*locators.SAVE_EDITS_BUTTON).click()
         self.driver.find_element(*locators.ADD_NEW_RESOURCE_NAVBAR_BUTTON).click()
-        print report_name, 'created'

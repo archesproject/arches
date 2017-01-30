@@ -1481,7 +1481,7 @@ ul.nav.nav-tabs.nav-justified {
     padding: 0;
 }
 .node-widget-label {
-    padding: 20px 0 15px;
+    padding: 20px 0px 10px 0px;
 }
 
 .concept-label {
@@ -3992,7 +3992,10 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     cursor: pointer;
 }
 .grid-item--width2, .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .grid-item--width2, .columns .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn), .grid-item--width2 {
-    width: 200px;
+    width: 225px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .select2-search, .dropdown-shim, .dropdown-shim, .dropdown-shim {
     margin-top: 10px;

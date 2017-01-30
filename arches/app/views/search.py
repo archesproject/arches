@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from datetime import date
+
+from dateutil import parser
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -216,23 +217,33 @@ def build_search_results_dsl(request):
             else:
                 boolfilter.must(geoshape)
 
-    if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
-        start_date = date(temporal_filter['year_min_max'][0], 1, 1)
-        end_date = date(temporal_filter['year_min_max'][1], 12, 31)
-        if start_date:
+    if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
+        start_date = None
+        end_date = None
+        try:
+            start_date = parser.parse(temporal_filter['fromDate'])
             start_date = start_date.isoformat()
-        if end_date:
+        except:
+            pass
+        try:
+            end_date = parser.parse(temporal_filter['toDate'])
             end_date = end_date.isoformat()
-        range = Range(field='dates.value', gte=start_date, lte=end_date)
-        nested = Nested(path='dates', query=range)
+        except:
+            pass
+
+        if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+            range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
+            time_query_dsl = Nested(path='tiles', query=range)
+        else:
+            time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
-            boolfilter.must_not(nested)
+            boolfilter.must_not(time_query_dsl)
         else:
-            boolfilter.must(nested)
+            boolfilter.must(time_query_dsl)
 
     if not boolquery.empty:
         query.add_query(boolquery)
