@@ -22,7 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph, tileserver
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
-from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 
@@ -57,7 +57,6 @@ urlpatterns = [
     url(r'^search/export$', search.export_results, name="search_results_export"),
     url(r'^buffer/$', search.buffer, name="buffer"),
     url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, resources.resource_manager, name="resource_manager"),
-    url(r'^resources/related/(?P<resourceid>%s|())$' % uuid_regex, resources.related_resources, name="related_resources"),
     url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, resources.edit_history, name="edit_history"),
     url(r'^resources/layers/(?P<entitytypeid>.*)$', resources.map_layers, name="map_layers"),
     url(r'^resources/markers/(?P<entitytypeid>.*)$', resources.map_layers, {'get_centroids':True}, name="map_markers"),
@@ -91,6 +90,7 @@ urlpatterns = [
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
+    url(r'^resource/related/(?P<resourceid>%s|())$' % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),

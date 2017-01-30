@@ -2944,6 +2944,12 @@ span.editable-card i.fa.fa-align-justify:hover{
     width: 100%;
     margin-bottom: 20px;
 }
+
+.report-image-grid.rr-image-grid {
+    top: 100px;
+    left: 25px;
+}
+
 .report-grid-item {
     float: left;
     margin: 3px;
@@ -4369,6 +4375,83 @@ div.row.widget-wrapper {
 }
 
 
+.related-resources-container {
+    -ms-flex: 0 0 calc(100% - 400px);
+    -webkit-flex: 0 0 calc(100% - 400px);
+    flex: 0 0 calc(100% - 400px);
+    margin-bottom: 0px;
+    margin-left: -1px;
+    padding: 0px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: all .5s;
+}
+
+.related-resources-title-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.save-relationships {
+    position: absolute;
+    right: 20px;
+}
+
+.dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
+    display: block;
+}
+
+.related-resources-editor-container {
+    position: absolute;
+    width: 100%;
+}
+
+.rr-drag-panel-target {
+    height: 100vh;
+    background: #ebeef0;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 0px 25px;
+}
+
+.settings-config-panel {
+    padding: 5px;
+}
+
+.rr-grid {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.rr-grid-item {
+    float: left;
+    margin: 3px;
+    width: 360px;
+    border: 1px solid #ddd;
+    opacity: .79;
+}
+
+.resource-relation-description {
+    color: #888;
+    padding-left: 5px;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+.settings-crud-panel {
+    margin-top: 70px;
+    margin-left: -20px;
+}
+
+.no-instructions-shim {
+    margin-top: -60px;
+}
+
+.report-image-grid {
+    width: 100%;
+    margin-bottom: 20px;
+}
 
 .add-card-icon {
 	color: #fff;
@@ -4380,6 +4463,7 @@ div.row.widget-wrapper {
     margin-top: 325px;
     width: 100%;
 }
+
 .rr-card-message-placement {
 	margin-top: 280px;
     width: 100%;
@@ -4389,6 +4473,17 @@ div.row.widget-wrapper {
     font-weight: 300;
     color: #999;
 }
+
+.rr-result-grid-container {
+	margin-top: 30px;
+    width: 100%;
+    font-size: 16px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 300;
+    color: #999;
+}
+
 .add-card-message-subtitle {
 	margin-top: -5px;
 	font-size: 13px;
@@ -5721,12 +5816,6 @@ span.basemap-unselected {
 	padding-left: 15px;
 	min-height: 500px;
 	overflow-y: scroll;
-}
-
-.search-title {
-	font-size: 19px;
-	font-weight: 500;
-	margin-top: 0px;
 }
 
 .resource-selector-button {
