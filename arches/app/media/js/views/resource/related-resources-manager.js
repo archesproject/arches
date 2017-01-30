@@ -29,7 +29,9 @@ define([
                 };
             });
             this.searchResults.relationshipCandidates.subscribe(function(val) {
-               self.saveRelationships(val)
+               if (val.length > 0) {
+                   self.saveRelationships(val)
+               }
            }, self);
             this.resourceRelationships = ko.observableArray();
             this.relatedresourceslist = new RelatedResourcesList({relationships:this.resourceRelationships});
@@ -78,13 +80,14 @@ define([
                         .done(function(data){this.parse(data)})
                         .fail(function(data){console.log('failed', data)});
                     },
-                    save: function(candidateIds, relationshipProperties) {
+                    save: function(candidateIds, relationshipProperties, relationshipIds) {
                         var root_resourceinstanceid = resourceinstanceid;
                         var self = this;
                         var payload = {
                             relationship_properties: relationshipProperties,
                             instances_to_relate: candidateIds,
-                            root_resourceinstanceid: resourceinstanceid
+                            root_resourceinstanceid: resourceinstanceid,
+                            relationship_ids: relationshipIds
                         }
                         $.ajax({
                             url: arches.urls.related_resources,
@@ -143,10 +146,14 @@ define([
 
         saveRelationships: function(){
             var candidateIds = _.pluck(this.searchResults.relationshipCandidates(), 'resourceinstanceid');
-            if (candidateIds.length > 0) {
-                var resource = this.currentResource()
-                resource.save(candidateIds, koMapping.toJS(this.relatedProperties));
-                this.searchResults.relationshipCandidates.removeAll()
+            var selectedResourceXids = _.pluck(this.selected(), 'resourcexid')
+            var resource = this.currentResource()
+            if (candidateIds.length > 0 || selectedResourceXids.length > 0) {
+                resource.save(candidateIds, koMapping.toJS(this.relatedProperties), selectedResourceXids);
+                if (candidateIds.length > 0 ) {
+                    this.searchResults.relationshipCandidates.removeAll()
+                }
+                this.propertiesDialogOpen(false);
             }
         },
 

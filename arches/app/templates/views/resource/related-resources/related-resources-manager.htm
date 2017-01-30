@@ -30,9 +30,10 @@
                                 <div class="clearfix">
                                     <div class="settings-config-panel">
 
-
+                                        <div class="related-resources-title-container">
                                         <h3 class="search-title">Relationship details</h3>
-
+                                        <button class="btn btn-sm btn-mint save-relationships" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save Details to Selected</button>
+                                        </div>
                                         <!-- Relationship participants -->
 
                                             <div class="resource-relation-description">
@@ -102,7 +103,7 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){deleteRelationships()}">Delete Relationships</button>
+                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
                 <!-- /ko -->
                 <!--Documentation dropdown-->
             </div>

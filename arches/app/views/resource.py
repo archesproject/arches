@@ -158,8 +158,6 @@ class ResourceReportView(BaseManagerView):
 @method_decorator(group_required('edit'), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
-        print 'GETTING' * 3
-
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
@@ -191,7 +189,13 @@ class RelatedResourcesView(BaseManagerView):
         datefrom = None if datefrom == '' else datefrom
         notes = res['relationship_properties[notes]'][0]
         root_resourceinstanceid = res['root_resourceinstanceid']
-        instances_to_relate = res['instances_to_relate[]']
+        instances_to_relate = []
+        relationships_to_update = []
+        if 'instances_to_relate[]' in res:
+            instances_to_relate = res['instances_to_relate[]']
+        if 'relationship_ids[]' in res:
+            relationships_to_update = res['relationship_ids[]']
+
         for instanceid in instances_to_relate:
             rr = models.ResourceXResource.objects.create(
                 resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
@@ -201,6 +205,16 @@ class RelatedResourcesView(BaseManagerView):
                 datestarted = datefrom,
                 dateended = dateto
             )
+            document = model_to_dict(rr)
+            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+
+        for relationshipid in relationships_to_update:
+            rr = models.ResourceXResource.objects.get(pk=relationshipid)
+            rr.notes = notes
+            rr.relationshiptype = models.Value(relationship_type)
+            rr.datestarted = datefrom
+            rr.dateended = dateto
+            rr.save()
             document = model_to_dict(rr)
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         start = request.GET.get('start', 0)

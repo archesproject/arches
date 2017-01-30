@@ -4384,6 +4384,16 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.related-resources-title-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.save-relationships {
+    position: absolute;
+    right: 20px;
+}
+
 .dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
     display: block;
 }
