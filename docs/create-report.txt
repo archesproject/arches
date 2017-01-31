@@ -1,0 +1,26 @@
+#################
+Creating a Report
+#################
+
+The final step in configuring our Resource Model is to create a report. Reports aggregate and display information that has been entered for a resource, and also allow you to keep certain information hidden from the public. You can also define multiple reports for a given Resource Model, which allow for even more flexibility in how you publish your data.
+
+1. From Manage..., choose Reports to enter the Report Designer.
+2. Click Add Report +.
+3. You now see the list of report templates that you must choose from. Because we have very simple information to display (just a name), we'll choose the most basic "No Header Template".
+4. Drag the "No Header Template" onto the right side of the screen.
+5. Now click on your report, which will be named "New Report" by default.
+6. On the left, you'll see the Report Manager, which shows all of the sections in the report.
+7. NOT FINISHED...
+
+.. |add-btn| image:: images/add-btn.png
+  :align: middle
+  :height: 20
+.. |save-edits-btn| image:: images/save-edits-btn.png
+  :align: middle
+  :height: 20
+.. |done-btn| image:: images/done-btn.png
+  :align: middle
+  :height: 20
+.. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
+  :align: middle
+  :height: 20

@@ -1,0 +1,31 @@
+############################
+Arches HIP Contents
+############################
+
+What is Arches HIP?
+===================
+
+The Arches Heritage Inventory Package (HIP) is a data schema that was originally developed for `Historic Places L.A. <http://historicplacesla.org>`_, the Arches implementation in Los Angeles that was designed to hold data from the ongoing Survey LA project.
+
+In Arches v4, the HIP takes the form of 6 Resource Models and 1 billion Branches. [pull quick description here from v3 docs].
+
+Resource Models
+======================================
+
++ Heritage Resource
+    *add description*
++ Heritage District
+    *add description*
++ Historic Event
+    *add description*
++ Actor
+    *add description*
++ Activity
+    *add description*
++ Information Resource
+    *add description*
+
+Branches
+=================
+
+<listy list list of branches>

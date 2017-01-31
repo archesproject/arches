@@ -1,14 +1,39 @@
-====================
-Arches Documentation
-====================
-
-Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :caption: Introduction
+    :name: this is the name
+    :maxdepth: 2
 
-   overview
-   getting-started
-   arches-data
-   rdm
-   arches-web-applications
+    overview
+
+.. toctree::
+    :caption: User Documentation
+    :maxdepth: 2
+
+    installation
+    general-configuration
+    managing-resources
+    using-the-arches-designer
+    creating-resources
+    import-export
+    Arches Data *from v3* <arches-data>
+    Reference Data Manager (RDM) *from v3* <rdm>
+    Arches Web Applications *from v3* <arches-web-applications>
+
+.. toctree::
+    :caption: Tutorials
+    :maxdepth: 2
+
+    create-resource-model
+    create-branch
+    add-branch-to-resource-model
+    create-form
+    create-report
+    add-function
+
+.. toctree::
+    :caption: Reference
+    :maxdepth: 2
+
+    Appendix A: Arches HIP <arches-hip-contents>
+    Appendix B: Glossary <glossary>
