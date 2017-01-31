@@ -116,16 +116,7 @@ class SKOSReader(object):
                         if predicate == SKOS.hasTopConcept:
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
-                            # if make_collections:
-                            #     collector_concept = Concept({
-                            #         'id': str(uuid.uuid4()),
-                            #         'legacyoid': "%s_%s" % (str(scheme), 'Collection'),
-                            #         'nodetype': 'Collection'
-                            #     })
-                            #     val = self.unwrapJsonLiteral(object)
-                            #     collector_concept.addvalue({'value':val['value'], 'language': object.language, 'type': 'prefLabel', 'category': 'label'})
-                            #     self.relations.append({'source': '00000000-0000-0000-0000-000000000003', 'type': 'hasCollection', 'target': collector_concept.id})
-                            #     self.nodes.append(collector_concept)
+
 
                 self.nodes.append(concept_scheme)
 
@@ -166,6 +157,40 @@ class SKOSReader(object):
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
                     self.nodes.append(concept)
+
+
+            # Search for ConceptSchemes first
+            for s, v, o in graph.triples((None, SKOS.hasCollection, None)):
+                print "%s %s %s " % (s,v,o)
+                concept = Concept({
+                    'id': self.generate_uuid_from_subject(baseuuid, o),
+                    'legacyoid': str(o),
+                    'nodetype': 'Collection'
+                })
+                # loop through all the elements within a <skos:Concept> element
+                for predicate, object in graph.predicate_objects(subject = o):
+                    if str(SKOS) in predicate or str(ARCHES) in predicate:
+                        if hasattr(object, 'language') and object.language not in allowed_languages:
+                            newlang = models.DLanguage()
+                            newlang.pk = object.language
+                            newlang.languagename = object.language
+                            newlang.isdefault = False
+                            newlang.save()
+                            allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
+
+                        relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
+
+                        if relation_or_value_type in skos_value_types_list:
+                            value_type = skos_value_types.get(valuetype=relation_or_value_type)
+                            val = self.unwrapJsonLiteral(object)
+                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                
+                self.nodes.append(concept)
+                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'hasCollection', 'target': self.generate_uuid_from_subject(baseuuid, o)})
+            
+            for s, v, o in graph.triples((None, SKOS.member, None)):
+                print "%s %s %s " % (s,v,o)
+                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
             # insert and index the concpets
             with transaction.atomic():
@@ -279,18 +304,16 @@ class SKOSWriter(object):
             scheme_id = concept_graph.id
 
             def build_skos(node):
-                if node.nodetype == 'Concept':
-                    rdf_graph.add((ARCHES[node.id], SKOS.member, ARCHES[scheme_id]))
-
                 for subconcept in node.subconcepts:
                     rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
 
-                # for value in node.values:
-                #     jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
-                #     if value.category == 'label' or value.category == 'note':
-                #         rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
-
                 rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
+                if node.nodetype == 'Collection':
+                    for value in node.values:
+                        if value.category == 'label' or value.category == 'note':
+                            jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
+                            rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+    
 
 
             concept_graph.traverse(build_skos)
