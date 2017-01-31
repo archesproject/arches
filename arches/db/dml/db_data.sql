@@ -3336,7 +3336,7 @@ INSERT INTO report_templates(templateid, name, description, component, component
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
 
-CREATE MATERIALIZED VIEW vw_getgeoms AS
+CREATE MATERIALIZED VIEW mv_getgeoms AS
     SELECT t.tileid,
        t.resourceinstanceid,
        n.nodeid,
@@ -3357,20 +3357,20 @@ CREATE MATERIALIZED VIEW vw_getgeoms AS
     				  FROM nodes n_1
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
-CREATE INDEX vw_getgeoms_gix ON vw_getgeoms USING GIST (geom);
+CREATE INDEX mv_getgeoms_gix ON mv_getgeoms USING GIST (geom);
 
-CREATE OR REPLACE FUNCTION refresh_vw_getgeoms() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION refresh_mv_getgeoms() RETURNS trigger AS
 $$
 BEGIN
-    REFRESH MATERIALIZED VIEW vw_getgeoms;
+    REFRESH MATERIALIZED VIEW mv_getgeoms;
     RETURN NULL;
 END;
 $$
 LANGUAGE plpgsql ;
 
-CREATE TRIGGER refresh_vw_getgeoms_trigger AFTER TRUNCATE OR INSERT OR UPDATE OR DELETE
+CREATE TRIGGER refresh_mv_getgeoms_trigger AFTER TRUNCATE OR INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH STATEMENT
-   EXECUTE PROCEDURE refresh_vw_getgeoms();
+   EXECUTE PROCEDURE refresh_mv_getgeoms();
 
 INSERT INTO map_sources(name, source)
     VALUES ('resources', '{
