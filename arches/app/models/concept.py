@@ -119,7 +119,7 @@ class Concept(object):
         if semantic == True:
             pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
         else:
-            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member') | Q(relationtype = 'hasCollection')
 
         if self.id != '':
             nodetype = kwargs.pop('nodetype', self.nodetype)
@@ -916,8 +916,9 @@ class ConceptValue(object):
             se.create_mapping('concept_labels', scheme.id, fieldname='type', fieldtype='string', fieldindex='not_analyzed')
             se.create_mapping('concept_labels', scheme.id, fieldname='category', fieldtype='string', fieldindex='not_analyzed')
             se.index_data('concept_labels', scheme.id, data, 'id')
-            # don't create terms for entity type concepts
-            if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
+            
+            # don't create terms for dropdown members
+            if not(scheme.id == '00000000-0000-0000-0000-000000000003'):
                 se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
 
     def delete_index(self):
