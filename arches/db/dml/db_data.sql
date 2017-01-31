@@ -3336,7 +3336,7 @@ INSERT INTO report_templates(templateid, name, description, component, component
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
 
-CREATE OR REPLACE VIEW vw_getgeoms AS
+CREATE MATERIALIZED VIEW vw_getgeoms AS
     SELECT t.tileid,
        t.resourceinstanceid,
        n.nodeid,
@@ -3357,12 +3357,26 @@ CREATE OR REPLACE VIEW vw_getgeoms AS
     				  FROM nodes n_1
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
+CREATE INDEX vw_getgeoms_gix ON vw_getgeoms USING GIST (geom);
+
+CREATE OR REPLACE FUNCTION refresh_vw_getgeoms() RETURNS trigger AS
+$$
+BEGIN
+    REFRESH MATERIALIZED VIEW vw_getgeoms;
+    RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql ;
+
+CREATE TRIGGER refresh_vw_getgeoms_trigger AFTER TRUNCATE OR INSERT OR UPDATE OR DELETE
+   ON tiles FOR EACH STATEMENT
+   EXECUTE PROCEDURE refresh_vw_getgeoms();
+
 INSERT INTO map_sources(name, source)
     VALUES ('resources', '{
         "type": "vector",
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
-
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
     VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[
