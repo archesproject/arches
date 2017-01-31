@@ -92,7 +92,7 @@
             ], 
             "reports": [], 
             "iconclass": "", 
-            "functions": [], 
+            "functions_x_graphs": [], 
             "domain_connections": [
                 {
                     "ontology_property": "P24_transferred_title_of", 

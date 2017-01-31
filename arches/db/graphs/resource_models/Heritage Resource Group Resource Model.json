@@ -80,7 +80,7 @@
             ], 
             "reports": [], 
             "iconclass": "", 
-            "functions": [], 
+            "functions_x_graphs": [], 
             "domain_connections": [
                 {
                     "ontology_property": "O22_partly_or_completely_contains", 

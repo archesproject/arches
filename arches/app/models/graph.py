@@ -58,12 +58,13 @@ class Graph(models.GraphModel):
         self.cards = {}
         self.widgets = {}
         self._nodegroups_to_delete = []
+        self.functions_x_graphs = []
 
         if args:
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
+                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions_x_graphs'):
                         setattr(self, key, value)
 
                 nodegroups = dict((item['nodegroupid'], item) for item in args[0]["nodegroups"])
@@ -76,8 +77,8 @@ class Graph(models.GraphModel):
                 for card in args[0]["cards"]:
                     self.add_card(card)
 
-                if 'functions' in args[0]:
-                    for function in args[0]["functions"]:
+                if 'functions_x_graphs' in args[0]:
+                    for function in args[0]["functions_x_graphs"]:
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
@@ -255,20 +256,25 @@ class Graph(models.GraphModel):
 
     def add_function(self, function):
         """
-        Adds a card to this graph
+        Adds a FunctionXGraph record to this graph
 
         Arguments:
-        node -- a dictionary representing a Card instance or an actual models.CardModel instance
+        node -- an object representing a FunctionXGraph instance or an actual models.CardModel instance
 
         """
 
         if not isinstance(function, models.FunctionXGraph):
-            functionobj = function.copy()
+            if isinstance(function, dict):
+                functionobj = models.FunctionXGraph(**function.copy())
+            else:
+                functionobj = function.copy()
             function = models.FunctionXGraph()
-            function.fuction_id = functionobj.functionid
+            function.function_id = functionobj.function_id
             function.config = functionobj.config
 
         function.graph = self
+
+        self.functions_x_graphs.append(function)
 
         return function
 
@@ -298,6 +304,9 @@ class Graph(models.GraphModel):
 
             for widget in self.widgets.itervalues():
                 widget.save()
+
+            for functionxgraph in self.functions_x_graphs:
+                functionxgraph.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()

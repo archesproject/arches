@@ -50,7 +50,7 @@
             ], 
             "reports": [], 
             "iconclass": "", 
-            "functions": [], 
+            "functions_x_graphs": [], 
             "domain_connections": [
                 {
                     "ontology_property": "L29i_is_responsible_organization_for", 

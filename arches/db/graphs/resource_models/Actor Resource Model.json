@@ -227,7 +227,7 @@
                 }
             ], 
             "iconclass": "fa fa-android", 
-            "functions": [], 
+            "functions_x_graphs": [], 
             "domain_connections": [
                 {
                     "ontology_property": "P76i_provides_access_to", 

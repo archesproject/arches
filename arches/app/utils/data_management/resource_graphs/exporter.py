@@ -6,7 +6,7 @@ import os
 import json
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 
@@ -74,6 +74,9 @@ def get_report_data_for_export(resource_graph):
     reports = Report.objects.filter(graph_id=resource_graph['graphid'])
     return reports
 
+def get_function_x_graph_data_for_export(functionids):
+    return FunctionXGraph.objects.filter(function_id__in=functionids)
+
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
@@ -87,6 +90,8 @@ def get_graphs_for_export(graphids=None):
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
 
     for resource_graph in resource_graph_query:
+        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(resource_graph['functions'])
+        del resource_graph['functions']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
         resource_graph['forms'] = get_forms_for_export(resource_graph)
         resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
