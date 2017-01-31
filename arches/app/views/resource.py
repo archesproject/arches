@@ -30,6 +30,12 @@ from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from django.forms.models import model_to_dict
+from arches.app.views.concept import get_preflabel_from_valueid
+from elasticsearch import Elasticsearch
+
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -148,3 +154,96 @@ class ResourceReportView(BaseManagerView):
          )
 
         return render(request, 'views/resource/report.htm', context)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class RelatedResourcesView(BaseManagerView):
+    def get(self, request, resourceid=None):
+        # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        start = request.GET.get('start', 0)
+        return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
+
+    def delete(self, request, resourceid=None):
+        es = Elasticsearch()
+        se = SearchEngineFactory().create()
+        req = dict(request.GET)
+        ids_to_delete = req['resourcexids[]']
+        root_resourceinstanceid = req['root_resourceinstanceid']
+        for resourcexid in ids_to_delete:
+            try:
+                ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
+            except:
+                print 'no such model'
+            se.delete(index='resource_relations', doc_type='all', id=resourcexid)
+        start = request.GET.get('start', 0)
+        es.indices.refresh(index="resource_relations")
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+
+    def post(self, request, resourceid=None):
+        es = Elasticsearch()
+        se = SearchEngineFactory().create()
+        res = dict(request.POST)
+        relationship_type = res['relationship_properties[relationship_type]'][0]
+        datefrom = res['relationship_properties[datefrom]'][0]
+        dateto = res['relationship_properties[dateto]'][0]
+        dateto = None if dateto == '' else dateto
+        datefrom = None if datefrom == '' else datefrom
+        notes = res['relationship_properties[notes]'][0]
+        root_resourceinstanceid = res['root_resourceinstanceid']
+        instances_to_relate = []
+        relationships_to_update = []
+        if 'instances_to_relate[]' in res:
+            instances_to_relate = res['instances_to_relate[]']
+        if 'relationship_ids[]' in res:
+            relationships_to_update = res['relationship_ids[]']
+
+        for instanceid in instances_to_relate:
+            rr = models.ResourceXResource.objects.create(
+                resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
+                resourceinstanceidto = Resource(instanceid),
+                notes = notes,
+                relationshiptype = models.Value(relationship_type),
+                datestarted = datefrom,
+                dateended = dateto
+            )
+            document = model_to_dict(rr)
+            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+
+        for relationshipid in relationships_to_update:
+            rr = models.ResourceXResource.objects.get(pk=relationshipid)
+            rr.notes = notes
+            rr.relationshiptype = models.Value(relationship_type)
+            rr.datestarted = datefrom
+            rr.dateended = dateto
+            rr.save()
+            document = model_to_dict(rr)
+            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+        start = request.GET.get('start', 0)
+        es.indices.refresh(index="resource_relations")
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+
+    def get_related_resources(self, resourceid, lang, limit=1000, start=0):
+        ret = {
+            'resource_relationships': [],
+            'related_resources': []
+        }
+        se = SearchEngineFactory().create()
+        query = Query(se, limit=limit, start=start)
+        query.add_filter(Terms(field='resourceinstanceidfrom', terms=resourceid).dsl, operator='or')
+        query.add_filter(Terms(field='resourceinstanceidto', terms=resourceid).dsl, operator='or')
+        resource_relations = query.search(index='resource_relations', doc_type='all')
+        ret['total'] = resource_relations['hits']['total']
+        instanceids = set()
+        for relation in resource_relations['hits']['hits']:
+            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            ret['resource_relationships'].append(relation['_source'])
+            instanceids.add(relation['_source']['resourceinstanceidto'])
+            instanceids.add(relation['_source']['resourceinstanceidfrom'])
+        if len(instanceids) > 0:
+            instanceids.remove(resourceid)
+
+        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
+        if related_resources:
+            for resource in related_resources['docs']:
+                ret['related_resources'].append(resource['_source'])
+
+        return ret

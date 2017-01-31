@@ -6,12 +6,10 @@ define(['jquery',
     'select2',
     'knockout',
     'knockout-mapping',
-    'views/related-resources-graph',
     'view-data',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, RelatedResourcesGraph, viewdata) {
-
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, viewdata) {
         return Backbone.View.extend({
 
             events: {
@@ -31,8 +29,10 @@ define(['jquery',
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
+                this.showRelationships = ko.observable();
+                this.mouseoverInstanceId = ko.observable();
+                this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
-                self.mouseoverInstanceId = ko.observable();
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -43,24 +43,29 @@ define(['jquery',
                 }
             },
 
-            showRelatedResouresGraph: function (e) {
-                var resourceId = $(e.target).data('resourceid');
-                var primaryName = $(e.target).data('primaryname');
-                var typeId = $(e.target).data('entitytypeid');
-                var searchItem = $(e.target).closest('.arches-search-item');
-                var graphPanel = searchItem.find('.arches-related-resource-panel');
-                var nodeInfoPanel = graphPanel.find('.node_info');
-                if (!graphPanel.hasClass('view-created')) {
-                    new RelatedResourcesGraph({
-                        el: graphPanel[0],
-                        resourceId: resourceId,
-                        resourceName: primaryName,
-                        resourceTypeId: typeId
-                    });
+            newPage: function(page, e){
+                if(page){
+                    this.page(page);
                 }
-                nodeInfoPanel.hide();
-                $(e.target).closest('li').toggleClass('graph-active');
-                graphPanel.slideToggle(500);
+            },
+
+            showRelatedResources: function(resourceinstanceid) {
+                var self = this;
+                return function(resourceinstanceid){
+                    self.showRelationships(resourceinstanceid)
+                }
+            },
+
+            toggleRelationshipCandidacy: function(resourceinstanceid) {
+                var self = this;
+                return function(resourceinstanceid){
+                    var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid)
+                    if (candidate) {
+                        self.relationshipCandidates.remove(resourceinstanceid)
+                    } else {
+                        self.relationshipCandidates.push(resourceinstanceid)
+                    }
+                }
             },
 
             newPage: function(page, e){
@@ -79,7 +84,7 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
-                
+
                 this.all_result_ids.removeAll();
                 this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
@@ -95,7 +100,9 @@ define(['jquery',
                         primarydescription: description,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
-                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid)
+                        showrelated: this.showRelatedResources(result._source.resourceinstanceid),
+                        mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
+                        relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid)
                     });
                 }, this);
 
@@ -114,21 +121,6 @@ define(['jquery',
 
             editResource: function(resourceinstance){
                 window.open(arches.urls.resource_editor + resourceinstance.resourceinstanceid);
-            },
-
-            itemMouseover: function(evt){
-                if(this.currentTarget !== evt.currentTarget){
-                    var data = $(evt.currentTarget).data();
-                    this.trigger('mouseover', data.resourceid);
-                    this.currentTarget = evt.currentTarget;
-                }
-                return false;
-            },
-
-            itemMouseout: function(evt){
-                this.trigger('mouseout');
-                delete this.currentTarget;
-                return false;
             },
 
             zoomToFeature: function(evt){

@@ -24,26 +24,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="">Related Resources</button>
+    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){openRelatedResources(!openRelatedResources())}">Related Resources</button>
     {{ block.super }}
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div class="flex relative">
+<div class="flex relative" data-bind="visible: !openRelatedResources()">
 
     <!--Form Listing -->
     <div class="left-column-crud-container form-list" data-bind="with: formList">
         {% include 'views/resource/editor/form-list.htm' %}
     </div>
 
-
     <!-- Card Container -->
     <div class="card-form-preview-container" data-bind="let: {'form': formView}">
-
         {% include 'views/resource/editor/form.htm' %}
-
     </div>
 
+</div>
+
+<div class="flex relative" data-bind="visible: openRelatedResources()">
+    <div class="related-resources-editor-container">
+        {% include 'views/search/search-base-manager.htm' %}
+    </div>
 </div>
 {% endblock content %}
 
