@@ -31,7 +31,9 @@
                     <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                     <!--/ko-->
                     <!--ko if: $root.resourceEditorContext -->
-                    <a class="search-candidate-link pull-right" href="" data-bind="click: relationshipcandidacy"><i class="fa fa-code-fork"></i> {% trans "Add Resource" %} </a>
+                        <!--ko if: relatable -->
+                    <a class="search-candidate-link pull-right" href="" data-bind="click: relationshipcandidacy"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %} </a>
+                        <!--/ko-->
                     <!--/ko-->
                 </div>
             </div>

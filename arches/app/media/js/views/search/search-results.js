@@ -89,11 +89,13 @@ define(['jquery',
                 this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
                     var description = "we should probably have a 'Primary Description Function' like we do for primary name";
-
+                    var relatable;
                     graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
                     })
-
+                    if (this.viewModel.graph) {
+                        relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, result._source.graph_id);
+                    }
                     this.results.push({
                         primaryname: result._source.primaryname,
                         resourceinstanceid: result._source.resourceinstanceid,
@@ -102,7 +104,8 @@ define(['jquery',
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
-                        relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid)
+                        relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
+                        relatable: relatable
                     });
                 }, this);
 
