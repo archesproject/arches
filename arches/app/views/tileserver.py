@@ -43,7 +43,7 @@ def get_tileserver_config():
                                         false AS poly_outline,
                                         geom AS __geometry__,
                                         row_number() over () as __id__
-                                    FROM mv_getgeoms
+                                    FROM mv_geojson_geoms
                                 UNION
                                 SELECT tileid::text,
                                         resourceinstanceid::text,
@@ -54,7 +54,7 @@ def get_tileserver_config():
                                         true AS poly_outline,
                                         ST_ExteriorRing(geom) AS __geometry__,
                                         row_number() over () as __id__
-                                    FROM mv_getgeoms
+                                    FROM mv_geojson_geoms
                                     where ST_GeometryType(geom) = 'ST_Polygon'"""
                         ]
                     },
