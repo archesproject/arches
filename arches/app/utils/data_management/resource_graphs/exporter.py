@@ -6,7 +6,7 @@ import os
 import json
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 
@@ -48,6 +48,11 @@ def write_edges(export_dir):
             for node in v:
                 writer.writerow(node)
 
+def r2r_constraints_for_export(resource_graph):
+    r2r_constraints = []
+    r2r_constraints = Resource2ResourceConstraint.objects.filter(resourceclassfrom=resource_graph['graphid'])
+    return r2r_constraints
+
 def get_card_x_node_x_widget_data_for_export(resource_graph):
     cards_x_nodes_x_widgets = []
     for card in  resource_graph['cards']:
@@ -69,6 +74,9 @@ def get_report_data_for_export(resource_graph):
     reports = Report.objects.filter(graph_id=resource_graph['graphid'])
     return reports
 
+def get_function_x_graph_data_for_export(functionids):
+    return FunctionXGraph.objects.filter(function_id__in=functionids)
+
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
@@ -82,10 +90,13 @@ def get_graphs_for_export(graphids=None):
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
 
     for resource_graph in resource_graph_query:
+        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(resource_graph['functions'])
+        del resource_graph['functions']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
         resource_graph['forms'] = get_forms_for_export(resource_graph)
         resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
         resource_graph['reports'] = get_report_data_for_export(resource_graph)
+        resource_graph['resource_2_resource_constraints'] = r2r_constraints_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
     return graphs
 
@@ -107,6 +118,8 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             export_node['arches_nodeid'] = str(node.nodeid)
             export_node['arches_node_name'] = node.name
             export_node['file_field_name'] = ""
+            if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
+                export_node['concept_export_value'] = "label"
             export_node['value_type'] = ""
             export_node['data_length'] = ""
             export_node['data_type'] = ""

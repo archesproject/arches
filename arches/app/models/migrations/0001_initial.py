@@ -672,6 +672,18 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='GraphXMapping',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('mapping', JSONField(blank=True, db_column='mapping')),
+            ],
+            options={
+                'db_table': 'graphs_x_mapping_file',
+                'managed': True,
+            },
+        ),
         # migrations.AlterField(
         #     model_name='edge',
         #     name='graph',
