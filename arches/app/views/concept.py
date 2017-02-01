@@ -43,10 +43,6 @@ class RDMView(BaseManagerView):
         for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
-        nav = self.get_default_nav()
-        nav['page_title'] = 'Reference Data Manager'
-        nav['help_title'] = 'Using the RDM'
-
         context = self.get_context_data(
             main_script='rdm',
             active_page='RDM',
@@ -54,8 +50,11 @@ class RDMView(BaseManagerView):
             conceptid=conceptid,
             concept_schemes=concept_schemes,
             CORE_CONCEPTS=CORE_CONCEPTS,
-            nav=nav
         )
+
+        context['nav']['title'] = 'Reference Data Manager'
+        context['nav']['help_title'] = 'Using the RDM'
+
         return render(request, 'rdm.htm', context)
 
 
