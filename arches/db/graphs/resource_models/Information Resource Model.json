@@ -2,7 +2,7 @@
     "graph": [
         {
             "subtitle": "Models information carriers such as images, reports, and publications.", 
-            "functions_x_graphs": [], 
+            "functions": [], 
             "mapfeaturecolor": "#FF0000", 
             "isresource": true, 
             "forms_x_cards": [

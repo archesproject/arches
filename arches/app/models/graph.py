@@ -58,13 +58,13 @@ class Graph(models.GraphModel):
         self.cards = {}
         self.widgets = {}
         self._nodegroups_to_delete = []
-        self.functions_x_graphs = []
+        self._functions = []
 
         if args:
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions_x_graphs'):
+                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
                         setattr(self, key, value)
 
                 nodegroups = dict((item['nodegroupid'], item) for item in args[0]["nodegroups"])
@@ -77,8 +77,8 @@ class Graph(models.GraphModel):
                 for card in args[0]["cards"]:
                     self.add_card(card)
 
-                if 'functions_x_graphs' in args[0]:
-                    for function in args[0]["functions_x_graphs"]:
+                if 'functions' in args[0]:
+                    for function in args[0]["functions"]:
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
@@ -274,7 +274,7 @@ class Graph(models.GraphModel):
 
         function.graph = self
 
-        self.functions_x_graphs.append(function)
+        self._functions.append(function)
 
         return function
 
@@ -305,7 +305,7 @@ class Graph(models.GraphModel):
             for widget in self.widgets.itervalues():
                 widget.save()
 
-            for functionxgraph in self.functions_x_graphs:
+            for functionxgraph in self._functions:
                 functionxgraph.save()
 
             for nodegroup in self._nodegroups_to_delete:
@@ -1007,6 +1007,7 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+        ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
 
         parentproperties = {
             self.root.nodeid: ''

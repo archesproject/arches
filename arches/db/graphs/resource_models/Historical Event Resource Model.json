@@ -50,7 +50,7 @@
             ], 
             "reports": [], 
             "iconclass": "fa fa-calendar", 
-            "functions_x_graphs": [], 
+            "functions": [], 
             "domain_connections": [
                 {
                     "ontology_property": "P11i_participated_in", 
