@@ -1,31 +1,6 @@
 {% load i18n %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
-
-<!--ko if: searchContext == 'full-search'-->
-    <!-- Page Header -->
-    <div class="ep-toolbar">
-
-        <!-- Title Bar -->
-        <div class="ep-tools-title">
-            <h1 class="page-header text-overflow ep-graph-title">
-                <i class="fa fa-search text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-                <span>{% trans "Search" %}</span>
-            </h1>
-        </div>
-
-        <!-- Help Bar -->
-        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
-              <i class="ion-help"></i>
-            </div>
-        </a>
-    </div>
-<!--/ko-->
-
-    <!-- Help Panel -->
-    {% include 'help-panel-base.htm' %}
-
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
