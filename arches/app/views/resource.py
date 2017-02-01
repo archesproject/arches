@@ -34,6 +34,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from django.forms.models import model_to_dict
 from arches.app.views.concept import get_preflabel_from_valueid
+from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
 
@@ -70,6 +71,12 @@ class ResourceEditorView(BaseManagerView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
+            resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+            default_relationshiptype_valueid = None
+            for relationship_type in resource_relationship_types:
+                if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
+                    default_relationshiptype_valueid = relationship_type[5]
+            relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
@@ -81,6 +88,7 @@ class ResourceEditorView(BaseManagerView):
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
+                relationship_types=relationship_type_values,
                 iconclass=resource_instance.graph.iconclass,
                 form=JSONSerializer().serialize(form),
                 forms=JSONSerializer().serialize(forms_w_cards),
@@ -160,7 +168,7 @@ class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
-        return JSONResponse(self.get_related_resources(resourceid, lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(resourceid, lang="en-US", start=start, limit=15), indent=4)
 
     def delete(self, request, resourceid=None):
         es = Elasticsearch()
@@ -176,7 +184,7 @@ class RelatedResourcesView(BaseManagerView):
             se.delete(index='resource_relations', doc_type='all', id=resourcexid)
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
     def post(self, request, resourceid=None):
         es = Elasticsearch()
@@ -219,7 +227,7 @@ class RelatedResourcesView(BaseManagerView):
             se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-us", start=start, limit=15), indent=4)
+        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
     def get_related_resources(self, resourceid, lang, limit=1000, start=0):
         ret = {

@@ -31,6 +31,25 @@ define([
         });
     };
 
+    // a method to track the old and new values of a subscribable
+    // from https://github.com/knockout/knockout/issues/914
+    //
+    // use case:
+    // var sub1 = this.FirstName.subscribeChanged(function (newValue, oldValue) {
+    //     this.NewValue1(newValue);
+    //     this.OldValue1(oldValue);
+    // }, this);
+
+    ko.subscribable.fn.subscribeChanged = function (callback, context) {
+        var savedValue = this.peek();
+        return this.subscribe(function (latestValue) {
+            var oldValue = savedValue;
+            savedValue = latestValue;
+            callback.call(context, latestValue, oldValue);
+        });
+    };
+
+
     var SearchBaseManagerView = BaseManagerView.extend({
         initialize: function(options) {
             this.isNewQuery = true;
@@ -57,15 +76,17 @@ define([
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
-            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
-                searchResults: this.viewModel.searchResults,
-                context: this.viewModel.searchContext,
-                editing_instance_id: this.viewModel.editingInstanceId
-            })
 
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
-            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
+                searchResults: this.viewModel.searchResults,
+                resourceEditorContext: this.viewModel.resourceEditorContext,
+                editing_instance_id: this.viewModel.editingInstanceId,
+                relationship_types: this.viewModel.relationship_types
+            })
+
+            this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.queryString = ko.computed(function() {

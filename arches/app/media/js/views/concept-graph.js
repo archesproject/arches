@@ -184,7 +184,7 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     d.y = height * 0.55;
                 }
                 if (d.type === 'Root') {
-                    d.fixed = true;
+                    d.fixed = false;
                     d.x = width * 0.1;
                     d.y = height * 0.1;
                 }

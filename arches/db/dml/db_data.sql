@@ -115,6 +115,7 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'Concept', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES CONCEPT');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'Collection', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES COLLECTION');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptScheme', 'CANDIDATES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000007', 'Concept', 'DEFAULT RESOURCE TO RESOURCE RELATIONSHIP TYPE');
 
 
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
@@ -122,6 +123,7 @@ INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (pub
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-US');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000007', 'prefLabel', 'Is Related', 'en-US');
 
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
@@ -129,6 +131,10 @@ INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000005', 'hasCollection');
+
+INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
+    VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000007', 'member');
+
 
 SET search_path = public, pg_catalog;
 
@@ -3336,7 +3342,7 @@ INSERT INTO report_templates(templateid, name, description, component, component
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
 
-CREATE OR REPLACE VIEW vw_getgeoms AS
+CREATE MATERIALIZED VIEW mv_geojson_geoms AS
     SELECT t.tileid,
        t.resourceinstanceid,
        n.nodeid,
@@ -3357,12 +3363,43 @@ CREATE OR REPLACE VIEW vw_getgeoms AS
     				  FROM nodes n_1
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
+CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
+
+CREATE OR REPLACE FUNCTION refresh_mv_geojson_geoms() RETURNS trigger AS
+$$
+DECLARE
+    geojson_node_count integer;
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        geojson_node_count = (select count(*)
+        	from nodes n
+        	where n.datatype = 'geojson-feature-collection'
+            and n.nodegroupid = OLD.nodegroupid);
+    ELSE
+        geojson_node_count = (select count(*)
+            from nodes n
+            where n.datatype = 'geojson-feature-collection'
+            and n.nodegroupid = NEW.nodegroupid);
+    END IF;
+
+    IF (geojson_node_count > 0) THEN
+        REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+    END IF;
+
+    RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql ;
+
+CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
+   ON tiles FOR EACH ROW
+   EXECUTE PROCEDURE refresh_mv_geojson_geoms();
+
 INSERT INTO map_sources(name, source)
     VALUES ('resources', '{
         "type": "vector",
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
-
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
     VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[

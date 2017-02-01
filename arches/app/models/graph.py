@@ -58,6 +58,7 @@ class Graph(models.GraphModel):
         self.cards = {}
         self.widgets = {}
         self._nodegroups_to_delete = []
+        self._functions = []
 
         if args:
             if isinstance(args[0], dict):
@@ -255,20 +256,25 @@ class Graph(models.GraphModel):
 
     def add_function(self, function):
         """
-        Adds a card to this graph
+        Adds a FunctionXGraph record to this graph
 
         Arguments:
-        node -- a dictionary representing a Card instance or an actual models.CardModel instance
+        node -- an object representing a FunctionXGraph instance or an actual models.CardModel instance
 
         """
 
         if not isinstance(function, models.FunctionXGraph):
-            functionobj = function.copy()
+            if isinstance(function, dict):
+                functionobj = models.FunctionXGraph(**function.copy())
+            else:
+                functionobj = function.copy()
             function = models.FunctionXGraph()
-            function.fuction_id = functionobj.functionid
+            function.function_id = functionobj.function_id
             function.config = functionobj.config
 
         function.graph = self
+
+        self._functions.append(function)
 
         return function
 
@@ -298,6 +304,9 @@ class Graph(models.GraphModel):
 
             for widget in self.widgets.itervalues():
                 widget.save()
+
+            for functionxgraph in self._functions:
+                functionxgraph.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
@@ -998,6 +1007,7 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+        ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
 
         parentproperties = {
             self.root.nodeid: ''

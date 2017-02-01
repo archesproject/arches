@@ -200,9 +200,10 @@ def concept(request, conceptid):
 
             elif skosfile:
                 overwrite_options = request.POST.get('overwrite_options', None)
+                staging_options = request.POST.get('staging_options', None)
                 skos = SKOSReader()
                 rdf = skos.read_file(skosfile)
-                ret = skos.save_concepts_from_skos(rdf, overwrite_options)
+                ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
                 return JSONResponse(ret)
 
         else:
@@ -291,7 +292,6 @@ def dropdown(request):
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
-    print label
     return JSONResponse(label)
 
 def search(request):
@@ -439,7 +439,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     se = SearchEngineFactory().create()
     query = Query(se)
     terms = Terms(field='conceptid', terms=[conceptid])
-    match = Match(field='type', query='preflabel', type='phrase')
+    match = Match(field='type', query='prefLabel', type='phrase')
     query.add_filter(terms)
     query.add_query(match)
     preflabels = query.search(index='concept_labels')['hits']['hits']
