@@ -81,12 +81,12 @@ define([
 
             this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
                 searchResults: this.viewModel.searchResults,
-                context: this.viewModel.searchContext,
+                resourceEditorContext: this.viewModel.resourceEditorContext,
                 editing_instance_id: this.viewModel.editingInstanceId,
                 relationship_types: this.viewModel.relationship_types
             })
 
-            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.queryString = ko.computed(function() {

@@ -15,18 +15,10 @@ define([
             this.propertiesDialogOpen = ko.observable(false);
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
-            this.relationshipTypes = ko.observableArray(options.relationship_types.values);
-            this.defaultRelationshipType = options.relationship_types.default;
             this.currentResource = ko.observable();
-            this.context = options.context;
+            this.resourceEditorContext = options.resourceEditorContext;
             this.showRelatedProperties = ko.observable(false);
-            this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
-            this.relatedProperties = koMapping.fromJS({
-                datefrom: '',
-                dateto: '',
-                relationship_type: this.defaultRelationshipType,
-                notes: ''
-            });
+
             _.each(this.relatedProperties, function(prop, key){
                 if (ko.isObservable(prop)) {
                     prop.subscribe(function(val){console.log(key, prop())});
@@ -125,7 +117,17 @@ define([
                 };
             };
 
-            if (this.context == 'resource-editor') {
+            if (this.resourceEditorContext === true) {
+                this.relationshipTypes = ko.observableArray(options.relationship_types.values);
+                this.defaultRelationshipType = options.relationship_types.default;
+                this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
+                this.relatedProperties = koMapping.fromJS({
+                    datefrom: '',
+                    dateto: '',
+                    relationship_type: this.defaultRelationshipType,
+                    notes: ''
+                });
+
                 this.currentResource(self.createResource(this.editingInstanceId));
                 this.getRelatedResources();
                 this.currentResource().resourceRelationships.subscribe(function(val){

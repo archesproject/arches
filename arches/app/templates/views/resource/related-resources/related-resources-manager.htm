@@ -19,7 +19,7 @@
 
 
                 <!--Documentation dropdown-->
-                <!--ko if: context == 'resource-editor'-->
+                <!--ko if: resourceEditorContext -->
                 <div class="related-resources-relationship">
                     <ul class="" style="list-style: none;">
                         <li class="mega-dropdown related-reources-crud-link">
@@ -130,7 +130,7 @@
                 {% include 'views/resource/related-resources/related-resources-grid.htm' %}
             </div>
             <!-- Message -->
-            <!--ko if: context == 'resource-editor'-->
+            <!--ko if: resourceEditorContext -->
             <div class="rr-card-message-placement">
                 <p class="text-center">
                     <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
@@ -139,7 +139,7 @@
             <!--/ko-->
         </div>
 
-        <!-- ko if: context == 'resource-editor' -->
+        <!-- ko if: resourceEditorContext -->
         <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
             <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
             <div class="rr-grid-item" data-bind="">

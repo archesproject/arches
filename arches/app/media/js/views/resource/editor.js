@@ -55,7 +55,7 @@ require([
     */
     var pageView = new SearchBaseManagerView({
         viewModel:{
-            searchContext: 'resource-editor',
+            resourceEditorContext: true,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
             formList: formList,
