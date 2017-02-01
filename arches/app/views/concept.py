@@ -297,6 +297,7 @@ def dropdown(request):
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
+    print "cat" * 10
     print label
     return JSONResponse(label)
 
@@ -445,7 +446,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     se = SearchEngineFactory().create()
     query = Query(se)
     terms = Terms(field='conceptid', terms=[conceptid])
-    match = Match(field='type', query='preflabel', type='phrase')
+    match = Match(field='type', query='prefLabel', type='phrase')
     query.add_filter(terms)
     query.add_query(match)
     preflabels = query.search(index='concept_labels')['hits']['hits']

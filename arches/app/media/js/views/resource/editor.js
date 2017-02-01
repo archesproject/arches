@@ -57,6 +57,7 @@ require([
         viewModel:{
             searchContext: 'resource-editor',
             editingInstanceId: data.resourceid,
+            relationship_types: data.relationship_types,
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),

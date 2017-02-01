@@ -5,23 +5,26 @@ define([
     'knockout-mapping',
     'arches',
     'views/resource/related-resources-list',
+    'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/summernote',
-    'plugins/knockout-select2',
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesList, datepicker) {
+], function($, Backbone, ko, koMapping, arches, RelatedResourcesList) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
             this.propertiesDialogOpen = ko.observable(false);
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
+            this.relationshipTypes = ko.observableArray(options.relationship_types.values);
+            this.defaultRelationshipType = options.relationship_types.default;
             this.currentResource = ko.observable();
             this.context = options.context;
             this.showRelatedProperties = ko.observable(false);
+            this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
             this.relatedProperties = koMapping.fromJS({
                 datefrom: '',
                 dateto: '',
-                relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
+                relationship_type: this.defaultRelationshipType,
                 notes: ''
             });
             _.each(this.relatedProperties, function(prop, key){

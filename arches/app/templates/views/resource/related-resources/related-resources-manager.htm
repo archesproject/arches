@@ -53,15 +53,7 @@
                                                 <form class="widgets">
                                                     <div class="row widget-container">
                                                         <div class="form-group">
-                                                            <div class="relative">
-                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
-                                                            </div>
-
-                                                            <div class="col-xs-12">
-                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.relationship_type">
-                                                            </div>
-
-                                                            <!-- <div class="row widget-wrapper">
+                                                            <div class="row widget-wrapper">
                                                                 <div class="form-group">
                                                                     <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
                                                                     <div class="col-xs-12">
@@ -69,17 +61,15 @@
                                                                             data-bind="select2: {
                                                                                 select2Config: {
                                                                                     clickBubble: true,
-                                                                                    data: {'id':relatedProperties.relationship_type(), text:'some nice'},
+                                                                                    data: relationshipTypes,
                                                                                     value: relatedProperties.relationship_type,
                                                                                     multiple: false,
-                                                                                    placeholder: ko.observable('test')
+                                                                                    placeholder: relationshipTypePlaceholder
                                                                                 }
                                                                             }">
                                                                     </div>
                                                                 </div>
-                                                            </div> -->
-
-
+                                                            </div>
 
                                                         </div>
                                                     </div>
