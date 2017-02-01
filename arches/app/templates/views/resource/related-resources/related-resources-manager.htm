@@ -19,7 +19,7 @@
 
 
                 <!--Documentation dropdown-->
-                <!--ko if: context == 'resource-editor'-->
+                <!--ko if: resourceEditorContext -->
                 <div class="related-resources-relationship">
                     <ul class="" style="list-style: none;">
                         <li class="mega-dropdown related-reources-crud-link">
@@ -53,13 +53,24 @@
                                                 <form class="widgets">
                                                     <div class="row widget-container">
                                                         <div class="form-group">
-                                                            <div class="relative">
-                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                            <div class="row widget-wrapper">
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                                    <div class="col-xs-12">
+                                                                        <input style="width:30%; display:inline-block;"
+                                                                            data-bind="select2: {
+                                                                                select2Config: {
+                                                                                    clickBubble: true,
+                                                                                    data: relationshipTypes,
+                                                                                    value: relatedProperties.relationship_type,
+                                                                                    multiple: false,
+                                                                                    placeholder: relationshipTypePlaceholder
+                                                                                }
+                                                                            }">
+                                                                    </div>
+                                                                </div>
                                                             </div>
 
-                                                            <div class="col-xs-12">
-                                                                <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.relationship_type">
-                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -116,10 +127,65 @@
             </div>
 
             <div class="rr-result-grid-container">
-                {% include 'views/resource/related-resources/related-resources-grid.htm' %}
+                <div>
+                    <!--ko if: resourceRelationships().length > 0 -->
+                    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>name</th>
+                                <th>relationship</th>
+                                <th>from</th>
+                                <th>to</th>
+                                <th>notes</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
+                                              jQueryUI: true,
+                                              scrollY: 250,
+                                              paging: true,
+                                              dom: 'rtip',
+                                              columns:[
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width:'100px'}
+                                              ]
+                                          }
+                                      }">
+                            <tr style="height:50px;" data-bind="click: function () {
+                                selected(!selected());
+                            }">
+                                <td>
+                                    <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
+                                    <span data-bind="text: resource.primaryname"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: preflabel.value"></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: datestarted'></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: dateended'></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: notes'></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--/ko -->
+
+                    <!--ko if: resourceRelationships().length === 0 -->
+                    <div>No Relationships</div>
+                    <!--/ko-->
+                </div>
+
             </div>
+
             <!-- Message -->
-            <!--ko if: context == 'resource-editor'-->
+            <!--ko if: resourceEditorContext -->
             <div class="rr-card-message-placement">
                 <p class="text-center">
                     <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
@@ -128,7 +194,7 @@
             <!--/ko-->
         </div>
 
-        <!-- ko if: context == 'resource-editor' -->
+        <!-- ko if: resourceEditorContext -->
         <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
             <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
             <div class="rr-grid-item" data-bind="">

@@ -4,10 +4,11 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'views/resource/related-resources-list',
+    'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/summernote',
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesList, datepicker) {
+    'bindings/datatable'
+], function($, Backbone, ko, koMapping, arches) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -15,14 +16,9 @@ define([
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.currentResource = ko.observable();
-            this.context = options.context;
+            this.resourceEditorContext = options.resourceEditorContext;
             this.showRelatedProperties = ko.observable(false);
-            this.relatedProperties = koMapping.fromJS({
-                datefrom: '',
-                dateto: '',
-                relationship_type: 'a9deade8-54c2-4683-8d76-a031c7301a47',
-                notes: ''
-            });
+
             _.each(this.relatedProperties, function(prop, key){
                 if (ko.isObservable(prop)) {
                     prop.subscribe(function(val){console.log(key, prop())});
@@ -34,7 +30,6 @@ define([
                }
            }, self);
             this.resourceRelationships = ko.observableArray();
-            this.relatedresourceslist = new RelatedResourcesList({relationships:this.resourceRelationships});
             this.selected = ko.computed(function(){
                 return _.filter(
                     this.resourceRelationships(), function(rr){
@@ -59,6 +54,7 @@ define([
                                         return resource;
                                     }
                                 });
+                                relationship.selected = ko.observable(false);
                                 relationship['resource'] = res.length > 0 ? res[0] : "";
                                 relationshipsWithResource.push(relationship)
                             }, this)
@@ -121,7 +117,17 @@ define([
                 };
             };
 
-            if (this.context == 'resource-editor') {
+            if (this.resourceEditorContext === true) {
+                this.relationshipTypes = ko.observableArray(options.relationship_types.values);
+                this.defaultRelationshipType = options.relationship_types.default;
+                this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
+                this.relatedProperties = koMapping.fromJS({
+                    datefrom: '',
+                    dateto: '',
+                    relationship_type: this.defaultRelationshipType,
+                    notes: ''
+                });
+
                 this.currentResource(self.createResource(this.editingInstanceId));
                 this.getRelatedResources();
                 this.currentResource().resourceRelationships.subscribe(function(val){

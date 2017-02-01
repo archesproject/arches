@@ -31,6 +31,7 @@ define([
         });
     };
 
+
     var SearchBaseManagerView = BaseManagerView.extend({
         initialize: function(options) {
             this.isNewQuery = true;
@@ -57,15 +58,17 @@ define([
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
-            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
-                searchResults: this.viewModel.searchResults,
-                context: this.viewModel.searchContext,
-                editing_instance_id: this.viewModel.editingInstanceId
-            })
 
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
-            this.viewModel.selectedTab = ko.observable(this.filters.mapFilter);
+            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
+                searchResults: this.viewModel.searchResults,
+                resourceEditorContext: this.viewModel.resourceEditorContext,
+                editing_instance_id: this.viewModel.editingInstanceId,
+                relationship_types: this.viewModel.relationship_types
+            })
+
+            this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.queryString = ko.computed(function() {
