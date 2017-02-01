@@ -3336,7 +3336,7 @@ INSERT INTO report_templates(templateid, name, description, component, component
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
 
-CREATE OR REPLACE VIEW vw_getgeoms AS
+CREATE MATERIALIZED VIEW mv_geojson_geoms AS
     SELECT t.tileid,
        t.resourceinstanceid,
        n.nodeid,
@@ -3357,12 +3357,43 @@ CREATE OR REPLACE VIEW vw_getgeoms AS
     				  FROM nodes n_1
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
+CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
+
+CREATE OR REPLACE FUNCTION refresh_mv_geojson_geoms() RETURNS trigger AS
+$$
+DECLARE
+    geojson_node_count integer;
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        geojson_node_count = (select count(*)
+        	from nodes n
+        	where n.datatype = 'geojson-feature-collection'
+            and n.nodegroupid = OLD.nodegroupid);
+    ELSE
+        geojson_node_count = (select count(*)
+            from nodes n
+            where n.datatype = 'geojson-feature-collection'
+            and n.nodegroupid = NEW.nodegroupid);
+    END IF;
+
+    IF (geojson_node_count > 0) THEN
+        REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+    END IF;
+
+    RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql ;
+
+CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
+   ON tiles FOR EACH ROW
+   EXECUTE PROCEDURE refresh_mv_geojson_geoms();
+
 INSERT INTO map_sources(name, source)
     VALUES ('resources', '{
         "type": "vector",
         "tiles": ["/tileserver/resources/{z}/{x}/{y}.pbf"]
     }');
-
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
     VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[
