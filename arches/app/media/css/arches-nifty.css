@@ -4743,6 +4743,11 @@ div.row.widget-wrapper.report-header:hover {
   padding: 10px;
 }
 
+.map-controls-overlay-icon {
+    padding-right: 10px;
+    /*margin-right: -10px;*/
+}
+
 .overlay-selection-container {
     position: absolute;
     top: 0px;

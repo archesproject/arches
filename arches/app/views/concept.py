@@ -22,6 +22,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.utils.module_loading import import_string
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
@@ -30,17 +32,16 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
-from django.utils.module_loading import import_string
 from arches.app.views.base import BaseManagerView
 
-
+@method_decorator(group_required('edit'), name='dispatch')
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         languages = models.DLanguage.objects.all()
 
         concept_schemes = []
-        for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
+        for concept in models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode')):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
         context = self.get_context_data(
@@ -69,23 +70,6 @@ def get_sparql_providers(endpoint=None):
     else:
         return sparql_providers
 
-@group_required('edit')
-def rdm(request, conceptid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    languages = models.DLanguage.objects.all()
-
-    concept_schemes = []
-    for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
-        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
-
-    return render(request, 'rdm.htm', {
-            'main_script': 'rdm',
-            'active_page': 'RDM',
-            'languages': languages,
-            'conceptid': conceptid,
-            'concept_schemes': concept_schemes,
-            'CORE_CONCEPTS': CORE_CONCEPTS
-        })
 
 @group_required('edit')
 def concept(request, conceptid):
@@ -176,16 +160,26 @@ def concept(request, conceptid):
                 })
 
 
-        concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-
         if f == 'skos':
             include_parentconcepts = False
             include_subconcepts = True
             depth_limit = None
+            
+            if this_concept.nodetype == 'ConceptScheme':
+                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+            else:
+                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=False,
+                    depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
+
             skos = SKOSWriter()
             return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
+
+        concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
         if emulate_elastic_search:
             ret.append({'_type': id, '_source': concept_graph})
@@ -210,9 +204,10 @@ def concept(request, conceptid):
 
             elif skosfile:
                 overwrite_options = request.POST.get('overwrite_options', None)
+                staging_options = request.POST.get('staging_options', None)
                 skos = SKOSReader()
                 rdf = skos.read_file(skosfile)
-                ret = skos.save_concepts_from_skos(rdf, overwrite_options)
+                ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
                 return JSONResponse(ret)
 
         else:
@@ -301,7 +296,6 @@ def dropdown(request):
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
-    print label
     return JSONResponse(label)
 
 def search(request):
@@ -449,7 +443,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     se = SearchEngineFactory().create()
     query = Query(se)
     terms = Terms(field='conceptid', terms=[conceptid])
-    match = Match(field='type', query='preflabel', type='phrase')
+    match = Match(field='type', query='prefLabel', type='phrase')
     query.add_filter(terms)
     query.add_query(match)
     preflabels = query.search(index='concept_labels')['hits']['hits']

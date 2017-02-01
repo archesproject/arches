@@ -186,13 +186,9 @@ class UITest(StaticLiveServerTestCase):
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
         results['added overlay'] = map_widget.add_overlay(1)
-        map_tools_working = True
-        for k, v in results.iteritems():
-            if v != True:
-                map_tools_working = False
-        print 'map tools results', results
 
-        self.assertTrue(map_tools_working)
+        print results
+        self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_make_form(self):
         print "Testing form creation"
@@ -257,14 +253,10 @@ class UITest(StaticLiveServerTestCase):
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
         results['added overlay'] = map_widget.add_overlay(2)
-        map_tools_working = True
-        for k, v in results.iteritems():
-            if v != True:
-                map_tools_working = False
-        print 'map tools results in report manager', results
         report_editor_page.save_report("ReportA")
 
-        self.assertTrue(map_tools_working)
+        print results
+        self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_add_resource(self):
         print "Testing resource instance creation and crud"

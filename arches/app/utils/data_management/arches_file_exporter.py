@@ -41,13 +41,6 @@ class ArchesFileExporter(object):
 		graph_data = resourceGraphExporter(graphids)
 		self.write_to_file(graph_data, data_dir)
 
-	def export_concepts(self, data_dir, conceptids):
-		"""
-		Wrapper around arches.app.utils.data_management.concepts.exporter method
-		"""
-		reference_data = referenceDataExporter(conceptids)
-		self.write_to_file(reference_data, data_dir)
-
 	def export_business_data(self, data_dir, resourceids):
 		resource_exporter = resourceDataExporter('json')
 		resource_data = resource_exporter.get_resources_for_export(resourceids)
@@ -76,22 +69,17 @@ class ArchesFileExporter(object):
 		metadata = {'os': os_type, 'os version': os_release, 'db': db, 'git hash': tag}
 		return metadata
 
-	def export_all(self, data_dir, graphids, resourceids, conceptids):
+	def export_all(self, data_dir, graphids, resourceids):
 		"""
 		Creates arches json export of resource graphs, concepts, and business data.
 		"""
 		data = {}
 		data['graph'] = []
-		data['reference_data'] = []
 		data['business_data'] = []
 
 		if graphids != False:
 			graphs_for_export = resourceGraphExporter(graphids)['graph']
 			data['graph'] = graphs_for_export
-
-		if conceptids != False:
-			reference_data_for_export = referenceDataExporter(conceptids)['reference_data']
-			data['reference_data'] = reference_data_for_export
 
 		if resourceids != False:
 			resource_exporter = resourceDataExporter('json')
@@ -105,4 +93,4 @@ class ArchesFileExporter(object):
 		data['metadata'] = self.export_metadata
 
 		with open(os.path.join(data_dir), 'w') as export_json:
-			export_json.write(JSONSerializer().serialize(data))
+			json.dump(JSONDeserializer().deserialize(JSONSerializer().serialize(data)), export_json, sort_keys=True, indent=4)

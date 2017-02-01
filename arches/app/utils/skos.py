@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid, re
 from django.db import transaction
+from django.db.models import Q
 from django.utils.http import urlencode
 from rdflib import Literal, Namespace, RDF, URIRef
 from rdflib.namespace import SKOS, DCTERMS
@@ -27,6 +28,8 @@ from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+# define the ARCHES namespace
+ARCHES = Namespace('http://www.archesproject.org/')
 
 class SKOSReader(object):
     def __init__(self):
@@ -38,7 +41,12 @@ class SKOSReader(object):
         parse the skos file and extract all available data
 
         """
+
         rdf_graph = Graph()
+
+        #bind the namespaces
+        rdf_graph.bind('arches',ARCHES)
+
         start = time()
         try:
             rdf = rdf_graph.parse(source=path_to_file, format=format)
@@ -47,12 +55,13 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options=None):
+    def save_concepts_from_skos(self, graph, overwrite_options=None, staging_options=False):
         """
         given an RDF graph, tries to save the concpets to the system
 
         Keyword arguments: 
-        overwrite_options -- 'overwrite', 'ignore', 'stage'
+        overwrite_options -- 'overwrite', 'ignore'
+        staging_options -- 'stage', 'keep'
 
         """
 
@@ -60,7 +69,7 @@ class SKOSReader(object):
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
         value_types = models.DValueType.objects.all()
-        skos_value_types = value_types.filter(namespace = 'skos')
+        skos_value_types = value_types.filter(Q(namespace = 'skos') | Q(namespace = 'arches'))
         skos_value_types_list = skos_value_types.values_list('valuetype', flat=True)
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
 
@@ -104,8 +113,11 @@ class SKOSReader(object):
                             pass
 
                     if str(SKOS) in predicate:
+                        print predicate
                         if predicate == SKOS.hasTopConcept:
-                            self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': self.generate_uuid_from_subject(baseuuid, object)})
+                            top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
+                            self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
+
 
                 self.nodes.append(concept_scheme)
 
@@ -123,7 +135,7 @@ class SKOSReader(object):
 
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject = s):
-                        if str(SKOS) in predicate:
+                        if str(SKOS) in predicate or str(ARCHES) in predicate:
                             if hasattr(object, 'language') and object.language not in allowed_languages:
                                 newlang = models.DLanguage()
                                 newlang.pk = object.language
@@ -132,7 +144,7 @@ class SKOSReader(object):
                                 newlang.save()
                                 allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
-                            relation_or_value_type = predicate.replace(SKOS, '') # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
+                            relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
 
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types.get(valuetype=relation_or_value_type)
@@ -147,18 +159,60 @@ class SKOSReader(object):
 
                     self.nodes.append(concept)
 
+
+            # Search for ConceptSchemes first
+            for s, v, o in graph.triples((None, SKOS.hasCollection, None)):
+                print "%s %s %s " % (s,v,o)
+                concept = Concept({
+                    'id': self.generate_uuid_from_subject(baseuuid, o),
+                    'legacyoid': str(o),
+                    'nodetype': 'Collection'
+                })
+                # loop through all the elements within a <skos:Concept> element
+                for predicate, object in graph.predicate_objects(subject = o):
+                    if str(SKOS) in predicate or str(ARCHES) in predicate:
+                        if hasattr(object, 'language') and object.language not in allowed_languages:
+                            newlang = models.DLanguage()
+                            newlang.pk = object.language
+                            newlang.languagename = object.language
+                            newlang.isdefault = False
+                            newlang.save()
+                            allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
+
+                        relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
+
+                        if relation_or_value_type in skos_value_types_list:
+                            value_type = skos_value_types.get(valuetype=relation_or_value_type)
+                            val = self.unwrapJsonLiteral(object)
+                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                
+                self.nodes.append(concept)
+                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'hasCollection', 'target': self.generate_uuid_from_subject(baseuuid, o)})
+            
+            for s, v, o in graph.triples((None, SKOS.member, None)):
+                print "%s %s %s " % (s,v,o)
+                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
+
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
+                    if staging_options == 'stage':
+                        try:
+                            models.Concept.objects.get(pk=node.id)
+                        except:
+                            # this is a new concept, so add a reference to it in the Candiates schema
+                            if node.nodetype != 'ConceptScheme':
+                                self.relations.append({'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
+                    
                     if overwrite_options == 'overwrite':
                         node.save()
                     elif overwrite_options == 'ignore':
                         try:
+                            # don't do anything if the concept already exists
                             models.Concept.objects.get(pk=node.id)
                         except:
+                            # else save it
                             node.save()
-                    else: # 'stage'
-                        pass
 
                 # insert the concept relations
                 for relation in self.relations:
@@ -211,9 +265,6 @@ class SKOSWriter(object):
         #get empty RDF graph
         rdf_graph = Graph()
 
-        #define namespaces
-        ARCHES = Namespace('http://www.archesproject.org/')
-
         #bind the namespaces
         rdf_graph.bind('arches',ARCHES)
         rdf_graph.bind('skos',SKOS)
@@ -230,7 +281,6 @@ class SKOSWriter(object):
             scheme_id = concept_graph.id
 
             def build_skos(node):
-
                 if node.nodetype == 'Concept':
                     rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
 
@@ -258,5 +308,24 @@ class SKOSWriter(object):
 
             concept_graph.traverse(build_skos)
             return rdf_graph.serialize(format=format)
+
+        elif concept_graph.nodetype == 'GroupingNode':
+            scheme_id = concept_graph.id
+
+            def build_skos(node):
+                for subconcept in node.subconcepts:
+                    rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
+
+                rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
+                if node.nodetype == 'Collection':
+                    for value in node.values:
+                        if value.category == 'label' or value.category == 'note':
+                            jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
+                            rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+    
+
+
+            concept_graph.traverse(build_skos)
+            return rdf_graph.serialize(format=format)
         else:
-            raise Exception('Only ConceptSchemes can be written to SKOS RDF files.')
+            raise Exception('Only ConceptSchemes and Collections can be written to SKOS RDF files.')
