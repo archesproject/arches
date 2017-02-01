@@ -223,10 +223,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="ep-tools-title">
                             <h1 class="page-header text-overflow ep-graph-title">
                                 <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-                                <span>{{ nav.title }}</span>
+                                <span>{% trans nav.title %}</span>
                             </h1>
                         </div>
 
+                        <!-- Login -->
                         {% if nav.login %}
                         <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
@@ -239,8 +240,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
-                        {% if nav.edit_history %}
                         <!-- Recently Added -->
+                        {% if nav.edit_history %}
                         <ul class="nav navbar-top-links pull-left">
                             <li class="mega-dropdown open">
                                 <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
@@ -295,7 +296,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="ep-help-panel" class="ep-help" style="display:none">
                         <div class="ep-help-header" style="padding-right:0px">
                             <div class="ep-help-title">
-                                <span>{{ nav.help.0 }}</span>
+                                <span>{% trans nav.help.0 %}</span>
                             </div>
                             <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Close Help">
