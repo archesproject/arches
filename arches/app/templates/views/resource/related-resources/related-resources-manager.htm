@@ -127,8 +127,37 @@
             </div>
 
             <div class="rr-result-grid-container">
-                {% include 'views/resource/related-resources/related-resources-grid.htm' %}
+                <div>
+                    <!--ko if: resourceRelationships().length > 0 -->
+                    <div>
+                        <div style="position: relative;" data-bind="foreach: {data: resourceRelationships, as: 'item'}">
+                            <div class="required-node-card" style="" data-bind="click: function(){item.selected(!item.selected())}">
+                                <div class="required-node-card-item">
+                                    <div class="required-node-card-vis-toggle">
+                                        <i data-bind="css: {'ion-checkmark-circled': item.selected}"></i>
+                                    </div>
+                                    <div class="required-node-card-main" style="">
+                                        <a class="" style="" href="#">
+                                            <span data-bind="text: item.resource.primaryname"></span>
+                                            <span data-bind="text: item.preflabel.value"></span>
+                                            <span data-bind='text: item.datestarted'></span>
+                                            <span data-bind='text: item.dateended'></span>
+                                            <span data-bind='text: item.notes'></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/ko -->
+
+                    <!--ko if: resourceRelationships().length === 0 -->
+                    <div>No Relationships</div>
+                    <!--/ko-->
+                </div>
+
             </div>
+
             <!-- Message -->
             <!--ko if: resourceEditorContext -->
             <div class="rr-card-message-placement">

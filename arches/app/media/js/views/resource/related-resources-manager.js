@@ -4,11 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'views/resource/related-resources-list',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/summernote',
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesList) {
+], function($, Backbone, ko, koMapping, arches) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -30,7 +29,6 @@ define([
                }
            }, self);
             this.resourceRelationships = ko.observableArray();
-            this.relatedresourceslist = new RelatedResourcesList({relationships:this.resourceRelationships});
             this.selected = ko.computed(function(){
                 return _.filter(
                     this.resourceRelationships(), function(rr){
@@ -55,6 +53,7 @@ define([
                                         return resource;
                                     }
                                 });
+                                relationship.selected = ko.observable(false);
                                 relationship['resource'] = res.length > 0 ? res[0] : "";
                                 relationshipsWithResource.push(relationship)
                             }, this)
