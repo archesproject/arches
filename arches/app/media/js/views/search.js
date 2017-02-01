@@ -4,5 +4,5 @@ define([
     'knockout',
     'views/search-base-manager'
 ], function($, _, ko, SearchBaseManagerView) {
-    return new SearchBaseManagerView({viewModel:{searchContext:'full-search'}});
+    return new SearchBaseManagerView({viewModel:{resourceEditorContext:false}});
 });
