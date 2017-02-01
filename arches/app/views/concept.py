@@ -297,8 +297,6 @@ def dropdown(request):
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
-    print "cat" * 10
-    print label
     return JSONResponse(label)
 
 def search(request):
