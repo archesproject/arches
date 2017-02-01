@@ -127,8 +127,63 @@
             </div>
 
             <div class="rr-result-grid-container">
-                {% include 'views/resource/related-resources/related-resources-grid.htm' %}
+                <div>
+                    <!--ko if: resourceRelationships().length > 0 -->
+                    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>name</th>
+                                <th>relationship</th>
+                                <th>from</th>
+                                <th>to</th>
+                                <th>notes</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
+                                              jQueryUI: true,
+                                              scrollY: 250,
+                                              paging: true,
+                                              dom: 'rtip',
+                                              columns:[
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width:'100px'}
+                                              ]
+                                          }
+                                      }">
+                            <tr style="height:50px;" data-bind="click: function () {
+                                selected(!selected());
+                            }">
+                                <td>
+                                    <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
+                                    <span data-bind="text: resource.primaryname"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: preflabel.value"></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: datestarted'></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: dateended'></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: notes'></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--/ko -->
+
+                    <!--ko if: resourceRelationships().length === 0 -->
+                    <div>No Relationships</div>
+                    <!--/ko-->
+                </div>
+
             </div>
+
             <!-- Message -->
             <!--ko if: resourceEditorContext -->
             <div class="rr-card-message-placement">
