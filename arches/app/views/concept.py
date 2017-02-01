@@ -200,9 +200,10 @@ def concept(request, conceptid):
 
             elif skosfile:
                 overwrite_options = request.POST.get('overwrite_options', None)
+                staging_options = request.POST.get('staging_options', None)
                 skos = SKOSReader()
                 rdf = skos.read_file(skosfile)
-                ret = skos.save_concepts_from_skos(rdf, overwrite_options)
+                ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
                 return JSONResponse(ret)
 
         else:

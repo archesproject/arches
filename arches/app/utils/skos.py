@@ -55,12 +55,13 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options=None, stage_options=False, make_collections=True):
+    def save_concepts_from_skos(self, graph, overwrite_options=None, staging_options=False):
         """
         given an RDF graph, tries to save the concpets to the system
 
         Keyword arguments: 
-        overwrite_options -- 'overwrite', 'ignore', 'stage'
+        overwrite_options -- 'overwrite', 'ignore'
+        staging_options -- 'stage', 'keep'
 
         """
 
@@ -195,15 +196,23 @@ class SKOSReader(object):
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
+                    if staging_options == 'stage':
+                        try:
+                            models.Concept.objects.get(pk=node.id)
+                        except:
+                            # this is a new concept, so add a reference to it in the Candiates schema
+                            if node.nodetype != 'ConceptScheme':
+                                self.relations.append({'source': '00000000-0000-0000-0000-000000000006', 'type': 'narrower', 'target': node.id})
+                    
                     if overwrite_options == 'overwrite':
                         node.save()
                     elif overwrite_options == 'ignore':
                         try:
+                            # don't do anything if the concept already exists
                             models.Concept.objects.get(pk=node.id)
                         except:
+                            # else save it
                             node.save()
-                    else: # 'stage'
-                        pass
 
                 # insert the concept relations
                 for relation in self.relations:
