@@ -29,5 +29,16 @@ class BaseManagerView(TemplateView):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['graph_models'] = models.GraphModel.objects.all()
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
+        context['nav'] = {
+            'icon':'fa-question',
+            'title':'',
+            'help':('',''),
+            'menu':False,
+            'search':True,
+            'res_edit':False,
+            'edit_history':False,
+            'login':True,
+            'print':False,
+        }
 
         return context

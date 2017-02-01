@@ -50,8 +50,12 @@ class RDMView(BaseManagerView):
             languages=languages,
             conceptid=conceptid,
             concept_schemes=concept_schemes,
-            CORE_CONCEPTS=CORE_CONCEPTS
+            CORE_CONCEPTS=CORE_CONCEPTS,
         )
+
+        context['nav']['title'] = 'Reference Data Manager'
+        context['nav']['help_title'] = 'Using the RDM'
+
         return render(request, 'rdm.htm', context)
 
 
