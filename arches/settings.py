@@ -144,7 +144,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 
-ONTOLOGY_PATH = ['db', 'ontologies', 'cidoc_crm']
+ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
 ONTOLOGY_BASE_VERSION = '6.2'
 ONTOLOGY_BASE_NAME = 'CIDOC CRM v6.2'

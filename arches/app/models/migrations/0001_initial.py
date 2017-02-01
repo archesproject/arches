@@ -26,9 +26,8 @@ def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
 
-    path_to_ontologies = os.path.join(settings.ROOT_DIR, *settings.ONTOLOGY_PATH)
-    extensions = [os.path.join(path_to_ontologies, x) for x in settings.ONTOLOGY_EXT]
-    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, settings.ONTOLOGY_BASE),
+    extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
+    management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
         version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions))
 
 def reverse_func(apps, schema_editor):
