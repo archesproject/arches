@@ -7,6 +7,7 @@ define([
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/summernote',
+    'bindings/datatable'
 ], function($, Backbone, ko, koMapping, arches) {
     return Backbone.View.extend({
         initialize: function(options) {
