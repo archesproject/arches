@@ -79,7 +79,8 @@ define([
             this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
                 searchResults: this.viewModel.searchResults,
                 context: this.viewModel.searchContext,
-                editing_instance_id: this.viewModel.editingInstanceId
+                editing_instance_id: this.viewModel.editingInstanceId,
+                relationship_types: this.viewModel.relationship_types
             })
 
             this.filters.mapFilter.results = this.viewModel.searchResults;
