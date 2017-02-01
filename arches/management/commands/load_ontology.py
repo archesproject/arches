@@ -103,22 +103,23 @@ class Command(BaseCommand):
                 #     ontology, created = models.Ontology.objects.get_or_create(pk=id, defaults={'version': version, 'name': name, 'path': data_source})
                 #if extensions is not None:
                 for extension in extensions:
-                    self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
-                        # filepath = os.path.split(os.path.abspath(extension))[0]
-                        # filename = os.path.split(extension)[1]
-                        # name = os.path.splitext(filename)[0]
-                        # self.parse_xml(extension)
-                        # if models.widget_storage_location.location in filepath:
-                        #     # if the file we're referencing already exists in the location where we 
-                        #     # usually store them then leave it there and just save a reference to it
-                        #     path = '.%s' % os.path.join(filepath.replace(models.widget_storage_location.location, ''), filename)
-                        # else:
-                        #     path = File(open(extension))
-                        
-                        # f, created = models.Ontology.objects.get_or_create(path=path, defaults={'version': version, 'name': name, 'path': path, 'parentontology': ontology})
-                        
-                        # print created
-                        # print f.path.path
+                    if extension:
+                        self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
+                            # filepath = os.path.split(os.path.abspath(extension))[0]
+                            # filename = os.path.split(extension)[1]
+                            # name = os.path.splitext(filename)[0]
+                            # self.parse_xml(extension)
+                            # if models.widget_storage_location.location in filepath:
+                            #     # if the file we're referencing already exists in the location where we 
+                            #     # usually store them then leave it there and just save a reference to it
+                            #     path = '.%s' % os.path.join(filepath.replace(models.widget_storage_location.location, ''), filename)
+                            # else:
+                            #     path = File(open(extension))
+                            
+                            # f, created = models.Ontology.objects.get_or_create(path=path, defaults={'version': version, 'name': name, 'path': path, 'parentontology': ontology})
+                            
+                            # print created
+                            # print f.path.path
 
                 for ontology_class, data in self.crawl_graph().iteritems():
                     models.OntologyClass.objects.update_or_create(source=ontology_class, ontology=ontology, defaults={'target': data})
