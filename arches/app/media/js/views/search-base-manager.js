@@ -76,6 +76,13 @@ define([
             this.viewModel.searchResults = new SearchResults({
                 viewModel: this.viewModel
             });
+            this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
+                searchResults: this.viewModel.searchResults,
+                context: this.viewModel.searchContext,
+                editing_instance_id: this.viewModel.editingInstanceId
+            })
+
+            this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.viewModel.relatedResourcesManager = new RelatedResourcesManager({
                 searchResults: this.viewModel.searchResults,
