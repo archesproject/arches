@@ -4392,6 +4392,10 @@ div.row.widget-wrapper {
     flex-direction: row;
 }
 
+.search-candidate-link.unrelatable-search-result {
+    color: #999;
+}
+
 .save-relationships {
     position: absolute;
     right: 20px;
