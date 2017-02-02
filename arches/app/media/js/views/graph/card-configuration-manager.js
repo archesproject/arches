@@ -24,6 +24,8 @@ require([
             data: data.graph
         }),
         permissions: data.permissions,
+        ontology_properties: data.ontology_properties,
+        ontologyproperty: data.ontologyproperty,
         helpPreviewActive: ko.observable(false),
         reset: function () {
             viewModel.card.reset();

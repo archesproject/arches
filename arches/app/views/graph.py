@@ -305,6 +305,7 @@ class CardView(GraphBaseView):
         for concept in top_concepts:
             if concept.label == 'Dropdown Lists':
                 concept_collections = concept.children
+        print ontology_properties
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -319,7 +320,8 @@ class CardView(GraphBaseView):
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
-            ontology_properties=ontology_properties,
+            ontology_properties=JSONSerializer().serialize(ontology_properties),
+            ontologyproperty=ontologyproperty,
         )
 
         context['nav']['title'] = self.graph.name
