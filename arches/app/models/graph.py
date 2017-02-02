@@ -1002,6 +1002,7 @@ class Graph(models.GraphModel):
 
         ret = JSONSerializer().handle_model(self)
         ret['root'] = self.root
+        ret['relatable_resource_model_ids'] = [str(relatable_node.graph.graphid) for relatable_node in self.root.get_relatable_resources()]
         ret['cards'] = self.get_cards()
         ret['nodegroups'] = self.get_nodegroups()
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
