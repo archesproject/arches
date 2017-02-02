@@ -25,7 +25,7 @@ require([
         }),
         permissions: data.permissions,
         ontology_properties: data.ontology_properties,
-        ontologyproperty: data.ontologyproperty,
+        ontologyproperty: ko.observable(data.ontologyproperty),
         helpPreviewActive: ko.observable(false),
         reset: function () {
             viewModel.card.reset();
@@ -65,6 +65,11 @@ require([
             viewModel.openCard(cardId);
         }
     });
+
+    viewModel.ontologyproperty.subscribe(function(val) {
+        var cardOntologyProperty = viewModel.card.get('ontologyproperty');
+        cardOntologyProperty(val);
+    }, this);
 
     viewModel.cardComponentsTree = new CardComponentsTree(viewModel);
 

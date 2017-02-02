@@ -206,7 +206,6 @@ class Card(models.CardModel):
 
         """
         self.graph = Graph.objects.get(graphid=self.graph_id)
-        self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
