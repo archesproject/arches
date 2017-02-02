@@ -39,7 +39,7 @@
                 {% trans "Relation to Resource" %}
             </div>
             <div data-bind="with: card">
-                <select class="resources" data-bind="value: $data.get('ontologyproperty'), options: $data.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: $root.ontologyproperty, options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -81,7 +81,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     <!-- Card CRUD Permissions Form -->

@@ -156,7 +156,6 @@ class ResourceReportView(BaseManagerView):
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
         templates = models.ReportTemplate.objects.all()
-
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
