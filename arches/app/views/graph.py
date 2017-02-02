@@ -59,7 +59,7 @@ class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -71,6 +71,7 @@ class GraphSettingsView(GraphBaseView):
                     'graph': res,
                     'is_relatable': (node_model in relatable_resources)
                 })
+
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
 
@@ -87,7 +88,7 @@ class GraphSettingsView(GraphBaseView):
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
         context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
-        
+
         return render(request, 'views/graph/graph-settings.htm', context)
 
     def post(self, request, graphid):
