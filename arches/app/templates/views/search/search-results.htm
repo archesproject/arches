@@ -31,14 +31,12 @@
                     <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                     <!--/ko-->
                     <!--ko if: $root.resourceEditorContext -->
-                        <!--ko if: relatable -->
+                        <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
                         <a class="search-candidate-link pull-right" href="" data-bind="click: relationshipcandidacy"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %} </a>
                         <!--/ko-->
-                        <!--ko ifnot: relatable -->
+                        <!--ko if: relatable == false || $root.editingInstanceId == resourceinstanceid -->
                         <a class="search-candidate-link unrelatable-search-result pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Cannot Be Related" %} </a>
-
                         <!--/ko-->
-
                     <!--/ko-->
                 </div>
             </div>
