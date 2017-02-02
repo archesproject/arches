@@ -23,3 +23,4 @@ arches/Net_files
 .idea
 arches/app/media/bower_components
 arches/tileserver/cache
+docs/_build

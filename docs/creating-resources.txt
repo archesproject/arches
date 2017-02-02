@@ -1,0 +1,7 @@
+############################
+Creating Resources
+############################
+
+Generally, creating resources (and editing existing ones) is a very straight-forward process. From the tools menu, find the “Add New Resources” menu, and choose what kind of new resource you’d like to add. You are able to create new resources based on any active resource models. You’ll be present with themed data-entry forms, each of which will record subsets of information that define your new resource.
+
+However, there are some advanced aspects to creating resource data, so here are some extra tips in case you get stuck.

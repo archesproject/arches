@@ -1,4 +1,4 @@
-############
+﻿############
 Arches Data
 ############
 
@@ -17,7 +17,7 @@ To accomplish this, Arches stores both metadata - defining the set of resource t
 The physical data model is best understood when broken into three distinct parts: Ontology Data,  Reference Data, and Resources Data.  The ``entity_types`` table plays a role in all three of these parts of the data model. 
 
 
-.. image:: images/Arches_ERD.jpg
+.. image:: _static/Arches_ERD.jpg
 
 
 **Ontology Data**
