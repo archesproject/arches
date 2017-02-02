@@ -284,6 +284,17 @@ class CardView(GraphBaseView):
             # assume this is a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         self.graph = Graph.objects.get(graphid=card.graph_id)
+
+        def get_edge_to_parent():
+            for edge in self.graph.edges.itervalues():
+                if str(edge.rangenode_id) == str(card.nodegroup_id):
+                    return edge
+
+        ontologyproperty = get_edge_to_parent().ontologyproperty
+        ontology_properties = []
+        if ontologyproperty:
+            ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayers.objects.all()
@@ -308,6 +319,7 @@ class CardView(GraphBaseView):
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
+            ontology_properties=ontology_properties,
         )
 
         context['nav']['title'] = self.graph.name
@@ -424,7 +436,6 @@ class ReportManagerView(GraphBaseView):
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
