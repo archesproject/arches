@@ -89,7 +89,9 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None, bulk=False):
+        start = time()
+
         if file_format == None:
             file_format = self.file_format
         if business_data == None:
@@ -99,10 +101,13 @@ class BusinessDataImporter(object):
         if file_format == 'json':
             ArchesFileImporter().import_business_data(business_data, mapping)
         elif file_format == 'csv':
-            CSVFileImporter().import_business_data(business_data, mapping)
+            CSVFileImporter().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
         elif file_format == 'shp':
             # SHPFileImporter().import_business_data(business_data, mapping)
             pass
+
+        elapsed = (time() - start)
+        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
 class ResourceLoader(object):
 
