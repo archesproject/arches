@@ -1538,7 +1538,7 @@
         <skos:member rdf:resource="http://www.archesproject.org/33fcebd6-f785-4b1f-a6b9-002700873e4b"/>
         <skos:member rdf:resource="http://www.archesproject.org/e73c6c73-6475-49eb-84bc-ce39a2446c2a"/>
         <skos:member rdf:resource="http://www.archesproject.org/7cd9aefe-6539-4321-b2af-4b3a1bb8c670"/>
-        <skos:member rdf:resource="http://www.archesproject.org/af19047f-bd6d-4457-a035-9b143af10160"/>
+        <skos:member rdf:resource="http://www.archesproject.org/00000000-0000-0000-0000-000000000007"/>
         <skos:prefLabel xml:lang="en-US">{"id": "d8c622f6-e786-11e6-905a-475a5eee86f5", "value": "Resource To Resource Relationship Types"}</skos:prefLabel>
         <skos:member rdf:resource="http://www.archesproject.org/7c2d77b5-ad2c-4308-a02a-c96175541fc5"/>
         <skos:member rdf:resource="http://www.archesproject.org/4077b419-d8ca-4fc1-b681-ddc7ed54e70e"/>
@@ -10958,7 +10958,7 @@
   <skos:Concept rdf:about="http://www.archesproject.org/2ef51687-9e68-43e3-b570-5f657c3cd8de"/>
   <skos:Concept rdf:about="http://www.archesproject.org/4da4079c-cfbc-4080-ab77-9cb0941ceb73"/>
   <skos:Concept rdf:about="http://www.archesproject.org/89327035-f908-495b-8a6e-566d589fc29d"/>
-  <skos:Concept rdf:about="http://www.archesproject.org/af19047f-bd6d-4457-a035-9b143af10160"/>
+  <skos:Concept rdf:about="http://www.archesproject.org/00000000-0000-0000-0000-000000000007"/>
   <skos:Concept rdf:about="http://www.archesproject.org/52835c0e-6952-4d4b-b370-30b5f0a1dcc6"/>
   <skos:Concept rdf:about="http://www.archesproject.org/2f43764f-babd-4bbd-a181-b77b10a45958"/>
   <skos:Concept rdf:about="http://www.archesproject.org/f020cdac-bd52-42f5-a458-a9f135938bba"/>

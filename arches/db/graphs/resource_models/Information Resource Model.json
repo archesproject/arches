@@ -1927,7 +1927,7 @@
                     "nodegroup_id": "9f210d2d-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "3b5a3cd9-c0ff-4053-88a2-9ce94aeec2cb"
+                        "rdmCollection": "3b5a3cd9-c0ff-4053-88a2-9ce94aeec2cb"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Information Carrier Format Type"
@@ -1942,7 +1942,7 @@
                     "nodegroup_id": "94d998b7-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Copyright Type"
@@ -1983,7 +1983,7 @@
                     "nodegroup_id": "b5f5b1ed-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "4063c7c5-485b-432b-9dfb-4f81cb6b5cfd"
+                        "rdmCollection": "4063c7c5-485b-432b-9dfb-4f81cb6b5cfd"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Keyword"
@@ -2011,7 +2011,7 @@
                     "nodegroup_id": "c0df1e05-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "a4bfeafb-7a04-43fd-b812-331105ce78b3"
+                        "rdmCollection": "a4bfeafb-7a04-43fd-b812-331105ce78b3"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "External Identifier Type"
@@ -2093,7 +2093,7 @@
                     "nodegroup_id": "7cdf3069-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Description Type"
@@ -2147,7 +2147,7 @@
                     "nodegroup_id": "86a103e3-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "d5230d60-0eb9-483d-90f4-9965eaca0292"
+                        "rdmCollection": "d5230d60-0eb9-483d-90f4-9965eaca0292"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Administrative Subdivision Type"
@@ -2175,7 +2175,7 @@
                     "nodegroup_id": "cc16f563-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "b539ba8b-2b70-45fb-8373-25fbfb652910"
+                        "rdmCollection": "b539ba8b-2b70-45fb-8373-25fbfb652910"
                     }, 
                     "parentproperty": "P72_has_language", 
                     "name": "Language_Type"
@@ -2242,7 +2242,7 @@
                     "nodegroup_id": "86a103e9-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Geometry Qualifier"
@@ -2270,7 +2270,7 @@
                     "nodegroup_id": "aa4096f1-e74a-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "a6998a7d-c618-4a49-8018-f8dcbc6b202d"
+                        "rdmCollection": "a6998a7d-c618-4a49-8018-f8dcbc6b202d"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Title Type"
@@ -2324,7 +2324,7 @@
                     "nodegroup_id": "141e22cd-e74b-11e6-84a6-026d961c88e6", 
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "fb67e800-51cd-4890-9ec3-92b49d46ab5f"
+                        "rdmCollection": "fb67e800-51cd-4890-9ec3-92b49d46ab5f"
                     }, 
                     "parentproperty": "P42_assigned", 
                     "name": "Information Resource Type"

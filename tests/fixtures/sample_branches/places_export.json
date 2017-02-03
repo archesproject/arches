@@ -209,7 +209,7 @@
             "datatype": "concept",
             "nodegroup_id": "4e779f11-96f0-11e6-a5de-6c4008b05c4c",
             "config": {
-                "topConcept": "195cea79-116f-47d7-8da7-f049cfbe4be4"
+                "rdmCollection": "195cea79-116f-47d7-8da7-f049cfbe4be4"
             },
             "parentproperty": "P1i_identifies",
             "name": "Admin Area Type"
@@ -271,7 +271,7 @@
             "datatype": "concept",
             "nodegroup_id": "23b80835-96f0-11e6-88f8-6c4008b05c4c",
             "config": {
-                "topConcept": "5e967d72-9603-42a3-97ea-87fd89517d02"
+                "rdmCollection": "5e967d72-9603-42a3-97ea-87fd89517d02"
             },
             "parentproperty": "P2_has_type",
             "name": "Address Type"

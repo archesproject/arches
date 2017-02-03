@@ -37,13 +37,14 @@ from copy import deepcopy
 
 class BusinessDataImporter(object):
 
-    def __init__(self, file=None, mapping_file=None):
+    def __init__(self, file=None, mapping_file=None, relations_file=None):
         self.business_data = ''
         self.mapping = None
         self.graphs = ''
         self.reference_data = ''
         self.business_data = ''
         self.file_format = ''
+        self.relations = ''
 
         if not file:
             file = settings.RESOURCE_GRAPH_LOCATIONS
@@ -60,6 +61,17 @@ class BusinessDataImporter(object):
                 mapping_file = [mapping_file]
             except:
                 print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
+
+        if relations_file == None:
+            try:
+                relations_file = [file[0].split('.')[0] + '.relations']
+            except:
+                pass
+
+        for path in relations_file:
+            if os.path.exists(path):
+                if isfile(join(path)):
+                    self.relations = csv.DictReader(open(relations_file[0], 'r'))
 
         for path in mapping_file:
             if os.path.exists(path):
@@ -103,6 +115,13 @@ class BusinessDataImporter(object):
         elif file_format == 'shp':
             # SHPFileImporter().import_business_data(business_data, mapping)
             pass
+
+    def import_relations(self, relations=None):
+        if relations == None:
+            relations = self.relations
+
+        for relation in relations:
+            print relation
 
 class ResourceLoader(object):
 
