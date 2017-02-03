@@ -177,13 +177,10 @@ class UITest(StaticLiveServerTestCase):
         #Navigate to the card manager and click on the correspoding card for the node created above
         card_page = CardPage(self.driver, self.live_server_url, graph_id)
         card_id = card_page.select_card(node_ids)
-
-        card_designer_page = CardDesignerPage(self.driver, self.live_server_url, card_id)
+        card_designer_page = CardDesignerPage(self.driver, self.live_server_url, resource_graph_id)
         map_widget = card_designer_page.add_widget(MapWidget)
 
         results = {}
-        import ipdb
-        ipdb.set_trace()
         card_designer_page.open()
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
