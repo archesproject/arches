@@ -11,7 +11,7 @@ cache:
   - pip
 
 addons:
-  sauce_connect: true
+  sauce_connect: false
   postgresql: 9.5
   apt:
     sources:
