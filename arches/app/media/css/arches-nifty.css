@@ -3091,7 +3091,7 @@ ul.jqtree_common li.jqtree-folder {
     padding: 15px 10px;
 }
 .dl-profile-accts dd, dt {
-    line-height: 1.57;
+    line-height: 1.25;
 }
 .library-secondary-panel {
     position: absolute;
@@ -4552,9 +4552,9 @@ div.row.widget-wrapper {
     margin-top: -1px;
     margin-bottom: 5px;
     color: #666;
-    padding-bottom: 10px;
+    padding-bottom: 0px;
     padding-left: 40px;
-    background: #fafafa;
+    background: #fff;
 }
 .rp-section-title {
 	font-size: 17px;
@@ -4590,7 +4590,12 @@ div.row.widget-wrapper {
 .rp-report-tile {
 	padding-bottom: 15px;
 	padding-left: 70px;
-	margin-top: 0px;
+	margin-top: 5px;
+}
+
+.rp-no-data {
+    color: #888;
+    margin-top: 10px;
 }
 
 .rp-report-tile-map {
@@ -6047,6 +6052,28 @@ table.table.dataTable {
 @media (min-width: 992px) {
     #page-content {
         padding: 15px 15px 25px;
+    }
+    .rp-report-section {
+        padding: 0px 0px 35px 140px;
+        background: #fff;
+    }
+    .rp-section-title {
+        margin-left: -100px;
+    }
+    .dl-horizontal dd {
+        margin-left: 280px;
+    }
+    .dl-horizontal dt {
+        float: left;
+        width: 260px;
+        overflow: hidden;
+        clear: left;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .rp-no-data {
+        margin-left: 280px;
     }
 }
 @media (min-width: 400px) {
