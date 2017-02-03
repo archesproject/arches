@@ -71,7 +71,7 @@ def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
 
     query = build_search_terms_dsl(request)
-    results = query.search(index='term', doc_type='value')
+    results = query.search(index='term', doc_type='value') or {'hits': {'hits':[]}}
 
     for result in results['hits']['hits']:
         prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
