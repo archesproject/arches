@@ -52,8 +52,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_csv', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tilserver_layer', 'delete_tilserver_layer',
+            'create_mapping_file', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -134,9 +134,6 @@ class Command(BaseCommand):
         if options['operation'] == 'build_permissions':
             self.build_permissions()
 
-        if options['operation'] == 'load_resources':
-            self.load_resources(package_name, options['source'])
-
         if options['operation'] == 'remove_resources':
             self.remove_resources(options['load_id'])
 
@@ -149,17 +146,14 @@ class Command(BaseCommand):
         if options['operation'] == 'export_business_data':
             self.export_business_data(options['dest_dir'], options['resources'], options['format'], options['config_file'])
 
-        if options['operation'] == 'import_json':
-            self.import_json(options['source'], options['graphs'], options['resources'])
+        if options['operation'] == 'import_graphs':
+            self.import_graphs(options['source'])
 
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
-
-        if options['operation'] == 'export_json':
-            self.export_json(options['dest_dir'], options['graphs'], options['resources'])
 
         if options['operation'] == 'add_tilserver_layer':
             self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
@@ -172,9 +166,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
-
-        if options['operation'] == 'import_csv':
-            self.import_csv(options['source'])
 
     def setup(self, package_name):
         """
@@ -343,17 +334,6 @@ class Command(BaseCommand):
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def load_resources(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        # data_source = None if data_source == '' else data_source
-        # load = import_string('%s.setup.load_resources' % package_name)
-        # load(data_source)
-        ArchesFileImporter(data_source).import_business_data()
-
-
     def remove_resources(self, load_id):
         """
         Runs the resource_remover command found in package_utils
@@ -410,8 +390,7 @@ class Command(BaseCommand):
             if os.path.isfile(os.path.join(path)):
                 BusinessDataImporter(path).import_business_data()
 
-
-    def import_json(self, data_source='', graphs=None, resources=None):
+    def import_graphs(self, data_source=''):
         """
         Imports objects from arches.json.
 
@@ -425,34 +404,11 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                ArchesFileImporter(path).import_all()
+                ArchesFileImporter(path).import_graphs()
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
-                    ArchesFileImporter(os.path.join(path, file_path)).import_all()
-
-    def import_csv(self, data_source=''):
-        """
-        Imports objects from csv file.
-
-        """
-
-        if data_source == '':
-            # data_source = settings.RESOURCE_GRAPH_LOCATIONS
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
-
-        if isinstance(data_source, basestring):
-            data_source = [data_source]
-
-        for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                CSVFileImporter(path).import_all()
-            else:
-                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.csv')]
-                for file_path in file_paths:
-                    CSVFileImporter(os.path.join(path, file_path)).import_all()
+                    ArchesFileImporter(os.path.join(path, file_path)).import_graphs()
 
     def start_livereload(self):
         from livereload import Server
@@ -462,18 +418,6 @@ class Command(BaseCommand):
         for path in settings.TEMPLATES[0]['DIRS']:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
-
-    def export_json(self, data_dest=None, graphs=None, resources=None):
-        """
-        Export objects to arches.json.
-        """
-
-        if graphs != False:
-            graphs = [x.strip(' ') for x in graphs.split(",")]
-        if resources != False:
-            resources = [x.strip(' ') for x in resources.split(",")]
-
-        ArchesFileExporter().export_all(data_dest, graphs, resources)
 
     def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
         if layer_name != False and mapnik_xml_path != False:
