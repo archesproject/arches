@@ -1993,6 +1993,8 @@ ul .collapse li:last-of-type {
 .resource-grid-tools-container a:last-of-type {
     padding-right: 0;
 }
+
+
 .hightlight-tool {
     color: #4F49DB;
     font-weight: 600;
@@ -3275,6 +3277,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools:hover {
     background: #f8f8f8;
     border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .navbar-top-links>li>a.navbar-button {
@@ -4618,6 +4621,7 @@ div.row.widget-wrapper {
 .rp-report-tile dt {
 	font-weight: 600;
 }
+
 .rp-tile-divider {
 	margin-left: 100px;
 	margin-right: 100px;
