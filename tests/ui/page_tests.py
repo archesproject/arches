@@ -182,6 +182,8 @@ class UITest(StaticLiveServerTestCase):
         map_widget = card_designer_page.add_widget(MapWidget)
 
         results = {}
+        import ipdb
+        ipdb.set_trace()
         card_designer_page.open()
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()

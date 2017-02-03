@@ -14,6 +14,8 @@ class MapWidget(BaseWidget):
 
     def open_tools(self):
         try:
+            import ipdb
+            ipdb.set_trace()
             map_tools_button = self.page.wait.until(
                 EC.element_to_be_clickable(locators.MAP_TOOLS_BUTTON)
             ).click()
@@ -34,6 +36,8 @@ class MapWidget(BaseWidget):
 
     def add_basemap(self):
         try:
+            import ipdb
+            ipdb.set_trace()
             for element in (
                 locators.MAP_TOOLS_BASEMAPS,
                 locators.SATELLITE_BASE_MAP
@@ -48,6 +52,8 @@ class MapWidget(BaseWidget):
 
     def add_overlay(self, number_of_added_overlays):
         try:
+            import ipdb
+            ipdb.set_trace()
             for element in (
                 locators.MAP_TOOLS_OVERLAYS,
                 locators.OVERLAY_LIBRARY_BUTTON,
@@ -72,4 +78,3 @@ class MapWidget(BaseWidget):
         ac = ActionChains(self.page.driver)
         map = self.page.driver.find_element(*locators.MAP_CANVAS)
         ac.click(map).perform()
-
