@@ -201,10 +201,8 @@ class CSVFileImporter(object):
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
-            # import ipdb
-            # ipdb.set_trace()
-
             def save_resource(populated_tiles, resourceinstanceid):
+                # create the resource instance
                 newresourceinstance, created = Resource.objects.get_or_create(
                     resourceinstanceid=resourceinstanceid,
                     defaults={'graph_id': target_resource_model, 'resourceinstancesecurity': None}
@@ -212,14 +210,18 @@ class CSVFileImporter(object):
 
                 # save all the tiles related to the resource instance
                 if bulk:
-                    Tile.objects.bulk_create(populated_tiles)
+                    tiles = populated_tiles
+                    for populated_tile in populated_tiles:
+                        for tile in populated_tile.tiles.itervalues():
+                            if len(tiles) > 0:
+                                tiles = tiles + tile
+                    Tile.objects.bulk_create(tiles)
                 else:
                     for populated_tile in populated_tiles:
                         saved_tile = populated_tile.save(index=False)
                 newresourceinstance.index()
 
             for row in business_data:
-                #populated_tiles = []
                 if row['ResourceID'] != previous_row_resourceid and len(populated_tiles) > 0:
 
                     save_resource(populated_tiles, resourceinstanceid)
@@ -246,7 +248,7 @@ class CSVFileImporter(object):
                     '''
                     need_new_tile = False
                     # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
-                    target_tile.tileid = None
+                    target_tile.tileid = uuid.uuid4()
                     target_tile.resourceinstance_id = resourceinstanceid
                     # Check the cardinality of the tile and check if it has been populated.
                     # If cardinality is one and the tile is populated the tile should not be populated again.
@@ -280,6 +282,8 @@ class CSVFileImporter(object):
                             for nodegroupid, childtile in target_tile.tiles.iteritems():
                                 prototype_tile = childtile.pop()
                                 prototype_tile.tileid = None
+                                prototype_tile.parenttile = target_tile
+                                prototype_tile.resourceinstance_id = resourceinstanceid
                                 if str(prototype_tile.nodegroup_id) in single_cardinality_nodegroups:
                                     child_tile_cardinality = '1'
                                 else:
