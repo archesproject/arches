@@ -33,16 +33,16 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
 from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
-from arches.app.models.models import ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class CSVFileImporter(object):
 
-    def import_business_data(self, business_data=None, mapping=None):
+    def import_business_data(self, business_data=None, mapping=None, bulk=False):
         errors = []
         # errors = businessDataValidator(self.business_data)
         if len(errors) == 0:
@@ -53,10 +53,13 @@ class CSVFileImporter(object):
             single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
-            previous_row_resourceid = business_data[0]['ResourceID']
+            previous_row_resourceid = None # business_data[0]['ResourceID']
+            #resourceinstanceid = uuid.uuid4()
+            populated_tiles = []
+
 
             def cache(blank_tile):
-                if blank_tile.data != None:
+                if blank_tile.data != {}:
                     for key in blank_tile.data.keys():
                         if key not in blanktilecache:
                             blanktilecache[str(key)] = blank_tile
@@ -198,12 +201,35 @@ class CSVFileImporter(object):
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
+            # import ipdb
+            # ipdb.set_trace()
+
+            def save_resource(populated_tiles, resourceinstanceid):
+                newresourceinstance, created = Resource.objects.get_or_create(
+                    resourceinstanceid=resourceinstanceid,
+                    defaults={'graph_id': target_resource_model, 'resourceinstancesecurity': None}
+                )
+
+                # save all the tiles related to the resource instance
+                if bulk:
+                    Tile.objects.bulk_create(populated_tiles)
+                else:
+                    for populated_tile in populated_tiles:
+                        saved_tile = populated_tile.save(index=False)
+                newresourceinstance.index()
+
             for row in business_data:
-                populated_tiles = []
-                if row['ResourceID'] != previous_row_resourceid:
+                #populated_tiles = []
+                if row['ResourceID'] != previous_row_resourceid and len(populated_tiles) > 0:
+
+                    save_resource(populated_tiles, resourceinstanceid)
+
+                    # reset values for next resource instance
+                    populated_tiles = []
                     resourceinstanceid = uuid.uuid4()
                     previous_row_resourceid = row['ResourceID']
                     populated_nodegroups[resourceinstanceid] = []
+                
                 source_data = column_names_to_targetids(row, mapping)
 
                 if source_data[0].keys():
@@ -221,6 +247,7 @@ class CSVFileImporter(object):
                     need_new_tile = False
                     # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
                     target_tile.tileid = None
+                    target_tile.resourceinstance_id = resourceinstanceid
                     # Check the cardinality of the tile and check if it has been populated.
                     # If cardinality is one and the tile is populated the tile should not be populated again.
                     if str(target_tile.nodegroup_id) in single_cardinality_nodegroups:
@@ -305,17 +332,8 @@ class CSVFileImporter(object):
                 if target_tile != None and len(source_data) > 0:
                     populate_tile(source_data, target_tile)
 
-
-                newresourceinstance, created = ResourceInstance.objects.get_or_create(
-                    resourceinstanceid = resourceinstanceid,
-                    graph_id = target_resource_model,
-                    resourceinstancesecurity = None
-                )
-
-                for populated_tile in populated_tiles:
-                    populated_tile.resourceinstance = newresourceinstance
-                    populated_tile.resourceid = resourceinstanceid
-                    saved_tile = populated_tile.save()
+            save_resource(populated_tiles, resourceinstanceid)
+        
         else:
             for error in errors:
                 print "{0} {1}".format(error[0], error[1])
