@@ -110,6 +110,7 @@ class ResourceEditorView(BaseManagerView):
                 graph_json=JSONSerializer().serialize(graph),
             )
 
+            context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = True
             context['nav']['edit_history'] = True
