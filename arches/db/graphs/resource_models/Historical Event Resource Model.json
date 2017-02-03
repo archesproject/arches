@@ -2513,7 +2513,7 @@
                     "nodegroup_id": "7d3d2751-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "4063c7c5-485b-432b-9dfb-4f81cb6b5cfd"
+                        "rdmCollection": "4063c7c5-485b-432b-9dfb-4f81cb6b5cfd"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Keyword"
@@ -2528,7 +2528,7 @@
                     "nodegroup_id": "7325b0ad-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Description Type"
@@ -2556,7 +2556,7 @@
                     "nodegroup_id": "b955b39d-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "216ee2fb-4197-4f84-84dd-3a38d59480fb"
+                        "rdmCollection": "216ee2fb-4197-4f84-84dd-3a38d59480fb"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Start Date Type"
@@ -2649,7 +2649,7 @@
                     "nodegroup_id": "64c4315b-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "051b5950-2c1e-49ff-af0d-dfbaa971d2fa"
+                        "rdmCollection": "051b5950-2c1e-49ff-af0d-dfbaa971d2fa"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Name Type"
@@ -2664,7 +2664,7 @@
                     "nodegroup_id": "87004cd7-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P42_assigned", 
                     "name": "Cultural Period"
@@ -2731,7 +2731,7 @@
                     "nodegroup_id": "9bcafa7d-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Geometry Qualifier"
@@ -2813,7 +2813,7 @@
                     "nodegroup_id": "a99ba1bf-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "a4bfeafb-7a04-43fd-b812-331105ce78b3"
+                        "rdmCollection": "a4bfeafb-7a04-43fd-b812-331105ce78b3"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "External Identifier Type"
@@ -2854,7 +2854,7 @@
                     "nodegroup_id": "87004cd7-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "9cd33b58-0f85-4993-9d8a-e0eb1737643d"
+                        "rdmCollection": "9cd33b58-0f85-4993-9d8a-e0eb1737643d"
                     }, 
                     "parentproperty": "P42_assigned", 
                     "name": "Historical Event Type"
@@ -2869,7 +2869,7 @@
                     "nodegroup_id": "b955b39d-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "873866bb-d7c6-46a7-94fd-8a085d8eff57"
+                        "rdmCollection": "873866bb-d7c6-46a7-94fd-8a085d8eff57"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "End Date Type"
@@ -2910,7 +2910,7 @@
                     "nodegroup_id": "9bcafa77-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Address Type"
@@ -2951,7 +2951,7 @@
                     "nodegroup_id": "9bcafa83-e749-11e6-84a6-026d961c88e6", 
                     "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6", 
                     "config": {
-                        "topConcept": "d5230d60-0eb9-483d-90f4-9965eaca0292"
+                        "rdmCollection": "d5230d60-0eb9-483d-90f4-9965eaca0292"
                     }, 
                     "parentproperty": "P2_has_type", 
                     "name": "Administrative Subdivision Type"

@@ -30,8 +30,8 @@ define([
             }
         };
 
-        this.node.config.topConcept.subscribe(setUrl);
-        setUrl(this.node.config.topConcept());
+        this.node.config.rdmCollection.subscribe(setUrl);
+        setUrl(this.node.config.rdmCollection());
     };
 
     return ConceptWidgetViewModel;
