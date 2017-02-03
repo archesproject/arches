@@ -18,6 +18,16 @@ define([
             this.currentResource = ko.observable();
             this.resourceEditorContext = options.resourceEditorContext;
             this.showRelatedProperties = ko.observable(false);
+            this.containerBottomMargin = ko.observable(700);
+
+            $(window).on('resize', function(e){
+                var rrPropertiesHeight = $('#rr-properties-id').height()
+                if (rrPropertiesHeight > 0) {
+                    self.containerBottomMargin(rrPropertiesHeight * 0.2)
+                }
+                console.log(rrPropertiesHeight)
+                console.log(self.containerBottomMargin())
+            })
 
             _.each(this.relatedProperties, function(prop, key){
                 if (ko.isObservable(prop)) {

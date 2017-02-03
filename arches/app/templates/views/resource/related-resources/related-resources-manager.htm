@@ -6,7 +6,7 @@
     <div class="relative">
 
         <!-- Target -->
-        <div class="relative rr-drag-panel-target">
+        <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin + '2px' }">
 
             <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
@@ -26,7 +26,7 @@
                             <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
                                 <i class="ion-wrench icon-lg"></i>{% trans "relation properties" %}
                             </a>
-                            <div class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
+                            <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
                                 <div class="clearfix">
                                     <div class="settings-config-panel">
 
