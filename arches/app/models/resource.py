@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import importlib
+from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -57,26 +58,11 @@ class Resource(models.ResourceInstance):
 
     def index(self):
         """
-        Indexes all the nessesary documents related to resources to support the map, search, and reports
+        Indexes all the nessesary items values a resource to support search
 
         """
 
         se = SearchEngineFactory().create()
-
-        search_documents = self.prepare_documents_for_search_index()
-        for document in search_documents:
-            se.index_data('resource', self.graph_id, document, id=self.pk)
-
-        # for term in self.prepare_terms_for_search_index():
-        #     term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
-        #     se.delete_terms(term_id)
-        #     se.index_term(term['term'], term_id, term['context'], term['options'])
-
-    def prepare_documents_for_search_index(self):
-        """
-        Generates a list of specialized resource based documents to support resource search
-
-        """
 
         document = JSONSerializer().serializeToPython(self)
         document['tiles'] = models.TileModel.objects.filter(resourceinstance=self)
@@ -86,12 +72,16 @@ class Resource(models.ResourceInstance):
         document['geometries'] = []
         document['numbers'] = []
 
+        terms_to_index = []
+
         for tile in document['tiles']:
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     if node.datatype == 'string':
                         document['strings'].append(nodevalue)
+                        if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                            terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
                     elif node.datatype == 'concept' or node.datatype == 'concept-list':
                         if node.datatype == 'concept':
                             nodevalue = [nodevalue]
@@ -105,7 +95,12 @@ class Resource(models.ResourceInstance):
                     elif node.datatype == 'number':
                         document['numbers'].append(nodevalue)
 
-        return [JSONSerializer().serializeToPython(document)]
+        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
+
+        for term in terms_to_index:
+            term_id = '%s_%s' % (str(term['tileid']), str(term['nodeid']))
+            se.delete_terms(term_id)
+            se.index_term(term['term'], term_id, term['context'], term['options'])
 
     def serialize(self):
         """
