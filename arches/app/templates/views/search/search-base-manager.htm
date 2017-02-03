@@ -66,9 +66,11 @@
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
                         <div>perform complex search</div>
                     </div>
+                    <!-- ko if: selectedTab() === relatedResourcesManager -->
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, with: relatedResourcesManager">
                         {% include 'views/resource/related-resources/related-resources-manager.htm' %}
                     </div>
+                    <!-- /ko -->
                 </div>
             </div>
         </div>

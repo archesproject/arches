@@ -17,6 +17,33 @@
                     <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph"><i class="ion-asterisk"></i></button>
                 </div>
 
+                <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
+                    resourceId: currentResource().resourceinstanceid,
+                    resourceName: 'root',
+                    resourceTypeId: ''
+                }">
+                    graph here....
+                    <div class="node_info" style="position: absolute;margin-top: 15px;right: 40px;">
+                        <dl style="margin-bottom: 0;">
+                            <dd class="arches-concept-heirarchy">
+                                <div>
+                                    <a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
+                                </div>
+                                <div>
+                                    <small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
+                                </div>
+                                <div>
+                                    <small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
+                                    <small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded' %}</small>
+                                </div>
+                                <div>
+                                    <small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
 
                 <!--Documentation dropdown-->
                 <!--ko if: resourceEditorContext -->
