@@ -33,6 +33,16 @@
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
 
+        <!-- Card Container Property -->
+        <div class="node-widget-label" style="">
+            <div class="control-label">
+                {% trans "Relation to Resource" %}
+            </div>
+            <div data-bind="with: card">
+                <select class="resources" data-bind="value: $root.ontologyproperty, options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
+
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Card Tab Title" %}
@@ -71,7 +81,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     <!-- Card CRUD Permissions Form -->

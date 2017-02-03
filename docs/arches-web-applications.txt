@@ -37,38 +37,3 @@ For Example::
             media
                 js
                 ..my_template.js
-
-Home Page
-=========
-
-
-Search
-======
-
-
-Map
-===
-
-
-Resource Data Management
-========================
-
-
-Forms
------
-
-
-Reports
--------
-
-
-Elasticsearch
-=============
-
-Indexing Arches Data
---------------------
-
-
-Arches Search Services
-----------------------
-

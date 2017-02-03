@@ -53,10 +53,17 @@ class ResourceListView(BaseManagerView):
                 'public': '',
                 'editor': ''
             })
+
         context = self.get_context_data(
             main_script='views/resource',
-            instance_summaries=instance_summaries
+            instance_summaries=instance_summaries,
         )
+
+        context['nav']['title'] = "Resource Editor"
+        context['nav']['edit_history'] = True
+        context['nav']['login'] = True
+        context['nav']['help'] = ('Creating and Editing Resources','')
+
         return render(request, 'views/resource.htm', context)
 
 
@@ -85,6 +92,7 @@ class ResourceEditorView(BaseManagerView):
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -101,6 +109,12 @@ class ResourceEditorView(BaseManagerView):
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
             )
+
+            context['nav']['title'] = graph.name
+            context['nav']['menu'] = True
+            context['nav']['edit_history'] = True
+            context['nav']['help'] = ('Creating and Editing Resources','')
+
             return render(request, 'views/resource/editor.htm', context)
 
         return HttpResponseNotFound()
@@ -158,8 +172,13 @@ class ResourceReportView(BaseManagerView):
             resource_graphs=resource_graphs,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name,
-            graph_json = JSONSerializer().serialize(graph)
+            graph_json = JSONSerializer().serialize(graph),
+            resourceid=resourceid,
          )
+
+        context['nav']['title'] = graph.name
+        context['nav']['res_edit'] = True
+        context['nav']['print'] = True
 
         return render(request, 'views/resource/report.htm', context)
 
@@ -204,17 +223,39 @@ class RelatedResourcesView(BaseManagerView):
         if 'relationship_ids[]' in res:
             relationships_to_update = res['relationship_ids[]']
 
+        def get_relatable_resources(graphid):
+            """
+            Takes the graphid of a resource, finds the graphs root node, and returns the relatable graphids
+            """
+            nodes = models.Node.objects.filter(graph_id=graphid)
+            top_node = [node for node in nodes if node.istopnode==True][0]
+            relatable_resources = [str(node.graph.graphid) for node in top_node.get_relatable_resources()]
+            return relatable_resources
+
+        def confirm_relationship_permitted(to_id, from_id):
+            resource_instance_to = models.ResourceInstance.objects.filter(resourceinstanceid=to_id)[0]
+            resource_instance_from = models.ResourceInstance.objects.filter(resourceinstanceid=from_id)[0]
+            relatable_to = get_relatable_resources(resource_instance_to.graph.graphid)
+            relatable_from = get_relatable_resources(resource_instance_from.graph.graphid)
+            relatable_to_is_valid = str(resource_instance_to.graph.graphid) in relatable_from
+            relatable_from_is_valid = str(resource_instance_from.graph.graphid) in relatable_to
+            return (relatable_to_is_valid == True and relatable_from_is_valid == True)
+
         for instanceid in instances_to_relate:
-            rr = models.ResourceXResource.objects.create(
-                resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
-                resourceinstanceidto = Resource(instanceid),
-                notes = notes,
-                relationshiptype = models.Value(relationship_type),
-                datestarted = datefrom,
-                dateended = dateto
-            )
-            document = model_to_dict(rr)
-            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+            permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
+            if permitted == True:
+                rr = models.ResourceXResource.objects.create(
+                    resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
+                    resourceinstanceidto = Resource(instanceid),
+                    notes = notes,
+                    relationshiptype = models.Value(relationship_type),
+                    datestarted = datefrom,
+                    dateended = dateto
+                )
+                document = model_to_dict(rr)
+                se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+            else:
+                print 'relationship not permitted'
 
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)

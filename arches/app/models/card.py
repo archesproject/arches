@@ -113,19 +113,12 @@ class Card(models.CardModel):
                         node_model.config = node.get('config', None)
                         self.nodes.append(node_model)
 
-                self.graph = Graph.objects.get(graphid=self.graph_id)
-
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
-
-                self.graph = Graph.objects.get(graphid=self.graph_id)
-
-                if self.graph.ontology and self.graph.isresource:
-                    self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
                 self.groups = self.get_group_permissions(self.nodegroup)
@@ -205,6 +198,7 @@ class Card(models.CardModel):
         Saves an a card and it's parent ontology property back to the db
 
         """
+        self.graph = Graph.objects.get(graphid=self.graph_id)
 
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
@@ -270,13 +264,11 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
-        ret['ontologyproperty'] = self.ontologyproperty
         ret['groups'] = self.groups
         ret['users'] = self.users
-
-        # provide a models.CardXNodeXWidget model for every node 
+        # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
-        for node in ret['nodes']: 
+        for node in ret['nodes']:
             found = False
             for widget in ret['widgets']:
                 if node.nodeid == widget.node_id:
@@ -291,9 +283,6 @@ class Card(models.CardModel):
                     widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
                     widget_model.label = node.name
                     ret['widgets'].append(widget_model)
-
-        if self.ontologyproperty:
-            ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret
 

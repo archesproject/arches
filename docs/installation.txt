@@ -1,0 +1,48 @@
+############
+Installation
+############
+
+System Requirements
+===================
+
+Arches works on Linux, Windows, or Mac OSX, but some of its dependencies may be more difficult to install on certain operating systems. Most enterprise-level installations of Arches have been created on Linux servers.
+
+To begin development or make a test installation of Arches, you will need the following:
+
++ **2gb disk space**
+	+ 1.5gb for all dependencies (Postgres/PostGIS, Python, GEOS, etc.) and 300mb for Arches.
+	+ In production, the amount of disk space you need will depend on the number of resources in your database, specifically uploaded images or media files.
+
++ **1gb memory (RAM)**
+	
+	+ In production, we advise 4-16gb of memory, primarily to support ElasticSearch.
+
+----------------
+
+*When viewing Arches, please note that it has been developed for modern browsers -- Chrome, Firefox, Internet Explorer (10 or higher), Safari, etc.*
+
+Dependencies
+============
+
+* PostgreSQL relational database (version 9.5)
+* PostGIS (version 2.x) spatial module for PostgreSQL
+* Python (version 2.7.6 - there seem to be issues with later versions of python) 
+* GEOS
+
+These instructions will provide some guidance on installing 
+the required dependencies and getting Arches up and running quickly.
+
+
+.. toctree::
+   :maxdepth: 1
+
+   installing-dependencies-linux
+   installing-dependencies-windows
+
+
+Using the Installer
+===================
+
+Once you have all of the dependencies installed, you can use the Arches installer that can be found here: ________
+
+To install Arches directly from our GitHub repo, follow our dev installation guide which is located `here <https://github.com/archesproject/arches/wiki/Dev-Installation>`_ in our GitHub repo wiki.

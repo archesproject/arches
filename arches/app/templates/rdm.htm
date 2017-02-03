@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
 {% endblock css %}
 
+{% block login_header %}{% endblock login_header %}
+
 {% block main_content %}
 
 
@@ -21,15 +23,16 @@
         <div class="container">
             <div class="row">
 
+                <!-- REMOVE PAGE NAME FROM HERE NOW THAT IT'S IN NAVBAR -->
                 <!-- App Name for larger screens -->
-                <div class="col-sm-5 col-lg-4 hidden-xs">
+                <!--<div class="col-sm-5 col-lg-4 hidden-xs">
                     <h1 class="pull-left arches-breadcrumb-title" style="margin-top: -5px;">{% trans "Reference Data Manager (RDM)" %}</h1>
-                </div>
+                </div>-->
 
                 <!-- App Name for xs screens -->
-                <div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
+                <!--<div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
                     <h1 class="arches-breadcrumb-title margin-top-minus-10">{% trans "Reference Data Manager (RDM)" %}</h1>
-                </div>
+                </div>-->
 
                 <!-- Concept Search -->
                 <div class="col-xs-12 col-sm-7 col-lg-8" id='rdm-concept-search-container'>

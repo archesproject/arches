@@ -58,6 +58,7 @@ require([
             resourceEditorContext: true,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
+            graph: data.graph,
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),

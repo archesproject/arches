@@ -1,0 +1,14 @@
+#####################
+General Configuration
+#####################
+
+Now that you have Arches installed, there are a lot of ways for you to make the platform your own. This section will guide you through some of the behind-the-scenes work you can do to get your installation ready for data entry.
+
+System Settings
+---------------
+
+Managing Map Servers
+--------------------
+
+Using the Field Project Manager
+-------------------------------

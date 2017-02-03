@@ -1993,6 +1993,8 @@ ul .collapse li:last-of-type {
 .resource-grid-tools-container a:last-of-type {
     padding-right: 0;
 }
+
+
 .hightlight-tool {
     color: #4F49DB;
     font-weight: 600;
@@ -3091,7 +3093,7 @@ ul.jqtree_common li.jqtree-folder {
     padding: 15px 10px;
 }
 .dl-profile-accts dd, dt {
-    line-height: 1.57;
+    line-height: 1.25;
 }
 .library-secondary-panel {
     position: absolute;
@@ -3215,10 +3217,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-menu {
     position: absolute;
-    top: 49px;
-    left: 0px;
+    top: 50px;
     bottom: 0;
-    border: 1px solid #ddd;
     z-index: 4000;
 }
 .ep-menu-editor {
@@ -3277,6 +3277,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools:hover {
     background: #f8f8f8;
     border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .navbar-top-links>li>a.navbar-button {
@@ -3314,6 +3315,13 @@ ul.jqtree_common li.jqtree-folder {
 
 .ep-tools-right a:first-child {
     margin: auto;
+}
+
+.ep-tools-login {
+    border: none;
+    padding-left: 16px;
+    padding-right: 20px;
+    vertical-align: middle
 }
 
 .ep-tool-title {
@@ -4392,6 +4400,10 @@ div.row.widget-wrapper {
     flex-direction: row;
 }
 
+.search-candidate-link.unrelatable-search-result {
+    color: #999;
+}
+
 .save-relationships {
     position: absolute;
     right: 20px;
@@ -4543,9 +4555,9 @@ div.row.widget-wrapper {
     margin-top: -1px;
     margin-bottom: 5px;
     color: #666;
-    padding-bottom: 10px;
+    padding-bottom: 0px;
     padding-left: 40px;
-    background: #fafafa;
+    background: #fff;
 }
 .rp-section-title {
 	font-size: 17px;
@@ -4581,7 +4593,12 @@ div.row.widget-wrapper {
 .rp-report-tile {
 	padding-bottom: 15px;
 	padding-left: 70px;
-	margin-top: 0px;
+	margin-top: 5px;
+}
+
+.rp-no-data {
+    color: #888;
+    margin-top: 10px;
 }
 
 .rp-report-tile-map {
@@ -4604,6 +4621,7 @@ div.row.widget-wrapper {
 .rp-report-tile dt {
 	font-weight: 600;
 }
+
 .rp-tile-divider {
 	margin-left: 100px;
 	margin-right: 100px;
@@ -6038,6 +6056,28 @@ table.table.dataTable {
 @media (min-width: 992px) {
     #page-content {
         padding: 15px 15px 25px;
+    }
+    .rp-report-section {
+        padding: 0px 0px 35px 140px;
+        background: #fff;
+    }
+    .rp-section-title {
+        margin-left: -100px;
+    }
+    .dl-horizontal dd {
+        margin-left: 280px;
+    }
+    .dl-horizontal dt {
+        float: left;
+        width: 260px;
+        overflow: hidden;
+        clear: left;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .rp-no-data {
+        margin-left: 280px;
     }
 }
 @media (min-width: 400px) {
