@@ -243,7 +243,7 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'concept',
-            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '{"topConcept": null}');
+            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '{"rdmCollection": null}');
 
 INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
     VALUES ('20000000-0000-0000-0000-100000000001', '', 'n');
@@ -265,7 +265,7 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
-        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"topConcept": null}');
+        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"rdmCollection": null}');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
