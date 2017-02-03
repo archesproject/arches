@@ -47,10 +47,4 @@ class ArchesTestCase(TestCase):
         pass
 
     def tearDown(self):
-        if not self.passed:
-            self.collect_web_traceback()
-            if self.break_on_fail:
-                self.driver.execute_script("sauce: break")
-        self.report_pass_fail()
-        if self.stop_on_teardown:
-            self.driver.quit()
+        pass
