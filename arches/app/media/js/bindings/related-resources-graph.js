@@ -9,37 +9,95 @@ define([
 ], function (ko, $, _, arches, resourceTypes, d3, d3Tip) {
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
-            this.$el = $(element);
-            this.el = element;
             var options = ko.unwrap(valueAccessor());
-            var self = this;
-            var width = this.$el.parent().width();
-            var height = 400;
-            this.resourceId = options.resourceId;
-            this.resourceName = options.resourceName;
-            this.resourceTypeId = options.resourceTypeId;
-            this.newNodeId = 0;
-            this.update = function () {
-                self.data = {
-                    nodes: self.force.nodes(self.data.nodes).nodes(),
-                    links: self.force.links(self.data.links).links()
+            var $el = $(element);
+            var width = $el.parent().width();
+            var height = $el.parent().height();
+            var newNodeId = 0;
+            var nodeMap = {};
+            var linkMap = {};
+            var data = {
+                nodes: [],
+                links: []
+            };
+            var texts;
+            var selectedNode;
+            var force = d3.layout.force()
+                .charge(-270)
+                .linkDistance(200)
+                .gravity(0.05)
+                .friction(0.55)
+                .linkStrength(function(l, i) {return 1; })
+                .theta(0.8)
+                .size([width, height]);
+
+            var redraw = function() {
+                vis.attr("transform",
+                    "translate(" + d3.event.translate + ")" +
+                    " scale(" + d3.event.scale + ")");
+                if (sourceTip) {
+                    sourceTip.hide();
+                }
+                if (targetTip) {
+                    targetTip.hide();
+                }
+                if (nodeTip) {
+                    nodeTip.hide();
+                }
+            };
+
+            var svg = d3.select(element).append("svg:svg")
+                .attr("width", width)
+                .attr("height", height)
+                .call(d3.behavior.zoom().on("zoom", redraw));
+
+            var vis = svg.append('svg:g');
+
+            var sourceTip = d3Tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function (d) {
+                    return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
+            });
+            var targetTip = d3Tip()
+                .attr('class', 'd3-tip')
+                .direction('s')
+                .offset([10, 0])
+                .html(function (d) {
+                    return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
+            });
+            var nodeTip = d3Tip()
+                .attr('class', 'd3-tip')
+                .direction('n')
+                .offset([-10, 0])
+                .html(function (d) {
+                    return  '<span class="graph-tooltip-name">' + d.name + "</span>";
+            });
+
+            vis.call(sourceTip)
+                .call(targetTip)
+                .call(nodeTip);
+            var update = function () {
+                data = {
+                    nodes: force.nodes(data.nodes).nodes(),
+                    links: force.links(data.links).links()
                 };
 
-                var link = self.vis.selectAll("line")
-                    .data(self.data.links);
+                var link = vis.selectAll("line")
+                    .data(data.links);
                 link.enter()
                     .insert("line", "circle")
                     .attr("class", "link")
                     .on("mouseover", function(d) {
                         d3.select(this).attr("class", "linkMouseover");
-                        self.vis.selectAll("circle").attr("class", function(d1){
+                        vis.selectAll("circle").attr("class", function(d1){
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
-                                var tip = (d.target === d1) ? self.targetTip : self.sourceTip;
+                                var tip = (d.target === d1) ? targetTip : sourceTip;
                                 className += '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
                                 tip.show(d1, this);
-                            } else if (d1 === self.selectedNode) {
+                            } else if (d1 === selectedNode) {
                                 className += '-over';
                             }
                             return className;
@@ -47,27 +105,27 @@ define([
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
-                        self.vis.selectAll("circle").attr("class", function(d1){
+                        vis.selectAll("circle").attr("class", function(d1){
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
-                            if (d1 === self.selectedNode) {
+                            if (d1 === selectedNode) {
                                 className += '-over';
                             }
                             return className;
                         });
-                        self.sourceTip.hide();
-                        self.targetTip.hide();
+                        sourceTip.hide();
+                        targetTip.hide();
                     });
                 link.exit()
                     .remove();
 
-                var drag = self.force.drag()
+                var drag = force.drag()
                     .on("dragstart", function(d) {
                         d3.event.sourceEvent.stopPropagation();
                         d3.event.sourceEvent.preventDefault();
                     });
 
-                var node = self.vis.selectAll("circle")
-                    .data(self.data.nodes, function(d) { return d.id; });
+                var node = vis.selectAll("circle")
+                    .data(data.nodes, function(d) { return d.id; });
                 node.enter()
                     .append("circle")
                     .attr("r",function(d){
@@ -80,12 +138,12 @@ define([
                     //     return "fill:" + resourceTypes[d.entitytypeid].fillColor + ";stroke:" + resourceTypes[d.entitytypeid].strokeColor;
                     // })
                     .on("mouseover", function(d){
-                        self.vis.selectAll("circle")
+                        vis.selectAll("circle")
                             .attr("class", function(d1){
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
                                     className += '-over';
-                                } else if (self.linkMap[d1.id+'_'+d.id] || self.linkMap[d.id+'_'+d1.id]){
+                                } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
                                     className += '-neighbor';
                                 }
                                 return className;
@@ -93,50 +151,50 @@ define([
                             // .attr("style", function(d1){
                             //     return "fill:" + resourceTypes[d1.entitytypeid].fillColor + ";stroke:" + resourceTypes[d1.entitytypeid].strokeColor;
                             // });
-                        self.vis.selectAll("line")
+                        vis.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
-                        self.updateNodeInfo(d);
-                        self.nodeTip.show(d, this);
+                        updateNodeInfo(d);
+                        nodeTip.show(d, this);
                     })
                     .on('mouseout', function (d) {
-                        self.vis.selectAll("circle")
+                        vis.selectAll("circle")
                             .attr("class", function(d1){
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
-                                if (d1 === self.selectedNode) {
+                                if (d1 === selectedNode) {
                                     className += '-over';
                                 }
                                 return className;
                             });
-                        self.vis.selectAll("line")
+                        vis.selectAll("line")
                             .attr('class', 'link');
-                        self.nodeTip.hide();
+                        nodeTip.hide();
                     })
                     .on("click", function (d) {
                         if (!d3.event.defaultPrevented){
-                            self.getResourceDataForNode(d);
+                            getResourceDataForNode(d);
                         }
                     })
                     .call(drag);
                 node.exit()
                     .remove();
 
-                if (self.texts){
-                    self.texts.remove();
+                if (texts){
+                    texts.remove();
                 }
 
-                self.texts = self.vis.selectAll("text.nodeLabels")
-                    .data(self.data.nodes);
+                texts = vis.selectAll("text.nodeLabels")
+                    .data(data.nodes);
 
-                self.texts.enter().append("text")
+                texts.enter().append("text")
                     .attr("class", 'root-node-label')
                     .attr("dy", ".35em")
                     .text(function(d) {
                         return d.isRoot ? d.name : '';
                     });
 
-                self.force.on("tick", function() {
+                force.on("tick", function() {
                     link.attr("x1", function(d) { return d.source.x; })
                         .attr("y1", function(d) { return d.source.y; })
                         .attr("x2", function(d) { return d.target.x; })
@@ -145,60 +203,60 @@ define([
                     node.attr("cx", function(d) { return d.x; })
                         .attr("cy", function(d) { return d.y; });
 
-                    self.texts
+                    texts
                         .attr("x", function(d) { return d.x; })
                         .attr("y", function(d) { return d.y; });
 
                 });
 
-                self.force.start();
+                force.start();
             };
 
-            this.updateNodeInfo = function (d) {
-                var iconEl = self.$el.find('.resource-type-icon');
-                self.$el.find('.selected-resource-name').html(d.name);
-                self.$el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
-                // self.$el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
+            updateNodeInfo = function (d) {
+                var iconEl = $el.find('.resource-type-icon');
+                $el.find('.selected-resource-name').html(d.name);
+                $el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
+                // $el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
                 if (d.relationCount) {
-                    self.$el.find('.relation-unloaded').hide();
-                    self.$el.find('.relation-count').show();
-                    self.$el.find('.relation-load-count').html(d.relationCount.loaded);
-                    self.$el.find('.relation-total-count').html(d.relationCount.total);
+                    $el.find('.relation-unloaded').hide();
+                    $el.find('.relation-count').show();
+                    $el.find('.relation-load-count').html(d.relationCount.loaded);
+                    $el.find('.relation-total-count').html(d.relationCount.total);
                     if (d.relationCount.loaded === d.relationCount.total) {
-                        self.$el.find('.load-more-relations-link').hide();
+                        $el.find('.load-more-relations-link').hide();
                     } else {
-                        self.$el.find('.load-more-relations-link').show();
+                        $el.find('.load-more-relations-link').show();
                     }
                 } else {
-                    self.$el.find('.load-more-relations-link').show();
-                    self.$el.find('.relation-count').hide();
-                    self.$el.find('.relation-unloaded').show();
+                    $el.find('.load-more-relations-link').show();
+                    $el.find('.relation-count').hide();
+                    $el.find('.relation-unloaded').show();
                 }
                 iconEl.removeClass();
                 iconEl.addClass('resource-type-icon');
                 // iconEl.addClass(resourceTypes[d.entitytypeid].icon);
-                self.$el.find('.node_info').show();
-                self.selectedNode = d;
-            },
-
-            this.loadMoreRelations = function () {
-                self.getResourceDataForNode(self.selectedNode);
+                $el.find('.node_info').show();
+                selectedNode = d;
             };
 
-            this.getResourceDataForNode = function(d) {
-                self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
+            var loadMoreRelations = function () {
+                getResourceDataForNode(selectedNode);
+            };
+
+            var getResourceDataForNode = function(d) {
+                getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
                     if (newData.nodes.length > 0 || newData.links.length > 0) {
-                        self.data.nodes = self.data.nodes.concat(newData.nodes);
-                        self.data.links = self.data.links.concat(newData.links);
-                        self.update(self.data);
+                        data.nodes = data.nodes.concat(newData.nodes);
+                        data.links = data.links.concat(newData.links);
+                        update(data);
                     }
                 }, false);
             };
 
-            this.getResourceData = function (resourceId, resourceName, resourceTypeId, callback, isRoot) {
+            var getResourceData = function (resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
-                var rootNode = this.nodeMap[resourceId];
+                var rootNode = nodeMap[resourceId];
 
                 if (rootNode) {
                     if (rootNode.relationCount) {
@@ -222,7 +280,7 @@ define([
 
                             if (isRoot){
                                 rootNode = {
-                                    id: self.newNodeId,
+                                    id: newNodeId,
                                     entityid: resourceId,
                                     name: resourceName,
                                     entitytypeid: resourceTypeId,
@@ -234,8 +292,8 @@ define([
                                     }
                                 };
                                 nodes.push(rootNode);
-                                self.nodeMap[resourceId] = rootNode;
-                                self.newNodeId += 1;
+                                nodeMap[resourceId] = rootNode;
+                                newNodeId += 1;
                             } else if (rootNode.relationCount) {
                                 rootNode.relationCount.loaded = rootNode.relationCount.loaded + response.resource_relationships.length;
                             } else {
@@ -245,28 +303,28 @@ define([
                                 };
                             }
                             rootNode.loading = false;
-                            self.updateNodeInfo(rootNode);
+                            updateNodeInfo(rootNode);
                             _.each(response.related_resources, function (related_resource) {
-                                if (!self.nodeMap[related_resource.entityid]) {
+                                if (!nodeMap[related_resource.resourceinstanceid]) {
                                     var node = {
-                                        id: self.newNodeId,
-                                        entityid: related_resource.entityid,
-                                        entitytypeid: related_resource.entitytypeid,
+                                        id: newNodeId,
+                                        entityid: related_resource.resourceinstanceid,
+                                        entitytypeid: related_resource.graph_id,
                                         name: related_resource.primaryname,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: null
                                     };
                                     nodes.push(node);
-                                    self.nodeMap[related_resource.entityid] = node;
-                                    self.newNodeId += 1;
+                                    nodeMap[related_resource.resourceinstanceid] = node;
+                                    newNodeId += 1;
                                 }
                             });
 
                             _.each(response.resource_relationships, function (resource_relationships) {
-                                var sourceId = self.nodeMap[resource_relationships.entityid1];
-                                var targetId = self.nodeMap[resource_relationships.entityid2];
-                                var linkExists = _.find(self.data.links, function(link){
+                                var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];
+                                var targetId = nodeMap[resource_relationships.resourceinstanceidto];
+                                var linkExists = _.find(data.links, function(link){
                                     return (link.source === sourceId && link.target === targetId);
                                 });
                                 var relationshipSource = resource_relationships.preflabel.value;
@@ -283,7 +341,7 @@ define([
                                         relationshipTarget: relationshipTarget,
                                         weight: 1
                                     });
-                                    self.linkMap[sourceId.id+'_'+targetId.id] = true;
+                                    linkMap[sourceId.id+'_'+targetId.id] = true;
                                 }
                             });
 
@@ -296,84 +354,19 @@ define([
                 }
             };
 
-            _.extend(this, _.pick(options, 'resourceId', 'resourceName', 'resourceTypeId'));
-
-            this.nodeMap = {};
-            this.linkMap = {};
-            this.data = {
-                nodes: [],
-                links: []
-            };
-
-            self.force = d3.layout.force()
-                .charge(-2750)
-                .linkDistance(200)
-                .gravity(0.05)
-                .friction(0.55)
-                .linkStrength(function(l, i) {return 1; })
-                .theta(0.8)
-                .size([width, height]);
-
-            var redraw = function() {
-                self.vis.attr("transform",
-                    "translate(" + d3.event.translate + ")" +
-                    " scale(" + d3.event.scale + ")");
-                if (self.sourceTip) {
-                    self.sourceTip.hide();
-                }
-                if (self.targetTip) {
-                    self.targetTip.hide();
-                }
-                if (self.nodeTip) {
-                    self.nodeTip.hide();
-                }
-            };
-
-            self.svg = d3.select(this.el).append("svg:svg")
-                .attr("width", width)
-                .attr("height", height)
-                .call(d3.behavior.zoom().on("zoom", redraw));
-            self.vis = self.svg.append('svg:g');
-
-
-            self.sourceTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function (d) {
-                    return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
-            });
-            self.targetTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .direction('s')
-                .offset([10, 0])
-                .html(function (d) {
-                    return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
-            });
-            self.nodeTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .direction('n')
-                .offset([-10, 0])
-                .html(function (d) {
-                    return  '<span class="graph-tooltip-name">' + d.name + "</span>";
-            });
-
-            self.vis.call(self.sourceTip)
-                .call(self.targetTip)
-                .call(self.nodeTip);
-
-            if (self.resourceId) {
-                self.$el.addClass('loading');
-                self.getResourceData(self.resourceId, this.resourceName, self.resourceTypeId, function (data) {
-                    self.$el.removeClass('loading');
-                    self.data = data;
-                    self.data.nodes[0].x = width/2;
-                    self.data.nodes[0].y = height/2;
-                    self.update();
+            if (options.resourceId) {
+                $el.addClass('loading');
+                getResourceData(options.resourceId, options.resourceName, options.resourceTypeId, function (newData) {
+                    $el.removeClass('loading');
+                    data = newData;
+                    data.nodes[0].x = width/2;
+                    data.nodes[0].y = height/2;
+                    update();
                 }, true);
             }
 
             $(window).on("resize", function() {
-                self.svg.attr("width", self.$el.parent().width());
+                svg.attr("width", $el.parent().width());
             }).trigger("resize");
         }
     };

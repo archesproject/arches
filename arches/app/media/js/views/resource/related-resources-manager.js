@@ -19,6 +19,7 @@ define([
             this.currentResource = ko.observable();
             this.resourceEditorContext = options.resourceEditorContext;
             this.showRelatedProperties = ko.observable(false);
+            this.showGraph = ko.observable(false);
 
             _.each(this.relatedProperties, function(prop, key) {
                 if (ko.isObservable(prop)) {

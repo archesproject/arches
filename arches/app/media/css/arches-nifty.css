@@ -6048,6 +6048,19 @@ table.table.dataTable {
     margin-bottom: 0;
 }
 
+.arches-related-resource-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.related-resources-header {
+    position: relative;
+    z-index: 2;
+}
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
