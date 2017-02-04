@@ -6,7 +6,7 @@
     <div class="relative">
 
         <!-- Target -->
-        <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin + '2px' }">
+        <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
             <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
@@ -31,8 +31,15 @@
                                     <div class="settings-config-panel">
 
                                         <div class="related-resources-title-container">
-                                        <h3 class="search-title">Relationship details</h3>
-                                        <button class="btn btn-sm btn-mint save-relationships" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save Details to Selected</button>
+                                            <h3 class="search-title">Relationship details</h3>
+                                            <div class="relation-properties-buttons">
+                                                <div class="relation-properties-button">
+                                                    <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save Details to Selected</button>
+                                                </div>
+                                                <div class="relation-properties-button">
+                                                    <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <!-- Relationship participants -->
 

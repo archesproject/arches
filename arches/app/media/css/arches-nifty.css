@@ -4395,6 +4395,18 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.relation-properties-buttons {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    right: 15px;
+    align-content: flex-end;
+}
+
+.relation-properties-button {
+    padding-left: 5px
+}
+
 .related-resources-title-container {
     display: flex;
     flex-direction: row;
@@ -4402,11 +4414,6 @@ div.row.widget-wrapper {
 
 .search-candidate-link.unrelatable-search-result {
     color: #999;
-}
-
-.save-relationships {
-    position: absolute;
-    right: 20px;
 }
 
 .dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
