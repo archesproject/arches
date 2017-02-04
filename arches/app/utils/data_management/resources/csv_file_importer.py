@@ -201,6 +201,7 @@ class CSVFileImporter(object):
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
+
             def save_resource(populated_tiles, resourceinstanceid):
                 # create the resource instance
                 newresourceinstance, created = Resource.objects.get_or_create(
@@ -221,15 +222,15 @@ class CSVFileImporter(object):
                         saved_tile = populated_tile.save(index=False)
                 newresourceinstance.index()
 
+
             for row in business_data:
-                if row['ResourceID'] != previous_row_resourceid and len(populated_tiles) > 0:
+                if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                     save_resource(populated_tiles, resourceinstanceid)
 
                     # reset values for next resource instance
                     populated_tiles = []
                     resourceinstanceid = uuid.uuid4()
-                    previous_row_resourceid = row['ResourceID']
                     populated_nodegroups[resourceinstanceid] = []
                 
                 source_data = column_names_to_targetids(row, mapping)
@@ -335,6 +336,8 @@ class CSVFileImporter(object):
 
                 if target_tile != None and len(source_data) > 0:
                     populate_tile(source_data, target_tile)
+
+                previous_row_resourceid = row['ResourceID']
 
             save_resource(populated_tiles, resourceinstanceid)
         
