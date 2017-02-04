@@ -147,7 +147,7 @@ class Command(BaseCommand):
             self.index_database(package_name)
 
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['resources'], options['format'], options['config_file'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'])
 
         if options['operation'] == 'import_graphs':
             self.import_graphs(options['source'])
@@ -360,20 +360,13 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-
-    def export_business_data(self, data_dest=None, resources=None, file_format=None, config_file=None):
-        """
-        Exports resources to specified format.
-        """
-
-        resource_exporter = ResourceExporter(file_format)
-        resource_exporter.export(resources=resources, configs=config_file)
-
-
-    def export_business_data(self, file_format, data_dest=None, resources=None, config_file=None):
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None):
         if file_format in ['csv', 'json', 'shp']:
             resource_exporter = ResourceExporter(file_format)
-            resource_exporter.export(data_dest=data_dest, resources=resources, configs=config_file)
+            data = resource_exporter.export(data_dest=data_dest, configs=config_file)
+            for file in data:
+                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    f.write(file['outputfile'].getvalue())
         else:
             print '{0} is not a valid export file format.'.format(file_format)
 

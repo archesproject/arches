@@ -39,7 +39,7 @@ class mappedArchesJSONImportTests(ArchesTestCase):
 
 	def setUp(self):
 		ResourceInstance.objects.all().delete()
-		ArchesFileImporter(os.path.join('tests/fixtures/data/json/cardinality_test_data/target.json')).import_all()
+		ArchesFileImporter(os.path.join('tests/fixtures/data/json/cardinality_test_data/target.json')).import_graphs()
 
 	@classmethod
 	def tearDownClass(cls):
