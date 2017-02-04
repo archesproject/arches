@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import importlib
+from django.conf import settings
 from arches.app.models import models
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Resource(models.ResourceInstance):
@@ -54,6 +56,51 @@ class Resource(models.ResourceInstance):
         #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
         #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
 
+    def index(self):
+        """
+        Indexes all the nessesary items values a resource to support search
+
+        """
+
+        se = SearchEngineFactory().create()
+
+        document = JSONSerializer().serializeToPython(self)
+        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self)
+        document['strings'] = []
+        document['dates'] = []
+        document['domains'] = []
+        document['geometries'] = []
+        document['numbers'] = []
+
+        terms_to_index = []
+
+        for tile in document['tiles']:
+            for nodeid, nodevalue in tile.data.iteritems():
+                node = models.Node.objects.get(pk=nodeid)
+                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    if node.datatype == 'string':
+                        document['strings'].append(nodevalue)
+                        if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                            terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
+                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
+                        if node.datatype == 'concept':
+                            nodevalue = [nodevalue]
+                        for concept_valueid in nodevalue:
+                            value = models.Value.objects.get(pk=concept_valueid)
+                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
+                    elif node.datatype == 'date':
+                        document['dates'].append(nodevalue)
+                    elif node.datatype == 'geojson-feature-collection':
+                        document['geometries'].append(nodevalue)
+                    elif node.datatype == 'number':
+                        document['numbers'].append(nodevalue)
+
+        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
+
+        for term in terms_to_index:
+            term_id = '%s_%s' % (str(term['tileid']), str(term['nodeid']))
+            se.delete_terms(term_id)
+            se.index_term(term['term'], term_id, term['context'], term['options'])
 
     def serialize(self):
         """
