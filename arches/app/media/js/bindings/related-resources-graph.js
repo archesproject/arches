@@ -212,7 +212,7 @@ define([
                 force.start();
             };
 
-            updateNodeInfo = function (d) {
+            var updateNodeInfo = function (d) {
                 var iconEl = $el.find('.resource-type-icon');
                 $el.find('.selected-resource-name').html(d.name);
                 $el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
@@ -360,7 +360,7 @@ define([
                     $el.removeClass('loading');
                     data = newData;
                     data.nodes[0].x = width/2;
-                    data.nodes[0].y = height/2;
+                    data.nodes[0].y = height/2-160;
                     update();
                 }, true);
             }

@@ -72,7 +72,8 @@ class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
-            resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
+            resource_instance = Resource.objects.create(graph_id=graphid)
+            resource_instance.index()
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
@@ -293,6 +294,7 @@ class RelatedResourcesView(BaseManagerView):
         related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
         if related_resources:
             for resource in related_resources['docs']:
+                print resource
                 ret['related_resources'].append(resource['_source'])
 
         return ret
