@@ -142,17 +142,16 @@ def get_paginator(request, results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
-        # before = paginator.page_range[0:page-1]
-        # after = paginator.page_range[page:paginator.num_pages]
-        # default_ct = 3
-        # ct_before = default_ct if len(after) > default_ct else default_ct*2-len(after)
-        # ct_after = default_ct if len(before) > default_ct else default_ct*2-len(before)
-        # if len(before) > ct_before:
-        #     before = [1,None]+before[-1*(ct_before-1):]
-        # if len(after) > ct_after:
-        #     after = after[0:ct_after-1]+[None,paginator.num_pages]
-        pages = [page for page in paginator.page_range]
-    print paginator.page_range, pages
+        before = range(1, page)
+        after = range(page+1, paginator.num_pages+1)
+        default_ct = 2
+        ct_before = default_ct if len(after) > default_ct else default_ct*2-len(after)
+        ct_after = default_ct if len(before) > default_ct else default_ct*2-len(before)
+        if len(before) > ct_before:
+            before = [1,None]+before[-1*(ct_before-1):]
+        if len(after) > ct_after:
+            after = after[0:ct_after-1]+[None,paginator.num_pages]
+        pages = before+pages+after
     return paginator, pages
 
     return render(request, 'pagination.htm', {
