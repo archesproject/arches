@@ -4,8 +4,8 @@
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
     	resourceId: currentResource().resourceinstanceid,
-    	resourceName: 'root',
-    	resourceTypeId: ''
+    	resourceName: currentResource().primaryname,
+    	resourceTypeId: currentResource().graphid
     }">
     	<div class="node_info" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
     		<dl style="margin-bottom: 0;">

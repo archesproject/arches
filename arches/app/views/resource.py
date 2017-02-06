@@ -279,7 +279,9 @@ class RelatedResourcesView(BaseManagerView):
         return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
     def get_related_resources(self, resourceid, lang='en-US', limit=1000, start=0):
+        resource_instance = Resource.objects.get(pk=resourceid)
         ret = {
+            'resource_instance': resource_instance,
             'resource_relationships': [],
             'related_resources': []
         }
