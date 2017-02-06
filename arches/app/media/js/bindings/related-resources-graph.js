@@ -242,10 +242,6 @@ define([
                 selectedNode = d;
             };
 
-            var loadMoreRelations = function () {
-                getResourceDataForNode(selectedNode);
-            };
-
             var getResourceDataForNode = function(d) {
                 getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
                     if (newData.nodes.length > 0 || newData.links.length > 0) {
@@ -371,6 +367,10 @@ define([
             $(window).on("resize", function() {
                 svg.attr("width", $el.parent().width());
             }).trigger("resize");
+
+            $el.find('.load-more-relations-link').click(function () {
+                getResourceDataForNode(selectedNode);
+            })
         }
     };
 
