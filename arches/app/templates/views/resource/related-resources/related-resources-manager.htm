@@ -1,6 +1,33 @@
 {% load i18n %}
 <div id="related-resources-drag-panel" class="search-container related-resources-container">
-    <!-- <div data-bind="text: test, click: function(){toggleShowRelatedProperties()}"></div> -->
+
+    <!--ko if: showGraph() -->
+    <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
+    	resourceId: currentResource().resourceinstanceid,
+    	resourceName: currentResource().primaryname,
+    	resourceTypeId: currentResource().graphid
+    }">
+    	<div class="node_info" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
+    		<dl style="margin-bottom: 0;">
+    			<dd class="arches-concept-heirarchy">
+    				<div>
+    					<a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
+    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded' %}</small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
+    				</div>
+    			</dd>
+    		</dl>
+    	</div>
+    </div>
+    <!--/ko-->
 
     <!-- Drag Panel -->
     <div class="relative">
@@ -8,15 +35,16 @@
         <!-- Target -->
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-            <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+            <div class="related-resources-header">
+            	<h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+
+            	<div class="btn-group rr-display-toggle">
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+            	</div>
+            </div>
 
             <div class="relative">
-
-                <div class="btn-group rr-display-toggle">
-                    <button class="btn btn-default btn-display-toggle selected add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid"><i class="ion-grid"></i></button>
-                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph"><i class="ion-asterisk"></i></button>
-                </div>
-
 
                 <!--Documentation dropdown-->
                 <!--ko if: resourceEditorContext -->
@@ -120,9 +148,9 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
-                
+
                 <!-- /ko -->
                 <!--Documentation dropdown-->
             </div>
@@ -134,17 +162,17 @@
                 </span>
             </div>
 
-            <div class="rr-result-grid-container">
+            <div class="rr-result-grid-container" data-bind="visible: !showGraph()">
                 <div>
                     <!--ko if: resourceRelationships().length > 0 -->
                     <table class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
-                                <th class="rr-tab-field">Resource ID</th>
-                                <th class="rr-tab-field">Relationship</th>
-                                <th class="rr-tab-field">From</th>
-                                <th class="rr-tab-field">To</th>
-                                <th class="rr-tab-field">Notes</th>
+                                <th class="rr-tab-field">{% trans "Resource ID" %}</th>
+                                <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                                <th class="rr-tab-field">{% trans "From" %}</th>
+                                <th class="rr-tab-field">{% trans "To" %}</th>
+                                <th class="rr-tab-field">{% trans "Notes" %}</th>
                             </tr>
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
@@ -186,7 +214,7 @@
                     <!--/ko -->
 
                     <!--ko if: resourceRelationships().length === 0 -->
-                    <div class="rr-panel-note">No Resources Selected...</div>
+                    <div class="rr-panel-note">{% trans "No Resources Selected..." %}</div>
                     <!--/ko-->
                 </div>
 

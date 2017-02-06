@@ -5961,7 +5961,7 @@ span.basemap-unselected {
 
 .rr-display-toggle {
     position: absolute;
-    top: -37px;
+    top: -7px;
     right: 170px;
 }
 
@@ -6122,6 +6122,94 @@ span.basemap-unselected {
 
 table.table.dataTable {
     margin-bottom: 0;
+}
+
+.arches-related-resource-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.related-resources-header {
+    position: relative;
+    z-index: 2;
+}
+
+.nodeLabels {
+    font-size: 11px;
+    fill: #454545;
+    text-anchor: middle;
+}
+
+.root-node-label {
+    stroke: #999; /*#3275b1;*/
+    font-size: 32px;
+    font-weight: 900;
+    fill: #fcfcfc; /*#fdfdfd; */
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.d3-tip {
+  line-height: 1.2;
+  display: block;
+  width: 200px;
+  font-size:11px;
+  border: solid 1px #BBBBBB;
+  padding: 6px;
+  background: rgba(256, 256, 256, 0.8);
+  color: #808080;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);
+}
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(180, 180, 180, 0.8);
+  position: absolute;
+  pointer-events: none;
+}
+
+.d3-tip.n:after {
+  content: "\25BC";
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+  text-align: center;
+}
+
+.d3-tip.e:after {
+  content: "\25C0";
+  margin: -4px 0 0 0;
+  top: 50%;
+  left: -8px;
+}
+
+.d3-tip.s:after {
+  content: "\25B2";
+  margin: 0 0 1px 0;
+  top: -10px;
+  left: 0;
+  text-align: center;
+}
+
+.d3-tip.w:after {
+  content: "\25B6";
+  margin: -4px 0 0 -1px;
+  top: 50%;
+  left: 100%;
+}
+
+.graph-tooltip-name{
+    font-weight: bold;
 }
 
 @keyframes loader {
