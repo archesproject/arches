@@ -53,6 +53,7 @@ class RDMView(BaseManagerView):
             CORE_CONCEPTS=CORE_CONCEPTS,
         )
 
+        context['nav']['icon'] = 'fa fa-align-left'
         context['nav']['title'] = 'Reference Data Manager'
         context['nav']['help_title'] = 'Using the RDM'
 
