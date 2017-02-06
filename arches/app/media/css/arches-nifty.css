@@ -1930,7 +1930,6 @@ ul .collapse li:last-of-type {
     float: left;
     width: 100%;
     border: 1px solid #ddd;
-    opacity: .79;
     border-left: 1px solid #ebeef0;
     border-right: 1px solid #ebeef0;
     margin: 0;
@@ -4442,7 +4441,7 @@ div.row.widget-wrapper {
     height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
-    border-bottom-width: 0px; 
+    border-bottom-width: 0px;
     border-radius: 2px;
     padding: 0px 25px;
 }
@@ -5992,7 +5991,7 @@ span.basemap-unselected {
     padding: 5px;
     height: 100px;
     background: #f8f8f8;
-    overflow-y: scroll; 
+    overflow-y: scroll;
 }
 
 .selected-resource {
