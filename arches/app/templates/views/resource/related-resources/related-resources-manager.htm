@@ -24,17 +24,17 @@
                     <ul class="" style="list-style: none;">
                         <li class="mega-dropdown related-reources-crud-link">
                             <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
-                                <i class="ion-wrench icon-lg"></i>{% trans "relation properties" %}
+                                <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
                             </a>
                             <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
                                 <div class="clearfix">
-                                    <div class="settings-config-panel">
+                                    <div class="settings-config-panel relative">
 
                                         <div class="related-resources-title-container">
                                             <h3 class="search-title">Relationship details</h3>
                                             <div class="relation-properties-buttons">
                                                 <div class="relation-properties-button">
-                                                    <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save Details to Selected</button>
+                                                    <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save</button>
                                                 </div>
                                                 <div class="relation-properties-button">
                                                     <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
@@ -47,11 +47,10 @@
                                                 <div class="target-resource">
                                                     <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
                                                 </div>
-                                                <div style="position: relative;" data-bind="foreach: {data: selected, as: 'item'}">
+                                                <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
                                                     <div class="selected-resource">
-                                                        <br><i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                                        <i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
                                                     </div>
-
                                                 </div>
                                             </div>
 
@@ -81,7 +80,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="row widget-container">
+                                                    <div class="row widget-container shim">
                                                         <div class="form-group">
                                                             <div class="relative" style="">
                                                                 <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
@@ -121,7 +120,9 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
+                
+                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
+                
                 <!-- /ko -->
                 <!--Documentation dropdown-->
             </div>
@@ -139,11 +140,11 @@
                     <table class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
-                                <th>name</th>
-                                <th>relationship</th>
-                                <th>from</th>
-                                <th>to</th>
-                                <th>notes</th>
+                                <th class="rr-tab-field">Resource ID</th>
+                                <th class="rr-tab-field">Relationship</th>
+                                <th class="rr-tab-field">From</th>
+                                <th class="rr-tab-field">To</th>
+                                <th class="rr-tab-field">Notes</th>
                             </tr>
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
@@ -160,7 +161,7 @@
                                               ]
                                           }
                                       }">
-                            <tr style="height:50px;" data-bind="click: function () {
+                            <tr class="rr-table-row" data-bind="click: function () {
                                 selected(!selected());
                             }">
                                 <td>
@@ -177,7 +178,7 @@
                                     <span data-bind='text: dateended'></span>
                                 </td>
                                 <td>
-                                    <span data-bind='text: notes'></span>
+                                    <span class="rr-text-notes" data-bind='text: notes'></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -185,7 +186,7 @@
                     <!--/ko -->
 
                     <!--ko if: resourceRelationships().length === 0 -->
-                    <div>No Relationships</div>
+                    <div class="rr-panel-note">No Resources Selected...</div>
                     <!--/ko-->
                 </div>
 
