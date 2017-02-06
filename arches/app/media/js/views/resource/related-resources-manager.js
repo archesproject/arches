@@ -18,6 +18,7 @@ define([
             this.editingInstanceId = options.editing_instance_id;
             this.currentResource = ko.observable();
             this.resourceEditorContext = options.resourceEditorContext;
+            this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(false);
 
@@ -155,6 +156,23 @@ define([
                     }, self)
                 })
             }
+
+            /**
+            * Ensure that the container for the relation properties dropdown is tall enough to scroll to the bottom of the dropdown
+            */
+            this.resize = function(){
+                var rrPropertiesHeight = $('#rr-properties-id').height()
+                if (rrPropertiesHeight > 0) {
+                    self.containerBottomMargin(rrPropertiesHeight * 0.3 + (self.selected().length * 20) + "px")
+                }
+            }
+
+            this.propertiesDialogOpen.subscribe(function(val){
+                if (val === true) {
+                    setTimeout(this.resize, 1000);
+                }
+            }, this)
+
         },
 
         deleteRelationships: function() {

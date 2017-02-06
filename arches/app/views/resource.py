@@ -122,9 +122,16 @@ class ResourceEditorView(BaseManagerView):
 
     def delete(self, request, resourceid=None):
         if resourceid is not None:
-            ret = models.ResourceInstance.objects.get(pk=resourceid).delete()
+            es = Elasticsearch()
+            se = SearchEngineFactory().create()
+            ret = models.ResourceInstance.objects.get(pk=resourceid)
+            related_resources = RelatedResourcesView().get_related_resources(str(ret.resourceinstanceid), 'en-US')
+            for rr in related_resources['resource_relationships']:
+                models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
+                se.delete(index='resource_relations', doc_type='all', id=rr['resourcexid'])
+            ret.delete()
+            se.delete(index='resource', doc_type=str(ret.graph_id), id=resourceid)
             return JSONResponse(ret)
-
         return HttpResponseNotFound()
 
 
@@ -271,7 +278,7 @@ class RelatedResourcesView(BaseManagerView):
         es.indices.refresh(index="resource_relations")
         return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
-    def get_related_resources(self, resourceid, lang, limit=1000, start=0):
+    def get_related_resources(self, resourceid, lang='en-US', limit=1000, start=0):
         ret = {
             'resource_relationships': [],
             'related_resources': []

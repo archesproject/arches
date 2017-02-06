@@ -99,6 +99,9 @@ class Command(BaseCommand):
         parser.add_argument('-b', '--is_basemap', action='store_true', dest='is_basemap',
             help='Add to make the layer a basemap.')
 
+        parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
+            help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
+
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -153,7 +156,7 @@ class Command(BaseCommand):
             self.import_json(options['source'], options['graphs'], options['resources'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'])
+            self.import_business_data(options['source'], options['bulk_load'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
@@ -351,7 +354,7 @@ class Command(BaseCommand):
         # data_source = None if data_source == '' else data_source
         # load = import_string('%s.setup.load_resources' % package_name)
         # load(data_source)
-        ArchesFileImporter(data_source).import_business_data()
+        ArchesFileImporter(data_source).import_business_data(bulk=bulk_load)
 
 
     def remove_resources(self, load_id):
@@ -394,7 +397,7 @@ class Command(BaseCommand):
         else:
             print '{0} is not a valid export file format.'.format(file_format)
 
-    def import_business_data(self, data_source):
+    def import_business_data(self, data_source, bulk_load=False):
         """
         Imports business data from all formats
         """
@@ -408,7 +411,7 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path).import_business_data()
+                BusinessDataImporter(path).import_business_data(bulk=bulk_load)
 
 
     def import_json(self, data_source='', graphs=None, resources=None):
