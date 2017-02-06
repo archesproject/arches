@@ -18,4 +18,3 @@ class ReportEditorPage(BaseWidgetPage):
         report_name_input.clear()
         report_name_input.send_keys(report_name)
         self.driver.find_element(*locators.SAVE_EDITS_BUTTON).click()
-        self.driver.find_element(*locators.ADD_NEW_RESOURCE_NAVBAR_BUTTON).click()

@@ -379,6 +379,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .widget-input {
     border-radius: 2px;
 }
+
+.date .form-control {
+    height: 36px;
+}
+
 .card-wz-grid {
     padding-top: 0;
     margin-top: -10px;
@@ -1925,7 +1930,6 @@ ul .collapse li:last-of-type {
     float: left;
     width: 100%;
     border: 1px solid #ddd;
-    opacity: .79;
     border-left: 1px solid #ebeef0;
     border-right: 1px solid #ebeef0;
     margin: 0;
@@ -3328,6 +3332,7 @@ ul.jqtree_common li.jqtree-folder {
     font-size: 14px;
     font-weight: 600;
     color: #666;
+    border-left: 1px solid transparent;
 }
 .ep-tools-title {
     height: 50px;
@@ -4098,6 +4103,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	border: 1px solid #B72F16;
 	border-right-width: 0px;
 	border-left-width: 0px;
+    z-index: 5000;
 }
 .ep-alert-blue {
 	background: #57c1df;
@@ -4395,6 +4401,18 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.relation-properties-buttons {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    right: 15px;
+    align-content: flex-end;
+}
+
+.relation-properties-button {
+    padding-left: 5px
+}
+
 .related-resources-title-container {
     display: flex;
     flex-direction: row;
@@ -4404,13 +4422,9 @@ div.row.widget-wrapper {
     color: #999;
 }
 
-.save-relationships {
-    position: absolute;
-    right: 20px;
-}
-
 .dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
     display: block;
+    margin-top: 5px;
 }
 
 .related-resources-editor-container {
@@ -4418,16 +4432,32 @@ div.row.widget-wrapper {
     width: 100%;
 }
 
+.rr-panel-note {
+    text-align: center;
+    font-size: 17px;
+}
+
 .rr-drag-panel-target {
     height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
+    border-bottom-width: 0px;
     border-radius: 2px;
     padding: 0px 25px;
 }
 
+#container .table-bordered td, #container .table-bordered th.rr-tab-field {
+    font-size: 13px;
+    font-weight: 400;
+    color: #666;
+}
+
 .settings-config-panel {
     padding: 5px;
+}
+
+.shim {
+    margin-top: -25px;
 }
 
 .rr-grid {
@@ -4446,13 +4476,16 @@ div.row.widget-wrapper {
 
 .resource-relation-description {
     color: #888;
-    padding-left: 5px;
+    padding: 10px;
     font-size: 13px;
     margin-top: 15px;
+    margin-right: 10px;
+    height: 145px;
+    border: 1px solid #ddd;
 }
 
 .settings-crud-panel {
-    margin-top: 70px;
+    margin-top: 10px;
     margin-left: -20px;
 }
 
@@ -4486,12 +4519,25 @@ div.row.widget-wrapper {
     color: #999;
 }
 
+.table>tbody>.rr-table-row>td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.table>tbody>.rr-table-row {
+    height: 40px;
+}
+
+.rr-text-notes {
+
+}
+
 .rr-result-grid-container {
 	margin-top: 30px;
     width: 100%;
     font-size: 16px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
     font-weight: 300;
     color: #999;
 }
@@ -5723,7 +5769,7 @@ span.basemap-unselected {
     flex: 0 0 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
-    padding: 10px 20px 20px 20px;
+    padding: 10px 20px 80px 20px;
     border-right: solid 1px #dddddd;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -5913,6 +5959,12 @@ span.basemap-unselected {
 	display: table-cell;
 }
 
+.rr-display-toggle {
+    position: absolute;
+    top: -7px;
+    right: 170px;
+}
+
 .related-resources-title {
 	font-size: 19px;
 	font-weight: 500;
@@ -5924,11 +5976,35 @@ span.basemap-unselected {
 	float: right;
 }
 
+.related-resources-delete {
+    position: absolute;
+    top: -37px;
+    left: 180px;
+    height: 33px;
+}
+
+.selected-resource-list {
+    position: absolute;
+    top: 85px;
+    right: 25px;
+    left: 15px;
+    padding: 5px;
+    height: 100px;
+    background: #f8f8f8;
+    overflow-y: scroll;
+}
+
+.selected-resource {
+    margin-left: 5px;
+    margin-bottom: 3px;
+}
+
 .related-reources-crud-link {
 	background: #ddd;
 	border: 1px solid #ccc;
-    padding: 4px 8px;
-    margin-top: -5px;
+    height: 33px;
+    padding: 5px 8px;
+    margin-top: -11px;
 }
 
 .search-filter {
@@ -6046,6 +6122,94 @@ span.basemap-unselected {
 
 table.table.dataTable {
     margin-bottom: 0;
+}
+
+.arches-related-resource-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.related-resources-header {
+    position: relative;
+    z-index: 2;
+}
+
+.nodeLabels {
+    font-size: 11px;
+    fill: #454545;
+    text-anchor: middle;
+}
+
+.root-node-label {
+    stroke: #999; /*#3275b1;*/
+    font-size: 32px;
+    font-weight: 900;
+    fill: #fcfcfc; /*#fdfdfd; */
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.d3-tip {
+  line-height: 1.2;
+  display: block;
+  width: 200px;
+  font-size:11px;
+  border: solid 1px #BBBBBB;
+  padding: 6px;
+  background: rgba(256, 256, 256, 0.8);
+  color: #808080;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);
+}
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(180, 180, 180, 0.8);
+  position: absolute;
+  pointer-events: none;
+}
+
+.d3-tip.n:after {
+  content: "\25BC";
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+  text-align: center;
+}
+
+.d3-tip.e:after {
+  content: "\25C0";
+  margin: -4px 0 0 0;
+  top: 50%;
+  left: -8px;
+}
+
+.d3-tip.s:after {
+  content: "\25B2";
+  margin: 0 0 1px 0;
+  top: -10px;
+  left: 0;
+  text-align: center;
+}
+
+.d3-tip.w:after {
+  content: "\25B6";
+  margin: -4px 0 0 -1px;
+  top: 50%;
+  left: 100%;
+}
+
+.graph-tooltip-name{
+    font-weight: bold;
 }
 
 @keyframes loader {

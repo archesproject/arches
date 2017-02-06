@@ -72,11 +72,12 @@ class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
-            resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
+            resource_instance = Resource.objects.create(graph_id=graphid)
+            resource_instance.index()
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-            resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+            resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
             default_relationshiptype_valueid = None
@@ -121,9 +122,16 @@ class ResourceEditorView(BaseManagerView):
 
     def delete(self, request, resourceid=None):
         if resourceid is not None:
-            ret = models.ResourceInstance.objects.get(pk=resourceid).delete()
+            es = Elasticsearch()
+            se = SearchEngineFactory().create()
+            ret = models.ResourceInstance.objects.get(pk=resourceid)
+            related_resources = RelatedResourcesView().get_related_resources(str(ret.resourceinstanceid), 'en-US')
+            for rr in related_resources['resource_relationships']:
+                models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
+                se.delete(index='resource_relations', doc_type='all', id=rr['resourcexid'])
+            ret.delete()
+            se.delete(index='resource', doc_type=str(ret.graph_id), id=resourceid)
             return JSONResponse(ret)
-
         return HttpResponseNotFound()
 
 
@@ -147,7 +155,7 @@ class ResourceReportView(BaseManagerView):
         except models.Report.DoesNotExist:
            report = None
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
@@ -270,8 +278,10 @@ class RelatedResourcesView(BaseManagerView):
         es.indices.refresh(index="resource_relations")
         return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
 
-    def get_related_resources(self, resourceid, lang, limit=1000, start=0):
+    def get_related_resources(self, resourceid, lang='en-US', limit=1000, start=0):
+        resource_instance = Resource.objects.get(pk=resourceid)
         ret = {
+            'resource_instance': resource_instance,
             'resource_relationships': [],
             'related_resources': []
         }
@@ -293,6 +303,7 @@ class RelatedResourcesView(BaseManagerView):
         related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
         if related_resources:
             for resource in related_resources['docs']:
+                print resource
                 ret['related_resources'].append(resource['_source'])
 
         return ret
