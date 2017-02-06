@@ -4098,6 +4098,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	border: 1px solid #B72F16;
 	border-right-width: 0px;
 	border-left-width: 0px;
+    z-index: 5000;
 }
 .ep-alert-blue {
 	background: #57c1df;
