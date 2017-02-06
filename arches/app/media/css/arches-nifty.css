@@ -379,6 +379,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .widget-input {
     border-radius: 2px;
 }
+
+.date .form-control {
+    height: 36px;
+}
+
 .card-wz-grid {
     padding-top: 0;
     margin-top: -10px;
@@ -3328,6 +3333,7 @@ ul.jqtree_common li.jqtree-folder {
     font-size: 14px;
     font-weight: 600;
     color: #666;
+    border-left: 1px solid transparent;
 }
 .ep-tools-title {
     height: 50px;
@@ -4418,6 +4424,7 @@ div.row.widget-wrapper {
 
 .dropdown-menu.mega-dropdown-menu.display-related-resource-properties {
     display: block;
+    margin-top: 5px;
 }
 
 .related-resources-editor-container {
@@ -4425,16 +4432,32 @@ div.row.widget-wrapper {
     width: 100%;
 }
 
+.rr-panel-note {
+    text-align: center;
+    font-size: 17px;
+}
+
 .rr-drag-panel-target {
     height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
+    border-bottom-width: 0px; 
     border-radius: 2px;
     padding: 0px 25px;
 }
 
+#container .table-bordered td, #container .table-bordered th.rr-tab-field {
+    font-size: 13px;
+    font-weight: 400;
+    color: #666;
+}
+
 .settings-config-panel {
     padding: 5px;
+}
+
+.shim {
+    margin-top: -25px;
 }
 
 .rr-grid {
@@ -4453,13 +4476,16 @@ div.row.widget-wrapper {
 
 .resource-relation-description {
     color: #888;
-    padding-left: 5px;
+    padding: 10px;
     font-size: 13px;
     margin-top: 15px;
+    margin-right: 10px;
+    height: 145px;
+    border: 1px solid #ddd;
 }
 
 .settings-crud-panel {
-    margin-top: 70px;
+    margin-top: 10px;
     margin-left: -20px;
 }
 
@@ -4493,12 +4519,25 @@ div.row.widget-wrapper {
     color: #999;
 }
 
+.table>tbody>.rr-table-row>td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.table>tbody>.rr-table-row {
+    height: 40px;
+}
+
+.rr-text-notes {
+
+}
+
 .rr-result-grid-container {
 	margin-top: 30px;
     width: 100%;
     font-size: 16px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
     font-weight: 300;
     color: #999;
 }
@@ -5730,7 +5769,7 @@ span.basemap-unselected {
     flex: 0 0 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
-    padding: 10px 20px 20px 20px;
+    padding: 10px 20px 80px 20px;
     border-right: solid 1px #dddddd;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -5920,6 +5959,12 @@ span.basemap-unselected {
 	display: table-cell;
 }
 
+.rr-display-toggle {
+    position: absolute;
+    top: -37px;
+    right: 170px;
+}
+
 .related-resources-title {
 	font-size: 19px;
 	font-weight: 500;
@@ -5931,11 +5976,35 @@ span.basemap-unselected {
 	float: right;
 }
 
+.related-resources-delete {
+    position: absolute;
+    top: -37px;
+    left: 180px;
+    height: 33px;
+}
+
+.selected-resource-list {
+    position: absolute;
+    top: 85px;
+    right: 25px;
+    left: 15px;
+    padding: 5px;
+    height: 100px;
+    background: #f8f8f8;
+    overflow-y: scroll; 
+}
+
+.selected-resource {
+    margin-left: 5px;
+    margin-bottom: 3px;
+}
+
 .related-reources-crud-link {
 	background: #ddd;
 	border: 1px solid #ccc;
-    padding: 4px 8px;
-    margin-top: -5px;
+    height: 33px;
+    padding: 5px 8px;
+    margin-top: -11px;
 }
 
 .search-filter {
