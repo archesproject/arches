@@ -168,11 +168,11 @@
                     <table class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
-                                <th class="rr-tab-field">Resource ID</th>
-                                <th class="rr-tab-field">Relationship</th>
-                                <th class="rr-tab-field">From</th>
-                                <th class="rr-tab-field">To</th>
-                                <th class="rr-tab-field">Notes</th>
+                                <th class="rr-tab-field">{% trans "Resource ID" %}</th>
+                                <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                                <th class="rr-tab-field">{% trans "From" %}</th>
+                                <th class="rr-tab-field">{% trans "To" %}</th>
+                                <th class="rr-tab-field">{% trans "Notes" %}</th>
                             </tr>
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
@@ -214,7 +214,7 @@
                     <!--/ko -->
 
                     <!--ko if: resourceRelationships().length === 0 -->
-                    <div class="rr-panel-note">No Resources Selected...</div>
+                    <div class="rr-panel-note">{% trans "No Resources Selected..." %}</div>
                     <!--/ko-->
                 </div>
 

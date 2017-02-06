@@ -52,7 +52,6 @@ define([
                     relationships: ko.observableArray(),
                     resourceRelationships: ko.observableArray(),
                     parse: function(data) {
-                        console.log(data);
                         var relationshipsWithResource = [];
                         var resources = data.related_resources;
                         data.resource_relationships.forEach(function(relationship) {
@@ -74,7 +73,7 @@ define([
                             }).value();
                         this.resourceRelationships(sorted);
                         this.primaryname = data.resource_instance.primaryname;
-                        this.graphid = data.resource_instance.graphid;
+                        this.graphid = data.resource_instance.graph_id;
                     },
                     get: function() {
                         $.ajax({

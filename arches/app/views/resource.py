@@ -77,7 +77,7 @@ class ResourceEditorView(BaseManagerView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-            resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+            resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
             default_relationshiptype_valueid = None
@@ -155,7 +155,7 @@ class ResourceReportView(BaseManagerView):
         except models.Report.DoesNotExist:
            report = None
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        resource_graphs = Graph.objects.exclude(pk=resource_instance.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)

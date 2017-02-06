@@ -3,12 +3,15 @@ define([
     'jquery',
     'underscore',
     'arches',
-    'resource-types',
     'd3',
     'plugins/d3-tip'
-], function (ko, $, _, arches, resourceTypes, d3, d3Tip) {
+], function (ko, $, _, arches, d3, d3Tip) {
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+            var modelMap = arches.resources.reduce(function(a, v) {
+                a[v.graphid] = v
+                return a;
+            }, {});
             var options = ko.unwrap(valueAccessor());
             var $el = $(element);
             var width = $el.parent().width();
@@ -134,9 +137,9 @@ define([
                     .attr("class", function(d){
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
-                    // .attr("style", function(d){
-                    //     return "fill:" + resourceTypes[d.entitytypeid].fillColor + ";stroke:" + resourceTypes[d.entitytypeid].strokeColor;
-                    // })
+                    .attr("style", function(d){
+                        return "fill:" + modelMap[d.entitytypeid].color + ";";
+                    })
                     .on("mouseover", function(d){
                         vis.selectAll("circle")
                             .attr("class", function(d1){
@@ -148,9 +151,9 @@ define([
                                 }
                                 return className;
                             })
-                            // .attr("style", function(d1){
-                            //     return "fill:" + resourceTypes[d1.entitytypeid].fillColor + ";stroke:" + resourceTypes[d1.entitytypeid].strokeColor;
-                            // });
+                            .attr("style", function(d1){
+                                return "fill:" + modelMap[d.entitytypeid].color + ";"
+                            });
                         vis.selectAll("line")
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
@@ -216,7 +219,7 @@ define([
                 var iconEl = $el.find('.resource-type-icon');
                 $el.find('.selected-resource-name').html(d.name);
                 $el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
-                // $el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
+                $el.find('.resource-type-name').html(modelMap[d.entitytypeid].name);
                 if (d.relationCount) {
                     $el.find('.relation-unloaded').hide();
                     $el.find('.relation-count').show();
@@ -234,7 +237,7 @@ define([
                 }
                 iconEl.removeClass();
                 iconEl.addClass('resource-type-icon');
-                // iconEl.addClass(resourceTypes[d.entitytypeid].icon);
+                iconEl.addClass(modelMap[d.entitytypeid].icon);
                 $el.find('.node_info').show();
                 selectedNode = d;
             };

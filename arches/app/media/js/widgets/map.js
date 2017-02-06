@@ -256,6 +256,9 @@ define([
                     return maplayer
                 }
                 resources.forEach(function(resource) {
+                    if (this.graphId && resource.maplayerid === this.graphid) {
+                        return;
+                    }
                     resourceLayers.push(MapLayer(resource))
                 })
                 return resourceLayers;

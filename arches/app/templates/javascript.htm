@@ -184,6 +184,7 @@
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
+              'graphid': '{{resource.graphid}}',
               'name': '{{ resource.name }}',
               'color': '{{ resource.mapfeaturecolor }}',
               'pointsize': '{{ resource.mappointsize }}',
