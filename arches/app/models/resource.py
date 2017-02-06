@@ -56,6 +56,13 @@ class Resource(models.ResourceInstance):
         #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
         #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
 
+    def get_datatype_instance(self, datatype):
+        d_datatype = models.DDataType.objects.get(datatype=datatype)
+        mod_path = d_datatype.modulename.replace('.py', '')
+        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
+        datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+        return datatype_instance
+
     def index(self):
         """
         Indexes all the nessesary items values a resource to support search
@@ -78,22 +85,10 @@ class Resource(models.ResourceInstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    if node.datatype == 'string':
-                        document['strings'].append(nodevalue)
-                        if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                            terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
-                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
-                        if node.datatype == 'concept':
-                            nodevalue = [nodevalue]
-                        for concept_valueid in nodevalue:
-                            value = models.Value.objects.get(pk=concept_valueid)
-                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
-                    elif node.datatype == 'date':
-                        document['dates'].append(nodevalue)
-                    elif node.datatype == 'geojson-feature-collection':
-                        document['geometries'].append(nodevalue)
-                    elif node.datatype == 'number':
-                        document['numbers'].append(nodevalue)
+                    datatype_instance = self.get_datatype_instance(node.datatype)
+                    datatype_instance.append_to_document(document, nodevalue)
+                    if node.datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
+                        terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
 
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
