@@ -1,32 +1,31 @@
 {% load i18n %}
 <div id="related-resources-drag-panel" class="search-container related-resources-container">
-    <!-- <div data-bind="text: test, click: function(){toggleShowRelatedProperties()}"></div> -->
 
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
-        resourceId: currentResource().resourceinstanceid,
-        resourceName: 'root',
-        resourceTypeId: ''
+    	resourceId: currentResource().resourceinstanceid,
+    	resourceName: 'root',
+    	resourceTypeId: ''
     }">
-        <div class="node_info" style="position: absolute;margin-top: 25px;right: 25px; z-index: 5;">
-            <dl style="margin-bottom: 0;">
-                <dd class="arches-concept-heirarchy">
-                    <div>
-                        <a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
-                        <small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded' %}</small>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
-                    </div>
-                </dd>
-            </dl>
-        </div>
+    	<div class="node_info" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
+    		<dl style="margin-bottom: 0;">
+    			<dd class="arches-concept-heirarchy">
+    				<div>
+    					<a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
+    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded' %}</small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
+    				</div>
+    			</dd>
+    		</dl>
+    	</div>
     </div>
     <!--/ko-->
 
@@ -37,16 +36,15 @@
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
             <div class="related-resources-header">
-                <h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+            	<h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
-                <div class="btn-group rr-display-toggle">
-                    <button class="btn btn-default btn-display-toggle selected add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(!showGraph()); }"><i class="ion-grid"></i></button>
-                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(!showGraph()); }"><i class="ion-asterisk"></i></button>
-                </div>
+            	<div class="btn-group rr-display-toggle">
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+            	</div>
             </div>
 
-        <div class="relative">
-
+            <div class="relative">
 
                 <!--Documentation dropdown-->
                 <!--ko if: resourceEditorContext -->
@@ -84,19 +82,17 @@
                                                 </div>
                                             </div>
 
-                                        </div>
-                                    </div>
-
-                                    <div class="settings-crud-panel">
-                                        <div class="col-xs-12">
-                                            <form class="widgets">
-                                                <div class="row widget-container">
-                                                    <div class="form-group">
-                                                        <div class="row widget-wrapper">
-                                                            <div class="form-group">
-                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
-                                                                <div class="col-xs-12">
-                                                                    <input style="width:30%; display:inline-block;" data-bind="select2: {
+                                        <div class="settings-crud-panel">
+                                            <div class="col-xs-12">
+                                                <form class="widgets">
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="row widget-wrapper">
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                                    <div class="col-xs-12">
+                                                                        <input style="width:30%; display:inline-block;"
+                                                                            data-bind="select2: {
                                                                                 select2Config: {
                                                                                     clickBubble: true,
                                                                                     data: relationshipTypes,
@@ -105,45 +101,46 @@
                                                                                     placeholder: relationshipTypePlaceholder
                                                                                 }
                                                                             }">
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
 
+                                                        </div>
                                                     </div>
-                                                </div>
 
                                                     <div class="row widget-container shim">
                                                         <div class="form-group">
                                                             <div class="relative" style="">
                                                                 <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
                                                                                         </label>
-                                                            <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
                                                                                         </label>
-                                                        </div>
-
-                                                        <div class="relative">
-                                                            <div class="col-xs-6">
-                                                                <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
                                                             </div>
-                                                            <div class="col-xs-6">
-                                                                <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
+
+                                                            <div class="relative">
+                                                                <div class="col-xs-6">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="row widget-container">
-                                                    <div class="form-group">
-                                                        <div class="relative">
-                                                            <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
-                                                        </div>
+                                                    <div class="row widget-container">
+                                                        <div class="form-group">
+                                                            <div class="relative">
+                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
+                                                            </div>
 
-                                                        <div class="col-xs-12">
-                                                            <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
+                                                            <div class="col-xs-12">
+                                                                <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -157,19 +154,15 @@
                 <!-- /ko -->
                 <!--Documentation dropdown-->
             </div>
-            <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
-            <!-- /ko -->
-            <!--Documentation dropdown-->
-        </div>
 
 
-        <div class="rr-card-icon-placement">
-            <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
+            <div class="rr-card-icon-placement">
+                <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
                     <i class="add-card-icon fa fa-code-fork fa-4x"></i>
                 </span>
-        </div>
+            </div>
 
-            <div class="rr-result-grid-container">
+            <div class="rr-result-grid-container" data-bind="visible: !showGraph()">
                 <div>
                     <!--ko if: resourceRelationships().length > 0 -->
                     <table class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -225,35 +218,30 @@
                     <!--/ko-->
                 </div>
 
-                <!--ko if: resourceRelationships().length === 0 -->
-                <div>No Relationships</div>
-                <!--/ko-->
             </div>
 
-        </div>
-
-        <!-- Message -->
-        <!--ko if: resourceEditorContext -->
-        <div class="rr-card-message-placement">
-            <p class="text-center">
-                <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
-            </p>
-        </div>
-        <!--/ko-->
-    </div>
-
-    <!-- ko if: resourceEditorContext -->
-    <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
-        <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
-        <div class="rr-grid-item" data-bind="">
-            <div class="rr-listing">
-                <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>
-                <div class="search-listing-body">TODO: Primary description goes here</div>
-                <div class="search-listing-footer">Footer details here</div>
+            <!-- Message -->
+            <!--ko if: resourceEditorContext -->
+            <div class="rr-card-message-placement">
+                <p class="text-center">
+                    <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
+                </p>
             </div>
+            <!--/ko-->
+        </div>
+
+        <!-- ko if: resourceEditorContext -->
+        <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
+            <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
+            <div class="rr-grid-item" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>
+                    <div class="search-listing-body">TODO: Primary description goes here</div>
+                    <div class="search-listing-footer">Footer details here</div>
+                </div>
+            </div>
+            <!-- /ko -->
         </div>
         <!-- /ko -->
     </div>
-    <!-- /ko -->
-</div>
 </div>
