@@ -32,8 +32,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
-from django.forms.models import model_to_dict
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
