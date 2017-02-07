@@ -7,7 +7,7 @@ from arches.app.models.concept import Concept
 import codecs
 from format import Writer
 from django.db.models import Q
-from arches.app.models.models import Node
+from arches.app.models.models import Node, Value
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 try:
@@ -21,20 +21,19 @@ class CsvWriter(Writer):
         super(CsvWriter, self).__init__()
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
-    def transform_value_for_export(self, datatype, value, domains, concept_export_value):
+    def transform_value_for_export(self, datatype, value, concept_export_value_type):
 
-        def get_concept_export_value(value, domains, concept_export_value):
-            if concept_export_value != None:
-                if concept_export_value == "label" or concept_export_value == "both":
-                    for domain in domains:
-                        if domain['valueid'] == value:
-                            if concept_export_value == "label":
-                                value = domain['label']
-                            elif concept_export_value == "both":
-                                value = value + '|' + domain['label']
+        def get_concept_export_value(value, concept_export_value_type):
+            if concept_export_value_type != None:
+                if concept_export_value_type == "label" or concept_export_value_type == "both":
+                    if concept_export_value_type == "label":
+                        value = Value.objects.get(valueid=value).value
+                    elif concept_export_value_type == "both":
+                        value = value + '|' + Value.objects.get(valueid=value).value
             return value
 
-
+        if datatype == 'string':
+            value = value.encode('utf8')
         if datatype == 'geojson-feature-collection':
             wkt_geoms = []
             for feature in value['features']:
@@ -43,11 +42,11 @@ class CsvWriter(Writer):
         elif datatype in ['concept-list', 'domain-value-list']:
             new_values = []
             for val in value:
-                new_val = get_concept_export_value(val, domains, concept_export_value)
+                new_val = get_concept_export_value(val, concept_export_value_type)
                 new_values.append(new_val)
             value = ','.join(new_values)
         elif datatype in ['concept', 'domain-value']:
-            value = get_concept_export_value(value, domains, concept_export_value)
+            value = get_concept_export_value(value, concept_export_value_type)
         return value
 
     def write_resources(self, resources, resource_export_configs=None):
@@ -78,14 +77,15 @@ class CsvWriter(Writer):
                     for k in tile['data'].keys():
                             if tile['data'][k] != '' and k in mapping:
                                 if mapping[k] not in csv_record:
-                                    concept_export_value = None
+                                    concept_export_value_type = None
                                     if k in concept_export_value_lookup:
-                                        concept_export_value = concept_export_value_lookup[k]
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], resource['_source']['domains'], concept_export_value)
+                                        concept_export_value_type = concept_export_value_lookup[k]
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
                                     csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
-                                    other_group_record[mapping[k]] = tile['data'][k]
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                    other_group_record[mapping[k]] = value
                             else:
                                 del tile['data'][k]
 
@@ -94,8 +94,7 @@ class CsvWriter(Writer):
                 other_group_records.append(other_group_record)
 
 
-        # csv_name_prefix = resource_export_configs['resource_model_name']
-        csv_name_prefix = ''
+        csv_name_prefix = resource_export_configs[0]['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
         dest = StringIO()
@@ -103,13 +102,13 @@ class CsvWriter(Writer):
         csvwriter.writeheader()
         csvs_for_export.append({'name':csv_name, 'outputfile': dest})
         for csv_record in csv_records:
-            csvwriter.writerow({k:str(v).encode('utf8') for k,v in csv_record.items()})
+            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
         csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        csvs_for_export.append({'name':csv_name + '_groups', 'outputfile': dest})
         for csv_record in other_group_records:
-            csvwriter.writerow({k:str(v).encode('utf8') for k,v in csv_record.items()})
+            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         return csvs_for_export

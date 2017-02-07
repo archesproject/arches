@@ -27,24 +27,15 @@ class ResourceExporter(object):
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    # def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
-    #     result=None
-    #     if search_results == True and dest_dir is not None:
-    #         result = self.writer.write_resources(resources, dest_dir)
-    #     elif search_results == True:
-    #         configs = self.read_export_configs()
-    #         result = self.writer.write_resources(resources, configs)
-    #     else:
-    #         self.writer.write_resources(dest_dir)
-    #     return result
-
-    def export(self, data_dest=None, resources=None, configs=None):
+    def export(self, data_dest=None, query=None, configs=None, graph=None):
         #resources should be changed to query
-        configs = self.read_csv_export_configs(configs)
-        business_data = self.get_search_results_for_export()
-        csv_files = self.writer.write_resources(business_data, configs)
+        configs = self.read_export_configs(configs)
+        business_data = self.get_resources_for_export(query, configs, graph)
+        resources = self.writer.write_resources(business_data, configs)
 
-    def read_csv_export_configs(self, configs):
+        return resources
+
+    def read_export_configs(self, configs):
         '''
         Reads the export configuration file or object and adds an array for records to store property data
         '''
@@ -58,22 +49,6 @@ class ResourceExporter(object):
             for val in configs:
                 resource_configs.append(val['mapping'])
             configs = resource_configs
-
-        return configs
-
-    def read_export_configs(self):
-        '''
-        Reads the export configuration file and adds an array for records to store property data
-        '''
-        configs = settings.EXPORT_CONFIG
-        if configs != '':
-            resource_export_configs = json.load(open(settings.EXPORT_CONFIG, 'r'))
-            if self.format in resource_export_configs:
-                configs = resource_export_configs[self.format]
-                for key, val in configs['RESOURCE_TYPES'].iteritems():
-                    configs['RESOURCE_TYPES'][key]['records'] = []
-            else:
-                configs = ''
 
         return configs
 
@@ -100,35 +75,53 @@ class ResourceExporter(object):
         response.write(zip_stream)
         return response
 
-    def get_resources_for_export(self, resourceids):
-        resources = []
-        relations = []
-        business_data_dict = {}
-        business_data_dict['business_data'] = {}
+    # def old_get_resources_for_export(self, resourceids):
+    #     resources = []
+    #     relations = []
+    #     business_data_dict = {}
+    #     business_data_dict['business_data'] = {}
+    #
+    #     if resourceids == None or resourceids == [] or resourceids == ['']:
+    #         resourceids = []
+    #         for resourceinstance in models.ResourceInstance.objects.all():
+    #             resourceids.append(resourceinstance.resourceinstanceid)
+    #
+    #     for resourceid in resourceids:
+    #         if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
+    #             resourceid = uuid.UUID(str(resourceid))
+    #             resource = {}
+    #             resource['tiles'] = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+    #             resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
+    #             resources.append(resource)
+    #
+    #     for relation in models.ResourceXResource.objects.all():
+    #         relations.append(relation)
+    #
+    #     business_data_dict['business_data']['resources'] = resources
+    #     business_data_dict['business_data']['relations'] = relations
+    #
+    #     return business_data_dict
 
-        if resourceids == None or resourceids == [] or resourceids == ['']:
-            resourceids = []
-            for resourceinstance in models.ResourceInstance.objects.all():
-                resourceids.append(resourceinstance.resourceinstanceid)
+    def get_resources_for_export(self, query=None, configs=None, graph=None):
+        if query == None and configs != []:
+            results = {}
+            results['hits']= {}
+            results['hits']['hits'] = []
+            resource_model_id = configs[0]['resource_model_id']
 
-        for resourceid in resourceids:
-            if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
-                resourceid = uuid.UUID(str(resourceid))
-                resource = {}
-                resource['tiles'] = models.TileModel.objects.filter(resourceinstance_id=resourceid)
-                resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
-                resources.append(resource)
+            resource_instances = models.ResourceInstance.objects.filter(graph_id=resource_model_id)
+            for resource_instance in resource_instances:
+                resource_instance_dict = {}
+                resource_instance_dict['_source'] = JSONSerializer().serializeToPython(resource_instance)
+                resource_instance_dict['_source']['tiles'] = JSONSerializer().serializeToPython(models.TileModel.objects.filter(resourceinstance_id=resource_instance_dict['_source']['resourceinstanceid']))
+                results['hits']['hits'].append(resource_instance_dict)
+            resources = results['hits']['hits']
+        elif graph != None:
+            resources = [str(resourceid) for resourceid in models.ResourceInstance.objects.filter(graph_id=graph).values_list('resourceinstanceid', flat=True)]
+        else:
+            se = SearchEngineFactory().create()
+            query = query
+            results = query.search(index='resource', doc_type='')
+            resources = results['hits']['hits']
 
-        for relation in models.ResourceXResource.objects.all():
-            relations.append(relation)
-
-        business_data_dict['business_data']['resources'] = resources
-        business_data_dict['business_data']['relations'] = relations
-
-        return business_data_dict
-
-    def get_search_results_for_export(self, query=None):
-        se = SearchEngineFactory().create()
-        query = Query(se, start=0, limit=10)
-        results = query.search(index='resource', doc_type='')
-        return results['hits']['hits']
+        return resources
