@@ -23,7 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-
+from arches.app.datatypes import datatypes
 
 
 class Tile(models.TileModel):
@@ -146,20 +146,8 @@ class Tile(models.TileModel):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    if node.datatype == 'string':
-                        document['strings'].append(nodevalue)
-                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
-                        if node.datatype == 'concept':
-                            nodevalue = [nodevalue]
-                        for concept_valueid in nodevalue:
-                            value = models.Value.objects.get(pk=concept_valueid)
-                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
-                    elif node.datatype == 'date':
-                        document['dates'].append(nodevalue)
-                    elif node.datatype == 'geojson-feature-collection':
-                        document['geometries'].append(nodevalue)
-                    elif node.datatype == 'number':
-                        document['numbers'].append(nodevalue)
+                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
+                    datatype_instance.append_to_document(document, nodevalue)
 
         return [JSONSerializer().serializeToPython(document)]
 
