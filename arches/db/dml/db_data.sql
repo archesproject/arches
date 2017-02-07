@@ -3440,7 +3440,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Polygon"]],
+           "filter": ["all", ["==", "$type", "Polygon"],["==", "is_cluster", false]],
            "paint": {
                "fill-color": "rgba(130, 130, 130, 0.5)"
            }
@@ -3453,7 +3453,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "is_cluster", false]],
            "paint": {
                "line-width": 3,
                "line-color": "rgba(200, 200, 200, .55)"
@@ -3467,7 +3467,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "is_cluster", false]],
            "paint": {
                "line-width": 1,
                "line-color": "rgba(130, 130, 130, 1)"
@@ -3481,7 +3481,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "is_cluster", false]],
            "paint": {
                "line-width": 1.5,
                "line-color": "rgba(200, 200, 200, 1)"
@@ -3495,7 +3495,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "is_cluster", false]],
            "paint": {
                "circle-radius": 5,
                "circle-color": "rgba(200, 200, 200, 1)"
@@ -3509,10 +3509,23 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "is_cluster", false]],
            "paint": {
                "circle-radius": 3,
                "circle-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-fill-cluster",
+           "type": "circle",
+           "source": "resource",
+           "source-layer": "resource",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all",["==", "is_cluster", true]],
+           "paint": {
+               "fill-color": "rgba(0, 255, 102, 1)"
            }
        }
    ]', TRUE, 'fa fa-globe');

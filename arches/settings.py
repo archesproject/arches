@@ -388,6 +388,11 @@ TILE_CACHE_CONFIG = {
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
+# map cluster distance in pixels, uses "ST_ClusterWithin"
+# http://postgis.net/docs/manual-dev/ST_ClusterWithin.html
+CLUSTER_DISTANCE = 20
+CLUSTER_MAX_ZOOM = 5
+
 try:
     from settings_local import *
 except ImportError:

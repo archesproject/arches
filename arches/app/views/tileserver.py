@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import os
 import shutil
 import sys
+import math
 from arches.app.models import models
 from TileStache import parseConfig
 from ModestMaps.Core import Coordinate
@@ -12,6 +13,11 @@ from arches.app.models import models
 from shapely.geometry import asShape
 
 
+
+EARTHRADIUS = 6378137
+EARTHCIRCUM = EARTHRADIUS * 2.0 * math.pi
+PIXELSPERTILE = 512
+
 def get_tileserver_config():
     # TODO: the resource queries here perhaps should be moved to a separate view
     # and url.  We may want to consider parameterizing it to support filtering
@@ -19,6 +25,52 @@ def get_tileserver_config():
     # permissions, which are defined at the node level; ie only show geometries
     # for nodes which the authenticated user has read permissions
     database = settings.DATABASES['default']
+    cluster_sql = """
+    SELECT row_number() over () AS __id__,
+        ST_NumGeometries(gc) as total,
+        ST_Centroid(gc) AS __geometry__,
+        ids AS resourceinstanceid,
+        sqrt(ST_Area(ST_MinimumBoundingCircle(gc)) / pi()) AS radius,
+        true as is_cluster
+    FROM (
+        SELECT unnest(ST_ClusterWithin(geom, %s)) gc,
+            array_agg(resourceinstanceid::text) ids
+        FROM mv_geojson_geoms
+    ) f
+    """
+    sql_list = []
+
+    for i in range(settings.CLUSTER_MAX_ZOOM + 1):
+        arc = EARTHCIRCUM / ((1 << (i)) * PIXELSPERTILE)
+        distance = arc * settings.CLUSTER_DISTANCE
+        sql_string = cluster_sql % distance
+        sql_list.append(sql_string)
+
+    sql_list.append("""SELECT tileid::text,
+            resourceinstanceid::text,
+            nodeid::text,
+            graphid::text,
+            node_name,
+            graph_name,
+            false AS poly_outline,
+            geom AS __geometry__,
+            row_number() over () as __id__,
+            false as is_cluster
+        FROM mv_geojson_geoms
+    UNION
+    SELECT tileid::text,
+            resourceinstanceid::text,
+            nodeid::text,
+            graphid::text,
+            node_name,
+            graph_name,
+            true AS poly_outline,
+            ST_ExteriorRing(geom) AS __geometry__,
+            row_number() over () as __id__,
+            false as is_cluster
+        FROM mv_geojson_geoms
+        where ST_GeometryType(geom) = 'ST_Polygon'""")
+
     return {
         "cache": settings.TILE_CACHE_CONFIG,
         "layers": {
@@ -33,30 +85,7 @@ def get_tileserver_config():
                             "database": database["NAME"],
                             "port": database["PORT"]
                         },
-                        "queries": [
-                            """SELECT tileid::text,
-                                        resourceinstanceid::text,
-                                        nodeid::text,
-                                        graphid::text,
-                                        node_name,
-                                        graph_name,
-                                        false AS poly_outline,
-                                        geom AS __geometry__,
-                                        row_number() over () as __id__
-                                    FROM mv_geojson_geoms
-                                UNION
-                                SELECT tileid::text,
-                                        resourceinstanceid::text,
-                                        nodeid::text,
-                                        graphid::text,
-                                        node_name,
-                                        graph_name,
-                                        true AS poly_outline,
-                                        ST_ExteriorRing(geom) AS __geometry__,
-                                        row_number() over () as __id__
-                                    FROM mv_geojson_geoms
-                                    where ST_GeometryType(geom) = 'ST_Polygon'"""
-                        ]
+                        "queries": sql_list
                     },
                 },
                 "allowed origin": "*",
@@ -65,7 +94,6 @@ def get_tileserver_config():
             }
         }
     }
-
 
 def handle_request(request):
     config_dict = get_tileserver_config()
