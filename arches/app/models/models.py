@@ -73,6 +73,8 @@ class Concept(models.Model):
 class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
     defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True)
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
