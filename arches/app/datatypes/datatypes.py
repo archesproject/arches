@@ -1,6 +1,14 @@
+import importlib
 import uuid
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+
+def get_datatype_instance(datatype):
+    d_datatype = models.DDataType.objects.get(datatype=datatype)
+    mod_path = d_datatype.modulename.replace('.py', '')
+    module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
+    datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+    return datatype_instance
 
 class StringDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):

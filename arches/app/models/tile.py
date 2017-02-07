@@ -23,7 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-
+from arches.app.datatypes import datatypes
 
 
 class Tile(models.TileModel):
@@ -128,19 +128,12 @@ class Tile(models.TileModel):
             se.delete_terms(term_id)
             se.index_term(term['term'], term_id, term['context'], term['options'])
 
-    def get_datatype_instance(self, datatype):
-        d_datatype = models.DDataType.objects.get(datatype=datatype)
-        mod_path = d_datatype.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
-        datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
-        return datatype_instance
-
     def prepare_documents_for_search_index(self):
         """
         Generates a list of specialized resource based documents to support resource search
 
         """
-        
+
         document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
         document['tiles'] = models.TileModel.objects.filter(resourceinstance=self.resourceinstance)
         document['strings'] = []
@@ -153,7 +146,7 @@ class Tile(models.TileModel):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = self.get_datatype_instance(node.datatype)
+                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
                     datatype_instance.append_to_document(document, nodevalue)
 
         return [JSONSerializer().serializeToPython(document)]
