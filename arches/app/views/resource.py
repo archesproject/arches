@@ -32,8 +32,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
-from django.forms.models import model_to_dict
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
@@ -122,15 +120,8 @@ class ResourceEditorView(BaseManagerView):
 
     def delete(self, request, resourceid=None):
         if resourceid is not None:
-            es = Elasticsearch()
-            se = SearchEngineFactory().create()
-            ret = models.ResourceInstance.objects.get(pk=resourceid)
-            related_resources = RelatedResourcesView().get_related_resources(str(ret.resourceinstanceid), 'en-US')
-            for rr in related_resources['resource_relationships']:
-                models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
-                se.delete(index='resource_relations', doc_type='all', id=rr['resourcexid'])
+            ret = Resource.objects.get(pk=resourceid)
             ret.delete()
-            se.delete(index='resource', doc_type=str(ret.graph_id), id=resourceid)
             return JSONResponse(ret)
         return HttpResponseNotFound()
 
@@ -195,7 +186,9 @@ class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
-        return JSONResponse(self.get_related_resources(resourceid, lang="en-US", start=start, limit=15), indent=4)
+        resource = Resource.objects.get(pk=resourceid)
+        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        return JSONResponse(related_resources, indent=4)
 
     def delete(self, request, resourceid=None):
         es = Elasticsearch()
@@ -207,11 +200,12 @@ class RelatedResourcesView(BaseManagerView):
             try:
                 ret = models.ResourceXResource.objects.get(pk=resourcexid).delete()
             except:
-                print 'no such model'
-            se.delete(index='resource_relations', doc_type='all', id=resourcexid)
+                print 'resource relation does not exist'
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
+        resource = Resource.objects.get(pk=root_resourceinstanceid[0])
+        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        return JSONResponse(related_resources, indent=4)
 
     def post(self, request, resourceid=None):
         es = Elasticsearch()
@@ -252,7 +246,7 @@ class RelatedResourcesView(BaseManagerView):
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
             if permitted == True:
-                rr = models.ResourceXResource.objects.create(
+                rr = models.ResourceXResource(
                     resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto = Resource(instanceid),
                     notes = notes,
@@ -260,8 +254,7 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted = datefrom,
                     dateended = dateto
                 )
-                document = model_to_dict(rr)
-                se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+                rr.save()
             else:
                 print 'relationship not permitted'
 
@@ -272,38 +265,9 @@ class RelatedResourcesView(BaseManagerView):
             rr.datestarted = datefrom
             rr.dateended = dateto
             rr.save()
-            document = model_to_dict(rr)
-            se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
-        return JSONResponse(self.get_related_resources(root_resourceinstanceid[0], lang="en-US", start=start, limit=15), indent=4)
-
-    def get_related_resources(self, resourceid, lang='en-US', limit=1000, start=0):
-        resource_instance = Resource.objects.get(pk=resourceid)
-        ret = {
-            'resource_instance': resource_instance,
-            'resource_relationships': [],
-            'related_resources': []
-        }
-        se = SearchEngineFactory().create()
-        query = Query(se, limit=limit, start=start)
-        query.add_filter(Terms(field='resourceinstanceidfrom', terms=resourceid).dsl, operator='or')
-        query.add_filter(Terms(field='resourceinstanceidto', terms=resourceid).dsl, operator='or')
-        resource_relations = query.search(index='resource_relations', doc_type='all')
-        ret['total'] = resource_relations['hits']['total']
-        instanceids = set()
-        for relation in resource_relations['hits']['hits']:
-            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
-            ret['resource_relationships'].append(relation['_source'])
-            instanceids.add(relation['_source']['resourceinstanceidto'])
-            instanceids.add(relation['_source']['resourceinstanceidfrom'])
-        if len(instanceids) > 0:
-            instanceids.remove(resourceid)
-
-        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
-        if related_resources:
-            for resource in related_resources['docs']:
-                print resource
-                ret['related_resources'].append(resource['_source'])
-
-        return ret
+        resource = Resource.objects.get(pk=root_resourceinstanceid[0])
+        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        return JSONResponse(related_resources, indent=4)

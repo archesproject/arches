@@ -49,7 +49,7 @@
                     <!--ko if: resourceEditorContext -->
                     <div class="related-resources-relationship">
                             <div class="mega-dropdown related-reources-crud-link">
-                                <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){console.log('popein'); propertiesDialogOpen(!propertiesDialogOpen())}">
+                                <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
                                     <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
                                 </a>
                                 <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
