@@ -21,6 +21,9 @@ from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from datetime import datetime
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.forms.models import model_to_dict
+
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
@@ -516,6 +519,17 @@ class ResourceXResource(models.Model):
     relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
+
+    def delete(self):
+        se = SearchEngineFactory().create()
+        se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
+        super(ResourceXResource, self).delete()
+
+    def save(self):
+        se = SearchEngineFactory().create()
+        document = model_to_dict(self)
+        se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+        super(ResourceXResource, self).save()
 
     class Meta:
         managed = True
