@@ -261,6 +261,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
+                ('modulename', models.TextField(blank=True, null=True)),
+                ('classname', models.TextField(blank=True, null=True)),
+                ('configcomponent', models.TextField(blank=True, null=True)),
                 ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
