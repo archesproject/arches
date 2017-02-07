@@ -23,6 +23,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.module_loading import import_string
 import os, sys, subprocess
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
@@ -37,6 +38,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from arches.app.models import models
 import csv, json
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
@@ -147,7 +149,7 @@ class Command(BaseCommand):
             self.index_database(package_name)
 
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['format'], options['config_file'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
 
         if options['operation'] == 'import_graphs':
             self.import_graphs(options['source'])
@@ -360,10 +362,11 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-    def export_business_data(self, data_dest=None, file_format=None, config_file=None):
-        if file_format in ['csv', 'json', 'shp']:
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
+        if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
-            data = resource_exporter.export(data_dest=data_dest, configs=config_file)
+            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
+
             for file in data:
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
@@ -400,11 +403,15 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                ArchesFileImporter(path).import_graphs()
+                with open(path, 'rU') as f:
+                    archesfile = JSONDeserializer().deserialize(f)
+                    ResourceGraphImporter(archesfile['graph'])
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
-                    ArchesFileImporter(os.path.join(path, file_path)).import_graphs()
+                    with open(file_path, 'rU') as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        ResourceGraphImporter(archesfile['graph'])
 
     def start_livereload(self):
         from livereload import Server

@@ -27,27 +27,15 @@ class ResourceExporter(object):
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    # def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
-    #     result=None
-    #     if search_results == True and dest_dir is not None:
-    #         result = self.writer.write_resources(resources, dest_dir)
-    #     elif search_results == True:
-    #         configs = self.read_export_configs()
-    #         result = self.writer.write_resources(resources, configs)
-    #     else:
-    #         self.writer.write_resources(dest_dir)
-    #     return result
-
-    def export(self, data_dest=None, query=None, configs=None):
+    def export(self, data_dest=None, query=None, configs=None, graph=None):
         #resources should be changed to query
-        configs = self.read_csv_export_configs(configs)
-        business_data = self.get_resources_for_export(query, configs)
+        configs = self.read_export_configs(configs)
+        business_data = self.get_resources_for_export(query, configs, graph)
         resources = self.writer.write_resources(business_data, configs)
 
         return resources
 
-
-    def read_csv_export_configs(self, configs):
+    def read_export_configs(self, configs):
         '''
         Reads the export configuration file or object and adds an array for records to store property data
         '''
@@ -61,22 +49,6 @@ class ResourceExporter(object):
             for val in configs:
                 resource_configs.append(val['mapping'])
             configs = resource_configs
-
-        return configs
-
-    def read_export_configs(self):
-        '''
-        Reads the export configuration file and adds an array for records to store property data
-        '''
-        configs = settings.EXPORT_CONFIG
-        if configs != '':
-            resource_export_configs = json.load(open(settings.EXPORT_CONFIG, 'r'))
-            if self.format in resource_export_configs:
-                configs = resource_export_configs[self.format]
-                for key, val in configs['RESOURCE_TYPES'].iteritems():
-                    configs['RESOURCE_TYPES'][key]['records'] = []
-            else:
-                configs = ''
 
         return configs
 
@@ -130,8 +102,8 @@ class ResourceExporter(object):
     #
     #     return business_data_dict
 
-    def get_resources_for_export(self, query=None, configs=None):
-        if query == None and configs != None:
+    def get_resources_for_export(self, query=None, configs=None, graph=None):
+        if query == None and configs != []:
             results = {}
             results['hits']= {}
             results['hits']['hits'] = []
@@ -143,11 +115,13 @@ class ResourceExporter(object):
                 resource_instance_dict['_source'] = JSONSerializer().serializeToPython(resource_instance)
                 resource_instance_dict['_source']['tiles'] = JSONSerializer().serializeToPython(models.TileModel.objects.filter(resourceinstance_id=resource_instance_dict['_source']['resourceinstanceid']))
                 results['hits']['hits'].append(resource_instance_dict)
-            # results['hits']['hits'] =
-
-
+            resources = results['hits']['hits']
+        elif graph != None:
+            resources = [str(resourceid) for resourceid in models.ResourceInstance.objects.filter(graph_id=graph).values_list('resourceinstanceid', flat=True)]
         else:
             se = SearchEngineFactory().create()
             query = query
             results = query.search(index='resource', doc_type='')
-        return results['hits']['hits']
+            resources = results['hits']['hits']
+
+        return resources

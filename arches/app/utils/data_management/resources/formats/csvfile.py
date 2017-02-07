@@ -84,7 +84,8 @@ class CsvWriter(Writer):
                                     csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
-                                    other_group_record[mapping[k]] = tile['data'][k]
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                    other_group_record[mapping[k]] = value
                             else:
                                 del tile['data'][k]
 
