@@ -21,6 +21,7 @@ from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.datatypes import datatypes
 
 class Resource(models.ResourceInstance):
 
@@ -56,13 +57,6 @@ class Resource(models.ResourceInstance):
         #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
         #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
 
-    def get_datatype_instance(self, datatype):
-        d_datatype = models.DDataType.objects.get(datatype=datatype)
-        mod_path = d_datatype.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
-        datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
-        return datatype_instance
-
     def index(self):
         """
         Indexes all the nessesary items values a resource to support search
@@ -85,7 +79,7 @@ class Resource(models.ResourceInstance):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = self.get_datatype_instance(node.datatype)
+                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
                     datatype_instance.append_to_document(document, nodevalue)
                     if node.datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
                         terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
