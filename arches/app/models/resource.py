@@ -20,6 +20,9 @@ import importlib
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from elasticsearch import Elasticsearch
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes import datatypes
 
@@ -104,3 +107,41 @@ class Resource(models.ResourceInstance):
         ret['tiles'] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
+
+    def delete(self):
+        es = Elasticsearch()
+        se = SearchEngineFactory().create()
+        related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
+        for rr in related_resources['resource_relationships']:
+            models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
+            se.delete(index='resource_relations', doc_type='all', id=rr['resourcexid'])
+        se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+        super(Resource, self).delete()
+
+    def get_related_resources(self, lang='en-US', limit=1000, start=0):
+        ret = {
+            'resource_instance': self,
+            'resource_relationships': [],
+            'related_resources': []
+        }
+        se = SearchEngineFactory().create()
+        query = Query(se, limit=limit, start=start)
+        query.add_filter(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid).dsl, operator='or')
+        query.add_filter(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid).dsl, operator='or')
+        resource_relations = query.search(index='resource_relations', doc_type='all')
+        ret['total'] = resource_relations['hits']['total']
+        instanceids = set()
+        for relation in resource_relations['hits']['hits']:
+            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            ret['resource_relationships'].append(relation['_source'])
+            instanceids.add(relation['_source']['resourceinstanceidto'])
+            instanceids.add(relation['_source']['resourceinstanceidfrom'])
+        if len(instanceids) > 0:
+            instanceids.remove(str(self.resourceinstanceid))
+
+        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
+        if related_resources:
+            for resource in related_resources['docs']:
+                ret['related_resources'].append(resource['_source'])
+
+        return ret
