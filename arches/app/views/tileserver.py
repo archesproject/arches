@@ -26,16 +26,23 @@ def get_tileserver_config():
     # for nodes which the authenticated user has read permissions
     database = settings.DATABASES['default']
     cluster_sql = """
-    SELECT row_number() over () AS __id__,
-        ST_NumGeometries(gc) as total,
-        ST_Centroid(gc) AS __geometry__,
-        ids AS resourceinstanceid,
-        sqrt(ST_Area(ST_MinimumBoundingCircle(gc)) / pi()) AS radius,
-        true as is_cluster
+    SELECT '' as tileid,
+    	'' AS resourceinstanceid,
+    	'' as nodeid,
+    	'' as graphid,
+    	'' as node_name,
+    	'' as graph_name,
+    	false AS poly_outline,
+    	row_number() over () as __id__,
+    	(ST_NumGeometries(gc) > 1) as is_cluster,
+    	ST_NumGeometries(gc) as total,
+    	sqrt(ST_Area(ST_MinimumBoundingCircle(gc)) / pi()) AS radius,
+    	CASE WHEN (ST_NumGeometries(gc) > 1) THEN ST_MinimumBoundingCircle(gc)
+    		ELSE ST_Centroid(gc)
+    	END AS __geometry__
     FROM (
-        SELECT unnest(ST_ClusterWithin(geom, %s)) gc,
-            array_agg(resourceinstanceid::text) ids
-        FROM mv_geojson_geoms
+    	SELECT unnest(ST_ClusterWithin(geom, %s)) gc
+    	FROM mv_geojson_geoms
     ) f
     """
     sql_list = []
@@ -44,6 +51,8 @@ def get_tileserver_config():
         arc = EARTHCIRCUM / ((1 << (i)) * PIXELSPERTILE)
         distance = arc * settings.CLUSTER_DISTANCE
         sql_string = cluster_sql % distance
+        print i
+        print distance
         sql_list.append(sql_string)
 
     sql_list.append("""SELECT tileid::text,

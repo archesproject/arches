@@ -3429,7 +3429,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
          }
      ]', TRUE, 'fa fa-building-o');
 
-
+DELETE from map_layers where name = 'All Resources';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'All Resources', '[
        {
@@ -3440,7 +3440,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Polygon"],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "Polygon"]],
            "paint": {
                "fill-color": "rgba(130, 130, 130, 0.5)"
            }
@@ -3516,16 +3516,18 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            }
        },
        {
-           "id": "resources-fill-cluster",
-           "type": "circle",
-           "source": "resource",
-           "source-layer": "resource",
-           "layout": {
-               "visibility": "visible"
-           },
-           "filter": ["all",["==", "is_cluster", true]],
-           "paint": {
-               "fill-color": "rgba(0, 255, 102, 1)"
-           }
-       }
+            "id": "resources-cluster-count",
+            "type": "symbol",
+            "source": "resources",
+            "source-layer": "resources",
+            "layout": {
+                "text-field": "{total}",
+                "text-font": [
+                    "DIN Offc Pro Medium",
+                    "Arial Unicode MS Bold"
+                ],
+                "text-size": 12
+            },
+            "filter": ["all", ["==", "is_cluster", true]]
+        }
    ]', TRUE, 'fa fa-globe');
