@@ -42,118 +42,116 @@
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
             	</div>
-            </div>
 
-            <div class="relative">
+                <div class="relative">
 
-                <!--Documentation dropdown-->
-                <!--ko if: resourceEditorContext -->
-                <div class="related-resources-relationship">
-                    <ul class="" style="list-style: none;">
-                        <li class="mega-dropdown related-reources-crud-link">
-                            <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
-                                <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
-                            </a>
-                            <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
-                                <div class="clearfix">
-                                    <div class="settings-config-panel relative">
+                    <!--Documentation dropdown-->
+                    <!--ko if: resourceEditorContext -->
+                    <div class="related-resources-relationship">
+                            <div class="mega-dropdown related-reources-crud-link">
+                                <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){console.log('popein'); propertiesDialogOpen(!propertiesDialogOpen())}">
+                                    <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
+                                </a>
+                                <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
+                                    <div class="clearfix">
+                                        <div class="settings-config-panel relative">
 
-                                        <div class="related-resources-title-container">
-                                            <h3 class="search-title">Relationship details</h3>
-                                            <div class="relation-properties-buttons">
-                                                <div class="relation-properties-button">
-                                                    <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save</button>
-                                                </div>
-                                                <div class="relation-properties-button">
-                                                    <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Relationship participants -->
-
-                                            <div class="resource-relation-description">
-                                                <div class="target-resource">
-                                                    <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
-                                                </div>
-                                                <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
-                                                    <div class="selected-resource">
-                                                        <i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                            <div class="related-resources-title-container">
+                                                <h3 class="search-title">Relationship details</h3>
+                                                <div class="relation-properties-buttons">
+                                                    <div class="relation-properties-button">
+                                                        <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save</button>
+                                                    </div>
+                                                    <div class="relation-properties-button">
+                                                        <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <!-- Relationship participants -->
 
-                                        <div class="settings-crud-panel">
-                                            <div class="col-xs-12">
-                                                <form class="widgets">
-                                                    <div class="row widget-container">
-                                                        <div class="form-group">
-                                                            <div class="row widget-wrapper">
-                                                                <div class="form-group">
-                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
-                                                                    <div class="col-xs-12">
-                                                                        <input style="width:30%; display:inline-block;"
-                                                                            data-bind="select2: {
-                                                                                select2Config: {
-                                                                                    clickBubble: true,
-                                                                                    data: relationshipTypes,
-                                                                                    value: relatedProperties.relationship_type,
-                                                                                    multiple: false,
-                                                                                    placeholder: relationshipTypePlaceholder
-                                                                                }
-                                                                            }">
+                                                <div class="resource-relation-description">
+                                                    <div class="target-resource">
+                                                        <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                                    </div>
+                                                    <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
+                                                        <div class="selected-resource">
+                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            <div class="settings-crud-panel">
+                                                <div class="col-xs-12">
+                                                    <form class="widgets">
+                                                        <div class="row widget-container">
+                                                            <div class="form-group">
+                                                                <div class="row widget-wrapper">
+                                                                    <div class="form-group">
+                                                                        <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                                        <div class="col-xs-12">
+                                                                            <input style="width:30%; display:inline-block;"
+                                                                                data-bind="select2: {
+                                                                                    select2Config: {
+                                                                                        clickBubble: true,
+                                                                                        data: relationshipTypes,
+                                                                                        value: relatedProperties.relationship_type,
+                                                                                        multiple: false,
+                                                                                        placeholder: relationshipTypePlaceholder
+                                                                                    }
+                                                                                }">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row widget-container shim">
+                                                            <div class="form-group">
+                                                                <div class="relative" style="">
+                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                            </label>
+                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                            </label>
+                                                                </div>
+
+                                                                <div class="relative">
+                                                                    <div class="col-xs-6">
+                                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
+                                                                    </div>
+                                                                    <div class="col-xs-6">
+                                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                         </div>
-                                                    </div>
 
-                                                    <div class="row widget-container shim">
-                                                        <div class="form-group">
-                                                            <div class="relative" style="">
-                                                                <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
-                                                                                        </label>
-                                                                <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
-                                                                                        </label>
-                                                            </div>
-
-                                                            <div class="relative">
-                                                                <div class="col-xs-6">
-                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
+                                                        <div class="row widget-container">
+                                                            <div class="form-group">
+                                                                <div class="relative">
+                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
                                                                 </div>
-                                                                <div class="col-xs-6">
-                                                                    <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
+
+                                                                <div class="col-xs-12">
+                                                                    <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-
-                                                    <div class="row widget-container">
-                                                        <div class="form-group">
-                                                            <div class="relative">
-                                                                <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
-                                                            </div>
-
-                                                            <div class="col-xs-12">
-                                                                <div id="editor1" class="" data-bind="summernote: {value: relatedProperties.notes, disable: false}"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
+                    </div>
+
+                    <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
+
+                    <!-- /ko -->
+                    <!--Documentation dropdown-->
                 </div>
-
-                <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
-
-                <!-- /ko -->
-                <!--Documentation dropdown-->
-            </div>
+          </div>
 
 
             <div class="rr-card-icon-placement">

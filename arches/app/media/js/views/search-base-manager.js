@@ -69,6 +69,17 @@ define([
             })
 
             this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
+            if (this.viewModel.resourceEditorContext === true) {
+                this.viewModel.openRelatedResources.subscribe(function(val) {
+                    if (val === true) {
+                        var resize = function(){
+                            $(window).trigger("resize");
+                        }
+                        setTimeout(resize, 200);
+                    }
+                })
+            }
+
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.queryString = ko.computed(function() {
