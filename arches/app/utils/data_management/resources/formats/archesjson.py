@@ -3,10 +3,13 @@ import os
 import types
 import sys
 import uuid
+import datetime
 from django.conf import settings
 from django.db import connection
 import arches.app.models.models as archesmodels
 from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
+from arches.app.models.graph import Graph
 from arches.app.models import models
 import codecs
 from format import Writer
@@ -14,52 +17,34 @@ import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import csv
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 
 class JsonWriter(Writer):
 
     def __init__(self):
         super(JsonWriter, self).__init__()
 
-    # def write_resources(self, dest_dir):
-    #     cursor = connection.cursor()
-    #     cursor.execute("""select entitytypeid from data.entity_types where isresource = TRUE""")
-    #     resource_types = cursor.fetchall()
-    #     json_resources = []
-    #     with open(dest_dir, 'w') as f:
-    #         for resource_type in resource_types:
-    #             resources = archesmodels.Entities.objects.filter(entitytypeid = resource_type)
-    #             print "Writing {0} {1} resources".format(len(resources), resource_type[0])
-    #             errors = []
-    #             for resource in resources:
-    #                 try:
-    #                     a_resource = Resource().get(resource.entityid)
-    #                     a_resource.form_groups = None
-    #                     json_resources.append(a_resource)
-    #                 except Exception as e:
-    #                     if e not in errors:
-    #                         errors.append(e)
-    #             if len(errors) > 0:
-    #                 print errors[0], ':', len(errors)
-    #         f.write((JSONSerializer().serialize({'resources':json_resources}, separators=(',',':'))))
+    def get_tiles(self, resourceid):
+        #insure parenttiles are ordered so they are imported before their respective child tiles
+        tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('-parenttile_id')
+        return tiles
 
-    def write_resources(self, resourceids, dest_dir):
+    def write_resources(self, resourceids, resource_export_configs=None):
+        json_for_export = []
         resources = []
         relations = []
         export = {}
         export['business_data'] = {}
 
-        if resourceids == None or resourceids == [] or resourceids == '':
-            resourceids = []
-            for resourceinstance in models.ResourceInstance.objects.all():
-                resourceids.append(resourceinstance.resourceinstanceid)
-        else:
-            resourceids = set([x.strip() for x in resourceids.split(',')])
-
         for resourceid in resourceids:
             if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
                 resourceid = uuid.UUID(str(resourceid))
                 resource = {}
-                resource['tiles'] = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+                resource['tiles'] = self.get_tiles(resourceid)
                 resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
 
@@ -69,8 +54,17 @@ class JsonWriter(Writer):
         export['business_data']['resources'] = resources
         export['business_data']['relations'] = relations
 
-        with open(dest_dir, 'w') as f:
-            f.write(JSONSerializer().serialize(export))
+        json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name
+
+        export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
+        dest = StringIO()
+        json.dump(export, dest)
+        json_for_export.append({'name':json_name, 'outputfile': dest})
+
+        return json_for_export
+
 
 class JsonReader():
 

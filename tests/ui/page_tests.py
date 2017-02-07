@@ -105,7 +105,7 @@ class UITest(StaticLiveServerTestCase):
         self.driver.implicitly_wait(5)
 
     def setUpLocal(self):
-        management.call_command('packages', operation='import_json', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         self.driver = getattr(webdriver, self.browser)()
         self.driver.implicitly_wait(3)
 
@@ -303,7 +303,7 @@ class UITest(StaticLiveServerTestCase):
     #     page.login('admin', 'admin')
     #
     #     #Create a new branch model
-    #     # management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+    #     # management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
     #     # graph_page = GraphPage(self.driver, self.live_server_url)
     #     # resource_graph_id = graph_page.import_arches_json()
     #

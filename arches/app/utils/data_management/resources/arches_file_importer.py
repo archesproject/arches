@@ -80,51 +80,6 @@ class ResourceImportReporter:
 
 class ArchesFileImporter(object):
 
-    def __init__(self, file=None, mapping_file=None):
-        self.graphs = ''
-        self.reference_data = ''
-        self.business_data = ''
-        self.mapping = ''
-
-        if not file:
-            file = settings.RESOURCE_GRAPH_LOCATIONS
-        else:
-            file = [file]
-
-        if mapping_file == None:
-            try:
-                mapping_file = [file[0].split('.')[0] + '.mapping']
-            except:
-                print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
-        else:
-            try:
-                mapping_file = [mapping_file]
-            except:
-                print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
-
-        for path in mapping_file:
-            if os.path.exists(path):
-                if isfile(join(path)):
-                    self.mapping = json.load(open(path, 'r'))
-                else:
-                    self.mapping = None
-
-        for path in file:
-            if os.path.exists(path):
-                if isfile(join(path)):
-                    with open(file[0], 'rU') as f:
-                        archesfile = JSONDeserializer().deserialize(f)
-                        if 'graph' in archesfile.keys():
-                            self.graphs = archesfile['graph']
-                        if 'reference_data' in archesfile.keys():
-                            self.reference_data = archesfile['reference_data']
-                        if 'business_data' in archesfile.keys():
-                            self.business_data = archesfile['business_data']
-                else:
-                    print str(file) + ' is not a valid file'
-            else:
-                print path + ' is not a valid path'
-
     def pre_import(self, tile, graph_id):
         for function in self.get_function_class_instances(tile, graph_id):
             try:
