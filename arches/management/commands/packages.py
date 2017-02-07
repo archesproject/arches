@@ -43,6 +43,7 @@ from arches.app.utils.data_management.resources.arches_file_importer import Arch
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.skos import SKOSReader
 from django.db import transaction
 
 
@@ -55,7 +56,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -94,6 +95,12 @@ class Command(BaseCommand):
 
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
+
+        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default=False,
+            help='Whether to overwrite existing concepts with ones being imported or not.')
+
+        parser.add_argument('-st', '--stage', action='store', dest='stage', default=False,
+            help='Whether to stage new concepts or add them to the existing concept scheme.')
 
         parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
             help='An icon class to use for a tileserver layer.')
@@ -150,6 +157,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'export_business_data':
             self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
+
+        if options['operation'] == 'import_reference_data':
+            self.import_reference_data(options['source'], options['overwrite'], options['stage'])
 
         if options['operation'] == 'import_graphs':
             self.import_graphs(options['source'])
@@ -372,6 +382,11 @@ class Command(BaseCommand):
                     f.write(file['outputfile'].getvalue())
         else:
             print '{0} is not a valid export file format.'.format(file_format)
+
+    def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
+        skos = SKOSReader()
+        rdf = skos.read_file(data_source)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
     def import_business_data(self, data_source, bulk_load=False):
         """
