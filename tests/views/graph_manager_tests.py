@@ -33,7 +33,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        management.call_command('packages', operation='import_json', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
         cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID = "11111111-0000-0000-0000-191919191919"
         cls.ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
