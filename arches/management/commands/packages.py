@@ -409,7 +409,7 @@ class Command(BaseCommand):
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
-                    with open(file_path, 'rU') as f:
+                    with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'])
 

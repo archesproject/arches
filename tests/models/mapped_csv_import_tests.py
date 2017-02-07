@@ -25,7 +25,7 @@ from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands.package_utils import authority_files
-from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import  BusinessDataImporter
 
 
@@ -40,7 +40,9 @@ class mappedCSVFileImportTests(ArchesTestCase):
 
 	def setUp(self):
 		ResourceInstance.objects.all().delete()
-		ArchesFileImporter(os.path.join('tests/fixtures/data/json/cardinality_test_data/target.json')).import_graphs()
+		with open(os.path.join('tests/fixtures/data/json/cardinality_test_data/target.json'), 'rU') as f:
+			archesfile = JSONDeserializer().deserialize(f)
+		ResourceGraphImporter(archesfile['graph'])
 
 	@classmethod
 	def tearDownClass(cls):
