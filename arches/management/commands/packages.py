@@ -84,7 +84,7 @@ class Command(BaseCommand):
         parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
             help='A comma separated list of the graphids of the resources you would like to import/export.')
 
-        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=False,
+        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=None,
             help='Usually an export mapping file.')
 
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
@@ -165,7 +165,7 @@ class Command(BaseCommand):
             self.import_graphs(options['source'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'], options['bulk_load'])
+            self.import_business_data(options['source'], options['config_file'], options['bulk_load'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
@@ -388,7 +388,7 @@ class Command(BaseCommand):
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, bulk_load=False):
+    def import_business_data(self, data_source, config_file=None, bulk_load=False):
         """
         Imports business data from all formats
         """
@@ -402,7 +402,7 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path).import_business_data(bulk=bulk_load)
+                BusinessDataImporter(path, config_file).import_business_data(bulk=bulk_load)
 
     def import_graphs(self, data_source=''):
         """
