@@ -4,7 +4,28 @@ define([
     'd3'
 ], function($, ko, d3) {
     ko.bindingHandlers.timeWheel = {
+
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var width = 750;
+            var height = 600;
+            var radius = Math.min(width, height) / 2;
+            var $el = $(element);
+
+            var vis = d3.select($el.find('.chart')[0]).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("class", "container")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            vis.append("svg:circle")
+                .attr("r", radius)
+                .style("opacity", 0);
+
+            ko.utils.domData.set(element, 'vis', vis);
+        },
+
+        update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var width = 750;
             var height = 600;
             var radius = Math.min(width, height) / 2;
@@ -15,7 +36,8 @@ define([
                 .range([0, radius]);
             var $el = $(element);
             var opts = ko.unwrap(valueAccessor());
-            var configJSON = opts.config;
+            var configJSON = opts.config();
+            var breadCrumb = opts.breadCrumb;
 
             // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
             var b = {
@@ -25,19 +47,15 @@ define([
                 t: 10
             };
 
-            var vis = d3.select($el.find('.chart')[0]).append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .append("g")
-                .attr("class", "container")
-                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            var vis = ko.utils.domData.get(element, 'vis');
+            vis.on("mouseleave", mouseleave);
 
             var partition = d3.layout.partition()
-                .value(function(d) {
-                    return d.size;
-                })
                 .sort(function(d) {
                     return d3.descending(d.start);
+                })
+                .value(function(d) {
+                    return d.size;
                 });
 
             var arc = d3.svg.arc()
@@ -54,17 +72,8 @@ define([
                     return Math.max(0, y(d.y + d.dy));
                 });
 
-            var trail = d3.select($el.find('.sequence')[0]).append("svg")
-                .attr("width", width)
-                .attr("height", 50)
-                .attr("class", "trail");
 
-            vis.append("svg:circle")
-                .attr("r", radius)
-                .style("opacity", 0);
-
-            var nodes = partition.nodes(configJSON);
-            var arcTweenZoom = function(d) {
+            var arcTween = function(d) {
                 var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
                     yd = d3.interpolate(y.domain(), [d.y, 1]),
                     yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
@@ -81,34 +90,150 @@ define([
                 };
             };
 
-            var path = vis.selectAll("path")
-                .data(nodes)
-                .enter().append("path")
-                .attr("display", function(d) {
-                    return d.depth ? null : "none";
-                })
-                .attr("d", arc)
-                .attr("fill-rule", "evenodd")
-                .style("fill", function(d) {
-                    return colortheme((d.children ? d : d.parent).name);
-                })
-                .style("opacity", 1)
-                .on("mouseover", mouseover)
-                .on("click", function(d) {
+            function clickcancel() {
+                // we want to a distinguish single/double click
+                // details http://bl.ocks.org/couchand/6394506
+                var event = d3.dispatch('click', 'dblclick');
+                function cc(selection) {
+                    var down, tolerance = 5, last, wait = null, args;
+                    // euclidean distance
+                    function dist(a, b) {
+                        return Math.sqrt(Math.pow(a[0] - b[0], 2), Math.pow(a[1] - b[1], 2));
+                    }
+                    selection.on('mousedown', function() {
+                        down = d3.mouse(document.body);
+                        last = +new Date();
+                        args = arguments;
+                    });
+                    selection.on('mouseup', function() {
+                        if (dist(down, d3.mouse(document.body)) > tolerance) {
+                            return;
+                        } else {
+                            if (wait) {
+                                window.clearTimeout(wait);
+                                wait = null;
+                                event.dblclick.apply(this, args);
+                            } else {
+                                wait = window.setTimeout((function() {
+                                    return function() {
+                                        event.click.apply(this, args);
+                                        wait = null;
+                                    };
+                                })(), 300);
+                            }
+                        } 
+                    });
+                };
+                return d3.rebind(cc, event, 'on');
+            }
+            var cc = clickcancel();
+
+            var updateChart = function (items) {
+                var root = items;
+                // DATA JOIN - Join new data with old elements, if any.
+                var gs = vis.selectAll("g").data(partition.nodes(root));
+                
+                // ENTER
+                var g = gs.enter()
+                    .append("g")
+                    .on("mouseover", mouseover)
+                    .call(cc);
+
+                // click and dblclick step on each other so we need this
+                cc.on("click", function(d) {
                     if (typeof opts.onClick === 'function') {
                         opts.onClick(d);
                     }
                 })
-                .on("dblclick", function(d) {
-                    path.transition()
-                        .duration(1000)
-                        .attrTween("d", arcTweenZoom(d));
-                });
+                .on("dblclick", dblclick)
 
-            // Add the mouseleave handler to the bounding circle.
-            d3.select($el.find('.container')[0]).on("mouseleave", function(d) {
+                // UPDATE
+                var path = g.append("path");
+
+                gs.select('path')
+                    .style("fill", function(d) {
+                        return colortheme((d.children ? d : d.parent).name);
+                    })
+                    .each(function(d) {
+                      this.x0 = d.x;
+                      this.dx0 = d.dx;
+                    })
+                    .transition().duration(500)
+                    .attr("d", arc);
+              
+              
+                // EXIT - Remove old elements as needed.
+                gs.exit().transition().duration(500).style("fill-opacity", 1e-6).remove();
+                
+            }
+
+            function dblclick(d) {
+                // console.log(d)
+                // fade out all text elements
+                if (d.size !== undefined) {
+                  d.size += 100;
+                };
+
+                vis.selectAll('path').transition()
+                  .duration(750)
+                  .attrTween("d", arcTween(d))
+                  .each("end", function(e, i) {
+                      // check if the animated element's data e lies within the visible angle span given in d
+                      if (e.x >= d.x && e.x < (d.x + d.dx)) {
+                          // get a selection of the associated text element
+                          var arcText = d3.select(this.parentNode).select("text");
+                          // fade in the text element and recalculate positions
+                          arcText.transition().duration(750)
+                              .attr("opacity", 1)
+                              .attr("transform", function() {
+                                  return "rotate(" + computeTextRotation(e) + ")"
+                              })
+                              .attr("x", function(d) {
+                                  return y(d.y);
+                              });
+                      }
+                });
+            } 
+
+            function mouseover(d) {
+                count = d.value;
+                if (d.value < 1) {
+                    count = "< 1";
+                }
+
+                d3.select($el.find('.count')[0])
+                    .text(count);
+
+                var sequenceArray = [];
+                var current = d;
+                while (current.parent) {
+                    sequenceArray.unshift(current.name);
+                    current = current.parent;
+                }
+
+                sequenceArray.push(count + ' resources')
+
+                breadCrumb(sequenceArray.join(' - '));
+
+                // Make the breadcrumb trail visible, if it's hidden.
+                d3.select($el.find('.sequence')[0])
+                    .style("visibility", "");
+
+                // Fade all the segments.
+                d3.selectAll("path")
+                    .style("opacity", 0.3);
+
+                // Then highlight only those that are an ancestor of the current segment.
+                vis.selectAll("path")
+                    .filter(function(node) {
+                        return (sequenceArray.indexOf(node.name) >= 0);
+                    })
+                    .style("opacity", 1);
+            }
+
+            function mouseleave(d){
                 // Hide the breadcrumb trail
-                d3.select($el.find('.trail')[0])
+                d3.select($el.find('.sequence')[0])
                     .style("visibility", "hidden");
 
                 // Deactivate all segments during transition.
@@ -122,90 +247,11 @@ define([
                     .each("end", function() {
                         d3.select(this).on("mouseover", mouseover);
                     });
-
-                d3.select($el.find('.explanation')[0])
-                    .style("visibility", "hidden");
-            });
-
-            // Fade all but the current sequence, and show it in the breadcrumb trail.
-            function mouseover(d) {
-                count = d.value;
-                if (d.value < 1) {
-                    count = "< 1";
-                }
-
-                d3.select($el.find('.count')[0])
-                    .text(count);
-
-                d3.select($el.find('.explanation')[0])
-                    .style("visibility", "");
-
-                var sequenceArray = [];
-                var current = d;
-                while (current.parent) {
-                    sequenceArray.unshift(current);
-                    current = current.parent;
-                }
-
-                // Data join; key function combines name and depth (= position in sequence).
-                var g = d3.select($el.find('.trail')[0])
-                    .selectAll("g")
-                    .data(sequenceArray, function(d) {
-                        return d.name + d.depth;
-                    });
-
-                // Add breadcrumb and label for entering nodes.
-                var entering = g.enter().append("g");
-
-                entering.append("text")
-                    .attr("x", (b.w + b.t) / 2)
-                    .attr("y", b.h / 2)
-                    .attr("dy", "0.35em")
-                    .attr("text-anchor", "middle")
-                    .attr("fill", "#123")
-                    .text(function(d) {
-                        return d.name;
-                    });
-
-                //Set position for entering and updating nodes.
-                g.attr("transform", function(d, i) {
-                    return "translate(" + i * (b.w + b.s) + ", 0)";
-                });
-
-                // Remove exiting nodes.
-                g.exit().remove();
-
-                // Make the breadcrumb trail visible, if it's hidden.
-                d3.select($el.find('.trail')[0])
-                    .style("visibility", "");
-
-                // Fade all the segments.
-                d3.selectAll("path")
-                    .style("opacity", 0.3);
-
-                // Then highlight only those that are an ancestor of the current segment.
-                vis.selectAll("path")
-                    .filter(function(node) {
-                        return (sequenceArray.indexOf(node) >= 0);
-                    })
-                    .style("opacity", 1);
+                
             }
 
-
-            //	Fill Colors
-            var hue = d3.scale.category10();
-
-            var luminance = d3.scale.sqrt()
-                .domain([0, 1e6])
-                .clamp(true)
-                .range([90, 20]);
-
-            function fill(d) {
-                var p = d;
-                while (p.depth > 1) p = p.parent;
-                var c = d3.lab(hue(p.name));
-                c.l = luminance(d.sum);
-                return c;
+            if(!!configJSON){
+                updateChart(configJSON);
             }
 
         }

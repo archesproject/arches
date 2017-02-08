@@ -62,15 +62,10 @@
     </div>
 
 
-    <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod }">
+    <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod, breadCrumb: breadCrumb}">
         <h3 class="search-title">{% trans "Time Wheel" %} <span class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</span></h3>
-        <div class="sequence"></div>
-        <div class="chart" class="">
-            <div class="explanation" style="visibility: hidden;">
-                <span class="count"></span><br/>
-                {% trans "resources fall within this period" %}
-            </div>
-        </div>
+        <div class="sequence" data-bind="text: breadCrumb"></div>
+        <div class="chart" class=""></div>
     </div>
 
 </div>

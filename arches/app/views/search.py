@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+import csv
+import math
 from dateutil import parser
 from django.conf import settings
 from django.shortcuts import render
@@ -30,12 +32,11 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from django.utils.module_loading import import_string
 from arches.app.views.base import BaseManagerView
 
-import csv
 
 try:
     from cStringIO import StringIO
@@ -90,7 +91,6 @@ def build_search_terms_dsl(request):
     query.add_query(boolquery)
 
     return query
-
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
@@ -320,3 +320,80 @@ def export_results(request):
     results.append({'name':csv_name, 'outputfile': dest})
     zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
     return zipped_results
+
+def time_wheel_config(request):
+    se = SearchEngineFactory().create()
+    query = Query(se, limit=0)
+    query.add_aggregation(MinAgg(field='dates', format='y'))
+    query.add_aggregation(MaxAgg(field='dates', format='y'))
+    results = query.search(index='resource')
+    min_date = int(results['aggregations']['min_dates']['value_as_string'])
+    max_date = int(results['aggregations']['max_dates']['value_as_string'])
+
+    # round min and max date to the nearest 1000 years
+    min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
+    max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
+
+    query = Query(se, limit=0)
+    for millennium in range(int(min_date),int(max_date)+1000,1000):
+        min_millenium = millennium
+        max_millenium = millennium + 1000
+        millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
+        
+        for century in range(min_millenium,max_millenium,100):
+            min_century = century
+            max_century = century + 100
+            century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
+            millenium_agg.add_aggregation(century_aggregation)
+                
+            for decade in range(min_century,max_century,10):
+                min_decade = decade
+                max_decade = decade + 10
+                decade_aggregation = DateRangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', format='y', min_date=str(min_decade), max_date=str(max_decade))
+                century_aggregation.add_aggregation(decade_aggregation)
+
+        query.add_aggregation(millenium_agg)
+    
+
+    root = d3Item(name='root')
+    transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
+
+    return JSONResponse(root, indent=4)
+    #return JSONResponse(query.search(index='resource'), indent=4)
+    #return JSONResponse(query.dsl, indent=4)
+
+def transformESAggToD3Hierarchy(results, d3ItemInstance):
+    if 'buckets' not in results:
+        return d3ItemInstance
+    
+    for key, value in results['buckets'][0].iteritems():
+        if key == 'from' or key == 'to':
+            pass
+        elif key == 'from_as_string':
+            d3ItemInstance.start = value
+        elif key == 'to_as_string':
+            d3ItemInstance.end = value 
+        elif key == 'doc_count':
+            d3ItemInstance.size = value
+        elif key == 'key':
+            pass
+            #d3ItemInstance.name = value
+        else:
+            d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
+
+    return d3ItemInstance
+
+
+class d3Item(object):
+    name = ''
+    size = 0
+    start = None
+    end = None
+    children = []
+
+    def __init__(self, **kwargs):
+        self.name = kwargs.pop('name', '')
+        self.size = kwargs.pop('size', 0)
+        self.start = kwargs.pop('start',None)
+        self.end = kwargs.pop('end', None)
+        self.children = kwargs.pop('children', [])
