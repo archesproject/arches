@@ -21,7 +21,9 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
             }
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
-            this.wheelConfig = wheelConfig;
+            this.breadCrumb = ko.observable();
+            this.wheelConfig = ko.observable();
+            this.getTimeWheelConfig();
             this.selectPeriod = function (d) {
                 var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
                 var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
@@ -76,6 +78,20 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
             }, this).extend({ deferred: true });
             
             BaseFilter.prototype.initialize.call(this, options);
+        },
+
+        getTimeWheelConfig: function(){
+            var self = this;
+            $.ajax({
+                type: "GET",
+                url: 'search/time_wheel_config',
+                success: function(response) {
+                    self.wheelConfig(response);
+                },
+                failure: function(response) {
+                    viewModel.loading(false);
+                }
+            });
         },
 
         appendFilters: function(filterParams) {
