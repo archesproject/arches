@@ -41,7 +41,8 @@ def get_tileserver_config():
         		row_number() over () as __id__,
         		1 as total,
         		0 AS radius,
-        		ST_Centroid(geom) AS __geometry__
+        		ST_Centroid(geom) AS __geometry__,
+                '' AS extent
         	FROM clusters
         	WHERE cid is NULL
 
@@ -57,7 +58,8 @@ def get_tileserver_config():
         		row_number() over () as __id__,
         		count(*) as total,
         		sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(geom))) / pi()) AS radius,
-        		ST_Centroid(ST_Collect(geom)) AS __geometry__
+        		ST_Centroid(ST_Envelope(ST_Collect(geom))) AS __geometry__,
+                ST_AsGeoJSON(ST_Envelope(ST_Collect(geom))) AS extent
         	FROM clusters
         	WHERE cid IS NOT NULL
         	GROUP BY cid
@@ -71,30 +73,32 @@ def get_tileserver_config():
         sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS)
         sql_list.append(sql_string)
 
-    sql_list.append("""SELECT tileid::text,
-            resourceinstanceid::text,
-            nodeid::text,
-            graphid::text,
-            node_name,
-            graph_name,
-            false AS poly_outline,
-            geom AS __geometry__,
-            row_number() over () as __id__,
-            false as is_cluster
-        FROM mv_geojson_geoms
-    UNION
-    SELECT tileid::text,
-            resourceinstanceid::text,
-            nodeid::text,
-            graphid::text,
-            node_name,
-            graph_name,
-            true AS poly_outline,
-            ST_ExteriorRing(geom) AS __geometry__,
-            row_number() over () as __id__,
-            false as is_cluster
-        FROM mv_geojson_geoms
-        where ST_GeometryType(geom) = 'ST_Polygon'""")
+    sql_list.append("""
+        SELECT tileid::text,
+                resourceinstanceid::text,
+                nodeid::text,
+                graphid::text,
+                node_name,
+                graph_name,
+                false AS poly_outline,
+                geom AS __geometry__,
+                row_number() over () as __id__,
+                1 as total
+            FROM mv_geojson_geoms
+        UNION
+        SELECT tileid::text,
+                resourceinstanceid::text,
+                nodeid::text,
+                graphid::text,
+                node_name,
+                graph_name,
+                true AS poly_outline,
+                ST_ExteriorRing(geom) AS __geometry__,
+                row_number() over () as __id__,
+                1 as total
+            FROM mv_geojson_geoms
+            where ST_GeometryType(geom) = 'ST_Polygon'
+    """)
 
     return {
         "cache": settings.TILE_CACHE_CONFIG,
@@ -122,6 +126,7 @@ def get_tileserver_config():
 
 def handle_request(request):
     config_dict = get_tileserver_config()
+    print settings.CACHE_RESOURCE_TILES
     layer_models = models.TileserverLayers.objects.all()
     for layer_model in layer_models:
         config_dict['layers'][layer_model.name] = {

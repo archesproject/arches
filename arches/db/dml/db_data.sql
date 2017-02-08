@@ -3524,8 +3524,22 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            },
            "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
            "paint": {
-               "circle-radius": 20,
+               "circle-radius": 12,
                "circle-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-cluster-point-halo",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+               "circle-radius": 22,
+               "circle-color": "rgba(130, 130, 130, 0.7)"
            }
        },
        {
