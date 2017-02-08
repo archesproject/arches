@@ -353,7 +353,6 @@ def time_wheel_config(request):
                 century_aggregation.add_aggregation(decade_aggregation)
 
         query.add_aggregation(millenium_agg)
-    
 
     root = d3Item(name='root')
     transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
