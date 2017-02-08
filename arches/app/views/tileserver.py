@@ -126,7 +126,6 @@ def get_tileserver_config():
 
 def handle_request(request):
     config_dict = get_tileserver_config()
-    print settings.CACHE_RESOURCE_TILES
     layer_models = models.TileserverLayers.objects.all()
     for layer_model in layer_models:
         config_dict['layers'][layer_model.name] = {
