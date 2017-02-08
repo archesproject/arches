@@ -1027,8 +1027,8 @@ a.select2-search-choice-close {
 }
 .link {
     fill: none;
-    stroke: #aaa;
-    stroke-width: 1px;
+    stroke: #bbb;
+    stroke-width: 2px;
 }
 .templink {
     fill: none;
