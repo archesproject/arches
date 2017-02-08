@@ -23,6 +23,16 @@ def delete_resources(load_id):
         except ObjectDoesNotExist:
             print 'Entity does not exist. Nothing to delete'
 
+def clear_resources():
+    """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
+    print 'removing resources'
+    print len(Resource.objects.all())
+    all_resources = Resource.objects.all()
+    for resource in all_resources:
+        resource.delete()
+    print len(Resource.objects.all())
+
+
 
 def truncate_resources():
     """Deletes ALL resources in your database. Use with caution!"""

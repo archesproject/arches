@@ -285,6 +285,9 @@ class Command(BaseCommand):
         prepare_term_index(create=True)
         prepare_resource_relations_index(create=True)
 
+    def drop_resources(self, packages_name):
+        drop_all_resources()
+
     def delete_indexes(self, package_name):
         delete_term_index()
         delete_search_index()
@@ -354,7 +357,8 @@ class Command(BaseCommand):
         Runs the resource_remover command found in package_utils
 
         """
-        resource_remover.delete_resources(load_id)
+        # resource_remover.delete_resources(load_id)
+        resource_remover.clear_resources()
 
     def load_concept_scheme(self, package_name, data_source=None):
         """
