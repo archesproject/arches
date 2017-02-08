@@ -30,7 +30,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from django.utils.module_loading import import_string
 from arches.app.views.base import BaseManagerView
@@ -90,7 +90,6 @@ def build_search_terms_dsl(request):
     query.add_query(boolquery)
 
     return query
-
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
@@ -302,6 +301,40 @@ def geocode(request):
     search_string = request.GET.get('q', '')
     return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['api_key']) })
 
+def time_wheel_config(request):
+    se = SearchEngineFactory().create()
+
+    query = Query(se, limit=0)
+    query.add_aggregation(MinAgg(field='dates', format='y'))
+    query.add_aggregation(MaxAgg(field='dates', format='y'))
+    results = query.search(index='resource')
+    min_date = results['aggregations']['min_dates']['value_as_string']
+    max_date = results['aggregations']['max_dates']['value_as_string']
+
+    query = Query(se, limit=0)
+    #date_range_agg = DateRangeAgg(field='dates', format='y', min_date=min_date, max_date=max_date)
+    #date_range_agg.add(min_date='2000', max_date='4000')
+    
+    #date_range_agg.add_aggregation(DateRangeAgg(field='dates', format='y', min_date=min_date, max_date=max_date))
+
+    # import ipdb
+    # ipdb.set_trace()
+    for millennium in range(0,3000,1000):
+        min_millenium = millennium
+        max_millenium = millennium + 1000
+        millenium_agg = DateRangeAgg(name="%s-%s"%(min_millenium, max_millenium), field='dates', format='yyyy', min_date=str(min_millenium), max_date=str(max_millenium))
+        
+        for century in range(min_millenium,max_millenium,100):
+            min_century = century
+            max_century = century + 100
+            century_aggregation = DateRangeAgg(name="%s-%s"%(min_century, max_century), field='dates', format='yyyy', min_date=str(min_century), max_date=str(max_century))
+            millenium_agg.add_aggregation(century_aggregation)
+
+        query.add_aggregation(millenium_agg)
+    return JSONResponse(get_tw_config(), indent=4)
+    return JSONResponse(query.search(index='resource'), indent=4)
+    return JSONResponse(query.dsl, indent=4)
+
 def export_results(request):
     dsl = build_search_results_dsl(request)
     search_results = dsl.search(index='entity', doc_type='')
@@ -320,3 +353,296 @@ def export_results(request):
     results.append({'name':csv_name, 'outputfile': dest})
     zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
     return zipped_results
+
+
+def get_tw_config():
+    return {
+        "name": "root",
+        "children": [{
+                "name": "Historic",
+                "children": [{
+                        "name": "21st Century",
+                        "size": 75,
+                        "start": 2001,
+                        "end": 2100
+                    },
+                    {
+                        "name": "20th Century",
+                        "start": 1901,
+                        "end": 2000,
+                        "children": [{
+                                "name": "Late 20th Century",
+                                "size": 230,
+                                "start": 1965,
+                                "end": 1999
+                            },
+                            {
+                                "name": "Middle 20th Century",
+                                "size": 190,
+                                "start": 1945,
+                                "end": 1965
+                            },
+                            {
+                                "name": "WWII",
+                                "size": 207,
+                                "start": 1939,
+                                "end": 1945
+                            },
+                            {
+                                "name": "Early 20th Century",
+                                "start": 1900,
+                                "end": 1939,
+                                "children": [{
+                                        "name": "WWI",
+                                        "size": 377,
+                                        "start": 1914,
+                                        "end": 1918
+                                    },
+                                    {
+                                        "name": "Post WWI",
+                                        "size": 632,
+                                        "start": 1918,
+                                        "end": 1939
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Enlightenment",
+                        "start": 1600,
+                        "end": 2000,
+                        "children": [{
+                                "name": "1900s",
+                                "size": 1003,
+                                "start": 1900,
+                                "end": 2000
+                            },
+                            {
+                                "name": "1800s",
+                                "size": 2108,
+                                "start": 1800,
+                                "end": 1900
+                            },
+                            {
+                                "name": "1700s",
+                                "size": 1533,
+                                "start": 1700,
+                                "end": 1800
+                            },
+                            {
+                                "name": "1600s",
+                                "size": 2312,
+                                "start": 1600,
+                                "end": 1700
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Post Midieval",
+                        "start": 1300,
+                        "end": 1600,
+                        "children": [{
+                                "name": "Victorian",
+                                "size": 3861,
+                                "start": 1400,
+                                "end": 1500
+                            },
+                            {
+                                "name": "Hannoverian",
+                                "start": 1380,
+                                "end": 1380,
+                                "children": [{
+                                        "name": "George I",
+                                        "size": 2877,
+                                        "start": 1380,
+                                        "end": 1380
+                                    },
+                                    {
+                                        "name": "George Ib",
+                                        "size": 1187,
+                                        "start": 1380,
+                                        "end": 1380
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Stuart",
+                                "start": 1340,
+                                "end": 1380,
+                                "children": [{
+                                    "name": "Jacobean",
+                                    "size": 961,
+                                    "start": 1340,
+                                    "end": 1380
+                                }]
+                            },
+                            {
+                                "name": "Tudor",
+                                "start": 1300,
+                                "end": 1340,
+                                "children": [{
+                                    "name": "Elizabethian",
+                                    "size": 1900,
+                                    "start": 1300,
+                                    "end": 1340
+                                }]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Midieval",
+                        "start": 900,
+                        "end": 1300,
+                        "children": [{
+                                "name": "Late Midieval",
+                                "size": 4134,
+                                "start": 1100,
+                                "end": 1300
+                            },
+                            {
+                                "name": "Early Midieval",
+                                "size": 7399,
+                                "start": 900,
+                                "end": 1100
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Roman",
+                        "size": 18012,
+                        "start": 43,
+                        "end": 900
+                    }
+                ]
+            },
+            {
+                "name": "Prehistoric",
+                "start": -15000,
+                "end": 43,
+                "children": [{
+                        "name": "Late Prehistoric",
+                        "children": [{
+                                "name": "Iron Age",
+                                "start": -800,
+                                "end": 43,
+                                "children": [{
+                                        "name": "Late Iron",
+                                        "size": 2977,
+                                        "start": 0,
+                                        "end": 43
+                                    },
+                                    {
+                                        "name": "Middle Iron",
+                                        "size": 3866,
+                                        "start": -400,
+                                        "end": 0
+                                    },
+                                    {
+                                        "name": "Early Iron",
+                                        "size": 5219,
+                                        "start": -800,
+                                        "end": -400
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Bronze Age",
+                                "start": -1800,
+                                "end": -800,
+                                "children": [{
+                                        "name": "Late Bronze",
+                                        "size": 1883,
+                                        "start": -1000,
+                                        "end": -800
+                                    },
+                                    {
+                                        "name": "Middle Bronze",
+                                        "size": 2016,
+                                        "start": -1200,
+                                        "end": -1000
+                                    },
+                                    {
+                                        "name": "Early Bronze",
+                                        "size": 300,
+                                        "start": -1800,
+                                        "end": -1200
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Neolithic",
+                                "start": -4500,
+                                "end": -1800,
+                                "children": [{
+                                        "name": "Late Neolithic",
+                                        "size": 2196,
+                                        "start": -2000,
+                                        "end": -1800
+                                    },
+                                    {
+                                        "name": "Middle Neolithic",
+                                        "size": 2445,
+                                        "start": -3000,
+                                        "end": -2000
+                                    },
+                                    {
+                                        "name": "Early Neolithic",
+                                        "size": 988,
+                                        "start": -4500,
+                                        "end": -3000
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Early Prehistoric",
+                        "start": -15000,
+                        "end": -4500,
+                        "children": [{
+                                "name": "Mesolithic",
+                                "children": [{
+                                        "name": "Late Mesolithic",
+                                        "size": 875,
+                                        "start": -6000,
+                                        "end": -4500
+                                    },
+                                    {
+                                        "name": "Early Mesolithic",
+                                        "size": 775,
+                                        "start": -8000,
+                                        "end": -6000
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Paleolithic",
+                                "start": -15000,
+                                "end": -8000,
+                                "children": [{
+                                        "name": "Upper Paleolithic",
+                                        "size": 3997,
+                                        "start": -10000,
+                                        "end": -8000
+                                    },
+                                    {
+                                        "name": "Middle Paleolithic",
+                                        "size": 1009,
+                                        "start": -13000,
+                                        "end": -10000
+                                    },
+                                    {
+                                        "name": "Lower Paleolithic",
+                                        "size": 8877,
+                                        "start": -15000,
+                                        "end": -13000
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
