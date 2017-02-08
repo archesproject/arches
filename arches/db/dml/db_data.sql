@@ -3429,7 +3429,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
          }
      ]', TRUE, 'fa fa-building-o');
 
-DELETE from map_layers where name = 'All Resources';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'All Resources', '[
        {
@@ -3440,7 +3439,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Polygon"]],
+           "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
            "paint": {
                "fill-color": "rgba(130, 130, 130, 0.5)"
            }
@@ -3453,7 +3452,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 3,
                "line-color": "rgba(200, 200, 200, .55)"
@@ -3467,7 +3466,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 1,
                "line-color": "rgba(130, 130, 130, 1)"
@@ -3481,7 +3480,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
            "paint": {
                "line-width": 1.5,
                "line-color": "rgba(200, 200, 200, 1)"
@@ -3495,7 +3494,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 5,
                "circle-color": "rgba(200, 200, 200, 1)"
@@ -3509,9 +3508,23 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"],["==", "is_cluster", false]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 3,
+               "circle-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-cluster-point",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+               "circle-radius": 20,
                "circle-color": "rgba(130, 130, 130, 1)"
            }
        },
@@ -3528,6 +3541,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
                 ],
                 "text-size": 12
             },
-            "filter": ["all", ["==", "is_cluster", true]]
+            "filter": ["all", [">", "total", 1]]
         }
    ]', TRUE, 'fa fa-globe');

@@ -25,34 +25,50 @@ def get_tileserver_config():
     # permissions, which are defined at the node level; ie only show geometries
     # for nodes which the authenticated user has read permissions
     database = settings.DATABASES['default']
+
     cluster_sql = """
-    SELECT '' as tileid,
-    	'' AS resourceinstanceid,
-    	'' as nodeid,
-    	'' as graphid,
-    	'' as node_name,
-    	'' as graph_name,
-    	false AS poly_outline,
-    	row_number() over () as __id__,
-    	(ST_NumGeometries(gc) > 1) as is_cluster,
-    	ST_NumGeometries(gc) as total,
-    	sqrt(ST_Area(ST_MinimumBoundingCircle(gc)) / pi()) AS radius,
-    	CASE WHEN (ST_NumGeometries(gc) > 1) THEN ST_MinimumBoundingCircle(gc)
-    		ELSE ST_Centroid(gc)
-    	END AS __geometry__
-    FROM (
-    	SELECT unnest(ST_ClusterWithin(geom, %s)) gc
-    	FROM mv_geojson_geoms
-    ) f
+        WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS
+        	(SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+        	FROM mv_geojson_geoms m)
+
+        SELECT tileid::text,
+        		resourceinstanceid::text,
+        		nodeid::text,
+        		graphid::text,
+        		node_name,
+        		graph_name,
+        		false AS poly_outline,
+        		row_number() over () as __id__,
+        		1 as total,
+        		0 AS radius,
+        		ST_Centroid(geom) AS __geometry__
+        	FROM clusters
+        	WHERE cid is NULL
+
+        UNION
+
+        SELECT '' as tileid,
+        		'' as resourceinstanceid,
+        		'' as nodeid,
+        		'' as graphid,
+        		'' as node_name,
+        		'' as graph_name,
+        		false AS poly_outline,
+        		row_number() over () as __id__,
+        		count(*) as total,
+        		sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(geom))) / pi()) AS radius,
+        		ST_Centroid(ST_Collect(geom)) AS __geometry__
+        	FROM clusters
+        	WHERE cid IS NOT NULL
+        	GROUP BY cid
     """
+
     sql_list = []
 
     for i in range(settings.CLUSTER_MAX_ZOOM + 1):
         arc = EARTHCIRCUM / ((1 << (i)) * PIXELSPERTILE)
         distance = arc * settings.CLUSTER_DISTANCE
-        sql_string = cluster_sql % distance
-        print i
-        print distance
+        sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS)
         sql_list.append(sql_string)
 
     sql_list.append("""SELECT tileid::text,
