@@ -98,6 +98,13 @@ class Query(Dsl):
                 else:
                     self.dsl['query'] = dsl
 
+    def add_aggregation(self, agg=None):
+        if agg is not None:
+            if 'aggs' not in self.dsl:
+                self.dsl['aggs'] = {}
+
+            self.dsl['aggs'][agg.name] = agg.agg[agg.name]
+
     def search(self, index='', doc_type='', **kwargs):
         self.fields = kwargs.pop('fields', self.fields)
         self.start = kwargs.pop('start', self.start)
@@ -368,3 +375,99 @@ class SimpleQueryString(Dsl):
         self.dsl = {
             "prefix" : { self.field : self.query }
         }
+
+class Aggregation(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.agg = {}
+        self.name = kwargs.pop('name', None)
+        self.field = kwargs.pop('field', '_all')
+        self.type = kwargs.pop('type', None)
+
+        if self.name is None:
+            raise Exception('You need to specify a name for your aggregation') 
+        if self.type is None:
+            raise Exception('You need to specify an aggregation type') 
+
+        self.agg = {
+            self.name: {
+                self.type: {
+                    'field' : self.field
+                }
+            }
+        }
+
+    def add_aggregation(self, agg=None):
+        if agg is not None:
+            if 'aggs' not in self.agg[self.name]:
+                self.agg[self.name]['aggs'] = {}
+
+            self.agg[self.name]['aggs'][agg.name] = agg.agg[agg.name]
+
+class CoreDateAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.format = kwargs.pop('format', None)
+        super(CoreDateAgg, self).__init__(**kwargs)
+
+        if self.format:
+            self.agg[self.name][self.type]['format'] = self.format
+
+class MinAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        name = kwargs.pop('name', 'min_%s' % kwargs.get('field', ''))
+        super(MinAgg, self).__init__(name=name, type='min', **kwargs)
+
+class MaxAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        name = kwargs.pop('name', 'max_%s' % kwargs.get('field', ''))
+        super(MaxAgg, self).__init__(name=name, type='max', **kwargs)
+
+class DateRangeAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        super(DateRangeAgg, self).__init__(type='date_range', **kwargs)
+        
+        self.add(**kwargs)
+
+    def add(self, **kwargs):
+        date_range = {}
+        min_date = kwargs.pop('min_date', None)
+        max_date = kwargs.pop('max_date', None)
+        key = kwargs.pop('key', None)
+
+        if 'ranges' not in self.agg[self.name][self.type]:
+            self.agg[self.name][self.type]['ranges'] = []
+
+        if min_date is not None:
+            date_range['from'] = min_date
+        if max_date is not None:
+            date_range['to'] = max_date
+        if key is not None:
+            date_range['key'] = key
+
+        if min_date is not None or max_date is not None:
+            self.agg[self.name][self.type]['ranges'].append(date_range)
