@@ -3428,7 +3428,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
              }
          }
      ]', TRUE, 'fa fa-building-o');
-
+-- DELETE FROM map_layers where name = 'All Resources';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'All Resources', '[
        {
@@ -3524,7 +3524,25 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            },
            "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
            "paint": {
-               "circle-radius": 12,
+                "circle-radius": {
+                    "property": "total",
+                    "type": "exponential",
+                    "stops": [
+                        [0,   12],
+                        [50, 14],
+                        [100, 16],
+                        [200, 18],
+                        [400, 20],
+                        [800, 22],
+                        [1200, 24],
+                        [1600, 26],
+                        [2000, 28],
+                        [2500, 30],
+                        [3000, 32],
+                        [4000, 34],
+                        [5000, 36]
+                    ]
+                },
                "circle-color": "rgba(130, 130, 130, 1)"
            }
        },
@@ -3538,7 +3556,24 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            },
            "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
            "paint": {
-               "circle-radius": 22,
+               "circle-radius": {
+                   "property": "total",
+                   "stops": [
+                       [0,   22],
+                       [50, 24],
+                       [100, 26],
+                       [200, 28],
+                       [400, 30],
+                       [800, 32],
+                       [1200, 34],
+                       [1600, 36],
+                       [2000, 38],
+                       [2500, 40],
+                       [3000, 42],
+                       [4000, 44],
+                       [5000, 46]
+                   ]
+               },
                "circle-color": "rgba(130, 130, 130, 0.7)"
            }
        },

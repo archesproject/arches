@@ -40,7 +40,6 @@ def get_tileserver_config():
         		false AS poly_outline,
         		row_number() over () as __id__,
         		1 as total,
-        		0 AS radius,
         		ST_Centroid(geom) AS __geometry__,
                 '' AS extent
         	FROM clusters
@@ -57,9 +56,16 @@ def get_tileserver_config():
         		false AS poly_outline,
         		row_number() over () as __id__,
         		count(*) as total,
-        		sqrt(ST_Area(ST_MinimumBoundingCircle(ST_Collect(geom))) / pi()) AS radius,
-        		ST_Centroid(ST_Envelope(ST_Collect(geom))) AS __geometry__,
-                ST_AsGeoJSON(ST_Envelope(ST_Collect(geom))) AS extent
+        		ST_Centroid(
+                    ST_Collect(geom)
+                ) AS __geometry__,
+                ST_AsGeoJSON(
+                    ST_Transform(
+                        ST_SetSRID(
+                            ST_Extent(geom), 900913
+                        ), 4326
+                    )
+                ) AS extent
         	FROM clusters
         	WHERE cid IS NOT NULL
         	GROUP BY cid

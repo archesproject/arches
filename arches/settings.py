@@ -392,7 +392,7 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 # http://postgis.net/docs/manual-dev/ST_ClusterDBSCAN.html
 CLUSTER_DISTANCE = 20
 CLUSTER_MAX_ZOOM = 5
-CLUSTER_MIN_POINTS = 2
+CLUSTER_MIN_POINTS = 3
 
 try:
     from settings_local import *
