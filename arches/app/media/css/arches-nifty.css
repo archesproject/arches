@@ -4401,6 +4401,10 @@ div.row.widget-wrapper {
     transition: all .5s;
 }
 
+.related-resources-container .pagination .active a {
+    z-index: 1;
+}
+
 .relation-properties-buttons {
     display: flex;
     flex-direction: row;
