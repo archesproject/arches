@@ -21,7 +21,7 @@ python manage.py packages -o setup
 
 cp /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
 
-sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
+sudo chown ubuntu:ubuntu /home/ubuntu/ENV/lib/python2.7/site-packages/arches/arches.log
 
 python manage.py packages -o setup_db
 python manage.py packages -o import_graphs
@@ -29,5 +29,5 @@ python manage.py packages -o add_tilserver_layer -m arches/tileserver/hillshade.
 python manage.py packages -o add_tilserver_layer -m arches/tileserver/world.xml -n world
 
 python manage.py collectstatic --noinput
-sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
+sudo chown www-data:www-data /home/ubuntu/ENV/lib/python2.7/site-packages/arches/arches.log
 sudo service apache2 restart
