@@ -237,7 +237,8 @@ define(function() {
             },
             "filter": ['all', ["==", "$type", "Polygon"],
                 ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "fill-color": "rgba(255, 0, 0, 0.7)"
@@ -253,7 +254,8 @@ define(function() {
             },
             "filter": ['all', ["==", "$type", "LineString"],
                 ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "line-color": "rgba(255, 0, 0, 0.7)",
@@ -270,7 +272,8 @@ define(function() {
             },
             "filter": ['all', ["==", "$type", "Point"],
                 ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "circle-radius": 3.0,
@@ -286,7 +289,8 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "Polygon"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "fill-color": "rgba(5, 155, 3, 0.7)"
@@ -301,7 +305,8 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "LineString"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "line-color": "rgba(5, 155, 3, 0.7)",
@@ -317,7 +322,8 @@ define(function() {
                 "visibility": "visible"
             },
             "filter": ['all', ["==", "$type", "Point"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""]
+                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
+                ["==", "total", 1]
             ],
             "paint": {
                 "circle-radius": 3.0,
