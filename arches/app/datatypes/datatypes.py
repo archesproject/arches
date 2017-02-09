@@ -89,6 +89,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return bounds
 
 class FileListDataType(BaseDataType):
+
     def transform_import_values(self, value):
         '''
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:

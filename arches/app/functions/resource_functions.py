@@ -2,6 +2,7 @@ import uuid
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.datatypes import datatypes
 
 class PrimaryNameFunction(BaseFunction):
     def get(self, resource, config):
@@ -13,10 +14,8 @@ class PrimaryNameFunction(BaseFunction):
                 if str(node.nodeid) in tile.data:
                     value = tile.data[str(node.nodeid)]
                     if value:
-                        concept_values = []
-                        if node.datatype == 'concept':
-                            print tile.data[str(node.nodeid)]
-                            concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
+                        datatype = datatypes.get_datatype_instance(node.datatype)
+                        concept_values = datatype.get_concept_values(tile, node)
                         if len(concept_values) == 1:
                             value = concept_values[0].value
                         config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)

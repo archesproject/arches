@@ -21,7 +21,6 @@ from django.conf import settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.datatypes import datatypes
 
@@ -165,13 +164,6 @@ class Tile(models.TileModel):
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
-
-    def get_node_display_values(self):
-        for nodeid, nodevalue in self.data.iteritems():
-            if models.Node.objects.get(pk=nodeid).datatype == 'concept':
-                self.data[nodeid] = get_preflabel_from_valueid(nodevalue, 'en-US')['value']
-
-        return self.data
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
