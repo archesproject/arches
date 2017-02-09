@@ -165,15 +165,6 @@ class Tile(models.TileModel):
                     terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
 
-    def get_node_display_values(self, lang='en-US'):
-        for nodeid, nodevalue in self.data.iteritems():
-            datatype = datatype.get_datatype_instance(models.Node.objects.get(pk=nodeid).datatype)
-            pref_label = datatype.get_pref_label(nodevalue, lang)
-            if pref_label is not None:
-                self.data[nodeid] = pref_label
-
-        return self.data
-
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
         parent_nodegroup = None
