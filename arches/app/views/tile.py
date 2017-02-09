@@ -42,6 +42,7 @@ class TileData(View):
                 tile = Tile(data)
                 with transaction.atomic():
                     try:
+                        clean_resource_cache(tile)
                         tile.save(request=request)
                     except ValidationError as e:
                         return JSONResponse({'status':'false','message':e.args}, status=500)

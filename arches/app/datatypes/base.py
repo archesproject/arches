@@ -22,3 +22,9 @@ class BaseDataType(object):
         Transforms values from probably string/wkt representation to specified datatype in arches
         """
         return value
+
+    def get_bounds(self, tile, node):
+        """
+        Gets the bounds of a geometry if the datatype is spatial
+        """
+        return None
