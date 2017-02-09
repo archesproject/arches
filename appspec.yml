@@ -7,7 +7,7 @@ hooks:
       mode: 755
       runas: ubuntu
   BeforeInstall:
-    - location: arches/install/ubuntu_trusty_setup.sh
+    - location: arches/install/ubuntu_xenial_setup.sh
       timeout: 300
       mode: 755
       runas: ubuntu

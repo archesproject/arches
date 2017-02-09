@@ -348,7 +348,7 @@ RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
+    os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
