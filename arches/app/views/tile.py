@@ -22,13 +22,13 @@ from arches.app.models.tile import Tile
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
+from arches.app.views.tileserver import clean_resource_cache
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
 from django.conf import settings
-from tileserver import clean_resource_cache
 
 @method_decorator(group_required('edit'), name='dispatch')
 class TileData(View):
@@ -42,8 +42,8 @@ class TileData(View):
                 tile = Tile(data)
                 with transaction.atomic():
                     try:
-                        clean_resource_cache(tile)
                         tile.save(request=request)
+                        clean_resource_cache(tile)
                     except ValidationError as e:
                         return JSONResponse({'status':'false','message':e.args}, status=500)
 

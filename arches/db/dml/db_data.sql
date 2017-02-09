@@ -3428,8 +3428,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
              }
          }
      ]', TRUE, 'fa fa-building-o');
-
-
+-- DELETE FROM map_layers where name = 'All Resources';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'All Resources', '[
        {
@@ -3440,7 +3439,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Polygon"]],
+           "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
            "paint": {
                "fill-color": "rgba(130, 130, 130, 0.5)"
            }
@@ -3453,7 +3452,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 3,
                "line-color": "rgba(200, 200, 200, .55)"
@@ -3467,7 +3466,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 1,
                "line-color": "rgba(130, 130, 130, 1)"
@@ -3481,7 +3480,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
            "paint": {
                "line-width": 1.5,
                "line-color": "rgba(200, 200, 200, 1)"
@@ -3495,7 +3494,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 5,
                "circle-color": "rgba(200, 200, 200, 1)"
@@ -3509,10 +3508,88 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 3,
                "circle-color": "rgba(130, 130, 130, 1)"
            }
-       }
+       },
+       {
+           "id": "resources-cluster-point",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+                "circle-radius": {
+                    "property": "total",
+                    "type": "exponential",
+                    "stops": [
+                        [0,   12],
+                        [50, 14],
+                        [100, 16],
+                        [200, 18],
+                        [400, 20],
+                        [800, 22],
+                        [1200, 24],
+                        [1600, 26],
+                        [2000, 28],
+                        [2500, 30],
+                        [3000, 32],
+                        [4000, 34],
+                        [5000, 36]
+                    ]
+                },
+               "circle-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-cluster-point-halo",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+               "circle-radius": {
+                   "property": "total",
+                   "stops": [
+                       [0,   22],
+                       [50, 24],
+                       [100, 26],
+                       [200, 28],
+                       [400, 30],
+                       [800, 32],
+                       [1200, 34],
+                       [1600, 36],
+                       [2000, 38],
+                       [2500, 40],
+                       [3000, 42],
+                       [4000, 44],
+                       [5000, 46]
+                   ]
+               },
+               "circle-color": "rgba(130, 130, 130, 0.7)"
+           }
+       },
+       {
+            "id": "resources-cluster-count",
+            "type": "symbol",
+            "source": "resources",
+            "source-layer": "resources",
+            "layout": {
+                "text-field": "{total}",
+                "text-font": [
+                    "DIN Offc Pro Medium",
+                    "Arial Unicode MS Bold"
+                ],
+                "text-size": 12
+            },
+            "filter": ["all", [">", "total", 1]]
+        }
    ]', TRUE, 'fa fa-globe');
