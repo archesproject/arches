@@ -15,6 +15,7 @@ source /home/ubuntu/ENV/bin/activate
 
 cd /home/ubuntu/arches
 python setup.py install
+python setup.py develop
 bower install
 
 python manage.py packages -o setup
