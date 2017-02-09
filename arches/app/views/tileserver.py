@@ -12,11 +12,8 @@ from django.conf import settings
 from arches.app.models import models
 from shapely.geometry import asShape
 
-
-
-EARTHRADIUS = 6378137
-EARTHCIRCUM = EARTHRADIUS * 2.0 * math.pi
-PIXELSPERTILE = 512
+EARTHCIRCUM = 40075016.6856
+PIXELSPERTILE = 256
 
 def get_tileserver_config():
     # TODO: the resource queries here perhaps should be moved to a separate view
@@ -72,7 +69,6 @@ def get_tileserver_config():
     """
 
     sql_list = []
-
     for i in range(settings.CLUSTER_MAX_ZOOM + 1):
         arc = EARTHCIRCUM / ((1 << (i)) * PIXELSPERTILE)
         distance = arc * settings.CLUSTER_DISTANCE
