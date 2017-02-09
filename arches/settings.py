@@ -372,6 +372,27 @@ BUSISNESS_DATA_FILES = (
 # this in production, but probably not during development
 CACHE_RESOURCE_TILES = False
 
+# Set this to True if you want the system to automatically clean the resource
+# tile cache when underlying data change. This is good for systems where you
+# require low latency in updating map layers and are managing relatively small
+# geometries (saving large geometries with this set to True will impact
+# performance, sometimes severely).
+#
+# If you are caching resource tiles and have this set to False, you will need to
+# manually manage cleaning of the cache.  To do this, you can simply delete
+# the resource tile cache folder ('arches/tileserver/cache/resources' by default)
+AUTO_MANAGE_TILE_CACHE = False
+
+# If you are manually managing your resource tile cache, you may want to "seed"
+# the cache (or prerender some tiles) for low zoom levels.  You can do this by running:
+# python manage.py packages -o seed_resource_tile_cache
+#
+# The following settings control the extent and max zoom level to which tiles
+# will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
+# will take a long time
+CACHE_SEED_BOUNDS = (-89.99, 179.99, 89.99, -179.99)
+CACHE_SEED_MAX_ZOOM = 5
+
 # configure where the tileserver should store its cache
 TILE_CACHE_CONFIG = {
     "name": "Disk",

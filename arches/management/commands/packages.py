@@ -44,6 +44,7 @@ from arches.app.utils.data_management.arches_file_exporter import ArchesFileExpo
 from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.skos import SKOSReader
+from arches.app.views.tileserver import seed_resource_cache
 from django.db import transaction
 
 
@@ -56,7 +57,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -175,6 +176,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
+
+        if options['operation'] == 'seed_resource_tile_cache':
+            self.seed_resource_tile_cache()
 
         if options['operation'] == 'delete_tilserver_layer':
             self.delete_tilserver_layer(options['layer_name'])
@@ -514,3 +518,6 @@ class Command(BaseCommand):
                 with open(path, 'rU') as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)
+
+    def seed_resource_tile_cache(self):
+        seed_resource_cache()
