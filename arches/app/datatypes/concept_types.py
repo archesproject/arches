@@ -31,6 +31,9 @@ class ConceptDataType(BaseConceptDataType):
     def get_pref_label(self, nodevalue, lang='en-US'):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
+    def get_concept_values(self, tile, node):
+        concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
+        return concept_values
 
 class ConceptListDataType(BaseConceptDataType):
     def transform_import_values(self, value):
