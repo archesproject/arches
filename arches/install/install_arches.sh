@@ -28,8 +28,8 @@ python manage.py packages -o import_reference_data -s arches/db/schemes/arches_c
 python manage.py packages -o import_reference_data -s arches/db/schemes/dropdowns.rdf -ow overwrite -st keep
 python manage.py packages -o import_graphs
 python manage.py packages -o import_business_data -s tests/fixtures/data/csv/heritage_resource_model_1000.csv -c tests/fixtures/data/csv/heritage_resource_model.mapping
-python manage.py packages -o add_tilserver_layer -m arches/tileserver/hillshade.xml -n hillshade
-python manage.py packages -o add_tilserver_layer -m arches/tileserver/world.xml -n world
+python manage.py packages -o add_tileserver_layer -m arches/tileserver/hillshade.xml -n hillshade
+python manage.py packages -o add_tileserver_layer -m arches/tileserver/world.xml -n world
 
 python manage.py collectstatic --noinput
 sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
