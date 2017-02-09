@@ -34,3 +34,9 @@ class BaseDataType(object):
         Gets the prefLabel of a concept value
         """
         return None
+
+    def manage_files(self, request, tile):
+        """
+        Handles saving and deleting of uploaded files
+        """
+        pass
