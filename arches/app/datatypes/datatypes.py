@@ -4,6 +4,7 @@ from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.contrib.gis.geos import GEOSGeometry
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from shapely.geometry import asShape
 
 def get_datatype_instance(datatype):
     d_datatype = models.DDataType.objects.get(datatype=datatype)
@@ -66,6 +67,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue):
         document['geometries'].append(nodevalue)
+
+    def get_bounds(self, tile, node):
+        bounds = None
+        node_data = tile.data[str(node.pk)]
+        for feature in node_data['features']:
+            shape = asShape(feature['geometry'])
+            bounds = shape.bounds
+        return bounds
 
 class FileListDataType(BaseDataType):
     def transform_import_values(self, value):

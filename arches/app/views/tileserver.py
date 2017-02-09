@@ -10,7 +10,7 @@ from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
 from arches.app.models import models
-from shapely.geometry import asShape
+from arches.app.datatypes import datatypes
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -168,23 +168,9 @@ def clean_resource_cache(tile):
     bounds = None
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
-        if node.datatype == 'geojson-feature-collection':
-            node_data = tile.data[str(node.pk)]
-            for feature in node_data['features']:
-                shape = asShape(feature['geometry'])
-                if bounds is None:
-                    bounds = shape.bounds
-                else:
-                    minx, miny, maxx, maxy = bounds
-                    if shape.bounds[0] < minx:
-                        minx = shape.bounds[0]
-                    if shape.bounds[1] < miny:
-                        miny = shape.bounds[1]
-                    if shape.bounds[2] > maxx:
-                        maxx = shape.bounds[2]
-                    if shape.bounds[3] > maxy:
-                        maxy = shape.bounds[3]
-                    bounds = (minx, miny, maxx, maxy)
+        datatype = datatypes.get_datatype_instance(node.datatype)
+        bounds = datatype.get_bounds(tile, node)
+        
     if bounds is None:
         return
 
