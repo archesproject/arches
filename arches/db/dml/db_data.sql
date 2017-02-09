@@ -101,10 +101,10 @@ INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', 'datatypes.py', 
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', 'datatypes.py', 'NumberDataType', null, null, null, '10000000-0000-0000-0000-000000000008');
 INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', 'datatypes.py', 'DateDataType', null, null, null, '10000000-0000-0000-0000-000000000004');
 INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'datatypes.py', 'GeojsonFeatureCollectionDataType', null, null, null, '10000000-0000-0000-0000-000000000007');
-INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'datatypes.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'datatypes.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
-INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'datatypes.py', 'DomainValueDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
-INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'datatypes.py', 'DomainValueListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.py', 'FileListDataType', null, null, null, '10000000-0000-0000-0000-000000000019');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
