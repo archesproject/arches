@@ -84,7 +84,7 @@ class Command(BaseCommand):
         parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
             help='A comma separated list of the graphids of the resources you would like to import/export.')
 
-        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=False,
+        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=None,
             help='Usually an export mapping file.')
 
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
@@ -165,7 +165,7 @@ class Command(BaseCommand):
             self.import_graphs(options['source'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'], options['bulk_load'])
+            self.import_business_data(options['source'], options['config_file'], options['bulk_load'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
@@ -285,6 +285,9 @@ class Command(BaseCommand):
         prepare_term_index(create=True)
         prepare_resource_relations_index(create=True)
 
+    def drop_resources(self, packages_name):
+        drop_all_resources()
+
     def delete_indexes(self, package_name):
         delete_term_index()
         delete_search_index()
@@ -354,7 +357,8 @@ class Command(BaseCommand):
         Runs the resource_remover command found in package_utils
 
         """
-        resource_remover.delete_resources(load_id)
+        # resource_remover.delete_resources(load_id)
+        resource_remover.clear_resources()
 
     def load_concept_scheme(self, package_name, data_source=None):
         """
@@ -388,7 +392,7 @@ class Command(BaseCommand):
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, bulk_load=False):
+    def import_business_data(self, data_source, config_file=None, bulk_load=False):
         """
         Imports business data from all formats
         """
@@ -402,7 +406,7 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path).import_business_data(bulk=bulk_load)
+                BusinessDataImporter(path, config_file).import_business_data(bulk=bulk_load)
 
     def import_graphs(self, data_source=''):
         """

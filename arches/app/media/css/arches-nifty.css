@@ -1027,8 +1027,8 @@ a.select2-search-choice-close {
 }
 .link {
     fill: none;
-    stroke: #aaa;
-    stroke-width: 1px;
+    stroke: #bbb;
+    stroke-width: 2px;
 }
 .templink {
     fill: none;
@@ -4399,6 +4399,10 @@ div.row.widget-wrapper {
     overflow-y: scroll;
     overflow-x: hidden;
     transition: all .5s;
+}
+
+.related-resources-container .pagination .active a {
+    z-index: 1;
 }
 
 .relation-properties-buttons {

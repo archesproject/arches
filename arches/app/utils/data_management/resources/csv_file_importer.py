@@ -37,6 +37,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
+from arches.app.datatypes import datatypes
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -85,100 +86,8 @@ class CSVFileImporter(object):
                 '''
                 request = ''
                 if datatype != '':
-                    if datatype == 'string':
-                        pass
-                    elif datatype == 'number':
-                        value = float(value)
-                    elif datatype == 'date':
-                        # datetime.datetime.strptime(value, '%Y-%m-%d')
-                        pass
-                    elif datatype == 'boolean':
-                        value = bool(distutils.util.strtobool(value))
-                    elif datatype == 'concept' or datatype == 'domain value':
-                        value = value.strip()
-                    elif datatype == 'concept-list' or datatype == 'domain-value-list':
-                        value = [x.strip() for x in value.split(',')]
-                    elif datatype == 'geojson-feature-collection':
-                        arches_geojson = {}
-                        arches_geojson['type'] = "FeatureCollection"
-                        arches_geojson['features'] = []
-
-                        geometry = GEOSGeometry(value, srid=4326)
-                        if geometry.num_geom > 1:
-                            for geom in geometry:
-                                arches_json_geometry = {}
-                                arches_json_geometry['geometry'] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
-                                arches_json_geometry['type'] = "Feature"
-                                arches_json_geometry['id'] = str(uuid.uuid4())
-                                arches_json_geometry['properties'] = {}
-                                arches_geojson['features'].append(arches_json_geometry)
-                        else:
-                            arches_json_geometry = {}
-                            arches_json_geometry['geometry'] = JSONDeserializer().deserialize(geometry.json)
-                            arches_json_geometry['type'] = "Feature"
-                            arches_json_geometry['id'] = str(uuid.uuid4())
-                            arches_json_geometry['properties'] = {}
-                            arches_geojson['features'].append(arches_json_geometry)
-
-                        value = arches_geojson
-
-                    elif datatype == 'file-list':
-                        '''
-                        Following commented code can be used if user does not already have file in final location using django ORM
-                        '''
-                        # request = HttpRequest()
-                        # # request.FILES['file-list_' + str(nodeid)] = None
-                        # files = []
-                        # # request_list = []
-                        #
-                        # for val in value.split(','):
-                        #     val_dict = {}
-                        #     val_dict['content'] = val
-                        #     val_dict['name'] = val.split('/')[-1].split('.')[0]
-                        #     val_dict['url'] = None
-                        #     # val_dict['size'] = None
-                        #     # val_dict['width'] = None
-                        #     # val_dict['height'] = None
-                        #     files.append(val_dict)
-                        #
-                        #     f = open(val, 'rb')
-                        #     django_file = InMemoryUploadedFile(f,'file',val.split('/')[-1].split('.')[0],None,None,None)
-                        #     request.FILES.appendlist('file-list_' + str(nodeid), django_file)
-                        #
-                        # print request.FILES
-                        # value = files
-
-                        mime = MimeTypes()
-                        tile_data = []
-                        for file_path in value.split(','):
-                            try:
-                                file_stats = os.stat(file_path)
-                                tile_file['lastModified'] = file_stats.st_mtime
-                                tile_file['size'] =  file_stats.st_size
-                            except:
-                                pass
-                            tile_file = {}
-                            tile_file['file_id'] =  str(uuid.uuid4())
-                            tile_file['status'] = ""
-                            tile_file['name'] =  file_path.split('/')[-1]
-                            tile_file['url'] =  settings.MEDIA_URL + 'uploadedfiles/' + str(tile_file['name'])
-                            # tile_file['index'] =  0
-                            # tile_file['height'] =  960
-                            # tile_file['content'] =  None
-                            # tile_file['width'] =  1280
-                            # tile_file['accepted'] =  True
-
-                            tile_file['type'] =  mime.guess_type(file_path)[0]
-                            tile_file['type'] = '' if tile_file['type'] == None else file_tile['type']
-
-
-                            tile_data.append(tile_file)
-
-                            file_path = 'uploadedfiles/' + str(tile_file['name'])
-                            fileid = tile_file['file_id']
-                            File.objects.get_or_create(fileid=fileid, path=file_path)
-
-                        value = json.loads(json.dumps(tile_data))
+                    datatype_instance = datatypes.get_datatype_instance(datatype)
+                    value = datatype_instance.transform_import_values(value)
                 else:
                     print 'No datatype detected for {0}'.format(value)
 
@@ -232,7 +141,7 @@ class CSVFileImporter(object):
                     populated_tiles = []
                     resourceinstanceid = uuid.uuid4()
                     populated_nodegroups[resourceinstanceid] = []
-                
+
                 source_data = column_names_to_targetids(row, mapping)
 
                 if source_data[0].keys():
@@ -340,7 +249,7 @@ class CSVFileImporter(object):
                 previous_row_resourceid = row['ResourceID']
 
             save_resource(populated_tiles, resourceinstanceid)
-        
+
         else:
             for error in errors:
                 print "{0} {1}".format(error[0], error[1])

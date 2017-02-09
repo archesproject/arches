@@ -1,4 +1,5 @@
 import os
+import sys
 import csv
 import json
 import uuid
@@ -55,12 +56,16 @@ class BusinessDataImporter(object):
             try:
                 mapping_file = [file[0].split('.')[0] + '.mapping']
             except:
-                print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
+                print '*'*80
+                print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
+                print '*'*80
         else:
             try:
                 mapping_file = [mapping_file]
             except:
-                print "mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your archesjson file and the extension .mapping"
+                print '*'*80
+                print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
+                print '*'*80
 
         if relations_file == None:
             try:
@@ -113,9 +118,21 @@ class BusinessDataImporter(object):
         if file_format == 'json':
             ArchesFileImporter().import_business_data(business_data, mapping)
         elif file_format == 'csv':
-            CSVFileImporter().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
+            if mapping != None:
+                CSVFileImporter().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
+            else:
+                print '*'*80
+                print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                print '*'*80
+                sys.exit()
         elif file_format == 'shp':
-            # SHPFileImporter().import_business_data(business_data, mapping)
+            # if mapping != None:
+            #     SHPFileImporter().import_business_data(business_data, mapping)
+            # else:
+            #     print '*'*80
+            #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+            #     print '*'*80
+            #     sys.exit()
             pass
 
         elapsed = (time() - start)
