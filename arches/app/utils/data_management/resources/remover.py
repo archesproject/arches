@@ -24,15 +24,12 @@ def delete_resources(load_id):
             print 'Entity does not exist. Nothing to delete'
 
 def clear_resources():
-    """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
-    print 'removing resources'
-    print len(Resource.objects.all())
+    """Removes all resource instances from your db and elasticsearch resource index"""
     all_resources = Resource.objects.all()
+    print 'deleting', len(all_resources), 'resources'
     for resource in all_resources:
         resource.delete()
-    print len(Resource.objects.all())
-
-
+    print len(Resource.objects.all()), 'resources remaining'
 
 def truncate_resources():
     """Deletes ALL resources in your database. Use with caution!"""

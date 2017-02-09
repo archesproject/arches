@@ -22,7 +22,6 @@ class BaseConceptDataType(BaseDataType):
 
 class ConceptDataType(BaseConceptDataType):
     def transform_import_values(self, value):
-        print value.strip()
         return value.strip()
 
     def transform_export_values(self, value):
@@ -30,7 +29,6 @@ class ConceptDataType(BaseConceptDataType):
 
 class ConceptListDataType(BaseConceptDataType):
     def transform_import_values(self, value):
-        print 'list', [v.strip() for v in value.split(',')]
         return [v.strip() for v in value.split(',')]
 
     def transform_export_values(self, value):
@@ -38,5 +36,4 @@ class ConceptListDataType(BaseConceptDataType):
         for val in value:
             new_val = self.get_concept_export_value(val, concept_export_value_type)
             new_values.append(new_val)
-        print new_values
         return ','.join(new_values)

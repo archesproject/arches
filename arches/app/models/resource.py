@@ -114,7 +114,6 @@ class Resource(models.ResourceInstance):
         related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
         for rr in related_resources['resource_relationships']:
             models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
-        print 'deleting', self.resourceinstanceid
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
         super(Resource, self).delete()
 
