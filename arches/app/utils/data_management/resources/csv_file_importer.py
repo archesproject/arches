@@ -27,6 +27,8 @@ from copy import deepcopy
 from mimetypes import MimeTypes
 from os.path import isfile, join
 from django.conf import settings
+from django.db import connection
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpRequest
 from django.contrib.gis.geos import GEOSGeometry
@@ -110,32 +112,54 @@ class CSVFileImporter(object):
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
+            tiles_ = []
+            resources = []
+            # import ipdb 
+            # ipdb.set_trace()
+            def sql_from_tile(tile):
+                sql_wo_parent = """INSERT INTO public.tiles(tileid, tiledata, nodegroupid, resourceinstanceid) VALUES ('%s', '%s', '%s', '%s');"""
+                sql_with_parent = """INSERT INTO public.tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid) VALUES ('%s', '%s', '%s', '%s', '%s');"""
+                if tile.parenttile_id:
+                    return sql_with_parent % (tile.tileid, JSONSerializer().serialize(tile.data), tile.nodegroup_id, tile.parenttile_id, tile.resourceinstance_id)
+                else:
+                    return sql_wo_parent % (tile.tileid, JSONSerializer().serialize(tile.data), tile.nodegroup_id, tile.resourceinstance_id)
 
-            def save_resource(populated_tiles, resourceinstanceid):
+            def save_resource(populated_tiles, resourceinstanceid, tiles):
                 # create the resource instance
-                newresourceinstance, created = Resource.objects.get_or_create(
+                newresourceinstance = Resource.objects.create(
                     resourceinstanceid=resourceinstanceid,
-                    defaults={'graph_id': target_resource_model, 'resourceinstancesecurity': None}
+                    graph_id=target_resource_model,
+                    resourceinstancesecurity=None
                 )
+                resources.append(newresourceinstance)
 
                 # save all the tiles related to the resource instance
                 if bulk:
-                    tiles = populated_tiles
+                    print 'bulk'
+                    #tiles.extend(populated_tiles)
+                    tiles = tiles + populated_tiles
                     for populated_tile in populated_tiles:
+                        #tiles.append(sql_from_tile(populated_tile))
+                        #tiles.append(populated_tile)
                         for tile in populated_tile.tiles.itervalues():
-                            if len(tiles) > 0:
+                            #print tile
+                            if len(tile) > 0:
+                                #tiles.append(sql_from_tile(tile[0]))
                                 tiles = tiles + tile
+                                #tiles.append(tile[0])
+                    #print len(tiles)
+                    newresourceinstance.tiles = tiles
                     Tile.objects.bulk_create(tiles)
                 else:
                     for populated_tile in populated_tiles:
                         saved_tile = populated_tile.save(index=False)
-                newresourceinstance.index()
+                #newresourceinstance.index()
 
 
             for row in business_data:
                 if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
-                    save_resource(populated_tiles, resourceinstanceid)
+                    save_resource(populated_tiles, resourceinstanceid, tiles_)
 
                     # reset values for next resource instance
                     populated_tiles = []
@@ -191,7 +215,7 @@ class CSVFileImporter(object):
                             populated_child_nodegroups = []
                             for nodegroupid, childtile in target_tile.tiles.iteritems():
                                 prototype_tile = childtile.pop()
-                                prototype_tile.tileid = None
+                                prototype_tile.tileid = uuid.uuid4()
                                 prototype_tile.parenttile = target_tile
                                 prototype_tile.resourceinstance_id = resourceinstanceid
                                 if str(prototype_tile.nodegroup_id) in single_cardinality_nodegroups:
@@ -248,8 +272,16 @@ class CSVFileImporter(object):
 
                 previous_row_resourceid = row['ResourceID']
 
-            save_resource(populated_tiles, resourceinstanceid)
+            save_resource(populated_tiles, resourceinstanceid ,tiles_)
+            # print len(tiles_)
+            # print tiles_
+            # cursor = connection.cursor()
+            # with transaction.atomic():
+            #     cursor.execute(";".join(tiles_))
+            #Tile.objects.bulk_create(tiles_)
 
+            Resource.bulk_index(resources=resources)
+        
         else:
             for error in errors:
                 print "{0} {1}".format(error[0], error[1])

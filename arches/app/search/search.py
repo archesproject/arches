@@ -245,11 +245,11 @@ class SearchEngine(object):
     def bulk_index(self, data):
         return helpers.bulk(self.es, data, chunk_size=500, raise_on_error=True)
 
-    def create_bulk_item(self, index, type, id, data):
-        if not(self.isempty_or_none(index) or self.isempty_or_none(type) or self.isempty_or_none(id)):
-            return[
-                { "index" : { "_index" : index, "_type" : type, "_id" : id } },
-                data
-            ]
-        else:
-            return false
+    def create_bulk_item(self, op_type='index', index=None, type=None, id=None, data=None):
+        return {
+            '_op_type': op_type,
+            '_index': index,
+            '_type': type,
+            '_id': id,
+            '_source': data
+        }

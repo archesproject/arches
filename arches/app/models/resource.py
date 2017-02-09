@@ -44,55 +44,77 @@ class Resource(models.ResourceInstance):
     def primaryname(self):
         module = importlib.import_module('arches.app.functions.resource_functions')
         PrimaryNameFunction = getattr(module, 'PrimaryNameFunction')()
-        #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
-        # config = {}
-        # config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
-        # config['string_template'] = '{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})'
-
-        #try:
         functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primaryname')
         if len(functionConfig) == 1:
             return PrimaryNameFunction.get(self, functionConfig[0].config)
         else:
             return 'undefined'
-        # except:
-        #     return 'undefined'
-        #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
-        #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
 
+    @staticmethod
+    def bulk_save(resources):
+        pass
+    
     def index(self):
         """
-        Indexes all the nessesary items values a resource to support search
+        Indexes all the nessesary items values of a resource to support search
 
         """
 
+        document, terms = self.get_documents_to_index()
         se = SearchEngineFactory().create()
+        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
+
+        for term in terms:
+            se.index_term(term['term'], term['term_id'], term['context'], term['options'])
+
+    def get_documents_to_index(self, fetchTiles=True):
+        """
+        Gets all the documents nessesary to index a single resource
+        returns a tuple of a document and list of terms
+
+        Keyword Arguments:
+        tiles -- pass in a list of tiles instead of fetching them from the database
+
+        """
 
         document = JSONSerializer().serializeToPython(self)
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self)
+        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self) if fetchTiles else self.tiles
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
 
-        terms_to_index = []
+        terms = []
 
         for tile in document['tiles']:
             for nodeid, nodevalue in tile.data.iteritems():
-                node = models.Node.objects.get(pk=nodeid)
+                #node = models.Node.objects.get(pk=nodeid)
+                datatype = models.Node.objects.values_list('datatype', flat=True).get(pk=nodeid)
+                #print datatype
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
+                    datatype_instance = datatypes.get_datatype_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue)
-                    if node.datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
-                        terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
+                    if datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
+                        terms.append({'term': nodevalue, 'term_id': '%s_%s' % (str(tile.tileid), str(nodeid)), 'context': '', 'options': {}})
 
-        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
+        return document, terms
 
-        for term in terms_to_index:
-            term_id = '%s_%s' % (str(term['tileid']), str(term['nodeid']))
-            se.delete_terms(term_id)
-            se.index_term(term['term'], term_id, term['context'], term['options'])
+    @staticmethod
+    def bulk_index(resources):
+        print 'in bulk_index'
+        se = SearchEngineFactory().create()
+        documents = []
+        term_list = []
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(fetchTiles=False)
+            documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+            for term in terms:
+                se.index_term(term['term'], term['term_id'], term['context'], term['options'])
+                #term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
+
+        se.bulk_index(documents)
+        #se.bulk_index(term_list)
 
     def serialize(self):
         """

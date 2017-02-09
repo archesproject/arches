@@ -94,6 +94,7 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
+    print dsl
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
