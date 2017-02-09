@@ -28,3 +28,9 @@ class BaseDataType(object):
         Gets the bounds of a geometry if the datatype is spatial
         """
         return None
+
+    def get_pref_label(self, nodevalue):
+        """
+        Gets the prefLabel of a concept value
+        """
+        return None

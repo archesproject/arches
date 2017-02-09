@@ -21,7 +21,6 @@ from django.conf import settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.datatypes import datatypes
 
@@ -166,10 +165,12 @@ class Tile(models.TileModel):
                     terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
 
-    def get_node_display_values(self):
+    def get_node_display_values(self, lang='en-US'):
         for nodeid, nodevalue in self.data.iteritems():
-            if models.Node.objects.get(pk=nodeid).datatype == 'concept':
-                self.data[nodeid] = get_preflabel_from_valueid(nodevalue, 'en-US')['value']
+            datatype = datatype.get_datatype_instance(models.Node.objects.get(pk=nodeid).datatype)
+            pref_label = datatype.get_pref_label(nodevalue, lang)
+            if pref_label is not None:
+                self.data[nodeid] = pref_label
 
         return self.data
 
