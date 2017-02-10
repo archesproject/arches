@@ -161,9 +161,9 @@ class Tile(models.TileModel):
         for nodeid, nodevalue in self.data.iteritems():
             node = models.Node.objects.get(pk=nodeid)
             datatype = datatypes.get_datatype_instance(node.datatype)
-            term = datatype.get_search_term(nodevalue, nodeid)
+            term = datatype.get_search_term(nodevalue)
             if term is not None:
-                terms.append(term)
+                terms.append({'term': term, 'nodeid': nodeid, 'context': '', 'options': {}})
         return terms
 
     @staticmethod

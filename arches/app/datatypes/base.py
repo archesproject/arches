@@ -43,9 +43,8 @@ class BaseDataType(object):
         """
         return []
 
-    def get_search_term(self, nodevalue, nodeid):
+    def get_search_term(self, nodevalue):
         """
-        Returns a dictionary with a search term. Example:
-        {'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}}
+        Returns a nodevalue if it qualifies as a search term
         """
         return None

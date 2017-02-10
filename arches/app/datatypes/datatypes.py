@@ -21,11 +21,11 @@ class StringDataType(BaseDataType):
     def transform_export_values(self, value):
         return value.encode('utf8')
 
-    def get_search_term(self, nodevalue, nodeid):
+    def get_search_term(self, nodevalue):
         term = None
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                term = {'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}}
+                term = nodevalue
         return term
 
 class NumberDataType(BaseDataType):
