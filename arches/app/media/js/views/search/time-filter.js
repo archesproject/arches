@@ -88,8 +88,8 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                 success: function(response) {
                     self.wheelConfig(response);
                 },
-                failure: function(response) {
-                    viewModel.loading(false);
+                error: function(response) {
+                    self.breadCrumb('Error loading time wheel config');
                 }
             });
         },
