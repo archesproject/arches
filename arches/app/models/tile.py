@@ -125,7 +125,6 @@ class Tile(models.TileModel):
 
         for term in self.prepare_terms_for_search_index():
             term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
-            se.delete_terms(term_id)
             se.index_term(term['term'], term_id, term['context'], term['options'])
 
     def prepare_documents_for_search_index(self):

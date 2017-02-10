@@ -107,45 +107,26 @@ class SearchEngine(object):
 
     def index_term(self, term, id, context='', options={}):
         """
-        If the term is already indexed, then simply increment the count and add the id of the term to the existing index.
-        If the term isn't indexed then add the index.
-
+        Arguments:
         id: a unique id associated with the term
+
+        Keyword Arguments:
         context: a uuid of a concept to associate with the term to render in the ui
         options: any additional information to associate with the term
 
         """
 
         if term.strip(' \t\n\r') != '':
-            already_indexed = False
-            count = 1
-            ids = [id]
-
             try:
-                #_id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
-                _id = uuid.uuid3(uuid.NAMESPACE_DNS, '%s%s' % (hash(term), hash(context)))
-                result = self.es.get(index='term', doc_type='value', id=_id, ignore=404)
-
-                #print 'result: %s' % result
-                if result['found'] == True:
-                    ids = result['_source']['ids']
-                    if id not in ids:
-                        ids.append(id)
-                else:
-                    ids = [id]
-
-                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options, 'count': len(ids), 'ids': ids}, id=_id)
-
+                _id = uuid.uuid4()
+                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options}, id=_id)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: search failed to index term: %s \nException detail: %s\n' % (datetime.now(), term, detail))
                 raise detail
 
     def delete_terms(self, ids):
         """
-        If the term is referenced more then once simply decrement the
-        count and remove the id of the deleted term from the from the existing index.
-
-        If the term is only referenced once then delete the index
+        Delete a term based on it's id
 
         """
 
@@ -153,33 +134,7 @@ class SearchEngine(object):
             ids = [ids]
 
         for id in ids:
-            result = self.es.search(index='term', doc_type='value', body={
-                "query": {
-                    "filtered": {
-                        "filter":{
-                            "terms": {
-                                "ids": [id]
-                            }
-                        },
-                        "query": {
-                            "match_all": {}
-                        }
-                    }
-                },
-                "from": 0,
-                "size": 10
-            }, ignore=404)
-
-            if 'hits' in result:
-                for document in result['hits']['hits']:
-                    document['_source']['ids'].remove(id)
-                    count = len(document['_source']['ids'])
-                    if count > 0:
-                        document['_source']['count'] = count
-                        self.index_data('term', 'value', document['_source'], id=document['_id'])
-                        self.es.indices.refresh(index='term')
-                    else:
-                        self.delete(index='term', doc_type='value', id=document['_id'])
+            self.delete(index='term', doc_type='value', id=document['_id'])
 
     def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """

@@ -40,7 +40,6 @@ def prepare_term_index(create=False):
         'mappings':{
             'value':{
                 'properties': {
-                    'ids':{'type': 'string', 'index' : 'not_analyzed'},
                     'context':{'type': 'string', 'index' : 'not_analyzed'},
                     'term': {
                         'type': 'string',
@@ -49,6 +48,10 @@ def prepare_term_index(create=False):
                             'folded': {
                                 'type': 'string',
                                 'analyzer': 'folding'
+                            },
+                            'raw': { 
+                                'type':  'string',
+                                'index': 'not_analyzed'
                             }
                         }
                     }
@@ -59,7 +62,7 @@ def prepare_term_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='term', body=index_settings, ignore=400)
+        se.create_index(index='term', body=index_settings)
 
     return index_settings
 
