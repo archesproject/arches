@@ -15,9 +15,9 @@ class PrimaryNameFunction(BaseFunction):
                     value = tile.data[str(node.nodeid)]
                     if value:
                         datatype = datatypes.get_datatype_instance(node.datatype)
-                        concept_values = datatype.get_concept_values(tile, node)
-                        if len(concept_values) == 1:
-                            value = concept_values[0].value
+                        display_value = datatype.get_display_value(tile, node)
+                        if display_value is not None:
+                            value = display_value
                         config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
 
         return config['string_template']
