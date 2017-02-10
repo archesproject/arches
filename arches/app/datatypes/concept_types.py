@@ -1,6 +1,7 @@
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.views.concept import get_preflabel_from_valueid
+import uuid
 
 class BaseConceptDataType(BaseDataType):
     def get_concept_export_value(self, value, concept_export_value_type):
@@ -31,9 +32,12 @@ class ConceptDataType(BaseConceptDataType):
     def get_pref_label(self, nodevalue, lang='en-US'):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
-    def get_concept_values(self, tile, node):
+    def get_display_value(self, tile, node):
+        value = None
         concept_values = models.Value.objects.filter(valueid=uuid.UUID(tile.data[str(node.nodeid)]))
-        return concept_values
+        if len(concept_values) > 0:
+            value = concept_values[0].value
+        return value
 
 class ConceptListDataType(BaseConceptDataType):
     def transform_import_values(self, value):

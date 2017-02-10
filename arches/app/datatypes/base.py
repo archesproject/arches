@@ -37,11 +37,11 @@ class BaseDataType(object):
         """
         return None
 
-    def get_concept_values(self, tile, node):
+    def get_display_value(self, tile, node):
         """
         Returns a list of concept values for a given node
         """
-        return []
+        return None
 
     def get_search_term(self, nodevalue):
         """
