@@ -48,3 +48,9 @@ class BaseDataType(object):
         Returns a nodevalue if it qualifies as a search term
         """
         return None
+
+    def manage_files(self, previously_saved_tile, current_tile, request, node):
+        """
+        Updates files
+        """
+        pass
