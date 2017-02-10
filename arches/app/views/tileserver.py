@@ -69,7 +69,7 @@ def get_tileserver_config():
 
     sql_list = []
     for i in range(settings.CLUSTER_MAX_ZOOM + 1):
-        arc = EARTHCIRCUM / ((1 << (i)) * PIXELSPERTILE)
+        arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
         distance = arc * settings.CLUSTER_DISTANCE
         sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS)
         sql_list.append(sql_string)
@@ -82,9 +82,10 @@ def get_tileserver_config():
                 node_name,
                 graph_name,
                 false AS poly_outline,
-                geom AS __geometry__,
                 row_number() over () as __id__,
-                1 as total
+                1 as total,
+                geom AS __geometry__,
+                '' AS extent
             FROM mv_geojson_geoms
         UNION
         SELECT tileid::text,
@@ -94,9 +95,10 @@ def get_tileserver_config():
                 node_name,
                 graph_name,
                 true AS poly_outline,
-                ST_ExteriorRing(geom) AS __geometry__,
                 row_number() over () as __id__,
-                1 as total
+                1 as total,
+                ST_ExteriorRing(geom) AS __geometry__,
+                '' AS extent
             FROM mv_geojson_geoms
             where ST_GeometryType(geom) = 'ST_Polygon'
     """)
