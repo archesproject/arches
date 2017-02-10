@@ -2,6 +2,7 @@
 
 sudo rm -r /home/ubuntu/arches
 sudo rm -r /home/ubuntu/ENV
+curl -XDELETE 'http://localhost:9200/_all'
 
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
