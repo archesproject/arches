@@ -42,3 +42,15 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         return []
+
+    def get_search_term(self, nodevalue):
+        """
+        Returns a nodevalue if it qualifies as a search term
+        """
+        return None
+
+    def manage_files(self, previously_saved_tile, current_tile, request, node):
+        """
+        Updates files
+        """
+        pass
