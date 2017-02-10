@@ -42,3 +42,10 @@ class BaseDataType(object):
         Returns a list of concept values for a given node
         """
         return []
+
+    def get_search_term(self, nodevalue, nodeid):
+        """
+        Returns a dictionary with a search term. Example:
+        {'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}}
+        """
+        return None

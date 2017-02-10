@@ -1,5 +1,6 @@
 import importlib
 import uuid
+from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.contrib.gis.geos import GEOSGeometry
@@ -19,6 +20,13 @@ class StringDataType(BaseDataType):
 
     def transform_export_values(self, value):
         return value.encode('utf8')
+
+    def get_search_term(self, nodevalue, nodeid):
+        term = None
+        if nodevalue is not None:
+            if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                term = {'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}}
+        return term
 
 class NumberDataType(BaseDataType):
     def transform_import_values(self, value):
