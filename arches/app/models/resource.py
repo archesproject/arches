@@ -19,8 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import importlib
 from django.conf import settings
 from arches.app.models import models
+from arches.app.models.models import TileModel
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from elasticsearch import Elasticsearch
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -50,9 +50,52 @@ class Resource(models.ResourceInstance):
         else:
             return 'undefined'
 
+    def save(self, *args, **kwargs):
+        """
+        Saves and indexes a single resource
+
+        """
+
+        super(Resource, self).save(*args, **kwargs)
+        for tile in self.tiles:
+            saved_tile = tile.save(index=False)
+        self.index()
+
     @staticmethod
     def bulk_save(resources):
-        pass
+        """
+        Saves and indexes a list of resources
+
+        Arguments:
+        resources -- a list of resource models
+
+        """
+
+        se = SearchEngineFactory().create()
+        tiles = []
+        documents = []
+        term_list = []
+
+        # flatten out the nested tiles into a single array
+        for resource in resources:
+            for parent_tile in resource.tiles:
+                for child_tile in parent_tile.tiles.itervalues():
+                    if len(child_tile) > 0:
+                        resource.tiles.extend(child_tile)
+                parent_tile.tiles = {}
+
+            tiles.extend(resource.tiles)
+
+            document, terms = resource.get_documents_to_index(fetchTiles=False)
+            documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
+
+        # bulk create and index the resources, tiles and terms
+        Resource.objects.bulk_create(resources)
+        TileModel.objects.bulk_create(tiles)
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
     
     def index(self):
         """
@@ -101,38 +144,12 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    @staticmethod
-    def bulk_index(resources):
-        print 'in bulk_index'
-        se = SearchEngineFactory().create()
-        documents = []
-        term_list = []
-        for resource in resources:
-            document, terms = resource.get_documents_to_index(fetchTiles=False)
-            documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
-            for term in terms:
-                se.index_term(term['term'], term['term_id'], term['context'], term['options'])
-                #term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
-
-        se.bulk_index(documents)
-        #se.bulk_index(term_list)
-
-    def serialize(self):
-        """
-        serialize to a different form then used by the internal class structure
-
-        used to append additional values (like parent ontology properties) that
-        internal objects (like models.Nodes) don't support
-
-        """
-
-        ret = JSONSerializer().handle_model(self)
-        ret['tiles'] = self.tiles
-
-        return JSONSerializer().serializeToPython(ret)
-
     def delete(self):
-        es = Elasticsearch()
+        """
+        Deletes a single resource and any related indexed data
+
+        """
+
         se = SearchEngineFactory().create()
         related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
         for rr in related_resources['resource_relationships']:
@@ -141,6 +158,11 @@ class Resource(models.ResourceInstance):
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=1000, start=0):
+        """
+        Returns an object that lists the related resources, the relationship types, and a reference to the current resource
+
+        """
+
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
@@ -167,3 +189,17 @@ class Resource(models.ResourceInstance):
                 ret['related_resources'].append(resource['_source'])
 
         return ret
+
+    def serialize(self):
+        """
+        Serialize to a different form then used by the internal class structure
+
+        used to append additional values (like parent ontology properties) that
+        internal objects (like models.Nodes) don't support
+
+        """
+
+        ret = JSONSerializer().handle_model(self)
+        ret['tiles'] = self.tiles
+
+        return JSONSerializer().serializeToPython(ret)
