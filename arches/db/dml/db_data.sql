@@ -101,13 +101,13 @@ INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', 'datatypes.py', 
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', 'datatypes.py', 'NumberDataType', null, null, null, '10000000-0000-0000-0000-000000000008');
 INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', 'datatypes.py', 'DateDataType', null, null, null, '10000000-0000-0000-0000-000000000004');
 INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'datatypes.py', 'GeojsonFeatureCollectionDataType', null, null, null, '10000000-0000-0000-0000-000000000007');
-INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'datatypes.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'datatypes.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
-INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'datatypes.py', 'DomainValueDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
-INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'datatypes.py', 'DomainValueListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.py', 'FileListDataType', null, null, null, '10000000-0000-0000-0000-000000000019');
-INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
+INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link', 'datatypes.py', 'BaseDataType');
 
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
@@ -3428,8 +3428,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
              }
          }
      ]', TRUE, 'fa fa-building-o');
-
-
+-- DELETE FROM map_layers where name = 'All Resources';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
    VALUES (public.uuid_generate_v1mc(), 'All Resources', '[
        {
@@ -3440,7 +3439,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Polygon"]],
+           "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
            "paint": {
                "fill-color": "rgba(130, 130, 130, 0.5)"
            }
@@ -3453,7 +3452,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 3,
                "line-color": "rgba(200, 200, 200, .55)"
@@ -3467,7 +3466,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
            "paint": {
                "line-width": 1,
                "line-color": "rgba(130, 130, 130, 1)"
@@ -3481,7 +3480,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true]],
+           "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
            "paint": {
                "line-width": 1.5,
                "line-color": "rgba(200, 200, 200, 1)"
@@ -3495,7 +3494,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 5,
                "circle-color": "rgba(200, 200, 200, 1)"
@@ -3509,10 +3508,88 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
            "layout": {
                "visibility": "visible"
            },
-           "filter": ["all", ["==", "$type", "Point"]],
+           "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
            "paint": {
                "circle-radius": 3,
                "circle-color": "rgba(130, 130, 130, 1)"
            }
-       }
+       },
+       {
+           "id": "resources-cluster-point",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+                "circle-radius": {
+                    "property": "total",
+                    "type": "exponential",
+                    "stops": [
+                        [0,   12],
+                        [50, 14],
+                        [100, 16],
+                        [200, 18],
+                        [400, 20],
+                        [800, 22],
+                        [1200, 24],
+                        [1600, 26],
+                        [2000, 28],
+                        [2500, 30],
+                        [3000, 32],
+                        [4000, 34],
+                        [5000, 36]
+                    ]
+                },
+               "circle-color": "rgba(130, 130, 130, 1)"
+           }
+       },
+       {
+           "id": "resources-cluster-point-halo",
+           "type": "circle",
+           "source": "resources",
+           "source-layer": "resources",
+           "layout": {
+               "visibility": "visible"
+           },
+           "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+           "paint": {
+               "circle-radius": {
+                   "property": "total",
+                   "stops": [
+                       [0,   22],
+                       [50, 24],
+                       [100, 26],
+                       [200, 28],
+                       [400, 30],
+                       [800, 32],
+                       [1200, 34],
+                       [1600, 36],
+                       [2000, 38],
+                       [2500, 40],
+                       [3000, 42],
+                       [4000, 44],
+                       [5000, 46]
+                   ]
+               },
+               "circle-color": "rgba(130, 130, 130, 0.7)"
+           }
+       },
+       {
+            "id": "resources-cluster-count",
+            "type": "symbol",
+            "source": "resources",
+            "source-layer": "resources",
+            "layout": {
+                "text-field": "{total}",
+                "text-font": [
+                    "DIN Offc Pro Medium",
+                    "Arial Unicode MS Bold"
+                ],
+                "text-size": 12
+            },
+            "filter": ["all", [">", "total", 1]]
+        }
    ]', TRUE, 'fa fa-globe');

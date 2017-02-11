@@ -44,6 +44,7 @@ from arches.app.utils.data_management.arches_file_exporter import ArchesFileExpo
 from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.skos import SKOSReader
+from arches.app.views.tileserver import seed_resource_cache
 from django.db import transaction
 
 
@@ -55,8 +56,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -170,14 +171,17 @@ class Command(BaseCommand):
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
 
-        if options['operation'] == 'add_tilserver_layer':
-            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
+        if options['operation'] == 'add_tileserver_layer':
+            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
 
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
 
-        if options['operation'] == 'delete_tilserver_layer':
-            self.delete_tilserver_layer(options['layer_name'])
+        if options['operation'] == 'seed_resource_tile_cache':
+            self.seed_resource_tile_cache()
+
+        if options['operation'] == 'delete_tileserver_layer':
+            self.delete_tileserver_layer(options['layer_name'])
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
@@ -285,6 +289,9 @@ class Command(BaseCommand):
         prepare_term_index(create=True)
         prepare_resource_relations_index(create=True)
 
+    def drop_resources(self, packages_name):
+        drop_all_resources()
+
     def delete_indexes(self, package_name):
         delete_term_index()
         delete_search_index()
@@ -354,7 +361,8 @@ class Command(BaseCommand):
         Runs the resource_remover command found in package_utils
 
         """
-        resource_remover.delete_resources(load_id)
+        # resource_remover.delete_resources(load_id)
+        resource_remover.clear_resources()
 
     def load_concept_scheme(self, package_name, data_source=None):
         """
@@ -437,7 +445,7 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
+    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
         if layer_name != False and mapnik_xml_path != False:
             with transaction.atomic():
                 tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
@@ -478,7 +486,7 @@ class Command(BaseCommand):
                     map_layer.save()
 
 
-    def delete_tilserver_layer(self, layer_name=False):
+    def delete_tileserver_layer(self, layer_name=False):
         if layer_name != False:
             with transaction.atomic():
                 tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
@@ -510,3 +518,6 @@ class Command(BaseCommand):
                 with open(path, 'rU') as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)
+
+    def seed_resource_tile_cache(self):
+        seed_resource_cache()

@@ -22,31 +22,8 @@ class CsvWriter(Writer):
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type):
-
-        def get_concept_export_value(value, concept_export_value_type):
-            if concept_export_value_type != None:
-                if concept_export_value_type == "label" or concept_export_value_type == "both":
-                    if concept_export_value_type == "label":
-                        value = Value.objects.get(valueid=value).value
-                    elif concept_export_value_type == "both":
-                        value = value + '|' + Value.objects.get(valueid=value).value
-            return value
-
-        if datatype == 'string':
-            value = value.encode('utf8')
-        if datatype == 'geojson-feature-collection':
-            wkt_geoms = []
-            for feature in value['features']:
-                wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
-            value = GeometryCollection(wkt_geoms)
-        elif datatype in ['concept-list', 'domain-value-list']:
-            new_values = []
-            for val in value:
-                new_val = get_concept_export_value(val, concept_export_value_type)
-                new_values.append(new_val)
-            value = ','.join(new_values)
-        elif datatype in ['concept', 'domain-value']:
-            value = get_concept_export_value(value, concept_export_value_type)
+        datatype_instance = datatypes.get_datatype_instance(datatype)
+        value = datatype_instance.transform_export_values(value)
         return value
 
     def write_resources(self, resources, resource_export_configs=None):

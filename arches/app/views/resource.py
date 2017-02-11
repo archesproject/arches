@@ -57,7 +57,8 @@ class ResourceListView(BaseManagerView):
             instance_summaries=instance_summaries,
         )
 
-        context['nav']['title'] = "Resource Editor"
+        context['nav']['icon'] = "fa fa-bookmark"
+        context['nav']['title'] = "Resource Manager"
         context['nav']['edit_history'] = True
         context['nav']['login'] = True
         context['nav']['help'] = ('Creating and Editing Resources','')
@@ -109,6 +110,8 @@ class ResourceEditorView(BaseManagerView):
                 graph_json=JSONSerializer().serialize(graph),
             )
 
+            if graph.iconclass:
+                context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = True
             context['nav']['edit_history'] = True
@@ -175,6 +178,8 @@ class ResourceReportView(BaseManagerView):
             resourceid=resourceid,
          )
 
+        if graph.iconclass:
+            context['nav']['icon'] = graph.iconclass
         context['nav']['title'] = graph.name
         context['nav']['res_edit'] = True
         context['nav']['print'] = True

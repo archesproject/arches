@@ -1071,10 +1071,32 @@ define([
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var hoverFeature = _.find(features, function(feature) {
-                        return feature.layer.id.indexOf('resources') === 0;
+                        return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
                     }) || null;
                     if (self.hoverFeature() !== hoverFeature) {
                         self.hoverFeature(hoverFeature);
+                    }
+                });
+                map.on('click', function (e) {
+                    var features = self.map.queryRenderedFeatures(e.point);
+                    var clickFeature = _.find(features, function(feature) {
+                        return feature.layer.id.indexOf('resources') === 0;
+                    }) || null;
+                    if (clickFeature && clickFeature.properties.total > 1) {
+                        var coordinates = JSON.parse(clickFeature.properties.extent).coordinates;
+                        if (Array.isArray(coordinates[0])) {
+                            coordinates = coordinates[0];
+                        } else {
+                            coordinates = [coordinates];
+                        }
+
+                        var bounds = coordinates.reduce(function(bounds, coord) {
+                            return bounds.extend(coord);
+                        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+                        map.fitBounds(bounds, {
+                            padding: 20
+                        });
                     }
                 });
 

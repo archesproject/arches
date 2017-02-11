@@ -30,7 +30,7 @@ class BaseManagerView(TemplateView):
         context['graph_models'] = models.GraphModel.objects.all()
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
         context['nav'] = {
-            'icon':'fa-question',
+            'icon':'fa fa-chevron-circle-right',
             'title':'',
             'help':('',''),
             'menu':False,
