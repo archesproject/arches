@@ -9,19 +9,19 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
 
 
-def delete_resources(load_id):
-    """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
-    resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
-    resourceids = set([editlog.resourceid for editlog in resources_for_removal])
-    for r_id in resourceids:
-        try:
-            resource = Resource(r_id)
-            resource.delete_index()
-            note = '{0} Deleted'.format(load_id)
-            resource.delete_all_resource_relationships()
-            resource.delete(note=note)
-        except ObjectDoesNotExist:
-            print 'Entity does not exist. Nothing to delete'
+# def delete_resources(load_id):
+#     """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
+#     resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
+#     resourceids = set([editlog.resourceid for editlog in resources_for_removal])
+#     for r_id in resourceids:
+#         try:
+#             resource = Resource(r_id)
+#             resource.delete_index()
+#             note = '{0} Deleted'.format(load_id)
+#             resource.delete_all_resource_relationships()
+#             resource.delete(note=note)
+#         except ObjectDoesNotExist:
+#             print 'Entity does not exist. Nothing to delete'
 
 def clear_resources():
     """Removes all resource instances from your db and elasticsearch resource index"""
@@ -31,8 +31,8 @@ def clear_resources():
         resource.delete()
     print len(Resource.objects.all()), 'resources remaining'
 
-def truncate_resources():
-    """Deletes ALL resources in your database. Use with caution!"""
-    cursor = connection.cursor()
-    cursor.execute("""TRUNCATE data.entities CASCADE;""" )
-    print 'Resources Truncated'
+# def truncate_resources():
+#     """Deletes ALL resources in your database. Use with caution!"""
+#     cursor = connection.cursor()
+#     cursor.execute("""TRUNCATE data.entities CASCADE;""" )
+#     print 'Resources Truncated'
