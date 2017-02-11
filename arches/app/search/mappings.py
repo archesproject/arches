@@ -90,6 +90,7 @@ def prepare_search_index(resource_model_id, create=False):
                     'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'primarydescription': {'type' : 'string', 'index' : 'not_analyzed'},
                     'tiles' : {
                         'type' : 'nested',
                         'properties' : {
