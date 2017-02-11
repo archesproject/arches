@@ -42,8 +42,8 @@ class Resource(models.ResourceInstance):
 
     @property
     def primaryname(self):
-        module = importlib.import_module('arches.app.functions.resource_functions')
-        PrimaryNameFunction = getattr(module, 'PrimaryNameFunction')()
+        module = importlib.import_module('arches.app.functions.primary_descriptors')
+        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
         #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
         # config = {}
         # config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
@@ -52,7 +52,7 @@ class Resource(models.ResourceInstance):
         #try:
         functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primaryname')
         if len(functionConfig) == 1:
-            return PrimaryNameFunction.get(self, functionConfig[0].config)
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config['name'])
         else:
             return 'undefined'
         # except:

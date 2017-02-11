@@ -78,6 +78,7 @@ class Graph(models.GraphModel):
                     self.add_card(card)
 
                 if 'functions' in args[0]:
+                    print args[0]
                     for function in args[0]["functions"]:
                         self.add_function(function)
 
@@ -264,6 +265,7 @@ class Graph(models.GraphModel):
         """
 
         if not isinstance(function, models.FunctionXGraph):
+            print 'functions', function, models.FunctionXGraph
             if isinstance(function, dict):
                 functionobj = models.FunctionXGraph(**function.copy())
             else:
