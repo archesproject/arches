@@ -1,5 +1,6 @@
 import importlib
 import uuid
+from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.contrib.gis.geos import GEOSGeometry
@@ -19,6 +20,13 @@ class StringDataType(BaseDataType):
 
     def transform_export_values(self, value):
         return value.encode('utf8')
+
+    def get_search_term(self, nodevalue):
+        term = None
+        if nodevalue is not None:
+            if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                term = nodevalue
+        return term
 
 class NumberDataType(BaseDataType):
     def transform_import_values(self, value):
@@ -73,10 +81,44 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         node_data = tile.data[str(node.pk)]
         for feature in node_data['features']:
             shape = asShape(feature['geometry'])
-            bounds = shape.bounds
+            if bounds is None:
+                bounds = shape.bounds
+            else:
+                minx, miny, maxx, maxy = bounds
+                if shape.bounds[0] < minx:
+                    minx = shape.bounds[0]
+                if shape.bounds[1] < miny:
+                    miny = shape.bounds[1]
+                if shape.bounds[2] > maxx:
+                    maxx = shape.bounds[2]
+                if shape.bounds[3] > maxy:
+                    maxy = shape.bounds[3]
+                bounds = (minx, miny, maxx, maxy)
         return bounds
 
 class FileListDataType(BaseDataType):
+    def manage_files(self, previously_saved_tile, current_tile, request, node):
+        if previously_saved_tile.count() == 1:
+            for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]:
+                previously_saved_file_has_been_removed = True
+                for incoming_file in current_tile.data[str(node.pk)]:
+                    if previously_saved_file['file_id'] == incoming_file['file_id']:
+                        previously_saved_file_has_been_removed = False
+                if previously_saved_file_has_been_removed:
+                    deleted_file = models.File.objects.get(pk=previously_saved_file["file_id"])
+                    deleted_file.delete()
+
+        files = request.FILES.getlist('file-list_' + str(node.pk), [])
+        for file_data in files:
+            file_model = models.File()
+            file_model.path = file_data
+            file_model.save()
+            for file_json in current_tile.data[str(node.pk)]:
+                if file_json["name"] == file_data.name and file_json["url"] is None:
+                    file_json["file_id"] = str(file_model.pk)
+                    file_json["url"] = str(file_model.path.url)
+                    file_json["status"] = 'uploaded'
+
     def transform_import_values(self, value):
         '''
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:

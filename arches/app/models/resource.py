@@ -95,8 +95,9 @@ class Resource(models.ResourceInstance):
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatypes.get_datatype_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue)
-                    if datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
-                        terms.append({'term': nodevalue, 'term_id': '%s_%s' % (str(tile.tileid), str(nodeid)), 'context': '', 'options': {}})
+                    term = datatype_instance.get_search_term(nodevalue)
+                    if term is not None:
+                        terms.append({'term': term, 'term_id': '%s_%s' % (str(tile.tileid), str(nodeid)), 'context': '', 'options': {}})
 
         return document, terms
 
