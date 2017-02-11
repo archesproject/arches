@@ -26,6 +26,9 @@ from django.core.paginator import Paginator
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
+from django.http import HttpResponseNotFound
+from django.utils.module_loading import import_string
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
@@ -34,7 +37,6 @@ from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-from django.utils.module_loading import import_string
 from arches.app.views.base import BaseManagerView
 
 
@@ -95,31 +97,34 @@ def build_search_terms_dsl(request):
 def search_results(request):
     dsl = build_search_results_dsl(request)
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
-    total = results['hits']['total']
-    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    all_result_ids = []
-    if request.GET.get('include_ids', 'false') == 'false':
-        all_result_ids = ['_none']
-    full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
-    all_result_ids = [hit['_id'] for hit in full_results['hits']['hits']]
+    if results is not None:
+        total = results['hits']['total']
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        all_result_ids = []
+        if request.GET.get('include_ids', 'false') == 'false':
+            all_result_ids = ['_none']
+        full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
+        all_result_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-    paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_result_ids)
-    page = paginator.page(page)
+        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_result_ids)
+        page = paginator.page(page)
 
-    ret = {}
-    ret['results'] = results
-    ret['all_result_ids'] = all_result_ids
+        ret = {}
+        ret['results'] = results
+        ret['all_result_ids'] = all_result_ids
 
-    ret['paginator'] = JSONSerializer().serializeToPython(page)
-    ret['paginator']['has_next'] = page.has_next()
-    ret['paginator']['has_previous'] = page.has_previous()
-    ret['paginator']['has_other_pages'] = page.has_other_pages()
-    ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
-    ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
-    ret['paginator']['start_index'] = page.start_index()
-    ret['paginator']['end_index'] = page.end_index()
-    ret['paginator']['pages'] = pages
-    return JSONResponse(ret)
+        ret['paginator'] = JSONSerializer().serializeToPython(page)
+        ret['paginator']['has_next'] = page.has_next()
+        ret['paginator']['has_previous'] = page.has_previous()
+        ret['paginator']['has_other_pages'] = page.has_other_pages()
+        ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
+        ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
+        ret['paginator']['start_index'] = page.start_index()
+        ret['paginator']['end_index'] = page.end_index()
+        ret['paginator']['pages'] = pages
+        return JSONResponse(ret)
+    else:
+        return HttpResponseNotFound(_("There was an error retrieving the search results"))
 
 def get_doc_type(request):
     doc_type = set()
@@ -327,37 +332,39 @@ def time_wheel_config(request):
     query.add_aggregation(MinAgg(field='dates', format='y'))
     query.add_aggregation(MaxAgg(field='dates', format='y'))
     results = query.search(index='resource')
-    min_date = int(results['aggregations']['min_dates']['value_as_string'])
-    max_date = int(results['aggregations']['max_dates']['value_as_string'])
+    if results is not None:
+        min_date = int(results['aggregations']['min_dates']['value_as_string'])
+        max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
-    # round min and max date to the nearest 1000 years
-    min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
-    max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
+        # round min and max date to the nearest 1000 years
+        min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
+        max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
 
-    query = Query(se, limit=0)
-    for millennium in range(int(min_date),int(max_date)+1000,1000):
-        min_millenium = millennium
-        max_millenium = millennium + 1000
-        millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
-        
-        for century in range(min_millenium,max_millenium,100):
-            min_century = century
-            max_century = century + 100
-            century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
-            millenium_agg.add_aggregation(century_aggregation)
-                
-            for decade in range(min_century,max_century,10):
-                min_decade = decade
-                max_decade = decade + 10
-                decade_aggregation = DateRangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', format='y', min_date=str(min_decade), max_date=str(max_decade))
-                century_aggregation.add_aggregation(decade_aggregation)
+        query = Query(se, limit=0)
+        for millennium in range(int(min_date),int(max_date)+1000,1000):
+            min_millenium = millennium
+            max_millenium = millennium + 1000
+            millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
+            
+            for century in range(min_millenium,max_millenium,100):
+                min_century = century
+                max_century = century + 100
+                century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
+                millenium_agg.add_aggregation(century_aggregation)
+                    
+                for decade in range(min_century,max_century,10):
+                    min_decade = decade
+                    max_decade = decade + 10
+                    decade_aggregation = DateRangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', format='y', min_date=str(min_decade), max_date=str(max_decade))
+                    century_aggregation.add_aggregation(decade_aggregation)
 
-        query.add_aggregation(millenium_agg)
+            query.add_aggregation(millenium_agg)
 
-    root = d3Item(name='root')
-    transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
-
-    return JSONResponse(root, indent=4)
+        root = d3Item(name='root')
+        transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
+        return JSONResponse(root, indent=4)
+    else:
+        return HttpResponseNotFound(_('Error retrieving the time wheel config'))
     #return JSONResponse(query.search(index='resource'), indent=4)
     #return JSONResponse(query.dsl, indent=4)
 
