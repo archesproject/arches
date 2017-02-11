@@ -3,12 +3,11 @@ define([
     'knockout',
     'moment',
     'views/search/base-filter',
-    'views/search/time-wheel-config',
     'bindings/datepicker',
     'bindings/chosen',
     'bindings/time-wheel'
 ],
-function(_, ko, moment, BaseFilter, wheelConfig) {
+function(_, ko, moment, BaseFilter) {
     return BaseFilter.extend({
         initialize: function(options) {
             var self = this;
@@ -89,7 +88,7 @@ function(_, ko, moment, BaseFilter, wheelConfig) {
                     self.wheelConfig(response);
                 },
                 error: function(response) {
-                    self.breadCrumb('Error loading time wheel config');
+                    self.breadCrumb(response.responseText);
                 }
             });
         },

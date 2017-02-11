@@ -153,11 +153,10 @@ define([
                 context: this,
                 success: function(response) {
                     var data = this.viewModel.searchResults.updateResults(response);
-                    //this.isNewQuery = true;
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
                     }
                 },
                 complete: function(request, status) {
