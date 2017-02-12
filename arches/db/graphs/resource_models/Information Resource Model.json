@@ -74,9 +74,7 @@
             ],
             "reports": [],
             "iconclass": "",
-            "functions": [
-                "60000000-0000-0000-0000-000000000000"
-            ],
+            "functions": [],
             "domain_connections": [
                 {
                     "ontology_property": "J7_is_based_on_evidence",

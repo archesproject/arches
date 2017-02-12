@@ -78,8 +78,8 @@ class Graph(models.GraphModel):
                     self.add_card(card)
 
                 if 'functions' in args[0]:
-                    print args[0]
                     for function in args[0]["functions"]:
+                        print 'adding function', function
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
