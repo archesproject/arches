@@ -335,9 +335,7 @@ def time_wheel_config(request):
     query.add_aggregation(MinAgg(field='dates', format='y'))
     query.add_aggregation(MaxAgg(field='dates', format='y'))
     results = query.search(index='resource')
-    if results is not None and 
-       results['aggregations']['min_dates']['value'] is not None and 
-       results['aggregations']['max_dates']['value'] is not None:
+    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
         min_date = int(results['aggregations']['min_dates']['value_as_string'])
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
