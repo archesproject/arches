@@ -89,14 +89,17 @@ class Resource(models.ResourceInstance):
 
             tiles.extend(resource.tiles)
 
+        # need to save the models first before getting the documents for index
+        Resource.objects.bulk_create(resources)
+        TileModel.objects.bulk_create(tiles)
+
+        for resource in resources:
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
 
-        # bulk create and index the resources, tiles and terms
-        Resource.objects.bulk_create(resources)
-        TileModel.objects.bulk_create(tiles)
+        # bulk index the resources, tiles and terms
         se.bulk_index(documents)
         se.bulk_index(term_list)
     
@@ -122,7 +125,9 @@ class Resource(models.ResourceInstance):
         returns a tuple of a document and list of terms
 
         Keyword Arguments:
-        tiles -- pass in a list of tiles instead of fetching them from the database
+        fetchTiles -- instead of fetching the tiles from the database get them off the model itself
+        datatype_factory -- refernce to the DataTypeFactory instance
+        node_datatypes -- a dictionary of datatypes keyed to node ids
 
         """
 
