@@ -103,7 +103,7 @@ require([
                 })
                 viewModel.loading(false);
             },
-            failure: function(response) {
+            error: function(response) {
                 viewModel.loading(false);
             }
         });
@@ -123,7 +123,7 @@ require([
                     viewModel.toggleFunctionLibrary();
                     viewModel.loading(false);
                 },
-                failure: function(response) {
+                error: function(response) {
                     viewModel.loading(false);
                 }
             });

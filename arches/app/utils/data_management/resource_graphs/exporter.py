@@ -90,7 +90,10 @@ def get_graphs_for_export(graphids=None):
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
 
     for resource_graph in resource_graph_query:
-        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(resource_graph['functions'])
+        function_ids = []
+        for function in resource_graph['functions']:
+            function_ids.append(function['function_id'])
+        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(function_ids)
         del resource_graph['functions']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
         resource_graph['forms'] = get_forms_for_export(resource_graph)

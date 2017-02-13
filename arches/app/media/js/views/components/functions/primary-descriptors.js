@@ -19,22 +19,24 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                 }
             }, this);
 
-            this.string_template = params.config.string_template;
-            this.nodegroup_id = params.config.nodegroup_id;
-            this.nodegroup_id.subscribe(function(nodegroup_id){
-                this.string_template(nodegroup_id);
-                var nodes = _.filter(this.graph.nodes, function(node){
-                    return node.nodegroup_id === nodegroup_id;
-                }, this);
-                var templateFragments = [];
-                _.each(nodes, function(node){
-                    templateFragments.push('<' + node.name + '>');
-                }, this);
+            this.name = params.config.name;
+            this.description = params.config.description;
 
-                var template = templateFragments.join(', ');
-                this.string_template(template);
+            _.each([this.name, this.description], function(property){
+                property.nodegroup_id.subscribe(function(nodegroup_id){
+                    property.string_template(nodegroup_id);
+                    var nodes = _.filter(this.graph.nodes, function(node){
+                        return node.nodegroup_id === nodegroup_id;
+                    }, this);
+                    var templateFragments = [];
+                    _.each(nodes, function(node){
+                        templateFragments.push('<' + node.name + '>');
+                    }, this);
 
-            }, this);
+                    var template = templateFragments.join(', ');
+                    property.string_template(template);
+                }, this);
+            }, this)
 
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
