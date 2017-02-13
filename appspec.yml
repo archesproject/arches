@@ -12,7 +12,7 @@ hooks:
       mode: 755
       runas: ubuntu
     - location: arches/install/install_arches.sh
-      timeout: 300
+      timeout: 10000
       mode: 755
       runas: ubuntu
     - location: arches/install/update_docs.sh

@@ -77,8 +77,8 @@ class Graph(models.GraphModel):
                 for card in args[0]["cards"]:
                     self.add_card(card)
 
-                if 'functions' in args[0]:
-                    for function in args[0]["functions"]:
+                if 'functions_x_graphs' in args[0]:
+                    for function in args[0]["functions_x_graphs"]:
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
@@ -306,7 +306,9 @@ class Graph(models.GraphModel):
                 widget.save()
 
             for functionxgraph in self._functions:
-                functionxgraph.save()
+                # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
+                if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list('functionid', flat=True)]:
+                    functionxgraph.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()

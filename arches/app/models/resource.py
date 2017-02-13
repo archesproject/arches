@@ -84,8 +84,9 @@ class Resource(models.ResourceInstance):
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatypes.get_datatype_instance(node.datatype)
                     datatype_instance.append_to_document(document, nodevalue)
-                    if node.datatype == 'string' and (settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM)):
-                        terms_to_index.append({'term': nodevalue, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
+                    term = datatype_instance.get_search_term(nodevalue)
+                    if term is not None:
+                        terms_to_index.append({'term': term, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
 
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 

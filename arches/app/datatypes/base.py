@@ -37,8 +37,20 @@ class BaseDataType(object):
         """
         return None
 
-    def get_concept_values(self, tile, node):
+    def get_display_value(self, tile, node):
         """
         Returns a list of concept values for a given node
         """
-        return []
+        return None
+
+    def get_search_term(self, nodevalue):
+        """
+        Returns a nodevalue if it qualifies as a search term
+        """
+        return None
+
+    def manage_files(self, previously_saved_tile, current_tile, request, node):
+        """
+        Updates files
+        """
+        pass

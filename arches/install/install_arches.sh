@@ -2,6 +2,7 @@
 
 sudo rm -r /home/ubuntu/arches
 sudo rm -r /home/ubuntu/ENV
+sudo curl -XDELETE 'http://localhost:9200/_all'
 
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
@@ -27,7 +28,7 @@ python manage.py packages -o setup_db
 python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_scheme.rdf -ow overwrite -st keep
 python manage.py packages -o import_reference_data -s arches/db/schemes/dropdowns.rdf -ow overwrite -st keep
 python manage.py packages -o import_graphs
-python manage.py packages -o import_business_data -s tests/fixtures/data/csv/heritage_resource_model_1000.csv -c tests/fixtures/data/csv/heritage_resource_model.mapping
+python manage.py packages -o import_business_data -s tests/fixtures/data/csv/heritage_resource_model.csv
 python manage.py packages -o add_tileserver_layer -m arches/tileserver/hillshade.xml -n hillshade
 python manage.py packages -o add_tileserver_layer -m arches/tileserver/world.xml -n world
 
