@@ -52,7 +52,7 @@ class SKOSReader(object):
             rdf = rdf_graph.parse(source=path_to_file, format=format)
             print 'time elapsed to parse rdf graph %s s'%(time()-start)
         except:
-            raise Exception('Error occurred while parsing the file %s'%path_to_file)
+            raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
 
     def save_concepts_from_skos(self, graph, overwrite_options=None, staging_options=False):
@@ -113,7 +113,7 @@ class SKOSReader(object):
                             pass
 
                     if str(SKOS) in predicate:
-                        print predicate
+                        #print predicate
                         if predicate == SKOS.hasTopConcept:
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
@@ -162,7 +162,7 @@ class SKOSReader(object):
 
             # Search for ConceptSchemes first
             for s, v, o in graph.triples((None, SKOS.hasCollection, None)):
-                print "%s %s %s " % (s,v,o)
+                #print "%s %s %s " % (s,v,o)
                 concept = Concept({
                     'id': self.generate_uuid_from_subject(baseuuid, o),
                     'legacyoid': str(o),
@@ -190,7 +190,7 @@ class SKOSReader(object):
                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'hasCollection', 'target': self.generate_uuid_from_subject(baseuuid, o)})
             
             for s, v, o in graph.triples((None, SKOS.member, None)):
-                print "%s %s %s " % (s,v,o)
+                #print "%s %s %s " % (s,v,o)
                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
             # insert and index the concpets
