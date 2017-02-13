@@ -2,7 +2,7 @@ import uuid
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 class PrimaryNameFunction(BaseFunction):
     def get(self, resource, config):
@@ -14,7 +14,8 @@ class PrimaryNameFunction(BaseFunction):
                 if str(node.nodeid) in tile.data:
                     value = tile.data[str(node.nodeid)]
                     if value:
-                        datatype = datatypes.get_datatype_instance(node.datatype)
+                        datatype_factory = DataTypeFactory()
+                        datatype = datatype_factory.get_instance(node.datatype)
                         display_value = datatype.get_display_value(tile, node)
                         if display_value is not None:
                             value = display_value

@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import importlib
+from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
@@ -24,7 +25,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 class Resource(models.ResourceInstance):
 
@@ -44,7 +45,7 @@ class Resource(models.ResourceInstance):
     def primaryname(self):
         module = importlib.import_module('arches.app.functions.resource_functions')
         PrimaryNameFunction = getattr(module, 'PrimaryNameFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primaryname')
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primaryname')
         if len(functionConfig) == 1:
             return PrimaryNameFunction.get(self, functionConfig[0].config)
         else:
@@ -72,6 +73,8 @@ class Resource(models.ResourceInstance):
         """
 
         se = SearchEngineFactory().create()
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
         tiles = []
         documents = []
         term_list = []
@@ -86,7 +89,7 @@ class Resource(models.ResourceInstance):
 
             tiles.extend(resource.tiles)
 
-            document, terms = resource.get_documents_to_index(fetchTiles=False)
+            document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
@@ -103,14 +106,17 @@ class Resource(models.ResourceInstance):
 
         """
 
-        document, terms = self.get_documents_to_index()
         se = SearchEngineFactory().create()
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
+        
+        document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
             se.index_term(term['term'], term['term_id'], term['context'], term['options'])
 
-    def get_documents_to_index(self, fetchTiles=True):
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -132,11 +138,9 @@ class Resource(models.ResourceInstance):
 
         for tile in document['tiles']:
             for nodeid, nodevalue in tile.data.iteritems():
-                #node = models.Node.objects.get(pk=nodeid)
-                datatype = models.Node.objects.values_list('datatype', flat=True).get(pk=nodeid)
-                #print datatype
+                datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = datatypes.get_datatype_instance(datatype)
+                    datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue)
                     term = datatype_instance.get_search_term(nodevalue)
                     if term is not None:

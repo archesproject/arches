@@ -39,7 +39,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -49,6 +49,7 @@ class CSVFileImporter(object):
         errors = []
         # errors = businessDataValidator(self.business_data)
         if len(errors) == 0:
+            save_count = 0
             resourceinstanceid = uuid.uuid4()
             blanktilecache = {}
             populated_nodegroups = {}
@@ -57,7 +58,8 @@ class CSVFileImporter(object):
             populated_tiles = []
             single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
-
+            all_nodes = Node.objects.all()
+            datatype_factory = DataTypeFactory()
 
             def cache(blank_tile):
                 if blank_tile.data != {}:
@@ -86,7 +88,7 @@ class CSVFileImporter(object):
                 '''
                 request = ''
                 if datatype != '':
-                    datatype_instance = datatypes.get_datatype_instance(datatype)
+                    datatype_instance = datatype_factory.get_instance(datatype)
                     value = datatype_instance.transform_import_values(value)
                 else:
                     print 'No datatype detected for {0}'.format(value)
@@ -134,12 +136,18 @@ class CSVFileImporter(object):
                 # if bulk saving then append the resources to a list otherwise just save the resource
                 if bulk:
                     resources.append(newresourceinstance)
+                    if len(resources) == 200:
+                        Resource.bulk_save(resources=resources)
+                        print 'Saved %s resources so far..' % save_count
+                        del resources[:]  # if memory usage get's to high, then this may??? fix it
+                        #resources = []
                 else:
                     newresourceinstance.save()
 
             for row in business_data:
                 if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
+                    save_count = save_count + 1
                     save_resource(populated_tiles, resourceinstanceid)
 
                     # reset values for next resource instance
@@ -150,7 +158,7 @@ class CSVFileImporter(object):
                 source_data = column_names_to_targetids(row, mapping)
 
                 if source_data[0].keys():
-                    target_resource_model = Node.objects.get(nodeid=source_data[0].keys()[0]).graph_id
+                    target_resource_model = all_nodes.get(nodeid=source_data[0].keys()[0]).graph_id
 
                 target_tile = get_blank_tile(source_data)
 
@@ -258,6 +266,7 @@ class CSVFileImporter(object):
 
             if bulk:
                 Resource.bulk_save(resources=resources)
+                print 'Saved %s resources total' % (save_count + 1)
         
         else:
             for error in errors:

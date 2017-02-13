@@ -7,12 +7,21 @@ from django.contrib.gis.geos import GEOSGeometry
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from shapely.geometry import asShape
 
-def get_datatype_instance(datatype):
-    d_datatype = models.DDataType.objects.get(datatype=datatype)
-    mod_path = d_datatype.modulename.replace('.py', '')
-    module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
-    datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
-    return datatype_instance
+class DataTypeFactory(object):
+    def __init__(self):
+        self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
+        self.datatype_instances = {}
+
+    def get_instance(self, datatype):
+        d_datatype = self.datatypes[datatype]
+        mod_path = d_datatype.modulename.replace('.py', '')
+        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
+        try:
+            datatype_instance = self.datatype_instances[d_datatype.classname]
+        except:
+            datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
+            self.datatype_instances[d_datatype.classname] = datatype_instance
+        return datatype_instance
 
 class StringDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
