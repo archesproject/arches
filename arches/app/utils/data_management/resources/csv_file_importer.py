@@ -113,16 +113,6 @@ class CSVFileImporter(object):
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
             resources = []
-            # import ipdb 
-            # ipdb.set_trace()
-            def sql_from_tile(tile):
-                sql_wo_parent = """INSERT INTO public.tiles(tileid, tiledata, nodegroupid, resourceinstanceid) VALUES ('%s', '%s', '%s', '%s');"""
-                sql_with_parent = """INSERT INTO public.tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid) VALUES ('%s', '%s', '%s', '%s', '%s');"""
-                if tile.parenttile_id:
-                    return sql_with_parent % (tile.tileid, JSONSerializer().serialize(tile.data), tile.nodegroup_id, tile.parenttile_id, tile.resourceinstance_id)
-                else:
-                    return sql_wo_parent % (tile.tileid, JSONSerializer().serialize(tile.data), tile.nodegroup_id, tile.resourceinstance_id)
-
             def save_resource(populated_tiles, resourceinstanceid):
                 # create a resource instance
                 newresourceinstance = Resource(
@@ -136,11 +126,10 @@ class CSVFileImporter(object):
                 # if bulk saving then append the resources to a list otherwise just save the resource
                 if bulk:
                     resources.append(newresourceinstance)
-                    if len(resources) == 200:
+                    if len(resources) == settings.BULK_IMPORT_BATCH_SIZE:
                         Resource.bulk_save(resources=resources)
-                        print 'Saved %s resources so far..' % save_count
-                        del resources[:]  # if memory usage get's to high, then this may??? fix it
-                        #resources = []
+                        print '%s resources saved' % save_count
+                        del resources[:]  #clear out the array
                 else:
                     newresourceinstance.save()
 
@@ -266,7 +255,7 @@ class CSVFileImporter(object):
 
             if bulk:
                 Resource.bulk_save(resources=resources)
-                print 'Saved %s resources total' % (save_count + 1)
+                print '%s total resource saved' % (save_count + 1)
         
         else:
             for error in errors:
