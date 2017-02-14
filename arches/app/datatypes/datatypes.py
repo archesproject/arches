@@ -4,7 +4,10 @@ from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import fromstr
+from django.contrib.gis.geos import Polygon
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from shapely.geometry import asShape
 
 class DataTypeFactory(object):
@@ -24,6 +27,15 @@ class DataTypeFactory(object):
         return datatype_instance
 
 class StringDataType(BaseDataType):
+
+    def validate(self, value, source=None):
+        errors = []
+        try:
+            value.upper()
+        except:
+            errors.append('ERROR LOCATION: {0} - {1} is not a string'.format(source, value), 'number_errors')
+        return errors
+
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
 
@@ -38,6 +50,15 @@ class StringDataType(BaseDataType):
         return term
 
 class NumberDataType(BaseDataType):
+
+    def validate(self, value, source=None):
+        errors = []
+        try:
+            decimal.Decimal(value)
+        except:
+            errors.append('ERROR LOCATION: {0} - {1} is not a properly formatted number.'.format(source, value), 'number_errors')
+        return errors
+
     def transform_import_values(self, value):
         return float(value)
 
@@ -53,6 +74,27 @@ class DateDataType(BaseDataType):
         document['dates'].append(nodevalue)
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
+
+    def validate(self, value, source=None):
+        errors = []
+        coord_limit = 1500
+        coordinate_count = 0
+        try:
+            for feature in value['features']:
+                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+                coordinate_count += geom.num_coords
+                bbox = Polygon(settings.DATA_VALIDATION_BBOX)
+                if coordinate_count > coord_limit:
+                    errors.append('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(source, value, coordinate_count, coord_limit), 'geometry_errors')
+
+                if bbox.contains(geom) == False:
+                    errors.append('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
+        except:
+            errors.append('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(source, value), 'geometry_errors')
+
+        return errors
+
+
     def transform_import_values(self, value):
         arches_geojson = {}
         arches_geojson['type'] = "FeatureCollection"

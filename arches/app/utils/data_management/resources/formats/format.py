@@ -10,7 +10,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class Reader(object):
 
     def __init__(self):
-        self.error_summary = {}
+        self.errors = []
 
     def validate_datatypes(self, record):
         pass

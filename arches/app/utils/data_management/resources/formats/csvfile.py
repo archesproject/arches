@@ -114,9 +114,8 @@ class CsvWriter(Writer):
 class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, bulk=False):
-        errors = []
         # errors = businessDataValidator(self.business_data)
-        if len(errors) == 0:
+        if len(self.errors) == 0:
             save_count = 0
             resourceinstanceid = uuid.uuid4()
             blanktilecache = {}
@@ -176,11 +175,10 @@ class CsvReader(Reader):
                         blank_tile = None
                 else:
                     blank_tile = None
-
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
-
             resources = []
+
             def save_resource(populated_tiles, resourceinstanceid):
                 # create a resource instance
                 newresourceinstance = Resource(
@@ -201,7 +199,7 @@ class CsvReader(Reader):
                 else:
                     newresourceinstance.save()
 
-            for row in business_data:
+            for row_number, row in enumerate(business_data):
                 if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                     save_count = save_count + 1
@@ -279,6 +277,10 @@ class CsvReader(Reader):
                                                     if source_key == target_key:
                                                         if prototype_tile_copy.data[source_key] == '':
                                                             value = transform_value(node_datatypes[source_key], source_column[source_key])
+                                                            datatype = datatype_factory.get_instance(node_datatypes[source_key])
+                                                            result = datatype.validate(value['value'])
+                                                            if result != []:
+                                                                self.errors + result
                                                             prototype_tile_copy.data[source_key] = value['value']
                                                             # target_tile.request = value['request']
                                                             del source_column[source_key]
@@ -326,5 +328,5 @@ class CsvReader(Reader):
                 print '%s total resource saved' % (save_count + 1)
 
         else:
-            for error in errors:
-                print "{0} {1}".format(error[0], error[1])
+            for error in self.errors:
+                print error

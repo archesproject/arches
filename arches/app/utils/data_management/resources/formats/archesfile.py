@@ -194,30 +194,6 @@ class Validator(object):
         if valid == False:
             self.append_error('ERROR ROW: {0} - {1} is not a properly formatted date. Dates must be in {2}, or {3} format.'.format(rownum, row['ATTRIBUTEVALUE'], (',').join(date_formats[:-1]), date_formats[-1]), 'date_errors')
 
-    def validate_geometries(self, row, rownum):
-        try:
-            geom = fromstr(row['ATTRIBUTEVALUE'])
-            coord_limit = 1500
-            bbox = geos.Polygon(settings.DATA_VALIDATION_BBOX)
-
-            if geom.num_coords > coord_limit:
-                self.append_error('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(rownum, row['ATTRIBUTEVALUE'][:75] + '......', geom.num_coords, coord_limit), 'geometry_errors')
-
-            # if fromstr(row['ATTRIBUTEVALUE']).valid == False:
-            #     self.append_error('ERROR ROW: {0} - {1} is an invalid geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-            if bbox.contains(geom) == False:
-                self.append_error('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-        except:
-            self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-    def validate_numbers(self, row, rownum):
-        try:
-            decimal.Decimal(row['ATTRIBUTEVALUE'])
-        except:
-            self.append_error('ERROR ROW: {0} - {1} is not a properly formatted number.'.format(rownum, row['ATTRIBUTEVALUE']), 'number_errors')
-
     def validate_files(self, row, rownum):
         """
         This method will have to be changed to include prefix for file directory.
