@@ -229,7 +229,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_map_layer(self, node=None):
         if node is None:
             return None
-        elif not node.config["layerActivated"]:
+        elif node.config is None or not node.config["layerActivated"]:
             return None
         source_name = "resources-%s" % node.nodeid
         return {
