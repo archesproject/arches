@@ -33,6 +33,6 @@ def clear_resources():
     cursor.execute("TRUNCATE public.resource_instances CASCADE;" )
     print Resource.objects.count(), 'resources remaining'
 
-    print 'deleting', ResourceXResource.objects.count(), 'resource relationships'
+    print 'deleting', models.ResourceXResource.objects.count(), 'resource relationships'
     cursor.execute("TRUNCATE public.resource_x_resource CASCADE;" )
-    print ResourceXResource.objects.count(), 'resource relationships remaining'
+    print models.ResourceXResource.objects.count(), 'resource relationships remaining'
