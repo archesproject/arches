@@ -121,54 +121,7 @@ define(function() {
                 "circle-color": resource.color(),
             }
         }];
-    }
-
-    var getResourceModelStyles = function(resource) {
-        return [{
-            "id": resource.maplayerid + "resources-fill",
-            "type": "fill",
-            "source": "resources",
-            "source-layer": "resources",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ["all", ["==", "$type", "Polygon"],
-                ["==", "graphid", resource.maplayerid]
-            ],
-            "paint": {
-                "fill-color": resource.color
-            }
-        }, {
-            "id": resource.maplayerid + "resources-line",
-            "type": "line",
-            "source": "resources",
-            "source-layer": "resources",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ["all", ["==", "$type", "LineString"],
-                ["==", "graphid", resource.maplayerid]
-            ],
-            "paint": {
-                "line-color": resource.color
-            }
-        }, {
-            "id": resource.maplayerid + "resources-point",
-            "type": "circle",
-            "source": "resources",
-            "source-layer": "resources",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ["all", ["==", "$type", "Point"],
-                ["==", "graphid", resource.maplayerid]
-            ],
-            "paint": {
-                "circle-radius": 5,
-                "circle-color": resource.color
-            }
-        }];
-    }
+    };
 
 
     var getSearchQueryStyles = function() {
@@ -223,119 +176,10 @@ define(function() {
                 "fill-opacity": 0.1
             }
         }]
-    }
-
-    var getSearchResultStyles = function(results) {
-        return [
-            {
-            "id": "search_results_resource-poly",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "fill",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "Polygon"],
-                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "fill-color": "rgba(255, 0, 0, 0.7)"
-            }
-        },
-        {
-            "id": "search_results_resource-line",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "line",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "LineString"],
-                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "line-color": "rgba(255, 0, 0, 0.7)",
-                "line-width": 1.5
-            }
-        },
-        {
-            "id": "search_results_resource-point",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "circle",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "Point"],
-                ["in", "resourceinstanceid"].concat(results.all_result_ids()),
-                ["!=", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "circle-radius": 3.0,
-                "circle-color": "rgba(255, 0, 0, 1)"
-            }
-        },
-        {
-            "id": "search_results_highlight_resource-poly",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "fill",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "Polygon"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "fill-color": "rgba(5, 155, 3, 0.7)"
-            }
-        },
-        {
-            "id": "search_results_highlight_resource-line",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "line",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "LineString"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "line-color": "rgba(5, 155, 3, 0.7)",
-                "line-width": 1.5
-            }
-        },
-        {
-            "id": "search_results_highlight_resource-point",
-            "source": "resources",
-            "source-layer": "resources",
-            "type": "circle",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ['all', ["==", "$type", "Point"],
-                ["==", "resourceinstanceid", results.mouseoverInstanceId() || ""],
-                ["==", "total", 1]
-            ],
-            "paint": {
-                "circle-radius": 3.0,
-                "circle-color": "rgba(5, 155, 3, 1)"
-            }
-        }];
-    }
+    };
 
     return {
         getDrawStyles: getDrawStyles,
-        getResourceModelStyles: getResourceModelStyles,
-        getSearchQueryStyles: getSearchQueryStyles,
-        getSearchResultStyles: getSearchResultStyles
+        getSearchQueryStyles: getSearchQueryStyles
     };
 });

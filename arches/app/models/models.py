@@ -82,6 +82,7 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
+    isgeometric = models.BooleanField()
 
     class Meta:
         managed = True

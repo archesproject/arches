@@ -1,0 +1,44 @@
+{% load i18n %}
+<div class="node-widget-label concept-label">
+    <div>
+        <div class="toggle-container">
+            <span class="switch switch-small" data-bind="css: {
+                'on': layerActivated()
+            }, click: function () {
+                layerActivated(!layerActivated());
+            }">
+                <small></small>
+            </span>
+            <p class="arches-toggle-sm">
+                {% trans "Activate Layer" %}
+            </p>
+            <span class="arches-toggle-subtitle">
+                {% trans "switch to make layer available to users" %}
+            </span>
+        </div>
+    </div>
+
+    <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "Main Color" %} <i class="ion-ios-checkmark-outline"></i></label>
+          </div>
+          <div class="colorpicker-component input-group">
+            <input placeholder="{% trans "Main Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: mainColor, format:'rgba'}">
+            <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: mainColor}"></i></span>
+          </div>
+        </div>
+    </div>
+
+    <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "Halo Color" %} <i class="ion-ios-checkmark-outline"></i></label>
+          </div>
+          <div class="colorpicker-component input-group">
+            <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: haloColor, format:'rgba'}">
+            <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: haloColor}"></i></span>
+          </div>
+        </div>
+    </div>
+</div>

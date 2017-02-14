@@ -267,6 +267,7 @@ class Migration(migrations.Migration):
                 ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
+                ('isgeometric', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'd_data_types',
