@@ -27,6 +27,8 @@ from copy import deepcopy
 from mimetypes import MimeTypes
 from os.path import isfile, join
 from django.conf import settings
+from django.db import connection
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpRequest
 from django.contrib.gis.geos import GEOSGeometry
@@ -37,7 +39,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -47,17 +49,17 @@ class CSVFileImporter(object):
         errors = []
         # errors = businessDataValidator(self.business_data)
         if len(errors) == 0:
+            save_count = 0
             resourceinstanceid = uuid.uuid4()
             blanktilecache = {}
             populated_nodegroups = {}
             populated_nodegroups[resourceinstanceid] = []
+            previous_row_resourceid = None
+            populated_tiles = []
             single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
-
-            previous_row_resourceid = None # business_data[0]['ResourceID']
-            #resourceinstanceid = uuid.uuid4()
-            populated_tiles = []
-
+            all_nodes = Node.objects.all()
+            datatype_factory = DataTypeFactory()
 
             def cache(blank_tile):
                 if blank_tile.data != {}:
@@ -86,7 +88,7 @@ class CSVFileImporter(object):
                 '''
                 request = ''
                 if datatype != '':
-                    datatype_instance = datatypes.get_datatype_instance(datatype)
+                    datatype_instance = datatype_factory.get_instance(datatype)
                     value = datatype_instance.transform_import_values(value)
                 else:
                     print 'No datatype detected for {0}'.format(value)
@@ -110,31 +112,31 @@ class CSVFileImporter(object):
                 # return deepcopy(blank_tile)
                 return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
-
+            resources = []
             def save_resource(populated_tiles, resourceinstanceid):
-                # create the resource instance
-                newresourceinstance, created = Resource.objects.get_or_create(
+                # create a resource instance
+                newresourceinstance = Resource(
                     resourceinstanceid=resourceinstanceid,
-                    defaults={'graph_id': target_resource_model, 'resourceinstancesecurity': None}
+                    graph_id=target_resource_model,
+                    resourceinstancesecurity=None
                 )
+                # add the tiles to the resource instance
+                newresourceinstance.tiles = populated_tiles
 
-                # save all the tiles related to the resource instance
+                # if bulk saving then append the resources to a list otherwise just save the resource
                 if bulk:
-                    tiles = populated_tiles
-                    for populated_tile in populated_tiles:
-                        for tile in populated_tile.tiles.itervalues():
-                            if len(tiles) > 0:
-                                tiles = tiles + tile
-                    Tile.objects.bulk_create(tiles)
+                    resources.append(newresourceinstance)
+                    if len(resources) == settings.BULK_IMPORT_BATCH_SIZE:
+                        Resource.bulk_save(resources=resources)
+                        print '%s resources saved' % save_count
+                        del resources[:]  #clear out the array
                 else:
-                    for populated_tile in populated_tiles:
-                        saved_tile = populated_tile.save(index=False)
-                newresourceinstance.index()
-
+                    newresourceinstance.save()
 
             for row in business_data:
                 if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
+                    save_count = save_count + 1
                     save_resource(populated_tiles, resourceinstanceid)
 
                     # reset values for next resource instance
@@ -145,7 +147,7 @@ class CSVFileImporter(object):
                 source_data = column_names_to_targetids(row, mapping)
 
                 if source_data[0].keys():
-                    target_resource_model = Node.objects.get(nodeid=source_data[0].keys()[0]).graph_id
+                    target_resource_model = all_nodes.get(nodeid=source_data[0].keys()[0]).graph_id
 
                 target_tile = get_blank_tile(source_data)
 
@@ -166,6 +168,7 @@ class CSVFileImporter(object):
                         target_tile_cardinality = '1'
                     else:
                         target_tile_cardinality = 'n'
+
                     if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
                         # Check if we are populating a parent tile by inspecting the target_tile.data array.
                         if target_tile.data != {}:
@@ -191,9 +194,6 @@ class CSVFileImporter(object):
                             populated_child_nodegroups = []
                             for nodegroupid, childtile in target_tile.tiles.iteritems():
                                 prototype_tile = childtile.pop()
-                                prototype_tile.tileid = None
-                                prototype_tile.parenttile = target_tile
-                                prototype_tile.resourceinstance_id = resourceinstanceid
                                 if str(prototype_tile.nodegroup_id) in single_cardinality_nodegroups:
                                     child_tile_cardinality = '1'
                                 else:
@@ -201,6 +201,9 @@ class CSVFileImporter(object):
 
                                 def populate_child_tiles(source_data):
                                     prototype_tile_copy = cPickle.loads(cPickle.dumps(prototype_tile, -1))
+                                    prototype_tile_copy.tileid = uuid.uuid4()
+                                    prototype_tile_copy.parenttile = target_tile
+                                    prototype_tile_copy.resourceinstance_id = resourceinstanceid
                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                         for target_key in prototype_tile_copy.data.keys():
                                             for source_column in source_data:
@@ -250,6 +253,10 @@ class CSVFileImporter(object):
 
             save_resource(populated_tiles, resourceinstanceid)
 
+            if bulk:
+                Resource.bulk_save(resources=resources)
+                print '%s total resource saved' % (save_count + 1)
+        
         else:
             for error in errors:
                 print "{0} {1}".format(error[0], error[1])

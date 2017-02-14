@@ -9,22 +9,20 @@ from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
 from arches.app.datatypes import datatypes
-
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 def get_tileserver_config(node_id=None):
     database = settings.DATABASES['default']
-    datatype = datatypes.get_datatype_instance('geojson-feature-collection')
+    datatype_factory = DataTypeFactory()
 
     config_dict = {
         "cache": settings.TILE_CACHE_CONFIG,
-        "layers": {
-            "resources": datatype.get_layer_config()
-        }
+        "layers": {}
     }
 
     if node_id is not None:
         node = models.Node.objects.get(pk=node_id)
-        datatype = datatypes.get_datatype_instance(node.datatype)
+        datatype = datatype_factory.get_instance(node.datatype)
         layer_config = datatype.get_layer_config(node)
         if layer_config is not None:
             config_dict["layers"][node_id] = layer_config
@@ -99,9 +97,10 @@ def clean_resource_cache(tile):
 
     # get the tile model's bounds
     bounds = None
+    datatype_factory = DataTypeFactory()
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
-        datatype = datatypes.get_datatype_instance(node.datatype)
+        datatype = datatype_factory.get_instance(node.datatype)
         current_bounds = datatype.get_bounds(tile, node)
         if current_bounds is not None:
             if bounds is None:

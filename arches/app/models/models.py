@@ -268,6 +268,7 @@ class FunctionXGraph(models.Model):
     class Meta:
         managed = True
         db_table = 'functions_x_graphs'
+        unique_together = ('function', 'graph',)
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -574,7 +575,7 @@ class TileModel(models.Model): #Tile
     parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    sortorder = models.IntegerField(blank=True, null=True, default=0)
 
     class Meta:
         managed = True

@@ -22,7 +22,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 class Tile(models.TileModel):
@@ -117,17 +117,17 @@ class Tile(models.TileModel):
         """
 
         se = SearchEngineFactory().create()
+        datatype_factory = DataTypeFactory()
 
-        search_documents = self.prepare_documents_for_search_index()
+        search_documents = self.prepare_documents_for_search_index(datatype_factory)
         for document in search_documents:
             se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
 
-        for term in self.prepare_terms_for_search_index():
+        for term in self.prepare_terms_for_search_index(datatype_factory):
             term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
-            se.delete_terms(term_id)
             se.index_term(term['term'], term_id, term['context'], term['options'])
 
-    def prepare_documents_for_search_index(self):
+    def prepare_documents_for_search_index(self, datatype_factory):
         """
         Generates a list of specialized resource based documents to support resource search
 
@@ -145,12 +145,12 @@ class Tile(models.TileModel):
             for nodeid, nodevalue in tile.data.iteritems():
                 node = models.Node.objects.get(pk=nodeid)
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
+                    datatype_instance = datatype_factory.get_instance(node.datatype)
                     datatype_instance.append_to_document(document, nodevalue)
 
         return [JSONSerializer().serializeToPython(document)]
 
-    def prepare_terms_for_search_index(self):
+    def prepare_terms_for_search_index(self, datatype_factory):
         """
         Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM
         long and any concept associated with a resource to support term search
@@ -160,7 +160,7 @@ class Tile(models.TileModel):
         terms = []
         for nodeid, nodevalue in self.data.iteritems():
             node = models.Node.objects.get(pk=nodeid)
-            datatype = datatypes.get_datatype_instance(node.datatype)
+            datatype = datatype_factory.get_instance(node.datatype)
             term = datatype.get_search_term(nodevalue)
             if term is not None:
                 terms.append({'term': term, 'nodeid': nodeid, 'context': '', 'options': {}})

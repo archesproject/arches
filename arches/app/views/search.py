@@ -35,7 +35,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 
@@ -90,7 +90,9 @@ def build_search_terms_dsl(request):
     boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
+
     query.add_query(boolquery)
+    query.add_aggregation(Aggregation(name='term_agg', type='terms', field='term.raw'))
 
     return query
 
@@ -332,7 +334,7 @@ def time_wheel_config(request):
     query.add_aggregation(MinAgg(field='dates', format='y'))
     query.add_aggregation(MaxAgg(field='dates', format='y'))
     results = query.search(index='resource')
-    if results is not None:
+    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
         min_date = int(results['aggregations']['min_dates']['value_as_string'])
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
@@ -345,13 +347,13 @@ def time_wheel_config(request):
             min_millenium = millennium
             max_millenium = millennium + 1000
             millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
-            
+
             for century in range(min_millenium,max_millenium,100):
                 min_century = century
                 max_century = century + 100
                 century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
                 millenium_agg.add_aggregation(century_aggregation)
-                    
+
                 for decade in range(min_century,max_century,10):
                     min_decade = decade
                     max_decade = decade + 10
@@ -371,14 +373,14 @@ def time_wheel_config(request):
 def transformESAggToD3Hierarchy(results, d3ItemInstance):
     if 'buckets' not in results:
         return d3ItemInstance
-    
+
     for key, value in results['buckets'][0].iteritems():
         if key == 'from' or key == 'to':
             pass
         elif key == 'from_as_string':
             d3ItemInstance.start = value
         elif key == 'to_as_string':
-            d3ItemInstance.end = value 
+            d3ItemInstance.end = value
         elif key == 'doc_count':
             d3ItemInstance.size = value
         elif key == 'key':

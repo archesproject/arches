@@ -594,7 +594,7 @@ class Migration(migrations.Migration):
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
                 ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.TileModel')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
-                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=0)),
             ],
             options={
                 'db_table': 'tiles',
@@ -786,6 +786,10 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='relation',
             unique_together=set([('conceptfrom', 'conceptto', 'relationtype')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='functionxgraph',
+            unique_together=set([('function', 'graph')]),
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),

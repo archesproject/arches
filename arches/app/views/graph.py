@@ -305,7 +305,6 @@ class CardView(GraphBaseView):
         for concept in top_concepts:
             if concept.label == 'Dropdown Lists':
                 concept_collections = concept.children
-        print ontology_properties
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',

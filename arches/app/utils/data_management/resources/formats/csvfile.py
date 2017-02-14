@@ -1,13 +1,14 @@
-from django.conf import settings
 import csv
 import os
 import datetime
 import json
-from arches.app.models.concept import Concept
 import codecs
 from format import Writer
-from django.db.models import Q
+from arches.app.models.concept import Concept
 from arches.app.models.models import Node, Value
+from arches.app.datatypes.datatypes import DataTypeFactory
+from django.db.models import Q
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 try:
@@ -19,10 +20,11 @@ class CsvWriter(Writer):
 
     def __init__(self):
         super(CsvWriter, self).__init__()
+        self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type):
-        datatype_instance = datatypes.get_datatype_instance(datatype)
+        datatype_instance = self.datatype_factory.get_instance(datatype)
         value = datatype_instance.transform_export_values(value)
         return value
 

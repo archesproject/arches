@@ -1041,13 +1041,22 @@ define([
 
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
+                    var hoveredSearchResults;
+                    var hoveredSearchResult;
                     var hoverFeature = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
                     }) || null;
                     if (self.hoverFeature() !== hoverFeature) {
+                        if (hoverFeature) {
+                            var hoveredSearchResults = _.filter(self.results.results(), function(f){return f.resourceinstanceid === hoverFeature.properties.resourceinstanceid})
+                            hoveredSearchResult = hoveredSearchResults.length < 1 || hoveredSearchResults[0]
+                            if (hoveredSearchResult){
+                                hoverFeature.properties['map_popup'] = hoveredSearchResult.map_popup
+                            }
+                        }
                         self.hoverFeature(hoverFeature);
                     }
-                });
+                }, this);
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickFeature = _.find(features, function(feature) {
