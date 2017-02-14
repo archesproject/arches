@@ -31,6 +31,29 @@ class BaseDataType(object):
         """
         return None
 
+    def get_layer_config(self, node=None):
+        """
+        Gets the layer config to generate a map layer (use if spatial)
+        """
+        return None
+
+
+    def get_map_layer(self, node=None):
+        """
+        Gets the array of map layers to add to the map for a given node
+        should be a dictionary including (as in map_layers table):
+        nodeid, name, layerdefinitions, isoverlay, icon
+        """
+        return None
+
+    def get_map_source(self, node=None):
+        """
+        Gets the map source definition to add to the map for a given node
+        should be a dictionary including (as in map_sources table):
+        name, source (json)
+        """
+        return None
+
     def get_pref_label(self, nodevalue):
         """
         Gets the prefLabel of a concept value

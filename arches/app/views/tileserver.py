@@ -8,127 +8,27 @@ from arches.app.models import models
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
-from arches.app.models import models
 from arches.app.datatypes import datatypes
 
-EARTHCIRCUM = 40075016.6856
-PIXELSPERTILE = 256
 
-def get_tileserver_config():
-    # TODO: the resource queries here perhaps should be moved to a separate view
-    # and url.  We may want to consider parameterizing it to support filtering
-    # on graphid and we will need to support filtering data based on user
-    # permissions, which are defined at the node level; ie only show geometries
-    # for nodes which the authenticated user has read permissions
+def get_tileserver_config(node_id=None):
     database = settings.DATABASES['default']
+    datatype = datatypes.get_datatype_instance('geojson-feature-collection')
 
-    cluster_sql = """
-        WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS
-        	(SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-        	FROM mv_geojson_geoms m)
-
-        SELECT tileid::text,
-        		resourceinstanceid::text,
-        		nodeid::text,
-        		graphid::text,
-        		node_name,
-        		graph_name,
-        		false AS poly_outline,
-        		row_number() over () as __id__,
-        		1 as total,
-        		ST_Centroid(geom) AS __geometry__,
-                '' AS extent
-        	FROM clusters
-        	WHERE cid is NULL
-
-        UNION
-
-        SELECT '' as tileid,
-        		'' as resourceinstanceid,
-        		'' as nodeid,
-        		'' as graphid,
-        		'' as node_name,
-        		'' as graph_name,
-        		false AS poly_outline,
-        		row_number() over () as __id__,
-        		count(*) as total,
-        		ST_Centroid(
-                    ST_Collect(geom)
-                ) AS __geometry__,
-                ST_AsGeoJSON(
-                    ST_Transform(
-                        ST_SetSRID(
-                            ST_Extent(geom), 900913
-                        ), 4326
-                    )
-                ) AS extent
-        	FROM clusters
-        	WHERE cid IS NOT NULL
-        	GROUP BY cid
-    """
-
-    sql_list = []
-    for i in range(settings.CLUSTER_MAX_ZOOM + 1):
-        arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-        distance = arc * settings.CLUSTER_DISTANCE
-        sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS)
-        sql_list.append(sql_string)
-
-    sql_list.append("""
-        SELECT tileid::text,
-                resourceinstanceid::text,
-                nodeid::text,
-                graphid::text,
-                node_name,
-                graph_name,
-                false AS poly_outline,
-                row_number() over () as __id__,
-                1 as total,
-                geom AS __geometry__,
-                '' AS extent
-            FROM mv_geojson_geoms
-        UNION
-        SELECT tileid::text,
-                resourceinstanceid::text,
-                nodeid::text,
-                graphid::text,
-                node_name,
-                graph_name,
-                true AS poly_outline,
-                row_number() over () as __id__,
-                1 as total,
-                ST_ExteriorRing(geom) AS __geometry__,
-                '' AS extent
-            FROM mv_geojson_geoms
-            where ST_GeometryType(geom) = 'ST_Polygon'
-    """)
-
-    return {
+    config_dict = {
         "cache": settings.TILE_CACHE_CONFIG,
         "layers": {
-            "resources": {
-                "provider": {
-                    "class": "TileStache.Goodies.VecTiles:Provider",
-                    "kwargs": {
-                        "dbinfo": {
-                            "host": database["HOST"],
-                            "user": database["USER"],
-                            "password": database["PASSWORD"],
-                            "database": database["NAME"],
-                            "port": database["PORT"]
-                        },
-                        "queries": sql_list
-                    },
-                },
-                "allowed origin": "*",
-                "compress": True,
-                "write cache": settings.CACHE_RESOURCE_TILES
-            }
+            "resources": datatype.get_layer_config()
         }
     }
 
-def handle_request(request):
-    config_dict = get_tileserver_config()
+    if node_id is not None:
+        node = models.Node.objects.get(pk=node_id)
+        datatype = datatypes.get_datatype_instance(node.datatype)
+        layer_config = datatype.get_layer_config(node)
+        if layer_config is not None:
+            config_dict["layers"][node_id] = layer_config
+
     layer_models = models.TileserverLayers.objects.all()
     for layer_model in layer_models:
         config_dict['layers'][layer_model.name] = {
@@ -137,6 +37,12 @@ def handle_request(request):
                 "mapfile": layer_model.path
             }
         }
+
+    return config_dict
+
+
+def handle_request(request, node_id=None):
+    config_dict = get_tileserver_config(node_id)
 
     config = TileStache.Config.buildConfiguration(config_dict)
     path_info = request.path.replace('/tileserver/', '')
@@ -238,7 +144,7 @@ def clean_resource_cache(tile):
 
 
 def seed_resource_cache():
-    zooms = range(settings.CACHE_SEED_MAX_ZOOM+1)
+    zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     config = TileStache.parseConfig(get_tileserver_config())
     layer = config.layers['resources']
     extension = 'pbf'
@@ -257,7 +163,8 @@ def seed_resource_cache():
     coordinates = generateCoordinates(ul, lr, zooms, padding)
 
     for (offset, count, coord) in coordinates:
-        path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom, coord.column, coord.row, extension)
+        path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
+                                   coord.column, coord.row, extension)
 
         progress = {"tile": path,
                     "offset": offset + 1,
@@ -270,7 +177,8 @@ def seed_resource_cache():
             print '%(offset)d of %(total)d...' % progress,
 
             try:
-                mimetype, content = TileStache.getTile(layer, coord, extension, True)
+                mimetype, content = TileStache.getTile(
+                    layer, coord, extension, True)
 
             except:
                 attempts -= 1

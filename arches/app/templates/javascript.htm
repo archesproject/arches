@@ -170,6 +170,8 @@
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
+            {% endfor %}{% for resource_map_source in resource_map_sources %}
+                '{{ resource_map_source.name }}': {{ resource_map_source.source }},
             {% endfor %}{% endautoescape %}},
             mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
                 'maplayerid': '{{ map_layer.maplayerid }}',
@@ -177,6 +179,12 @@
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'icon': '{{ map_layer.icon }}'
+            },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
+                'maplayerid': '{{ resource_map_layer.nodeid }}',
+                'name': '{{ resource_map_layer.name }}',
+                'layer_definitions': {{ resource_map_layer.layer_definitions }},
+                'isoverlay': true,
+                'icon': '{{ resource_map_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',

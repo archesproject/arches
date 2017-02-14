@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
+from arches.app.datatypes import datatypes
 
 class BaseManagerView(TemplateView):
 
@@ -40,5 +41,21 @@ class BaseManagerView(TemplateView):
             'login':True,
             'print':False,
         }
+        geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
+        geom_nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=geom_datatypes)
+        resource_layers = []
+        resource_sources = []
+        for node in geom_nodes:
+            print node.name
+            datatype = datatypes.get_datatype_instance(node.datatype)
+            map_source = datatype.get_map_source(node)
+            if map_source is not None:
+                resource_sources.append(map_source)
+            map_layer = datatype.get_map_layer(node)
+            if map_layer is not None:
+                resource_layers.append(map_layer)
+
+        context['resource_map_layers'] = resource_layers
+        context['resource_map_sources'] = resource_sources
 
         return context

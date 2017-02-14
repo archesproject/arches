@@ -177,20 +177,20 @@ define([
                 var dc = '';
                 var resourceSourceId = 'resources';
                 this.form.on('after-update', function(req, tile) {
-                    if (self.map) {
-                        var style = self.map.getStyle();
-                        var oldDc = dc;
-                        dc = '-' + new Date().getTime();
-                        style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
-                        delete style.sources[resourceSourceId + oldDc];
-                        _.each(style.layers, function(layer) {
-                            if (layer.source === resourceSourceId + oldDc) {
-                                layer.source = resourceSourceId + dc;
-                            }
-                        });
-                        style.sources = _.defaults(self.sources, style.sources);
-                        self.map.setStyle(style);
-                    }
+                    // if (self.map) {
+                    //     var style = self.map.getStyle();
+                    //     var oldDc = dc;
+                    //     dc = '-' + new Date().getTime();
+                    //     style.sources[resourceSourceId + dc] = style.sources[resourceSourceId + oldDc];
+                    //     delete style.sources[resourceSourceId + oldDc];
+                    //     _.each(style.layers, function(layer) {
+                    //         if (layer.source === resourceSourceId + oldDc) {
+                    //             layer.source = resourceSourceId + dc;
+                    //         }
+                    //     });
+                    //     style.sources = _.defaults(self.sources, style.sources);
+                    //     self.map.setStyle(style);
+                    // }
 
                     if (self.draw !== undefined) {
                         self.draw.changeMode('simple_select')
@@ -242,30 +242,6 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.createResouceModelOverlays = function(resources) {
-                var resourceLayers = [];
-
-                function MapLayer(resource) {
-                    var maplayer = {
-                        icon: resource.icon,
-                        layer_definitions: mapStyles.getResourceModelStyles(resource),
-                        maplayerid: resource.maplayerid,
-                        name: resource.name,
-                        isoverlay: true
-                    }
-                    return maplayer
-                }
-                resources.forEach(function(resource) {
-                    if (this.graphId && resource.maplayerid === this.graphid) {
-                        return;
-                    }
-                    resourceLayers.push(MapLayer(resource))
-                })
-                return resourceLayers;
-            }
-
-            this.resourceModelOverlays = this.createResouceModelOverlays(arches.resources)
-
             if (!this.configForm && this.context === 'report-header') {
                 _.each(arches.mapLayers, function(layer) {
                     _.each(layer.layer_definitions, function(def) {
@@ -277,8 +253,7 @@ define([
                 });
             }
 
-            this.allLayers = _.union(this.resourceModelOverlays, arches.mapLayers)
-            this.layers = $.extend(true, [], this.allLayers); //deep copy of layers
+            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
 
             this.defineSearchQueryLayer = function() {
                 var searchQueryLayer = {
@@ -328,64 +303,64 @@ define([
                 }
             }
 
-            /**
-             * Creates the map layer for the resource with widget configs
-             * @return {object}
-             */
-            this.defineResourceLayer = function() {
-                var resourceLayer = {
-                    name: this.resourceName,
-                    maplayerid: this.graphId,
-                    isResource: true,
-                    layer_definitions: [{
-                        "id": "resource-poly" + this.graphId,
-                        "source": "resource",
-                        "type": "fill",
-                        "layout": {},
-                        "filter": ["!in", "$type", "LineString"],
-                        "paint": {
-                            "fill-color": this.featureColor(),
-                            "fill-opacity": 0.8
-                        }
-                    }, {
-                        "id": "resource-point" + this.graphId,
-                        "source": "resource",
-                        "type": "circle",
-                        "layout": {},
-                        "filter": ["!in", "$type", "LineString", "Polygon"],
-                        "paint": {
-                            "circle-radius": this.featurePointSize(),
-                            "circle-color": this.featureColor(),
-                            "circle-opacity": 0.8
-                        }
-                    }, {
-                        "id": "resource-line" + this.graphId,
-                        "source": "resource",
-                        "type": "line",
-                        "layout": {},
-                        "paint": {
-                            "line-color": this.featureColor(),
-                            "line-opacity": 0.8,
-                            "line-width": this.featureLineWidth()
-                        }
-                    }],
-                    isoverlay: false,
-                    icon: this.resourceIcon
-                };
-                return resourceLayer;
-            }
-
-            this.defineSearchResultsLayer = function() {
-                var resourceLayer = {
-                    name: "Search Results",
-                    maplayerid: "search_results_",
-                    isResource: true,
-                    layer_definitions: mapStyles.getSearchResultStyles(self.results),
-                    isoverlay: false,
-                    icon: 'ion-search'
-                };
-                return resourceLayer;
-            }
+            // /**
+            //  * Creates the map layer for the resource with widget configs
+            //  * @return {object}
+            //  */
+            // this.defineResourceLayer = function() {
+            //     var resourceLayer = {
+            //         name: this.resourceName,
+            //         maplayerid: this.graphId,
+            //         isResource: true,
+            //         layer_definitions: [{
+            //             "id": "resource-poly" + this.graphId,
+            //             "source": "resource",
+            //             "type": "fill",
+            //             "layout": {},
+            //             "filter": ["!in", "$type", "LineString"],
+            //             "paint": {
+            //                 "fill-color": this.featureColor(),
+            //                 "fill-opacity": 0.8
+            //             }
+            //         }, {
+            //             "id": "resource-point" + this.graphId,
+            //             "source": "resource",
+            //             "type": "circle",
+            //             "layout": {},
+            //             "filter": ["!in", "$type", "LineString", "Polygon"],
+            //             "paint": {
+            //                 "circle-radius": this.featurePointSize(),
+            //                 "circle-color": this.featureColor(),
+            //                 "circle-opacity": 0.8
+            //             }
+            //         }, {
+            //             "id": "resource-line" + this.graphId,
+            //             "source": "resource",
+            //             "type": "line",
+            //             "layout": {},
+            //             "paint": {
+            //                 "line-color": this.featureColor(),
+            //                 "line-opacity": 0.8,
+            //                 "line-width": this.featureLineWidth()
+            //             }
+            //         }],
+            //         isoverlay: false,
+            //         icon: this.resourceIcon
+            //     };
+            //     return resourceLayer;
+            // }
+            //
+            // this.defineSearchResultsLayer = function() {
+            //     var resourceLayer = {
+            //         name: "Search Results",
+            //         maplayerid: "search_results_",
+            //         isResource: true,
+            //         layer_definitions: mapStyles.getSearchResultStyles(self.results),
+            //         isoverlay: false,
+            //         icon: 'ion-search'
+            //     };
+            //     return resourceLayer;
+            // }
 
             /**
              * creates an array of map layers available to the map when the map object is instantiated
@@ -393,16 +368,16 @@ define([
              */
             this.addInitialLayers = function() {
                 var initialLayers = [];
-                if (this.context === 'report-header') {
-                    this.resourceLayer = this.defineResourceLayer();
-                    this.layers.unshift(this.resourceLayer);
-                }
+                // if (this.context === 'report-header') {
+                //     this.resourceLayer = this.defineResourceLayer();
+                //     this.layers.unshift(this.resourceLayer);
+                // }
 
                 if (this.context === 'search-filter') {
-                    this.searchResultsLayer = this.defineSearchResultsLayer();
+                    // this.searchResultsLayer = this.defineSearchResultsLayer();
                     this.searchQueryLayer = this.defineSearchQueryLayer();
                     this.layers.unshift(this.searchQueryLayer);
-                    this.layers.unshift(this.searchResultsLayer);
+                    // this.layers.unshift(this.searchResultsLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -500,7 +475,7 @@ define([
                             "features": []
                         };
                         var data = null;
-                        var all_resources_layer;
+                        // var all_resources_layer;
 
                         self.getMapStyle = function() {
                             var style = map.getStyle();
@@ -517,35 +492,31 @@ define([
                         };
 
                         self.overlayLibrary(self.createOverlays())
-                        if (self.resourceLayer !== undefined && self.context === 'report-header') {
-                            self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                        }
+                        // if (self.resourceLayer !== undefined && self.context === 'report-header') {
+                        //     self.overlays.unshift(self.createOverlay(self.resourceLayer));
+                        // }
 
                         if (self.context === 'search-filter') {
-                            self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
+                            // self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            self.updateSearchResultsLayer = function() {
-                                var style = self.getMapStyle();
-                                var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                                style.layers.forEach(function(layer) {
-                                    var filter;
-                                    var search_layer = _.find(layerDefs, {
-                                        id: layer.id
-                                    });
-                                    if (search_layer) {
-                                        layer.filter = search_layer.filter
-                                    }
-                                })
-                                if (self.results.total() === self.results.all_result_ids().length) {
-                                    self.map.setStyle(style);
-                                }
-                            }
-                            self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
-                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
-
-                            all_resources_layer = _.filter(self.layers, {'name': 'All Resources'})[0]
-                            all_resources_layer.checkedOutOfLibrary(true);
-                            self.overlays.push(all_resources_layer);
+                            // self.updateSearchResultsLayer = function() {
+                            //     var style = self.getMapStyle();
+                            //     var layerDefs = self.defineSearchResultsLayer().layer_definitions
+                            //     style.layers.forEach(function(layer) {
+                            //         var filter;
+                            //         var search_layer = _.find(layerDefs, {
+                            //             id: layer.id
+                            //         });
+                            //         if (search_layer) {
+                            //             layer.filter = search_layer.filter
+                            //         }
+                            //     })
+                            //     if (self.results.total() === self.results.all_result_ids().length) {
+                            //         self.map.setStyle(style);
+                            //     }
+                            // }
+                            // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
+                            // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
                         }
 
 
@@ -558,11 +529,11 @@ define([
                                 }, self);
                             }, self)
                             data = result;
-                            source.setData(data)
-                            _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
-                                var cacheLayer = self.map.getLayer(layerId);
-                                self.map.moveLayer(layerId, self.anchorLayerId)
-                            }, self)
+                            // source.setData(data)
+                            // _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
+                            //     var cacheLayer = self.map.getLayer(layerId);
+                            //     self.map.moveLayer(layerId, self.anchorLayerId)
+                            // }, self)
 
                         } else if (self.context !== 'report-header' && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
