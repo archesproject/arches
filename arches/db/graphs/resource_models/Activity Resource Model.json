@@ -3412,7 +3412,7 @@
                     "datatype": "geojson-feature-collection",
                     "nodegroup_id": "f74db64f-e741-11e6-84a6-026d961c88e6",
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
-                    "config": "{\"layerActivated\": true, \"mainColor\": \"rgba(130, 130, 130, 0.7)\", \"haloColor\": \"rgba(200, 200, 200, 0.5)\"}"
+                    "config": "{\"layerActivated\": true, \"mainColor\": \"rgba(130, 130, 130, 0.7)\", \"haloColor\": \"rgba(200, 200, 200, 0.5)\"}",
                     "parentproperty": "P87_is_identified_by",
                     "name": "Spatial Coordinates Geometry"
                 },

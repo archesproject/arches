@@ -222,7 +222,7 @@
             "nodeid": "32bfad82-96f0-11e6-ad94-6c4008b05c4c",
             "datatype": "geojson-feature-collection",
             "nodegroup_id": "32bfad82-96f0-11e6-ad94-6c4008b05c4c",
-            "config": "{\"layerActivated\": true, \"mainColor\": \"rgba(130, 130, 130, 0.7)\", \"haloColor\": \"rgba(200, 200, 200, 0.5)\"}"
+            "config": "{\"layerActivated\": true, \"mainColor\": \"rgba(130, 130, 130, 0.7)\", \"haloColor\": \"rgba(200, 200, 200, 0.5)\"}",
             "parentproperty": "P67i_is_referred_to_by",
             "name": "Geometry"
         }, {
