@@ -97,9 +97,10 @@ define(['jquery',
                     }
                     console.log(result._source)
                     this.results.push({
-                        primaryname: result._source.primaryname,
+                        displayname: result._source.displayname,
                         resourceinstanceid: result._source.resourceinstanceid,
-                        primarydescription: result._source.primarydescription,
+                        displaydescription: result._source.displaydescription,
+                        map_popup: result._source.map_popup,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),

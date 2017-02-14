@@ -41,7 +41,7 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    def get_descriptor(descriptor):
+    def get_descriptor(self, descriptor):
         module = importlib.import_module('arches.app.functions.primary_descriptors')
         PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
         functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
@@ -51,16 +51,16 @@ class Resource(models.ResourceInstance):
             return 'undefined'
 
     @property
-    def primarydescription(self):
-        return get_descriptor('description')
+    def displaydescription(self):
+        return self.get_descriptor('description')
 
     @property
-    def primarymapdescription(self):
-        return get_descriptor('map_popup')
+    def map_popup(self):
+        return self.get_descriptor('map_popup')
 
     @property
-    def primaryname(self):
-        return get_descriptor('name')
+    def displayname(self):
+        return self.get_descriptor('name')
 
     def save(self, *args, **kwargs):
         """
