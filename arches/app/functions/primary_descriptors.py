@@ -16,7 +16,7 @@ class PrimaryDescriptorsFunction(BaseFunction):
                         datatype = datatype_factory.get_instance(node.datatype)
                         display_value = datatype.get_display_value(tile, node)
                         if display_value is not None:
-                            value = display_value
+                            value = display_value.value
                         config['string_template'] = config['string_template'].replace('<%s>' % node.name, value)
 
         return config['string_template']

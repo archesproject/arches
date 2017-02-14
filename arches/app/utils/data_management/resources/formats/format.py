@@ -7,6 +7,17 @@ from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
+class Reader(object):
+
+    def __init__(self):
+        self.error_summary = {}
+
+    def validate_datatypes(self, record):
+        pass
+
+    def import_business_data(self):
+        pass
+
 class Writer(object):
 
     def __init__(self):
@@ -20,7 +31,7 @@ class Writer(object):
             ],
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
-        } 
+        }
 
     def create_template_record(self, schema, resource, resource_type):
         """
