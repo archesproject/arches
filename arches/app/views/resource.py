@@ -44,7 +44,7 @@ class ResourceListView(BaseManagerView):
         for resource_instance in Resource.objects.all():
             instance_summaries.append({
                 'id': resource_instance.pk,
-                'name': resource_instance.primaryname,
+                'name': resource_instance.displayname,
                 'type': resource_instance.graph.name,
                 'last_edited': '',
                 'qc': '',
