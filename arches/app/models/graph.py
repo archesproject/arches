@@ -264,7 +264,6 @@ class Graph(models.GraphModel):
         """
 
         if not isinstance(function, models.FunctionXGraph):
-            print 'functions', function, models.FunctionXGraph
             if isinstance(function, dict):
                 functionobj = models.FunctionXGraph(**function.copy())
             else:
