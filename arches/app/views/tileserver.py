@@ -25,7 +25,7 @@ def get_tileserver_config(node_id=None):
         datatype = datatype_factory.get_instance(node.datatype)
         layer_config = datatype.get_layer_config(node)
         if layer_config is not None:
-            config_dict["layers"][node_id] = layer_config
+            config_dict["layers"][str(node_id)] = layer_config
 
     layer_models = models.TileserverLayers.objects.all()
     for layer_model in layer_models:
@@ -96,56 +96,41 @@ def clean_resource_cache(tile):
         return
 
     # get the tile model's bounds
-    bounds = None
     datatype_factory = DataTypeFactory()
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
         datatype = datatype_factory.get_instance(node.datatype)
-        current_bounds = datatype.get_bounds(tile, node)
-        if current_bounds is not None:
-            if bounds is None:
-                bounds = current_bounds
-            else:
-                minx, miny, maxx, maxy = bounds
-                if current_bounds[0] < minx:
-                    minx = current_bounds[0]
-                if current_bounds[1] < miny:
-                    miny = current_bounds[1]
-                if current_bounds[2] > maxx:
-                    maxx = current_bounds[2]
-                if current_bounds[3] > maxy:
-                    maxy = current_bounds[3]
-                bounds = (minx, miny, maxx, maxy)
+        bounds = datatype.get_bounds(tile, node)
 
-    if bounds is None:
-        return
+        if bounds is not None:
+            zooms = range(20)
+            config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+            layer = config.layers[str(node.nodeid)]
+            mimetype, format = layer.getTypeByExtension('pbf')
 
-    zooms = range(20)
-    config = TileStache.parseConfig(get_tileserver_config())
-    layer = config.layers['resources']
-    mimetype, format = layer.getTypeByExtension('pbf')
+            lon1, lat1, lon2, lat2 = bounds
+            south, west = min(lat1, lat2), min(lon1, lon2)
+            north, east = max(lat1, lat2), max(lon1, lon2)
 
-    lon1, lat1, lon2, lat2 = bounds
-    south, west = min(lat1, lat2), min(lon1, lon2)
-    north, east = max(lat1, lat2), max(lon1, lon2)
+            northwest = Location(north, west)
+            southeast = Location(south, east)
 
-    northwest = Location(north, west)
-    southeast = Location(south, east)
+            ul = layer.projection.locationCoordinate(northwest)
+            lr = layer.projection.locationCoordinate(southeast)
 
-    ul = layer.projection.locationCoordinate(northwest)
-    lr = layer.projection.locationCoordinate(southeast)
+            padding = 0
+            coordinates = generateCoordinates(ul, lr, zooms, padding)
 
-    padding = 0
-    coordinates = generateCoordinates(ul, lr, zooms, padding)
-
-    for (offset, count, coord) in coordinates:
-        config.cache.remove(layer, coord, format)
+            for (offset, count, coord) in coordinates:
+                config.cache.remove(layer, coord, format)
 
 
 def seed_resource_cache():
+    if not settings.CACHE_RESOURCE_TILES:
+        print 'set "CACHE_RESOURCE_TILES" to true in settings before seeding cache'
+        return
+
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
-    config = TileStache.parseConfig(get_tileserver_config())
-    layer = config.layers['resources']
     extension = 'pbf'
 
     lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS
@@ -155,40 +140,44 @@ def seed_resource_cache():
     northwest = Location(north, west)
     southeast = Location(south, east)
 
-    ul = layer.projection.locationCoordinate(northwest)
-    lr = layer.projection.locationCoordinate(southeast)
-
     padding = 0
-    coordinates = generateCoordinates(ul, lr, zooms, padding)
 
-    for (offset, count, coord) in coordinates:
-        path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
-                                   coord.column, coord.row, extension)
+    datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
+    nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=datatypes)
+    for node in nodes:
+        config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+        layer = config.layers[str(node.nodeid)]
+        ul = layer.projection.locationCoordinate(northwest)
+        lr = layer.projection.locationCoordinate(southeast)
+        coordinates = generateCoordinates(ul, lr, zooms, padding)
+        for (offset, count, coord) in coordinates:
+            path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
+                                       coord.column, coord.row, extension)
 
-        progress = {"tile": path,
-                    "offset": offset + 1,
-                    "total": count}
+            progress = {"tile": path,
+                        "offset": offset + 1,
+                        "total": count}
 
-        attempts = 3
-        rendered = False
+            attempts = 3
+            rendered = False
 
-        while not rendered:
-            print '%(offset)d of %(total)d...' % progress,
+            while not rendered:
+                print '%(offset)d of %(total)d...' % progress,
 
-            try:
-                mimetype, content = TileStache.getTile(
-                    layer, coord, extension, True)
+                try:
+                    mimetype, content = TileStache.getTile(
+                        layer, coord, extension, True)
 
-            except:
-                attempts -= 1
-                print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
+                except:
+                    attempts -= 1
+                    print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
 
-                if attempts == 0:
-                    print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
-                    break
+                    if attempts == 0:
+                        print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
+                        break
 
-            else:
-                rendered = True
-                progress['size'] = '%dKB' % (len(content) / 1024)
+                else:
+                    rendered = True
+                    progress['size'] = '%dKB' % (len(content) / 1024)
 
-                print '%(tile)s (%(size)s)' % progress
+                    print '%(tile)s (%(size)s)' % progress
