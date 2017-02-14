@@ -17,14 +17,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import importlib
+from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
+from arches.app.models.models import TileModel
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from elasticsearch import Elasticsearch
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 class Resource(models.ResourceInstance):
 
@@ -43,7 +44,7 @@ class Resource(models.ResourceInstance):
     def get_descriptor(descriptor):
         module = importlib.import_module('arches.app.functions.primary_descriptors')
         PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primarydescriptors')
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
@@ -61,57 +62,114 @@ class Resource(models.ResourceInstance):
     def primaryname(self):
         return get_descriptor('name')
 
-    def index(self):
+    def save(self, *args, **kwargs):
         """
-        Indexes all the nessesary items values a resource to support search
+        Saves and indexes a single resource
+
+        """
+
+        super(Resource, self).save(*args, **kwargs)
+        for tile in self.tiles:
+            saved_tile = tile.save(index=False)
+        self.index()
+
+    @staticmethod
+    def bulk_save(resources):
+        """
+        Saves and indexes a list of resources
+
+        Arguments:
+        resources -- a list of resource models
 
         """
 
         se = SearchEngineFactory().create()
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
+        tiles = []
+        documents = []
+        term_list = []
+
+        # flatten out the nested tiles into a single array
+        for resource in resources:
+            for parent_tile in resource.tiles:
+                for child_tile in parent_tile.tiles.itervalues():
+                    if len(child_tile) > 0:
+                        resource.tiles.extend(child_tile)
+                parent_tile.tiles = {}
+
+            tiles.extend(resource.tiles)
+
+        # need to save the models first before getting the documents for index
+        Resource.objects.bulk_create(resources)
+        TileModel.objects.bulk_create(tiles)
+
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
+
+        # bulk index the resources, tiles and terms
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
+
+    def index(self):
+        """
+        Indexes all the nessesary items values of a resource to support search
+
+        """
+
+        se = SearchEngineFactory().create()
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
+
+        document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
+
+        for term in terms:
+            se.index_term(term['term'], term['term_id'], term['context'], term['options'])
+
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
+        """
+        Gets all the documents nessesary to index a single resource
+        returns a tuple of a document and list of terms
+
+        Keyword Arguments:
+        fetchTiles -- instead of fetching the tiles from the database get them off the model itself
+        datatype_factory -- refernce to the DataTypeFactory instance
+        node_datatypes -- a dictionary of datatypes keyed to node ids
+
+        """
 
         document = JSONSerializer().serializeToPython(self)
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self)
+        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self) if fetchTiles else self.tiles
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []
         document['geometries'] = []
         document['numbers'] = []
 
-        terms_to_index = []
+        terms = []
 
         for tile in document['tiles']:
             for nodeid, nodevalue in tile.data.iteritems():
-                node = models.Node.objects.get(pk=nodeid)
+                datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = datatypes.get_datatype_instance(node.datatype)
+                    datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue)
                     term = datatype_instance.get_search_term(nodevalue)
                     if term is not None:
-                        terms_to_index.append({'term': term, 'tileid': tile.tileid, 'nodeid': nodeid, 'context': '', 'options': {}})
+                        terms.append({'term': term, 'term_id': '%s_%s' % (str(tile.tileid), str(nodeid)), 'context': '', 'options': {}})
 
-        se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
-
-        for term in terms_to_index:
-            term_id = '%s_%s' % (str(term['tileid']), str(term['nodeid']))
-            se.delete_terms(term_id)
-            se.index_term(term['term'], term_id, term['context'], term['options'])
-
-    def serialize(self):
-        """
-        serialize to a different form then used by the internal class structure
-
-        used to append additional values (like parent ontology properties) that
-        internal objects (like models.Nodes) don't support
-
-        """
-
-        ret = JSONSerializer().handle_model(self)
-        ret['tiles'] = self.tiles
-
-        return JSONSerializer().serializeToPython(ret)
+        return document, terms
 
     def delete(self):
-        es = Elasticsearch()
+        """
+        Deletes a single resource and any related indexed data
+
+        """
+
         se = SearchEngineFactory().create()
         related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
         for rr in related_resources['resource_relationships']:
@@ -120,6 +178,11 @@ class Resource(models.ResourceInstance):
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=1000, start=0):
+        """
+        Returns an object that lists the related resources, the relationship types, and a reference to the current resource
+
+        """
+
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
@@ -146,3 +209,17 @@ class Resource(models.ResourceInstance):
                 ret['related_resources'].append(resource['_source'])
 
         return ret
+
+    def serialize(self):
+        """
+        Serialize to a different form then used by the internal class structure
+
+        used to append additional values (like parent ontology properties) that
+        internal objects (like models.Nodes) don't support
+
+        """
+
+        ret = JSONSerializer().handle_model(self)
+        ret['tiles'] = self.tiles
+
+        return JSONSerializer().serializeToPython(ret)

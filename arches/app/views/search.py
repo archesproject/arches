@@ -35,7 +35,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 
@@ -90,12 +90,15 @@ def build_search_terms_dsl(request):
     boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
+
     query.add_query(boolquery)
+    query.add_aggregation(Aggregation(name='term_agg', type='terms', field='term.raw'))
 
     return query
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
+    print dsl
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     if results is not None:
         total = results['hits']['total']
@@ -332,7 +335,7 @@ def time_wheel_config(request):
     query.add_aggregation(MinAgg(field='dates', format='y'))
     query.add_aggregation(MaxAgg(field='dates', format='y'))
     results = query.search(index='resource')
-    if results is not None:
+    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
         min_date = int(results['aggregations']['min_dates']['value_as_string'])
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 

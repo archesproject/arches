@@ -9,7 +9,7 @@ from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
 from arches.app.models import models
-from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -193,9 +193,10 @@ def clean_resource_cache(tile):
 
     # get the tile model's bounds
     bounds = None
+    datatype_factory = DataTypeFactory()
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
-        datatype = datatypes.get_datatype_instance(node.datatype)
+        datatype = datatype_factory.get_instance(node.datatype)
         current_bounds = datatype.get_bounds(tile, node)
         if current_bounds is not None:
             if bounds is None:

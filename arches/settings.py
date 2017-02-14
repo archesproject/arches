@@ -331,7 +331,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-    },
+    }
 }
 
 LOGIN_URL = 'auth'
@@ -414,6 +414,8 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 CLUSTER_DISTANCE = 20
 CLUSTER_MAX_ZOOM = 5
 CLUSTER_MIN_POINTS = 3
+
+BULK_IMPORT_BATCH_SIZE = 2000
 
 try:
     from settings_local import *
