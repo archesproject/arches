@@ -33,8 +33,6 @@ def clear_resources():
     cursor.execute("TRUNCATE public.resource_instances CASCADE;" )
     print Resource.objects.count(), 'resources remaining'
 
-# def truncate_resources():
-#     """Deletes ALL resources in your database. Use with caution!"""
-#     cursor = connection.cursor()
-#     cursor.execute("""TRUNCATE data.entities CASCADE;""" )
-#     print 'Resources Truncated'
+    print 'deleting', ResourceXResource.objects.count(), 'resource relationships'
+    cursor.execute("TRUNCATE public.resource_x_resource CASCADE;" )
+    print ResourceXResource.objects.count(), 'resource relationships remaining'
