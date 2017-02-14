@@ -2135,10 +2135,10 @@ INSERT INTO functions(functionid, modulename, classname, functiontype, name, des
     VALUES ('60000000-0000-0000-0000-000000000000', 'local_file_storage.py', 'LocalFileStorageFunction', 'node', 'Local File Upload', 'Sets the default storage mechanism for uploaded files', '{}', 'views/components/functions/local-file-storage');
 
 INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
-    VALUES ('60000000-0000-0000-0000-000000000001', 'resource_functions.py', 'PrimaryNameFunction', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"nodegroup_id": "", "string_template": ""}', 'views/components/functions/primary-name');
+    VALUES ('60000000-0000-0000-0000-000000000001', 'primary_descriptors.py', 'PrimaryDescriptorsFunction', 'primarydescriptors', 'Define Resource Descriptors', 'Configure the name, description, and map popup of a resource', '{"name": {"nodegroup_id": "", "string_template": ""}, "description": {"nodegroup_id": "", "string_template":""}, "map_popup": {"nodegroup_id": "", "string_template":""} }', 'views/components/functions/primary-descriptors');
 
 INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
-    VALUES ('60000000-0000-0000-0000-000000000002', 'required-nodes.py', 'RequiredNodesFunction', 'validation', 'Required Nodes Function', 'A function that requires that specified nodes are populated', '{"required_nodes":"{}"}', 'views/components/functions/required-nodes');
+    VALUES ('60000000-0000-0000-0000-000000000002', 'required_nodes.py', 'RequiredNodesFunction', 'validation', 'Define Required Nodes', 'Define which values are required for a user to save card', '{"required_nodes":"{}"}', 'views/components/functions/required-nodes');
 
 
 

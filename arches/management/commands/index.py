@@ -135,7 +135,7 @@ class Command(BaseCommand):
                 id = getid(document, data)
             try:
                 if bulk:
-                    bulkitem = se.create_bulk_item(index, type, id, data)
+                    bulkitem = se.create_bulk_item(index=index, type=type, id=id, data=data)
                     bulkitems.append(bulkitem[0])
                     bulkitems.append(bulkitem[1])
                 else:

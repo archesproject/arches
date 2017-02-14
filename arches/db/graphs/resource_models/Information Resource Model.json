@@ -5,7 +5,7 @@
             "functions_x_graphs": [
                 {
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
-                    "function_id": "60000000-0000-0000-0000-000000000000", 
+                    "function_id": "60000000-0000-0000-0000-000000000000",
                     "config": {
                         "triggering_nodegroups": [
                             "9f210d2d-e74a-11e6-84a6-026d961c88e6"
