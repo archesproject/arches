@@ -1,11 +1,15 @@
 import importlib
 import uuid
+import json
 from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.contrib.gis.geos import GEOSGeometry
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from shapely.geometry import asShape
+
+EARTHCIRCUM = 40075016.6856
+PIXELSPERTILE = 256
 
 class DataTypeFactory(object):
     def __init__(self):
@@ -104,6 +108,309 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     maxy = shape.bounds[3]
                 bounds = (minx, miny, maxx, maxy)
         return bounds
+
+    def get_layer_config(self, node=None):
+        database = settings.DATABASES['default']
+        where_clause = ''
+        and_where_clause = ''
+        if node is not None:
+            where_clause = "WHERE nodeid = '%s'" % node.pk
+            and_where_clause = "AND nodeid = '%s'" % node.pk
+
+        cluster_sql = """
+            WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
+                SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+            	FROM mv_geojson_geoms m
+                %s
+            )
+
+            SELECT tileid::text,
+            		resourceinstanceid::text,
+            		nodeid::text,
+            		graphid::text,
+            		node_name,
+            		graph_name,
+            		false AS poly_outline,
+            		row_number() over () as __id__,
+            		1 as total,
+            		ST_Centroid(geom) AS __geometry__,
+                    '' AS extent
+            	FROM clusters
+            	WHERE cid is NULL
+
+            UNION
+
+            SELECT '' as tileid,
+            		'' as resourceinstanceid,
+            		'' as nodeid,
+            		'' as graphid,
+            		'' as node_name,
+            		'' as graph_name,
+            		false AS poly_outline,
+            		row_number() over () as __id__,
+            		count(*) as total,
+            		ST_Centroid(
+                        ST_Collect(geom)
+                    ) AS __geometry__,
+                    ST_AsGeoJSON(
+                        ST_Transform(
+                            ST_SetSRID(
+                                ST_Extent(geom), 900913
+                            ), 4326
+                        )
+                    ) AS extent
+            	FROM clusters
+            	WHERE cid IS NOT NULL
+            	GROUP BY cid
+        """
+
+        sql_list = []
+        for i in range(settings.CLUSTER_MAX_ZOOM + 1):
+            arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
+            distance = arc * settings.CLUSTER_DISTANCE
+            sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS, where_clause)
+            sql_list.append(sql_string)
+
+        sql_list.append("""
+            SELECT tileid::text,
+                    resourceinstanceid::text,
+                    nodeid::text,
+                    graphid::text,
+                    node_name,
+                    graph_name,
+                    false AS poly_outline,
+                    row_number() over () as __id__,
+                    1 as total,
+                    geom AS __geometry__,
+                    '' AS extent
+                FROM mv_geojson_geoms
+                %s
+            UNION
+            SELECT tileid::text,
+                    resourceinstanceid::text,
+                    nodeid::text,
+                    graphid::text,
+                    node_name,
+                    graph_name,
+                    true AS poly_outline,
+                    row_number() over () as __id__,
+                    1 as total,
+                    ST_ExteriorRing(geom) AS __geometry__,
+                    '' AS extent
+                FROM mv_geojson_geoms
+                where ST_GeometryType(geom) = 'ST_Polygon'
+                %s
+        """ % (where_clause, and_where_clause))
+
+        return {
+            "provider": {
+                "class": "TileStache.Goodies.VecTiles:Provider",
+                "kwargs": {
+                    "dbinfo": {
+                        "host": database["HOST"],
+                        "user": database["USER"],
+                        "password": database["PASSWORD"],
+                        "database": database["NAME"],
+                        "port": database["PORT"]
+                    },
+                    "queries": sql_list
+                },
+            },
+            "allowed origin": "*",
+            "compress": True,
+            "write cache": settings.CACHE_RESOURCE_TILES
+        }
+
+    def get_map_layer(self, node=None):
+        if node is None:
+            return None
+        elif node.config is None or not node.config["layerActivated"]:
+            return None
+        source_name = "resources-%s" % node.nodeid
+        return {
+            "nodeid": node.nodeid,
+            "name": "%s - %s" % (node.graph.name, node.name),
+            "layer_definitions": """[
+                {
+                    "id": "resources-fill-%(nodeid)s",
+                    "type": "fill",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
+                    "paint": {
+                        "fill-color": "%(mainColor)s"
+                    }
+                },
+                {
+                    "id": "resources-line-halo-%(nodeid)s",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "paint": {
+                        "line-width": 3,
+                        "line-color": "%(haloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-line-%(nodeid)s",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
+                    "paint": {
+                        "line-width": 1,
+                        "line-color": "%(mainColor)s"
+                    }
+                },
+                {
+                    "id": "resources-poly-outline-%(nodeid)s",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
+                    "paint": {
+                        "line-width": 1.5,
+                        "line-color": "%(haloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-point-halo-%(nodeid)s",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
+                    "paint": {
+                        "circle-radius": 5,
+                        "circle-color": "%(haloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-point-%(nodeid)s",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
+                    "paint": {
+                        "circle-radius": 3,
+                        "circle-color": "%(mainColor)s"
+                    }
+                },
+                {
+                    "id": "resources-cluster-point-halo-%(nodeid)s",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+                    "paint": {
+                        "circle-radius": {
+                            "property": "total",
+                            "stops": [
+                                [0,   22],
+                                [50, 24],
+                                [100, 26],
+                                [200, 28],
+                                [400, 30],
+                                [800, 32],
+                                [1200, 34],
+                                [1600, 36],
+                                [2000, 38],
+                                [2500, 40],
+                                [3000, 42],
+                                [4000, 44],
+                                [5000, 46]
+                            ]
+                        },
+                        "circle-color": "%(haloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-cluster-point-%(nodeid)s",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+                    "paint": {
+                         "circle-radius": {
+                             "property": "total",
+                             "type": "exponential",
+                             "stops": [
+                                 [0,   12],
+                                 [50, 14],
+                                 [100, 16],
+                                 [200, 18],
+                                 [400, 20],
+                                 [800, 22],
+                                 [1200, 24],
+                                 [1600, 26],
+                                 [2000, 28],
+                                 [2500, 30],
+                                 [3000, 32],
+                                 [4000, 34],
+                                 [5000, 36]
+                             ]
+                         },
+                        "circle-color": "%(mainColor)s"
+                    }
+                },
+                {
+                     "id": "resources-cluster-count-%(nodeid)s",
+                     "type": "symbol",
+                     "source": "%(source_name)s",
+                     "source-layer": "%(nodeid)s",
+                     "layout": {
+                         "text-field": "{total}",
+                         "text-font": [
+                             "DIN Offc Pro Medium",
+                             "Arial Unicode MS Bold"
+                         ],
+                         "text-size": 12
+                     },
+                     "filter": ["all", [">", "total", 1]]
+                 }
+            ]""" % {
+                "source_name": source_name,
+                "nodeid": node.nodeid,
+                "mainColor": node.config["mainColor"],
+                "haloColor": node.config["haloColor"],
+            },
+            "icon": node.graph.iconclass,
+        }
+
+    def get_map_source(self, node=None):
+        if node is None:
+            return None
+        return {
+            "name": "resources-%s" % node.nodeid,
+            "source": json.dumps({
+                "type": "vector",
+                "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
+            })
+        }
 
 class FileListDataType(BaseDataType):
     def manage_files(self, previously_saved_tile, current_tile, request, node):

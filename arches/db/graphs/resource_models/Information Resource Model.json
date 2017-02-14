@@ -2037,7 +2037,7 @@
                     "datatype": "geojson-feature-collection",
                     "nodegroup_id": "86a103e9-e74a-11e6-84a6-026d961c88e6",
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
-                    "config": null,
+                    "config": "{\"layerActivated\": true, \"mainColor\": \"rgba(130, 130, 130, 0.7)\", \"haloColor\": \"rgba(200, 200, 200, 0.5)\"}"
                     "parentproperty": "P87_is_identified_by",
                     "name": "Spatial Coordinates Geometry"
                 },
