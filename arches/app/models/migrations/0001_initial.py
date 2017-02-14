@@ -786,6 +786,10 @@ class Migration(migrations.Migration):
             name='relation',
             unique_together=set([('conceptfrom', 'conceptto', 'relationtype')]),
         ),
+        migrations.AlterUniqueTogether(
+            name='functionxgraph',
+            unique_together=set([('function', 'graph')]),
+        ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),

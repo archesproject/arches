@@ -267,6 +267,7 @@ class FunctionXGraph(models.Model):
     class Meta:
         managed = True
         db_table = 'functions_x_graphs'
+        unique_together = ('function', 'graph',)
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.

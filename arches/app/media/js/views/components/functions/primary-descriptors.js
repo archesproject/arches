@@ -21,8 +21,9 @@ function (ko, koMapping, FunctionViewModel, chosen) {
 
             this.name = params.config.name;
             this.description = params.config.description;
+            this.map_popup = params.config.map_popup;
 
-            _.each([this.name, this.description], function(property){
+            _.each([this.name, this.description, this.map_popup], function(property){
                 property.nodegroup_id.subscribe(function(nodegroup_id){
                     property.string_template(nodegroup_id);
                     var nodes = _.filter(this.graph.nodes, function(node){

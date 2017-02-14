@@ -4949,6 +4949,10 @@ div.row.widget-wrapper.report-header:hover {
   height: 38px;
 }
 
+.primary-descriptors {
+    background-color: #ddd;
+}
+
 .required-node-card {
    float: left;
    width: 100%;
