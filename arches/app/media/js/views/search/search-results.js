@@ -88,7 +88,6 @@ define(['jquery',
                 this.all_result_ids.removeAll();
                 this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
-                    var description = "we should probably have a 'Primary Description Function' like we do for primary name";
                     var relatable;
                     graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
@@ -96,10 +95,11 @@ define(['jquery',
                     if (this.viewModel.graph) {
                         relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, result._source.graph_id);
                     }
+                    console.log(result._source)
                     this.results.push({
                         primaryname: result._source.primaryname,
                         resourceinstanceid: result._source.resourceinstanceid,
-                        primarydescription: description,
+                        primarydescription: result._source.primarydescription,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),

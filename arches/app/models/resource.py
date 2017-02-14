@@ -40,25 +40,26 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    @property
-    def primaryname(self):
+    def get_descriptor(descriptor):
         module = importlib.import_module('arches.app.functions.primary_descriptors')
         PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
-        #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
-        # config = {}
-        # config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
-        # config['string_template'] = '{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})'
-
-        #try:
-        functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primaryname')
+        functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primarydescriptors')
         if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config['name'])
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
             return 'undefined'
-        # except:
-        #     return 'undefined'
-        #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
-        #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
+
+    @property
+    def primarydescription(self):
+        return get_descriptor('description')
+
+    @property
+    def primarymapdescription(self):
+        return get_descriptor('map_popup')
+
+    @property
+    def primaryname(self):
+        return get_descriptor('name')
 
     def index(self):
         """
