@@ -98,7 +98,6 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    print dsl
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     if results is not None:
         total = results['hits']['total']
@@ -348,13 +347,13 @@ def time_wheel_config(request):
             min_millenium = millennium
             max_millenium = millennium + 1000
             millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
-            
+
             for century in range(min_millenium,max_millenium,100):
                 min_century = century
                 max_century = century + 100
                 century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
                 millenium_agg.add_aggregation(century_aggregation)
-                    
+
                 for decade in range(min_century,max_century,10):
                     min_decade = decade
                     max_decade = decade + 10
@@ -374,14 +373,14 @@ def time_wheel_config(request):
 def transformESAggToD3Hierarchy(results, d3ItemInstance):
     if 'buckets' not in results:
         return d3ItemInstance
-    
+
     for key, value in results['buckets'][0].iteritems():
         if key == 'from' or key == 'to':
             pass
         elif key == 'from_as_string':
             d3ItemInstance.start = value
         elif key == 'to_as_string':
-            d3ItemInstance.end = value 
+            d3ItemInstance.end = value
         elif key == 'doc_count':
             d3ItemInstance.size = value
         elif key == 'key':

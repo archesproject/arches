@@ -41,15 +41,26 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    @property
-    def primaryname(self):
-        module = importlib.import_module('arches.app.functions.resource_functions')
-        PrimaryNameFunction = getattr(module, 'PrimaryNameFunction')()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primaryname')
+    def get_descriptor(self, descriptor):
+        module = importlib.import_module('arches.app.functions.primary_descriptors')
+        PrimaryDescriptorsFunction = getattr(module, 'PrimaryDescriptorsFunction')()
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype='primarydescriptors')
         if len(functionConfig) == 1:
-            return PrimaryNameFunction.get(self, functionConfig[0].config)
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
             return 'undefined'
+
+    @property
+    def displaydescription(self):
+        return self.get_descriptor('description')
+
+    @property
+    def map_popup(self):
+        return self.get_descriptor('map_popup')
+
+    @property
+    def displayname(self):
+        return self.get_descriptor('name')
 
     def save(self, *args, **kwargs):
         """
@@ -102,7 +113,7 @@ class Resource(models.ResourceInstance):
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
         se.bulk_index(term_list)
-    
+
     def index(self):
         """
         Indexes all the nessesary items values of a resource to support search
@@ -112,7 +123,7 @@ class Resource(models.ResourceInstance):
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
-        
+
         document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 

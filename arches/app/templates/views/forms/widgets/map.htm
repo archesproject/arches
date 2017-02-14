@@ -150,6 +150,9 @@
             <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
             <div data-bind="text: 'Resource Instance:' + hoverFeature().properties.resourceinstanceid"></div>
             <div data-bind="text: 'Resource Model:' + hoverFeature().properties.graphid"></div>
+            <!-- ko if: hoverFeature().properties.popup !== null -->
+                <div data-bind="text: hoverFeature().properties.map_popup"></div>
+            <!--/ko-->
         </div>
         <!--/ko-->
 

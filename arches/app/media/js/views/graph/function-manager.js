@@ -55,7 +55,6 @@ require([
         viewModel.appliedFunctionList.items.push(new FunctionXGraphModel(func));
     }, this);
 
-
     viewModel.appliedFunctionList.on('item-clicked', function(func){
         if (func.selected()) {
             viewModel.selectedFunction(func);
@@ -143,6 +142,27 @@ require([
             }
         });
     }
+
+    _.each(viewModel.appliedFunctionList.items(), function(item){
+        console.log(item)
+    })
+
+    viewModel.filterFunctions = function() {
+        var vm = this;
+        return function(applied) {
+            var applied_ids = _.pluck(applied, 'function_id')
+            _.each(vm.functionList.items(), function(item){
+                if (_.contains(applied_ids, item.functionid)) {
+                    item.filtered(true)
+                } else if (item.filtered() === true){
+                    item.filtered(false)
+                }
+            }, this)
+        }
+    }
+
+    viewModel.appliedFunctionList.items.subscribe(viewModel.filterFunctions())
+    viewModel.appliedFunctionList.items.valueHasMutated(); //force the filter to updated on page load
 
     /**
     * a GraphPageView representing the graph manager page

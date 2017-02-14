@@ -49,7 +49,7 @@ def prepare_term_index(create=False):
                                 'type': 'string',
                                 'analyzer': 'folding'
                             },
-                            'raw': { 
+                            'raw': {
                                 'type':  'string',
                                 'index': 'not_analyzed'
                             }
@@ -92,7 +92,9 @@ def prepare_search_index(resource_model_id, create=False):
                 'properties' : {
                     'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
                     'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'displayname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'displaydescription': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'map_popup': {'type' : 'string', 'index' : 'not_analyzed'},
                     'tiles' : {
                         'type' : 'nested',
                         'properties' : {
