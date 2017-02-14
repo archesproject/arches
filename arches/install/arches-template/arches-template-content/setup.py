@@ -18,9 +18,9 @@ def setup():
 
 def install(path_to_source_data_dir=None):
     truncate_db()
-    
+
     delete_index(index='concept_labels')
-    delete_index(index='term') 
+    delete_index(index='term')
     Resource().prepare_term_index(create=True)
 
     load_resource_graphs()
@@ -31,8 +31,8 @@ def install(path_to_source_data_dir=None):
     delete_index(index='resource')
     delete_index(index='entity')
     delete_index(index='maplayers')
-    delete_index(index='resource_relations') 
-    create_indexes()   
+    delete_index(index='resource_relations')
+    create_indexes()
 
     load_resources()
 
@@ -43,7 +43,7 @@ def import_data():
     pass
 
 def truncate_db():
-    management.call_command('packages', operation='setup_db') 
+    management.call_command('packages', operation='setup_db')
 
 def load_resource_graphs():
     resource_graphs.load_graphs(break_on_error=True)
@@ -79,6 +79,7 @@ def load_users():
     pass
 
 def load_resources(external_file=None):
+    print 'loading' * 5
     rl = ResourceLoader()
     if external_file != None:
         print 'loading:', external_file
@@ -86,7 +87,7 @@ def load_resources(external_file=None):
     else:
         for f in settings.BUSISNESS_DATA_FILES:
             rl.load(f)
-        
+
 if __name__ == "__main__":
     install()
 

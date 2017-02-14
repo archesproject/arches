@@ -41,7 +41,6 @@ import csv, json
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
-from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
