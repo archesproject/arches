@@ -11,6 +11,11 @@ from shapely.geometry import asShape
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
 class DataTypeFactory(object):
     def __init__(self):
         self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
@@ -239,7 +244,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "fill-color": "rgba(130, 130, 130, 0.5)"
+                        "fill-color": "%(color)s"
                     }
                 },
                 {
@@ -267,7 +272,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
                     "paint": {
                         "line-width": 1,
-                        "line-color": "rgba(130, 130, 130, 1)"
+                        "line-color": "%(color)s"
                     }
                 },
                 {
@@ -309,7 +314,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
                         "circle-radius": 3,
-                        "circle-color": "rgba(130, 130, 130, 1)"
+                        "circle-color": "%(color)s"
                     }
                 },
                 {
@@ -341,7 +346,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                  [5000, 36]
                              ]
                          },
-                        "circle-color": "rgba(130, 130, 130, 1)"
+                        "circle-color": "%(color)s"
                     }
                 },
                 {
@@ -372,7 +377,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                 [5000, 46]
                             ]
                         },
-                        "circle-color": "rgba(130, 130, 130, 0.7)"
+                        "circle-color": "rgba(200, 200, 200, 0.7)"
                     }
                 },
                 {
@@ -390,7 +395,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                      },
                      "filter": ["all", [">", "total", 1]]
                  }
-            ]""" % {"source_name": source_name, "nodeid": node.nodeid},
+            ]""" % {"source_name": source_name, "nodeid": node.nodeid, "color": node.graph.mapfeaturecolor},
             "icon": node.graph.iconclass,
         }
 
