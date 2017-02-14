@@ -143,10 +143,6 @@ require([
         });
     }
 
-    _.each(viewModel.appliedFunctionList.items(), function(item){
-        console.log(item)
-    })
-
     viewModel.filterFunctions = function() {
         var vm = this;
         return function(applied) {
