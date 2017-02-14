@@ -11,11 +11,6 @@ from shapely.geometry import asShape
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
-def hex_to_rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
-
 class DataTypeFactory(object):
     def __init__(self):
         self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
