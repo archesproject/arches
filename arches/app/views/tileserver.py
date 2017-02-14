@@ -40,6 +40,8 @@ def get_tileserver_config(node_id=None):
 
 
 def handle_request(request, node_id=None):
+    # TODO: check user node permissions here, if node_id is not None and user
+    # does not have read access to that node, fire an exception
     config_dict = get_tileserver_config(node_id)
 
     config = TileStache.Config.buildConfiguration(config_dict)

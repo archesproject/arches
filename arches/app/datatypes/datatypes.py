@@ -227,7 +227,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def get_map_layer(self, node=None):
-        if node is None:
+        if node is None or not node.config["layerActivated"]:
             return None
         source_name = "resources-%s" % node.nodeid
         return {
@@ -244,7 +244,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "fill-color": "%(color)s"
+                        "fill-color": "%(mainColor)s"
                     }
                 },
                 {
@@ -258,7 +258,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
                     "paint": {
                         "line-width": 3,
-                        "line-color": "rgba(200, 200, 200, .55)"
+                        "line-color": "%(haloColor)s"
                     }
                 },
                 {
@@ -272,7 +272,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
                     "paint": {
                         "line-width": 1,
-                        "line-color": "%(color)s"
+                        "line-color": "%(mainColor)s"
                     }
                 },
                 {
@@ -286,7 +286,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
                     "paint": {
                         "line-width": 1.5,
-                        "line-color": "rgba(200, 200, 200, 1)"
+                        "line-color": "%(haloColor)s"
                     }
                 },
                 {
@@ -300,7 +300,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
                         "circle-radius": 5,
-                        "circle-color": "rgba(200, 200, 200, 1)"
+                        "circle-color": "%(haloColor)s"
                     }
                 },
                 {
@@ -314,7 +314,38 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
                         "circle-radius": 3,
-                        "circle-color": "%(color)s"
+                        "circle-color": "%(mainColor)s"
+                    }
+                },
+                {
+                    "id": "resources-cluster-point-halo-%(nodeid)s",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
+                    "paint": {
+                        "circle-radius": {
+                            "property": "total",
+                            "stops": [
+                                [0,   22],
+                                [50, 24],
+                                [100, 26],
+                                [200, 28],
+                                [400, 30],
+                                [800, 32],
+                                [1200, 34],
+                                [1600, 36],
+                                [2000, 38],
+                                [2500, 40],
+                                [3000, 42],
+                                [4000, 44],
+                                [5000, 46]
+                            ]
+                        },
+                        "circle-color": "%(haloColor)s"
                     }
                 },
                 {
@@ -346,38 +377,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                  [5000, 36]
                              ]
                          },
-                        "circle-color": "%(color)s"
-                    }
-                },
-                {
-                    "id": "resources-cluster-point-halo-%(nodeid)s",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
-                    "paint": {
-                        "circle-radius": {
-                            "property": "total",
-                            "stops": [
-                                [0,   22],
-                                [50, 24],
-                                [100, 26],
-                                [200, 28],
-                                [400, 30],
-                                [800, 32],
-                                [1200, 34],
-                                [1600, 36],
-                                [2000, 38],
-                                [2500, 40],
-                                [3000, 42],
-                                [4000, 44],
-                                [5000, 46]
-                            ]
-                        },
-                        "circle-color": "rgba(200, 200, 200, 0.7)"
+                        "circle-color": "%(mainColor)s"
                     }
                 },
                 {
@@ -395,7 +395,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                      },
                      "filter": ["all", [">", "total", 1]]
                  }
-            ]""" % {"source_name": source_name, "nodeid": node.nodeid, "color": node.graph.mapfeaturecolor},
+            ]""" % {
+                "source_name": source_name,
+                "nodeid": node.nodeid,
+                "mainColor": node.config["mainColor"],
+                "haloColor": node.config["haloColor"],
+            },
             "icon": node.graph.iconclass,
         }
 

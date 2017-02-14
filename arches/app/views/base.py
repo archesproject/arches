@@ -47,6 +47,9 @@ class BaseManagerView(TemplateView):
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
+            # TODO: check user node level permissions here, if user does not
+            # have read permissions on this node, then do not create map layer
+            # or source
             datatype = datatype_factory.get_instance(node.datatype)
             map_source = datatype.get_map_source(node)
             if map_source is not None:
