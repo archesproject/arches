@@ -1,11 +1,11 @@
-import importlib
 import uuid
 import json
-from django.conf import settings
-from arches.app.datatypes.base import BaseDataType
+import importlib
 from arches.app.models import models
-from django.contrib.gis.geos import GEOSGeometry
+from arches.app.datatypes.base import BaseDataType
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from django.conf import settings
+from django.contrib.gis.geos import GEOSGeometry
 from shapely.geometry import asShape
 
 EARTHCIRCUM = 40075016.6856
@@ -27,6 +27,7 @@ class DataTypeFactory(object):
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
 
+
 class StringDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
@@ -41,6 +42,7 @@ class StringDataType(BaseDataType):
                 term = nodevalue
         return term
 
+
 class NumberDataType(BaseDataType):
     def transform_import_values(self, value):
         return float(value)
@@ -48,13 +50,16 @@ class NumberDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['numbers'].append(nodevalue)
 
+
 class BooleanDataType(BaseDataType):
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
+
 class DateDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['dates'].append(nodevalue)
+
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
     def transform_import_values(self, value):
