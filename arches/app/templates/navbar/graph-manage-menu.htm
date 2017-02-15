@@ -31,8 +31,8 @@
                         {% endif %}>
 
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-file-o"></i> {% if graph.isresource %}{% trans "Cards" %}{% else %}{% trans "Card" %}{% endif %}</div>
+                            <span class="text-muted menu-item-subtitle">{% if graph.isresource %}{% trans "Configure data entry cards" %}{% else %}{% trans "Configure data entry card" %}{% endif %}</span>
                         </div>
                     </a>
                 </li>
@@ -43,8 +43,8 @@
                 <li id="form-manager" class="edit-menu-item">
                     <a href="{% url 'form_manager' graphid %}" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Menus" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create data entry menus" %}</span>
                         </div>
                     </a>
                 </li>
@@ -58,7 +58,6 @@
                         </div>
                     </a>
                 </li>
-                {% endif %}
 
                 <!-- Menu Item -->
                 <li class="edit-menu-item">
@@ -69,13 +68,14 @@
                         </div>
                     </a>
                 </li>
+                {% endif %}
 
                 <!-- Menu Item -->
                 <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
                     <a href="{% url 'graph' graphid %}" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Define graph, permissions" %}</span>
+                            <span class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
                         </div>
                     </a>
                 </li>
