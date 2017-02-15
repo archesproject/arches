@@ -14,6 +14,7 @@ from shapely.geometry import asShape
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
+
 class DataTypeFactory(object):
     def __init__(self):
         self.datatypes = {datatype.datatype:datatype for datatype in models.DDataType.objects.all()}
@@ -29,6 +30,7 @@ class DataTypeFactory(object):
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
+
 
 class StringDataType(BaseDataType):
 
@@ -53,6 +55,7 @@ class StringDataType(BaseDataType):
                 term = nodevalue
         return term
 
+
 class NumberDataType(BaseDataType):
 
     def validate(self, value, source=None):
@@ -69,13 +72,16 @@ class NumberDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['numbers'].append(nodevalue)
 
+
 class BooleanDataType(BaseDataType):
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
+
 class DateDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['dates'].append(nodevalue)
+
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
@@ -97,7 +103,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             errors.append('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(source, value), 'geometry_errors')
 
         return errors
-
 
     def transform_import_values(self, value):
         arches_geojson = {}
