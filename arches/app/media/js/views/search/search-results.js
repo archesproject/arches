@@ -25,7 +25,6 @@ define(['jquery',
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
-                this.all_result_ids = ko.observableArray();
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
@@ -85,8 +84,6 @@ define(['jquery',
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
 
-                this.all_result_ids.removeAll();
-                this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
                     var relatable;
                     graphdata = _.find(viewdata.graphs, function(graphdata){
