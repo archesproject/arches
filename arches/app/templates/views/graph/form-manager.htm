@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 {% block graph_header_title %}
-{% trans "Data Entry Forms" %}
+{% trans "Data Entry Menus" %}
 {% endblock graph_header_title %}
 
 {% block graph_header_tools %}
@@ -45,13 +45,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card">
                     <a id="add-card" href="#" data-toggle="modal" data-bind="click: addForm">
-                        <h3 class="text-thin" style="margin-top: 10px;"> {% trans "Add Form" %}</h3>
+                        <h3 class="text-thin" style="margin-top: 10px;"> {% trans "Add Menu" %}</h3>
 
                         <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
                             <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
                         </span>
 
-                        <h5 class="" style="font-weight: 200;"> {% trans "Group data entry cards into thematic forms" %} </h5>
+                        <h5 class="" style="font-weight: 200;"> {% trans "Group data entry cards into thematic menus" %} </h5>
                     </a>
                 </div>
 
@@ -82,7 +82,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span data-bind="if:!visible">
                                     <i class="fa fa-minus-circle"></i> Inactive
                                 </span>
-                                <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Form</a>
+                                <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Menu</a>
                             </div>
                         </div>
                     </div>
