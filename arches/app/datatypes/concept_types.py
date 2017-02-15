@@ -35,6 +35,15 @@ class BaseConceptDataType(BaseDataType):
 
 
 class ConceptDataType(BaseConceptDataType):
+    def validate(self, value, source=''):
+        errors = []
+        print 'validating concept', value 
+            # def validate_domains(self, row, rownum):
+            #     if row['ATTRIBUTEVALUE'] not in self.domain_values:
+            #         self.append_error('ERROR ROW:{0} - {1} is not a valid domain value. Check authority document related to {2}'.format(rownum, row['ATTRIBUTEVALUE'], row['ATTRIBUTENAME']), 'domain_errors')
+
+        return errors
+
     def transform_import_values(self, value):
         return value.strip()
 

@@ -118,7 +118,6 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
             root_nodes = models.Node.objects.filter(istopnode=True)
-
             context = self.get_context_data(
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),

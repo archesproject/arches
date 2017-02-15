@@ -176,11 +176,6 @@ class Validator(object):
             elif business_table == 'numbers':
                 self.validate_numbers(row, rownum)
 
-
-    def validate_domains(self, row, rownum):
-        if row['ATTRIBUTEVALUE'] not in self.domain_values:
-            self.append_error('ERROR ROW:{0} - {1} is not a valid domain value. Check authority document related to {2}'.format(rownum, row['ATTRIBUTEVALUE'], row['ATTRIBUTENAME']), 'domain_errors')
-
     def validate_dates(self, row, rownum):
         date_formats = settings.DATE_PARSING_FORMAT
         valid = False
