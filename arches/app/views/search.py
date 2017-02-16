@@ -102,20 +102,15 @@ def search_results(request):
     if results is not None:
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-        all_result_ids = []
-        if request.GET.get('include_ids', 'false') == 'false':
-            all_result_ids = ['_none']
-        full_results = dsl.search(index='resource', doc_type='', start=0, limit=10000, fields=[])
-        all_result_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_result_ids)
+        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
         page = paginator.page(page)
 
         ret = {}
         ret['results'] = results
-        ret['all_result_ids'] = all_result_ids
 
-        ret['paginator'] = JSONSerializer().serializeToPython(page)
+        ret['paginator'] = {}
+        ret['paginator']['current_page'] = page.number
         ret['paginator']['has_next'] = page.has_next()
         ret['paginator']['has_previous'] = page.has_previous()
         ret['paginator']['has_other_pages'] = page.has_other_pages()
@@ -145,7 +140,7 @@ def get_doc_type(request):
 
     return list(doc_type)
 
-def get_paginator(request, results, total_count, page, count_per_page, all_ids):
+def get_paginator(request, results, total_count, page, count_per_page):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
@@ -160,13 +155,6 @@ def get_paginator(request, results, total_count, page, count_per_page, all_ids):
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
     return paginator, pages
-
-    return render(request, 'pagination.htm', {
-        'pages': pages,
-        'page_obj': paginator.page(page),
-        'results': JSONSerializer().serialize(results),
-        'all_ids': JSONSerializer().serialize(all_ids)
-    })
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')

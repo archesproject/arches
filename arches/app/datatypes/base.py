@@ -5,6 +5,9 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
+    def validate(self, value, source=None):
+        return []
+
     def append_to_document(self, document, nodevalue):
         """
         Assigns a given node value to the corresponding key in a document in
@@ -18,7 +21,6 @@ class BaseDataType(object):
         datatype in arches
         """
         return value
-
 
     def transform_export_values(self, value):
         """
@@ -38,7 +40,6 @@ class BaseDataType(object):
         Gets the layer config to generate a map layer (use if spatial)
         """
         return None
-
 
     def get_map_layer(self, node=None):
         """

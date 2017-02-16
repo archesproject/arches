@@ -1,11 +1,16 @@
-import importlib
 import uuid
 import json
+import decimal
+import importlib
 from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
-from django.contrib.gis.geos import GEOSGeometry
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import fromstr
+from django.contrib.gis.geos import Polygon
+from django.core.exceptions import ValidationError
 from shapely.geometry import asShape
 
 EARTHCIRCUM = 40075016.6856
@@ -27,7 +32,17 @@ class DataTypeFactory(object):
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
 
+
 class StringDataType(BaseDataType):
+
+    def validate(self, value, source=None):
+        errors = []
+        try:
+            value.upper()
+        except:
+            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
+        return errors
+
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
 
@@ -41,22 +56,65 @@ class StringDataType(BaseDataType):
                 term = nodevalue
         return term
 
+
 class NumberDataType(BaseDataType):
+
+    def validate(self, value, source=''):
+        'validating a number'
+        errors = []
+
+        try:
+            decimal.Decimal(value)
+        except:
+            errors.append({'source': source, 'value': value, 'message': 'not a properly formatted number', 'datatype': self.datatype_model.datatype})
+        return errors
+
     def transform_import_values(self, value):
         return float(value)
 
     def append_to_document(self, document, nodevalue):
         document['numbers'].append(nodevalue)
 
+
 class BooleanDataType(BaseDataType):
+
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
+
 class DateDataType(BaseDataType):
+
     def append_to_document(self, document, nodevalue):
         document['dates'].append(nodevalue)
 
+
 class GeojsonFeatureCollectionDataType(BaseDataType):
+
+    def validate(self, value, source=None):
+        errors = []
+        coord_limit = 1500
+        coordinate_count = 0
+
+        def validate_geom(geom, coordinate_count=0):
+            try:
+                coordinate_count += geom.num_coords
+                bbox = Polygon(settings.DATA_VALIDATION_BBOX)
+                if coordinate_count > coord_limit:
+                    message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
+                    errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+
+                if bbox.contains(geom) == False:
+                    message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
+            except:
+                message = 'Not a properly formatted geometry'
+                errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+
+        for feature in value['features']:
+            geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+            validate_geom(geom, coordinate_count)
+
+        return errors
+
     def transform_import_values(self, value):
         arches_geojson = {}
         arches_geojson['type'] = "FeatureCollection"
@@ -222,6 +280,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def get_map_layer(self, node=None):
+
         if node is None:
             return None
         elif node.config is None or not node.config["layerActivated"]:

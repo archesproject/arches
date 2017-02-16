@@ -116,7 +116,6 @@ define([
             if (this.context === 'search-filter') {
                 this.results = params.results;
                 this.query = params.query;
-                this.results.all_result_ids = this.results.all_result_ids;
             }
 
             this.buffer = ko.observable(100.0);

@@ -120,13 +120,11 @@ define([
                 if(this.viewModel.searchResults.userRequestedNewPage()){
                     this.isNewQuery = false;
                     this.viewModel.searchResults.userRequestedNewPage(false);
-                    console.log('user requested new page')
                     this.doQuery();
                 }
             }, this)
 
             this.queryString.subscribe(function() {
-                console.log('user updated a filter')
                 this.isNewQuery = true;
                 this.viewModel.searchResults.page(1);
                 this.doQuery();
@@ -136,10 +134,8 @@ define([
         },
 
         doQuery: function() {
-            console.log('in doQuery');
             var queryString = this.queryString();
             queryString.page = this.viewModel.searchResults.page();
-            queryString.include_ids = this.isNewQuery;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }

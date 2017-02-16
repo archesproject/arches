@@ -53,7 +53,7 @@
                     <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#">«</a></li>
                     <!-- ko foreach: { data: pages, as: 'page' } -->
                         <!-- ko if: page -->
-                        <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.number())}">
+                        <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page())}">
                             <a href="#" data-bind="text: page, attr:{'data-page':page}"></a>
                         </li>
                         <!-- /ko -->

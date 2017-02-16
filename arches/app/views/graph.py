@@ -118,7 +118,6 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
             root_nodes = models.Node.objects.filter(istopnode=True)
-
             context = self.get_context_data(
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),
@@ -370,7 +369,7 @@ class FormManagerView(GraphBaseView):
                     formModel.save()
                 ret = data['forms']
             if self.action == 'add_form':
-                form = models.Form(title=_('New Form'), graph=graph)
+                form = models.Form(title=_('New Menu'), graph=graph)
                 form.save()
                 ret = form
         return JSONResponse(ret)
