@@ -251,7 +251,7 @@ class UITest(StaticLiveServerTestCase):
         map_widget = report_editor_page.add_widget(MapWidget)
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
-        results['added overlay'] = map_widget.add_overlay(2)
+        results['added overlay'] = map_widget.add_overlay(1)
         report_editor_page.save_report("ReportA")
 
         print results

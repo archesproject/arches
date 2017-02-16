@@ -38,10 +38,36 @@ def prepare_term_index(create=False):
             }
         },
         'mappings':{
-            'value':{
+            'term':{
                 'properties': {
-                    'context':{'type': 'string', 'index' : 'not_analyzed'},
-                    'term': {
+                    'nodeid':{'type': 'string', 'index' : 'not_analyzed'},
+                    'nodegroupid':{'type': 'string', 'index' : 'not_analyzed'},
+                    'tileid':{'type': 'string', 'index' : 'not_analyzed'},
+                    'value': {
+                        'type': 'string',
+                        'analyzer': 'standard',
+                        'fields': {
+                            'folded': {
+                                'type': 'string',
+                                'analyzer': 'folding'
+                            },
+                            'raw': {
+                                'type':  'string',
+                                'index': 'not_analyzed'
+                            }
+                        }
+                    }
+                }
+            },
+            'concept':{
+                'properties': {
+                    'category': {'type': 'string', 'index' : 'not_analyzed'},
+                    'conceptid': {'type': 'string', 'index' : 'not_analyzed'},
+                    'language': {'type': 'string', 'index' : 'not_analyzed'},
+                    'type': {'type': 'string', 'index' : 'not_analyzed'},
+                    'id': {'type': 'string', 'index' : 'not_analyzed'},
+                    'top_concept':{'type': 'string', 'index' : 'not_analyzed'},
+                    'value': {
                         'type': 'string',
                         'analyzer': 'standard',
                         'fields': {
@@ -62,13 +88,13 @@ def prepare_term_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='term', body=index_settings)
+        se.create_index(index='strings', body=index_settings)
 
     return index_settings
 
 def delete_term_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='term')
+    se.delete_index(index='strings')
 
 def prepare_search_index(resource_model_id, create=False):
     """

@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import uuid
 import importlib
 from django.db.models import Q
 from django.conf import settings
@@ -106,9 +107,9 @@ class Resource(models.ResourceInstance):
 
         for resource in resources:
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-            documents.append(se.create_bulk_item(index='resource', type=document['graph_id'], id=document['resourceinstanceid'], data=document))
+            documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
-                term_list.append(se.create_bulk_item(index='term', type='value', id=term['term_id'], data=term))
+                term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=uuid.uuid4(), data=term))
 
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
@@ -128,7 +129,7 @@ class Resource(models.ResourceInstance):
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
-            se.index_term(term['term'], term['term_id'], term['context'], term['options'])
+            se.index_data('strings', 'term', term, id=uuid.uuid4())
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -160,7 +161,7 @@ class Resource(models.ResourceInstance):
                     datatype_instance.append_to_document(document, nodevalue)
                     term = datatype_instance.get_search_term(nodevalue)
                     if term is not None:
-                        terms.append({'term': term, 'term_id': '%s_%s' % (str(tile.tileid), str(nodeid)), 'context': '', 'options': {}})
+                        terms.append({'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid})
 
         return document, terms
 

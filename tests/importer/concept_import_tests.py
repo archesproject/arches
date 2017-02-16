@@ -35,19 +35,15 @@ class conceptImportTests(ArchesTestCase):
 	@classmethod
 	def setUpClass(cls):
 		se = SearchEngineFactory().create()
-		se.delete_index(index='concept_labels')
-		se.delete_index(index='term')
-		se.create_index(index='concept_labels')
-		se.create_index(index='term')
+		se.delete_index(index='strings')
+		se.create_index(index='strings')
 		# management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
 	@classmethod
 	def tearDownClass(cls):
 		se = SearchEngineFactory().create()
-		se.delete_index(index='concept_labels')
-		se.delete_index(index='term')
-		se.create_index(index='concept_labels')
-		se.create_index(index='term')
+		se.delete_index(index='strings')
+		se.create_index(index='strings')
 
 
 	# def test_hierarchical_relationships(self):
