@@ -146,10 +146,14 @@
 
         <!-- ko if: hoverFeature() !== null -->
         <div class="hover-feature-info">
-            <div data-bind="text: hoverFeature().properties.graph_name"></div>
-            <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
-            <div data-bind="text: 'Resource Instance:' + hoverFeature().properties.resourceinstanceid"></div>
-            <div data-bind="text: 'Resource Model:' + hoverFeature().properties.graphid"></div>
+            <div class="hover-feature-title-bar">
+                <div class="hover-feature-title" data-bind="text: hoverFeature().properties.graph_name"></div>
+            </div>
+            <div class="hover-feature-body">
+                <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
+                <div data-bind="text: 'Resource Instance:' + hoverFeature().properties.resourceinstanceid"></div>
+                <div data-bind="text: 'Resource Model:' + hoverFeature().properties.graphid"></div>
+            </div>
             <!-- ko if: hoverFeature().properties.popup !== null -->
                 <div data-bind="text: hoverFeature().properties.map_popup"></div>
             <!--/ko-->
