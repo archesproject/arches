@@ -1,11 +1,13 @@
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.views.concept import get_preflabel_from_valueid
+from django.core.exceptions import ObjectDoesNotExist
 import uuid
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
         self.value_lookup = {}
+        self.datatype_model = model
 
     def get_value(self, valueid):
         try:
@@ -33,15 +35,15 @@ class BaseConceptDataType(BaseDataType):
             value = self.get_value(valueid)
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
-
 class ConceptDataType(BaseConceptDataType):
+
     def validate(self, value, source=''):
         errors = []
-        print 'validating concept', value
-            # def validate_domains(self, row, rownum):
-            #     if row['ATTRIBUTEVALUE'] not in self.domain_values:
-            #         self.append_error('ERROR ROW:{0} - {1} is not a valid domain value. Check authority document related to {2}'.format(rownum, row['ATTRIBUTEVALUE'], row['ATTRIBUTENAME']), 'domain_errors')
-
+        try:
+            models.Value.objects.get(pk=value)
+        except ObjectDoesNotExist:
+            message = "Not a valid domain value"
+            errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
         return errors
 
     def transform_import_values(self, value):

@@ -7,6 +7,47 @@ from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
+class ResourceImportReporter:
+    def __init__(self, business_data):
+        self.resources = 0
+        self.total_tiles = 0
+        self.resources_saved = 0
+        self.tiles_saved = 0
+        self.relations_saved = 0
+        self.relations = 0
+
+        if 'resources' in business_data:
+            self.resources = len(business_data['resources'])
+
+        if 'relations' in business_data:
+            self.relations = len(business_data['relations'])
+
+    def update_resources_saved(self, count=1):
+        self.resources_saved += count
+        print '{0} of {1} resources saved'.format(self.resources_saved, self.resources)
+
+    def update_tiles(self, count=1):
+        self.total_tiles += count
+
+    def update_tiles_saved(self, count=1):
+        self.tiles_saved += count
+
+    def update_relations_saved(self, count=1):
+        self.relations_saved += count
+        print self.tiles_saved
+
+    def report_results(self):
+        if self.resources > 0:
+            result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
+            print result.format(
+                    self.resources,
+                    self.resources_saved,
+                    self.total_tiles,
+                    self.tiles_saved,
+                    self.relations,
+                    self.relations_saved
+                    )
+
 class Reader(object):
 
     def __init__(self):
@@ -18,8 +59,13 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-class Writer(object):
+    def report_errors(self):
+        for error in self.errors:
+            print 'ERROR, {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])
 
+
+class Writer(object):
+    
     def __init__(self):
         self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
         self.default_mapping = {

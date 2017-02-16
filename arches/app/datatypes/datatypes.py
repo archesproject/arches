@@ -1,6 +1,7 @@
 import importlib
 import uuid
 import json
+import decimal
 from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -10,10 +11,10 @@ from django.contrib.gis.geos import Polygon
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from shapely.geometry import asShape
+from django.core.exceptions import ValidationError
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
-
 
 class DataTypeFactory(object):
     def __init__(self):
@@ -39,7 +40,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append('ERROR LOCATION: {0} - {1} is not a string'.format(source, value), 'number_errors')
+            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -58,12 +59,13 @@ class StringDataType(BaseDataType):
 
 class NumberDataType(BaseDataType):
 
-    def validate(self, value, source=None):
+    def validate(self, value, source=''):
         errors = []
+
         try:
             decimal.Decimal(value)
         except:
-            errors.append('ERROR LOCATION: {0} - {1} is not a properly formatted number.'.format(source, value), 'number_errors')
+            errors.append({'source': source, 'value': value, 'message': 'not a properly formatted number', 'datatype': self.datatype_model.datatype})
         return errors
 
     def transform_import_values(self, value):
@@ -74,11 +76,13 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
+
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
 
 class DateDataType(BaseDataType):
+
     def append_to_document(self, document, nodevalue):
         document['dates'].append(nodevalue)
 
@@ -89,18 +93,24 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
-        try:
-            for feature in value['features']:
-                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+
+        def validate_geom(geom, coordinate_count=0):
+            try:
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    errors.append('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(source, value, coordinate_count, coord_limit), 'geometry_errors')
+                    message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
+                    errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
 
                 if bbox.contains(geom) == False:
-                    errors.append('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-        except:
-            errors.append('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(source, value), 'geometry_errors')
+                    message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
+            except:
+                message = 'Not a properly formatted geometry'
+                errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+
+        for feature in value['features']:
+            geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+            validate_geom(geom, coordinate_count)
 
         return errors
 
