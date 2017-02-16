@@ -302,52 +302,52 @@ define([
                 }
             }
 
-            // /**
-            //  * Creates the map layer for the resource with widget configs
-            //  * @return {object}
-            //  */
-            // this.defineResourceLayer = function() {
-            //     var resourceLayer = {
-            //         name: this.resourceName,
-            //         maplayerid: this.graphId,
-            //         isResource: true,
-            //         layer_definitions: [{
-            //             "id": "resource-poly" + this.graphId,
-            //             "source": "resource",
-            //             "type": "fill",
-            //             "layout": {},
-            //             "filter": ["!in", "$type", "LineString"],
-            //             "paint": {
-            //                 "fill-color": this.featureColor(),
-            //                 "fill-opacity": 0.8
-            //             }
-            //         }, {
-            //             "id": "resource-point" + this.graphId,
-            //             "source": "resource",
-            //             "type": "circle",
-            //             "layout": {},
-            //             "filter": ["!in", "$type", "LineString", "Polygon"],
-            //             "paint": {
-            //                 "circle-radius": this.featurePointSize(),
-            //                 "circle-color": this.featureColor(),
-            //                 "circle-opacity": 0.8
-            //             }
-            //         }, {
-            //             "id": "resource-line" + this.graphId,
-            //             "source": "resource",
-            //             "type": "line",
-            //             "layout": {},
-            //             "paint": {
-            //                 "line-color": this.featureColor(),
-            //                 "line-opacity": 0.8,
-            //                 "line-width": this.featureLineWidth()
-            //             }
-            //         }],
-            //         isoverlay: false,
-            //         icon: this.resourceIcon
-            //     };
-            //     return resourceLayer;
-            // }
+            /**
+             * Creates the map layer for the resource with widget configs
+             * @return {object}
+             */
+            this.defineResourceLayer = function() {
+                var resourceLayer = {
+                    name: this.resourceName,
+                    maplayerid: this.graphId,
+                    isResource: true,
+                    layer_definitions: [{
+                        "id": "resource-poly" + this.graphId,
+                        "source": "resource",
+                        "type": "fill",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString"],
+                        "paint": {
+                            "fill-color": this.featureColor(),
+                            "fill-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-point" + this.graphId,
+                        "source": "resource",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString", "Polygon"],
+                        "paint": {
+                            "circle-radius": this.featurePointSize(),
+                            "circle-color": this.featureColor(),
+                            "circle-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-line" + this.graphId,
+                        "source": "resource",
+                        "type": "line",
+                        "layout": {},
+                        "paint": {
+                            "line-color": this.featureColor(),
+                            "line-opacity": 0.8,
+                            "line-width": this.featureLineWidth()
+                        }
+                    }],
+                    isoverlay: false,
+                    icon: this.resourceIcon
+                };
+                return resourceLayer;
+            }
             //
             // this.defineSearchResultsLayer = function() {
             //     var resourceLayer = {
@@ -367,10 +367,10 @@ define([
              */
             this.addInitialLayers = function() {
                 var initialLayers = [];
-                // if (this.context === 'report-header') {
-                //     this.resourceLayer = this.defineResourceLayer();
-                //     this.layers.unshift(this.resourceLayer);
-                // }
+                if (this.context === 'report-header') {
+                    this.resourceLayer = this.defineResourceLayer();
+                    this.layers.unshift(this.resourceLayer);
+                }
 
                 if (this.context === 'search-filter') {
                     // this.searchResultsLayer = this.defineSearchResultsLayer();
@@ -491,9 +491,9 @@ define([
                         };
 
                         self.overlayLibrary(self.createOverlays())
-                        // if (self.resourceLayer !== undefined && self.context === 'report-header') {
-                        //     self.overlays.unshift(self.createOverlay(self.resourceLayer));
-                        // }
+                        if (self.resourceLayer !== undefined && self.context === 'report-header') {
+                            self.overlays.unshift(self.createOverlay(self.resourceLayer));
+                        }
 
                         if (self.context === 'search-filter') {
                             // self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
@@ -528,11 +528,11 @@ define([
                                 }, self);
                             }, self)
                             data = result;
-                            // source.setData(data)
-                            // _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
-                            //     var cacheLayer = self.map.getLayer(layerId);
-                            //     self.map.moveLayer(layerId, self.anchorLayerId)
-                            // }, self)
+                            source.setData(data)
+                            _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
+                                var cacheLayer = self.map.getLayer(layerId);
+                                self.map.moveLayer(layerId, self.anchorLayerId)
+                            }, self);
 
                         } else if (self.context !== 'report-header' && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
