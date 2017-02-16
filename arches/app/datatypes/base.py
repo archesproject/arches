@@ -20,7 +20,6 @@ class BaseDataType(object):
         """
         return value
 
-
     def transform_export_values(self, value):
         """
         Transforms values from probably string/wkt representation to specified
@@ -39,7 +38,6 @@ class BaseDataType(object):
         Gets the layer config to generate a map layer (use if spatial)
         """
         return None
-
 
     def get_map_layer(self, node=None):
         """

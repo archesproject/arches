@@ -1,8 +1,9 @@
-from arches.app.datatypes.base import BaseDataType
+import uuid
 from arches.app.models import models
+from arches.app.datatypes.base import BaseDataType
 from arches.app.views.concept import get_preflabel_from_valueid
 from django.core.exceptions import ObjectDoesNotExist
-import uuid
+
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):

@@ -369,7 +369,7 @@ class FormManagerView(GraphBaseView):
                     formModel.save()
                 ret = data['forms']
             if self.action == 'add_form':
-                form = models.Form(title=_('New Form'), graph=graph)
+                form = models.Form(title=_('New Menu'), graph=graph)
                 form.save()
                 ret = form
         return JSONResponse(ret)

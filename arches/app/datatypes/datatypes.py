@@ -1,17 +1,17 @@
-import importlib
 import uuid
 import json
 import decimal
+import importlib
 from django.conf import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from shapely.geometry import asShape
 from django.core.exceptions import ValidationError
+from shapely.geometry import asShape
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
