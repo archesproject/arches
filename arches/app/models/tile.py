@@ -116,55 +116,7 @@ class Tile(models.TileModel):
 
         """
 
-        se = SearchEngineFactory().create()
-        datatype_factory = DataTypeFactory()
-
-        search_documents = self.prepare_documents_for_search_index(datatype_factory)
-        for document in search_documents:
-            se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
-
-        for term in self.prepare_terms_for_search_index(datatype_factory):
-            term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
-            se.index_term(term['term'], term_id, term['context'], term['options'])
-
-    def prepare_documents_for_search_index(self, datatype_factory):
-        """
-        Generates a list of specialized resource based documents to support resource search
-
-        """
-
-        document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self.resourceinstance)
-        document['strings'] = []
-        document['dates'] = []
-        document['domains'] = []
-        document['geometries'] = []
-        document['numbers'] = []
-
-        for tile in document['tiles']:
-            for nodeid, nodevalue in tile.data.iteritems():
-                node = models.Node.objects.get(pk=nodeid)
-                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    datatype_instance = datatype_factory.get_instance(node.datatype)
-                    datatype_instance.append_to_document(document, nodevalue)
-
-        return [JSONSerializer().serializeToPython(document)]
-
-    def prepare_terms_for_search_index(self, datatype_factory):
-        """
-        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM
-        long and any concept associated with a resource to support term search
-
-        """
-
-        terms = []
-        for nodeid, nodevalue in self.data.iteritems():
-            node = models.Node.objects.get(pk=nodeid)
-            datatype = datatype_factory.get_instance(node.datatype)
-            term = datatype.get_search_term(nodevalue)
-            if term is not None:
-                terms.append({'term': term, 'nodeid': nodeid, 'context': '', 'options': {}})
-        return terms
+        Resource.objects.get(pk=self.resourceinstance_id).index()
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
