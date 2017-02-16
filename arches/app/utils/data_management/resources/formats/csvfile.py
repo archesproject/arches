@@ -21,7 +21,7 @@ from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.resource import Resource
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.db import connection
 from django.db import transaction
 from django.db.models import Q
@@ -183,7 +183,7 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append(e)
+                            errors.append({'value': value, 'message': e, 'source': source, 'datatype':'unknown'})
 
                         if len(errors) > 0:
                             self.errors += errors
@@ -333,7 +333,5 @@ class CsvReader(Reader):
                     Resource.bulk_save(resources=resources)
                     print '%s total resource saved' % (save_count + 1)
 
-                for error in self.errors:
-                    print "{0} {1}".format(error[0])
         except:
             self.report_errors()

@@ -60,12 +60,15 @@ class Reader(object):
         pass
 
     def report_errors(self):
+        print "Import Errors Found"
         for error in self.errors:
-            print 'ERROR, {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])
-
+            try:
+                print 'ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])
+            except TypeError as e:
+                print e, error
 
 class Writer(object):
-    
+
     def __init__(self):
         self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
         self.default_mapping = {

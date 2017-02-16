@@ -60,6 +60,7 @@ class StringDataType(BaseDataType):
 class NumberDataType(BaseDataType):
 
     def validate(self, value, source=''):
+        'validating a number'
         errors = []
 
         try:
