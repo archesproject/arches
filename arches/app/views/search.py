@@ -72,29 +72,59 @@ def home_page(request):
 
 def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-
-    query = build_search_terms_dsl(request)
-    results = query.search(index='term', doc_type='value') or {'hits': {'hits':[]}}
-
-    for result in results['hits']['hits']:
-        prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
-        result['_source']['options']['context_label'] = prefLabel['value']
-
-    return JSONResponse(results)
-
-def build_search_terms_dsl(request):
     se = SearchEngineFactory().create()
     searchString = request.GET.get('q', '')
-    query = Query(se, start=0, limit=settings.SEARCH_DROPDOWN_LENGTH)
+    query = Query(se, start=0, limit=0)
+    
     boolquery = Bool()
-    boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
-
+    boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO'))
     query.add_query(boolquery)
-    query.add_aggregation(Aggregation(name='term_agg', type='terms', field='term.raw'))
+    
+    base_agg = Aggregation(name='value_agg', type='terms', field='value.raw', size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"})
+    nodegroupid_agg = Aggregation(name='nodegroupid', type='terms', field='nodegroupid')
+    top_concept_agg = Aggregation(name='top_concept', type='terms', field='top_concept')
+    conceptid_agg = Aggregation(name='conceptid', type='terms', field='conceptid')
+    max_score_agg = MaxAgg(name='max_score', script='_score')
 
-    return query
+    top_concept_agg.add_aggregation(conceptid_agg)
+    base_agg.add_aggregation(max_score_agg)
+    base_agg.add_aggregation(top_concept_agg)
+    base_agg.add_aggregation(nodegroupid_agg)
+    query.add_aggregation(base_agg)
+
+    results = query.search(index='strings') or {'hits': {'hits':[]}}
+
+    i = 0;
+    ret = []
+    for result in results['aggregations']['value_agg']['buckets']:
+        if len(result['top_concept']['buckets']) > 0:
+            for top_concept in result['top_concept']['buckets']:
+                top_concept_id = top_concept['key']
+                top_concept_label = get_preflabel_from_conceptid(top_concept['key'], lang)['value']
+                for concept in top_concept['conceptid']['buckets']:
+                    ret.append({
+                        'type': 'concept',
+                        'context': top_concept_id,
+                        'context_label': top_concept_label,
+                        'id': i,
+                        'text': result['key'],
+                        'value': concept['key']
+                    })
+                i = i + 1
+        else:
+            ret.append({
+                'type': 'term',
+                'context': '',
+                'context_label': '',
+                'id': i,
+                'text': result['key'],
+                'value': result['key']
+            })
+            i = i + 1
+
+    return JSONResponse(ret)
 
 def search_results(request):
     dsl = build_search_results_dsl(request)

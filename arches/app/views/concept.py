@@ -306,7 +306,7 @@ def search(request):
     query = Query(se, start=0, limit=100)
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
-    results = query.search(index='concept_labels')
+    results = query.search(index='strings', doc_type='concept')
 
     ids = []
     if removechildren != None:
@@ -320,18 +320,19 @@ def search(request):
     cached_scheme_names = {}
     for result in results['hits']['hits']:
         if result['_source']['conceptid'] not in ids:
-            # first look to see if we've already retrieved the scheme name
-            # else look up the scheme name with ES and cache the result
-            if result['_type'] in cached_scheme_names:
-                result['in_scheme_name'] = cached_scheme_names[result['_type']]
+            # first look to see if we've already retrieved the top concept name
+            # else look up the top concept name with ES and cache the result
+            top_concept = result['_source']['top_concept']
+            if top_concept in cached_scheme_names:
+                result['in_scheme_name'] = cached_scheme_names[top_concept]
             else:
                 query = Query(se, start=0, limit=100)
-                phrase = Match(field='conceptid', query=result['_type'], type='phrase')
+                phrase = Match(field='conceptid', query=top_concept, type='phrase')
                 query.add_query(phrase)
-                scheme = query.search(index='concept_labels')
+                scheme = query.search(index='strings', doc_type='concept')
                 for label in scheme['hits']['hits']:
                     if label['_source']['type'] == 'prefLabel':
-                        cached_scheme_names[result['_type']] = label['_source']['value']
+                        cached_scheme_names[top_concept] = label['_source']['value']
                         result['in_scheme_name'] = label['_source']['value']
 
             newresults.append(result)
@@ -421,13 +422,13 @@ def concept_tree(request):
 
 def get_preflabel_from_valueid(valueid, lang):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='concept_labels', id=valueid)
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
     if concept_label['found']:
         return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()
-    concept_label = se.search(index='concept_labels', id=valueid)
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
     if concept_label['found']:
         return concept_label['_source']
 
@@ -447,7 +448,7 @@ def get_preflabel_from_conceptid(conceptid, lang):
     match = Match(field='type', query='prefLabel', type='phrase')
     query.add_filter(terms)
     query.add_query(match)
-    preflabels = query.search(index='concept_labels')['hits']['hits']
+    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']
         # get the label in the preferred language, otherwise get the label in the default language
