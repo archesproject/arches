@@ -401,16 +401,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "icon": node.graph.iconclass,
         }
 
-    def get_map_source(self, node=None):
-        if node is None:
-            return None
-        return {
-            "name": "resources-%s" % node.nodeid,
-            "source": json.dumps({
-                "type": "vector",
-                "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
-            })
-        }
 
 class FileListDataType(BaseDataType):
     def manage_files(self, previously_saved_tile, current_tile, request, node):

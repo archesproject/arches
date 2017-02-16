@@ -43,7 +43,7 @@ class BaseManagerView(TemplateView):
             'print':False,
         }
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-        geom_nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=geom_datatypes)
+        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes)
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
