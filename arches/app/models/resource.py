@@ -26,6 +26,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes.datatypes import DataTypeFactory
+from django.db import transaction
 
 class Resource(models.ResourceInstance):
 

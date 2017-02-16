@@ -21,10 +21,10 @@ from arches.app.models.concept import Concept
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from optparse import make_option
-from formats.archesfile import ArchesReader
 from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
 from formats.csvfile import CsvReader
+from formats.archesfile import ArchesFileReader
 from arches.app.models.tile import Tile
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
@@ -32,7 +32,6 @@ from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
 from copy import deepcopy
 
 
@@ -116,7 +115,7 @@ class BusinessDataImporter(object):
         if mapping == None:
             mapping = self.mapping
         if file_format == 'json':
-            ArchesFileImporter().import_business_data(business_data, mapping)
+            ArchesFileReader().import_business_data(business_data, mapping)
         elif file_format == 'csv':
             if mapping != None:
                 CsvReader().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)

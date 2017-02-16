@@ -3,6 +3,9 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
+    def validate(self, value, source=None):
+        return []
+
     def append_to_document(self, document, nodevalue):
         """
         Assigns a given node value to the corresponding key in a document in

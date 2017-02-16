@@ -1,367 +1,323 @@
-from django.conf import settings
-import csv
-from django.db import connection
-import unicodecsv
-from datetime import datetime
-from django.contrib.gis.geos import fromstr
-from django.contrib.gis import geos
-import decimal
-import sys
+'''
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+'''
+
 import os
-from arches.management.commands import utils
-import time
+import sys
+import csv
+import json
+import uuid
+import datetime
+from time import time
+from os.path import isfile, join
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.conf import settings
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
+from arches.app.utils.data_management.concepts.importer import import_reference_data as conceptImporter
+from arches.app.models.tile import Tile
+from arches.app.models.models import ResourceInstance
+from arches.app.models.models import FunctionXGraph
+from arches.app.models.models import ResourceXResource
+from arches.app.models.models import NodeGroup
+from django.core.exceptions import ValidationError
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from copy import deepcopy
+from format import Writer
+from format import Reader
+from format import ResourceImportReporter
 
-class Row(object):
-    def __init__(self, *args):
-        if len(args) == 0:
-            self.resource_id = ''
-            self.resourcetype = ''
-            self.attributename = ''
-            self.attributevalue = ''
-            self.group_id = ''
-        elif isinstance(args[0], dict):
-            details = args[0]
-            self.resource_id = details['RESOURCEID'].strip()
-            self.resourcetype = details['RESOURCETYPE'].strip()
-            self.attributename = details['ATTRIBUTENAME'].strip()
-            self.attributevalue = details['ATTRIBUTEVALUE'].strip().replace('\\n', '\n')
-            self.group_id = details['GROUPID'].strip()
 
-    def __repr__(self):
-        return ('"%s, %s, %s, %s"') % (self.resource_id, self. resourcetype, self. attributename, self.attributevalue)
+class ArchesFileReader(Reader):
 
-class Group(object):
-    def __init__(self, *args):
-        if len(args) == 0:
-            self.resource_id = ''
-            self.group_id = ''
-            self.rows = []
-        elif isinstance(args[0], dict):
-            details = args[0]
-            self.resource_id = details['RESOURCEID'].strip()
-            self.group_id = details['GROUPID'].strip()
-            self.rows = []
-
-class Resource(object):
-    def __init__(self, *args):
-
-        if len(args) == 0:
-            self.resource_id = ''
-            self.entitytypeid = ''
-            self.groups = []
-
-        elif isinstance(args[0], dict):
-            details = args[0]
-            self.entitytypeid = details['RESOURCETYPE'].strip()
-            self.resource_id = details['RESOURCEID'].strip()
-            self.groups = []
-
-    def appendrow(self, row, group_id=None):
-        if group_id != None:
-            for group in self.groups:
-                if group.group_id == group_id:
-                    group.rows.append(row)
-
-    def __str__(self):
-        return '{0},{1}'.format(self.resource_id, self.entitytypeid)
-
-class Validation_Errors(object):
-    def __init__(self, *args):
-        self.syntax_errors = []
-        self.entitytype_errors = []
-        self.businesstable_error = []
-        self.domain_errors = []
-        self.date_errors = []
-        self.geometry_errors = []
-        self.filepath_errors = []
-        self.number_errors = []
-        self.contiguousness_errors = []
-        self.relations_errors = []
-
-class Validator(object):
-    def __init__(self, *args):
-        self.resource_attributes = self.get_resource_attributes() # {resource1:{entitype:businesstable, entitytype:businesstable}, resource2:{entitype:businesstable, entitytype:businesstable}...}
-        self.domain_values = self.get_domain_values()
-        self.complete_resources = {}
-        self.previous_resourceid = ''
-        self.contiguous_errors = []
-        self.current_group = {}
-        self.group_errors = []
-        self.unique_resourceids = set()
-        self.errors = []
-
-        self.validation_errors = Validation_Errors()
-
-    def get_resource_attributes(self):
-        cursor = connection.cursor()
-        sql = """
-            SELECT m.entitytypeidfrom, m.entitytypeidto, et.businesstablename FROM mappings m
-            JOIN entity_types et ON et.entitytypeid = m.entitytypeidto
-        """
-        cursor.execute(sql)
-        resource_types = []
-        resource_dict = {}
-        for val in cursor.fetchall():
-            if val[0] in resource_dict:
-                resource_dict[val[0]][val[1]] = val[2]
-            else:
-                resource_dict[val[0]] = {val[1] : val[2]}
-
-        return resource_dict
-
-    def get_domain_values(self):
-        cursor = connection.cursor()
-        sql = """
-            SELECT DISTINCT(legacyoid) FROM concepts.concepts
-        """
-        cursor.execute(sql)
-        domain_vals = []
-        for val in cursor.fetchall():
-            domain_vals.append(val[0])
-
-        return domain_vals
-
-    def validate_contiguousness(self, row, rownum):
-        if row['RESOURCEID'] not in self.complete_resources:
-            self.complete_resources[row['RESOURCEID']] = False
-        else:
-            if self.complete_resources[row['RESOURCEID']] != False and row['RESOURCEID'] not in self.contiguous_errors:
-                self.append_error('ERROR ROW: {0} - {1} has noncontiguous attributes.'.format(rownum, row['RESOURCEID']), 'contiguousness_errors')
-                self.contiguous_errors.append(row['RESOURCEID'])
-
-        if self.previous_resourceid != row['RESOURCEID']:
-            self.complete_resources[self.previous_resourceid] = True
-
-        self.previous_resourceid = row['RESOURCEID']
-
-    def validate_row_syntax(self, row, rownum):
-        # property for row num, also value for missing property row['MISSING'] same for additional
-        if 'MISSING' in row.values():
-            self.append_error('row missing value', 'syntax_errors')
-
-        if 'ADDITIONAL' in row.values():
-            self.append_error('additional values present in row', 'syntax_errors')
-
-    def validate_entitytype(self, row, rownum):
-        if row['RESOURCETYPE'] in self.resource_attributes:
-            if row['ATTRIBUTENAME'] in self.resource_attributes[row['RESOURCETYPE']]:
+    def pre_import(self, tile, graph_id):
+        for function in self.get_function_class_instances(tile, graph_id):
+            try:
+                function.on_import(tile)
+            except NotImplementedError:
                 pass
+        return tile
+
+    def get_function_class_instances(self, tile, graph_id):
+        ret = []
+        functions = FunctionXGraph.objects.filter(graph_id=graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+        for function in functions:
+            mod_path = function.function.modulename.replace('.py', '')
+            module = importlib.import_module('arches.app.functions.%s' % mod_path)
+            func = getattr(module, function.function.classname)(function.config, tile['nodegroup_id'])
+            ret.append(func)
+        return ret
+
+    def validate_business_data(self, business_data):
+        errors = []
+        if type(business_data) == dict and business_data['resources']:
+            for resource in business_data['resources']:
+                graph_id = resource['resourceinstance']['graph_id']
+                for tile in resource['tiles']:
+                    try:
+                        self.pre_import(tile, graph_id)
+                    except ValidationError as e:
+                        errors.append(e.args)
+        return errors
+
+    def import_graphs(self):
+        """
+        Wrapper around arches.app.utils.data_management.resource_graphs.importer method.
+        """
+        resourceGraphImporter(self.graphs)
+
+    def import_reference_data(self):
+        """
+        Wrapper around arches.app.utils.data_management.concepts.importer method.
+        """
+        conceptImporter(self.reference_data)
+
+    def import_business_data(self, business_data, mapping=None):
+        reporter = ResourceImportReporter(business_data)
+        try:
+            if mapping == None or mapping == '':
+                for resource in business_data['resources']:
+                    if resource['resourceinstance'] != None:
+
+                        resourceinstance, created = ResourceInstance.objects.update_or_create(
+                            resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
+                            graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
+                            resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
+                        )
+                        if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                            reporter.update_resources_saved()
+
+                    if resource['tiles'] != []:
+                        reporter.update_tiles(len(resource['tiles']))
+                        for tile in resource['tiles']:
+                            tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
+
+                            tile, created = Tile.objects.update_or_create(
+                                resourceinstance = resourceinstance,
+                                parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
+                                nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                                tileid = uuid.UUID(str(tile['tileid'])),
+                                data = tile['data']
+                            )
+                            if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
+                                reporter.update_tiles_saved()
+
+                for relation in business_data['relations']:
+                    relation = ResourceXResource.objects.update_or_create(
+                        resourcexid = uuid.UUID(str(relation['resourcexid'])),
+                        resourceinstanceidfrom = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom']))),
+                        resourceinstanceidto = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto']))),
+                        notes = relation['notes'],
+                        relationshiptype = uuid.UUID(str(relation['relationshiptype'])),
+                        datestarted = relation['datestarted'],
+                        dateended = relation['dateended']
+                    )
+                    if len(ResourceXResource.objects.filter(resourcexid=relation['resourcexid'])) == 1:
+                        reporter.update_relations_saved()
             else:
-                self.append_error('{0} not a valid entity type for {1} resource.'.format(row['ATTRIBUTENAME'], row['RESOURCETYPE']), 'entitytype_errors')
+
+                blanktilecache = {}
+                target_nodegroup_cardinalities = {}
+                for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
+                    target_nodegroup_cardinalities[nodegroup['nodegroupid']] = nodegroup['cardinality']
+
+                def replace_source_nodeid(tiles, mapping):
+                    for tile in tiles:
+                        new_data = []
+                        for sourcekey in tile['data'].keys():
+                            for row in mapping['nodes']:
+                                if row['file_field_name'] == sourcekey:
+                                    d = {}
+                                    d[row['arches_nodeid']] =  tile['data'][sourcekey]
+                                    new_data.append(d)
+                                    # tile['data'][row['targetnodeid']] = tile['data'][sourcekey]
+                                    # del tile['data'][sourcekey]
+                        tile['data'] = new_data
+                    return tiles
+
+                def cache(blank_tile):
+                    if blank_tile.data != {}:
+                        for tile in blank_tile.tiles.values():
+                            if isinstance(tile, Tile):
+                                for key in tile.data.keys():
+                                    blanktilecache[key] = blank_tile
+                    # else:
+                    #     print blank_tile
+
+                for resource in business_data['resources']:
+                    reporter.update_tiles(len(resource['tiles']))
+                    parenttileids = []
+                    populated_tiles = []
+                    resourceinstanceid = uuid.uuid4()
+                    populated_nodegroups = []
+
+                    target_resource_model = mapping['resource_model_id']
+
+                    for tile in resource['tiles']:
+                        if tile['data'] != {}:
+
+                            def get_tiles(tile):
+                                if tile['parenttile_id'] != None:
+                                    if tile['parenttile_id'] not in parenttileids:
+                                        parenttileids.append(tile['parenttile_id'])
+                                        ret = []
+                                        for sibling_tile in resource['tiles']:
+                                            if sibling_tile['parenttile_id'] == tile['parenttile_id']:
+                                                ret.append(sibling_tile)
+                                    else:
+                                        ret = None
+                                else:
+                                    ret = [tile]
+
+                                #deletes nodes that don't have values
+                                if ret is not None:
+                                    for tile in ret:
+                                        for key, value in tile['data'].iteritems():
+                                            if value == "":
+                                                del tile['data'][key]
+                                return ret
+
+                            def get_blank_tile(sourcetilegroup):
+                                if len(sourcetilegroup[0]['data']) > 0:
+                                    if sourcetilegroup[0]['data'][0] != {}:
+                                        if sourcetilegroup[0]['data'][0].keys()[0] not in blanktilecache:
+                                            blank_tile = Tile.get_blank_tile(tiles[0]['data'][0].keys()[0], resourceid=resourceinstanceid)
+                                            cache(blank_tile)
+                                        else:
+                                            blank_tile = blanktilecache[tiles[0]['data'][0].keys()[0]]
+                                    else:
+                                        blank_tile = None
+                                else:
+                                    blank_tile = None
+                                return blank_tile
+
+                            tiles = get_tiles(tile)
+                            if tiles is not None:
+                                mapped_tiles = replace_source_nodeid(tiles, mapping)
+                                blank_tile = get_blank_tile(tiles)
+
+                                def populate_tile(sourcetilegroup, target_tile):
+                                    need_new_tile = False
+                                    target_tile_cardinality = target_nodegroup_cardinalities[str(target_tile.nodegroup_id)]
+                                    if str(target_tile.nodegroup_id) not in populated_nodegroups:
+                                        if target_tile.data != {}:
+                                            for source_tile in sourcetilegroup:
+                                                for tiledata in source_tile['data']:
+                                                    for nodeid in tiledata.keys():
+                                                        if nodeid in target_tile.data:
+                                                            if target_tile.data[nodeid] == '':
+                                                                target_tile.data[nodeid] = tiledata[nodeid]
+                                                                for key in tiledata.keys():
+                                                                    if key == nodeid:
+                                                                        del tiledata[nodeid]
+                                                for tiledata in source_tile['data']:
+                                                    if tiledata == {}:
+                                                        source_tile['data'].remove(tiledata)
+
+                                        elif target_tile.tiles != None:
+                                            populated_child_nodegroups = []
+                                            for nodegroupid, childtile in target_tile.tiles.iteritems():
+                                                childtile_empty = True
+                                                child_tile_cardinality = target_nodegroup_cardinalities[str(childtile[0].nodegroup_id)]
+                                                if str(childtile[0].nodegroup_id) not in populated_child_nodegroups:
+                                                    prototype_tile = childtile.pop()
+                                                    prototype_tile.tileid = None
+
+                                                    for source_tile in sourcetilegroup:
+                                                        if prototype_tile.nodegroup_id not in populated_child_nodegroups:
+                                                            prototype_tile_copy = deepcopy(prototype_tile)
+
+                                                            for data in source_tile['data']:
+                                                                for nodeid in data.keys():
+                                                                    if nodeid in prototype_tile.data.keys():
+                                                                        if prototype_tile.data[nodeid] == '':
+                                                                            prototype_tile_copy.data[nodeid] = data[nodeid]
+                                                                            for key in data.keys():
+                                                                                if key == nodeid:
+                                                                                    del data[nodeid]
+                                                                            if child_tile_cardinality == '1':
+                                                                                populated_child_nodegroups.append(prototype_tile.nodegroup_id)
+                                                            for data in source_tile['data']:
+                                                                if data == {}:
+                                                                    source_tile['data'].remove(data)
+
+                                                            for key in prototype_tile_copy.data.keys():
+                                                                if prototype_tile_copy.data[key] != '':
+                                                                    childtile_empty = False
+                                                            if prototype_tile_copy.data == {} or childtile_empty:
+                                                                prototype_tile_copy = None
+                                                            if prototype_tile_copy is not None:
+                                                                childtile.append(prototype_tile_copy)
+                                                        else:
+                                                            break
+
+                                        if target_tile.data:
+                                            if target_tile.data == {} and target_tile.tiles == {}:
+                                                target_tile = None
+
+                                        populated_tiles.append(target_tile)
+
+                                        for source_tile in sourcetilegroup:
+                                            if source_tile['data']:
+                                                for data in source_tile['data']:
+                                                    if len(data) > 0:
+                                                        need_new_tile = True
+
+                                        if need_new_tile:
+                                            if get_blank_tile(sourcetilegroup) != None:
+                                                populate_tile(sourcetilegroup, get_blank_tile(sourcetilegroup))
+
+                                        if target_tile_cardinality == '1':
+                                            populated_nodegroups.append(str(target_tile.nodegroup_id))
+                                    else:
+                                        target_tile = None
+
+                                if blank_tile != None:
+                                    populate_tile(mapped_tiles, blank_tile)
+
+                    newresourceinstance = ResourceInstance.objects.create(
+                        resourceinstanceid = resourceinstanceid,
+                        graph_id = target_resource_model,
+                        resourceinstancesecurity = None
+                    )
+                    if len(ResourceInstance.objects.filter(resourceinstanceid=resourceinstanceid)) == 1:
+                        reporter.update_resources_saved()
+
+                    # print JSONSerializer().serialize(populated_tiles)
+                    for populated_tile in populated_tiles:
+                        populated_tile.resourceinstance = newresourceinstance
+                        saved_tile = populated_tile.save()
+                        # tile_saved = count parent tile and count of tile array if tile array != {}
+                        # reporter.update_tiles_saved(tile_saved)
+
+        except (KeyError, TypeError) as e:
+            print e
+
+        finally:
+            reporter.report_results()
+
+    def import_all(self):
+        errors = []
+        conceptImporter(self.reference_data)
+        resource_graph_errors, resource_graph_reporter = resourceGraphImporter(self.graphs)
+        resource_graph_reporter.report_results()
+        errors = self.validate_business_data(self.business_data)
+        if len(errors) == 0:
+            if self.business_data not in ('',[]):
+                self.import_business_data(self.business_data, self.mapping)
         else:
-            self.append_error('{0} is not a valid resource type.'.format(row['RESOURCETYPE']), 'entitytype_errors')
-
-
-    def valdiate_attribute_value(self, row, rownum):
-        entity_type = row['ATTRIBUTENAME']
-        resource_type = row['RESOURCETYPE']
-        business_table = self.get_businesstable(resource_type, entity_type)
-
-        if business_table not in ['strings', 'dates', 'domains', 'files', 'geometries', 'numbers']:
-            self.append_error('{0} is not a valid business table name for {1}.'.format(business_table, row['ATTRIBUTENAME']), 'businesstable_error')
-        else:
-            if business_table == 'domains':
-                self.validate_domains(row, rownum)
-
-            elif business_table == 'dates':
-                self.validate_dates(row, rownum)
-
-            elif business_table == 'geometries':
-                self.validate_geometries(row, rownum)
-
-            # DO NOT DELETE: Uncomment this when we have acual file paths to test against.
-            # elif business_table == 'files':
-            #     self.validate_files(row, rownum)
-
-            elif business_table == 'numbers':
-                self.validate_numbers(row, rownum)
-
-
-    def validate_domains(self, row, rownum):
-        if row['ATTRIBUTEVALUE'] not in self.domain_values:
-            self.append_error('ERROR ROW:{0} - {1} is not a valid domain value. Check authority document related to {2}'.format(rownum, row['ATTRIBUTEVALUE'], row['ATTRIBUTENAME']), 'domain_errors')
-
-    def validate_dates(self, row, rownum):
-        date_formats = settings.DATE_PARSING_FORMAT
-        valid = False
-        for format in date_formats:
-            if valid == False:
-                try:
-                    if datetime.strptime(row['ATTRIBUTEVALUE'], format):
-                        valid = True
-                except:
-                    valid = False
-        if valid == False:
-            self.append_error('ERROR ROW: {0} - {1} is not a properly formatted date. Dates must be in {2}, or {3} format.'.format(rownum, row['ATTRIBUTEVALUE'], (',').join(date_formats[:-1]), date_formats[-1]), 'date_errors')
-
-    def validate_geometries(self, row, rownum):
-        try:
-            geom = fromstr(row['ATTRIBUTEVALUE'])
-            coord_limit = 1500
-            bbox = geos.Polygon(settings.DATA_VALIDATION_BBOX)
-
-            if geom.num_coords > coord_limit:
-                self.append_error('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(rownum, row['ATTRIBUTEVALUE'][:75] + '......', geom.num_coords, coord_limit), 'geometry_errors')
-
-            # if fromstr(row['ATTRIBUTEVALUE']).valid == False:
-            #     self.append_error('ERROR ROW: {0} - {1} is an invalid geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-            if bbox.contains(geom) == False:
-                self.append_error('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-        except:
-            self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-    def validate_numbers(self, row, rownum):
-        try:
-            decimal.Decimal(row['ATTRIBUTEVALUE'])
-        except:
-            self.append_error('ERROR ROW: {0} - {1} is not a properly formatted number.'.format(rownum, row['ATTRIBUTEVALUE']), 'number_errors')
-
-    def validate_files(self, row, rownum):
-        """
-        This method will have to be changed to include prefix for file directory.
-        """
-        if os.path.isfile(row['ATTRIBUTEVALUE']):
-                pass
-        else:
-            self.append_error('ERROR ROW: {0} - {1} file either does not exist at location or is not readable.'.format(rownum, row['ATTRIBUTEVALUE']), 'filepath_errors')
-
-    def validate_relations_file(self, arches_file):
-        unique_relationids = set()
-        relations_file = arches_file.replace('.arches', '.relations')
-        with open(relations_file, 'rU') as f:
-            fieldnames = ['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES']
-            rows = unicodecsv.DictReader(f, fieldnames=fieldnames,
-                encoding='utf-8-sig', delimiter='|', restkey='ADDITIONAL', restval='MISSING')
-            rows.next()
-            rownum = 2
-            for row in rows:
-                self.validate_row_syntax(row, rownum)
-                unique_relationids.add(row['RESOURCEID_FROM'])
-                unique_relationids.add(row['RESOURCEID_TO'])
-                rownum += 1
-
-        for resourceid in unique_relationids - self.unique_resourceids:
-            self.append_error('"{0}" is present in {1} but not {2}. Both resourceids must be present in {3} in order to create a valid relation.'.format(resourceid, relations_file.split('/')[-1], arches_file.split('/')[-1], arches_file.split('/')[-1]), 'relations_errors')
-
-    def get_businesstable(self, resource, attributename):
-        try:
-            return self.resource_attributes[resource][attributename]
-        except:
-            self.append_error('No business table for {0} in {1}. Check if attributename is valid and that business table name is populated for {2} in {3}.'.format(attributename, resource, attributename, resource), 'businesstable_error')
-
-    def append_error(self, text, error_type):
-        error_type_list = getattr(self.validation_errors, error_type)
-        error_type_list.append(text)
-
-class ArchesReader():
-
-    def validate_file(self, arches_file, break_on_error=True):
-        """
-        Creates row dictionaries from a csv file
-
-        """
-        validator = Validator()
-        with open(arches_file, 'rU') as f:
-            fieldnames = ['RESOURCEID','RESOURCETYPE','ATTRIBUTENAME','ATTRIBUTEVALUE','GROUPID']
-            rows = unicodecsv.DictReader(f, fieldnames=fieldnames,
-                encoding='utf-8-sig', delimiter='|', restkey='ADDITIONAL', restval='MISSING')
-            rows.next() # skip header row
-            rownum = 2
-            start_time = time.time()
-            for row in rows:
-                validator.validate_row_syntax(row, rownum)
-                validator.validate_entitytype(row, rownum)
-                validator.valdiate_attribute_value(row, rownum)
-                validator.validate_contiguousness(row, rownum)
-
-                validator.unique_resourceids.add(row['RESOURCEID'])
-                rownum += 1
-        validator.validate_relations_file(arches_file)
-        duration = time.time() - start_time
-
-        sorted_errors = []
-        attr_length = len(validator.validation_errors.__dict__)
-        for attr, value in validator.validation_errors.__dict__.iteritems():
-            if value != []:
-                sorted_errors.extend(value)
-                sorted_errors.append('\n\n\n\n')
-        if len(sorted_errors) > 1:
-            del sorted_errors[-1]
-
-        print 'Validation of your Arches file took: {0} seconds.'.format(str(duration))
-        if len(sorted_errors) > 0:
-            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'), '\n'.join(sorted_errors))
-            print "\n\nERROR: There were errors detected in your arches file."
-            print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'))
-            if break_on_error:
-                sys.exit(101)
-
-    def load_file(self, arches_file):
-        '''Reads an arches data file and creates resource graphs'''
-        resource_list = []
-        resource_id = ''
-        group_id = ''
-        resource = ''
-
-        resource_info = csv.DictReader(open(arches_file, 'r'), delimiter='|')
-
-        # Import package specific validation module.
-        fully_qualified_modulename = settings.PACKAGE_VALIDATOR
-        components = fully_qualified_modulename.split('.')
-        classname = components[len(components)-1]
-        modulename = ('.').join(components[0:len(components)])
-        validation_module = __import__(modulename, globals(), locals(), [classname], -1)
-        start_time = time.time()
-
-        for row in resource_info:
-            # print row
-
-            group_val = row['GROUPID'].strip()
-            resource_type_val = row['RESOURCETYPE'].strip()
-            resource_id_val = row['RESOURCEID'].strip()
-
-            if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or resource_type_val in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
-                if resource_id_val != resource_id:
-                    if resource != '':
-                        validation_module.validate_resource(resource)
-                    resource = Resource(row)
-                    resource_list.append(resource)
-                    resource_id = resource_id_val
-                    group_id = ''
-
-                if group_val != group_id:  #create a new group of resouces
-                    resource.groups.append(Group(row))
-                    group_id = group_val
-
-                if group_val == group_id:
-                    resource.appendrow(Row(row), group_id=group_id)
-
-        validation_module.validate_resource(resource)
-
-        sorted_errors = []
-        attr_length = len(validation_module.validation_errors.__dict__)
-        for attr, value in validation_module.validation_errors.__dict__.iteritems():
-            if value != []:
-                sorted_errors.extend(value)
-                sorted_errors.append('\n\n\n\n')
-        if len(sorted_errors) > 1:
-            del sorted_errors[-1]
-        duration = time.time() - start_time
-        print 'Validation of your business data took: {0} seconds.'.format(str(duration))
-        if len(sorted_errors) > 0:
-            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'), '\n'.join(sorted_errors))
-            print "\n\nERROR: There were errors detected in your business data."
-            print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'))
-            break_on_error = True
-            if break_on_error:
-                sys.exit(101)
-
-        return resource_list
-
-    def load_file_new(self, arches_file):
-        '''Reads an arches4json file and creates resource instances'''
-        archesfile = JSONDeserializer().deserialize(open(arches_file, 'r'))
-        resources = archesfile['business_data']['resources']
-        relations = archesfile['business_data']['relations']
+            for error in errors:
+                print "{0} {1}".format(error[0], error[1])
