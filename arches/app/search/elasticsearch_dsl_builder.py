@@ -468,9 +468,12 @@ class DateRangeAgg(CoreDateAgg):
     """
 
     def __init__(self, **kwargs):
+        min_date = kwargs.pop('min_date', None)
+        max_date = kwargs.pop('max_date', None)
+        key = kwargs.pop('key', None)
         super(DateRangeAgg, self).__init__(type='date_range', **kwargs)
         
-        self.add(**kwargs)
+        self.add(min_date=min_date, max_date=max_date, key=key, **kwargs)
 
     def add(self, **kwargs):
         date_range = {}
