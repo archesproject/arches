@@ -55,7 +55,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s' % path_to_file)
         return rdf
 
-    def save_concepts_from_skos(self, graph, overwrite_options=None, staging_options=False):
+    def save_concepts_from_skos(self, graph, overwrite_options='overwrite', staging_options='keep'):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -70,11 +70,12 @@ class SKOSReader(object):
 
         value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(Q(namespace = 'skos') | Q(namespace = 'arches'))
-        skos_value_types_list = skos_value_types.values_list('valuetype', flat=True)
+        skos_value_types_list = list(skos_value_types.values_list('valuetype', flat=True))
+        skos_value_types = {valuetype.valuetype: valuetype for valuetype in skos_value_types}
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
 
-        relation_types = models.DRelationType.objects.all()
-        skos_relation_types = relation_types.filter(namespace = 'skos')
+        # relation_types = models.DRelationType.objects.all()
+        # skos_relation_types = relation_types.filter(namespace = 'skos')
 
 
         # if the graph is of the type rdflib.graph.Graph
@@ -147,7 +148,7 @@ class SKOSReader(object):
                             relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
 
                             if relation_or_value_type in skos_value_types_list:
-                                value_type = skos_value_types.get(valuetype=relation_or_value_type)
+                                value_type = skos_value_types[relation_or_value_type]
                                 val = self.unwrapJsonLiteral(object)
                                 concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
                             elif predicate == SKOS.broader:
@@ -182,7 +183,7 @@ class SKOSReader(object):
                         relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
 
                         if relation_or_value_type in skos_value_types_list:
-                            value_type = skos_value_types.get(valuetype=relation_or_value_type)
+                            value_type = skos_value_types[relation_or_value_type]
                             val = self.unwrapJsonLiteral(object)
                             concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
                 
