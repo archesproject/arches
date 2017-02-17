@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import time
 from tests.base_test import ArchesTestCase
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
@@ -27,7 +28,7 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 class SearchTests(ArchesTestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def tearDownClass(cls):
         se = SearchEngineFactory().create()
         se.delete_index(index='test')
 
@@ -38,7 +39,6 @@ class SearchTests(ArchesTestCase):
         """
 
         se = SearchEngineFactory().create()
-        # se.create_index(index='test')
 
         for i in range(10):
             x = {
@@ -54,12 +54,13 @@ class SearchTests(ArchesTestCase):
             }
             se.index_data(index='test', doc_type='test', body=y, idfield='id', refresh=True)
 
-
+        time.sleep(1)
+        
         query = Query(se, start=0, limit=100)
         match = Match(field='type', query='altLabel')
         query.add_query(match)
 
         query.delete(index='test', refresh=True)
 
-        self.assertEqual(se.es.count(index='test', doc_type='test')['count'], 10)
+        self.assertEqual(se.count(index='test', doc_type='test'), 10)
 
