@@ -147,39 +147,41 @@ def seed_resource_cache():
     datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
     nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=datatypes)
     for node in nodes:
-        config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
-        layer = config.layers[str(node.nodeid)]
-        ul = layer.projection.locationCoordinate(northwest)
-        lr = layer.projection.locationCoordinate(southeast)
-        coordinates = generateCoordinates(ul, lr, zooms, padding)
-        for (offset, count, coord) in coordinates:
-            path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
-                                       coord.column, coord.row, extension)
+        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        if count > 0:
+            config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+            layer = config.layers[str(node.nodeid)]
+            ul = layer.projection.locationCoordinate(northwest)
+            lr = layer.projection.locationCoordinate(southeast)
+            coordinates = generateCoordinates(ul, lr, zooms, padding)
+            for (offset, count, coord) in coordinates:
+                path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
+                                           coord.column, coord.row, extension)
 
-            progress = {"tile": path,
-                        "offset": offset + 1,
-                        "total": count}
+                progress = {"tile": path,
+                            "offset": offset + 1,
+                            "total": count}
 
-            attempts = 3
-            rendered = False
+                attempts = 3
+                rendered = False
 
-            while not rendered:
-                print '%(offset)d of %(total)d...' % progress,
+                while not rendered:
+                    print '%(offset)d of %(total)d...' % progress,
 
-                try:
-                    mimetype, content = TileStache.getTile(
-                        layer, coord, extension, True)
+                    try:
+                        mimetype, content = TileStache.getTile(
+                            layer, coord, extension, True)
 
-                except:
-                    attempts -= 1
-                    print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
+                    except:
+                        attempts -= 1
+                        print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
 
-                    if attempts == 0:
-                        print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
-                        break
+                        if attempts == 0:
+                            print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
+                            break
 
-                else:
-                    rendered = True
-                    progress['size'] = '%dKB' % (len(content) / 1024)
+                    else:
+                        rendered = True
+                        progress['size'] = '%dKB' % (len(content) / 1024)
 
-                    print '%(tile)s (%(size)s)' % progress
+                        print '%(tile)s (%(size)s)' % progress

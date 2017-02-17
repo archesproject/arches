@@ -1,3 +1,5 @@
+import json
+
 class BaseDataType(object):
 
     def __init__(self, model=None):
@@ -53,7 +55,15 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
-        return None
+        if node is None:
+            return None
+        return {
+            "name": "resources-%s" % node.nodeid,
+            "source": json.dumps({
+                "type": "vector",
+                "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
+            })
+        }
 
     def get_pref_label(self, nodevalue):
         """
