@@ -280,11 +280,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         }
 
     def get_map_layer(self, node=None):
-
         if node is None:
             return None
         elif node.config is None or not node.config["layerActivated"]:
             return None
+        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        if count < 1:
+            return None
+
         source_name = "resources-%s" % node.nodeid
         return {
             "nodeid": node.nodeid,
