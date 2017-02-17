@@ -25,7 +25,9 @@ require([
         });
         var conceptTree = new ConceptTree({
             el: $('#jqtree')[0],
-            model: concept
+            model: new ConceptModel({
+                id: '00000000-0000-0000-0000-000000000001'
+            })
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
