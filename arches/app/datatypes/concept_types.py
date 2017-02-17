@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
-		super(BaseConceptDataType, self).__init__(model=model)
+        super(BaseConceptDataType, self).__init__(model=model)
         self.value_lookup = {}
 
     def get_value(self, valueid):

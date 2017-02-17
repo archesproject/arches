@@ -333,5 +333,6 @@ class CsvReader(Reader):
                     Resource.bulk_save(resources=resources)
                     print '%s total resource saved' % (save_count + 1)
 
-        except:
+        except Exception as e:
+            print e
             self.report_errors()
