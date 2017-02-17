@@ -25,6 +25,7 @@ define([
             var self = this;
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
+            self.layer = options.layer;
 
             self._node = ko.observable('');
             self.selected = ko.observable(false);

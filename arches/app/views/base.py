@@ -58,6 +58,7 @@ class BaseManagerView(TemplateView):
             if map_layer is not None:
                 resource_layers.append(map_layer)
 
+        context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers
         context['resource_map_sources'] = resource_sources
 

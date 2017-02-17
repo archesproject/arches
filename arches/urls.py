@@ -105,7 +105,7 @@ urlpatterns = [
     url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
-    url(r'^tileserver/(?P<node_id>%s)/*' % uuid_regex, tileserver.handle_request, name="tileserver"),
+    url(r'^tileserver/(?P<node_id>%s)/*' % uuid_regex, tileserver.handle_request, name="tileserver_node"),
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
 

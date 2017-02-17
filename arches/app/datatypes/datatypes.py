@@ -279,13 +279,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "write cache": settings.CACHE_RESOURCE_TILES
         }
 
-    def get_map_layer(self, node=None):
+    def get_map_layer(self, node=None, preview=False):
         if node is None:
             return None
-        elif node.config is None or not node.config["layerActivated"]:
+        elif node.config is None:
             return None
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if count < 1:
+        if not preview and count < 1 or not node.config["layerActivated"]:
             return None
 
         source_name = "resources-%s" % node.nodeid
@@ -303,7 +303,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
                     "paint": {
-                        "fill-color": "%(mainColor)s"
+                        "fill-color": "%(fillColor)s"
                     }
                 },
                 {
@@ -316,8 +316,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
                     "paint": {
-                        "line-width": 3,
-                        "line-color": "%(haloColor)s"
+                        "line-width": %(haloWeight)s,
+                        "line-color": "%(lineHaloColor)s"
                     }
                 },
                 {
@@ -330,8 +330,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1]],
                     "paint": {
-                        "line-width": 1,
-                        "line-color": "%(mainColor)s"
+                        "line-width": %(weight)s,
+                        "line-color": "%(lineColor)s"
                     }
                 },
                 {
@@ -344,8 +344,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
                     "paint": {
-                        "line-width": 1.5,
-                        "line-color": "%(haloColor)s"
+                        "line-width": %(outlineWeight)s,
+                        "line-color": "%(outlineColor)s"
                     }
                 },
                 {
@@ -358,8 +358,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": 5,
-                        "circle-color": "%(haloColor)s"
+                        "circle-radius": %(haloRadius)s,
+                        "circle-color": "%(pointHaloColor)s"
                     }
                 },
                 {
@@ -372,8 +372,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     },
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
-                        "circle-radius": 3,
-                        "circle-color": "%(mainColor)s"
+                        "circle-radius": %(radius)s,
+                        "circle-color": "%(pointColor)s"
                     }
                 },
                 {
@@ -404,7 +404,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                 [5000, 46]
                             ]
                         },
-                        "circle-color": "%(haloColor)s"
+                        "circle-color": "%(pointHaloColor)s"
                     }
                 },
                 {
@@ -436,7 +436,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                                  [5000, 36]
                              ]
                          },
-                        "circle-color": "%(mainColor)s"
+                        "circle-color": "%(pointColor)s"
                     }
                 },
                 {
@@ -457,8 +457,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             ]""" % {
                 "source_name": source_name,
                 "nodeid": node.nodeid,
-                "mainColor": node.config["mainColor"],
-                "haloColor": node.config["haloColor"],
+                "pointColor": node.config["pointColor"],
+                "pointHaloColor": node.config["pointHaloColor"],
+                "radius": node.config["radius"],
+                "haloRadius": node.config["haloRadius"],
+                "lineColor": node.config["lineColor"],
+                "lineHaloColor": node.config["lineHaloColor"],
+                "weight": node.config["weight"],
+                "haloWeight": node.config["haloWeight"],
+                "fillColor": node.config["fillColor"],
+                "outlineColor": node.config["outlineColor"],
+                "outlineWeight": node.config["outlineWeight"],
             },
             "icon": node.graph.iconclass,
         }

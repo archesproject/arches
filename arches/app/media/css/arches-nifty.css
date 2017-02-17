@@ -6229,6 +6229,77 @@ table.table.dataTable {
     font-weight: bold;
 }
 
+.resource-map-service-container {
+	padding-top: 10px;
+}
+
+.map-service-container {
+	padding: 10px;
+}
+
+.map-service-preview {
+	background: #f4f4f4;
+	border: 1px solid #ddd;
+	min-height: 250px;
+}
+
+.map-service-config {
+	padding: 0px 30px 10px 30px;
+}
+
+.config-title {
+	font-weight: normal;
+    padding: 0 20px 0 0px;
+    margin-top: -10px;
+    font-size: 1.216em;
+    line-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-widget-container {
+	padding: 0px 15px 10px 15px;
+	margin-top: -10px;
+}
+
+.service-label {
+	font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    line-height: 1.2;
+    padding-bottom: 5px;
+}
+
+.service-name {
+	font-size: 14px;
+	font-weight: 400;
+	color: #888;
+	line-height: 1.2;
+	overflow-wrap: break-word;
+}
+
+.dropdown-shim {
+	margin-top: 10px;
+}
+
+.style-title {
+	font-weight: 600;
+	color: #666;
+}
+
+.col-divider {
+	border-right: 1px solid #eee;
+}
+
+.service-notes {
+	color: #888;
+	margin-bottom: 0px;
+}
+.control-label-value {
+    padding-top: 7px;
+    font-weight: bold;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
