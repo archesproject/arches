@@ -2960,6 +2960,10 @@ span.editable-card i.fa.fa-align-justify:hover{
     float: left;
     margin: 3px;
 }
+
+.recent-additions-container {
+    margin-top: 10px;
+}
 .card-grid{
     -ms-flex: 1;
     -webkit-flex: 1;
@@ -5078,6 +5082,12 @@ div.row.widget-wrapper.report-header:hover {
     width: -webkit-calc(100% - 55px);
     width:    -moz-calc(100% - 55px);
     width:         calc(100% - 55px);
+}
+
+.geometry-edit-button-group {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 .notifications-narrow {
