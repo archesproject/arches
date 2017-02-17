@@ -132,7 +132,7 @@ class SearchEngine(object):
                     }
                 }
 
-        self.create_index(index=index, ignore=400)
+        self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type=doc_type, body=body)
 
     def create_index(self, **kwargs):
@@ -160,7 +160,7 @@ class SearchEngine(object):
                     id = getattr(document,idfield)
 
             try:
-                self.es.index(index=index, doc_type=doc_type, body=document, id=id, **kwargs)
+                self.es.index(index=index, doc_type=doc_type, body=document, id=id)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
                 raise detail
@@ -177,3 +177,10 @@ class SearchEngine(object):
             '_id': id,
             '_source': data
         }
+
+    def count(self, **kwargs):
+        count = self.es.count(**kwargs)
+        if count is not None:
+            return count['count']
+        else:
+            return None
