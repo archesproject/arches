@@ -7,7 +7,42 @@
 {% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
-    CONTENT!
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <!-- Edit Content -->
+    <div class="flex">
+        <div class="flex">
+            <!--Form Listing -->
+            <div class="left-column-crud-container form-list">
+                <!-- Title Block -->
+                <div class="title-block-title">
+                    <h4 class="title-block-title"> Map Layers</h4>
+                </div>
+                <div id="function-list" class="report-image-grid" style="margin-top: 5px;">
+                    list layers here...
+                </div>
+            </div>
+
+            <!-- Card Container -->
+            <div class="card-form-preview-container">
+                <!-- Right Panel: Config Form -->
+                <div class="card-form-preview-container">
+                    <div id="card-preview" class="pad-all" style="">
+                        <div id="permissions-form" class="panel">
+                            <div class="panel-heading">
+                                <div class="">
+                                    <h3 class="panel-title card-main-title">Layer Form...</h3>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
@@ -16,7 +51,9 @@
 {{block.super}}
     <script>
         {% autoescape off %}define('map-layer-manager-data', [], function() {
-            return {};
+            return {
+
+            };
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}
