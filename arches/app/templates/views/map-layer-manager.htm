@@ -1,0 +1,22 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {% trans "Map Layer Manager" %} {% endblock title %}
+
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
+    CONTENT!
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('map-layer-manager-data', [], function() {
+            return {};
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

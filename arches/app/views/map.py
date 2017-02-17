@@ -15,14 +15,27 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-
 from django.shortcuts import render
+from django.utils.translation import ugettext as _
+from arches.app.models import models
+from arches.app.views.base import BaseManagerView
 
-def get_page(request):
-    resource_id = request.GET.get('resourceid', '')
-    return render(request, 'map.htm', {
-        'main_script': 'map',
-        'active_page': 'Map',
-        'resource_id': resource_id
-    })
 
+class MapLayerManagerView(BaseManagerView):
+    def get(self, request):
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
+        date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+
+        context = self.get_context_data(
+            date_nodes=date_nodes,
+            map_layers=map_layers,
+            map_sources=map_sources,
+            main_script='views/map-layer-manager',
+        )
+
+        context['nav']['title'] = _('Map Layer Manager')
+        context['nav']['icon'] = 'fa-server'
+        context['nav']['help'] = (_('Map Layer Manager'),'')
+
+        return render(request, 'views/map-layer-manager.htm', context)
