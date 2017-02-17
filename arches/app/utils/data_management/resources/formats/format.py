@@ -1,11 +1,12 @@
 from django.conf import settings
 from arches.app.models.concept import Concept
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.utils.translation import ugettext as _
 
 class ResourceImportReporter:
     def __init__(self, business_data):
