@@ -23,18 +23,16 @@
         <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
-                <div class="alert alert-warning" role="alert">
-                    <button class="close" type="button">
-                   </button>
+                <div class="alert alert-warning relative" role="alert">
                     <div class="media">
                         <!-- ko if: drawMode() === 'draw_point'  -->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_polygon'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating polygons. Click the Polygon tool to exit." %}
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating polygons. Click the Polygon tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_line_string'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'simple_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a " %}<span data-bind="text: selectedFeatureType"></span>.
@@ -48,6 +46,11 @@
                         <!-- ko if: drawMode() === 'direct_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
+                    </div>
+                    <div class="btn-group geometry-edit-button-group">
+                        <button class="btn btn-sm btn-primary">New</button>
+                        <button class="btn btn-sm btn-default">Delete</button>
+                        <button class="btn btn-sm btn-default">Edit</button>
                     </div>
                 </div>
             </div>
@@ -153,10 +156,11 @@
                 <div data-bind="text: '(' + hoverFeature().properties.node_name + ')'"></div>
                 <div data-bind="text: 'Resource Instance:' + hoverFeature().properties.resourceinstanceid"></div>
                 <div data-bind="text: 'Resource Model:' + hoverFeature().properties.graphid"></div>
+                <!-- ko if: hoverFeature().properties.popup !== null -->
+                    <div class="hover-feature" data-bind="text: hoverFeature().properties.map_popup"></div>
+                <!--/ko-->
             </div>
-            <!-- ko if: hoverFeature().properties.popup !== null -->
-                <div data-bind="text: hoverFeature().properties.map_popup"></div>
-            <!--/ko-->
+           
         </div>
         <!--/ko-->
 

@@ -2960,6 +2960,10 @@ span.editable-card i.fa.fa-align-justify:hover{
     float: left;
     margin: 3px;
 }
+
+.recent-additions-container {
+    margin-top: 10px;
+}
 .card-grid{
     -ms-flex: 1;
     -webkit-flex: 1;
@@ -3577,6 +3581,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -ms-flex: 0 0 275px;
     -webkit-flex: 0 0 275px;
     flex: 0 0 275px;
+    margin-top: -1px;
     margin-bottom: 0px;
     background-color: #fafafa;
     width: 275px;
@@ -5079,6 +5084,12 @@ div.row.widget-wrapper.report-header:hover {
     width:         calc(100% - 55px);
 }
 
+.geometry-edit-button-group {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
 .notifications-narrow {
   width: -webkit-calc(100% - 250px);
   width:    -moz-calc(100% - 250px);
@@ -5774,7 +5785,11 @@ span.basemap-unselected {
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
 }
-
+.hover-feature {
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
 .search-results {
     -ms-flex: 0 0 400px;
     -webkit-flex: 0 0 400px;
