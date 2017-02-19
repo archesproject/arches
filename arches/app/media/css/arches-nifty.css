@@ -4017,6 +4017,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .select2-search, .dropdown-shim, .dropdown-shim, .dropdown-shim {
     margin-top: 10px;
+    margin-left: 50px;
 }
 .relative, .slide, .relative, .slide, .relative, .slide, .relative {
     position: relative;
