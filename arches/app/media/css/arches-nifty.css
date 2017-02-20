@@ -2564,6 +2564,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     left: 0;
     top: 0;
 }
+
 .concept_result {
     font-weight: 700;
 }
@@ -4017,8 +4018,16 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .select2-search, .dropdown-shim, .dropdown-shim, .dropdown-shim {
     margin-top: 10px;
-    margin-left: 50px;
 }
+
+.select2-drop.select2-drop-above .select2-search input {
+    margin-bottom: 10px;
+}
+
+.select2-results {
+    margin-top: 10px;
+}
+
 .relative, .slide, .relative, .slide, .relative, .slide, .relative {
     position: relative;
 }
@@ -4444,7 +4453,8 @@ div.row.widget-wrapper {
 
 .rr-panel-note {
     text-align: center;
-    font-size: 17px;
+    font-size: 27px;
+    margin-top: 150px;
 }
 
 .rr-drag-panel-target {
@@ -4454,6 +4464,10 @@ div.row.widget-wrapper {
     border-bottom-width: 0px;
     border-radius: 2px;
     padding: 0px 25px;
+}
+
+.recent-edits-panel {
+    margin-left: 50px;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {
@@ -5768,6 +5782,7 @@ span.basemap-unselected {
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
+    left: 30px;
     margin: 10px;
     padding: 0px;
     border: solid 1px #999;
@@ -5778,7 +5793,7 @@ span.basemap-unselected {
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
-    background: #f2f2f2;
+    background: #ebebeb;
 }
 .hover-feature-title {
     font-size: 15px;
@@ -6115,6 +6130,7 @@ span.basemap-unselected {
   float: left;
   width: 750px;
   margin-top: 25px;
+  margin-bottom: 100px;
 }
 
 .time-wheel-wrap .sequence {
