@@ -168,18 +168,18 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return bounds
 
     def get_layer_config(self, node=None):
+        if node is None:
+            return None
+        elif node.config is None:
+            return None
         database = settings.DATABASES['default']
-        where_clause = ''
-        and_where_clause = ''
-        if node is not None:
-            where_clause = "WHERE nodeid = '%s'" % node.pk
-            and_where_clause = "AND nodeid = '%s'" % node.pk
+        config = node.config
 
         cluster_sql = """
             WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
-                %s
+                WHERE nodeid = %s
             )
 
             SELECT tileid::text,
@@ -223,10 +223,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         """
 
         sql_list = []
-        for i in range(settings.CLUSTER_MAX_ZOOM + 1):
+        for i in range(config['clusterMaxZoom'] + 1):
             arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-            distance = arc * settings.CLUSTER_DISTANCE
-            sql_string = cluster_sql % (distance, settings.CLUSTER_MIN_POINTS, where_clause)
+            distance = arc * config['clusterDistance']
+            sql_string = cluster_sql % (distance, config['clusterMinPoints'], node.pk)
             sql_list.append(sql_string)
 
         sql_list.append("""
@@ -242,7 +242,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     geom AS __geometry__,
                     '' AS extent
                 FROM mv_geojson_geoms
-                %s
+                WHERE nodeid = %s
             UNION
             SELECT tileid::text,
                     resourceinstanceid::text,
@@ -256,9 +256,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     ST_ExteriorRing(geom) AS __geometry__,
                     '' AS extent
                 FROM mv_geojson_geoms
-                where ST_GeometryType(geom) = 'ST_Polygon'
-                %s
-        """ % (where_clause, and_where_clause))
+                WHERE ST_GeometryType(geom) = 'ST_Polygon'
+                AND nodeid = %s
+        """ % node.pk)
 
         return {
             "provider": {
@@ -276,7 +276,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             },
             "allowed origin": "*",
             "compress": True,
-            "write cache": settings.CACHE_RESOURCE_TILES
+            "write cache": config["cacheTiles"]
         }
 
     def get_map_layer(self, node=None, preview=False):
@@ -289,9 +289,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
 
         source_name = "resources-%s" % node.nodeid
+        layer_name = "%s - %s" % (node.graph.name, node.name)
+        if not preview and node.config["layerName"] != "":
+            layer_name = node.config["layerName"]
         return {
             "nodeid": node.nodeid,
-            "name": "%s - %s" % (node.graph.name, node.name),
+            "name": layer_name,
             "layer_definitions": """[
                 {
                     "id": "resources-fill-%(nodeid)s",

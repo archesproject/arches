@@ -23,6 +23,12 @@ define([
                 graph: undefined,
                 layer: _.find(data.resource_map_layers, function(layer) {
                     return layer.nodeid === node.nodeid;
+                }),
+                mapSource: _.find(data.resource_map_sources, function(source) {
+                    return source.nodeid === node.nodeid;
+                }),
+                graph: _.find(data.graphs, function(graph) {
+                    return graph.graphid === node.graph_id;
                 })
             })
         );

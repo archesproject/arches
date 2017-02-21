@@ -21,7 +21,7 @@
                         <div class="panel mar-no">
                             <!-- Function Name -->
                             <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: node.layer.icon"></i> <span data-bind="text: node.layer.name"></span></h3>
+                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: node.layer.icon"></i> <span data-bind="text: node.config.layerName() || node.layer.name"></span></h3>
                             </div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
             <div class="card-form-preview-container" style="margin:20px;">
                 <div class="panel">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().layer.name"></span></h3>
+                        <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                     </div>
 
                     <div class="panel-body">
@@ -58,7 +58,9 @@
             return {
                 "geom_nodes": {{geom_nodes_json}},
                 "resource_map_layers": {{resource_map_layers_json}},
-                "datatypes": {{ datatypes_json }}
+                "resource_map_sources": {{resource_map_sources_json}},
+                "datatypes": {{ datatypes_json }},
+                "graphs": {{ graphs }}
             };
         });{% endautoescape %}
     </script>

@@ -26,6 +26,8 @@ define([
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
             self.layer = options.layer;
+            self.mapSource = options.mapSource;
+
 
             self._node = ko.observable('');
             self.selected = ko.observable(false);
@@ -181,15 +183,20 @@ define([
             self.istopnode = source.istopnode;
 
             self.set('id', self.nodeid);
+            self.set('graph_id', source.graph_id);
         },
 
         setupConfig: function(config) {
             var self = this;
             self.configKeys.removeAll();
             _.each(config, function(configVal, configKey) {
-                self.config[configKey] = Array.isArray(configVal) ?
-                    ko.observableArray(configVal) :
-                    ko.observable(configVal);
+                if (!ko.isObservable(self.config[configKey])) {
+                    self.config[configKey] = Array.isArray(configVal) ?
+                        ko.observableArray(configVal) :
+                        ko.observable(configVal);
+                } else {
+                    self.config[configKey](configVal);
+                }
                 self.configKeys.push(configKey);
             });
         },
@@ -243,6 +250,18 @@ define([
                     }, this);
                 }
             }, this);
-        }
+        },
+
+        _getURL: function(method){
+            var id = this.get('graph_id');
+            if(!(id)){
+                id = '';
+            }
+            if(this.url.indexOf('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') > -1){
+                return this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', id);
+            }else{
+                return this.url + id;
+            }
+        },
     });
 });

@@ -2,8 +2,21 @@
 <!-- ko if: $data.layer -->
 <div class="row map-service-container">
 
-    <div class="col-md-5 col-lg-4 map-service-preview">
-        preview here
+    <div class="col-md-5 col-lg-4 map-service-preview" style="padding:0;" data-bind="mapboxgl: {
+            mapOptions: {
+                style: mapStyle,
+                zoom: zoom,
+                minZoom: minZoom,
+                maxZoom: maxZoom,
+                centerX: centerX,
+                centerY: centerY,
+                pitch: pitch,
+                bearing: bearing
+            },
+            afterRender: function(map){
+                setupMap(map);
+            }
+        }">
     </div>
 
     <div class="col-md-7 col-lg-8">
@@ -18,23 +31,27 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Layer Name:</label>
                                 <div class="col-sm-9">
-                                    <input type="" placeholder="" class="form-control" data-bind="value: layer.name">
+                                    <input type="text" class="form-control" data-bind="attr: {'placeholder': layer.name}, value: config.layerName">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Activated:</label>
                                 <div class="col-sm-9">
                                     <span class="switch switch-small" data-bind="css: {
-                                            'on': layerActivated()
+                                            'on': config.layerActivated()
                                         }, click: function () {
-                                            layerActivated(!layerActivated());
+                                            config.layerActivated(!config.layerActivated());
                                         }">
                                         <small></small>
                                     </span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Node Name:</label>
+                                <label class="col-sm-3 control-label">Resource Model:</label>
+                                <div class="col-sm-9 control-label-value" data-bind="text: graph.name"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Node:</label>
                                 <div class="col-sm-9 control-label-value" data-bind="text: node.name"></div>
                             </div>
                             <div class="form-group">
@@ -75,8 +92,8 @@
                                             <label class="col-sm-3 control-label">Color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: pointColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: pointColor}"></i></span>
+                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -84,21 +101,21 @@
                                             <label class="col-sm-3 control-label">Halo color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: pointHaloColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: pointHaloColor}"></i></span>
+                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointHaloColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointHaloColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Radius</label>
                                             <div class="col-sm-9">
-                                                <input type="" placeholder="2" class="form-control" data-bind="value: radius">
+                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.radius">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Halo radius</label>
                                             <div class="col-sm-9">
-                                                <input type="" placeholder="2" class="form-control" data-bind="value: haloRadius">
+                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.haloRadius">
                                             </div>
                                         </div>
                                     </div>
@@ -115,8 +132,8 @@
                                             <label class="col-sm-3 control-label">Color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: lineColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: lineColor}"></i></span>
+                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -124,21 +141,21 @@
                                             <label class="col-sm-3 control-label">Halo color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: lineHaloColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: lineHaloColor}"></i></span>
+                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineHaloColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineHaloColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Weight</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: weight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.weight">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Halo weight</label>
                                             <div class="col-sm-9">
-                                                <input type="" placeholder="2" class="form-control" data-bind="value: haloWeight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.haloWeight">
                                             </div>
                                         </div>
                                     </div>
@@ -156,8 +173,8 @@
                                             <label class="col-sm-3 control-label">Fill Color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: fillColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: fillColor}"></i></span>
+                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.fillColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.fillColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -165,15 +182,15 @@
                                             <label class="col-sm-3 control-label">Outline color</label>
                                             <div class="col-sm-9">
                                                 <div class="colorpicker-component input-group">
-                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: outlineColor, format:'rgba'}">
-                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: outlineColor}"></i></span>
+                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.outlineColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.outlineColor}"></i></span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Outline weight</label>
                                             <div class="col-sm-9">
-                                                <input type="" placeholder="2" class="form-control" data-bind="value: outlineWeight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.outlineWeight">
                                             </div>
                                         </div>
                                     </div>
@@ -181,7 +198,10 @@
                             </div>
                         </div>
 
-
+                        <!-- ko if: node.dirty() -->
+                        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { node.save() }">Save Edits</button>
+                        <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
+                        <!-- /ko -->
                     </div>
 
                 </div>
