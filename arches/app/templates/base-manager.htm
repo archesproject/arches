@@ -241,7 +241,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         <!-- Recently Added -->
-                        {% if nav.edit_history %}
+                        {% if nav.edit_history and 'edit' in user.user_groups %}
                         <ul class="nav navbar-top-links pull-left">
                             <li class="mega-dropdown open">
                                 <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
