@@ -38,7 +38,7 @@ class BaseManagerView(TemplateView):
             'menu':False,
             'search':True,
             'res_edit':False,
-            'edit_history':False,
+            'edit_history':True,
             'login':True,
             'print':False,
         }

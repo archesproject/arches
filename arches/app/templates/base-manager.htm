@@ -241,13 +241,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         <!-- Recently Added -->
-                        {% if nav.edit_history %}
+                        {% if nav.edit_history and 'edit' in user.user_groups %}
                         <ul class="nav navbar-top-links pull-left">
                             <li class="mega-dropdown open">
                                 <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
                                     <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
                                 </a>
-                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim" data-bind="visible:recentsActive()">
+                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim recent-edits-panel" data-bind="visible:recentsActive()">
                                     <!-- Resource Records Table, this should probably be split out into a separate .htm-->
                                     <div class="pad-all">
                                         Table of recently added resource instances will go here.
