@@ -1938,6 +1938,11 @@ ul .collapse li:last-of-type {
     height: 90px;
     background: #ebeef0;
 }
+
+.report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
+    margin-top: -331px;
+}
+
 .resource-grid-main {
     padding-top: 10px;
     padding-left: 0;
