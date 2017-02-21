@@ -24,9 +24,6 @@ define([
             }, []);
             var sources = $.extend(true, {}, arches.mapSources);
             sources[params.mapSource.name] = JSON.parse(params.mapSource.source);
-            console.log(params.mapSource.name)
-            console.log(sources[overlays[0].source]);
-            console.log(basemapLayers.concat(overlays))
 
             this.mapStyle = {
                 "version": 8,
