@@ -59,8 +59,7 @@ define([
             }
 
             this.node.json.subscribe(function () {
-                var style = self.map.getStyle();
-                _.each(style.layers, function(layer) {
+                _.each(overlays, function(layer) {
                     switch (layer.id) {
                         case "resources-fill-" + params.nodeid:
                             layer.paint["fill-color"] = self.config.fillColor()
@@ -92,9 +91,8 @@ define([
                         default:
 
                     }
-                })
-                style.sources = sources;
-                self.map.setStyle(style);
+                });;
+                self.map.setStyle(self.mapStyle);
             })
         },
         template: { require: 'text!datatype-config-templates/geojson-feature-collection' }

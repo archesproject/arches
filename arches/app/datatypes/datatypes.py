@@ -179,7 +179,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
-                WHERE nodeid = %s
+                WHERE nodeid = '%s'
             )
 
             SELECT tileid::text,
@@ -242,7 +242,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     geom AS __geometry__,
                     '' AS extent
                 FROM mv_geojson_geoms
-                WHERE nodeid = %s
+                WHERE nodeid = '%s'
             UNION
             SELECT tileid::text,
                     resourceinstanceid::text,
@@ -257,8 +257,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     '' AS extent
                 FROM mv_geojson_geoms
                 WHERE ST_GeometryType(geom) = 'ST_Polygon'
-                AND nodeid = %s
-        """ % node.pk)
+                AND nodeid = '%s'
+        """ % (node.pk, node.pk))
 
         return {
             "provider": {
