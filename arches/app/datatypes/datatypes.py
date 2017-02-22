@@ -23,11 +23,11 @@ class DataTypeFactory(object):
 
     def get_instance(self, datatype):
         d_datatype = self.datatypes[datatype]
-        mod_path = d_datatype.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
+            mod_path = d_datatype.modulename.replace('.py', '')
+            module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
