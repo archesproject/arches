@@ -15,7 +15,7 @@ addons:
   postgresql: 9.6
   apt:
     sources:
-      - elasticsearch-2.x
+      - elasticsearch-5.x
     packages:
       - elasticsearch
       - libxml2-dev
