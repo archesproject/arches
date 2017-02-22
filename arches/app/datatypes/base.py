@@ -1,4 +1,5 @@
 import json
+from arches.app.models import models
 
 class BaseDataType(object):
 
@@ -61,7 +62,8 @@ class BaseDataType(object):
             "type": "vector",
             "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
         }
-        if preview:
+        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        if preview and count == 0:
             source_config = {
                 "type": "geojson",
                 "data": {
@@ -273,7 +275,8 @@ class BaseDataType(object):
         return {
             "nodeid": node.nodeid,
             "name": "resources-%s" % node.nodeid,
-            "source": json.dumps(source_config)
+            "source": json.dumps(source_config),
+            "count": count
         }
 
     def get_pref_label(self, nodevalue):

@@ -292,10 +292,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_name = "%s - %s" % (node.graph.name, node.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
-        return {
-            "nodeid": node.nodeid,
-            "name": layer_name,
-            "layer_definitions": """[
+
+        if not preview and node.config["advancedStyling"]:
+            try:
+                style = json.loads(node.config["advancedStyle"])
+                for layer in style:
+                    layer["source-layer"] = str(node.pk)
+                layer_def = json.dumps(style)
+            except ValueError:
+                layer_def = "[]"
+        else:
+            layer_def = """[
                 {
                     "id": "resources-fill-%(nodeid)s",
                     "type": "fill",
@@ -471,7 +478,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "fillColor": node.config["fillColor"],
                 "outlineColor": node.config["outlineColor"],
                 "outlineWeight": node.config["outlineWeight"],
-            },
+            }
+        return {
+            "nodeid": node.nodeid,
+            "name": layer_name,
+            "layer_definitions": layer_def,
             "icon": node.graph.iconclass,
         }
 

@@ -13,6 +13,8 @@
 @import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
+@import url(../bower_components/codemirror/lib/codemirror.css);
+@import url(../bower_components/codemirror/theme/monokai.css);
 
 
 /*  Summernote Overrides */
@@ -6278,6 +6280,11 @@ table.table.dataTable {
 	background: #f4f4f4;
 	border: 1px solid #ddd;
 	min-height: 450px;
+}
+
+.advanced-map-style-switch {
+    margin-top: -40px;
+    margin-right: 50px;
 }
 
 .map-service-config {

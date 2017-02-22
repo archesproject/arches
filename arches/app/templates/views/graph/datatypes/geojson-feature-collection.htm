@@ -105,9 +105,28 @@
             <h3 class="config-title">
                 <i class="ion-image"></i> Service Styling
             </h3>
+            <div class="pull-right advanced-map-style-switch">
+                <label class="control-label">Advanced Styling:</label>
+                <span class="switch switch-small" data-bind="css: {
+                        'on': config.advancedStyling()
+                    }, click: function () {
+                        config.advancedStyling(!config.advancedStyling());
+                    }">
+                    <small></small>
+                </span>
+            </div>
 
-            <!-- Resource Style -->
-            <div class="col-xs-12">
+            <div class="col-xs-12" data-bind="if: config.advancedStyling()">
+                <div id="style-panel" class="tab-pane fade active in">
+                    <div class="panel-body" style="padding-top: 0px;">
+                        <div class="row">
+                            <div data-bind="codemirror: { value: config.advancedStyle, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12" data-bind="if: !config.advancedStyling()">
                 <div id="style-panel" class="tab-pane fade active in">
                     <div class="panel-body" style="padding-top: 0px;">
                         <div class="row">
@@ -228,14 +247,14 @@
                             </div>
                         </div>
 
-                        <!-- ko if: node.dirty() -->
-                        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { node.save() }">Save Edits</button>
-                        <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
-                        <!-- /ko -->
                     </div>
 
                 </div>
             </div>
+            <!-- ko if: node.dirty() -->
+            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { node.save() }">Save Edits</button>
+            <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
+            <!-- /ko -->
         </div>
     </div>
 </div>
