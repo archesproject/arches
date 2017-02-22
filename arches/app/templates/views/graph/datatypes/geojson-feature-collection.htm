@@ -31,7 +31,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Layer Name:</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" data-bind="attr: {'placeholder': layer.name}, value: config.layerName">
+                                    <input type="text" class="form-control" data-bind="attr: {'placeholder': layer.name}, valueUpdate: 'keyup', value: config.layerName">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -73,19 +73,19 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Cluster Distance:</label>
                                 <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="value: config.clusterDistance">
+                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Cluster Max Zoom:</label>
                                 <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="value: config.clusterMaxZoom">
+                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">Cluster Min Points:</label>
                                 <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="value: config.clusterMinPoints">
+                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
                                 </div>
                             </div>
                         </div>
@@ -139,13 +139,13 @@
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Radius</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.radius">
+                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Halo radius</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.haloRadius">
+                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
                                             </div>
                                         </div>
                                     </div>
@@ -179,13 +179,13 @@
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Weight</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.weight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Halo weight</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.haloWeight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Outline weight</label>
                                             <div class="col-sm-9">
-                                                <input type="number" placeholder="" class="form-control" data-bind="value: config.outlineWeight">
+                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
                                             </div>
                                         </div>
                                     </div>
