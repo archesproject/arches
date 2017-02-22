@@ -201,7 +201,6 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
-    boolquery = Bool()
     boolfilter = Bool()
 
     if term_filter != '':
@@ -276,11 +275,7 @@ def build_search_results_dsl(request):
         else:
             boolfilter.must(time_query_dsl)
 
-    if not boolquery.empty:
-        query.add_query(boolquery)
-
-    if not boolfilter.empty:
-        query.add_filter(boolfilter)
+    query.add_query(boolfilter)
 
     return query
 

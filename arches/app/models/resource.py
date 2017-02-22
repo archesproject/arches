@@ -23,7 +23,7 @@ from django.conf import settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -192,8 +192,10 @@ class Resource(models.ResourceInstance):
         }
         se = SearchEngineFactory().create()
         query = Query(se, limit=limit, start=start)
-        query.add_filter(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid).dsl, operator='or')
-        query.add_filter(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid).dsl, operator='or')
+        bool_filter = Bool()
+        bool_filter.filter(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid))
+        bool_filter.filter(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid))
+        query.add_query(bool_filter)
         resource_relations = query.search(index='resource_relations', doc_type='all')
         ret['total'] = resource_relations['hits']['total']
         instanceids = set()

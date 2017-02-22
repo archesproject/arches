@@ -47,8 +47,6 @@ class Query(Dsl):
 
     def __init__(self, se, **kwargs):
         self.se = se
-        self._filtered = False
-        self.filter_operator = None
         self.fields = kwargs.pop('fields', None)
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
@@ -59,44 +57,14 @@ class Query(Dsl):
             }
         }
 
-    def add_filter(self, dsl=None, operator='and'):
-        """
-        Wrap the filter in an "and" or "or" clause by specifying an operator value of "and" or "or"
-
-        """
-
-        if dsl is not None:
-            dsl = Dsl(dsl).dsl
-            if operator:
-                self.filter_operator = operator
-
-            if self._filtered:
-                self.dsl['query']['filtered']['filter'].append(dsl)
-            else:
-                self._filtered = True
-                self.dsl = {
-                    'query':{
-                        'filtered':{
-                            'query': self.dsl['query'],
-                            'filter': [dsl]
-                        }
-                    }
-                }
-
     def add_query(self, dsl=None):
         if dsl is not None:
             dsl = Dsl(dsl).dsl
 
-            if self._filtered:
-                if 'bool' in dsl and 'bool' in self.dsl['query']['filtered']['query']:
-                    self.dsl['query']['filtered']['query'] = Bool(self.dsl['query']['filtered']['query']).merge(dsl).dsl
-                else:
-                    self.dsl['query']['filtered']['query'] = dsl
-            else:
-                if 'bool' in dsl and 'bool' in self.dsl['query']:
-                    self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
-                else:
-                    self.dsl['query'] = dsl
+        if 'bool' in dsl and 'bool' in self.dsl['query']:
+            self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
+        else:
+            self.dsl['query'] = dsl
 
     def add_aggregation(self, agg=None):
         if agg is not None:
@@ -121,12 +89,6 @@ class Query(Dsl):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
 
-        if self._filtered:
-            if not ('or' in self.dsl['query']['filtered']['filter'] or 'and' in self.dsl['query']['filtered']['filter']):
-                self.dsl['query']['filtered']['filter'] = {   
-                    self.filter_operator: self.dsl['query']['filtered']['filter']
-                }
-
         if self.fields != None:
             self.dsl['fields'] = self.fields
 
@@ -142,7 +104,8 @@ class Bool(Dsl):
             'bool':{
                 'should':[],
                 'must':[],
-                'must_not':[]
+                'must_not':[],
+                'filter':[]
             }
         }
         if isinstance(dsl, dict):
@@ -153,6 +116,7 @@ class Bool(Dsl):
         self.should(kwargs.pop('should', None))
         self.must(kwargs.pop('must', None))
         self.must_not(kwargs.pop('must_not', None))
+        self.filter(kwargs.pop('filter', None))
         self.empty = True
 
     def must(self, dsl):
@@ -163,6 +127,9 @@ class Bool(Dsl):
 
     def must_not(self, dsl):
         return self._append('must_not', dsl)
+
+    def filter(self, dsl):
+        return self._append('filter', dsl)
 
     def _append(self, type, dsl):
         if dsl:
@@ -178,6 +145,7 @@ class Bool(Dsl):
         self.dsl['bool']['must'] = self.dsl['bool']['must'] + object.dsl['bool']['must']
         self.dsl['bool']['should'] = self.dsl['bool']['should'] + object.dsl['bool']['should']
         self.dsl['bool']['must_not'] = self.dsl['bool']['must_not'] + object.dsl['bool']['must_not']
+        self.dsl['bool']['filter'] = self.dsl['bool']['filter'] + object.dsl['bool']['filter']
 
         return self
        
