@@ -123,6 +123,11 @@
                                         </div>
                                         <div class="map-server-instructions">
                                             {% trans "Changes to cluster settings will only be reflected after saving.  If tiles are being cached, tile cache will need to be cleared to reflect changes." %}
+                                            <!-- ko if: count === 0 -->
+                                            </br></br>
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Preview map data do not use clustering algorithm.  Add data for this resource model to see real clustered data." %}
+                                            <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>
