@@ -88,6 +88,9 @@ class Command(BaseCommand):
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
             help='A path to a mapnik xml file to generate a tileserver layer from.')
 
+        parser.add_argument('-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
+            help='A path to a tile config json file to generate a tileserver layer from.')
+
         parser.add_argument('-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
             help='A path to a mapbox json file to generate a layer from.')
 
@@ -169,7 +172,7 @@ class Command(BaseCommand):
             self.import_mapping_file(options['source'])
 
         if options['operation'] == 'add_tileserver_layer':
-            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
+            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'], options['tile_config_path'])
 
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
@@ -442,16 +445,19 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
-        if layer_name != False and mapnik_xml_path != False:
-            with transaction.atomic():
-                tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
-                source_dict = {
-                    "type": "raster",
-                    "tiles": [
-                        ("/tileserver/%s/{z}/{x}/{y}.png") % (layer_name)
-                    ],
-                    "tileSize": 256
+    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
+        if layer_name != False:
+            config = None
+            extension = "png"
+            layer_type = "raster"
+            tile_size = 256
+            if mapnik_xml_path != False:
+                path = os.path.abspath(mapnik_xml_path),
+                config = {
+                    "provider": {
+                        "name": "mapnik",
+                        "mapfile": os.path.abspath(mapnik_xml_path)
+                    }
                 }
                 layer_list = [{
                     "id": layer_name,
@@ -460,13 +466,41 @@ class Command(BaseCommand):
                     "minzoom": 0,
                     "maxzoom": 22
                 }]
-                map_source = models.MapSources(name=layer_name, source=source_dict)
-                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
-                map_source.save()
-                map_layer.save()
-                tileserver_layer.map_layer = map_layer
-                tileserver_layer.map_source = map_source
-                tileserver_layer.save()
+            elif tile_config_path != False:
+                path = os.path.abspath(tile_config_path)
+                with open(path) as content:
+                    config_data = json.load(content)
+                config = config_data["config"]
+                layer_type = config_data["type"]
+                layer_list = config_data["layers"]
+                for layer in layer_list:
+                    layer["source"] = layer_name
+                    if layer_type == "vector":
+                        layer["source-layer"] = layer_name
+                if layer_type == "vector":
+                    extension = "pbf"
+                    tile_size = 512
+            if config is not None:
+                with transaction.atomic():
+                    tileserver_layer = models.TileserverLayers(
+                        name=layer_name,
+                        path=path,
+                        config=config
+                    )
+                    source_dict = {
+                        "type": layer_type,
+                        "tiles": [
+                            ("/tileserver/%s/{z}/{x}/{y}.%s") % (layer_name, extension)
+                        ],
+                        "tileSize": tile_size
+                    }
+                    map_source = models.MapSources(name=layer_name, source=source_dict)
+                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                    map_source.save()
+                    map_layer.save()
+                    tileserver_layer.map_layer = map_layer
+                    tileserver_layer.map_source = map_source
+                    tileserver_layer.save()
 
 
     def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):

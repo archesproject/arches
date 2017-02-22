@@ -671,6 +671,7 @@ class MapLayers(models.Model):
 class TileserverLayers(models.Model):
     name = models.TextField(unique=True)
     path = models.TextField()
+    config = JSONField()
     map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
     map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
 
