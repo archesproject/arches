@@ -209,6 +209,23 @@ define([
             this.parse(JSON.parse(this._node()), self);
         },
 
+        save: function (userCallback, scope) {
+            var method = "POST";
+            var callback = function (request, status, model) {
+                if (typeof userCallback === 'function') {
+                    userCallback.call(this, request, status, model);
+                }
+                if (status==='success') {
+                    this._node(this.json());
+                };
+            };
+            this._doRequest({
+                type: method,
+                url: this._getURL(method),
+                data: JSON.stringify(this.toJSON())
+            }, callback, scope, 'save');
+        },
+
         /**
          * returns a JSON object containing model data
          * @memberof NodeModel.prototype
