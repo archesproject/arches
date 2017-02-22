@@ -395,11 +395,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
+                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
                                                 <i class="fa fa-server"></i>
                                                 <span class="menu-title">
-                                                    <strong>Map Server Manager</strong>
+                                                    <strong>{% trans "Map Layer Manager" %}</strong>
                                                 </span>
                                             </a>
                                         </li>
