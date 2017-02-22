@@ -62,7 +62,7 @@
     </div>
 
 
-    <div class="time-wheel-wrap time-search-subcontainer" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod, breadCrumb: breadCrumb}">
+    <div class="time-wheel-wrap time-search-subcontainer relative" data-bind="timeWheel: { config: wheelConfig, onClick: selectPeriod, breadCrumb: breadCrumb}">
         <h3 class="search-title">{% trans "Time Wheel" %} <span class="text-xs text-muted text-thin">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</span></h3>
         <div class="sequence" data-bind="text: breadCrumb"></div>
         <div class="chart" class=""></div>
