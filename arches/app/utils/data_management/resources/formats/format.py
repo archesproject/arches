@@ -25,7 +25,7 @@ class ResourceImportReporter:
 
     def update_resources_saved(self, count=1):
         self.resources_saved += count
-        print '{0} of {1} resources saved'.format(self.resources_saved, self.resources)
+        print _('{0} of {1} resources saved'.format(self.resources_saved, self.resources))
 
     def update_tiles(self, count=1):
         self.total_tiles += count
@@ -61,12 +61,16 @@ class Reader(object):
         pass
 
     def report_errors(self):
-        print "Import Errors Found"
-        for error in self.errors:
-            try:
-                print 'ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])
-            except TypeError as e:
-                print e, error
+        if len(self.errors) == 0:
+            print _("No import errors")
+        else:
+            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
+            with open('arches/logs/resource_import.log', 'w') as f:
+                for error in self.errors:
+                    try:
+                        f.write(_('ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])))
+                    except TypeError as e:
+                        f.write(e + unicode(error))
 
 class Writer(object):
 
