@@ -661,6 +661,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
+                ('config', JSONField(db_column='config')),
                 ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
                 ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
             ],
