@@ -40,7 +40,7 @@ define([
             this.zoom = ko.observable(0);
             this.minZoom = ko.observable(0);
             this.maxZoom = ko.observable(20);
-            this.centerX = ko.observable(0);
+            this.centerX = ko.observable(-80);
             this.centerY = ko.observable(0);
             this.pitch = ko.observable(0);
             this.bearing = ko.observable(0);

@@ -70,7 +70,8 @@ class BaseDataType(object):
                         {
                             "type": "Feature",
                             "properties": {
-                                "total": 1
+                                "total": 1,
+                                "poly_outline": False
                             },
                             "geometry": {
                                 "type": "Point",
@@ -83,20 +84,22 @@ class BaseDataType(object):
                         {
                             "type": "Feature",
                             "properties": {
-                                "total": 100
+                                "total": 100,
+                                "poly_outline": False
                             },
                             "geometry": {
                                 "type": "Point",
                                 "coordinates": [
-                                    -118.30078125,
-                                    34.075412438417395
+                                    -58.30078125,
+                                    -18.075412438417395
                                 ]
                             }
                         },
                         {
                             "type": "Feature",
                             "properties": {
-                                "total": 1
+                                "total": 1,
+                                "poly_outline": False
                             },
                             "geometry": {
                                 "type": "LineString",
@@ -127,7 +130,8 @@ class BaseDataType(object):
                         {
                             "type": "Feature",
                             "properties": {
-                                "total": 1
+                                "total": 1,
+                                "poly_outline": False
                             },
                             "geometry": {
                                 "type": "Polygon",
@@ -160,7 +164,40 @@ class BaseDataType(object):
                         {
                             "type": "Feature",
                             "properties": {
-                                "total": 1
+                                "total": 1,
+                                "poly_outline": True
+                            },
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [
+                                        -50.9765625,
+                                        22.59372606392931
+                                    ],
+                                    [
+                                        -23.37890625,
+                                        22.59372606392931
+                                    ],
+                                    [
+                                        -23.37890625,
+                                        42.94033923363181
+                                    ],
+                                    [
+                                        -50.9765625,
+                                        42.94033923363181
+                                    ],
+                                    [
+                                        -50.9765625,
+                                        22.59372606392931
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "properties": {
+                                "total": 1,
+                                "poly_outline": False
                             },
                             "geometry": {
                                 "type": "Polygon",
@@ -190,6 +227,42 @@ class BaseDataType(object):
                                             -27.59765625,
                                             -14.434680215297268
                                         ]
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "properties": {
+                                "total": 1,
+                                "poly_outline": True
+                            },
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [
+                                        -27.59765625,
+                                        -14.434680215297268
+                                    ],
+                                    [
+                                        -24.43359375,
+                                        -32.10118973232094
+                                    ],
+                                    [
+                                        0.87890625,
+                                        -31.653381399663985
+                                    ],
+                                    [
+                                        2.28515625,
+                                        -12.554563528593656
+                                    ],
+                                    [
+                                        -14.23828125,
+                                        -0.3515602939922709
+                                    ],
+                                    [
+                                        -27.59765625,
+                                        -14.434680215297268
                                     ]
                                 ]
                             }
