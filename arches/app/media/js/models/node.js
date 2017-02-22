@@ -27,6 +27,7 @@ define([
             self.datatypelookup = options.datatypelookup;
             self.layer = options.layer;
             self.mapSource = options.mapSource;
+            self.loading = options.loading;
 
 
             self._node = ko.observable('');

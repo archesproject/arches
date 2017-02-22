@@ -13,13 +13,15 @@
         <div class="flex">
             <div class="left-column-crud-container form-list">
                 <div class="title-block-title">
-                    <h4 class="title-block-title"> {% trans "Layers" %}</h4>
+                    <h4> {% trans "Layers" %}</h4>
+                </div>
+                <div class="title-block-title">
+                    {% trans "Resouce layers" %}
                 </div>
                 <div class="report-image-grid" style="margin-top: 5px;">
                     <!-- ko foreach: { data: geomNodes, as: "node" } -->
                     <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(node) }, css: {'active': $parent.selection() === node}">
                         <div class="panel mar-no">
-                            <!-- Function Name -->
                             <div class="panel-heading">
                                 <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: node.layer.icon"></i> <span data-bind="text: node.config.layerName() || node.layer.name"></span></h3>
                             </div>

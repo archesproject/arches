@@ -1,4 +1,5 @@
 import json
+from arches.app.models import models
 
 class BaseDataType(object):
 
@@ -41,6 +42,19 @@ class BaseDataType(object):
         """
         return None
 
+    def should_cache(self, node=None):
+        """
+        Tells the system if the tileserver should cache for a given node
+        """
+        return False
+
+    def should_manage_cache(self, node=None):
+        """
+        Tells the system if the tileserver should clear cache on edits for a
+        given node
+        """
+        return False
+
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node
@@ -61,7 +75,8 @@ class BaseDataType(object):
             "type": "vector",
             "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
         }
-        if preview:
+        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        if preview and count == 0:
             source_config = {
                 "type": "geojson",
                 "data": {
@@ -273,7 +288,8 @@ class BaseDataType(object):
         return {
             "nodeid": node.nodeid,
             "name": "resources-%s" % node.nodeid,
-            "source": json.dumps(source_config)
+            "source": json.dumps(source_config),
+            "count": count
         }
 
     def get_pref_label(self, nodevalue):

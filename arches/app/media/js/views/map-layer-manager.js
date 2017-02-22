@@ -7,7 +7,8 @@ define([
     'datatype-config-components'
 ], function(ko, _, BaseManagerView, NodeModel, data) {
     var vm = {
-        geomNodes: []
+        geomNodes: [],
+        loading: ko.observable(false)
     };
 
     var datatypelookup = {};
@@ -18,6 +19,7 @@ define([
     _.each(data.geom_nodes, function(node) {
         vm.geomNodes.push(
             new NodeModel({
+                loading: vm.loading,
                 source: node,
                 datatypelookup: datatypelookup,
                 graph: undefined,

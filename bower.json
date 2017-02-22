@@ -46,7 +46,8 @@
     "bootstrap-colorpicker": "^2.3.6",
     "uuid.js": "^3.3.0",
     "jsts.min": "https://cdn.rawgit.com/bjornharrtell/jsts/gh-pages/1.2.0/jsts.min.js",
-    "proj4": "^2.3.15"
+    "proj4": "^2.3.15",
+    "codemirror": "^5.24.0"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

@@ -94,44 +94,38 @@ def generateCoordinates(ul, lr, zooms, padding):
 
 
 def clean_resource_cache(tile):
-    if not settings.CACHE_RESOURCE_TILES or not settings.AUTO_MANAGE_TILE_CACHE:
-        return
-
     # get the tile model's bounds
     datatype_factory = DataTypeFactory()
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
         datatype = datatype_factory.get_instance(node.datatype)
-        bounds = datatype.get_bounds(tile, node)
+        if datatype.should_cache(node) and datatype.should_manage_cache(node):
+            bounds = datatype.get_bounds(tile, node)
 
-        if bounds is not None:
-            zooms = range(20)
-            config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
-            layer = config.layers[str(node.nodeid)]
-            mimetype, format = layer.getTypeByExtension('pbf')
+            if bounds is not None:
+                zooms = range(20)
+                config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+                layer = config.layers[str(node.nodeid)]
+                mimetype, format = layer.getTypeByExtension('pbf')
 
-            lon1, lat1, lon2, lat2 = bounds
-            south, west = min(lat1, lat2), min(lon1, lon2)
-            north, east = max(lat1, lat2), max(lon1, lon2)
+                lon1, lat1, lon2, lat2 = bounds
+                south, west = min(lat1, lat2), min(lon1, lon2)
+                north, east = max(lat1, lat2), max(lon1, lon2)
 
-            northwest = Location(north, west)
-            southeast = Location(south, east)
+                northwest = Location(north, west)
+                southeast = Location(south, east)
 
-            ul = layer.projection.locationCoordinate(northwest)
-            lr = layer.projection.locationCoordinate(southeast)
+                ul = layer.projection.locationCoordinate(northwest)
+                lr = layer.projection.locationCoordinate(southeast)
 
-            padding = 0
-            coordinates = generateCoordinates(ul, lr, zooms, padding)
+                padding = 0
+                coordinates = generateCoordinates(ul, lr, zooms, padding)
 
-            for (offset, count, coord) in coordinates:
-                config.cache.remove(layer, coord, format)
+                for (offset, count, coord) in coordinates:
+                    config.cache.remove(layer, coord, format)
 
 
 def seed_resource_cache():
-    if not settings.CACHE_RESOURCE_TILES:
-        print 'set "CACHE_RESOURCE_TILES" to true in settings before seeding cache'
-        return
-
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
 
@@ -147,8 +141,9 @@ def seed_resource_cache():
     datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
     nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=datatypes)
     for node in nodes:
+        datatype = datatype_factory.get_instance(node.datatype)
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
-        if count > 0:
+        if datatype.should_cache(node) and count > 0:
             config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
             layer = config.layers[str(node.nodeid)]
             ul = layer.projection.locationCoordinate(northwest)

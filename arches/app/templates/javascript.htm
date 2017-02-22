@@ -50,6 +50,11 @@
             'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
             'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core'
         },
+        packages: [{
+            name: "codemirror",
+            location: '{{ STATIC_URL }}bower_components/codemirror',
+            main: "lib/codemirror"
+        }],
         shim: {
             'openlayers': {
                 exports: 'ol'

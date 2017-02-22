@@ -18,11 +18,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.views.base import BaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.decorators import group_required
 
 
+@method_decorator(group_required('edit'), name='dispatch')
 class MapLayerManagerView(BaseManagerView):
     def get(self, request):
         datatype_factory = DataTypeFactory()
@@ -56,8 +59,5 @@ class MapLayerManagerView(BaseManagerView):
         context['nav']['title'] = _('Map Layer Manager')
         context['nav']['icon'] = 'fa-server'
         context['nav']['help'] = (_('Map Layer Manager'),'')
-
-
-
 
         return render(request, 'views/map-layer-manager.htm', context)

@@ -223,10 +223,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         """
 
         sql_list = []
-        for i in range(config['clusterMaxZoom'] + 1):
+        for i in range(int(config['clusterMaxZoom']) + 1):
             arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-            distance = arc * config['clusterDistance']
-            sql_string = cluster_sql % (distance, config['clusterMinPoints'], node.pk)
+            distance = arc * int(config['clusterDistance'])
+            sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
             sql_list.append(sql_string)
 
         sql_list.append("""
@@ -279,6 +279,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "write cache": config["cacheTiles"]
         }
 
+    def should_cache(self, node=None):
+        if node is None:
+            return False
+        elif node.config is None:
+            return False
+        return node.config["cacheTiles"]
+
+    def should_manage_cache(self, node=None):
+        if node is None:
+            return False
+        elif node.config is None:
+            return False
+        return node.config["autoManageCache"]
+
     def get_map_layer(self, node=None, preview=False):
         if node is None:
             return None
@@ -292,10 +306,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_name = "%s - %s" % (node.graph.name, node.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
-        return {
-            "nodeid": node.nodeid,
-            "name": layer_name,
-            "layer_definitions": """[
+
+        if not preview and node.config["advancedStyling"]:
+            try:
+                style = json.loads(node.config["advancedStyle"])
+                for layer in style:
+                    layer["source-layer"] = str(node.pk)
+                layer_def = json.dumps(style)
+            except ValueError:
+                layer_def = "[]"
+        else:
+            layer_def = """[
                 {
                     "id": "resources-fill-%(nodeid)s",
                     "type": "fill",
@@ -471,7 +492,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "fillColor": node.config["fillColor"],
                 "outlineColor": node.config["outlineColor"],
                 "outlineWeight": node.config["outlineWeight"],
-            },
+            }
+        return {
+            "nodeid": node.nodeid,
+            "name": layer_name,
+            "layer_definitions": layer_def,
             "icon": node.graph.iconclass,
         }
 
