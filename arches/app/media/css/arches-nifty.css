@@ -6348,6 +6348,13 @@ table.table.dataTable {
     padding: 10px;
     color: #808080;
 }
+.map-server-basemap-button{
+    position: absolute;
+    z-index: 10;
+    right: 10px;
+    top: 10px;
+    background: rgba(255, 255, 255, 0.88);
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

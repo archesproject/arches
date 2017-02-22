@@ -284,14 +284,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return False
         elif node.config is None:
             return False
-        return config["cacheTiles"]
+        return node.config["cacheTiles"]
 
     def should_manage_cache(self, node=None):
         if node is None:
             return False
         elif node.config is None:
             return False
-        return config["autoManageCache"]
+        return node.config["autoManageCache"]
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:

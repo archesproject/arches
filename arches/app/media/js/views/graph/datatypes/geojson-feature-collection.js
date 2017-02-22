@@ -16,6 +16,7 @@ define([
             this.graph = params.graph;
             this.layer = params.layer;
             if (this.layer) {
+                this.count = params.mapSource.count;
                 this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);
                 var getDisplayLayers = function () {
@@ -41,11 +42,28 @@ define([
                         delete overlay["source-layer"];
                     })
                 }
-                var basemapLayers = _.filter(arches.mapLayers, function(layer) {
-                    return layer.name === 'streets';
-                }).reduce(function(layers, layer) {
-                    return layers.concat(layer.layer_definitions);
-                }, []);
+                this.selectedBasemapName = ko.observable('');
+                this.basemaps = _.filter(arches.mapLayers, function(layer) {
+                    return !layer.isoverlay;
+                });
+                this.basemaps.forEach(function (basemap) {
+                    if (self.selectedBasemapName() === '') {
+                        self.selectedBasemapName(basemap.name);
+                    }
+                    if (basemap.name === 'streets') {
+                        self.selectedBasemapName('streets');
+                    }
+                    basemap.select = function () {
+                        self.selectedBasemapName(basemap.name);
+                    }
+                });
+                var getBasemapLayers = function () {
+                    return _.filter(self.basemaps, function(layer) {
+                        return layer.name === self.selectedBasemapName();
+                    }).reduce(function(layers, layer) {
+                        return layers.concat(layer.layer_definitions);
+                    }, []);
+                }
                 var sources = $.extend(true, {}, arches.mapSources);
                 sources[params.mapSource.name] = JSON.parse(params.mapSource.source);
                 _.each(sources, function(sourceConfig, name) {
@@ -59,6 +77,7 @@ define([
                 });
 
                 var displayLayers = getDisplayLayers();
+                var basemapLayers = getBasemapLayers();
                 this.mapStyle = {
                     "version": 8,
                     "name": "Basic",
@@ -89,7 +108,7 @@ define([
                     this.map = map;
                 }
 
-                this.node.json.subscribe(function () {
+                var updateMapStyle = function () {
                     _.each(overlays, function(layer) {
                         switch (layer.id) {
                             case "resources-fill-" + params.nodeid:
@@ -122,9 +141,13 @@ define([
                         }
                     });
                     var displayLayers = getDisplayLayers();
+                    var basemapLayers = getBasemapLayers();
                     self.mapStyle.layers = basemapLayers.concat(displayLayers);
                     self.map.setStyle(self.mapStyle);
-                });
+                };
+
+                this.node.json.subscribe(updateMapStyle);
+                this.selectedBasemapName.subscribe(updateMapStyle);
 
                 this.config.advancedStyling.subscribe(function(value) {
                     if (value && !self.config.advancedStyle()) {

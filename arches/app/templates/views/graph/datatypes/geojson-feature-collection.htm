@@ -1,7 +1,6 @@
 {% load i18n %}
 <!-- ko if: $data.layer -->
 <div class="row map-service-container">
-
     <!-- ko if: !loading() -->
     <div class="col-md-5 col-lg-4 map-service-preview" style="padding:0;" data-bind="mapboxgl: {
             mapOptions: {
@@ -18,6 +17,14 @@
                 setupMap(map);
             }
         }">
+        <div class="btn-group map-server-basemap-button">
+            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- ko foreach: basemaps -->
+                <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                <!-- /ko -->
+            </ul>
+        </div>
     </div>
     <!-- /ko -->
     <!-- ko if: loading() -->
@@ -51,6 +58,11 @@
                             <div class="row service-widget-container">
                                 <div class="form-horizontal">
                                     <div class="panel-body">
+                                        <!-- ko if: count === 0 -->
+                                        <div class="map-server-instructions">
+                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
+                                        </div>
+                                        <!-- /ko -->
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Layer Name:</label>
                                             <div class="col-sm-9">
