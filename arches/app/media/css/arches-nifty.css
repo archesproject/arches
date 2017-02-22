@@ -13,6 +13,8 @@
 @import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
+@import url(../bower_components/codemirror/lib/codemirror.css);
+@import url(../bower_components/codemirror/theme/monokai.css);
 
 
 /*  Summernote Overrides */
@@ -2521,6 +2523,12 @@ ul.jqtree-tree div.jqtree_common {
     margin: 5px 0;
     padding: 5px 10px;
 }
+
+ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
+    background-color: #ddd;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
 ul.jqtree-tree div.jqtree_common:hover {
     color: #2ea8e5;
     background: #fff;
@@ -3028,6 +3036,7 @@ ul.jqtree-tree .jqtree-title {
     margin-bottom: 2px;
     font-size: 13px;
 }
+
 ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
     background: none;
     background-color: #49596A;
@@ -3970,7 +3979,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
     background: #37495b;
 }
 .help-close:hover, .library-close-btn:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover {
-    color: #fff;
+    color: #123;
 }
 .nav-tabs.library-tools > li.active > a > i {
     color: #123;
@@ -5805,6 +5814,14 @@ span.basemap-unselected {
 }
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 10; /* number of lines to show */
+    line-height: 1.2em;        /* fallback */
+    max-height: 12em;       /* fallback */
 }
 .hover-feature {
     font-size: 13px;
@@ -6109,13 +6126,17 @@ span.basemap-unselected {
 }
 
 .search-listing-body {
-	max-height: 60px;
-    min-height: 60px;
+    height: 4.6em;
     font-size: 12px;
     line-height: 1.35;
 	color: #888;
 	background: #fff;
 	padding: 5px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* number of lines to show */
 }
 
 .search-listing-footer {
@@ -6139,8 +6160,8 @@ span.basemap-unselected {
 }
 
 .time-wheel-wrap .sequence {
-  width: 600px;
-  height: 50px;
+  font-size: 15px;
+  margin-bottom: 10px;
 }
 
 .time-wheel-wrap .sequence text {
@@ -6280,6 +6301,11 @@ table.table.dataTable {
 	min-height: 450px;
 }
 
+.advanced-map-style-switch {
+    margin-top: -40px;
+    margin-right: 50px;
+}
+
 .map-service-config {
 	padding: 0px 30px 10px 30px;
 }
@@ -6336,6 +6362,17 @@ table.table.dataTable {
 .control-label-value {
     padding-top: 7px;
     font-weight: bold;
+}
+.map-server-instructions {
+    padding: 10px;
+    color: #808080;
+}
+.map-server-basemap-button{
+    position: absolute;
+    z-index: 10;
+    right: 10px;
+    top: 10px;
+    background: rgba(255, 255, 255, 0.88);
 }
 @keyframes loader {
 	0% { background: #ddd; }

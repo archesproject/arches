@@ -3,7 +3,9 @@ define([
     'knockout',
     'underscore',
     'bindings/color-picker',
-    'bindings/mapbox-gl'
+    'bindings/mapbox-gl',
+    'bindings/codemirror',
+    'codemirror/mode/javascript/javascript'
 ], function (arches, ko, _) {
     var name = 'geojson-feature-collection-datatype-config';
     ko.components.register(name, {
@@ -13,84 +15,153 @@ define([
             this.config = params.config;
             this.graph = params.graph;
             this.layer = params.layer;
-            var overlays = JSON.parse(this.layer.layer_definitions);
-            _.each(overlays, function(overlay){
-                delete overlay["source-layer"];
-            })
-            var basemapLayers = _.filter(arches.mapLayers, function(layer) {
-                return layer.name === 'streets';
-            }).reduce(function(layers, layer) {
-                return layers.concat(layer.layer_definitions);
-            }, []);
-            var sources = $.extend(true, {}, arches.mapSources);
-            sources[params.mapSource.name] = JSON.parse(params.mapSource.source);
+            if (this.layer) {
+                this.count = params.mapSource.count;
+                this.loading = params.loading || ko.observable(false);
+                var overlays = JSON.parse(this.layer.layer_definitions);
+                var getDisplayLayers = function () {
+                    var displayLayers = overlays;
+                    if (self.config.advancedStyling()) {
+                        var advancedStyle = self.config.advancedStyle();
+                        try {
+                            displayLayers = JSON.parse(advancedStyle);
+                        }
+                        catch (e) {
+                            displayLayers = [];
+                        }
+                    }
+                    if (params.mapSource.count > 0) {
+                        _.each(displayLayers, function(layer){
+                            layer["source-layer"] = params.nodeid;
+                        });
+                    }
+                    return displayLayers
+                }
+                if (params.mapSource.count === 0) {
+                    _.each(overlays, function(overlay){
+                        delete overlay["source-layer"];
+                    })
+                }
+                this.selectedBasemapName = ko.observable('');
+                this.basemaps = _.filter(arches.mapLayers, function(layer) {
+                    return !layer.isoverlay;
+                });
+                this.basemaps.forEach(function (basemap) {
+                    if (self.selectedBasemapName() === '') {
+                        self.selectedBasemapName(basemap.name);
+                    }
+                    if (basemap.name === 'streets') {
+                        self.selectedBasemapName('streets');
+                    }
+                    basemap.select = function () {
+                        self.selectedBasemapName(basemap.name);
+                    }
+                });
+                var getBasemapLayers = function () {
+                    return _.filter(self.basemaps, function(layer) {
+                        return layer.name === self.selectedBasemapName();
+                    }).reduce(function(layers, layer) {
+                        return layers.concat(layer.layer_definitions);
+                    }, []);
+                }
+                var sources = $.extend(true, {}, arches.mapSources);
+                sources[params.mapSource.name] = JSON.parse(params.mapSource.source);
+                _.each(sources, function(sourceConfig, name) {
+                    if (sourceConfig.tiles) {
+                        sourceConfig.tiles.forEach(function(url, i) {
+                            if (url.startsWith('/')) {
+                                sourceConfig.tiles[i] = window.location.origin + url;
+                            }
+                        });
+                    }
+                });
 
-            this.mapStyle = {
-                "version": 8,
-                "name": "Basic",
-                "metadata": {
-                    "mapbox:autocomposite": true,
-                    "mapbox:type": "template"
-                },
-                "sources": sources,
-                "sprite": "mapbox://sprites/mapbox/basic-v9",
-                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-                "layers": basemapLayers.concat(overlays)
-            };
-            this.zoom = ko.observable(0);
-            this.minZoom = ko.observable(0);
-            this.maxZoom = ko.observable(20);
-            this.centerX = ko.observable(-80);
-            this.centerY = ko.observable(0);
-            this.pitch = ko.observable(0);
-            this.bearing = ko.observable(0);
+                var displayLayers = getDisplayLayers();
+                var basemapLayers = getBasemapLayers();
+                this.mapStyle = {
+                    "version": 8,
+                    "name": "Basic",
+                    "metadata": {
+                        "mapbox:autocomposite": true,
+                        "mapbox:type": "template"
+                    },
+                    "sources": sources,
+                    "sprite": "mapbox://sprites/mapbox/basic-v9",
+                    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                    "layers": basemapLayers.concat(displayLayers)
+                };
+                this.zoom = ko.observable(0);
+                this.minZoom = ko.observable(0);
+                this.maxZoom = ko.observable(20);
+                this.centerX = ko.observable(-80);
+                this.centerY = ko.observable(0);
+                this.pitch = ko.observable(0);
+                this.bearing = ko.observable(0);
 
-            this.serviceURL = window.location.origin +
+                this.serviceURL = window.location.origin +
                 arches.urls.tileserver +
                 '/' + params.nodeid +
                 '/{z}/{x}/{y}.pbf';
 
-            this.map = null;
-            this.setupMap = function(map) {
-                this.map = map;
-            }
+                this.map = null;
+                this.setupMap = function(map) {
+                    this.map = map;
+                }
 
-            this.node.json.subscribe(function () {
-                _.each(overlays, function(layer) {
-                    switch (layer.id) {
-                        case "resources-fill-" + params.nodeid:
-                            layer.paint["fill-color"] = self.config.fillColor()
-                            break;
-                        case "resources-line-halo-" + params.nodeid:
-                            layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                            layer.paint["line-color"] = self.config.lineHaloColor();
-                            break;
-                        case "resources-line-" + params.nodeid:
-                            layer.paint["line-width"] = parseInt(self.config.weight());
-                            layer.paint["line-color"] = self.config.lineColor();
-                            break;
-                        case "resources-poly-outline-" + params.nodeid:
-                            layer.paint["line-width"] = parseInt(self.config.outlineWeight());
-                            layer.paint["line-color"] = self.config.outlineColor();
-                            break;
-                        case "resources-point-halo-" + params.nodeid:
-                            layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
-                        case "resources-cluster-point-halo-" + params.nodeid:
-                            layer.paint["circle-color"] = self.config.pointHaloColor();
-                            break;
-                        case "resources-point-" + params.nodeid:
-                            layer.paint["circle-radius"] = parseInt(self.config.radius());
-                        case "resources-cluster-point-" + params.nodeid:
-                            layer.paint["circle-color"] = self.config.pointColor();
-                            break;
-                        case "resources-cluster-count-" + params.nodeid:
-                            break;
-                        default:
+                var updateMapStyle = function () {
+                    _.each(overlays, function(layer) {
+                        switch (layer.id) {
+                            case "resources-fill-" + params.nodeid:
+                                layer.paint["fill-color"] = self.config.fillColor()
+                                break;
+                            case "resources-line-halo-" + params.nodeid:
+                                layer.paint["line-width"] = parseInt(self.config.haloWeight());
+                                layer.paint["line-color"] = self.config.lineHaloColor();
+                                break;
+                            case "resources-line-" + params.nodeid:
+                                layer.paint["line-width"] = parseInt(self.config.weight());
+                                layer.paint["line-color"] = self.config.lineColor();
+                                break;
+                            case "resources-poly-outline-" + params.nodeid:
+                                layer.paint["line-width"] = parseInt(self.config.outlineWeight());
+                                layer.paint["line-color"] = self.config.outlineColor();
+                                break;
+                            case "resources-point-halo-" + params.nodeid:
+                                layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
+                            case "resources-cluster-point-halo-" + params.nodeid:
+                                layer.paint["circle-color"] = self.config.pointHaloColor();
+                                break;
+                            case "resources-point-" + params.nodeid:
+                                layer.paint["circle-radius"] = parseInt(self.config.radius());
+                            case "resources-cluster-point-" + params.nodeid:
+                                layer.paint["circle-color"] = self.config.pointColor();
+                                break;
+                            default:
 
+                        }
+                    });
+                    var displayLayers = getDisplayLayers();
+                    var basemapLayers = getBasemapLayers();
+                    self.mapStyle.layers = basemapLayers.concat(displayLayers);
+                    self.map.setStyle(self.mapStyle);
+                };
+
+                this.node.json.subscribe(updateMapStyle);
+                this.selectedBasemapName.subscribe(updateMapStyle);
+
+                this.config.advancedStyling.subscribe(function(value) {
+                    if (value && !self.config.advancedStyle()) {
+                        self.config.advancedStyle(JSON.stringify(overlays, null, '\t'))
                     }
-                });;
-                self.map.setStyle(self.mapStyle);
-            })
+                });
+
+                this.saveNode = function() {
+                    self.loading(true);
+                    self.node.save(function() {
+                        self.loading(false);
+                    });
+                }
+            }
         },
         template: { require: 'text!datatype-config-templates/geojson-feature-collection' }
     });

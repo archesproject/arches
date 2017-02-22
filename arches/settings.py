@@ -367,23 +367,6 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-# Set to true to cache resource vector tiles; slows tile save performance, but
-# improves performance of tile layers on client. Usually, you may want to use
-# this in production, but probably not during development
-CACHE_RESOURCE_TILES = False
-
-# Set this to True if you want the system to automatically clean the resource
-# tile cache when underlying data change. This is good for systems where you
-# require low latency in updating map layers and are managing relatively small
-# geometries (saving large geometries with this set to True will impact
-# performance, sometimes severely).
-#
-# If you are caching resource tiles and have this set to False, you will need to
-# manually manage cleaning of the cache.  To do this, you can simply delete
-# the resource tile cache folder ('arches/tileserver/cache/resources' by
-# default)
-AUTO_MANAGE_TILE_CACHE = False
-
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -410,12 +393,6 @@ TILE_CACHE_CONFIG = {
 }
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
-
-# map cluster distance in pixels, uses "ST_ClusterDBSCAN"
-# http://postgis.net/docs/manual-dev/ST_ClusterDBSCAN.html
-CLUSTER_DISTANCE = 20
-CLUSTER_MAX_ZOOM = 5
-CLUSTER_MIN_POINTS = 3
 
 BULK_IMPORT_BATCH_SIZE = 2000
 

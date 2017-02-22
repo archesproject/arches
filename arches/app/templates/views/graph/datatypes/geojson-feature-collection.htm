@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko if: $data.layer -->
 <div class="row map-service-container">
-
+    <!-- ko if: !loading() -->
     <div class="col-md-5 col-lg-4 map-service-preview" style="padding:0;" data-bind="mapboxgl: {
             mapOptions: {
                 style: mapStyle,
@@ -17,7 +17,19 @@
                 setupMap(map);
             }
         }">
+        <div class="btn-group map-server-basemap-button">
+            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- ko foreach: basemaps -->
+                <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                <!-- /ko -->
+            </ul>
+        </div>
     </div>
+    <!-- /ko -->
+    <!-- ko if: loading() -->
+    <div class="col-md-5 col-lg-4 map-service-preview"></div>
+    <!-- /ko -->
 
     <div class="col-md-7 col-lg-8">
         <div class="map-service-config">
@@ -25,67 +37,143 @@
             <h3 class="config-title"><i class="ion-wrench"></i> Service Details</h3>
 
             <div class="col-xs-12">
-                <div class="row service-widget-container">
-                    <div class="form-horizontal">
-                        <div class="panel-body">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Layer Name:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" data-bind="attr: {'placeholder': layer.name}, valueUpdate: 'keyup', value: config.layerName">
+                <div class="tab-base" style="background: #f9f9f9; margin-bottom: 0px;">
+
+                    <!-- Resource Styling Tabs -->
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a data-toggle="tab" href="#details-panel" aria-expanded="true">Details</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#clustering-panel" aria-expanded="false">Clustering</a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#caching-panel" aria-expanded="false">Caching</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+
+                        <div id="details-panel" class="tab-pane fade active in">
+                            <div class="row service-widget-container">
+                                <div class="form-horizontal">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Layer Name:</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" data-bind="attr: {'placeholder': layer.name}, valueUpdate: 'keyup', value: config.layerName">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Activated:</label>
+                                            <div class="col-sm-9">
+                                                <span class="switch switch-small" data-bind="css: {
+                                                        'on': config.layerActivated()
+                                                    }, click: function () {
+                                                        config.layerActivated(!config.layerActivated());
+                                                    }">
+                                                    <small></small>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Resource Model:</label>
+                                            <div class="col-sm-9 control-label-value" data-bind="text: graph.name"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Node:</label>
+                                            <div class="col-sm-9 control-label-value" data-bind="text: node.name"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Service URL:</label>
+                                            <div class="col-sm-9 control-label-value" data-bind="text: serviceURL"></div>
+                                        </div>
+                                        <!-- ko if: count === 0 -->
+                                        <div class="map-server-instructions">
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Activated:</label>
-                                <div class="col-sm-9">
-                                    <span class="switch switch-small" data-bind="css: {
-                                            'on': config.layerActivated()
-                                        }, click: function () {
-                                            config.layerActivated(!config.layerActivated());
-                                        }">
-                                        <small></small>
-                                    </span>
+                        </div>
+
+                        <div id="clustering-panel" class="tab-pane fade">
+                            <div class="row service-widget-container">
+                                <div class="form-horizontal">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Cluster Distance:</label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Cluster Max Zoom:</label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Cluster Min Points:</label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
+                                            </div>
+                                        </div>
+                                        <div class="map-server-instructions">
+                                            {% trans "Changes to cluster settings will only be reflected after saving.  If tiles are being cached, tile cache will need to be cleared to reflect changes." %}
+                                            <!-- ko if: count === 0 -->
+                                            </br></br>
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Preview map data do not use clustering algorithm.  Add data for this resource model to see real clustered data." %}
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Resource Model:</label>
-                                <div class="col-sm-9 control-label-value" data-bind="text: graph.name"></div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Node:</label>
-                                <div class="col-sm-9 control-label-value" data-bind="text: node.name"></div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Service URL:</label>
-                                <div class="col-sm-9 control-label-value" data-bind="text: serviceURL"></div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Cache Tiles:</label>
-                                <div class="col-sm-9">
-                                    <span class="switch switch-small" data-bind="css: {
-                                            'on': config.cacheTiles()
-                                        }, click: function () {
-                                            config.cacheTiles(!config.cacheTiles());
-                                        }">
-                                        <small></small>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Cluster Distance:</label>
-                                <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Cluster Max Zoom:</label>
-                                <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Cluster Min Points:</label>
-                                <div class="col-sm-9">
-                                    <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
+                        </div>
+
+                        <div id="caching-panel" class="tab-pane fade">
+                            <div class="row service-widget-container">
+                                <div class="form-horizontal">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Cache Tiles:</label>
+                                            <div class="col-sm-9">
+                                                <span class="switch switch-small" data-bind="css: {
+                                                        'on': config.cacheTiles()
+                                                    }, click: function () {
+                                                        config.cacheTiles(!config.cacheTiles());
+                                                    }">
+                                                    <small></small>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Clean Cache on Edit:</label>
+                                            <div class="col-sm-9">
+                                                <span class="switch switch-small" data-bind="css: {
+                                                        'on': config.autoManageCache()
+                                                    }, click: function () {
+                                                        config.autoManageCache(!config.autoManageCache());
+                                                    }">
+                                                    <small></small>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="map-server-instructions">
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Warning: only change tile caching settings if you know what you are doing." %}
+                                            </br></br>
+                                            {% trans "Automatically cleaning the tile cache slows save performance in forms." %}
+                                            </br></br>
+                                            {% trans "Cleaning the tile cache on edit is good for systems that require low latency in updating map layers and are managing relatively small geometries (saving large geometries with automatic cache cleaning on will impact performance, sometimes severely)." %}
+                                            </br></br>
+                                            {% trans "If you are caching tiles and do not have automatic cache cleaning on, you will need to manually manage cleaning of the cache. In most cases, this can be done by simply deleting folder in your tile cache directory that matches the node's id (shown in the service URL)." %}
+                                            <!-- TODO: ADD HELP LINK HERE! -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -105,9 +193,28 @@
             <h3 class="config-title">
                 <i class="ion-image"></i> Service Styling
             </h3>
+            <div class="pull-right advanced-map-style-switch">
+                <label class="control-label">Advanced Styling:</label>
+                <span class="switch switch-small" data-bind="css: {
+                        'on': config.advancedStyling()
+                    }, click: function () {
+                        config.advancedStyling(!config.advancedStyling());
+                    }">
+                    <small></small>
+                </span>
+            </div>
 
-            <!-- Resource Style -->
-            <div class="col-xs-12">
+            <div class="col-xs-12" data-bind="if: config.advancedStyling()">
+                <div id="style-panel" class="tab-pane fade active in">
+                    <div class="panel-body" style="padding-top: 0px;">
+                        <div class="row">
+                            <div data-bind="codemirror: { value: config.advancedStyle, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12" data-bind="if: !config.advancedStyling()">
                 <div id="style-panel" class="tab-pane fade active in">
                     <div class="panel-body" style="padding-top: 0px;">
                         <div class="row">
@@ -228,14 +335,14 @@
                             </div>
                         </div>
 
-                        <!-- ko if: node.dirty() -->
-                        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { node.save() }">Save Edits</button>
-                        <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
-                        <!-- /ko -->
                     </div>
 
                 </div>
             </div>
+            <!-- ko if: node.dirty() -->
+            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">Save Edits</button>
+            <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
+            <!-- /ko -->
         </div>
     </div>
 </div>
