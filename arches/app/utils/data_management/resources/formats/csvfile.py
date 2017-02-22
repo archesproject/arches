@@ -7,6 +7,7 @@ import os
 import sys
 import uuid
 import distutils.util
+import traceback
 from copy import deepcopy
 from mimetypes import MimeTypes
 from os.path import isfile, join
@@ -30,6 +31,7 @@ from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from django.http import HttpRequest
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.translation import ugettext as _
 
 try:
     from cStringIO import StringIO
@@ -128,7 +130,7 @@ class CsvReader(Reader):
             resources.append(newresourceinstance)
             if len(resources) == settings.BULK_IMPORT_BATCH_SIZE:
                 Resource.bulk_save(resources=resources)
-                print '%s resources saved' % save_count
+                print _('%s resources saved' % save_count)
                 del resources[:]  #clear out the array
         else:
             newresourceinstance.save()
@@ -188,7 +190,7 @@ class CsvReader(Reader):
                         if len(errors) > 0:
                             self.errors += errors
                     else:
-                        print 'No datatype detected for {0}'.format(value)
+                        print _('No datatype detected for {0}'.format(value))
 
                     return {'value': value, 'request': request}
 
@@ -331,8 +333,14 @@ class CsvReader(Reader):
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
-                    print '%s total resource saved' % (save_count + 1)
+                    print _('%s total resource saved' % (save_count + 1))
 
         except Exception as e:
-            print e
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            if len(formatted):
+                for message in formatted:
+                    print message
+
+        finally:
             self.report_errors()
