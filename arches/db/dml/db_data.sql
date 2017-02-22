@@ -118,6 +118,7 @@ INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'd
     "clusterMaxZoom": 5,
     "clusterMinPoints": 3,
     "cacheTiles": false,
+    "autoManageCache": false,
     "advancedStyling": false,
     "advancedStyle": ""
 }', 'views/graph/datatypes/geojson-feature-collection', 'geojson-feature-collection-datatype-config', TRUE, '10000000-0000-0000-0000-000000000007');

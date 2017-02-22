@@ -6344,6 +6344,10 @@ table.table.dataTable {
     padding-top: 7px;
     font-weight: bold;
 }
+.map-server-instructions {
+    padding: 10px;
+    color: #808080;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

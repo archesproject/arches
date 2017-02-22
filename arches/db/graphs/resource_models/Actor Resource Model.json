@@ -1588,7 +1588,7 @@
                     "datatype": "geojson-feature-collection",
                     "nodegroup_id": "be9d6e1b-e742-11e6-84a6-026d961c88e6",
                     "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
-                    "config": {"pointColor": "rgba(130, 130, 130, 0.7)", "pointHaloColor": "rgba(200, 200, 200, 0.5)", "radius": 2, "haloRadius": 4, "lineColor": "rgba(130, 130, 130, 0.7)", "lineHaloColor": "rgba(200, 200, 200, 0.5)", "weight": 2, "haloWeight": 4, "fillColor": "rgba(130, 130, 130, 0.5)", "outlineColor": "rgba(200, 200, 200, 0.7)", "outlineWeight": 2, "layerActivated": true, "layerName": "", "clusterDistance": 20, "clusterMaxZoom": 5, "clusterMinPoints": 3, "cacheTiles": false, "advancedStyling": false, "advancedStyle": ""},
+                    "config": {"pointColor": "rgba(130, 130, 130, 0.7)", "pointHaloColor": "rgba(200, 200, 200, 0.5)", "radius": 2, "haloRadius": 4, "lineColor": "rgba(130, 130, 130, 0.7)", "lineHaloColor": "rgba(200, 200, 200, 0.5)", "weight": 2, "haloWeight": 4, "fillColor": "rgba(130, 130, 130, 0.5)", "outlineColor": "rgba(200, 200, 200, 0.7)", "outlineWeight": 2, "layerActivated": true, "layerName": "", "clusterDistance": 20, "clusterMaxZoom": 5, "clusterMinPoints": 3, "cacheTiles": false, "autoManageCache": false, "advancedStyling": false, "advancedStyle": ""},
                     "parentproperty": "P87_is_identified_by",
                     "name": "Spatial Coordinates Geometry"
                 },

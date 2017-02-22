@@ -223,10 +223,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         """
 
         sql_list = []
-        for i in range(config['clusterMaxZoom'] + 1):
+        for i in range(int(config['clusterMaxZoom']) + 1):
             arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-            distance = arc * config['clusterDistance']
-            sql_string = cluster_sql % (distance, config['clusterMinPoints'], node.pk)
+            distance = arc * int(config['clusterDistance'])
+            sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
             sql_list.append(sql_string)
 
         sql_list.append("""
@@ -278,6 +278,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "compress": True,
             "write cache": config["cacheTiles"]
         }
+
+    def should_cache(self, node=None):
+        if node is None:
+            return False
+        elif node.config is None:
+            return False
+        return config["cacheTiles"]
+
+    def should_manage_cache(self, node=None):
+        if node is None:
+            return False
+        elif node.config is None:
+            return False
+        return config["autoManageCache"]
 
     def get_map_layer(self, node=None, preview=False):
         if node is None:

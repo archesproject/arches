@@ -16,6 +16,7 @@ define([
             this.graph = params.graph;
             this.layer = params.layer;
             if (this.layer) {
+                this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);
                 var getDisplayLayers = function () {
                     var displayLayers = overlays;
@@ -129,7 +130,14 @@ define([
                     if (value && !self.config.advancedStyle()) {
                         self.config.advancedStyle(JSON.stringify(overlays, null, '\t'))
                     }
-                })
+                });
+
+                this.saveNode = function() {
+                    self.loading(true);
+                    self.node.save(function() {
+                        self.loading(false);
+                    });
+                }
             }
         },
         template: { require: 'text!datatype-config-templates/geojson-feature-collection' }
