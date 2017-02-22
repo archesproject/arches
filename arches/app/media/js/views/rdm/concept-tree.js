@@ -40,14 +40,16 @@ define([
 
             self.$el.tree(
                 'loadDataFromUrl',
-                arches.urls.concept_tree + "?node=" + this.model.get('id'),
+                arches.urls.concept_tree,
                 null,
                 function() {
                     var node;
                     if (self.model.get('id') !== '') {
                         node = self.$el.tree('getNodeById', self.model.get('id'));
-                        self.$el.tree('selectNode', node);
-                        self.$el.tree('scrollToNode', node);
+                        if (node) {
+                            self.$el.tree('selectNode', node);
+                            self.$el.tree('scrollToNode', node);
+                        }
                     }
                 }
             );

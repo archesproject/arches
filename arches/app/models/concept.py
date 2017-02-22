@@ -565,7 +565,7 @@ class Concept(object):
                 return child_concept
 
         graph = []
-        if self.id == None or self.id == '' or self.id == top_concept:
+        if self.id == None or self.id == '' or self.id == 'None' or self.id == top_concept:
             concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
             for conceptmodel in concepts:
                 graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
