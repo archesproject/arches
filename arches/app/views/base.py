@@ -38,12 +38,12 @@ class BaseManagerView(TemplateView):
             'menu':False,
             'search':True,
             'res_edit':False,
-            'edit_history':False,
+            'edit_history':True,
             'login':True,
             'print':False,
         }
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-        geom_nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=geom_datatypes)
+        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes)
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
@@ -58,6 +58,7 @@ class BaseManagerView(TemplateView):
             if map_layer is not None:
                 resource_layers.append(map_layer)
 
+        context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers
         context['resource_map_sources'] = resource_sources
 

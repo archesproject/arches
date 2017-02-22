@@ -94,10 +94,10 @@ class Command(BaseCommand):
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
 
-        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default=False,
+        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default='overwrite',
             help='Whether to overwrite existing concepts with ones being imported or not.')
 
-        parser.add_argument('-st', '--stage', action='store', dest='stage', default=False,
+        parser.add_argument('-st', '--stage', action='store', dest='stage', default='keep',
             help='Whether to stage new concepts or add them to the existing concept scheme.')
 
         parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',

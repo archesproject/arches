@@ -499,9 +499,7 @@ class Concept(object):
                 query = Query(se, start=0, limit=10000)
                 term = Term(field='conceptid', term=concept.id)
                 query.add_query(term)
-                query.delete(index='concept_labels')
-                for conceptvalue in concept.values:
-                    se.delete_terms(conceptvalue.id)
+                query.delete(index='strings', doc_type='concept')
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
@@ -567,14 +565,14 @@ class Concept(object):
                 return child_concept
 
         graph = []
-        #if self.id == None or self.id == '' or self.id == top_concept:
-        concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
-        for conceptmodel in concepts:
-            graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
-        #else:
-            #graph = [_findNarrowerConcept(self.id, depth_limit=1)]
-            #concepts = _findNarrowerConcept(self.id, depth_limit=1)
-            #graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
+        if self.id == None or self.id == '' or self.id == 'None' or self.id == top_concept:
+            concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
+            for conceptmodel in concepts:
+                graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+        else:
+            graph = _findNarrowerConcept(self.id, depth_limit=1).children
+            # concepts = _findNarrowerConcept(self.id, depth_limit=1)
+            # graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
 
         return graph
 
@@ -911,28 +909,20 @@ class ConceptValue(object):
             if scheme == None:
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
 
-            se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
-            se.create_mapping('concept_labels', scheme.id, fieldname='id', fieldtype='string', fieldindex='not_analyzed')
-            se.create_mapping('concept_labels', scheme.id, fieldname='type', fieldtype='string', fieldindex='not_analyzed')
-            se.create_mapping('concept_labels', scheme.id, fieldname='category', fieldtype='string', fieldindex='not_analyzed')
-            se.index_data('concept_labels', scheme.id, data, 'id')
-            
-            # don't create terms for dropdown members
-            if not(scheme.id == '00000000-0000-0000-0000-000000000003'):
-                se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
+            data['top_concept'] = scheme.id
+            se.index_data('strings', 'concept', data, 'id')
 
     def delete_index(self):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
         term = Term(field='id', term=self.id)
         query.add_query(term)
-        query.delete(index='concept_labels')
-        se.delete_terms(self.id)
+        query.delete(index='strings', doc_type='concept')
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
-        result = se.search(index='concept_labels', id=self.id)
+        result = se.search(index='strings', doc_type='concept', id=self.id)
         if result['found']:
-            return Concept(result['_type'])
+            return Concept(result['top_concept'])
         else:
             return None

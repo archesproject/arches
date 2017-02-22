@@ -25,6 +25,7 @@ from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDat
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
+from arches.app.views.map import MapLayerManagerView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -37,7 +38,6 @@ urlpatterns = [
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
-    url(r'^map', map.get_page, name="map"),
     url(r'^geocoder', search.geocode, name="geocoder"),
 
     url(r'^entities/(?P<entityid>%s)$' % uuid_regex , entity.Entities),
@@ -105,8 +105,10 @@ urlpatterns = [
     url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
     url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
-    url(r'^tileserver/(?P<node_id>%s)/*' % uuid_regex, tileserver.handle_request, name="tileserver"),
+    url(r'^tileserver/(?P<node_id>%s)/*' % uuid_regex, tileserver.handle_request, name="tileserver_node"),
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
+    url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
+
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

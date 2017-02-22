@@ -1,0 +1,67 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {% trans "Map Layer Manager" %} {% endblock title %}
+
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <div class="flex">
+        <div class="flex">
+            <div class="left-column-crud-container form-list">
+                <div class="title-block-title">
+                    <h4 class="title-block-title"> {% trans "Layers" %}</h4>
+                </div>
+                <div class="report-image-grid" style="margin-top: 5px;">
+                    <!-- ko foreach: { data: geomNodes, as: "node" } -->
+                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(node) }, css: {'active': $parent.selection() === node}">
+                        <div class="panel mar-no">
+                            <!-- Function Name -->
+                            <div class="panel-heading">
+                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: node.layer.icon"></i> <span data-bind="text: node.config.layerName() || node.layer.name"></span></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+
+            <div class="card-form-preview-container" style="margin:20px;">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div data-bind='component: {
+                            name: selection().datatypeConfigComponent,
+                            params: selection()
+                        }'></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('map-layer-manager-data', [], function() {
+            return {
+                "geom_nodes": {{geom_nodes_json}},
+                "resource_map_layers": {{resource_map_layers_json}},
+                "resource_map_sources": {{resource_map_sources_json}},
+                "datatypes": {{ datatypes_json }},
+                "graphs": {{ graphs }}
+            };
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

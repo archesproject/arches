@@ -1938,6 +1938,11 @@ ul .collapse li:last-of-type {
     height: 90px;
     background: #ebeef0;
 }
+
+.report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group ul {
+    margin-top: -331px;
+}
+
 .resource-grid-main {
     padding-top: 10px;
     padding-left: 0;
@@ -2564,6 +2569,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     left: 0;
     top: 0;
 }
+
 .concept_result {
     font-weight: 700;
 }
@@ -2959,6 +2965,10 @@ span.editable-card i.fa.fa-align-justify:hover{
 .report-grid-item {
     float: left;
     margin: 3px;
+}
+
+.recent-additions-container {
+    margin-top: 10px;
 }
 .card-grid{
     -ms-flex: 1;
@@ -3577,6 +3587,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -ms-flex: 0 0 275px;
     -webkit-flex: 0 0 275px;
     flex: 0 0 275px;
+    margin-top: -1px;
     margin-bottom: 0px;
     background-color: #fafafa;
     width: 275px;
@@ -4013,6 +4024,15 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .select2-search, .dropdown-shim, .dropdown-shim, .dropdown-shim {
     margin-top: 10px;
 }
+
+.select2-drop.select2-drop-above .select2-search input {
+    margin-bottom: 10px;
+}
+
+.select2-results {
+    margin-top: 10px;
+}
+
 .relative, .slide, .relative, .slide, .relative, .slide, .relative {
     position: relative;
 }
@@ -4438,7 +4458,8 @@ div.row.widget-wrapper {
 
 .rr-panel-note {
     text-align: center;
-    font-size: 17px;
+    font-size: 27px;
+    margin-top: 150px;
 }
 
 .rr-drag-panel-target {
@@ -4448,6 +4469,10 @@ div.row.widget-wrapper {
     border-bottom-width: 0px;
     border-radius: 2px;
     padding: 0px 25px;
+}
+
+.recent-edits-panel {
+    margin-left: 50px;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {
@@ -5077,6 +5102,12 @@ div.row.widget-wrapper.report-header:hover {
     width: -webkit-calc(100% - 55px);
     width:    -moz-calc(100% - 55px);
     width:         calc(100% - 55px);
+}
+
+.geometry-edit-button-group {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 .notifications-narrow {
@@ -5756,11 +5787,29 @@ span.basemap-unselected {
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
+    left: 30px;
     margin: 10px;
-    padding: 10px;
-    border: solid 1px #808080;
+    padding: 0px;
+    border: solid 1px #999;
+    border-radius: 2px;
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
+}
+.hover-feature-title-bar {
+    height: 40px;
+    padding: 10px;
+    background: #ebebeb;
+}
+.hover-feature-title {
+    font-size: 15px;
+}
+.hover-feature-body {
+    padding: 10px 10px 20px 10px;
+}
+.hover-feature {
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
 }
 .search-results {
     -ms-flex: 0 0 400px;
@@ -6086,6 +6135,7 @@ span.basemap-unselected {
   float: left;
   width: 750px;
   margin-top: 25px;
+  margin-bottom: 100px;
 }
 
 .time-wheel-wrap .sequence {
@@ -6216,6 +6266,77 @@ table.table.dataTable {
     font-weight: bold;
 }
 
+.resource-map-service-container {
+	padding-top: 10px;
+}
+
+.map-service-container {
+	padding: 10px;
+}
+
+.map-service-preview {
+	background: #f4f4f4;
+	border: 1px solid #ddd;
+	min-height: 450px;
+}
+
+.map-service-config {
+	padding: 0px 30px 10px 30px;
+}
+
+.config-title {
+	font-weight: normal;
+    padding: 0 20px 0 0px;
+    margin-top: -10px;
+    font-size: 1.216em;
+    line-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-widget-container {
+	padding: 0px 15px 10px 15px;
+	margin-top: -10px;
+}
+
+.service-label {
+	font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    line-height: 1.2;
+    padding-bottom: 5px;
+}
+
+.service-name {
+	font-size: 14px;
+	font-weight: 400;
+	color: #888;
+	line-height: 1.2;
+	overflow-wrap: break-word;
+}
+
+.dropdown-shim {
+	margin-top: 10px;
+}
+
+.style-title {
+	font-weight: 600;
+	color: #666;
+}
+
+.col-divider {
+	border-right: 1px solid #eee;
+}
+
+.service-notes {
+	color: #888;
+	margin-bottom: 0px;
+}
+.control-label-value {
+    padding-top: 7px;
+    font-weight: bold;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

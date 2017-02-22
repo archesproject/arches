@@ -385,9 +385,15 @@ class Aggregation(Dsl):
     def __init__(self, **kwargs):
         self.agg = {}
         self.name = kwargs.pop('name', None)
-        self.field = kwargs.pop('field', '_all')
+        self.field = kwargs.pop('field', None)
+        self.script = kwargs.pop('script', None)
         self.type = kwargs.pop('type', None)
+        self.size = kwargs.pop('size', None)
 
+        if self.field is not None and self.script is not None:
+            raise Exception('You need to specify either a "field" or a "script"') 
+        if self.field is None and self.script is None:
+            raise Exception('You need to specify either a "field" or a "script"') 
         if self.name is None:
             raise Exception('You need to specify a name for your aggregation') 
         if self.type is None:
@@ -395,11 +401,19 @@ class Aggregation(Dsl):
 
         self.agg = {
             self.name: {
-                self.type: {
-                    'field' : self.field
-                }
+                self.type: {}
             }
         }
+
+        if self.field is not None:
+            self.agg[self.name][self.type]['field'] = self.field
+        elif self.script is not None:
+            self.agg[self.name][self.type]['script'] = self.script
+
+        self.set_size(self.size)
+
+        for key in kwargs:
+            self.agg[self.name][self.type][key] = kwargs.get(key, None)
 
     def add_aggregation(self, agg=None):
         if agg is not None:
@@ -407,6 +421,11 @@ class Aggregation(Dsl):
                 self.agg[self.name]['aggs'] = {}
 
             self.agg[self.name]['aggs'][agg.name] = agg.agg[agg.name]
+
+    def set_size(self, size):
+        if size is not None and size > 0:
+            self.agg[self.name][self.type]['size'] = size
+
 
 class CoreDateAgg(Aggregation):
     """
@@ -449,9 +468,12 @@ class DateRangeAgg(CoreDateAgg):
     """
 
     def __init__(self, **kwargs):
+        min_date = kwargs.pop('min_date', None)
+        max_date = kwargs.pop('max_date', None)
+        key = kwargs.pop('key', None)
         super(DateRangeAgg, self).__init__(type='date_range', **kwargs)
         
-        self.add(**kwargs)
+        self.add(min_date=min_date, max_date=max_date, key=key, **kwargs)
 
     def add(self, **kwargs):
         date_range = {}

@@ -105,37 +105,6 @@ class SearchEngine(object):
 
         return ret
 
-    def index_term(self, term, id, context='', options={}):
-        """
-        Arguments:
-        id: a unique id associated with the term
-
-        Keyword Arguments:
-        context: a uuid of a concept to associate with the term to render in the ui
-        options: any additional information to associate with the term
-
-        """
-
-        if term.strip(' \t\n\r') != '':
-            try:
-                _id = uuid.uuid4()
-                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options}, id=_id)
-            except Exception as detail:
-                self.logger.warning('%s: WARNING: search failed to index term: %s \nException detail: %s\n' % (datetime.now(), term, detail))
-                raise detail
-
-    def delete_terms(self, ids):
-        """
-        Delete a term based on it's id
-
-        """
-
-        if not isinstance(ids, list):
-            ids = [ids]
-
-        for id in ids:
-            self.delete(index='term', doc_type='value', id=document['_id'])
-
     def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
@@ -163,7 +132,7 @@ class SearchEngine(object):
                     }
                 }
 
-        self.create_index(index=index, ignore=400)
+        self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type=doc_type, body=body)
 
     def create_index(self, **kwargs):
@@ -191,7 +160,7 @@ class SearchEngine(object):
                     id = getattr(document,idfield)
 
             try:
-                self.es.index(index=index, doc_type=doc_type, body=document, id=id, **kwargs)
+                self.es.index(index=index, doc_type=doc_type, body=document, id=id)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to index document: %s \nException detail: %s\n' % (datetime.now(), document, detail))
                 raise detail
@@ -200,11 +169,18 @@ class SearchEngine(object):
     def bulk_index(self, data):
         return helpers.bulk(self.es, data, chunk_size=500, raise_on_error=True)
 
-    def create_bulk_item(self, op_type='index', index=None, type=None, id=None, data=None):
+    def create_bulk_item(self, op_type='index', index=None, doc_type=None, id=None, data=None):
         return {
             '_op_type': op_type,
             '_index': index,
-            '_type': type,
+            '_type': doc_type,
             '_id': id,
             '_source': data
         }
+
+    def count(self, **kwargs):
+        count = self.es.count(**kwargs)
+        if count is not None:
+            return count['count']
+        else:
+            return None
