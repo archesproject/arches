@@ -58,11 +58,6 @@
                             <div class="row service-widget-container">
                                 <div class="form-horizontal">
                                     <div class="panel-body">
-                                        <!-- ko if: count === 0 -->
-                                        <div class="map-server-instructions">
-                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
-                                        </div>
-                                        <!-- /ko -->
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Layer Name:</label>
                                             <div class="col-sm-9">
@@ -93,6 +88,12 @@
                                             <label class="col-sm-3 control-label">Service URL:</label>
                                             <div class="col-sm-9 control-label-value" data-bind="text: serviceURL"></div>
                                         </div>
+                                        <!-- ko if: count === 0 -->
+                                        <div class="map-server-instructions">
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
+                                        </div>
+                                        <!-- /ko -->
                                     </div>
                                 </div>
                             </div>
@@ -102,9 +103,6 @@
                             <div class="row service-widget-container">
                                 <div class="form-horizontal">
                                     <div class="panel-body">
-                                        <div class="map-server-instructions">
-                                            Changes to cluster settings will only be reflected after saving.  If tiles are being cached, tile cache will need to be cleared to reflect changes.
-                                        </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Cluster Distance:</label>
                                             <div class="col-sm-9">
@@ -123,6 +121,9 @@
                                                 <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
                                             </div>
                                         </div>
+                                        <div class="map-server-instructions">
+                                            {% trans "Changes to cluster settings will only be reflected after saving.  If tiles are being cached, tile cache will need to be cleared to reflect changes." %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -132,9 +133,6 @@
                             <div class="row service-widget-container">
                                 <div class="form-horizontal">
                                     <div class="panel-body">
-                                        <div class="map-server-instructions">
-                                            Warning: only change tile caching settings if you know what you are doing. [ADD HELP LINK HERE!]
-                                        </div>
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label">Cache Tiles:</label>
                                             <div class="col-sm-9">
@@ -158,6 +156,21 @@
                                                     <small></small>
                                                 </span>
                                             </div>
+                                        </div>
+                                        <div class="map-server-instructions">
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Warning: only change tile caching settings if you know what you are doing." %}
+                                            </br></br>
+                                            {% trans "Automatically cleaning the tile cache slows save performance in forms." %}
+                                            </br></br>
+                                            {% trans "Cleaning the tile cache on edit is good for systems that require low latency
+                                            in updating map layers and are managing relatively small
+                                            geometries (saving large geometries with automatic cache cleaning on will impact performance, sometimes severely)." %}
+                                            </br></br>
+                                            {% trans "If you are caching tiles and do not have automatic cache cleaning on, you will need to
+                                            manually manage cleaning of the cache. In most cases, this can be done by simply deleting
+                                            folder in your tile cache directory that matches the node's id (shown in the service URL)." %}
+                                            <!-- TODO: ADD HELP LINK HERE! -->
                                         </div>
                                     </div>
                                 </div>
