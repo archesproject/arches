@@ -184,13 +184,15 @@
                 'name': '{{ map_layer.name }}',
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
-                'icon': '{{ map_layer.icon }}'
+                'icon': '{{ map_layer.icon }}',
+                'is_resource_layer': false
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
                 'name': '{{ resource_map_layer.name }}',
                 'layer_definitions': {{ resource_map_layer.layer_definitions }},
                 'isoverlay': true,
-                'icon': '{{ resource_map_layer.icon }}'
+                'icon': '{{ resource_map_layer.icon }}',
+                'is_resource_layer': true
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',
