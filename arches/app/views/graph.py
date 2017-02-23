@@ -289,10 +289,14 @@ class CardView(GraphBaseView):
                 if str(edge.rangenode_id) == str(card.nodegroup_id):
                     return edge
 
-        ontologyproperty = get_edge_to_parent().ontologyproperty
+        ontologyproperty = None
         ontology_properties = []
-        if ontologyproperty:
-            ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
+
+        if self.graph.isresource:
+            parent_edge = get_edge_to_parent()
+            if parent_edge:
+                ontologyproperty = parent_edge.ontologyproperty
+                ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
