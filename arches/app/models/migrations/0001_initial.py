@@ -638,6 +638,7 @@ class Migration(migrations.Migration):
                 ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
                 ('icon', models.TextField(default=None)),
+                ('activated', models.BooleanField(default=True)),
             ],
             options={
                 'db_table': 'map_layers',

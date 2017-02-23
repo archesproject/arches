@@ -20,9 +20,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 
-{% block title %} 
-{{ block.super }} 
-{% trans "Map Layer Manager" %} 
+{% block title %}
+{{ block.super }}
+{% trans "Map Layer Manager" %}
 {% endblock title %}
 
 {% block login_header %}{% endblock login_header %}
@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="grid">
                         <!-- ko foreach: { data: geomNodes, as: "node" } -->
                         <div class="library-card selected-card" data-bind="click: function () { $parent.selection(node) }, css: {'selected': $parent.selection() === node}">
-                            
+
                             <div class="library-icon" style="">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
                                     <i class="" data-bind="css: node.layer.icon"></i>
@@ -52,38 +52,54 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="crud-card-subtitle">
                                 <a class="listitem_name" data-bind="text: node.name">
                                 </a>
-                            </div>  
+                            </div>
                         </div>
                         <!-- /ko -->
                     </div>
                 </div>
+
                 <div class="title-block-title">
-                    {% trans "Overlays" %}
+                    <h4 class="title-block-title"> {% trans "Basemaps" %}</h4>
                 </div>
-                <div class="report-image-grid" style="margin-top: 5px;">
-                    <!-- ko foreach: { data: overlays, as: "overlay" } -->
-                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(overlay) }, css: {'active': $parent.selection() === overlay}">
-                        <div class="panel mar-no">
-                            <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: overlay.icon"></i> <span data-bind="text: overlay.name"></span></h3>
+                <div class="report-image-grid relative" style="margin-top: 5px;">
+                    <div class="grid">
+                        <!-- ko foreach: { data: basemaps, as: "basemap" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(basemap) }, css: {'selected': $parent.selection() === basemap}">
+
+                            <div class="library-icon" style="">
+                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+                                    <i class="" data-bind="css: basemap.icon"></i>
+                                </span>
+                            </div>
+                            <div class="crud-card-main">
+                                <a class="listitem_name text-semibold" data-bind="text: basemap.name">
+                                </a>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
+
                 <div class="title-block-title">
-                    {% trans "Basemaps" %}
+                    <h4 class="title-block-title"> {% trans "Overlays" %}</h4>
                 </div>
-                <div class="report-image-grid" style="margin-top: 5px;">
-                    <!-- ko foreach: { data: basemaps, as: "basemap" } -->
-                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(basemap) }, css: {'active': $parent.selection() === basemap}">
-                        <div class="panel mar-no">
-                            <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: basemap.icon"></i> <span data-bind="text: basemap.name"></span></h3>
+                <div class="report-image-grid relative" style="margin-top: 5px;">
+                    <div class="grid">
+                        <!-- ko foreach: { data: overlays, as: "overlay" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(overlay) }, css: {'selected': $parent.selection() === overlay}">
+
+                            <div class="library-icon" style="">
+                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+                                    <i class="" data-bind="css: overlay.icon"></i>
+                                </span>
+                            </div>
+                            <div class="crud-card-main">
+                                <a class="listitem_name text-semibold" data-bind="text: overlay.name">
+                                </a>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
             </div>
 
@@ -126,7 +142,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             setupMap(map);
                                         }
                                     }">
-                                    <div class="btn-group map-server-basemap-button">
+                                    <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
                                         <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-right">
                                             <!-- ko foreach: basemaps -->
@@ -136,6 +152,106 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="">
+
+                                        <h3 class="config-title">
+                                            <i class="ion-image"></i> Layer Styling
+                                        </h3>
+
+                                        <div class="col-xs-12 advanced-style-panel">
+                                            <div id="style-panel" class="tab-pane fade active in">
+                                                <div class="panel-body" style="padding: 0px;">
+                                                    <div class="row">
+                                                        <div data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="col-sm-12">
+                                <div class="map-service-config">
+
+                                    <h3 class="config-title"><i class="ion-wrench"></i> Layer Details</h3>
+
+                                    <div class="row service-widget-container">
+                                        <div class="form-horizontal">
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">Layer Name:</label>
+                                                    <div class="col-sm-9">
+                                                        <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">Activated:</label>
+                                                    <div class="col-sm-9">
+                                                        <span class="switch switch-small" data-bind="css: {
+                                                                'on': selection().activated()
+                                                            }, click: function () {
+                                                                selection().activated(!selection().activated());
+                                                            }">
+                                                            <small></small>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <!-- Icon search -->
+                                                    <div style="padding-left: 10px;">
+                                                        <div class="relative" style="padding: 10px 0px;">
+
+                                                            <div>
+                                                                {% trans "Layer icon:" %}
+                                                                <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + selection().icon(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                            </div>
+
+                                                            <div style="position: absolute; left: 110px; top: 10px;">
+                                                                <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+
+                                                                <!-- ko if: iconFilter() !== '' -->
+                                                                <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                                <!-- /ko -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Icon List -->
+                                                    <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
+                                                        <div class="row">
+
+                                                            <!-- ko foreach: icons -->
+                                                            <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selection().icon())}, click: function() { $root.selection().icon(cssclass) }">
+                                                                <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+                                                            </div>
+                                                            <!-- /ko -->
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">Delete Layer</button>
+
+                                <!-- ko if: selection().dirty() -->
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">Save Edits</button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">Discard Edits</button>
+                                <!-- /ko -->
+                            </div>
+
                         </div>
                         <!-- /ko -->
                     </div>
@@ -158,7 +274,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 "resource_map_layers": {{resource_map_layers_json}},
                 "resource_map_sources": {{resource_map_sources_json}},
                 "datatypes": {{ datatypes_json }},
-                "graphs": {{ graphs }}
+                "graphs": {{ graphs }},
+                "icons": {{icons}}
             };
         });{% endautoescape %}
     </script>

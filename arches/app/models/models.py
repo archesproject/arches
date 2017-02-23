@@ -656,6 +656,7 @@ class MapLayers(models.Model):
     name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
+    activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
 
     @property
