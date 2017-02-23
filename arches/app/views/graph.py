@@ -131,7 +131,7 @@ class GraphManagerView(GraphBaseView):
 
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = ('About the Arches Designer','')
+            context['nav']['help'] = ('About the Arches Designer','help/arches-designer-help.htm')
 
             return render(request, 'views/graph.htm', context)
 
