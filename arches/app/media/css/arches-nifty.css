@@ -821,6 +821,17 @@ a.select2-search-choice-close {
     border-left: 5px solid #fdfdfd;
     opacity: .825;
 }
+
+.library-card.active {
+    background: #ffffff;
+    border-left: 5px solid steelblue;
+}
+
+.library-card.active:hover {
+    background: #fff;
+    border-left: 5px solid steelblue;
+}
+
 .library-card:first-of-type {
     border-top: 1px solid #ddd;
 }
@@ -3997,9 +4008,10 @@ li.aside-li.active:hover, .library-dark .tab-content {
     background: #f8f8f8;
 }
 .library-card.selected {
-    background: #fff;
+    background: #ffffff;
     border-left: 5px solid steelblue;
 }
+
 
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {
     color: #999;
@@ -6287,6 +6299,10 @@ table.table.dataTable {
     font-weight: bold;
 }
 
+.map-preview-panel {
+    padding-top: 5px;
+}
+
 .resource-map-service-container {
 	padding-top: 10px;
 }
@@ -6295,30 +6311,65 @@ table.table.dataTable {
 	padding: 10px;
 }
 
+.map-service-manage-buttons {
+    position: absolute;
+    top: 10px;
+    right: 60px;
+}
+
 .map-service-preview {
 	background: #f4f4f4;
 	border: 1px solid #ddd;
-	min-height: 450px;
+	height: 250px;
 }
 
 .advanced-map-style-switch {
-    margin-top: -40px;
-    margin-right: 50px;
+    margin-top: -45px;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .map-service-config {
 	padding: 0px 30px 10px 30px;
 }
 
+.service-url {
+    font-size: 12px;
+    color: #999;
+}
+
+.service-switch-shim {
+    margin-top: 8px;
+}
+
 .config-title {
 	font-weight: normal;
     padding: 0 20px 0 0px;
-    margin-top: -10px;
+    margin-top: 10px;
     font-size: 1.216em;
     line-height: 40px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.advanced-style-panel {
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.map-style-panel-body {
+    padding-bottom: 5px;
+}
+
+.layer-styler {
+    width: 33%;
+}
+
+.map-service-nav-tabs {
+    background: #f6f6f6;
 }
 
 .service-widget-container {
@@ -6371,9 +6422,17 @@ table.table.dataTable {
     position: absolute;
     z-index: 10;
     right: 10px;
-    top: 10px;
+    top: 5px;
     background: rgba(255, 255, 255, 0.88);
 }
+
+.map-service-tabs {
+    border: 1px solid #ddd;
+    background: #f9f9f9; 
+    margin-bottom: 0px;
+}
+
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
