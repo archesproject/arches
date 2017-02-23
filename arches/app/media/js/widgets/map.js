@@ -252,7 +252,9 @@ define([
                 });
             }
 
-            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
+            this.layers = $.extend(true, [], _.filter(arches.mapLayers, function (layer) {
+                return layer.activated;
+            })); //deep copy of layers
 
             this.defineSearchQueryLayer = function() {
                 var searchQueryLayer = {

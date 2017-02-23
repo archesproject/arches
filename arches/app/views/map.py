@@ -15,14 +15,16 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.views.base import BaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
+from arches.app.utils.JSONResponse import JSONResponse
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -63,3 +65,27 @@ class MapLayerManagerView(BaseManagerView):
         context['nav']['help'] = (_('Map Layer Manager'),'')
 
         return render(request, 'views/map-layer-manager.htm', context)
+
+    def post(self, request, maplayerid):
+        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        data = JSONDeserializer().deserialize(request.body)
+        map_layer.name = data['name']
+        map_layer.icon = data['icon']
+        map_layer.activated = data['activated']
+        map_layer.layerdefinitions = data['layer_definitions']
+        with transaction.atomic():
+            map_layer.save()
+        return JSONResponse({'succces':True, 'map_layer': map_layer})
+
+    def delete(self, request, maplayerid):
+        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        try:
+           tileserver_layer = models.TileserverLayers.objects.get(map_layer=map_layer)
+        except models.TileserverLayers.DoesNotExist:
+           tileserver_layer = None
+        with transaction.atomic():
+            if tileserver_layer is not None:
+                tileserver_layer.map_source.delete()
+                tileserver_layer.delete()
+            map_layer.delete()
+        return JSONResponse({'succces':True})

@@ -96,7 +96,7 @@
                                         setupMap(map);
                                     }
                                 }">
-                                <div class="btn-group map-server-basemap-button">
+                                <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
                                     <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <!-- ko foreach: basemaps -->
@@ -186,7 +186,7 @@
                                         <div id="style-panel" class="tab-pane fade active in">
                                             <div class="panel-body" style="padding-top: 0px;">
                                                 <div class="row">
-                                                    <div data-bind="codemirror: { value: selection().layerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                    <div data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -194,6 +194,11 @@
                                 </div>
                             </div>
                         </div>
+                        <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">Delete Layer</button>
+                        <!-- ko if: selection().dirty() -->
+                        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">Save Edits</button>
+                        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">Discard Edits</button>
+                        <!-- /ko -->
                     </div>
                     <!-- /ko -->
                 </div>
