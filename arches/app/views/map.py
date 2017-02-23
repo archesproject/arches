@@ -33,7 +33,9 @@ class MapLayerManagerView(BaseManagerView):
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
+        icons = models.Icon.objects.order_by('name')
         context = self.get_context_data(
+            icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
             map_layers=map_layers,

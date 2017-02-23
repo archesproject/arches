@@ -20,22 +20,34 @@ define([
         centerX: ko.observable(-80),
         centerY: ko.observable(0),
         pitch: ko.observable(0),
-        bearing: ko.observable(0)
+        bearing: ko.observable(0),
+        iconFilter: ko.observable(''),
     };
+    vm.icons = ko.computed(function () {
+        return _.filter(data.icons, function (icon) {
+            return icon.name.indexOf(vm.iconFilter()) >= 0;
+        });
+    });
     var mapLayers = $.extend(true, {}, arches.mapLayers);
+    _.each(mapLayers, function(layer) {
+        layer.layerJSON = ko.observable(JSON.stringify(layer.layer_definitions, null, '\t'))
+        layer.activated = ko.observable(layer.activated);
+        layer.name = ko.observable(layer.name);
+        layer.icon = ko.observable(layer.icon);
+    });
     vm.selectedBasemapName = ko.observable('');
     vm.basemaps = _.filter(mapLayers, function(layer) {
         return !layer.isoverlay;
     });
     vm.basemaps.forEach(function (basemap) {
         if (vm.selectedBasemapName() === '') {
-            vm.selectedBasemapName(basemap.name);
+            vm.selectedBasemapName(basemap.name());
         }
-        if (basemap.name === 'streets') {
+        if (basemap.name() === 'streets') {
             vm.selectedBasemapName('streets');
         }
         basemap.select = function () {
-            vm.selectedBasemapName(basemap.name);
+            vm.selectedBasemapName(basemap.name());
         }
     });
     vm.overlays = _.filter(mapLayers, function(layer) {
@@ -44,7 +56,7 @@ define([
 
     var getBasemapLayers = function () {
         return _.filter(vm.basemaps, function(layer) {
-            return layer.name === vm.selectedBasemapName();
+            return layer.name() === vm.selectedBasemapName();
         }).reduce(function(layers, layer) {
             return layers.concat(layer.layer_definitions);
         }, []);

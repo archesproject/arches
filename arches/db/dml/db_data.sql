@@ -2207,24 +2207,24 @@ VALUES ('search-query', '{
     }
 }');
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
         "source": "stamen-terrain",
         "minzoom": 0,
         "maxzoom": 22
-    }]', FALSE, 'fa fa-road');
+    }]', FALSE, 'fa fa-road', TRUE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
     VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
-    }]', FALSE, '');
+    }]', FALSE, '', TRUE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
     VALUES (public.uuid_generate_v1mc(), 'streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
@@ -3028,9 +3028,9 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
             "text-halo-blur": 1
         },
         "source-layer": "country_label"
-    }]', FALSE, '');
+    }]', FALSE, '', TRUE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
    VALUES (public.uuid_generate_v1mc(), 'mapzen', '
      [
      {
@@ -3331,7 +3331,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
          }
        ]
 
-     ', FALSE, '');
+     ', FALSE, '', TRUE);
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
@@ -3415,7 +3415,7 @@ CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH ROW
    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
     VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[
          {
              "id": "building-extrusion",
@@ -3441,4 +3441,4 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
                  }
              }
          }
-     ]', TRUE, 'fa fa-building-o');
+     ]', TRUE, 'fa fa-building-o', TRUE);
