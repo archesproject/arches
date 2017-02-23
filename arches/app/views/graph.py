@@ -269,7 +269,7 @@ class CardManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Cards','')
+        context['nav']['help'] = ('Managing Cards','help/card-manager-help.htm')
 
         return render(request, 'views/graph/card-manager.htm', context)
 
@@ -328,7 +328,7 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Cards and Widgets','')
+        context['nav']['help'] = ('Configuring Cards and Widgets','help/card-designer-help.htm')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
