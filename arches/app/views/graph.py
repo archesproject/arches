@@ -453,7 +453,7 @@ class ReportManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Reports','')
+        context['nav']['help'] = ('Managing Reports','help/report-manager-help.htm')
 
         return render(request, 'views/graph/report-manager.htm', context)
 
@@ -499,7 +499,7 @@ class ReportEditorView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Editing Reports','')
+        context['nav']['help'] = ('Designing Reports','help/report-designer-help.htm')
 
         return render(request, 'views/graph/report-editor.htm', context)
 
