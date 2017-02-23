@@ -1,33 +1,61 @@
-{% extends "base-manager.htm" %}
-{% load i18n %}
-{% load staticfiles %}
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
-{% block title %} {{ block.super }} {% trans "Map Layer Manager" %} {% endblock title %}
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+
+{% block title %} 
+{{ block.super }} 
+{% trans "Map Layer Manager" %} 
+{% endblock title %}
 
 {% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
-
     <div class="flex">
         <div class="flex">
             <div class="left-column-crud-container form-list">
                 <div class="title-block-title">
-                    <h4> {% trans "Layers" %}</h4>
+                    <h4 class="title-block-title"> {% trans "Resource Layers" %}</h4>
                 </div>
-                <div class="title-block-title">
-                    {% trans "Resouce layers" %}
-                </div>
-                <div class="report-image-grid" style="margin-top: 5px;">
-                    <!-- ko foreach: { data: geomNodes, as: "node" } -->
-                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(node) }, css: {'active': $parent.selection() === node}">
-                        <div class="panel mar-no">
-                            <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: node.layer.icon"></i> <span data-bind="text: node.config.layerName() || node.layer.name"></span></h3>
+                <div class="report-image-grid relative" style="margin-top: 5px;">
+                    <div class="grid">
+                        <!-- ko foreach: { data: geomNodes, as: "node" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(node) }, css: {'selected': $parent.selection() === node}">
+                            
+                            <div class="library-icon" style="">
+                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+                                    <i class="" data-bind="css: node.layer.icon"></i>
+                                </span>
                             </div>
+                            <div class="crud-card-main">
+                                <a class="listitem_name text-semibold" data-bind="text: layer.name">
+                                </a>
+                            </div>
+                            <div class="crud-card-subtitle">
+                                <a class="listitem_name" data-bind="text: node.name">
+                                </a>
+                            </div>  
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
                 <div class="title-block-title">
                     {% trans "Overlays" %}
@@ -59,55 +87,58 @@
                 </div>
             </div>
 
-            <div class="card-form-preview-container" style="margin:20px;">
-                <div class="panel">
-                    <!-- ko if: selection().nodeid -->
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
-                    </div>
+            <!-- Resource Layer Config -->
+            <div class="card-form-preview-container">
+                <div class="ep-card-crud-container">
+                    <div class="panel">
+                        <!-- ko if: selection().nodeid -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                        </div>
 
-                    <div class="panel-body">
-                        <div data-bind='component: {
-                            name: selection().datatypeConfigComponent,
-                            params: selection()
-                        }'></div>
-                    </div>
-                    <!-- /ko -->
+                        <div class="panel-body map-preview-panel">
+                            <div data-bind='component: {
+                                name: selection().datatypeConfigComponent,
+                                params: selection()
+                            }'></div>
+                        </div>
+                        <!-- /ko -->
 
-                    <!-- ko if: !selection().nodeid -->
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
-                    </div>
+                        <!-- ko if: !selection().nodeid -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
+                        </div>
 
-                    <div class="panel-body">
-                        <div class="row map-service-container">
-                            <div class="col-md-5 col-lg-4 map-service-preview" style="padding:0;" data-bind="mapboxgl: {
-                                    mapOptions: {
-                                        style: mapStyle,
-                                        zoom: zoom,
-                                        minZoom: minZoom,
-                                        maxZoom: maxZoom,
-                                        centerX: centerX,
-                                        centerY: centerY,
-                                        pitch: pitch,
-                                        bearing: bearing
-                                    },
-                                    afterRender: function(map){
-                                        setupMap(map);
-                                    }
-                                }">
-                                <div class="btn-group map-server-basemap-button">
-                                    <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <!-- ko foreach: basemaps -->
-                                        <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
-                                        <!-- /ko -->
-                                    </ul>
+                        <div class="panel-body">
+                            <div class="row map-service-container">
+                                <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
+                                        mapOptions: {
+                                            style: mapStyle,
+                                            zoom: zoom,
+                                            minZoom: minZoom,
+                                            maxZoom: maxZoom,
+                                            centerX: centerX,
+                                            centerY: centerY,
+                                            pitch: pitch,
+                                            bearing: bearing
+                                        },
+                                        afterRender: function(map){
+                                            setupMap(map);
+                                        }
+                                    }">
+                                    <div class="btn-group map-server-basemap-button">
+                                        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <!-- ko foreach: basemaps -->
+                                            <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                                            <!-- /ko -->
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
             </div>
         </div>
