@@ -57,33 +57,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
                     </div>
                 </div>
+
                 <div class="title-block-title">
-                    {% trans "Overlays" %}
+                    <h4 class="title-block-title"> {% trans "Basemaps" %}</h4>
                 </div>
-                <div class="report-image-grid" style="margin-top: 5px;">
-                    <!-- ko foreach: { data: overlays, as: "overlay" } -->
-                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(overlay) }, css: {'active': $parent.selection() === overlay}">
-                        <div class="panel mar-no">
-                            <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: overlay.icon"></i> <span data-bind="text: overlay.name"></span></h3>
+                <div class="report-image-grid relative" style="margin-top: 5px;">
+                    <div class="grid">
+                        <!-- ko foreach: { data: basemaps, as: "basemap" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(basemap) }, css: {'selected': $parent.selection() === basemap}">
+
+                            <div class="library-icon" style="">
+                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+                                    <i class="" data-bind="css: basemap.icon"></i>
+                                </span>
+                            </div>
+                            <div class="crud-card-main">
+                                <a class="listitem_name text-semibold" data-bind="text: basemap.name">
+                                </a>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
+
                 <div class="title-block-title">
-                    {% trans "Basemaps" %}
+                    <h4 class="title-block-title"> {% trans "Overlays" %}</h4>
                 </div>
-                <div class="report-image-grid" style="margin-top: 5px;">
-                    <!-- ko foreach: { data: basemaps, as: "basemap" } -->
-                    <div class="card-grid-item" style="width: 250px;" data-bind="click: function () { $parent.selection(basemap) }, css: {'active': $parent.selection() === basemap}">
-                        <div class="panel mar-no">
-                            <div class="panel-heading">
-                                <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: basemap.icon"></i> <span data-bind="text: basemap.name"></span></h3>
+                <div class="report-image-grid relative" style="margin-top: 5px;">
+                    <div class="grid">
+                        <!-- ko foreach: { data: overlays, as: "overlay" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(overlay) }, css: {'selected': $parent.selection() === overlay}">
+
+                            <div class="library-icon" style="">
+                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+                                    <i class="" data-bind="css: overlay.icon"></i>
+                                </span>
+                            </div>
+                            <div class="crud-card-main">
+                                <a class="listitem_name text-semibold" data-bind="text: overlay.name">
+                                </a>
                             </div>
                         </div>
+                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 </div>
             </div>
 
