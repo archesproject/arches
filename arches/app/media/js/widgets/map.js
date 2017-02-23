@@ -813,7 +813,7 @@ define([
                 }
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
-                    return baselayer.isoverlay === false
+                    return baselayer.isoverlay === false && baselayer.activated;
                 });
 
                 this.setBasemap = function(basemapType) {
