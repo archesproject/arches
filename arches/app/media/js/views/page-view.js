@@ -75,7 +75,7 @@ define([
             
             $('.ep-help-topic-toggle').click(function (){
                 var sectionEl = $(this).closest('div');
-                contentEl = $(sectionEl).find('.ep-help-topic-content');
+                contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                 contentEl.slideToggle();
             });
             
