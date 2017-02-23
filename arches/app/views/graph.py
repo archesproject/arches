@@ -539,7 +539,7 @@ class FunctionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Functions','')
+        context['nav']['help'] = ('Managing Functions','help/function-help.htm')
 
         return render(request, 'views/graph/function-manager.htm', context)
 
