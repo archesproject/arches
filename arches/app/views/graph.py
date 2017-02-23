@@ -357,7 +357,7 @@ class FormManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Using the Form Manager','')
+        context['nav']['help'] = ('Using the Menu Manager','help/menu-manager-help.htm')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -398,7 +398,7 @@ class FormView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Forms','')
+        context['nav']['help'] = ('Configuring Menus','help/menu-designer-help.htm')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
