@@ -134,9 +134,11 @@ class SearchEngine(object):
 
         self.es.indices.create(index=index, ignore=400)
         self.es.indices.put_mapping(index=index, doc_type=doc_type, body=body)
+        print 'creating index : %s/%s' % (index, doc_type)
 
     def create_index(self, **kwargs):
         self.es.indices.create(**kwargs)
+        print 'creating index : %s' % kwargs.get('index', '')
 
     def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
         """

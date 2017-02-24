@@ -39,13 +39,13 @@ function install_bower {
     sudo npm install -g bower
 }
 
-function install_elasticsearch {
-    sudo sh -c 'echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch-2.x.list'
-    wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-    sudo apt-get update -y
-    sudo apt-get install openjdk-8-jre-headless -y elasticsearch=2.4.0
-    sudo service elasticsearch start
-}
+# function install_elasticsearch {
+#     sudo sh -c 'echo "deb http://packages.elastic.co/elasticsearch/5.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch-5.x.list'
+#     wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+#     sudo apt-get update -y
+#     sudo apt-get install openjdk-8-jre-headless -y elasticsearch=5.2.1
+#     sudo service elasticsearch start
+# }
 
 function main {
   sudo apt-get update -y

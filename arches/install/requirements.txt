@@ -1,5 +1,5 @@
 Django==1.9.2
-elasticsearch>=2.0.0,<3.0.0
+elasticsearch>=5.0.0,<6.0.0
 xlrd==0.9.4
 Pillow==3.1.0
 rdflib
@@ -17,4 +17,4 @@ python-dateutil
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.3.5/elasticsearch-2.3.5.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.zip
