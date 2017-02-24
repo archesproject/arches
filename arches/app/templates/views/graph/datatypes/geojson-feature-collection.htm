@@ -40,12 +40,6 @@
             }
         }">
     </div>
-        <!-- ko if: count === 0 -->
-        <div class="map-server-instructions">
-            <i class="fa fa-warning"></i>
-            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
-        </div>
-        <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: loading() -->
@@ -60,16 +54,19 @@
                 <!-- Resource Styling Tabs -->
                 <ul class="nav nav-tabs map-service-nav-tabs">
                     <li class="active">
-                        <a class="config-title mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
                     </li>
                     <li class="">
-                        <a class="config-title mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false"><i class="ion-ios-pie"></i> Clustering</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
                     </li>
                     <li class="">
-                        <a class="config-title mar-no" data-toggle="tab" href="#caching-panel" aria-expanded="false"><i class="ion-ios-grid-view"></i> Caching</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false"><i class="ion-ios-pie"></i> Clustering</a>
                     </li>
                     <li class="">
-                        <a class="config-title mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true"><i class="ion-ios-color-wand"></i> Permissions</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#caching-panel" aria-expanded="false"><i class="ion-ios-grid-view"></i> Caching</a>
+                    </li>
+                    <li class="">
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true"><i class="ion-ios-color-wand"></i> Permissions</a>
                     </li>
                 </ul>
 
@@ -77,7 +74,7 @@
                     <div id="styling-panel" class="tab-pane fade active in">
                         <div class="row">
                             <div class="pull-right advanced-map-style-switch">
-                                <label class="control-label text-semibold">Advanced Styling:</label>
+                                <label class="control-label text-semibold">Advanced:</label>
                                 <span class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
                                     }, click: function () {
@@ -97,9 +94,15 @@
                                 </div>
                             </div>
 
-                            <div class="col-xs-12" data-bind="if: !config.advancedStyling()">
+                            <div class="col-xs-12 simple-style-panel" data-bind="if: !config.advancedStyling()">
                                 <div id="style-panel" class="tab-pane fade active in">
                                     <div class="panel-body" style="padding-top: 0px; padding-bottom: 5px;">
+                                        <!-- ko if: count === 0 -->
+                                        <div class="map-server-instructions">
+                                            <i class="fa fa-warning"></i>
+                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
+                                        </div>
+                                        <!-- /ko -->
                                         <div class="">
                                             <!-- Points -->
                                             <div class="col-sm-6 col-md-4 col-divider">
@@ -224,6 +227,62 @@
                         </div>
                     </div>
 
+                    <div id="settings-panel" class="tab-pane fade">
+                        <div class="row service-widget-container">
+                            <div class="form-horizontal">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">Layer Name:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">Add to Search map by default:</label>
+                                        <div class="col-sm-9">
+                                            <span class="switch switch-small service-switch-shim" data-bind="">
+                                                <small></small>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <!-- Icon search -->
+                                        <div style="padding-left: 10px;">
+                                            <div class="relative" style="padding: 10px 0px;">
+
+                                                <div>
+                                                    {% trans "Layer icon:" %}
+                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + selection().icon(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                </div>
+
+                                                <div style="position: absolute; left: 110px; top: 10px;">
+                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+
+                                                    <!-- ko if: iconFilter() !== '' -->
+                                                    <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Icon List -->
+                                        <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
+                                            <div class="row">
+
+                                                <!-- ko foreach: icons -->
+                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selection().icon())}, click: function() { $root.selection().icon(cssclass) }">
+                                                    <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+                                                </div>
+                                                <!-- /ko -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="clustering-panel" class="tab-pane fade">
                         <div class="row service-widget-container">
                             <div class="form-horizontal">
@@ -304,7 +363,28 @@
                     </div>
 
                     <div id="permissions-panel" class="tab-pane fade">
-                        permissions!
+                        <div class="row service-widget-container">
+                            <div class="panel-body">
+                                
+                                    
+                                <div class="map-server-instructions">
+                                    <i class="ion-ios-information"></i> This layer has the following permissions. If you wish to change who can access this layer, please update the permissions on the layer node.
+                                </div>
+                                <dl class="dl-horizontal">
+                                    <dt>Guest</dt>
+                                    <dd>read</dd>
+                                    <dt>Crowd Source</dt>
+                                    <dd>create, read, update, delete</dd>
+                                    <dt>Editor</dt>
+                                    <dd>create, read, update, delete</dd>
+                                    <dt>Administrator</dt>
+                                    <dd>create, read, update, delete</dd>
+                                    <dt>RDM Manager</dt>
+                                    <dd>no access</dd>
+                                </dl>
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- ko if: node.dirty() -->
