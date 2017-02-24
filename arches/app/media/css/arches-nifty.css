@@ -3632,6 +3632,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .form-list{
     padding-top: 0px;
     background: #f0f0f0;
+    padding-bottom: 31px;
 }
 .form-list .grid{
     border-top: none;
@@ -6303,6 +6304,11 @@ table.table.dataTable {
     padding-top: 5px;
 }
 
+.basemap-preview-panel {
+    padding-top: 5px;
+    padding-left: 7.5px;
+}
+
 .resource-map-service-container {
 	padding-top: 10px;
 }
@@ -6315,6 +6321,10 @@ table.table.dataTable {
     position: absolute;
     top: 10px;
     right: 60px;
+}
+
+.basemap-preview-panel .map-service-manage-buttons {
+    right: 10px;
 }
 
 .map-service-preview {
@@ -6353,6 +6363,17 @@ table.table.dataTable {
     text-overflow: ellipsis;
 }
 
+.config-title-tab {
+    font-weight: normal;
+    padding: 0 20px 0 0px;
+    margin-top: 10px;
+    font-size: 1.15em;
+    line-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .advanced-style-panel {
     margin-right: 0px;
     margin-left: 0px;
@@ -6362,6 +6383,10 @@ table.table.dataTable {
 
 .map-style-panel-body {
     padding-bottom: 5px;
+}
+
+.simple-style-panel {
+    margin-top: -15px;
 }
 
 .layer-styler {
@@ -6415,7 +6440,7 @@ table.table.dataTable {
     font-weight: bold;
 }
 .map-server-instructions {
-    padding: 10px;
+    padding: 0px 10px 20px 10px;
     color: #808080;
 }
 .map-server-basemap-button{
