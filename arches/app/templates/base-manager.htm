@@ -402,6 +402,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>{% trans "Map Layer Manager" %}</strong>
                                                 </span>
                                             </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph#basemaps" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Basemaps" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#overlays')">{% trans "Overlays" %}</a>
+                                                </li>
+                                            </ul>
                                         </li>
 
                                         <!--Menu list item-->

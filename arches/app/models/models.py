@@ -656,6 +656,7 @@ class MapLayers(models.Model):
     name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
+    activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
 
     @property
@@ -671,6 +672,7 @@ class MapLayers(models.Model):
 class TileserverLayers(models.Model):
     name = models.TextField(unique=True)
     path = models.TextField()
+    config = JSONField()
     map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
     map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
 

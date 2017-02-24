@@ -43,7 +43,8 @@ define([
                     })
                 }
                 this.selectedBasemapName = ko.observable('');
-                this.basemaps = _.filter(arches.mapLayers, function(layer) {
+                var mapLayers = $.extend(true, {}, arches.mapLayers);
+                this.basemaps = _.filter(mapLayers, function(layer) {
                     return !layer.isoverlay;
                 });
                 this.basemaps.forEach(function (basemap) {

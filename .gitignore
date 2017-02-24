@@ -24,3 +24,4 @@ arches/Net_files
 arches/app/media/bower_components
 arches/tileserver/cache
 docs/_build
+arches/logs/*.log
