@@ -19,12 +19,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import csv
 import math
+from datetime import datetime
 from dateutil import parser
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry
+from django.db import connection
 from django.db.models import Max, Min
 from django.http import HttpResponseNotFound
 from django.utils.module_loading import import_string
@@ -248,6 +250,7 @@ def build_search_results_dsl(request):
                 boolfilter.must(geoshape)
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
+        now = str(datetime.utcnow())
         start_date = None
         end_date = None
         try:
@@ -261,22 +264,80 @@ def build_search_results_dsl(request):
         except:
             pass
 
-        if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-            range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
-            time_query_dsl = Nested(path='tiles', query=range)
-        else:
-            time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
+        try:
+            start_year = parser.parse(start_date).year
+        except:
+            start_year = 'null'
+        try:
+            end_year = parser.parse(end_date).year
+        except:
+            end_year = 'null'
+
+
+        # add filter for concepts that define min or max dates
+        sql = None
+        basesql = """
+            SELECT value.conceptid 
+            FROM (
+                SELECT 
+                    {select_clause}, 
+                    v.conceptid
+                FROM 
+                    public."values" v, 
+                    public."values" v2
+                WHERE 
+                    v.conceptid = v2.conceptid and
+                    v.valuetype = 'minimum date' and
+                    v2.valuetype = 'maximum date'
+            ) as value
+            WHERE overlap = true;
+        """
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
-            boolfilter.must_not(time_query_dsl)
+            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), lte=start_date, gte=end_date)
+                time_query_dsl = Nested(path='tiles', query=range)
+                boolfilter.should(time_query_dsl)
+            else:
+                select_clause = []
+                if start_date is not None:
+                    boolfilter.should(Range(field='dates', lte=start_date))
+                    select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
+                if end_date is not None:
+                    boolfilter.should(Range(field='dates', gte=end_date))
+                    select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
+
+                select_clause = " or ".join(select_clause) + " as overlap"
+                sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
+
         else:
-            boolfilter.must(time_query_dsl)
+            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
+                time_query_dsl = Nested(path='tiles', query=range)
+                boolfilter.should(time_query_dsl)
+            else:
+                time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
+                boolfilter.should(time_query_dsl)
+
+                select_clause = """
+                    numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
+                """
+                sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
+
+        # is a dateNodeId is not specified
+        if sql is not None:
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            ret =  [str(row[0]) for row in cursor.fetchall()]
+
+            conceptid_filter = Terms(field='domains.conceptid', terms=ret)
+            boolfilter.should(conceptid_filter)
+
 
     query.add_query(boolfilter)
-
     return query
 
 def buffer(request):
