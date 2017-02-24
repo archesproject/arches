@@ -3414,31 +3414,3 @@ LANGUAGE plpgsql ;
 CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH ROW
    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
-
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
-    VALUES (public.uuid_generate_v1mc(), '3D Buildings', '[
-         {
-             "id": "building-extrusion",
-             "type": "fill-extrusion",
-             "source": "mapbox-streets",
-             "source-layer": "building",
-             "filter": [
-                 "==",
-                 "$type",
-                 "Polygon"
-             ],
-             "layout": {},
-             "paint": {
-                 "fill-extrusion-color": "hsl(0, 0%, 78%)",
-                 "fill-extrusion-opacity": 0.4,
-                 "fill-extrusion-height": {
-                     "type": "identity",
-                     "property": "height"
-                 },
-                 "fill-extrusion-base": {
-                     "type": "identity",
-                     "property": "min_height"
-                 }
-             }
-         }
-     ]', TRUE, 'fa fa-building-o', TRUE);
