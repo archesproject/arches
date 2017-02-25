@@ -46,9 +46,6 @@ class SearchTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = Client()
-        models.DValueType.objects.create(valuetype='maximum date', namespace='arches', datatype='text')
-        models.DValueType.objects.create(valuetype='minimum date', namespace='arches', datatype='text')
-
         models.ResourceInstance.objects.all().delete()
         with open(os.path.join('tests/fixtures/resource_graphs/Search Test Model.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -58,8 +55,6 @@ class SearchTests(ArchesTestCase):
         cls.search_model_cultural_period_nodeid = '7a182580-fa60-11e6-96d1-14109fd34195'
         cls.search_model_creation_date_nodeid = '1c1d05f5-fa60-11e6-887f-14109fd34195'
 
-        #BusinessDataImporter('tests/fixtures/data/csv/heritage_resource_model_10.csv', mapping_file='tests/fixtures/data/csv/heritage_resource_model.mapping').import_business_data()
-    
     @classmethod
     def tearDownClass(cls):
         se = SearchEngineFactory().create()
@@ -98,7 +93,7 @@ class SearchTests(ArchesTestCase):
                             "value": "1950",
                             "language": "en-US",
                             "category": "note",
-                            "type": "minimum date",
+                            "type": "min year",
                             "id": "",
                             "conceptid": ""
                         },
@@ -106,7 +101,7 @@ class SearchTests(ArchesTestCase):
                             "value": "1980",
                             "language": "en-US",
                             "category": "note",
-                            "type": "maximum date",
+                            "type": "max year",
                             "id": "",
                             "conceptid": ""
                         }
