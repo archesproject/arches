@@ -63,6 +63,8 @@ INSERT INTO d_value_types VALUES ('collector', 'undefined', null, 'arches', 'tex
 
 --ARCHES PROPERTIES
 INSERT INTO d_value_types VALUES ('sortorder', 'undefined', null, 'arches', 'text');
+INSERT INTO d_value_types VALUES ('min year', 'undefined', null, 'arches', 'text');
+INSERT INTO d_value_types VALUES ('max year', 'undefined', null, 'arches', 'text');
 
 --
 -- TOC entry 3329 (class 0 OID 11000965)
