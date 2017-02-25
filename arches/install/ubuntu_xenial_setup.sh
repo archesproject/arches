@@ -67,7 +67,7 @@ function main {
 
   install_postgres
   install_bower
-  install_elasticsearch
+  # install_elasticsearch
   # echo "Would you like to install and configure postgres/postgis?"
   # select yn in "Yes" "No"; do
   #     case $yn in
