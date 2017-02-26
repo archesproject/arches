@@ -1,6 +1,15 @@
 {% load i18n %}
 <!-- ko if: $data.layer -->
 <div class="row map-service-container relative">
+
+    <!-- Save/discard edits buttons (for convenience) -->
+    <!-- ko if: node.dirty() -->
+    <div class="resource-service-buttons-heading">
+        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">Save Edits</button>
+        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">Discard Edits</button>
+    </div>
+    <!-- /ko -->
+
     <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> Layer Preview <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
 
     <div class="map-service-manage-buttons">
@@ -70,7 +79,7 @@
                     </li>
                 </ul>
 
-                <div class="tab-content">
+                <div class="tab-content map-service-tab-content">
                     <div id="styling-panel" class="tab-pane fade active in">
                         <div class="row">
                             <div class="pull-right advanced-map-style-switch">
@@ -238,7 +247,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Add to map by default:</label>
+                                        <label class="col-sm-3 control-label">Add to Search map:</label>
                                         <div class="col-sm-9">
                                             <span class="switch switch-small service-switch-shim" data-bind="">
                                                 <small></small>

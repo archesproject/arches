@@ -6304,6 +6304,12 @@ table.table.dataTable {
     padding-top: 5px;
 }
 
+.service-buttons-heading {
+    position: absolute;
+    top: -3px;
+    right: 10px;
+}
+
 .basemap-preview-panel {
     padding-top: 5px;
     padding-left: 7.5px;
@@ -6324,6 +6330,12 @@ table.table.dataTable {
 }
 
 .basemap-preview-panel .map-service-manage-buttons {
+    right: 60px;
+}
+
+.resource-service-buttons-heading {
+    position: absolute;
+    top: -60px;
     right: 10px;
 }
 
@@ -6331,6 +6343,10 @@ table.table.dataTable {
 	background: #f4f4f4;
 	border: 1px solid #ddd;
 	height: 250px;
+}
+
+.map-service-tab-content {
+    min-height: 250px;
 }
 
 .advanced-map-style-switch {
