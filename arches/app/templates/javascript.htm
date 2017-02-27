@@ -190,6 +190,7 @@
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'icon': '{{ map_layer.icon }}',
                 'activated': {{ map_layer.activated|lower }},
+                'addtomap': {{ map_layer.addtomap|lower }},
                 'is_resource_layer': false
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
@@ -198,6 +199,7 @@
                 'isoverlay': true,
                 'icon': '{{ resource_map_layer.icon }}',
                 'activated': true,
+                'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{

@@ -34,6 +34,7 @@ define([
         layer._layer = ko.observable(JSON.stringify(layer));
         layer.layerJSON = ko.observable(JSON.stringify(layer.layer_definitions, null, '\t'))
         layer.activated = ko.observable(layer.activated);
+        layer.addtomap = ko.observable(layer.addtomap);
         layer.name = ko.observable(layer.name);
         layer.icon = ko.observable(layer.icon);
         layer.toJSON = ko.computed(function () {
@@ -51,6 +52,7 @@ define([
                 "isoverlay": layer.isoverlay,
                 "icon": layer.icon(),
                 "activated": layer.activated(),
+                "addtomap": layer.addtomap(),
                 "is_resource_layer": false
             })
         });
@@ -66,6 +68,22 @@ define([
                 success: function(response) {
                     layer._layer(layer.toJSON());
                     pageView.viewModel.loading(false);
+                    var mapLayer = _.find(arches.mapLayers, function(mapLayer) {
+                        return mapLayer.maplayerid === layer.maplayerid
+                    });
+                    _.extend(mapLayer, JSON.parse(layer._layer()));
+                    if (!mapLayer.isoverlay && mapLayer.addtomap) {
+                        _.each(vm.basemaps(), function (basemap) {
+                            if (basemap.maplayerid !== layer.maplayerid) {
+                                basemap.addtomap(false);
+                            }
+                        });
+                        _.each(arches.mapLayers, function (mapLayer) {
+                            if (!mapLayer.isoverlay && mapLayer.maplayerid !== layer.maplayerid) {
+                                mapLayer.addtomap = false;
+                            }
+                        });
+                    }
                 },
                 error: function(response) {
                     pageView.viewModel.loading(false);
@@ -76,6 +94,7 @@ define([
             var _layer = JSON.parse(layer._layer());
             layer.layerJSON(JSON.stringify(_layer.layer_definitions, null, '\t'))
             layer.activated(_layer.activated);
+            layer.addtomap(_layer.addtomap),
             layer.name(_layer.name);
             layer.icon(_layer.icon);
         };
@@ -89,6 +108,9 @@ define([
                     url: window.location.pathname + '/' + layer.maplayerid,
                     success: function(response) {
                         mapLayers.remove(layer);
+                        arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
+                            maplayerid: layer.maplayerid
+                        }));
                         var newSelection = mapLayers()[0] || vm.geomNodes[0]
                         vm.selection(mapLayers()[0]);
                         pageView.viewModel.loading(false);
@@ -108,16 +130,17 @@ define([
         })
     });
     vm.basemaps().forEach(function (basemap) {
-        if (vm.selectedBasemapName() === '') {
-            vm.selectedBasemapName(basemap.name());
-        }
-        if (basemap.name() === 'streets') {
-            vm.selectedBasemapName('streets');
-        }
         basemap.select = function () {
             vm.selectedBasemapName(basemap.name());
         }
     });
+    var defaultBasemap = _.find(vm.basemaps(), function (basemap) {
+        return basemap.addtomap();
+    });
+    if (!defaultBasemap) {
+        defaultBasemap = vm.basemaps()[0];
+    }
+    vm.selectedBasemapName(defaultBasemap.name());
     vm.overlays = ko.computed(function() {
         return _.filter(mapLayers(), function(layer) {
             return layer.isoverlay && !layer.is_resource_layer;
@@ -153,6 +176,7 @@ define([
                 loading: vm.loading,
                 source: node,
                 datatypelookup: datatypelookup,
+                icons: data.icons,
                 graph: undefined,
                 layer: _.find(data.resource_map_layers, function(layer) {
                     return layer.nodeid === node.nodeid;

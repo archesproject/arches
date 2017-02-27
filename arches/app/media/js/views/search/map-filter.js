@@ -1,9 +1,10 @@
 define([
     'knockout',
     'views/search/base-filter',
-    'widgets/map'
+    'arches',
+    'widgets/map',
 ],
-function(ko, BaseFilter) {
+function(ko, BaseFilter, arches) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
@@ -16,6 +17,24 @@ function(ko, BaseFilter) {
               "features": []
             });
             this.filter.inverted = ko.observable(false);
+            var basemaps = _.filter(arches.mapLayers, function(layer) {
+                return !layer.isoverlay;
+            });
+            this.defaultBasemap = _.find(basemaps, function (basemap) {
+                return basemap.addtomap;
+            });
+            if (!this.defaultBasemap) {
+                this.defaultBasemap = vm.basemaps()[0];
+            }
+            this.overlays = _.filter(arches.mapLayers, function(layer) {
+                return layer.isoverlay && layer.addtomap;
+            }).map(function(layer) {
+                return {
+                    'maplayerid': layer.maplayerid,
+                    'name': layer.name,
+                    'opacity': 100
+                };
+            });
         },
 
         restoreState: function(query) {

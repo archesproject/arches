@@ -498,6 +498,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "name": layer_name,
             "layer_definitions": layer_def,
             "icon": node.graph.iconclass,
+            "addtomap": node.config['addToMap'],
         }
 
 
