@@ -22,8 +22,9 @@ define([
         centerY: ko.observable(0),
         pitch: ko.observable(0),
         bearing: ko.observable(0),
-        iconFilter: ko.observable(''),
+        iconFilter: ko.observable('')
     };
+    console.log(data);
     vm.icons = ko.computed(function () {
         return _.filter(data.icons, function (icon) {
             return icon.name.indexOf(vm.iconFilter()) >= 0;
@@ -174,6 +175,7 @@ define([
         vm.geomNodes.push(
             new NodeModel({
                 loading: vm.loading,
+                permissions: data.node_permissions[node.nodeid],
                 source: node,
                 datatypelookup: datatypelookup,
                 icons: data.icons,

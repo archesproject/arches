@@ -381,19 +381,21 @@
 
 
                                 <div class="map-server-instructions">
-                                    <i class="ion-ios-information"></i> This layer has the following permissions. If you wish to change who can access this layer, please update the permissions on the layer node.
+                                    <i class="ion-ios-information"></i> The following users and groups can view this layer. If you wish to change who can access this layer, please update the permissions on the layer node.
                                 </div>
                                 <dl class="dl-horizontal">
-                                    <dt>Guest</dt>
-                                    <dd>read</dd>
-                                    <dt>Crowd Source</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>Editor</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>Administrator</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>RDM Manager</dt>
-                                    <dd>no access</dd>
+                                    <dt>Users</dt>
+                                    <dd>
+                                        <!-- ko foreach: permissions.users -->
+                                        <div data-bind="text: username"></div>
+                                        <!-- /ko -->
+                                    </dd>
+                                    <dt>Groups</dt>
+                                    <dd>
+                                        <!-- ko foreach: permissions.groups -->
+                                        <div data-bind="text: name"></div>
+                                        <!-- /ko -->
+                                    </dd>
                                 </dl>
 
                             </div>

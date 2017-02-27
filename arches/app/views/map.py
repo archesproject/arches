@@ -19,7 +19,9 @@ from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
+from guardian.shortcuts import get_users_with_perms
 from arches.app.models import models
+from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -49,6 +51,7 @@ class MapLayerManagerView(BaseManagerView):
         context['geom_nodes_json'] = JSONSerializer().serialize(context['geom_nodes'])
         resource_layers = []
         resource_sources = []
+        permissions = {}
         for node in context['geom_nodes']:
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
@@ -57,8 +60,14 @@ class MapLayerManagerView(BaseManagerView):
             map_source = datatype.get_map_source(node=node, preview=True)
             if map_source is not None:
                 resource_sources.append(map_source)
+            card = Card.objects.get(nodegroup_id=node.nodegroup_id)
+            permissions[str(node.pk)] = {
+                "users": card.users,
+                "groups": card.groups,
+            }
         context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
+        context['node_permissions'] = JSONSerializer().serialize(permissions)
 
         context['nav']['title'] = _('Map Layer Manager')
         context['nav']['icon'] = 'fa-server'
