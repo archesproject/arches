@@ -243,18 +243,54 @@
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">Layer Name:</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: layer.name">
+                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Add to Search map:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Add to search map by default:" %}</label>
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small service-switch-shim" data-bind="">
+                                            <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                                    'on': config.addToMap()
+                                                }, click: function () {
+                                                    config.addToMap(!config.addToMap());
+                                                }">
                                                 <small></small>
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <!-- Icon search -->
+                                        <div style="padding-left: 10px;">
+                                            <div class="relative" style="padding: 10px 0px;">
 
+                                                <div>
+                                                    {% trans "Layer icon:" %}
+                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + (config.layerIcon() || layer.icon), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                </div>
+
+                                                <div style="position: absolute; left: 110px; top: 10px;">
+                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+
+                                                    <!-- ko if: iconFilter() !== '' -->
+                                                    <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Icon List -->
+                                        <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
+                                            <div class="row">
+
+                                                <!-- ko foreach: icons -->
+                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }">
+                                                    <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+                                                </div>
+                                                <!-- /ko -->
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

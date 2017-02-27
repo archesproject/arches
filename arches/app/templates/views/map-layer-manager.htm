@@ -49,11 +49,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-                                    <i class="" data-bind="css: node.layer.icon"></i>
+                                    <i class="" data-bind="css: node.config.layerIcon() || node.layer.icon"></i>
                                 </span>
                             </div>
                             <div class="crud-card-main">
-                                <a class="listitem_name" data-bind="text: layer.name">
+                                <a class="listitem_name" data-bind="text: (node.config.layerName ? node.config.layerName() : false) || layer.name">
                                 </a>
                             </div>
                             <div class="crud-card-subtitle" data-bind="text: node.name"></div>
@@ -125,7 +125,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="panel">
                         <!-- ko if: selection().nodeid -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                            <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                         </div>
 
                         <div class="panel-body map-preview-panel">
@@ -154,7 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="panel-body basemap-preview-panel">
                             <div class="row map-service-container relative">
                                 <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> Layer Preview</h3>
-                                
+
                                 <div class="map-service-manage-buttons">
                                     <div class="form-group">
                                         <label class="control-label">Activated:</label>
@@ -175,7 +175,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- /ko -->
                                     </ul>
                                 </div>
-                                
+
                                 <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
                                         mapOptions: {
                                             style: mapStyle,
@@ -191,7 +191,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             setupMap(map);
                                         }
                                     }">
-                                
+
                                 </div>
                             </div>
 
@@ -211,7 +211,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </ul>
 
                                         <div class="tab-content">
-                                            <div id="styling-panel" class="tab-pane fade active in">       
+                                            <div id="styling-panel" class="tab-pane fade active in">
                                                 <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
                                                     <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
                                                 </div>
@@ -227,7 +227,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
                                                                 </div>
                                                             </div>
-                                                            
+
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to search map by default:" %}' : '{% trans "Default search basemap:" %}'"></label>
+                                                                <div class="col-sm-9">
+                                                                    <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                                                            'on': selection().addtomap()
+                                                                        }, click: function () {
+                                                                            selection().addtomap(!selection().addtomap());
+                                                                        }">
+                                                                        <small></small>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
                                                             <div class="form-group">
                                                                 <!-- Icon search -->
                                                                 <div style="padding-left: 10px;">

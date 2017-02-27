@@ -639,6 +639,7 @@ class Migration(migrations.Migration):
                 ('isoverlay', models.BooleanField(default=False)),
                 ('icon', models.TextField(default=None)),
                 ('activated', models.BooleanField(default=True)),
+                ('addtomap', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'map_layers',

@@ -26,9 +26,9 @@ define([
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
             self.layer = options.layer;
+            self.icons = options.icons || [];
             self.mapSource = options.mapSource;
             self.loading = options.loading;
-
 
             self._node = ko.observable('');
             self.selected = ko.observable(false);

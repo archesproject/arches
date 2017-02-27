@@ -658,6 +658,7 @@ class MapLayers(models.Model):
     isoverlay = models.BooleanField(default=False)
     activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
+    addtomap = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
