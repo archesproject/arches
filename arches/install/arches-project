@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+import arches
+import argparse
+import codecs
+import os
+import sys
+import imp
+
+from django.core.management.templates import TemplateCommand
+from django.core.management.base import BaseCommand, CommandError
+from importlib import import_module
+from os import path
+from django.core.management.utils import handle_extensions
+import errno
+import django
+from django.template import Template, Context
+import shutil
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
+here = os.path.abspath(os.path.dirname(__file__))
+COMMANDS = {}
+
+from arches.management.commands import utils
+
+parent_parser = argparse.ArgumentParser(add_help=False)
+
+parser = argparse.ArgumentParser(
+    prog='arches',
+    description='Manage Arches-based Applications',
+    parents=[parent_parser],
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+subparsers = parser.add_subparsers(title='available commands', dest='command')
+subparsers.required = True
+
+class ArchesCommand(TemplateCommand):
+    help = ("Creates a Django project directory structure for the given "
+            "project name in the current directory or optionally in the "
+            "given directory.")
+    missing_args_message = "You must provide a project name."
+
+    def handle(self, **options):
+        project_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(project_name, "project")
+
+        # Check that the project_name cannot be imported.
+        try:
+            import_module(project_name)
+        except ImportError:
+            pass
+        else:
+            raise CommandError("%r conflicts with the name of an existing "
+                               "Python module and cannot be used as a "
+                               "project name. Please try another name." %
+                               project_name)
+
+        # Create a random SECRET_KEY to put it in the main settings.
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        options['secret_key'] = get_random_string(50, chars)
+        print options
+        super(Command, self).handle('project', project_name, target, **options)
+
+
+def command_create_app(args):
+    cmd = ArchesCommand()
+    cmd.handle(args.name, args)
+
+parser_start = subparsers.add_parser(
+    'create',
+    help="Create the scaffolding for a new Arches application",
+)
+parser_start.add_argument(
+    'name',
+    type=str,
+    help='name of your new app'
+    )
+parser_start.add_argument(
+    '-d', '--directory',
+    help='destination directory of your new project',
+    dest='directory',
+    type=str,
+    default='',
+)
+parser_start.add_argument(
+    '-t', '--template',
+    help="The path or URL to load the template from.",
+    type=str,
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-template')
+)
+parser_start.add_argument(
+    '-e', '--extension',
+    dest='extensions',
+    help='The file extension(s) to render (default: py).',
+    type=str,
+    default=['py','txt','html','js','css']
+)
+parser_start.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='name of your new arches application',
+    type=str,
+    default='',
+)
+parser_start.add_argument(
+    '-a', '--app',
+    dest='source_app',
+    help='An application upon which your new app runs',
+    type=str,
+    default='arches',
+)
+
+try:
+    # Python 3
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
+except AttributeError:
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr)
+
+class CommandError(Exception):
+    pass
+
+COMMANDS['create'] = command_create_app
+
+def main(argv=None):
+    if argv is not None:
+        args = parser.parse_args(argv)
+    else:
+        args = parser.parse_args()
+
+    try:
+        COMMANDS[args.command](args)
+    except CommandError as e:
+        print str(e)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
