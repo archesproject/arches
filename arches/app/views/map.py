@@ -72,9 +72,12 @@ class MapLayerManagerView(BaseManagerView):
         map_layer.name = data['name']
         map_layer.icon = data['icon']
         map_layer.activated = data['activated']
+        map_layer.addtomap = data['addtomap']
         map_layer.layerdefinitions = data['layer_definitions']
         with transaction.atomic():
             map_layer.save()
+            if not map_layer.isoverlay and map_layer.addtomap:
+                models.MapLayers.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
         return JSONResponse({'succces':True, 'map_layer': map_layer})
 
     def delete(self, request, maplayerid):

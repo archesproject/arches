@@ -114,7 +114,7 @@ INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'd
     "fillColor": "rgba(130, 130, 130, 0.5)",
     "outlineColor": "rgba(200, 200, 200, 0.7)",
     "outlineWeight": 2,
-    "layerActivated": true,
+    "layerActivated": true, "addToMap": false,
     "layerName": "",
     "clusterDistance": 20,
     "clusterMaxZoom": 5,
@@ -2209,24 +2209,24 @@ VALUES ('search-query', '{
     }
 }');
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
         "source": "stamen-terrain",
         "minzoom": 0,
         "maxzoom": 22
-    }]', FALSE, 'fa fa-road', TRUE);
+    }]', FALSE, 'fa fa-road', TRUE, FALSE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
-    }]', FALSE, '', TRUE);
+    }]', FALSE, '', TRUE, FALSE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
@@ -3030,9 +3030,9 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
             "text-halo-blur": 1
         },
         "source-layer": "country_label"
-    }]', FALSE, '', TRUE);
+    }]', FALSE, '', TRUE, TRUE);
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated)
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'mapzen', '
      [
      {
@@ -3333,7 +3333,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
          }
        ]
 
-     ', FALSE, '', TRUE);
+     ', FALSE, '', TRUE, FALSE);
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');

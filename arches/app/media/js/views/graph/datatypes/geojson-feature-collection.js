@@ -48,16 +48,17 @@ define([
                     return !layer.isoverlay;
                 });
                 this.basemaps.forEach(function (basemap) {
-                    if (self.selectedBasemapName() === '') {
-                        self.selectedBasemapName(basemap.name);
-                    }
-                    if (basemap.name === 'streets') {
-                        self.selectedBasemapName('streets');
-                    }
                     basemap.select = function () {
                         self.selectedBasemapName(basemap.name);
                     }
                 });
+                var defaultBasemap = _.find(this.basemaps, function (basemap) {
+                    return basemap.addtomap;
+                });
+                if (!defaultBasemap) {
+                    defaultBasemap = this.basemaps[0];
+                }
+                this.selectedBasemapName(defaultBasemap.name);
                 var getBasemapLayers = function () {
                     return _.filter(self.basemaps, function(layer) {
                         return layer.name === self.selectedBasemapName();

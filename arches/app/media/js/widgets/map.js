@@ -678,6 +678,7 @@ define([
 
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
+                    console.log(initialConfigs);
                     for (var i = initialConfigs.length; i-- > 0;) {
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid

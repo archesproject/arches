@@ -243,13 +243,17 @@
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">Layer Name:</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: layer.name">
+                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Add to Search map:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Add to search map by default:" %}</label>
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small service-switch-shim" data-bind="">
+                                            <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                                    'on': config.addToMap()
+                                                }, click: function () {
+                                                    config.addToMap(!config.addToMap());
+                                                }">
                                                 <small></small>
                                             </span>
                                         </div>
