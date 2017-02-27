@@ -5,16 +5,14 @@ import codecs
 import os
 import sys
 import imp
-
-from django.core.management.templates import TemplateCommand
-from django.core.management.base import BaseCommand, CommandError
 from importlib import import_module
-from os import path
-from django.core.management.utils import handle_extensions
 import errno
 import django
-from django.template import Template, Context
-import shutil
+
+from django.utils.crypto import get_random_string
+from django.core.management.utils import handle_extensions
+from django.core.management.templates import TemplateCommand
+from django.core.management.base import BaseCommand, CommandError
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
 here = os.path.abspath(os.path.dirname(__file__))
@@ -39,7 +37,7 @@ class ArchesCommand(TemplateCommand):
             "given directory.")
     missing_args_message = "You must provide a project name."
 
-    def handle(self, **options):
+    def handle(self, options):
         project_name, target = options.pop('name'), options.pop('directory')
         self.validate_name(project_name, "project")
 
@@ -57,17 +55,15 @@ class ArchesCommand(TemplateCommand):
         # Create a random SECRET_KEY to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
         options['secret_key'] = get_random_string(50, chars)
-        print options
-        super(Command, self).handle('project', project_name, target, **options)
-
+        super(ArchesCommand, self).handle('project', project_name, target, **options)
 
 def command_create_app(args):
     cmd = ArchesCommand()
-    cmd.handle(args.name, args)
+    cmd.handle(vars(args))
 
 parser_start = subparsers.add_parser(
     'create',
-    help="Create the scaffolding for a new Arches application",
+    help="Create the scaffolding for a new Arches project",
 )
 parser_start.add_argument(
     'name',
@@ -78,14 +74,14 @@ parser_start.add_argument(
     '-d', '--directory',
     help='destination directory of your new project',
     dest='directory',
-    type=str,
-    default='',
+    default=None,
 )
 parser_start.add_argument(
     '-t', '--template',
     help="The path or URL to load the template from.",
     type=str,
-    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-template')
+    default=None
+    # default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-template')
 )
 parser_start.add_argument(
     '-e', '--extension',
@@ -101,12 +97,9 @@ parser_start.add_argument(
     type=str,
     default='',
 )
-parser_start.add_argument(
-    '-a', '--app',
-    dest='source_app',
-    help='An application upon which your new app runs',
-    type=str,
-    default='arches',
+parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
+    type=int, choices=[0, 1, 2, 3],
+    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'
 )
 
 try:
