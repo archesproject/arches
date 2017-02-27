@@ -16,6 +16,12 @@ define([
             this.graph = params.graph;
             this.layer = params.layer;
             if (this.layer) {
+                this.iconFilter = ko.observable('');
+                this.icons = ko.computed(function () {
+                    return _.filter(params.icons, function (icon) {
+                        return icon.name.indexOf(self.iconFilter()) >= 0;
+                    });
+                });
                 this.count = params.mapSource.count;
                 this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);

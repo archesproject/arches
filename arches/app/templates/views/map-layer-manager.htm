@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-                                    <i class="" data-bind="css: node.layer.icon"></i>
+                                    <i class="" data-bind="css: node.config.layerIcon() || node.layer.icon"></i>
                                 </span>
                             </div>
                             <div class="crud-card-main">
@@ -108,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="panel">
                         <!-- ko if: selection().nodeid -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i data-bind="css: selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                            <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                         </div>
 
                         <div class="panel-body map-preview-panel">

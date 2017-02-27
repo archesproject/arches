@@ -3391,7 +3391,7 @@
                         "clusterMaxZoom": 5, 
                         "weight": 2, 
                         "pointColor": "rgba(130, 130, 130, 0.7)", 
-                        "layerActivated": true, "addToMap": false, 
+                        "layerActivated": true, "addToMap": false, "layerIcon": "", 
                         "clusterMinPoints": 3, 
                         "clusterDistance": 20, 
                         "haloRadius": 4, 

@@ -176,6 +176,7 @@ define([
                 loading: vm.loading,
                 source: node,
                 datatypelookup: datatypelookup,
+                icons: data.icons,
                 graph: undefined,
                 layer: _.find(data.resource_map_layers, function(layer) {
                     return layer.nodeid === node.nodeid;
