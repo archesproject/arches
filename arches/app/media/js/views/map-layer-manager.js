@@ -23,6 +23,7 @@ define([
         pitch: ko.observable(0),
         bearing: ko.observable(0),
         iconFilter: ko.observable(''),
+        selectedList: ko.observable()
     };
     vm.icons = ko.computed(function () {
         return _.filter(data.icons, function (icon) {
@@ -174,6 +175,7 @@ define([
         vm.geomNodes.push(
             new NodeModel({
                 loading: vm.loading,
+                permissions: data.node_permissions[node.nodeid],
                 source: node,
                 datatypelookup: datatypelookup,
                 icons: data.icons,
@@ -248,6 +250,18 @@ define([
     vm.selectedBasemapName.subscribe(updateMapStyle);
     vm.selection.subscribe(updateMapStyle);
     vm.selectedLayerJSON.subscribe(updateMapStyle);
+    vm.selectedList(vm.geomNodes);
+    vm.listFilter = ko.observable('');
+    vm.listItems = ko.computed(function () {
+        var listFilter = vm.listFilter();
+        var layerList = ko.unwrap(vm.selectedList());
+        return _.filter(layerList, function(item) {
+            var name = item.nodeid ?
+                (item.config.layerName() ? item.config.layerName() : item.layer.name) :
+                item.name();
+            return name.indexOf(listFilter) > -1;
+        })
+    });
 
     var pageView = new BaseManagerView({
         viewModel: vm
