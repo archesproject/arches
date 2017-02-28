@@ -306,6 +306,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_name = "%s - %s" % (node.graph.name, node.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
+        layer_icon = node.graph.iconclass
+        if not preview and node.config["layerIcon"] != "":
+            layer_icon = node.config["layerIcon"]
 
         if not preview and node.config["advancedStyling"]:
             try:
@@ -497,7 +500,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "nodeid": node.nodeid,
             "name": layer_name,
             "layer_definitions": layer_def,
-            "icon": node.graph.iconclass,
+            "icon": layer_icon,
             "addtomap": node.config['addToMap'],
         }
 
