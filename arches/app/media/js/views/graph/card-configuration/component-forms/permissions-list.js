@@ -39,7 +39,6 @@ define([
                 return ret;
             };
 
-            console.log(options.permissions)
             this.permissionsForm = new PermissionsForm({
                 permissions: options.permissions,
                 selectedItems: this.selectedItems,
