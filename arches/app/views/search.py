@@ -203,32 +203,32 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
-    boolfilter = Bool()
+    search_query = Bool()
+
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                term_filter = Bool()
-                term_filter.must(Match(field='strings', query=term['value'], type='phrase'))
+                term_filter = Match(field='strings', query=term['value'], type='phrase')
                 if term['inverted']:
-                    boolfilter.must_not(term_filter)
+                    search_query.must_not(term_filter)
                 else:
-                    boolfilter.must(term_filter)
+                    search_query.must(term_filter)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 conceptid_filter = Terms(field='domains.conceptid', terms=concept_ids)
                 if term['inverted']:
-                    boolfilter.must_not(conceptid_filter)
+                    search_query.must_not(conceptid_filter)
                 else:
-                    boolfilter.must(conceptid_filter)
+                    search_query.must(conceptid_filter)
             elif term['type'] == 'string':
                 string_filter = Bool()
                 string_filter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
                 string_filter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
                 if term['inverted']:
-                    boolfilter.must_not(string_filter)
+                    search_query.must_not(string_filter)
                 else:
-                    boolfilter.must(string_filter)
+                    search_query.must(string_filter)
 
     if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:
@@ -245,9 +245,9 @@ def build_search_results_dsl(request):
                 invert_spatial_search = feature_properties['inverted']
 
             if invert_spatial_search == True:
-                boolfilter.must_not(geoshape)
+                search_query.must_not(geoshape)
             else:
-                boolfilter.must(geoshape)
+                search_query.must(geoshape)
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
@@ -293,22 +293,33 @@ def build_search_results_dsl(request):
             WHERE overlap = true;
         """
 
+        temporal_query = Bool()
+
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
         if temporal_filter['inverted']:
+            # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
+            # eg: less than START_DATE OR greater than END_DATE
+            select_clause = []
+            inverted_date_filter = Bool()
+            
+            field = 'dates'
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), lte=start_date, gte=end_date)
-                time_query_dsl = Nested(path='tiles', query=range)
-                boolfilter.should(time_query_dsl)
+                field='tiles.data.%s' % (temporal_filter['dateNodeId'])
+
+            if start_date is not None:
+                inverted_date_filter.should(Range(field=field, lte=start_date))
+                select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
+            if end_date is not None:
+                inverted_date_filter.should(Range(field=field, gte=end_date))
+                select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
+            
+            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
+                date_range_query = Nested(path='tiles', query=inverted_date_filter)
+                temporal_query.should(date_range_query)
             else:
-                select_clause = []
-                if start_date is not None:
-                    boolfilter.should(Range(field='dates', lte=start_date))
-                    select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
-                if end_date is not None:
-                    boolfilter.should(Range(field='dates', gte=end_date))
-                    select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
+                temporal_query.should(inverted_date_filter)
 
                 select_clause = " or ".join(select_clause) + " as overlap"
                 sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
@@ -316,11 +327,11 @@ def build_search_results_dsl(request):
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
-                time_query_dsl = Nested(path='tiles', query=range)
-                boolfilter.should(time_query_dsl)
+                date_range_query = Nested(path='tiles', query=range)
+                temporal_query.should(date_range_query)
             else:
-                time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
-                boolfilter.should(time_query_dsl)
+                date_range_query = Range(field='dates', gte=start_date, lte=end_date)
+                temporal_query.should(date_range_query)
 
                 select_clause = """
                     numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
@@ -333,11 +344,14 @@ def build_search_results_dsl(request):
             cursor.execute(sql)
             ret =  [str(row[0]) for row in cursor.fetchall()]
 
-            conceptid_filter = Terms(field='domains.conceptid', terms=ret)
-            boolfilter.should(conceptid_filter)
+            if len(ret) > 0:
+                conceptid_filter = Terms(field='domains.conceptid', terms=ret)
+                temporal_query.should(conceptid_filter)
 
+        
+        search_query.must(temporal_query)
 
-    query.add_query(boolfilter)
+    query.add_query(search_query)
     return query
 
 def buffer(request):
