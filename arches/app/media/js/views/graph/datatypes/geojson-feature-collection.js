@@ -16,6 +16,13 @@ define([
             this.graph = params.graph;
             this.layer = params.layer;
             if (this.layer) {
+                this.permissions = params.permissions;
+                this.iconFilter = ko.observable('');
+                this.icons = ko.computed(function () {
+                    return _.filter(params.icons, function (icon) {
+                        return icon.name.indexOf(self.iconFilter()) >= 0;
+                    });
+                });
                 this.count = params.mapSource.count;
                 this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);
@@ -43,20 +50,22 @@ define([
                     })
                 }
                 this.selectedBasemapName = ko.observable('');
-                this.basemaps = _.filter(arches.mapLayers, function(layer) {
+                var mapLayers = $.extend(true, {}, arches.mapLayers);
+                this.basemaps = _.filter(mapLayers, function(layer) {
                     return !layer.isoverlay;
                 });
                 this.basemaps.forEach(function (basemap) {
-                    if (self.selectedBasemapName() === '') {
-                        self.selectedBasemapName(basemap.name);
-                    }
-                    if (basemap.name === 'streets') {
-                        self.selectedBasemapName('streets');
-                    }
                     basemap.select = function () {
                         self.selectedBasemapName(basemap.name);
                     }
                 });
+                var defaultBasemap = _.find(this.basemaps, function (basemap) {
+                    return basemap.addtomap;
+                });
+                if (!defaultBasemap) {
+                    defaultBasemap = this.basemaps[0];
+                }
+                this.selectedBasemapName(defaultBasemap.name);
                 var getBasemapLayers = function () {
                     return _.filter(self.basemaps, function(layer) {
                         return layer.name === self.selectedBasemapName();

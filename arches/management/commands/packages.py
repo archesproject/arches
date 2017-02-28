@@ -34,8 +34,6 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from arches.app.models import models
 import csv, json
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -88,6 +86,9 @@ class Command(BaseCommand):
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
             help='A path to a mapnik xml file to generate a tileserver layer from.')
 
+        parser.add_argument('-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
+            help='A path to a tile config json file to generate a tileserver layer from.')
+
         parser.add_argument('-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
             help='A path to a mapbox json file to generate a layer from.')
 
@@ -116,27 +117,27 @@ class Command(BaseCommand):
         print 'package: '+ package_name
 
         if options['operation'] == 'setup':
-            self.setup(package_name)
+            self.setup(package_name, es_install_location=options['dest_dir'])
 
         if options['operation'] == 'install':
             self.install(package_name)
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
-            self.delete_indexes(package_name)
-            self.setup_indexes(package_name)
+            self.delete_indexes()
+            self.setup_indexes()
 
         if options['operation'] == 'setup_indexes':
-            self.setup_indexes(package_name)
+            self.setup_indexes()
 
         if options['operation'] == 'delete_indexes':
-            self.delete_indexes(package_name)
+            self.delete_indexes()
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
 
         if options['operation'] == 'setup_elasticsearch':
-            self.setup_elasticsearch(package_name)
+            self.setup_elasticsearch(install_location=options['dest_dir'])
 
         if options['operation'] == 'livereload':
             self.start_livereload()
@@ -169,7 +170,7 @@ class Command(BaseCommand):
             self.import_mapping_file(options['source'])
 
         if options['operation'] == 'add_tileserver_layer':
-            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
+            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'], options['tile_config_path'])
 
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
@@ -183,15 +184,15 @@ class Command(BaseCommand):
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
 
-    def setup(self, package_name):
+    def setup(self, package_name, es_install_location=None):
         """
         Installs Elasticsearch into the package directory and
         installs the database into postgres as "arches_<package_name>"
 
         """
-        self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)
+        self.setup_elasticsearch(install_location=es_install_location, port=settings.ELASTICSEARCH_HTTP_PORT)
         self.setup_db(package_name)
-        self.generate_procfile(package_name)
+        self.generate_procfile(package_name, es_install_location=es_install_location)
 
     def install(self, package_name):
         """
@@ -202,48 +203,8 @@ class Command(BaseCommand):
         install = import_string('%s.setup.install' % package_name)
         install()
 
-    def setup_elasticsearch(self, package_name, port=9200):
-        """
-        Installs Elasticsearch into the package directory and
-        adds default settings for running in a test environment
-
-        Change these settings in production
-
-        """
-
-        install_location = self.get_elasticsearch_install_location(package_name)
-        install_root = os.path.abspath(os.path.join(install_location, '..'))
-        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
-        file_name = url.split('/')[-1]
-
-        download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
-        unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
-
-        es_config_directory = os.path.join(install_location, 'config')
-        try:
-            os.rename(os.path.join(es_config_directory, 'elasticsearch.yml'), os.path.join(es_config_directory, 'elasticsearch.yml.orig'))
-        except: pass
-
-        with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
-            f.write('# ----------------- FOR TESTING ONLY -----------------')
-            f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\nnode.max_local_storage_nodes: 1')
-            f.write('\nnode.local: true')
-            f.write('\nindex.number_of_shards: 1')
-            f.write('\nindex.number_of_replicas: 0')
-            f.write('\nhttp.port: %s' % port)
-            f.write('\ndiscovery.zen.ping.multicast.enabled: false')
-            f.write('\ndiscovery.zen.ping.unicast.hosts: ["localhost"]')
-            f.write('\ncluster.routing.allocation.disk.threshold_enabled: false')
-
-        # install plugin
-        if sys.platform == 'win32':
-            os.system("call %s install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
-        else:
-            os.chdir(os.path.join(install_location, 'bin'))
-            os.system("chmod u+x plugin")
-            os.system("./plugin install mobz/elasticsearch-head")
-            os.system("chmod u+x elasticsearch")
+    def setup_elasticsearch(self, install_location=None, port=9200):
+        management.call_command('es', operation='install', dest_dir=install_location, port=port)
 
     def start_elasticsearch(self, package_name):
         """
@@ -282,19 +243,16 @@ class Command(BaseCommand):
 
         management.call_command('migrate')
 
-    def setup_indexes(self, package_name):
-        prepare_term_index(create=True)
-        prepare_resource_relations_index(create=True)
+    def setup_indexes(self):
+        management.call_command('es', operation='setup_indexes')
 
     def drop_resources(self, packages_name):
         drop_all_resources()
 
-    def delete_indexes(self, package_name):
-        delete_term_index()
-        delete_search_index()
-        delete_resource_relations_index()
+    def delete_indexes(self):
+        management.call_command('es', operation='delete_indexes')
 
-    def generate_procfile(self, package_name):
+    def generate_procfile(self, package_name, es_install_location=None):
         """
         Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
 
@@ -303,7 +261,8 @@ class Command(BaseCommand):
         python_exe = os.path.abspath(sys.executable)
 
         contents = []
-        contents.append('\nelasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
+        if es_install_location:
+            contents.append('\nelasticsearch: %s' % os.path.join(es_install_location, 'bin', 'elasticsearch'))
         contents.append('django: %s manage.py runserver' % (python_exe))
         contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
 
@@ -442,16 +401,19 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
-        if layer_name != False and mapnik_xml_path != False:
-            with transaction.atomic():
-                tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
-                source_dict = {
-                    "type": "raster",
-                    "tiles": [
-                        ("/tileserver/%s/{z}/{x}/{y}.png") % (layer_name)
-                    ],
-                    "tileSize": 256
+    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
+        if layer_name != False:
+            config = None
+            extension = "png"
+            layer_type = "raster"
+            tile_size = 256
+            if mapnik_xml_path != False:
+                path = os.path.abspath(mapnik_xml_path),
+                config = {
+                    "provider": {
+                        "name": "mapnik",
+                        "mapfile": os.path.abspath(mapnik_xml_path)
+                    }
                 }
                 layer_list = [{
                     "id": layer_name,
@@ -460,13 +422,41 @@ class Command(BaseCommand):
                     "minzoom": 0,
                     "maxzoom": 22
                 }]
-                map_source = models.MapSources(name=layer_name, source=source_dict)
-                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
-                map_source.save()
-                map_layer.save()
-                tileserver_layer.map_layer = map_layer
-                tileserver_layer.map_source = map_source
-                tileserver_layer.save()
+            elif tile_config_path != False:
+                path = os.path.abspath(tile_config_path)
+                with open(path) as content:
+                    config_data = json.load(content)
+                config = config_data["config"]
+                layer_type = config_data["type"]
+                layer_list = config_data["layers"]
+                for layer in layer_list:
+                    layer["source"] = layer_name
+                    if layer_type == "vector":
+                        layer["source-layer"] = layer_name
+                if layer_type == "vector":
+                    extension = "pbf"
+                    tile_size = 512
+            if config is not None:
+                with transaction.atomic():
+                    tileserver_layer = models.TileserverLayers(
+                        name=layer_name,
+                        path=path,
+                        config=config
+                    )
+                    source_dict = {
+                        "type": layer_type,
+                        "tiles": [
+                            ("/tileserver/%s/{z}/{x}/{y}.%s") % (layer_name, extension)
+                        ],
+                        "tileSize": tile_size
+                    }
+                    map_source = models.MapSources(name=layer_name, source=source_dict)
+                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                    map_source.save()
+                    map_layer.save()
+                    tileserver_layer.map_layer = map_layer
+                    tileserver_layer.map_source = map_source
+                    tileserver_layer.save()
 
 
     def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):

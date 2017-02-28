@@ -11,41 +11,34 @@ from django.conf import settings
 from arches.app.datatypes import datatypes
 from arches.app.datatypes.datatypes import DataTypeFactory
 
-def get_tileserver_config(node_id=None):
+
+def get_tileserver_config(layer_id):
     database = settings.DATABASES['default']
     datatype_factory = DataTypeFactory()
+
+    try:
+        node = models.Node.objects.get(pk=layer_id)
+        # TODO: check user node permissions here, if  user
+        # does not have read access to this node, fire an exception
+        datatype = datatype_factory.get_instance(node.datatype)
+        layer_config = datatype.get_layer_config(node)
+    except Exception:
+        layer_model = models.TileserverLayers.objects.get(name=layer_id)
+        layer_config = layer_model.config
 
     config_dict = {
         "cache": settings.TILE_CACHE_CONFIG,
         "layers": {}
     }
-
-    if node_id is not None:
-        node = models.Node.objects.get(pk=node_id)
-        datatype = datatype_factory.get_instance(node.datatype)
-        layer_config = datatype.get_layer_config(node)
-        if layer_config is not None:
-            config_dict["layers"][str(node_id)] = layer_config
-
-    layer_models = models.TileserverLayers.objects.all()
-    for layer_model in layer_models:
-        config_dict['layers'][layer_model.name] = {
-            "provider": {
-                "name": "mapnik",
-                "mapfile": layer_model.path
-            }
-        }
-
+    config_dict["layers"][layer_id] = layer_config
     return config_dict
 
 
-def handle_request(request, node_id=None):
-    # TODO: check user node permissions here, if node_id is not None and user
-    # does not have read access to that node, fire an exception
-    config_dict = get_tileserver_config(node_id)
-
-    config = TileStache.Config.buildConfiguration(config_dict)
+def handle_request(request):
     path_info = request.path.replace('/tileserver/', '')
+    layer_id = path_info.split('/')[0]
+    config_dict = get_tileserver_config(layer_id)
+    config = TileStache.Config.buildConfiguration(config_dict)
     query_string = ""
     script_name = ""
     response = HttpResponse()
@@ -104,7 +97,8 @@ def clean_resource_cache(tile):
 
             if bounds is not None:
                 zooms = range(20)
-                config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+                config = TileStache.parseConfig(
+                    get_tileserver_config(node.nodeid))
                 layer = config.layers[str(node.nodeid)]
                 mimetype, format = layer.getTypeByExtension('pbf')
 
@@ -138,11 +132,14 @@ def seed_resource_cache():
 
     padding = 0
 
-    datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-    nodes = models.Node.objects.filter(graph__isresource=True, datatype__in=datatypes)
+    datatypes = [
+        d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
+    nodes = models.Node.objects.filter(
+        graph__isresource=True, datatype__in=datatypes)
     for node in nodes:
         datatype = datatype_factory.get_instance(node.datatype)
-        count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+        count = models.TileModel.objects.filter(
+            data__has_key=str(node.nodeid)).count()
         if datatype.should_cache(node) and count > 0:
             config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
             layer = config.layers[str(node.nodeid)]

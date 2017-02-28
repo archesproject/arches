@@ -1,0 +1,54 @@
+{
+    "version": 8,
+    "name": "Empty",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "template"
+    },
+    "center": [
+        -122.40749185820582,
+        37.77427167363035
+    ],
+    "zoom": 16.56510535603044,
+    "bearing": 0,
+    "pitch": 0,
+    "sources": {
+        "composite": {
+            "url": "mapbox://mapbox.mapbox-streets-v7",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/rgaston/cixs2kvf3001g2sp29dbkogih",
+    "glyphs": "mapbox://fonts/rgaston/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "3d-buildings",
+            "type": "fill-extrusion",
+            "source": "composite",
+            "source-layer": "building",
+            "filter": [
+                "==",
+                "$type",
+                "Polygon"
+            ],
+            "layout": {},
+            "paint": {
+                "fill-extrusion-color": "hsl(0, 0%, 78%)",
+				"fill-extrusion-opacity": 0.4,
+                "fill-extrusion-height": {
+					"type": "identity",
+					"property": "height"
+				},
+                "fill-extrusion-base": {
+					"type": "identity",
+					"property": "min_height"
+				}
+            }
+        }
+    ],
+    "created": "2017-01-10T22:09:17.377Z",
+    "id": "cixs2kvf3001g2sp29dbkogih",
+    "modified": "2017-01-10T22:23:14.936Z",
+    "owner": "rgaston",
+    "draft": false
+}

@@ -444,10 +444,10 @@ def get_preflabel_from_conceptid(conceptid, lang):
     }
     se = SearchEngineFactory().create()
     query = Query(se)
-    terms = Terms(field='conceptid', terms=[conceptid])
-    match = Match(field='type', query='prefLabel', type='phrase')
-    query.add_filter(terms)
-    query.add_query(match)
+    bool_query = Bool()
+    bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
+    bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
+    query.add_query(bool_query)
     preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
     for preflabel in preflabels:
         default = preflabel['_source']

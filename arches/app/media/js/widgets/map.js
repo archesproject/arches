@@ -252,7 +252,9 @@ define([
                 });
             }
 
-            this.layers = $.extend(true, [], arches.mapLayers); //deep copy of layers
+            this.layers = $.extend(true, [], _.filter(arches.mapLayers, function (layer) {
+                return layer.activated;
+            })); //deep copy of layers
 
             this.defineSearchQueryLayer = function() {
                 var searchQueryLayer = {
@@ -676,6 +678,7 @@ define([
 
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
+                    console.log(initialConfigs);
                     for (var i = initialConfigs.length; i-- > 0;) {
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid
@@ -811,7 +814,7 @@ define([
                 }
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
-                    return baselayer.isoverlay === false
+                    return baselayer.isoverlay === false && baselayer.activated;
                 });
 
                 this.setBasemap = function(basemapType) {

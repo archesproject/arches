@@ -638,6 +638,8 @@ class Migration(migrations.Migration):
                 ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
                 ('icon', models.TextField(default=None)),
+                ('activated', models.BooleanField(default=True)),
+                ('addtomap', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'map_layers',
@@ -661,6 +663,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
+                ('config', JSONField(db_column='config')),
                 ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
                 ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
             ],

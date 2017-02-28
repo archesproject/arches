@@ -23,11 +23,11 @@ class DataTypeFactory(object):
 
     def get_instance(self, datatype):
         d_datatype = self.datatypes[datatype]
-        mod_path = d_datatype.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
         try:
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
+            mod_path = d_datatype.modulename.replace('.py', '')
+            module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
@@ -306,6 +306,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_name = "%s - %s" % (node.graph.name, node.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
+        layer_icon = node.graph.iconclass
+        if not preview and node.config["layerIcon"] != "":
+            layer_icon = node.config["layerIcon"]
 
         if not preview and node.config["advancedStyling"]:
             try:
@@ -497,7 +500,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "nodeid": node.nodeid,
             "name": layer_name,
             "layer_definitions": layer_def,
-            "icon": node.graph.iconclass,
+            "icon": layer_icon,
+            "addtomap": node.config['addToMap'],
         }
 
 

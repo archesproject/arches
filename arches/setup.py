@@ -20,7 +20,7 @@ def install():
 
         # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
         tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
-        os.system("pip install -b %s setuptools --no-use-wheel --upgrade" % (tmpinstalldir))
+        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
         os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
         if settings.MODE == 'DEV':
             os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
@@ -154,7 +154,7 @@ def get_elasticsearch_download_url(install_dir):
 ------------------------------------------------------------------------------------------------------
     ERROR: There was an error getting the url for Elastic search from the requirements.txt file
     Make sure the requirements.txt file contains a line similar to the following line,\nincluding the pound symbol (#) but not the double quotes (") and where the x.x.x represent the version number:
-        "# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-x.x.x.zip"
+        "# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-x.x.x.zip"
 ----------------------------------------------------------------------------------------------------\n""")
 
 def get_version(version=None):

@@ -27,16 +27,16 @@ define([
                 this.parseItems(card);
             }, this);
             this.parseItems(this.card());
-        
+
             this.getPermsForDisplay = function(){
                 var ret = {'default': [], 'local': []};
                 this.perms.local().forEach(function(perm){
                     ret.local.push(ko.unwrap(perm.name));
-                }); 
+                });
                 this.perms.default().forEach(function(perm){
                     ret.default.push(ko.unwrap(perm.name));
-                }); 
-                return ret; 
+                });
+                return ret;
             };
 
             this.permissionsForm = new PermissionsForm({
