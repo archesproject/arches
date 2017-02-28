@@ -205,6 +205,7 @@ def build_search_results_dsl(request):
     query = Query(se, start=limit*int(page-1), limit=limit)
     search_query = Bool()
 
+
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
@@ -292,6 +293,8 @@ def build_search_results_dsl(request):
             WHERE overlap = true;
         """
 
+        temporal_query = Bool()
+
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
@@ -313,10 +316,10 @@ def build_search_results_dsl(request):
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
             
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                time_query_dsl = Nested(path='tiles', query=inverted_date_filter)
-                search_query.must(time_query_dsl)
+                date_range_query = Nested(path='tiles', query=inverted_date_filter)
+                temporal_query.should(date_range_query)
             else:
-                search_query.must(inverted_date_filter)
+                temporal_query.should(inverted_date_filter)
 
                 select_clause = " or ".join(select_clause) + " as overlap"
                 sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
@@ -324,11 +327,11 @@ def build_search_results_dsl(request):
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
-                time_query_dsl = Nested(path='tiles', query=range)
-                search_query.must(time_query_dsl)
+                date_range_query = Nested(path='tiles', query=range)
+                temporal_query.should(date_range_query)
             else:
-                time_query_dsl = Range(field='dates', gte=start_date, lte=end_date)
-                search_query.must(time_query_dsl)
+                date_range_query = Range(field='dates', gte=start_date, lte=end_date)
+                temporal_query.should(date_range_query)
 
                 select_clause = """
                     numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
@@ -343,8 +346,10 @@ def build_search_results_dsl(request):
 
             if len(ret) > 0:
                 conceptid_filter = Terms(field='domains.conceptid', terms=ret)
-                search_query.should(conceptid_filter)
+                temporal_query.should(conceptid_filter)
 
+        
+        search_query.must(temporal_query)
 
     query.add_query(search_query)
     return query
