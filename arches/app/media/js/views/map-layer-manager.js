@@ -253,12 +253,13 @@ define([
     vm.selectedList(vm.geomNodes);
     vm.listFilter = ko.observable('');
     vm.listItems = ko.computed(function () {
-        var listFilter = vm.listFilter();
+        var listFilter = vm.listFilter().toLowerCase();
         var layerList = ko.unwrap(vm.selectedList());
         return _.filter(layerList, function(item) {
             var name = item.nodeid ?
                 (item.config.layerName() ? item.config.layerName() : item.layer.name) :
                 item.name();
+            name = name.toLowerCase()
             return name.indexOf(listFilter) > -1;
         })
     });
