@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import arches
 import argparse
+import subprocess
 import codecs
 import os
 import sys
 import imp
-from importlib import import_module
 import errno
+from importlib import import_module
 import django
-
 from django.utils.crypto import get_random_string
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
@@ -19,17 +19,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 COMMANDS = {}
 
 from arches.management.commands import utils
-
-parent_parser = argparse.ArgumentParser(add_help=False)
-
-parser = argparse.ArgumentParser(
-    prog='arches',
-    description='Manage Arches-based Applications',
-    parents=[parent_parser],
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-subparsers = parser.add_subparsers(title='available commands', dest='command')
-subparsers.required = True
 
 class ArchesCommand(TemplateCommand):
     help = ("Creates a Django project directory structure for the given "
@@ -59,47 +48,65 @@ class ArchesCommand(TemplateCommand):
 
 def command_create_app(args):
     cmd = ArchesCommand()
-    cmd.handle(vars(args))
+    options = vars(args)
+    proj_name = options['name']
+    proj_dir = options['directory']
+    cmd.handle(options)
+    bower_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    os.chdir(bower_path)
+    bower_install = 'bower install'
+    subprocess.call(bower_install.split(), shell=False)
+
+parent_parser = argparse.ArgumentParser(add_help=False)
+
+parser = argparse.ArgumentParser(
+    prog='arches',
+    description='Manage Arches-based Applications',
+    parents=[parent_parser],
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+subparsers = parser.add_subparsers(title='available commands', dest='command')
+subparsers.required = True
 
 parser_start = subparsers.add_parser(
     'create',
     help="Create the scaffolding for a new Arches project",
-)
+    )
+
 parser_start.add_argument(
     'name',
     type=str,
-    help='name of your new app'
-    )
+    help='name of your new app')
+
 parser_start.add_argument(
     '-d', '--directory',
     help='destination directory of your new project',
     dest='directory',
-    default=None,
-)
+    default=None,)
+
 parser_start.add_argument(
     '-t', '--template',
     help="The path or URL to load the template from.",
     type=str,
-    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
-)
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates'))
+
 parser_start.add_argument(
     '-e', '--extension',
     dest='extensions',
     help='The file extension(s) to render (default: py).',
     type=str,
-    default=['py','txt','html','js','css']
-)
+    default=['py','txt','html','js','css'])
+
 parser_start.add_argument(
     '-n', '--name',
     dest='files',
     help='name of your new arches application',
     type=str,
-    default='',
-)
+    default='',)
+
 parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
     type=int, choices=[0, 1, 2, 3],
-    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'
-)
+    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
 
 try:
     # Python 3
