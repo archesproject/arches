@@ -35,74 +35,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="layer-list">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                        <input type="text" class="form-control" style="" placeholder="Find a layer..." data-bind="">
+                        <input type="text" class="form-control" style="" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+                        <span class="clear-node-search" data-bind="click: function () { listFilter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
 
                 </div>
                 <div class="report-image-grid relative">
                     <div class="grid">
-                        <!-- ko foreach: { data: geomNodes, as: "node" } -->
-                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(node) }, css: {'selected': $parent.selection() === node}">
+                        <!-- ko foreach: { data: listItems(), as: "item" } -->
+                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}">
 
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-                                    <i class="" data-bind="css: node.config.layerIcon() || node.layer.icon"></i>
+                                    <!-- ko if: item.nodeid -->
+                                    <i class="" data-bind="css: item.config.layerIcon() || item.layer.icon"></i>
+                                    <!-- /ko -->
+                                    <!-- ko if: !item.nodeid -->
+                                    <i class="" data-bind="css: item.icon"></i>
+                                    <!-- /ko -->
                                 </span>
                             </div>
                             <div class="crud-card-main">
-                                <a class="listitem_name" data-bind="text: (node.config.layerName ? node.config.layerName() : false) || layer.name">
-                                </a>
+                                <!-- ko if: item.nodeid -->
+                                <a class="listitem_name" data-bind="text: (item.config.layerName ? item.config.layerName() : false) || item.layer.name"></a>
+                                <!-- /ko -->
+                                <!-- ko if: !item.nodeid -->
+                                <a class="listitem_name" data-bind="text: item.name"></a>
+                                <!-- /ko -->
                             </div>
-                            <div class="crud-card-subtitle" data-bind="text: node.name"></div>
-                        </div>
-                        <!-- /ko -->
-                    </div>
-                </div>
-
-                <div class="title-block-title">
-                    <h4 class="title-block-title"> {% trans "Basemaps" %}</h4>
-                </div>
-                <div class="report-image-grid relative" style="margin-top: 5px;">
-                    <div class="grid">
-                        <!-- ko foreach: { data: basemaps, as: "basemap" } -->
-                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(basemap) }, css: {'selected': $parent.selection() === basemap}">
-
-                            <div class="library-icon">
-                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-                                    <i class="" data-bind="css: basemap.icon"></i>
-                                </span>
-                            </div>
-                            <div class="crud-card-main">
-                                <a class="listitem_name" data-bind="text: basemap.name">
-                                </a>
-                            </div>
-                            <div class="crud-card-subtitle">Basemap</div>
-                        </div>
-                        <!-- /ko -->
-                    </div>
-                </div>
-
-                <div class="title-block-title">
-                    <h4 class="title-block-title"> {% trans "Overlays" %}</h4>
-                </div>
-                <div class="report-image-grid relative" style="margin-top: 5px;">
-                    <div class="grid">
-                        <!-- ko foreach: { data: overlays, as: "overlay" } -->
-                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(overlay) }, css: {'selected': $parent.selection() === overlay}">
-
-                            <div class="library-icon">
-                                <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
-                                    <i class="" data-bind="css: overlay.icon"></i>
-                                </span>
-                            </div>
-                            <div class="crud-card-main">
-                                <a class="listitem_name" data-bind="text: overlay.name">
-                                </a>
-                            </div>
-                            <div class="crud-card-subtitle">Overlay</div>
+                            <!-- ko if: item.nodeid -->
+                            <div class="crud-card-subtitle" data-bind="text: item.name"></div>
+                            <!-- /ko -->
+                            <!-- ko if: !item.nodeid -->
+                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? '{% trans "Overlay" %}' : '{% trans "Basemap" %}'"></div>
+                            <!-- /ko -->
                         </div>
                         <!-- /ko -->
                     </div>
@@ -116,9 +84,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="category-header" style="">
                     <!-- Resource/Graph Toggle -->
                     <div style="display: block;">
-                        <a id="" class="category-title active" href="">{% trans "Resource Layers" %}</a>
-                        <a id="" class="category-title" href="">{% trans "Basemaps" %}</a>
-                        <a id="" class="category-title" href="">{% trans "Overlays" %}</a>
+                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
+                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
+                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
                     </div>
                 </div>
                 <div class="ep-card-crud-container">
