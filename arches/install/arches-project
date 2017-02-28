@@ -80,8 +80,7 @@ parser_start.add_argument(
     '-t', '--template',
     help="The path or URL to load the template from.",
     type=str,
-    default=None
-    # default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-template')
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
 )
 parser_start.add_argument(
     '-e', '--extension',

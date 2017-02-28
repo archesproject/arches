@@ -16,11 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from {{ source_app }} import urls as {{ source_app }}_urls
-from django.conf.urls import patterns, url, include
+import os
+import sys
+import inspect
+path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
 
-uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+if path not in sys.path:
+    sys.path.append(path)
 
-urlpatterns = patterns('',
-    url(r'', include({{ source_app }}_urls)),
-)
+# reverting back to the old style of setting the DJANGO_SETTINGS_MODULE env variable
+# refer to the following blog post under the heading "Leaking of process environment variables."
+# http://blog.dscpl.com.au/2012/10/requests-running-in-wrong-django.html
+os.environ['DJANGO_SETTINGS_MODULE'] = "{{ project_name }}.settings"
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
