@@ -2210,8 +2210,6 @@ VALUES ('search-query', '{
     }
 }');
 
-DELETE FROM map_layers WHERE name = 'Search Results';
-
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'Search Results', '[{
             "id": "search-results-hex",
