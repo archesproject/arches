@@ -177,7 +177,9 @@ define([
         }, 0);
     });
 
-    aggregated.features = aggregated.features.concat(pointsFC.features.slice(0, 5));
+    var resultsPoints = pointsFC.features.slice(0, 5);
+    resultsPoints[0].properties.highlight = true
+    aggregated.features = aggregated.features.concat(resultsPoints);
 
     sources["search-results-hex"] = {
         "type": "geojson",
