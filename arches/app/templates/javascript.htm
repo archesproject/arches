@@ -183,6 +183,7 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            hexBinSize: {{ map_info.hex_bin_size }},
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% for resource_map_source in resource_map_sources %}

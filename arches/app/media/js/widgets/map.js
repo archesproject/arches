@@ -96,8 +96,8 @@ define([
                     agg.bounds.bounds.top_left.lat
                 ];
 
-                var cellWidth = 100;
-                var units = 'miles';
+                var cellWidth = arches.hexBinSize;
+                var units = 'kilometers';
                 var hexGrid = turf.hexGrid(bbox, cellWidth, units);
                 var features = [];
                 _.each(agg.grid.buckets, function (cell) {

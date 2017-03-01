@@ -2211,25 +2211,89 @@ VALUES ('search-query', '{
 }');
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[{
-            "id": "search-results-hex",
-            "type": "fill-extrusion",
-            "source": "search-results-hex",
-            "filter": ["all", [">", "doc_count", 0]],
+    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
+        {
             "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "all",
+                [
+                    ">",
+                    "doc_count",
+                    0
+                ]
+            ],
             "paint": {
-                "fill-extrusion-color": "hsl(0, 0%, 78%)",
-                "fill-extrusion-opacity": 0.4,
+                "fill-extrusion-color": {
+                    "property": "doc_count",
+                    "stops": [
+                        [
+                            0,
+                            "#ffffb2"
+                        ],
+                        [
+                            10,
+                            "#fed976"
+                        ],
+                        [
+                            50,
+                            "#feb24c"
+                        ],
+                        [
+                            200,
+                            "#fd8d3c"
+                        ],
+                        [
+                            500,
+                            "#f03b20"
+                        ],
+                        [
+                            1000,
+                            "#bd0026"
+                        ]
+                    ]
+                },
                 "fill-extrusion-height": {
                     "type": "exponential",
                     "property": "doc_count",
                     "stops": [
-                        [0,0],
-                        [1000, 20000000]
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            1000,
+                            65535
+                        ]
                     ]
-                }
-            }
-        }]', TRUE, 'ion-search', TRUE, TRUE);
+                },
+                "fill-extrusion-opacity": 0.4
+            },
+            "type": "fill-extrusion",
+            "id": "search-results-hex"
+        },
+        {
+            "filter": [
+                "all",
+                [
+                    ">",
+                    "doc_count",
+                    0
+                ]
+            ],
+            "layout": {
+                "text-size": 12,
+                "text-font": [
+                    "DIN Offc Pro Medium",
+                    "Arial Unicode MS Bold"
+                ],
+                "text-field": "{doc_count}"
+            },
+            "type": "symbol",
+            "id": "search-results-hex-count",
+            "source": "search-results-hex"
+        }
+    ]', TRUE, 'ion-search', TRUE, TRUE);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
