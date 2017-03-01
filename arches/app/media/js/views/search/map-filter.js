@@ -2,7 +2,7 @@ define([
     'knockout',
     'views/search/base-filter',
     'arches',
-    'widgets/map',
+    'views/components/widgets/map',
 ],
 function(ko, BaseFilter, arches) {
     return BaseFilter.extend({
