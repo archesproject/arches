@@ -102,7 +102,9 @@ define([
                 var features = [];
                 _.each(agg.grid.buckets, function (cell) {
                     var pt = geohash.decode(cell.key);
-                    var feature = turf.point([pt.lon, pt.lat], {doc_count: cell.doc_count});
+                    var feature = turf.point([pt.lon, pt.lat], {
+                        doc_count: cell.doc_count
+                    });
                     features.push(feature);
                 });
                 var pointsFC = turf.featureCollection(features);
@@ -115,6 +117,39 @@ define([
                 });
 
                 return aggregated;
+            }
+            var getSearchPointsGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg || !agg.results) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+
+                var features = [];
+                _.each(agg.results, function (result) {
+                    _.each(result._source.points, function (pt) {
+                        var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                            marker: arches.searchResultMarkerUnicode,
+                            highlight: false
+                        }));
+                        features.push(feature);
+                    });
+                });
+
+                var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                if (mouseoverInstanceId) {
+                    var highlightFeature = _.find(features, function(feature) {
+                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
+                    });
+                    if (highlightFeature) {
+                        highlightFeature.properties.highlight = true;
+                    }
+                }
+
+                var pointsFC = turf.featureCollection(features);
+                return pointsFC;
             }
 
             this.configType = params.reportHeader || 'header';
@@ -524,16 +559,27 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.updateSearchResultsLayer = function() {
-                                var source = self.map.getSource('search-results-hex')
-                                var data = getSearchAggregationGeoJSON();
-                                source.setData(data)
+                                var aggSource = self.map.getSource('search-results-hex')
+                                var aggData = getSearchAggregationGeoJSON();
+                                aggSource.setData(aggData)
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
                             if (self.searchAggregations) {
                                 self.updateSearchResultsLayer()
                             }
-                            // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
-                            // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(function () {
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
+                            });
+                            self.results.mapLinkPoint.subscribe(function(point) {
+                                self.map.flyTo({
+                                    center: [point.lon, point.lat]
+                                });
+                            });
                         }
 
 
@@ -694,7 +740,6 @@ define([
 
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
-                    console.log(initialConfigs);
                     for (var i = initialConfigs.length; i-- > 0;) {
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid
@@ -1139,6 +1184,13 @@ define([
                     "features": []
                 }
             };
+            this.sources["search-results-points"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
 
             this.mapStyle = {
                 "version": 8,
@@ -1148,8 +1200,8 @@ define([
                     "mapbox:type": "template"
                 },
                 "sources": this.sources,
-                "sprite": "mapbox://sprites/mapbox/basic-v9",
-                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "sprite": arches.mapboxSprites,
+                "glyphs": arches.mapboxGlyphs,
                 "layers": []
             };
 

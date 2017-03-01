@@ -46,14 +46,14 @@ define([
             this.filters.resourceTypeFilter = new ResourceTypeFilter({
                 termFilter: this.filters.termFilter
             });
+            this.filters.savedSearches = new BaseFilter();
+            this.filters.advancedFilter = new BaseFilter();
+            this.filters.searchRelatedResources = new BaseFilter()
             this.filters.mapFilter = new MapFilter({
                 aggregations: this.aggregations,
                 resizeOnChange: this.viewModel.resultsExpanded,
                 termFilter: this.filters.termFilter
             });
-            this.filters.savedSearches = new BaseFilter();
-            this.filters.advancedFilter = new BaseFilter();
-            this.filters.searchRelatedResources = new BaseFilter()
 
             _.extend(this.viewModel, this.filters);
 

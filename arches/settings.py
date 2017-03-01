@@ -394,6 +394,13 @@ TILE_CACHE_CONFIG = {
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
+# links to sprites and glyphs for use on map
+MAPBOX_SPRITES = "mapbox://sprites/rgaston/cizraivuk005w2ro1nvgmuj2n"
+MAPBOX_GLYPHS = "mapbox://fonts/rgaston/{fontstack}/{range}.pbf"
+
+# unicode for character to be used for search result markers
+SEARCH_RESULT_MARKER_UNICODE = "\uf041"
+
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.

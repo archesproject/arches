@@ -167,6 +167,7 @@ define([
     });
     _.each(pointsFC.features, function (feature) {
         feature.properties.doc_count = Math.round(Math.random()*1000);
+        feature.properties.marker = arches.searchResultMarkerUnicode;
     });
 
     var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
@@ -176,9 +177,17 @@ define([
         }, 0);
     });
 
+    var resultsPoints = pointsFC.features.slice(0, 5);
+    resultsPoints[0].properties.highlight = true
+    var pointsFC = turf.featureCollection(resultsPoints);
+
     sources["search-results-hex"] = {
         "type": "geojson",
         "data": aggregated
+    };
+    sources["search-results-points"] = {
+        "type": "geojson",
+        "data": pointsFC
     };
 
     _.each(sources, function(sourceConfig, name) {
@@ -244,8 +253,8 @@ define([
             "mapbox:type": "template"
         },
         "sources": sources,
-        "sprite": "mapbox://sprites/mapbox/basic-v9",
-        "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+        "sprite": arches.mapboxSprites,
+        "glyphs": arches.mapboxGlyphs,
         "layers": basemapLayers.concat(displayLayers)
     };
 
