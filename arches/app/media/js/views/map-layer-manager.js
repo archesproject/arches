@@ -167,7 +167,6 @@ define([
     });
     _.each(pointsFC.features, function (feature) {
         feature.properties.doc_count = Math.round(Math.random()*1000);
-        feature.properties.marker = arches.searchResultMarkerUnicode;
     });
 
     var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');

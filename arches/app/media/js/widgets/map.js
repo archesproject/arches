@@ -131,7 +131,6 @@ define([
                 _.each(agg.results, function (result) {
                     _.each(result._source.points, function (pt) {
                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
-                            marker: arches.searchResultMarkerUnicode,
                             highlight: false
                         }));
                         features.push(feature);
