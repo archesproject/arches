@@ -83,13 +83,12 @@ define([
             this.searchAggregations = params.searchAggregations;
             var getSearchAggregationGeoJSON = function () {
                 var agg = ko.unwrap(self.searchAggregations);
-                if (!agg) {
+                if (!agg || !agg.bounds.bounds) {
                     return {
                         "type": "FeatureCollection",
                         "features": []
                     };
                 }
-
                 var bbox = [
                     agg.bounds.bounds.top_left.lon,
                     agg.bounds.bounds.bottom_right.lat,
