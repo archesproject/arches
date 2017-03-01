@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div style="height:0px">
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Card Name" %}</label>
+      </div>
+
+      <div class="col-xs-12">
+          <select data-placeholder="{% trans "Choose a card." %}"
+          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: selected_nodegroup, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+      </div>
+    </div>
+  </div>
+</div>
