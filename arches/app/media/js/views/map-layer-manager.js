@@ -1,6 +1,7 @@
 define([
     'knockout',
     'underscore',
+    'turf',
     'views/base-manager',
     'models/node',
     'viewmodels/alert',
@@ -10,7 +11,7 @@ define([
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript',
     'datatype-config-components'
-], function(ko, _, BaseManagerView, NodeModel, AlertViewModel, data, arches) {
+], function(ko, _, turf, BaseManagerView, NodeModel, AlertViewModel, data, arches) {
     var vm = {
         map: null,
         geomNodes: [],
@@ -156,6 +157,30 @@ define([
         }, []);
     };
     var sources = $.extend(true, {}, arches.mapSources);
+
+    var cellWidth = arches.hexBinSize;
+    var units = 'kilometers';
+    var bbox = [-13, 32, 47, 57];
+    var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+    var pointsFC = turf.random('points', 200, {
+        bbox: bbox
+    });
+    _.each(pointsFC.features, function (feature) {
+        feature.properties.doc_count = Math.round(Math.random()*1000);
+    });
+
+    var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+    _.each(aggregated.features, function(feature) {
+        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
+            return i+ii;
+        }, 0);
+    });
+
+    sources["search-results-hex"] = {
+        "type": "geojson",
+        "data": aggregated
+    };
+
     _.each(sources, function(sourceConfig, name) {
         if (sourceConfig.tiles) {
             sourceConfig.tiles.forEach(function(url, i) {

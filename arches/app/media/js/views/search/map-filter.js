@@ -8,6 +8,7 @@ function(ko, BaseFilter, arches) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
+            this.aggregations = options.aggregations;
             this.name = "Map Filter";
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);

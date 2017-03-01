@@ -394,6 +394,14 @@ TILE_CACHE_CONFIG = {
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
+# size to use for hex binning search results on map (in km)
+HEX_BIN_SIZE = 100
+# binning uses elasticsearch GeoHash grid aggregation.
+# precision for binning is set based on GeoHash precision, see this table:
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
+# high precision binning may result in performance issues.
+HEX_BIN_PRECISION = 5
+
 BULK_IMPORT_BATCH_SIZE = 2000
 
 try:

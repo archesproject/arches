@@ -8,6 +8,8 @@ define([
     'mapbox-gl-draw',
     'jsts',
     'proj4',
+    'turf',
+    'geohash',
     'knockout-mapping',
     'geojson-extent',
     'views/list',
@@ -20,7 +22,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -77,6 +79,43 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+
+            this.searchAggregations = params.searchAggregations;
+            var getSearchAggregationGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg || !agg.bounds.bounds) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+                var bbox = [
+                    agg.bounds.bounds.top_left.lon,
+                    agg.bounds.bounds.bottom_right.lat,
+                    agg.bounds.bounds.bottom_right.lon,
+                    agg.bounds.bounds.top_left.lat
+                ];
+
+                var cellWidth = arches.hexBinSize;
+                var units = 'kilometers';
+                var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+                var features = [];
+                _.each(agg.grid.buckets, function (cell) {
+                    var pt = geohash.decode(cell.key);
+                    var feature = turf.point([pt.lon, pt.lat], {doc_count: cell.doc_count});
+                    features.push(feature);
+                });
+                var pointsFC = turf.featureCollection(features);
+
+                var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+                _.each(aggregated.features, function(feature) {
+                    feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
+                        return i+ii;
+                    }, 0);
+                });
+
+                return aggregated;
+            }
 
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
@@ -350,18 +389,6 @@ define([
                 };
                 return resourceLayer;
             }
-            //
-            // this.defineSearchResultsLayer = function() {
-            //     var resourceLayer = {
-            //         name: "Search Results",
-            //         maplayerid: "search_results_",
-            //         isResource: true,
-            //         layer_definitions: mapStyles.getSearchResultStyles(self.results),
-            //         isoverlay: false,
-            //         icon: 'ion-search'
-            //     };
-            //     return resourceLayer;
-            // }
 
             /**
              * creates an array of map layers available to the map when the map object is instantiated
@@ -375,10 +402,8 @@ define([
                 }
 
                 if (this.context === 'search-filter') {
-                    // this.searchResultsLayer = this.defineSearchResultsLayer();
                     this.searchQueryLayer = this.defineSearchQueryLayer();
                     this.layers.unshift(this.searchQueryLayer);
-                    // this.layers.unshift(this.searchResultsLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -476,7 +501,6 @@ define([
                             "features": []
                         };
                         var data = null;
-                        // var all_resources_layer;
 
                         self.getMapStyle = function() {
                             var style = map.getStyle();
@@ -498,24 +522,16 @@ define([
                         }
 
                         if (self.context === 'search-filter') {
-                            // self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            // self.updateSearchResultsLayer = function() {
-                            //     var style = self.getMapStyle();
-                            //     var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                            //     style.layers.forEach(function(layer) {
-                            //         var filter;
-                            //         var search_layer = _.find(layerDefs, {
-                            //             id: layer.id
-                            //         });
-                            //         if (search_layer) {
-                            //             layer.filter = search_layer.filter
-                            //         }
-                            //     })
-                            //     if (self.results.total() === self.results.all_result_ids().length) {
-                            //         self.map.setStyle(style);
-                            //     }
-                            // }
+                            self.updateSearchResultsLayer = function() {
+                                var source = self.map.getSource('search-results-hex')
+                                var data = getSearchAggregationGeoJSON();
+                                source.setData(data)
+                            }
+                            self.searchAggregations.subscribe(self.updateSearchResultsLayer);
+                            if (self.searchAggregations) {
+                                self.updateSearchResultsLayer()
+                            }
                             // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
                             // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
                         }
@@ -1110,6 +1126,13 @@ define([
 
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
+            this.sources["search-results-hex"] = {
                 "type": "geojson",
                 "data": {
                     "type": "FeatureCollection",
