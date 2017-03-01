@@ -47,6 +47,10 @@ class Command(BaseCommand):
         if options['operation'] == 'unregister':
             self.unregister(fn_name=options['fn_name'])
 
+        if options['operation'] == 'list':
+            self.list()
+
+
     def start(self, dest_dir):
         """
         Creates a template function
@@ -59,17 +63,20 @@ class Command(BaseCommand):
 
         """
 
+        import imp
+        fn_config = imp.load_source('', source_dir)
+        details = fn_config.details
         fn = models.Function(
-            name = "Sample Function",
-            functiontype = "node",
-            description = "Just a sample",
-            defaultconfig = "{}",
+            name = details['name'],
+            functiontype = details['type'],
+            description = details['description'],
+            defaultconfig = details['defaultconfig'],
             modulename = os.path.basename(source_dir),
-            classname = "SampleFunction",
-            component = os.path.splitext(os.path.basename(source_dir))[0] + '.js'
+            classname = details['classname'],
+            component = details['component']
         )
+
         fn.save()
-        # with (open_source, 'r') as f:
 
     def unregister(self, fn_name):
         """
@@ -82,6 +89,17 @@ class Command(BaseCommand):
         except Exception as e:
             print e
 
+    def list(self):
+        """
+        Lists registered functions
+
+        """
+        try:
+            fn = models.Function.objects.all()
+            for function in fn:
+                print function.name
+        except Exception as e:
+            print e
 
     def validate(self):
         """
