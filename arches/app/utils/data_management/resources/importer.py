@@ -30,6 +30,7 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import ResourceXResource
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from copy import deepcopy
@@ -134,6 +135,8 @@ class BusinessDataImporter(object):
             #     sys.exit()
             pass
 
+        self.import_relations()
+
         elapsed = (time() - start)
         print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
@@ -142,7 +145,15 @@ class BusinessDataImporter(object):
             relations = self.relations
 
         for relation in relations:
-            print relation
+            relation = ResourceXResource(
+                resourceinstanceidfrom = Resource(uuid.UUID(str(relation['resourceinstanceidfrom']))),
+                resourceinstanceidto = Resource(uuid.UUID(str(relation['resourceinstanceidto']))),
+                relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                datestarted = relation['datestarted'],
+                dateended = relation['dateended'],
+                notes = relation['notes']
+            )
+            relation.save()
 
 class ResourceLoader(object):
 

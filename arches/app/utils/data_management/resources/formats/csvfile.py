@@ -141,7 +141,10 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
-                resourceinstanceid = uuid.uuid4()
+                if type(uuid.UUID(business_data[0]['ResourceID'])) == uuid.UUID:
+                    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
+                else:
+                    resourceinstanceid = uuid.uuid4()
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
