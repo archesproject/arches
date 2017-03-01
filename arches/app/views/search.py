@@ -37,7 +37,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 
@@ -77,13 +77,13 @@ def search_terms(request):
     se = SearchEngineFactory().create()
     searchString = request.GET.get('q', '')
     query = Query(se, start=0, limit=0)
-    
+
     boolquery = Bool()
     boolquery.should(Match(field='value', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='value.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='value.folded', query=searchString.lower(), fuzziness='AUTO'))
     query.add_query(boolquery)
-    
+
     base_agg = Aggregation(name='value_agg', type='terms', field='value.raw', size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"})
     nodegroupid_agg = Aggregation(name='nodegroupid', type='terms', field='nodegroupid')
     top_concept_agg = Aggregation(name='top_concept', type='terms', field='top_concept')
@@ -203,6 +203,8 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
+    query.add_aggregation(GeoHashGridAgg(field='points', name='grid'))
+    query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
     search_query = Bool()
 
 
@@ -277,15 +279,15 @@ def build_search_results_dsl(request):
         # add filter for concepts that define min or max dates
         sql = None
         basesql = """
-            SELECT value.conceptid 
+            SELECT value.conceptid
             FROM (
-                SELECT 
-                    {select_clause}, 
+                SELECT
+                    {select_clause},
                     v.conceptid
-                FROM 
-                    public."values" v, 
+                FROM
+                    public."values" v,
                     public."values" v2
-                WHERE 
+                WHERE
                     v.conceptid = v2.conceptid and
                     v.valuetype = 'min year' and
                     v2.valuetype = 'max year'
@@ -303,7 +305,7 @@ def build_search_results_dsl(request):
             # eg: less than START_DATE OR greater than END_DATE
             select_clause = []
             inverted_date_filter = Bool()
-            
+
             field = 'dates'
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 field='tiles.data.%s' % (temporal_filter['dateNodeId'])
@@ -314,7 +316,7 @@ def build_search_results_dsl(request):
             if end_date is not None:
                 inverted_date_filter.should(Range(field=field, gte=end_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
-            
+
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 date_range_query = Nested(path='tiles', query=inverted_date_filter)
                 temporal_query.should(date_range_query)
@@ -348,7 +350,7 @@ def build_search_results_dsl(request):
                 conceptid_filter = Terms(field='domains.conceptid', terms=ret)
                 temporal_query.should(conceptid_filter)
 
-        
+
         search_query.must(temporal_query)
 
     query.add_query(search_query)

@@ -48,7 +48,9 @@
             'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}bower_components/geojson-extent/geojson-extent',
             'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
-            'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core'
+            'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core',
+            'turf': '{{ STATIC_URL }}bower_components/turf/index',
+            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash'
         },
         packages: [{
             name: "codemirror",
@@ -99,6 +101,9 @@
             },
             'uuid': {
                 exports: 'UUID'
+            },
+            'geohash': {
+                exports: 'Geohash'
             }
         }
     });
