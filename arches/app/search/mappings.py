@@ -161,6 +161,9 @@ def prepare_search_index(resource_model_id, create=False):
                             "type": {'type': 'keyword'}
                         }
                     },
+                    'points': {
+                        "type": "geo_point"
+                    },
                     'dates' : {
                         "type" : "date"
                     },

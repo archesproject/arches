@@ -20,13 +20,13 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Dsl(object):
     def __init__(self, dsl=None):
-        if dsl is None: 
+        if dsl is None:
             self.dsl = {}
         else:
             self.dsl = dsl
 
     def __str__(self):
-        return JSONSerializer().serialize(self.dsl, indent=4) 
+        return JSONSerializer().serialize(self.dsl, indent=4)
 
     @property
     def dsl(self):
@@ -37,7 +37,7 @@ class Dsl(object):
         try:
             self._dsl = value.dsl
         except AttributeError:
-            self._dsl = value  
+            self._dsl = value
 
 class Query(Dsl):
     """
@@ -96,10 +96,10 @@ class Query(Dsl):
 class Bool(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-    
+
     """
-    
-    def __init__(self, dsl=None, **kwargs):  
+
+    def __init__(self, dsl=None, **kwargs):
         self.dsl = {
             'bool':{
                 'should':[],
@@ -148,12 +148,12 @@ class Bool(Dsl):
         self.dsl['bool']['filter'] = self.dsl['bool']['filter'] + object.dsl['bool']['filter']
 
         return self
-       
+
 
 class Match(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
-    
+
     """
 
     def __init__(self, **kwargs):
@@ -176,7 +176,7 @@ class Match(Dsl):
         }
 
         if self.fuzziness and self.type != 'phrase_prefix':
-            self.dsl['match'][self.field]['fuzziness'] = self.fuzziness   
+            self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):
     """
@@ -199,7 +199,7 @@ class Nested(Dsl):
         }
 
         if self.score_mode:
-            self.dsl['nested']['score_mode'] = self.score_mode 
+            self.dsl['nested']['score_mode'] = self.score_mode
 
         if self.query:
             self.add_query(dsl=self.query)
@@ -291,7 +291,7 @@ class Range(Dsl):
             }
         else:
             boost = {}
-            
+
         self.dsl = {
             'range' : {
                 self.field : boost
@@ -301,10 +301,10 @@ class Range(Dsl):
         if self.gte is None and self.gt is None and self.lte is None and self.lt is None:
             raise Exception('You need at least one of the following: gte, gt, lte, or lt')
         if self.gte is not None and self.gt is not None:
-            raise Exception('You can only use one of either: gte or gt') 
+            raise Exception('You can only use one of either: gte or gt')
         if self.lte is not None and self.lt is not None:
-            raise Exception('You can only use one of either: lte or lt') 
-        
+            raise Exception('You can only use one of either: lte or lt')
+
         if self.gte is not None:
             self.dsl['range'][self.field]['gte'] = self.gte
         if self.gt is not None:
@@ -359,13 +359,13 @@ class Aggregation(Dsl):
         self.size = kwargs.pop('size', None)
 
         if self.field is not None and self.script is not None:
-            raise Exception('You need to specify either a "field" or a "script"') 
+            raise Exception('You need to specify either a "field" or a "script"')
         if self.field is None and self.script is None:
-            raise Exception('You need to specify either a "field" or a "script"') 
+            raise Exception('You need to specify either a "field" or a "script"')
         if self.name is None:
-            raise Exception('You need to specify a name for your aggregation') 
+            raise Exception('You need to specify a name for your aggregation')
         if self.type is None:
-            raise Exception('You need to specify an aggregation type') 
+            raise Exception('You need to specify an aggregation type')
 
         self.agg = {
             self.name: {
@@ -393,6 +393,34 @@ class Aggregation(Dsl):
     def set_size(self, size):
         if size is not None and size > 0:
             self.agg[self.name][self.type]['size'] = size
+
+
+class GeoHashGridAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.precision = kwargs.get('precision', 5)
+        super(GeoHashGridAgg, self).__init__(type='geohash_grid',**kwargs)
+
+        self.agg[self.name][self.type]['precision'] = self.precision
+
+
+class GeoBoundsAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.wrap_longitude = kwargs.get('wrap_longitude', True)
+        super(GeoBoundsAgg, self).__init__(type='geo_bounds',**kwargs)
+
+        self.agg[self.name][self.type]['wrap_longitude'] = self.wrap_longitude
 
 
 class CoreDateAgg(Aggregation):
@@ -440,7 +468,7 @@ class DateRangeAgg(CoreDateAgg):
         max_date = kwargs.pop('max_date', None)
         key = kwargs.pop('key', None)
         super(DateRangeAgg, self).__init__(type='date_range', **kwargs)
-        
+
         self.add(min_date=min_date, max_date=max_date, key=key, **kwargs)
 
     def add(self, **kwargs):

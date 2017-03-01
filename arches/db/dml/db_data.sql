@@ -2210,6 +2210,29 @@ VALUES ('search-query', '{
     }
 }');
 
+DELETE FROM map_layers WHERE name = 'Search Results';
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[{
+            "id": "search-results-hex",
+            "type": "fill-extrusion",
+            "source": "search-results-hex",
+            "filter": ["all", [">", "doc_count", 0]],
+            "layout": {},
+            "paint": {
+                "fill-extrusion-color": "hsl(0, 0%, 78%)",
+                "fill-extrusion-opacity": 0.4,
+                "fill-extrusion-height": {
+                    "type": "exponential",
+                    "property": "doc_count",
+                    "stops": [
+                        [0,0],
+                        [1000, 20000000]
+                    ]
+                }
+            }
+        }]', TRUE, 'ion-search', TRUE, TRUE);
+
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",

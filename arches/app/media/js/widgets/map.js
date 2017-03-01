@@ -8,6 +8,8 @@ define([
     'mapbox-gl-draw',
     'jsts',
     'proj4',
+    'turf',
+    'geohash',
     'knockout-mapping',
     'geojson-extent',
     'views/list',
@@ -20,7 +22,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -77,6 +79,44 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+
+            this.searchAggregations = params.searchAggregations;
+            var getSearchAggregationGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+
+                var bbox = [
+                    agg.bounds.bounds.top_left.lon,
+                    agg.bounds.bounds.bottom_right.lat,
+                    agg.bounds.bounds.bottom_right.lon,
+                    agg.bounds.bounds.top_left.lat
+                ];
+
+                var cellWidth = 100;
+                var units = 'miles';
+                var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+                var features = [];
+                _.each(agg.grid.buckets, function (cell) {
+                    var pt = geohash.decode(cell.key);
+                    var feature = turf.point([pt.lon, pt.lat], {doc_count: cell.doc_count});
+                    features.push(feature);
+                });
+                var pointsFC = turf.featureCollection(features);
+
+                var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+                _.each(aggregated.features, function(feature) {
+                    feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
+                        return i+ii;
+                    }, 0);
+                });
+
+                return aggregated;
+            }
 
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
@@ -350,18 +390,35 @@ define([
                 };
                 return resourceLayer;
             }
-            //
-            // this.defineSearchResultsLayer = function() {
-            //     var resourceLayer = {
-            //         name: "Search Results",
-            //         maplayerid: "search_results_",
-            //         isResource: true,
-            //         layer_definitions: mapStyles.getSearchResultStyles(self.results),
-            //         isoverlay: false,
-            //         icon: 'ion-search'
-            //     };
-            //     return resourceLayer;
-            // }
+
+            this.defineSearchResultsLayer = function() {
+                var resourceLayer = {
+                    name: "Search Results",
+                    maplayerid: "search_results_",
+                    layer_definitions: [{
+                        'id': 'search-results-hex',
+                        "type": "fill-extrusion",
+                        'source': 'search-results-hex',
+                        "filter": ["all", [">", "doc_count", 0]],
+                        'layout': {},
+                        "paint": {
+                            "fill-extrusion-color": "hsl(0, 0%, 78%)",
+            				"fill-extrusion-opacity": 0.4,
+                            "fill-extrusion-height": {
+            					"type": "exponential",
+            					"property": "doc_count",
+                                "stops": [
+                                    [0,0],
+                                    [1000, 20000000]
+                                ]
+            				}
+                        }
+                    }],
+                    isoverlay: false,
+                    icon: 'ion-search'
+                };
+                return resourceLayer;
+            }
 
             /**
              * creates an array of map layers available to the map when the map object is instantiated
@@ -375,10 +432,8 @@ define([
                 }
 
                 if (this.context === 'search-filter') {
-                    // this.searchResultsLayer = this.defineSearchResultsLayer();
                     this.searchQueryLayer = this.defineSearchQueryLayer();
                     this.layers.unshift(this.searchQueryLayer);
-                    // this.layers.unshift(this.searchResultsLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -498,10 +553,12 @@ define([
                         }
 
                         if (self.context === 'search-filter') {
-                            // self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            // self.updateSearchResultsLayer = function() {
-                            //     var style = self.getMapStyle();
+                            self.updateSearchResultsLayer = function() {
+                                var source = self.map.getSource('search-results-hex')
+                                var data = getSearchAggregationGeoJSON();
+                                source.setData(data)
+
                             //     var layerDefs = self.defineSearchResultsLayer().layer_definitions
                             //     style.layers.forEach(function(layer) {
                             //         var filter;
@@ -515,7 +572,11 @@ define([
                             //     if (self.results.total() === self.results.all_result_ids().length) {
                             //         self.map.setStyle(style);
                             //     }
-                            // }
+                            }
+                            self.searchAggregations.subscribe(self.updateSearchResultsLayer);
+                            if (self.searchAggregations) {
+                                self.updateSearchResultsLayer()
+                            }
                             // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
                             // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
                         }
@@ -1110,6 +1171,13 @@ define([
 
             this.sources = $.extend(true, {}, arches.mapSources); //deep copy of sources
             this.sources["resource"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
+            this.sources["search-results-hex"] = {
                 "type": "geojson",
                 "data": {
                     "type": "FeatureCollection",

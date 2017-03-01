@@ -146,10 +146,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue):
         document['geometries'].append(nodevalue)
+        minx, miny, maxx, maxy = self.get_bounds_from_value(nodevalue)
+        centerx = maxx - (maxx - minx) / 2
+        centery = maxy - (maxy - miny) / 2
+        document['points'].append({
+            "lon": centerx,
+            "lat": centery
+        })
 
     def get_bounds(self, tile, node):
-        bounds = None
         node_data = tile.data[str(node.pk)]
+        return self.get_bounds_from_value(node_data)
+
+    def get_bounds_from_value(self, node_data):
+        bounds = None
         for feature in node_data['features']:
             shape = asShape(feature['geometry'])
             if bounds is None:
@@ -164,6 +174,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     maxx = shape.bounds[2]
                 if shape.bounds[3] > maxy:
                     maxy = shape.bounds[3]
+
+                print 'minx: %s' % minx
+                print 'maxx: %s' % maxx
+                print 'center x: %s' % (maxx-minx)
+                print 'miny: %s' % miny
+                print 'maxy: %s' % maxy
+                print 'center y: %s' % (maxy-miny)
+                # max - (max - min) / 2
                 bounds = (minx, miny, maxx, maxy)
         return bounds
 

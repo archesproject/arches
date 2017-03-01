@@ -83,6 +83,7 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                this.aggregations(response.results.aggregations)
 
                 response.results.hits.hits.forEach(function(result){
                     var relatable;
