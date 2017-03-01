@@ -119,7 +119,8 @@ define([
                 _.each(agg.results, function (result) {
                     _.each(result._source.points, function (pt) {
                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
-                            marker: arches.searchResultMarkerUnicode
+                            marker: arches.searchResultMarkerUnicode,
+                            highlight: false
                         }));
                         aggregated.features.push(feature);
                     });
@@ -537,14 +538,27 @@ define([
                             self.updateSearchResultsLayer = function() {
                                 var source = self.map.getSource('search-results-hex')
                                 var data = getSearchAggregationGeoJSON();
+                                var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                                if (mouseoverInstanceId) {
+                                    var highlightFeature = _.find(data.features, function(feature) {
+                                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
+                                    });
+                                    if (highlightFeature) {
+                                        highlightFeature.properties.highlight = true;
+                                    }
+                                }
                                 source.setData(data)
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
                             if (self.searchAggregations) {
                                 self.updateSearchResultsLayer()
                             }
-                            // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
-                            // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.results.mapLinkPoint.subscribe(function(point) {
+                                self.map.flyTo({
+                                    center: [point.lon, point.lat]
+                                });
+                            });
                         }
 
 
@@ -705,7 +719,6 @@ define([
 
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
-                    console.log(initialConfigs);
                     for (var i = initialConfigs.length; i-- > 0;) {
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid

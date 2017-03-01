@@ -3513,6 +3513,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                    "==",
                    "$type",
                    "Point"
+               ],
+               [
+                   "!=",
+                   "highlight",
+                   true
                ]
            ],
            "layout": {
@@ -3530,7 +3535,45 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                "text-allow-overlap": true
            },
            "paint": {
-               "text-color": "hsl(0, 83%, 45%)",
+               "text-color": "rgb(185, 24, 24)",
+               "text-halo-width": 1,
+               "text-halo-color": "rgba(255,255,255,0.75)",
+               "text-halo-blur": 1
+           }
+       },
+       {
+           "id": "search-results-points-markers-highlighted",
+           "type": "symbol",
+           "source": "search-results-hex",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ],
+               [
+                   "==",
+                   "highlight",
+                   true
+               ]
+           ],
+           "layout": {
+               "text-offset": [
+                   0,
+                   -0.8
+               ],
+               "text-field": "{marker}",
+               "text-font": [
+                   "FontAwesome Regular"
+               ],
+               "text-max-width": 8,
+               "text-anchor": "top",
+               "text-size": 46,
+               "text-allow-overlap": true
+           },
+           "paint": {
+               "text-color": "rgb(222, 31, 31)",
                "text-halo-width": 1,
                "text-halo-color": "rgba(255,255,255,0.75)",
                "text-halo-blur": 1
