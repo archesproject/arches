@@ -398,6 +398,9 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
+HEX_BIN_BOUNDS = (-122, -52, 128, 69)
+# "bounds": {"bottom_right": {"lat": -51.700000036507845, "lon": 177.46666993014514}, "top_left": {"lat": 68.70980999898165, "lon": -122.752620074898}}}},
+
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.

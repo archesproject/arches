@@ -83,22 +83,15 @@ define([
             this.searchAggregations = params.searchAggregations;
             var getSearchAggregationGeoJSON = function () {
                 var agg = ko.unwrap(self.searchAggregations);
-                if (!agg || !agg.bounds.bounds) {
+                if (!agg || !agg.grid.buckets) {
                     return {
                         "type": "FeatureCollection",
                         "features": []
                     };
                 }
-                var bbox = [
-                    agg.bounds.bounds.top_left.lon,
-                    agg.bounds.bounds.bottom_right.lat,
-                    agg.bounds.bounds.bottom_right.lon,
-                    agg.bounds.bounds.top_left.lat
-                ];
-
                 var cellWidth = arches.hexBinSize;
                 var units = 'kilometers';
-                var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+                var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
                 var features = [];
                 _.each(agg.grid.buckets, function (cell) {
                     var pt = geohash.decode(cell.key);
