@@ -1100,6 +1100,8 @@ define([
                     var hoveredSearchResult;
                     var hoverFeature = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
+                    }) || _.find(features, function(feature) {
+                        return feature.layer.id === 'search-results-hex';
                     }) || null;
                     if (self.hoverFeature() !== hoverFeature) {
                         if (hoverFeature) {

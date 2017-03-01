@@ -3483,27 +3483,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            "id": "search-results-hex"
        },
        {
-           "filter": [
-               "all",
-               [
-                   ">",
-                   "doc_count",
-                   0
-               ]
-           ],
-           "layout": {
-               "text-size": 12,
-               "text-font": [
-                   "DIN Offc Pro Medium",
-                   "Arial Unicode MS Bold"
-               ],
-               "text-field": "{doc_count}"
-           },
-           "type": "symbol",
-           "id": "search-results-hex-count",
-           "source": "search-results-hex"
-       },
-       {
            "id": "search-results-points-markers",
            "type": "symbol",
            "source": "search-results-points",
