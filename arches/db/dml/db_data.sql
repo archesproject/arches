@@ -3483,27 +3483,6 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            "id": "search-results-hex"
        },
        {
-           "filter": [
-               "all",
-               [
-                   ">",
-                   "doc_count",
-                   0
-               ]
-           ],
-           "layout": {
-               "text-size": 12,
-               "text-font": [
-                   "DIN Offc Pro Medium",
-                   "Arial Unicode MS Bold"
-               ],
-               "text-field": "{doc_count}"
-           },
-           "type": "symbol",
-           "id": "search-results-hex-count",
-           "source": "search-results-hex"
-       },
-       {
            "id": "search-results-points-markers",
            "type": "symbol",
            "source": "search-results-points",
@@ -3521,25 +3500,12 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                ]
            ],
            "layout": {
-               "text-offset": [
-                   0,
-                   -0.8
-               ],
-               "text-field": "{marker}",
-               "text-font": [
-                   "FontAwesome Regular"
-               ],
-               "text-max-width": 8,
-               "text-anchor": "top",
-               "text-size": 32,
-               "text-allow-overlap": true
+               "icon-image": "marker-15",
+               "icon-size": 2,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
            },
-           "paint": {
-               "text-color": "rgb(185, 24, 24)",
-               "text-halo-width": 1,
-               "text-halo-color": "rgba(255,255,255,0.75)",
-               "text-halo-blur": 1
-           }
+           "paint": {}
        },
        {
            "id": "search-results-points-markers-highlighted",
@@ -3559,24 +3525,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                ]
            ],
            "layout": {
-               "text-offset": [
-                   0,
-                   -0.8
-               ],
-               "text-field": "{marker}",
-               "text-font": [
-                   "FontAwesome Regular"
-               ],
-               "text-max-width": 8,
-               "text-anchor": "top",
-               "text-size": 46,
-               "text-allow-overlap": true
+               "icon-image": "marker-15",
+               "icon-size": 3,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
            },
-           "paint": {
-               "text-color": "rgb(222, 31, 31)",
-               "text-halo-width": 1,
-               "text-halo-color": "rgba(255,255,255,0.75)",
-               "text-halo-blur": 1
-           }
+           "paint": {}
        }
    ]', TRUE, 'ion-search', TRUE, TRUE);

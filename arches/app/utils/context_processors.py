@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
 from arches import __version__
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def livereload(request):
     return {
@@ -41,7 +42,7 @@ def map_info(request):
             'hex_bin_size': settings.HEX_BIN_SIZE,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'search_result_marker_unicode': settings.SEARCH_RESULT_MARKER_UNICODE
+            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS)
         }
     }
 

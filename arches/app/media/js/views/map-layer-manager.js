@@ -160,14 +160,12 @@ define([
 
     var cellWidth = arches.hexBinSize;
     var units = 'kilometers';
-    var bbox = [-13, 32, 47, 57];
-    var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+    var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
     var pointsFC = turf.random('points', 200, {
-        bbox: bbox
+        bbox: arches.hexBinBounds
     });
     _.each(pointsFC.features, function (feature) {
         feature.properties.doc_count = Math.round(Math.random()*1000);
-        feature.properties.marker = arches.searchResultMarkerUnicode;
     });
 
     var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
