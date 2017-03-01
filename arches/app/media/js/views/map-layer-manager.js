@@ -179,11 +179,15 @@ define([
 
     var resultsPoints = pointsFC.features.slice(0, 5);
     resultsPoints[0].properties.highlight = true
-    aggregated.features = aggregated.features.concat(resultsPoints);
+    var pointsFC = turf.featureCollection(resultsPoints);
 
     sources["search-results-hex"] = {
         "type": "geojson",
         "data": aggregated
+    };
+    sources["search-results-points"] = {
+        "type": "geojson",
+        "data": pointsFC
     };
 
     _.each(sources, function(sourceConfig, name) {

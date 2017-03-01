@@ -3506,7 +3506,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
        {
            "id": "search-results-points-markers",
            "type": "symbol",
-           "source": "search-results-hex",
+           "source": "search-results-points",
            "filter": [
                "all",
                [
@@ -3544,7 +3544,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
        {
            "id": "search-results-points-markers-highlighted",
            "type": "symbol",
-           "source": "search-results-hex",
+           "source": "search-results-points",
            "filter": [
                "all",
                [

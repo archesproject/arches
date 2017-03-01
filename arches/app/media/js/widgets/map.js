@@ -116,17 +116,40 @@ define([
                     }, 0);
                 });
 
+                return aggregated;
+            }
+            var getSearchPointsGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg || !agg.results) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+
+                var features = [];
                 _.each(agg.results, function (result) {
                     _.each(result._source.points, function (pt) {
                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
                             marker: arches.searchResultMarkerUnicode,
                             highlight: false
                         }));
-                        aggregated.features.push(feature);
+                        features.push(feature);
                     });
                 });
 
-                return aggregated;
+                var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                if (mouseoverInstanceId) {
+                    var highlightFeature = _.find(features, function(feature) {
+                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
+                    });
+                    if (highlightFeature) {
+                        highlightFeature.properties.highlight = true;
+                    }
+                }
+
+                var pointsFC = turf.featureCollection(features);
+                return pointsFC;
             }
 
             this.configType = params.reportHeader || 'header';
@@ -536,24 +559,22 @@ define([
                         if (self.context === 'search-filter') {
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.updateSearchResultsLayer = function() {
-                                var source = self.map.getSource('search-results-hex')
-                                var data = getSearchAggregationGeoJSON();
-                                var mouseoverInstanceId = self.results.mouseoverInstanceId();
-                                if (mouseoverInstanceId) {
-                                    var highlightFeature = _.find(data.features, function(feature) {
-                                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
-                                    });
-                                    if (highlightFeature) {
-                                        highlightFeature.properties.highlight = true;
-                                    }
-                                }
-                                source.setData(data)
+                                var aggSource = self.map.getSource('search-results-hex')
+                                var aggData = getSearchAggregationGeoJSON();
+                                aggSource.setData(aggData)
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
                             if (self.searchAggregations) {
                                 self.updateSearchResultsLayer()
                             }
-                            self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.results.mouseoverInstanceId.subscribe(function () {
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
+                            });
                             self.results.mapLinkPoint.subscribe(function(point) {
                                 self.map.flyTo({
                                     center: [point.lon, point.lat]
@@ -1157,6 +1178,13 @@ define([
                 }
             };
             this.sources["search-results-hex"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
+            this.sources["search-results-points"] = {
                 "type": "geojson",
                 "data": {
                     "type": "FeatureCollection",
