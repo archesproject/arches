@@ -102,7 +102,9 @@ define([
                 var features = [];
                 _.each(agg.grid.buckets, function (cell) {
                     var pt = geohash.decode(cell.key);
-                    var feature = turf.point([pt.lon, pt.lat], {doc_count: cell.doc_count});
+                    var feature = turf.point([pt.lon, pt.lat], {
+                        doc_count: cell.doc_count
+                    });
                     features.push(feature);
                 });
                 var pointsFC = turf.featureCollection(features);
@@ -112,6 +114,15 @@ define([
                     feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
                         return i+ii;
                     }, 0);
+                });
+
+                _.each(agg.results, function (result) {
+                    _.each(result._source.points, function (pt) {
+                        var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                            marker: arches.searchResultMarkerUnicode
+                        }));
+                        aggregated.features.push(feature);
+                    });
                 });
 
                 return aggregated;
@@ -1148,8 +1159,8 @@ define([
                     "mapbox:type": "template"
                 },
                 "sources": this.sources,
-                "sprite": "mapbox://sprites/mapbox/basic-v9",
-                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "sprite": arches.mapboxSprites,
+                "glyphs": arches.mapboxGlyphs,
                 "layers": []
             };
 

@@ -2211,91 +2211,6 @@ VALUES ('search-query', '{
 }');
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-        {
-            "layout": {},
-            "source": "search-results-hex",
-            "filter": [
-                "all",
-                [
-                    ">",
-                    "doc_count",
-                    0
-                ]
-            ],
-            "paint": {
-                "fill-extrusion-color": {
-                    "property": "doc_count",
-                    "stops": [
-                        [
-                            0,
-                            "#ffffb2"
-                        ],
-                        [
-                            10,
-                            "#fed976"
-                        ],
-                        [
-                            50,
-                            "#feb24c"
-                        ],
-                        [
-                            200,
-                            "#fd8d3c"
-                        ],
-                        [
-                            500,
-                            "#f03b20"
-                        ],
-                        [
-                            1000,
-                            "#bd0026"
-                        ]
-                    ]
-                },
-                "fill-extrusion-height": {
-                    "type": "exponential",
-                    "property": "doc_count",
-                    "stops": [
-                        [
-                            0,
-                            0
-                        ],
-                        [
-                            1000,
-                            65535
-                        ]
-                    ]
-                },
-                "fill-extrusion-opacity": 0.4
-            },
-            "type": "fill-extrusion",
-            "id": "search-results-hex"
-        },
-        {
-            "filter": [
-                "all",
-                [
-                    ">",
-                    "doc_count",
-                    0
-                ]
-            ],
-            "layout": {
-                "text-size": 12,
-                "text-font": [
-                    "DIN Offc Pro Medium",
-                    "Arial Unicode MS Bold"
-                ],
-                "text-field": "{doc_count}"
-            },
-            "type": "symbol",
-            "id": "search-results-hex-count",
-            "source": "search-results-hex"
-        }
-    ]', TRUE, 'ion-search', TRUE, TRUE);
-
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
@@ -3502,3 +3417,123 @@ LANGUAGE plpgsql ;
 CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH ROW
    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
+
+-- delete from map_layers where name = 'Search Results';
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
+       {
+           "layout": {},
+           "source": "search-results-hex",
+           "filter": [
+               "all",
+               [
+                   ">",
+                   "doc_count",
+                   0
+               ]
+           ],
+           "paint": {
+               "fill-extrusion-color": {
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           "#ffffb2"
+                       ],
+                       [
+                           10,
+                           "#fed976"
+                       ],
+                       [
+                           50,
+                           "#feb24c"
+                       ],
+                       [
+                           200,
+                           "#fd8d3c"
+                       ],
+                       [
+                           500,
+                           "#f03b20"
+                       ],
+                       [
+                           1000,
+                           "#bd0026"
+                       ]
+                   ]
+               },
+               "fill-extrusion-height": {
+                   "type": "exponential",
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           0
+                       ],
+                       [
+                           1000,
+                           65535
+                       ]
+                   ]
+               },
+               "fill-extrusion-opacity": 0.4
+           },
+           "type": "fill-extrusion",
+           "id": "search-results-hex"
+       },
+       {
+           "filter": [
+               "all",
+               [
+                   ">",
+                   "doc_count",
+                   0
+               ]
+           ],
+           "layout": {
+               "text-size": 12,
+               "text-font": [
+                   "DIN Offc Pro Medium",
+                   "Arial Unicode MS Bold"
+               ],
+               "text-field": "{doc_count}"
+           },
+           "type": "symbol",
+           "id": "search-results-hex-count",
+           "source": "search-results-hex"
+       },
+       {
+           "id": "search-results-points-markers",
+           "type": "symbol",
+           "source": "search-results-hex",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ]
+           ],
+           "layout": {
+               "text-offset": [
+                   0,
+                   -0.8
+               ],
+               "text-field": "{marker}",
+               "text-font": [
+                   "FontAwesome Regular"
+               ],
+               "text-max-width": 8,
+               "text-anchor": "top",
+               "text-size": 32,
+               "text-allow-overlap": true
+           },
+           "paint": {
+               "text-color": "hsl(0, 83%, 45%)",
+               "text-halo-width": 1,
+               "text-halo-color": "rgba(255,255,255,0.75)",
+               "text-halo-blur": 1
+           }
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);

@@ -38,7 +38,10 @@ def map_info(request):
             'resource_marker_font': settings.RESOURCE_MARKER_ICON_FONT,
             'resource_marker_color': settings.RESOURCE_MARKER_DEFAULT_COLOR,
             'mapbox_api_key': settings.MAPBOX_API_KEY,
-            'hex_bin_size': settings.HEX_BIN_SIZE
+            'hex_bin_size': settings.HEX_BIN_SIZE,
+            'mapbox_sprites': settings.MAPBOX_SPRITES,
+            'mapbox_glyphs': settings.MAPBOX_GLYPHS,
+            'search_result_marker_unicode': settings.SEARCH_RESULT_MARKER_UNICODE
         }
     }
 
