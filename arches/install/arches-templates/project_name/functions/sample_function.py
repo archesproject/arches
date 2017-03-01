@@ -8,8 +8,8 @@ import json
 details = {
     'name': 'Sample Function',
     'type': 'node',
-    'description': 'Just a sample',
-    'defaultconfig': '{}',
+    'description': 'Just a sample demonstrating node group selection',
+    'defaultconfig': {"selected_nodegroup":""},
     'classname': 'SampleFunction',
     'component': 'views/components/functions/sample-function'
 }
