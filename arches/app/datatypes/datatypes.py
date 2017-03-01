@@ -175,13 +175,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 if shape.bounds[3] > maxy:
                     maxy = shape.bounds[3]
 
-                print 'minx: %s' % minx
-                print 'maxx: %s' % maxx
-                print 'center x: %s' % (maxx-minx)
-                print 'miny: %s' % miny
-                print 'maxy: %s' % maxy
-                print 'center y: %s' % (maxy-miny)
-                # max - (max - min) / 2
                 bounds = (minx, miny, maxx, maxy)
         return bounds
 

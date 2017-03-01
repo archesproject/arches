@@ -390,35 +390,6 @@ define([
                 return resourceLayer;
             }
 
-            this.defineSearchResultsLayer = function() {
-                var resourceLayer = {
-                    name: "Search Results",
-                    maplayerid: "search_results_",
-                    layer_definitions: [{
-                        'id': 'search-results-hex',
-                        "type": "fill-extrusion",
-                        'source': 'search-results-hex',
-                        "filter": ["all", [">", "doc_count", 0]],
-                        'layout': {},
-                        "paint": {
-                            "fill-extrusion-color": "hsl(0, 0%, 78%)",
-            				"fill-extrusion-opacity": 0.4,
-                            "fill-extrusion-height": {
-            					"type": "exponential",
-            					"property": "doc_count",
-                                "stops": [
-                                    [0,0],
-                                    [1000, 20000000]
-                                ]
-            				}
-                        }
-                    }],
-                    isoverlay: false,
-                    icon: 'ion-search'
-                };
-                return resourceLayer;
-            }
-
             /**
              * creates an array of map layers available to the map when the map object is instantiated
              * @return {object}
@@ -530,7 +501,6 @@ define([
                             "features": []
                         };
                         var data = null;
-                        // var all_resources_layer;
 
                         self.getMapStyle = function() {
                             var style = map.getStyle();
@@ -557,20 +527,6 @@ define([
                                 var source = self.map.getSource('search-results-hex')
                                 var data = getSearchAggregationGeoJSON();
                                 source.setData(data)
-
-                            //     var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                            //     style.layers.forEach(function(layer) {
-                            //         var filter;
-                            //         var search_layer = _.find(layerDefs, {
-                            //             id: layer.id
-                            //         });
-                            //         if (search_layer) {
-                            //             layer.filter = search_layer.filter
-                            //         }
-                            //     })
-                            //     if (self.results.total() === self.results.all_result_ids().length) {
-                            //         self.map.setStyle(style);
-                            //     }
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
                             if (self.searchAggregations) {
