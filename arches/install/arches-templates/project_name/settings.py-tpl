@@ -16,9 +16,6 @@ STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 FUNCTIONS = (os.path.join(APP_ROOT, 'functions'),)
 FUNCTION_TEMPLATES = [os.path.join(APP_ROOT, 'functions/templates'),]
-FUNCTION_STATIC = (os.path.join(APP_ROOT, 'functions/components'),)
-
-STATICFILES_DIRS = STATICFILES_DIRS + FUNCTION_STATIC
 
 TEMPLATES[0]['DIRS'] + FUNCTION_TEMPLATES
 # TEMPLATE_DIRS = (os.path.join(APP_ROOT, 'templates'),os.path.join(PACKAGE_ROOT, 'templatetags')) + TEMPLATE_DIRS
