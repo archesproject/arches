@@ -26,7 +26,7 @@ services:
         - MAPBOX_API_KEY=
         - TZ=EST
       ports:
-        - '8000:8000'
+        - '81:8000'
       depends_on:
         - db
         - elasticsearch
@@ -55,28 +55,6 @@ services:
         - "9200:9200"
         - "9300:9300"
       environment:
-        - TZ=EST
-        
-    nginx:
-      container_name: nginx
-      restart: always
-      image: cvast/cvast-nginx:1.1.1
-      ports:
-        - '81:80'
-        - '443:443'
-      volumes:
-        - arches4-web-static:/www/static
-        - arches4-nginx-logs:/var/log/nginx
-        - arches4-nginx-conf:/etc/nginx/conf.d
-        - arches4-nginx-root:/var/www
-        - arches4-letsencrypt-config:/etc/letsencrypt
-      depends_on:
-        - web
-      environment:
-        - PROXY_CONTAINER=web
-        - PROXY_PORT=8000
-        - DOMAIN_NAMES=localhost
-        - PUBLIC_MODE=False
         - TZ=EST
     
     letsencrypt:
