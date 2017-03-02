@@ -42,7 +42,11 @@ def map_info(request):
             'hex_bin_size': settings.HEX_BIN_SIZE,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS)
+            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS),
+            'search_page_default_zoom': settings.SEARCH_PAGE_DEFAULT_ZOOM,
+            'search_page_min_zoom': settings.SEARCH_PAGE_MIN_ZOOM,
+            'search_page_max_zoom': settings.SEARCH_PAGE_MAX_ZOOM,
+            'search_page_default_center': JSONSerializer().serialize(settings.SEARCH_PAGE_DEFAULT_CENTER)
         }
     }
 
