@@ -42,9 +42,9 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     User = apps.get_model("auth", "User")
     Permission = apps.get_model("auth", "Permission")
     try:
-        read_perm = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
-        write_perm = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
-        delete_perm = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        write_nodegroup = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        delete_nodegroup = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
     except Permission.DoesNotExist:
         if with_create_permissions:
             # Manually run create_permissions
@@ -58,18 +58,21 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
         else:
             raise
 
-    edit_group = Group.objects.using(db_alias).create(name='edit')
-    edit_group.permissions.add(read_perm, write_perm, delete_perm)
 
-    read_group = Group.objects.using(db_alias).create(name='read')
-    read_group.permissions.add(read_perm)
-
-    admin_user = User.objects.using(db_alias).get(username='admin')
-    admin_user.groups.add(edit_group)
-    admin_user.groups.add(read_group)
+    graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
+    graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
+    
+    resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
+    rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
+    app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
+    sys_admin_group = Group.objects.using(db_alias).create(name='System Administrator')
+    mobile_project_admin_group = Group.objects.using(db_alias).create(name='Mobile Project Administrator')
+    crowdsource_editor_group = Group.objects.using(db_alias).create(name='Crowdsource Editor')
+    guest_group = Group.objects.using(db_alias).create(name='Guest')
 
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
-    anonymous_user.groups.add(read_group)
+    anonymous_user.groups.add(guest_group)
+
 
 class Migration(migrations.Migration):
 

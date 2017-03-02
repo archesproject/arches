@@ -54,7 +54,7 @@ class GraphBaseView(BaseManagerView):
         return context
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -113,7 +113,7 @@ class GraphSettingsView(GraphBaseView):
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
@@ -172,7 +172,7 @@ class GraphManagerView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
 
     action = 'update_node'
@@ -254,7 +254,7 @@ class GraphDataView(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -274,7 +274,7 @@ class CardManagerView(GraphBaseView):
         return render(request, 'views/graph/card-manager.htm', context)
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
@@ -342,7 +342,7 @@ class CardView(GraphBaseView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormManagerView(GraphBaseView):
     action = 'add_form'
 
@@ -378,7 +378,7 @@ class FormManagerView(GraphBaseView):
                 ret = form
         return JSONResponse(ret)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
@@ -431,7 +431,7 @@ class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -465,7 +465,7 @@ class ReportManagerView(GraphBaseView):
         report.save()
         return JSONResponse(report)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
@@ -523,7 +523,7 @@ class ReportEditorView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FunctionManagerView(GraphBaseView):
     action = ''
 

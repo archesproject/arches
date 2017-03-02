@@ -34,7 +34,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from arches.app.views.base import BaseManagerView
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('RDM Administrator'), name='dispatch')
 class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -72,7 +72,7 @@ def get_sparql_providers(endpoint=None):
         return sparql_providers
 
 
-@group_required('edit')
+@group_required('RDM Administrator')
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     mode = request.GET.get('mode', '')
