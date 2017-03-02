@@ -1,0 +1,34 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <div class="col-xs-12">
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min}, style: {width: width}" class="form-control input-lg widget-input">
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Placeholder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Min" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Min" %}" id="" class="form-control input-md widget-input" data-bind="value: min, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Max" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Max" %}" id="" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
+</div>
+{% endblock config_form %}

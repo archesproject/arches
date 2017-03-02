@@ -160,10 +160,9 @@ define([
 
     var cellWidth = arches.hexBinSize;
     var units = 'kilometers';
-    var bbox = [-13, 32, 47, 57];
-    var hexGrid = turf.hexGrid(bbox, cellWidth, units);
+    var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
     var pointsFC = turf.random('points', 200, {
-        bbox: bbox
+        bbox: arches.hexBinBounds
     });
     _.each(pointsFC.features, function (feature) {
         feature.properties.doc_count = Math.round(Math.random()*1000);
@@ -176,9 +175,17 @@ define([
         }, 0);
     });
 
+    var resultsPoints = pointsFC.features.slice(0, 5);
+    resultsPoints[0].properties.highlight = true
+    var pointsFC = turf.featureCollection(resultsPoints);
+
     sources["search-results-hex"] = {
         "type": "geojson",
         "data": aggregated
+    };
+    sources["search-results-points"] = {
+        "type": "geojson",
+        "data": pointsFC
     };
 
     _.each(sources, function(sourceConfig, name) {
@@ -244,8 +251,8 @@ define([
             "mapbox:type": "template"
         },
         "sources": sources,
-        "sprite": "mapbox://sprites/mapbox/basic-v9",
-        "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+        "sprite": arches.mapboxSprites,
+        "glyphs": arches.mapboxGlyphs,
         "layers": basemapLayers.concat(displayLayers)
     };
 

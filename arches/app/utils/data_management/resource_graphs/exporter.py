@@ -5,10 +5,19 @@ from pprint import pprint as pp
 import os
 import json
 import uuid
+import csv
+import zipfile
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph
+from arches.app.models.concept import Concept
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
+from operator import itemgetter
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 def export(export_dir):
     """
@@ -104,8 +113,10 @@ def get_graphs_for_export(graphids=None):
     return graphs
 
 def create_mapping_configuration_file(graphid, data_dir=None):
+    files_for_export = []
     graphid = uuid.UUID(graphid)
     nodes = []
+    values = {}
     export_json = OrderedDict()
     if graphid != False:
         if graphid == None or graphid == 'all' or graphid == ['']:
@@ -123,15 +134,76 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             export_node['file_field_name'] = ""
             if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                 export_node['concept_export_value'] = "label"
-            export_node['value_type'] = ""
-            export_node['data_length'] = ""
-            export_node['data_type'] = ""
+            # export_node['value_type'] = ""
+            # export_node['data_length'] = ""
+            export_node['data_type'] = node.datatype
             export_node['export'] = False
 
             export_json['nodes'].append(export_node)
 
+            concept_export={}
+
+            def get_values(concept, values):
+                for subconcept in concept.subconcepts:
+                    for value in subconcept.values:
+                        values[value.id] = value.value
+                    get_values(subconcept, values)
+                return values
+
+            if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
+                    if node.datatype in ['concept', 'concept-list']:
+                        if node.config['rdmCollection'] != None:
+                            rdmCollection = node.config['rdmCollection']
+                        try:
+                            concept = Concept().get(node.config['rdmCollection'], include_subconcepts=True, semantic=False)
+                            rdmCollectionLabel = concept.get_preflabel().value
+                            collection_values = {}
+                            concepts = OrderedDict(sorted(get_values(concept, collection_values).items(), key=itemgetter(1)))
+                            values[rdmCollectionLabel] = concepts
+                        except:
+                            values[node.name] = node.name + ' does not appear to be configured with a valid concept collectionid'
+                    elif node.datatype in ['domain-value', 'domain-value-list']:
+                        concepts = {}
+                        if node.config['options']:
+                            for concept in node.config['options']:
+                                concepts[concept['id']] = concept['text']
+
+                        values[node.name] = OrderedDict(sorted(concepts.items(), key=itemgetter(1)))
+
+    file_name_prefix = export_json['resource_model_name']
+
+    # Concept lookup file
+    file_name = os.path.join('{0}_{1}.{2}'.format(file_name_prefix, 'concepts', 'json'))
+    dest = StringIO()
+    dest.write(json.dumps(values, indent=4))
+    files_for_export.append({'name':file_name, 'outputfile': dest})
+
+    # Import/Export mapping file
+    file_name = os.path.join('{0}.{1}'.format(file_name_prefix, 'mapping'))
+    dest = StringIO()
+    dest.write(json.dumps(export_json, indent=4))
+    files_for_export.append({'name':file_name, 'outputfile': dest})
+
+
     if data_dir != None:
         with open(os.path.join(data_dir), 'w') as config_file:
             json.dump(export_json, config_file, indent=4)
+
+        file_name = Graph.objects.get(graphid=graphid).name
+
+        buffer = StringIO()
+
+        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
+            for f in files_for_export:
+                f['outputfile'].seek(0)
+                zip.writestr(f['name'], f['outputfile'].read())
+
+        zip.close()
+        buffer.flush()
+        zip_stream = buffer.getvalue()
+        buffer.close()
+
+        with open(os.path.join(data_dir), 'w') as archive:
+            archive.write(zip_stream)
     else:
-        return export_json
+        return files_for_export

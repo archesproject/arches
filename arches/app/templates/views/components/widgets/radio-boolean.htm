@@ -1,0 +1,35 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+  <div class="form-group">
+      <p class="control-label widget-input-label" data-bind="text:label"></p>
+      <div class="col-xs-12">
+        <div style="pad-hor">
+        <label data-bind="css: { 'active': value() }, click: function () { value(true) }" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value" value="true"><span data-bind="text:trueLabel"></span>
+        </label>
+        <label data-bind="css: { 'active': !value() }, click: function () { value(false) }" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value" value="false"><span data-bind="text:config().falseLabel"></span>
+        </label>
+     </div>
+   </div>
+  </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Label 'True'" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input" data-bind="value:trueLabel, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Label 'False'" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input" data-bind="value: falseLabel, valueUpdate: 'keyup'">
+</div>
+{% endblock config_form %}

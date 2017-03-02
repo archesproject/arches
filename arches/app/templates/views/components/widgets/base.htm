@@ -1,0 +1,23 @@
+{% load i18n %}
+<!-- ko if: !configForm  && state === 'form' -->
+{% block form %}
+{% endblock form %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
+{% endblock report %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'display_value' -->
+{% block display_value %}
+<span data-bind="text: displayValue() || '{% trans "None" %}'"></span>
+{% endblock display_value %}
+<!-- /ko -->
+
+<!-- ko if: configForm -->
+{% block config_form %}
+{% endblock config_form %}
+<!-- /ko -->
