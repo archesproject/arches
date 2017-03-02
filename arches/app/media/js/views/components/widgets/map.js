@@ -81,6 +81,9 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             this.searchAggregations = params.searchAggregations;
+            var cellWidth = arches.hexBinSize;
+            var units = 'kilometers';
+            var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
             var getSearchAggregationGeoJSON = function () {
                 var agg = ko.unwrap(self.searchAggregations);
                 if (!agg || !agg.grid.buckets) {
@@ -89,9 +92,6 @@ define([
                         "features": []
                     };
                 }
-                var cellWidth = arches.hexBinSize;
-                var units = 'kilometers';
-                var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
                 var features = [];
                 _.each(agg.grid.buckets, function (cell) {
                     var pt = geohash.decode(cell.key);
