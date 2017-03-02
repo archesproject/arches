@@ -41,7 +41,8 @@ run_django_server() {
 activate_virtualenv
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 	install_dev_requirements
-	run_tests
+elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
+	collect_static
 fi
-collect_static
+run_tests
 run_django_server
