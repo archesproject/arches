@@ -141,10 +141,10 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
-                if type(uuid.UUID(business_data[0]['ResourceID'])) == uuid.UUID:
-                    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
-                else:
-                    resourceinstanceid = uuid.uuid4()
+                try:
+                   resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
+                except:
+                   resourceinstanceid = uuid.uuid4()
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -222,10 +222,10 @@ class CsvReader(Reader):
                         self.save_resource(populated_tiles, resourceinstanceid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
-                        if type(uuid.UUID(row['ResourceID'])) == uuid.UUID:
-                            resourceinstanceid = uuid.UUID(row['ResourceID'])
-                        else:
-                            resourceinstanceid = uuid.uuid4()
+                        try:
+                           resourceinstanceid = uuid.UUID(row['ResourceID'])
+                        except:
+                           resourceinstanceid = uuid.uuid4()
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping)
