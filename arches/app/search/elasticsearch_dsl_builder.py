@@ -417,7 +417,7 @@ class GeoBoundsAgg(Aggregation):
 
     def __init__(self, **kwargs):
         self.field = kwargs.get('field', '')
-        self.wrap_longitude = kwargs.get('wrap_longitude', True)
+        self.wrap_longitude = kwargs.get('wrap_longitude', False)
         super(GeoBoundsAgg, self).__init__(type='geo_bounds',**kwargs)
 
         self.agg[self.name][self.type]['wrap_longitude'] = self.wrap_longitude
