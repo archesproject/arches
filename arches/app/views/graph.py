@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import itertools
+import zipfile
 import json
 from django.conf import settings as app_settings
 from django.db import transaction
@@ -33,6 +34,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
@@ -40,6 +42,10 @@ from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
@@ -188,14 +194,28 @@ class GraphDataView(View):
             response['Content-Disposition'] = 'attachment; filename="%s.json"' %(graph_name)
             return response
         elif self.action == 'export_mapping_file':
-            mapping = create_mapping_configuration_file(graphid)
-            graph_name = mapping['resource_model_name']
-            f = json.dumps(mapping, indent=4)
-            # Use json.dumps above to preserve key order for mapping file.
+            files_for_export = create_mapping_configuration_file(graphid)
+            file_name = Graph.objects.get(graphid=graphid).name
 
-            response = HttpResponse(f, content_type='json/plain')
-            response['Content-Disposition'] = 'attachment; filename="%s.mapping"' %(graph_name)
+            buffer = StringIO()
+
+            with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
+                for f in files_for_export:
+                    f['outputfile'].seek(0)
+                    zip.writestr(f['name'], f['outputfile'].read())
+
+            zip.close()
+            buffer.flush()
+            zip_stream = buffer.getvalue()
+            buffer.close()
+
+            response = HttpResponse()
+            response['Content-Disposition'] = 'attachment; filename=' + file_name + '.zip'
+            response['Content-length'] = str(len(zip_stream))
+            response['Content-Type'] = 'application/zip'
+            response.write(zip_stream)
             return response
+
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':

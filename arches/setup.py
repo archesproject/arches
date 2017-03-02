@@ -20,7 +20,7 @@ def install():
 
         # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
         tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
-        os.system("pip install -b %s setuptools --no-use-wheel --upgrade" % (tmpinstalldir))
+        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
         os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
         if settings.MODE == 'DEV':
             os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))

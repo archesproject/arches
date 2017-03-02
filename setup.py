@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 class post_install(install):
     def run(self):
-        from arches.setup import install as arches_install         
+        from arches.setup import install as arches_install
         install.run(self)
         arches_install()
 
@@ -27,7 +27,7 @@ setup(
     author='Farallon Geographics, Inc',
     author_email='dev@fargeo.com',
     license='GNU AGPL',
-    scripts=['arches/install/arches-app'],
+    scripts=['arches/install/arches-app', 'arches/install/arches-project'],
 
     cmdclass={'install': post_install},
 

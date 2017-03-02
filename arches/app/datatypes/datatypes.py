@@ -146,10 +146,22 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue):
         document['geometries'].append(nodevalue)
+        bounds = self.get_bounds_from_value(nodevalue)
+        if bounds is not None:
+            minx, miny, maxx, maxy = bounds
+            centerx = maxx - (maxx - minx) / 2
+            centery = maxy - (maxy - miny) / 2
+            document['points'].append({
+                "lon": centerx,
+                "lat": centery
+            })
 
     def get_bounds(self, tile, node):
-        bounds = None
         node_data = tile.data[str(node.pk)]
+        return self.get_bounds_from_value(node_data)
+
+    def get_bounds_from_value(self, node_data):
+        bounds = None
         for feature in node_data['features']:
             shape = asShape(feature['geometry'])
             if bounds is None:
@@ -164,6 +176,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     maxx = shape.bounds[2]
                 if shape.bounds[3] > maxy:
                     maxy = shape.bounds[3]
+
                 bounds = (minx, miny, maxx, maxy)
         return bounds
 
@@ -306,6 +319,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         layer_name = "%s - %s" % (node.graph.name, node.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
+        layer_icon = node.graph.iconclass
+        if not preview and node.config["layerIcon"] != "":
+            layer_icon = node.config["layerIcon"]
 
         if not preview and node.config["advancedStyling"]:
             try:
@@ -497,7 +513,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "nodeid": node.nodeid,
             "name": layer_name,
             "layer_definitions": layer_def,
-            "icon": node.graph.iconclass,
+            "icon": layer_icon,
             "addtomap": node.config['addToMap'],
         }
 

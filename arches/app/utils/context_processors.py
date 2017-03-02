@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
 from arches import __version__
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def livereload(request):
     return {
@@ -37,7 +38,11 @@ def map_info(request):
             'resource_marker_icon': settings.RESOURCE_MARKER_ICON_UNICODE,
             'resource_marker_font': settings.RESOURCE_MARKER_ICON_FONT,
             'resource_marker_color': settings.RESOURCE_MARKER_DEFAULT_COLOR,
-            'mapbox_api_key': settings.MAPBOX_API_KEY
+            'mapbox_api_key': settings.MAPBOX_API_KEY,
+            'hex_bin_size': settings.HEX_BIN_SIZE,
+            'mapbox_sprites': settings.MAPBOX_SPRITES,
+            'mapbox_glyphs': settings.MAPBOX_GLYPHS,
+            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS)
         }
     }
 

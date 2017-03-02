@@ -149,6 +149,7 @@
 
         <!-- ko if: hoverFeature() !== null -->
         <div class="hover-feature-info">
+            <!-- ko if: hoverFeature().properties.graph_name -->
             <div class="hover-feature-title-bar">
                 <div class="hover-feature-title" data-bind="text: hoverFeature().properties.graph_name"></div>
             </div>
@@ -160,7 +161,16 @@
                     <div class="hover-feature" data-bind="text: hoverFeature().properties.map_popup"></div>
                 <!--/ko-->
             </div>
-           
+            <!--/ko-->
+
+            <!-- ko if: hoverFeature().properties.doc_count -->
+            <div class="hover-feature-title-bar">
+                <div class="hover-feature-title">Binned Search Results</div>
+            </div>
+            <div class="hover-feature-body">
+                <div data-bind="text: 'count: ' + hoverFeature().properties.doc_count"></div>
+            </div>
+            <!--/ko-->
         </div>
         <!--/ko-->
 

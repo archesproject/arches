@@ -8,6 +8,8 @@ define([
     'mapbox-gl-draw',
     'jsts',
     'proj4',
+    'turf',
+    'geohash',
     'knockout-mapping',
     'geojson-extent',
     'views/list',
@@ -20,7 +22,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -77,6 +79,70 @@ define([
             ];
 
             WidgetViewModel.apply(this, [params]);
+
+            this.searchAggregations = params.searchAggregations;
+            var getSearchAggregationGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg || !agg.grid.buckets) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+                var cellWidth = arches.hexBinSize;
+                var units = 'kilometers';
+                var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
+                var features = [];
+                _.each(agg.grid.buckets, function (cell) {
+                    var pt = geohash.decode(cell.key);
+                    var feature = turf.point([pt.lon, pt.lat], {
+                        doc_count: cell.doc_count
+                    });
+                    features.push(feature);
+                });
+                var pointsFC = turf.featureCollection(features);
+
+                var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+                _.each(aggregated.features, function(feature) {
+                    feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
+                        return i+ii;
+                    }, 0);
+                });
+
+                return aggregated;
+            }
+            var getSearchPointsGeoJSON = function () {
+                var agg = ko.unwrap(self.searchAggregations);
+                if (!agg || !agg.results) {
+                    return {
+                        "type": "FeatureCollection",
+                        "features": []
+                    };
+                }
+
+                var features = [];
+                _.each(agg.results, function (result) {
+                    _.each(result._source.points, function (pt) {
+                        var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                            highlight: false
+                        }));
+                        features.push(feature);
+                    });
+                });
+
+                var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                if (mouseoverInstanceId) {
+                    var highlightFeature = _.find(features, function(feature) {
+                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
+                    });
+                    if (highlightFeature) {
+                        highlightFeature.properties.highlight = true;
+                    }
+                }
+
+                var pointsFC = turf.featureCollection(features);
+                return pointsFC;
+            }
 
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
@@ -350,18 +416,6 @@ define([
                 };
                 return resourceLayer;
             }
-            //
-            // this.defineSearchResultsLayer = function() {
-            //     var resourceLayer = {
-            //         name: "Search Results",
-            //         maplayerid: "search_results_",
-            //         isResource: true,
-            //         layer_definitions: mapStyles.getSearchResultStyles(self.results),
-            //         isoverlay: false,
-            //         icon: 'ion-search'
-            //     };
-            //     return resourceLayer;
-            // }
 
             /**
              * creates an array of map layers available to the map when the map object is instantiated
@@ -375,10 +429,8 @@ define([
                 }
 
                 if (this.context === 'search-filter') {
-                    // this.searchResultsLayer = this.defineSearchResultsLayer();
                     this.searchQueryLayer = this.defineSearchQueryLayer();
                     this.layers.unshift(this.searchQueryLayer);
-                    // this.layers.unshift(this.searchResultsLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -476,7 +528,6 @@ define([
                             "features": []
                         };
                         var data = null;
-                        // var all_resources_layer;
 
                         self.getMapStyle = function() {
                             var style = map.getStyle();
@@ -498,26 +549,29 @@ define([
                         }
 
                         if (self.context === 'search-filter') {
-                            // self.overlays.unshift(self.createOverlay(self.searchResultsLayer))
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
-                            // self.updateSearchResultsLayer = function() {
-                            //     var style = self.getMapStyle();
-                            //     var layerDefs = self.defineSearchResultsLayer().layer_definitions
-                            //     style.layers.forEach(function(layer) {
-                            //         var filter;
-                            //         var search_layer = _.find(layerDefs, {
-                            //             id: layer.id
-                            //         });
-                            //         if (search_layer) {
-                            //             layer.filter = search_layer.filter
-                            //         }
-                            //     })
-                            //     if (self.results.total() === self.results.all_result_ids().length) {
-                            //         self.map.setStyle(style);
-                            //     }
-                            // }
-                            // self.results.all_result_ids.subscribe(self.updateSearchResultsLayer);
-                            // self.results.mouseoverInstanceId.subscribe(self.updateSearchResultsLayer);
+                            self.updateSearchResultsLayer = function() {
+                                var aggSource = self.map.getSource('search-results-hex')
+                                var aggData = getSearchAggregationGeoJSON();
+                                aggSource.setData(aggData)
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
+                            }
+                            self.searchAggregations.subscribe(self.updateSearchResultsLayer);
+                            if (self.searchAggregations) {
+                                self.updateSearchResultsLayer()
+                            }
+                            self.results.mouseoverInstanceId.subscribe(function () {
+                                var pointSource = self.map.getSource('search-results-points')
+                                var pointData = getSearchPointsGeoJSON();
+                                pointSource.setData(pointData)
+                            });
+                            self.results.mapLinkPoint.subscribe(function(point) {
+                                self.map.flyTo({
+                                    center: [point.lon, point.lat]
+                                });
+                            });
                         }
 
 
@@ -678,7 +732,6 @@ define([
 
                 this.overlayLibrary.subscribe(function(overlays) {
                     var initialConfigs = self.overlayConfigs();
-                    console.log(initialConfigs);
                     for (var i = initialConfigs.length; i-- > 0;) {
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid
@@ -1047,6 +1100,8 @@ define([
                     var hoveredSearchResult;
                     var hoverFeature = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
+                    }) || _.find(features, function(feature) {
+                        return feature.layer.id === 'search-results-hex';
                     }) || null;
                     if (self.hoverFeature() !== hoverFeature) {
                         if (hoverFeature) {
@@ -1116,6 +1171,20 @@ define([
                     "features": []
                 }
             };
+            this.sources["search-results-hex"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
+            this.sources["search-results-points"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            };
 
             this.mapStyle = {
                 "version": 8,
@@ -1125,8 +1194,8 @@ define([
                     "mapbox:type": "template"
                 },
                 "sources": this.sources,
-                "sprite": "mapbox://sprites/mapbox/basic-v9",
-                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "sprite": arches.mapboxSprites,
+                "glyphs": arches.mapboxGlyphs,
                 "layers": []
             };
 

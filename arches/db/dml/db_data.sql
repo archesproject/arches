@@ -3417,3 +3417,119 @@ LANGUAGE plpgsql ;
 CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH ROW
    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
+
+-- delete from map_layers where name = 'Search Results';
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
+       {
+           "layout": {},
+           "source": "search-results-hex",
+           "filter": [
+               "all",
+               [
+                   ">",
+                   "doc_count",
+                   0
+               ]
+           ],
+           "paint": {
+               "fill-extrusion-color": {
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           "#ffffb2"
+                       ],
+                       [
+                           10,
+                           "#fed976"
+                       ],
+                       [
+                           50,
+                           "#feb24c"
+                       ],
+                       [
+                           200,
+                           "#fd8d3c"
+                       ],
+                       [
+                           500,
+                           "#f03b20"
+                       ],
+                       [
+                           1000,
+                           "#bd0026"
+                       ]
+                   ]
+               },
+               "fill-extrusion-height": {
+                   "type": "exponential",
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           0
+                       ],
+                       [
+                           1000,
+                           65535
+                       ]
+                   ]
+               },
+               "fill-extrusion-opacity": 0.4
+           },
+           "type": "fill-extrusion",
+           "id": "search-results-hex"
+       },
+       {
+           "id": "search-results-points-markers",
+           "type": "symbol",
+           "source": "search-results-points",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ],
+               [
+                   "!=",
+                   "highlight",
+                   true
+               ]
+           ],
+           "layout": {
+               "icon-image": "marker-15",
+               "icon-size": 2,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
+           },
+           "paint": {}
+       },
+       {
+           "id": "search-results-points-markers-highlighted",
+           "type": "symbol",
+           "source": "search-results-points",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ],
+               [
+                   "==",
+                   "highlight",
+                   true
+               ]
+           ],
+           "layout": {
+               "icon-image": "marker-15",
+               "icon-size": 3,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
+           },
+           "paint": {}
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);

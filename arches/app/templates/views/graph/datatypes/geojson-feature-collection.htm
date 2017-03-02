@@ -63,19 +63,19 @@
                 <!-- Resource Styling Tabs -->
                 <ul class="nav nav-tabs map-service-nav-tabs">
                     <li class="active">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false"><i class="ion-ios-pie"></i> Clustering</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false"><i class="ion-ios-pie"></i> {% trans "Clustering" %}</a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#caching-panel" aria-expanded="false"><i class="ion-ios-grid-view"></i> Caching</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#caching-panel" aria-expanded="false"><i class="ion-ios-grid-view"></i> {% trans "Caching" %}</a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true"><i class="ion-ios-color-wand"></i> Permissions</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true"><i class="ion-ios-color-wand"></i> {% trans "Permissions" %}</a>
                     </li>
                 </ul>
 
@@ -83,7 +83,7 @@
                     <div id="styling-panel" class="tab-pane fade active in">
                         <div class="row">
                             <div class="pull-right advanced-map-style-switch">
-                                <label class="control-label text-semibold">Advanced:</label>
+                                <label class="control-label text-semibold">{% trans "Advanced:" %}</label>
                                 <span class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
                                     }, click: function () {
@@ -115,12 +115,12 @@
                                         <div class="">
                                             <!-- Points -->
                                             <div class="col-sm-6 col-md-4 col-divider">
-                                                <span class="style-title">Point Style</span>
+                                                <span class="style-title">{% trans "Point Style" %}</span>
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointColor, format:'rgba'}">
@@ -129,7 +129,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Halo color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointHaloColor, format:'rgba'}">
@@ -138,13 +138,13 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Radius</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Radius" %}</label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Halo radius</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Halo radius" %}</label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
                                                             </div>
@@ -155,12 +155,12 @@
 
                                             <!-- Lines -->
                                             <div class="col-sm-6 col-md-4 col-divider">
-                                                <span class="style-title">Line Style</span>
+                                                <span class="style-title">{% trans "Line Style" %}</span>
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineColor, format:'rgba'}">
@@ -169,7 +169,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Halo color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineHaloColor, format:'rgba'}">
@@ -178,13 +178,13 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Weight</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Weight" %}</label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Halo weight</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Halo weight" %}</label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
                                                             </div>
@@ -196,12 +196,12 @@
 
                                             <!-- Polygons -->
                                             <div class="col-sm-6 col-md-4">
-                                                <span class="style-title">Polygon Style</span>
+                                                <span class="style-title">{% trans "Polygon Style" %}</span>
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Fill Color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Fill Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.fillColor, format:'rgba'}">
@@ -210,7 +210,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Outline color</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Outline color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
                                                                     <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.outlineColor, format:'rgba'}">
@@ -219,7 +219,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="col-sm-3 control-label">Outline weight</label>
+                                                            <label class="col-sm-3 control-label">{% trans "Outline weight" %}</label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
                                                             </div>
@@ -241,7 +241,7 @@
                             <div class="form-horizontal">
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Layer Name:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Layer Name:" %}</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
                                         </div>
@@ -301,19 +301,19 @@
                             <div class="form-horizontal">
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Cluster Distance:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Cluster Distance:" %}</label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Cluster Max Zoom:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Cluster Max Zoom:" %}</label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Cluster Min Points:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Cluster Min Points:" %}</label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
                                         </div>
@@ -336,7 +336,7 @@
                             <div class="form-horizontal">
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Cache Tiles:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Cache Tiles:" %}</label>
                                         <div class="col-sm-9">
                                             <span class="switch switch-small service-switch-shim" data-bind="css: {
                                                     'on': config.cacheTiles()
@@ -348,7 +348,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-3 control-label">Clean Cache on Edit:</label>
+                                        <label class="col-sm-3 control-label">{% trans "Clean Cache on Edit:" %}</label>
                                         <div class="col-sm-9">
                                             <span class="switch switch-small service-switch-shim" data-bind="css: {
                                                     'on': config.autoManageCache()
@@ -381,19 +381,21 @@
 
 
                                 <div class="map-server-instructions">
-                                    <i class="ion-ios-information"></i> This layer has the following permissions. If you wish to change who can access this layer, please update the permissions on the layer node.
+                                    <i class="ion-ios-information"></i> {% trans "The following users and groups can view this layer. If you wish to change who can access this layer, please update the permissions on the layer node." %}
                                 </div>
                                 <dl class="dl-horizontal">
-                                    <dt>Guest</dt>
-                                    <dd>read</dd>
-                                    <dt>Crowd Source</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>Editor</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>Administrator</dt>
-                                    <dd>create, read, update, delete</dd>
-                                    <dt>RDM Manager</dt>
-                                    <dd>no access</dd>
+                                    <dt>{% trans "Users" %}</dt>
+                                    <dd>
+                                        <!-- ko foreach: permissions.users -->
+                                        <div data-bind="text: username"></div>
+                                        <!-- /ko -->
+                                    </dd>
+                                    <dt>{% trans "Groups" %}</dt>
+                                    <dd>
+                                        <!-- ko foreach: permissions.groups -->
+                                        <div data-bind="text: name"></div>
+                                        <!-- /ko -->
+                                    </dd>
                                 </dl>
 
                             </div>

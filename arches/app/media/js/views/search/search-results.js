@@ -32,6 +32,7 @@ define(['jquery',
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
+                this.mapLinkPoint = ko.observable(null);
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -83,6 +84,11 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                this.aggregations(
+                    _.extend(response.results.aggregations, {
+                        results: response.results.hits.hits
+                    })
+                );
 
                 response.results.hits.hits.forEach(function(result){
                     var relatable;
@@ -92,7 +98,10 @@ define(['jquery',
                     if (this.viewModel.graph) {
                         relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, result._source.graph_id);
                     }
-                    console.log(result._source)
+                    var point = null;
+                    if (result._source.points.length > 0) {
+                        point = result._source.points[0]
+                    }
                     this.results.push({
                         displayname: result._source.displayname,
                         resourceinstanceid: result._source.resourceinstanceid,
@@ -103,7 +112,11 @@ define(['jquery',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        relatable: relatable
+                        relatable: relatable,
+                        point: point,
+                        mapLinkClicked: function () {
+                            self.mapLinkPoint(point);
+                        }
                     });
                 }, this);
 

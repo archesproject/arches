@@ -16,6 +16,7 @@ define([
             this.graph = params.graph;
             this.layer = params.layer;
             if (this.layer) {
+                this.permissions = params.permissions;
                 this.iconFilter = ko.observable('');
                 this.icons = ko.computed(function () {
                     return _.filter(params.icons, function (icon) {

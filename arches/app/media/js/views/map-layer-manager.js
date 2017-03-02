@@ -1,6 +1,7 @@
 define([
     'knockout',
     'underscore',
+    'turf',
     'views/base-manager',
     'models/node',
     'viewmodels/alert',
@@ -10,7 +11,7 @@ define([
     'bindings/codemirror',
     'codemirror/mode/javascript/javascript',
     'datatype-config-components'
-], function(ko, _, BaseManagerView, NodeModel, AlertViewModel, data, arches) {
+], function(ko, _, turf, BaseManagerView, NodeModel, AlertViewModel, data, arches) {
     var vm = {
         map: null,
         geomNodes: [],
@@ -23,6 +24,7 @@ define([
         pitch: ko.observable(0),
         bearing: ko.observable(0),
         iconFilter: ko.observable(''),
+        selectedList: ko.observable()
     };
     vm.icons = ko.computed(function () {
         return _.filter(data.icons, function (icon) {
@@ -155,6 +157,37 @@ define([
         }, []);
     };
     var sources = $.extend(true, {}, arches.mapSources);
+
+    var cellWidth = arches.hexBinSize;
+    var units = 'kilometers';
+    var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
+    var pointsFC = turf.random('points', 200, {
+        bbox: arches.hexBinBounds
+    });
+    _.each(pointsFC.features, function (feature) {
+        feature.properties.doc_count = Math.round(Math.random()*1000);
+    });
+
+    var aggregated = turf.collect(hexGrid, pointsFC, 'doc_count', 'doc_count');
+    _.each(aggregated.features, function(feature) {
+        feature.properties.doc_count = _.reduce(feature.properties.doc_count, function(i,ii) {
+            return i+ii;
+        }, 0);
+    });
+
+    var resultsPoints = pointsFC.features.slice(0, 5);
+    resultsPoints[0].properties.highlight = true
+    var pointsFC = turf.featureCollection(resultsPoints);
+
+    sources["search-results-hex"] = {
+        "type": "geojson",
+        "data": aggregated
+    };
+    sources["search-results-points"] = {
+        "type": "geojson",
+        "data": pointsFC
+    };
+
     _.each(sources, function(sourceConfig, name) {
         if (sourceConfig.tiles) {
             sourceConfig.tiles.forEach(function(url, i) {
@@ -174,6 +207,7 @@ define([
         vm.geomNodes.push(
             new NodeModel({
                 loading: vm.loading,
+                permissions: data.node_permissions[node.nodeid],
                 source: node,
                 datatypelookup: datatypelookup,
                 icons: data.icons,
@@ -217,8 +251,8 @@ define([
             "mapbox:type": "template"
         },
         "sources": sources,
-        "sprite": "mapbox://sprites/mapbox/basic-v9",
-        "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+        "sprite": arches.mapboxSprites,
+        "glyphs": arches.mapboxGlyphs,
         "layers": basemapLayers.concat(displayLayers)
     };
 
@@ -248,6 +282,19 @@ define([
     vm.selectedBasemapName.subscribe(updateMapStyle);
     vm.selection.subscribe(updateMapStyle);
     vm.selectedLayerJSON.subscribe(updateMapStyle);
+    vm.selectedList(vm.geomNodes);
+    vm.listFilter = ko.observable('');
+    vm.listItems = ko.computed(function () {
+        var listFilter = vm.listFilter().toLowerCase();
+        var layerList = ko.unwrap(vm.selectedList());
+        return _.filter(layerList, function(item) {
+            var name = item.nodeid ?
+                (item.config.layerName() ? item.config.layerName() : item.layer.name) :
+                item.name();
+            name = name.toLowerCase()
+            return name.indexOf(listFilter) > -1;
+        })
+    });
 
     var pageView = new BaseManagerView({
         viewModel: vm
