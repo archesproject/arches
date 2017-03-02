@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+"""This module contains commands for building Arches."""
+
 import os
 from arches.management.commands import utils
 from arches.app.models import models
@@ -25,64 +27,59 @@ from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
     """
-    Commands for managing Arches functions
+    Commands for managing datatypes
 
     """
 
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?')
 
-        parser.add_argument('-s', '--source', action='store', dest='fn_source', default='',
-            help='Function file to be loaded')
+        parser.add_argument('-s', '--source', action='store', dest='dt_source', default='',
+            help='Datatype file to be loaded')
 
-        parser.add_argument('-n', '--name', action='store', dest='fn_name', default='',
-            help='The name of the function to unregister')
+        parser.add_argument('-d', '--datatype', action='store', dest='datatype', default='',
+            help='The name of the datatype to unregister')
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
-            self.register(source_dir=options['fn_source'])
+            self.register(source_dir=options['dt_source'])
 
         if options['operation'] == 'unregister':
-            self.unregister(fn_name=options['fn_name'])
+            self.unregister(datatype=options['datatype'])
 
         if options['operation'] == 'list':
             self.list()
 
-
-    def start(self, dest_dir):
-        """
-        Creates a template function
-
-        """
-
     def register(self, source_dir):
         """
-        Inserts a function into the arches db
+        Inserts a datatype into the arches db
 
         """
 
         import imp
         fn_config = imp.load_source('', source_dir)
         details = fn_config.details
-        fn = models.Function(
-            name = details['name'],
-            functiontype = details['type'],
-            description = details['description'],
-            defaultconfig = details['defaultconfig'],
+        dt = models.DDataType(
+            datatype = details['datatype'],
+            iconclass = details['iconclass'],
             modulename = os.path.basename(source_dir),
             classname = details['classname'],
-            component = details['component']
-        )
+            defaultwidget = details['defaultwidget'],
+            defaultconfig = details['defaultconfig'],
+            configcomponent = details['configcomponent'],
+            configname = details['configname'],
+            isgeometric = details['isgeometric']
+            )
 
-        fn.save()
+        dt.save()
 
-    def unregister(self, fn_name):
+    def unregister(self, datatype):
         """
-        Removes a function from the system
+        Removes a datatype from the system
 
         """
         try:
-            fn = models.Function.objects.filter(name=fn_name)
+            fn = models.DDataType.objects.filter(datatype=datatype)
             fn[0].delete()
         except Exception as e:
             print e
@@ -93,14 +90,8 @@ class Command(BaseCommand):
 
         """
         try:
-            fn = models.Function.objects.all()
-            for function in fn:
-                print function.name
+            dt = models.DDataType.objects.all()
+            for datatype in dt:
+                print datatype.datatype
         except Exception as e:
             print e
-
-    def validate(self):
-        """
-        Validates a functions configuration
-
-        """
