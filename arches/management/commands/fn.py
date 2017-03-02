@@ -16,8 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-"""This module contains commands for building Arches."""
-
 import os
 from arches.management.commands import utils
 from arches.app.models import models
@@ -27,7 +25,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
     """
-    Commands for running common elasticsearch commands
+    Commands for managing Arches functions
 
     """
 
