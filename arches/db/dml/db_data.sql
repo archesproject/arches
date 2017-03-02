@@ -168,25 +168,25 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null}');
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'views/components/widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%", "maxLength": null}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'views/components/widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-multiselect-widget', 'widgets/concept-multiselect', 'concept-list', '{ "placeholder": "Select an option", "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-multiselect-widget', 'views/components/widgets/concept-multiselect', 'concept-list', '{ "placeholder": "Select an option", "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000015', 'domain-select-widget', 'widgets/domain-select', 'domain-value', '{ "placeholder": "Select an option" }');
+    VALUES ('10000000-0000-0000-0000-000000000015', 'domain-select-widget', 'views/components/widgets/domain-select', 'domain-value', '{ "placeholder": "Select an option" }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000016', 'domain-multiselect-widget', 'widgets/domain-multiselect', 'domain-value-list', '{ "placeholder": "Select an option" }');
+    VALUES ('10000000-0000-0000-0000-000000000016', 'domain-multiselect-widget', 'views/components/widgets/domain-multiselect', 'domain-value-list', '{ "placeholder": "Select an option" }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
+    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'views/components/widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date',
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'views/components/widgets/datepicker', 'date',
     '{
         "placeholder": "Enter date",
         "viewMode": "days",
@@ -197,13 +197,13 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 );
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
+    VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'views/components/widgets/rich-text', 'string', '{}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
+    VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'views/components/widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'widgets/map', 'geojson-feature-collection',
+    VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'views/components/widgets/map', 'geojson-feature-collection',
     '{
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
@@ -226,22 +226,22 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 );
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
+    VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'views/components/widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'widgets/concept-radio', 'concept', '{ "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'views/components/widgets/concept-radio', 'concept', '{ "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000013', 'concept-checkbox-widget', 'widgets/concept-checkbox', 'concept-list', '{ "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000013', 'concept-checkbox-widget', 'views/components/widgets/concept-checkbox', 'concept-list', '{ "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000017', 'domain-radio-widget', 'widgets/domain-radio', 'domain-value', '{}');
+    VALUES ('10000000-0000-0000-0000-000000000017', 'domain-radio-widget', 'views/components/widgets/domain-radio', 'domain-value', '{}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'widgets/domain-checkbox', 'domain-value-list', '{}');
+    VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'views/components/widgets/domain-checkbox', 'domain-value-list', '{}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'widgets/file', 'file-list', '{"acceptedFiles": "", "maxFilesize": "200"}');
+    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'views/components/widgets/file', 'file-list', '{"acceptedFiles": "", "maxFilesize": "200"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
@@ -2211,91 +2211,6 @@ VALUES ('search-query', '{
 }');
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-        {
-            "layout": {},
-            "source": "search-results-hex",
-            "filter": [
-                "all",
-                [
-                    ">",
-                    "doc_count",
-                    0
-                ]
-            ],
-            "paint": {
-                "fill-extrusion-color": {
-                    "property": "doc_count",
-                    "stops": [
-                        [
-                            0,
-                            "#ffffb2"
-                        ],
-                        [
-                            10,
-                            "#fed976"
-                        ],
-                        [
-                            50,
-                            "#feb24c"
-                        ],
-                        [
-                            200,
-                            "#fd8d3c"
-                        ],
-                        [
-                            500,
-                            "#f03b20"
-                        ],
-                        [
-                            1000,
-                            "#bd0026"
-                        ]
-                    ]
-                },
-                "fill-extrusion-height": {
-                    "type": "exponential",
-                    "property": "doc_count",
-                    "stops": [
-                        [
-                            0,
-                            0
-                        ],
-                        [
-                            1000,
-                            65535
-                        ]
-                    ]
-                },
-                "fill-extrusion-opacity": 0.4
-            },
-            "type": "fill-extrusion",
-            "id": "search-results-hex"
-        },
-        {
-            "filter": [
-                "all",
-                [
-                    ">",
-                    "doc_count",
-                    0
-                ]
-            ],
-            "layout": {
-                "text-size": 12,
-                "text-font": [
-                    "DIN Offc Pro Medium",
-                    "Arial Unicode MS Bold"
-                ],
-                "text-field": "{doc_count}"
-            },
-            "type": "symbol",
-            "id": "search-results-hex-count",
-            "source": "search-results-hex"
-        }
-    ]', TRUE, 'ion-search', TRUE, TRUE);
-
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
@@ -3502,3 +3417,119 @@ LANGUAGE plpgsql ;
 CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
    ON tiles FOR EACH ROW
    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
+
+-- delete from map_layers where name = 'Search Results';
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
+       {
+           "layout": {},
+           "source": "search-results-hex",
+           "filter": [
+               "all",
+               [
+                   ">",
+                   "doc_count",
+                   0
+               ]
+           ],
+           "paint": {
+               "fill-extrusion-color": {
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           "#ffffb2"
+                       ],
+                       [
+                           10,
+                           "#fed976"
+                       ],
+                       [
+                           50,
+                           "#feb24c"
+                       ],
+                       [
+                           200,
+                           "#fd8d3c"
+                       ],
+                       [
+                           500,
+                           "#f03b20"
+                       ],
+                       [
+                           1000,
+                           "#bd0026"
+                       ]
+                   ]
+               },
+               "fill-extrusion-height": {
+                   "type": "exponential",
+                   "property": "doc_count",
+                   "stops": [
+                       [
+                           0,
+                           0
+                       ],
+                       [
+                           1000,
+                           65535
+                       ]
+                   ]
+               },
+               "fill-extrusion-opacity": 0.4
+           },
+           "type": "fill-extrusion",
+           "id": "search-results-hex"
+       },
+       {
+           "id": "search-results-points-markers",
+           "type": "symbol",
+           "source": "search-results-points",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ],
+               [
+                   "!=",
+                   "highlight",
+                   true
+               ]
+           ],
+           "layout": {
+               "icon-image": "marker-15",
+               "icon-size": 2,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
+           },
+           "paint": {}
+       },
+       {
+           "id": "search-results-points-markers-highlighted",
+           "type": "symbol",
+           "source": "search-results-points",
+           "filter": [
+               "all",
+               [
+                   "==",
+                   "$type",
+                   "Point"
+               ],
+               [
+                   "==",
+                   "highlight",
+                   true
+               ]
+           ],
+           "layout": {
+               "icon-image": "marker-15",
+               "icon-size": 3,
+               "icon-offset": [0,-6],
+               "icon-allow-overlap": true
+           },
+           "paint": {}
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);

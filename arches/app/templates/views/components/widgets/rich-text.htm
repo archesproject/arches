@@ -1,0 +1,18 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <div class="col-xs-12">
+            <div class="summernote" data-bind='summernote: {value: value, disable: disabled}'></div>
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="html: value() || '{% trans "None" %}'"></dd>
+{% endblock report %}
