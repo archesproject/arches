@@ -30,9 +30,6 @@ def install():
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(django_install_location, 'contrib', 'auth'))
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(django_install_location, 'contrib', 'admin', 'static', 'admin', 'css'))
 
-        # GET ELASTICSEARCH
-        download_elasticsearch(install_dir)
-
         # INSTALL PSYCOPG2
         if sys.platform == 'win32':
             is_64bit_python = sys.maxsize > 2**32
