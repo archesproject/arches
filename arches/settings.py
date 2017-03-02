@@ -400,6 +400,7 @@ MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
 
 # bounds for search results hex binning fabric
+# a smaller bbox will give you less distortion in hexes and better performance
 HEX_BIN_BOUNDS = (-122, -52, 128, 69)
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100

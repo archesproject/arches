@@ -204,7 +204,6 @@ def build_search_results_dsl(request):
 
     query = Query(se, start=limit*int(page-1), limit=limit)
     query.add_aggregation(GeoHashGridAgg(field='points', name='grid', precision=settings.HEX_BIN_PRECISION))
-    query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
     search_query = Bool()
 
 
