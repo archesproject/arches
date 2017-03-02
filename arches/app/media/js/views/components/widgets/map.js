@@ -497,6 +497,19 @@ define([
                                         "features": []
                                     };
                                 }
+                                if (agg.bounds.bounds && self.map && !self.extentSearch()) {
+                                    var bounds = [
+                                        [
+                                            agg.bounds.bounds.top_left.lon,
+                                            agg.bounds.bounds.bottom_right.lat
+                                        ],
+                                        [
+                                            agg.bounds.bounds.bottom_right.lon,
+                                            agg.bounds.bounds.top_left.lat
+                                        ]
+                                    ];
+                                    map.fitBounds(bounds);
+                                }
                                 var features = [];
                                 _.each(agg.grid.buckets, function (cell) {
                                     var pt = geohash.decode(cell.key);
