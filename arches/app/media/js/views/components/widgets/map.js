@@ -13,7 +13,7 @@ define([
     'knockout-mapping',
     'geojson-extent',
     'views/list',
-    'widgets/map/map-styles',
+    'views/components/widgets/map/map-styles',
     'viewmodels/geocoder',
     'viewmodels/map-controls',
     'select2',
