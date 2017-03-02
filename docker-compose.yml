@@ -1,0 +1,114 @@
+version: '2'
+services:
+
+    web:
+      container_name: web
+      restart: always
+      image: arches/arches:latest
+      build: 
+        context: .
+        dockerfile: ./Dockerfile
+      command: bash -c  "sleep 15 && /install/entrypoint.sh"
+      volumes:
+        - web-log:/arches/arches/logs
+        - web-static:/static_root
+        - web-uploadedfiles:/web_root/arches/arches/uploadedfiles
+        - web-virtualenv:/web_root/ENV
+      environment:
+        - PGPASSWORD=
+        - PGDBNAME=arches
+        - PGHOST=db
+        - PGPORT=5432
+        - ESHOST=elasticsearch
+        - DJANGO_MODE=DEV
+        - DJANGO_DEBUG=True
+        - DOMAIN_NAMES=localhost
+        - MAPBOX_API_KEY=
+        - TZ=EST
+      ports:
+        - '8000:8000'
+      depends_on:
+        - db
+        - elasticsearch
+        
+    db:
+      container_name: db
+      restart: always
+      image: mdillon/postgis:9.5
+      volumes:
+          - postgres-data:/var/lib/postgresql/data
+          - postgres-log:/var/log/postgresql
+      ports:
+        - '5432:5432'
+      environment:
+        - POSTGRES_PASSWORD=
+        - TZ=EST
+        
+    elasticsearch:
+      container_name: elasticsearch
+      restart: always
+      image: elasticsearch:5.2.1
+      volumes:
+        - elasticsearch-config:/usr/share/elasticsearch/config
+        - elasticsearch-data:/usr/share/elasticsearch/data
+      ports:
+        - "9200:9200"
+        - "9300:9300"
+      environment:
+        - TZ=EST
+        
+    nginx:
+      container_name: nginx
+      restart: always
+      image: cvast/cvast-nginx:1.1.1
+      ports:
+        - '81:80'
+        - '443:443'
+      volumes:
+        - arches4-web-static:/www/static
+        - arches4-nginx-logs:/var/log/nginx
+        - arches4-nginx-conf:/etc/nginx/conf.d
+        - arches4-nginx-root:/var/www
+        - arches4-letsencrypt-config:/etc/letsencrypt
+      depends_on:
+        - web
+      environment:
+        - PROXY_CONTAINER=web
+        - PROXY_PORT=8000
+        - DOMAIN_NAMES=localhost
+        - PUBLIC_MODE=False
+        - TZ=EST
+    
+    letsencrypt:
+      container_name: letsencrypt
+      image: cvast/cvast-letsencrypt:1.1
+      volumes:
+        - nginx-root:/var/www
+        - letsencrypt-config:/etc/letsencrypt
+        - letsencrypt-log:/var/log/letsencrypt
+        - letsencrypt-workdir:/var/lib/letsencrypt
+      command: get_certificate
+      environment:
+        - LETSENCRYPT_EMAIL=vmeijer@usf.edu
+        - DOMAIN_NAMES=localhost
+        - PRODUCTION_MODE=False
+        # - FORCE_RENEWAL=False
+        - PERSISTENT_MODE=True
+        - TZ=EST
+
+        
+volumes:
+    web-log:
+    web-static:
+    web-uploadedfiles:
+    web-virtualenv:
+    postgres-data:
+    postgres-log:
+    elasticsearch-data:
+    elasticsearch-config:
+    nginx-root:
+    nginx-conf:
+    nginx-logs:
+    letsencrypt-workdir:
+    letsencrypt-config:
+    letsencrypt-log:

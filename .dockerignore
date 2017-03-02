@@ -1,0 +1,13 @@
+.git
+.eggs
+.github
+docbox
+docs
+.editorconfig
+.gitignore
+.travis.yml
+docker-compose.yml
+docker-compose-local.yml
+Dockerfile*
+arches/settings_local.py
+arches/settings_local.pyc
