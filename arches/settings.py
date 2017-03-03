@@ -398,7 +398,7 @@ MAP_MAX_ZOOM = 20
 # a smaller bbox will give you less distortion in hexes and better performance
 HEX_BIN_BOUNDS = (-122, -52, 128, 69)
 # size to use for hex binning search results on map (in km)
-HEX_BIN_SIZE = 50
+HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.
 # precision for binning is set based on GeoHash precision, see this table:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
