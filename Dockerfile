@@ -79,34 +79,6 @@ RUN git clone https://github.com/mapnik/mapnik.git mapnik &&\
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
-
-
-## Install virtualenv and Arches dependencies
-# The latter is also done by the `python setup.py install` command, but running it here saves build time. 
-# `docker build` uses a cache and only builds those steps in the Dockerfile that have changed since the last build. 
-# Every time code is edited, `docker build` runs from the first COPY command below.
-WORKDIR ${WEB_ROOT}
-RUN pip install virtualenv==13.1.2 &&\
-	virtualenv ENV &&\
-	. ENV/bin/activate &&\
-	pip install -U pip setuptools &&\
-	pip install requests \
-		'Django==1.9.2' \
-		'elasticsearch>=2.0.0,<3.0.0' \
-		'xlrd==0.9.4' \
-		'Pillow==3.1.0' \
-		rdflib \
-		unicodecsv \
-		pyyaml \
-		'pyshp==1.2.3' \
-		networkx \
-		django-guardian \
-		tilestache \
-		shapely \
-		python-memcached \
-		'mapbox-vector-tile==0.5.0' \
-		mapnik \
-		python-dateutil
 	apt-get install -y postgresql-client-9.6
 
 
