@@ -154,11 +154,6 @@
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tileserver: "{% url 'tileserver' %}"
             },
-            resourceMarker: {
-                font: '{{ map_info.resource_marker_font }}',
-                icon: '{{ map_info.resource_marker_icon }}',
-                defaultColor: '{{ map_info.resource_marker_color }}'
-            },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
@@ -187,10 +182,12 @@
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
             hexBinBounds: {{ map_info.hex_bin_bounds }},
-            searchPageDefaultZoom: {{ map_info.search_page_default_zoom}},
-            searchPageMinZoom: {{ map_info.search_page_min_zoom}},
-            searchPageMaxZoom: {{ map_info.search_page_max_zoom}},
-            searchPageDefaultCenter: {{ map_info.search_page_default_center}},
+            hexBinBounds: {{ map_info.hex_bin_bounds }},
+            mapDefaultX: {{ map_info.x }},
+            mapDefaultY: {{ map_info.y }},
+            mapDefaultZoom: {{ map_info.zoom }},
+            mapDefaultMinZoom: {{ map_info.map_min_zoom }},
+            mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% for resource_map_source in resource_map_sources %}
