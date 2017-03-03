@@ -47,7 +47,7 @@ services:
     elasticsearch:
       container_name: elasticsearch
       restart: always
-      image: elasticsearch:5.2.1
+      image: elasticsearch:5.2
       volumes:
         - elasticsearch-config:/usr/share/elasticsearch/config
         - elasticsearch-data:/usr/share/elasticsearch/data
