@@ -1,11 +1,16 @@
-from django.conf import settings
+import uuid
 from arches.app.models.concept import Concept
+from arches.app.models.models import ResourceXResource
+from arches.app.models.resource import Resource
+from arches.app.models.models import Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
+from django.db import connection, transaction
 from django.utils.translation import ugettext as _
 
 class ResourceImportReporter:
@@ -59,6 +64,74 @@ class Reader(object):
 
     def import_business_data(self):
         pass
+
+    def import_relations(self, relation_configs=None, relations=None):
+
+        def get_resourceid_from_legacyid(legacyid):
+            where_query = []
+            if relation_configs != None:
+                for config in relation_configs:
+                    where_query.append('tiledata @> \'{"%s":"%s"}\''%(config['relation_node_id'], legacyid))
+
+                cursor = connection.cursor()
+                sql = """SELECT t.resourceinstanceid FROM tiles t JOIN resource_instances r
+                         ON r.resourceinstanceid = t.resourceinstanceid WHERE {0}""".format(' or '.join(where_query))
+                cursor.execute(sql)
+                ret = [item[0] for item in cursor.fetchall()]
+
+                if len(ret) > 1 or len(ret) == 0:
+                    return None
+                else:
+                    return ret[0]
+            else:
+                self.errors.append({'datatype': 'relation config file', 'value': '', 'source':'', 'message': 'A relation_config file is required if you are trying to import relations via a legacyid.'})
+
+        for relation in relations:
+
+            # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
+            try:
+                # Test if resourceinstanceid from relations file is a UUID.
+                resourceinstancefrom = uuid.UUID(relation['resourceinstanceidfrom'])
+                try:
+                    # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
+                    Resource.objects.get(resourceinstanceid=resourceinstancefrom)
+                except:
+                    # If resourceintssanceid is not associated with a resource instance then set resourceinstanceid to None
+                    resourceinstancefrom = None
+            except:
+                # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
+                resourceinstancefrom = get_resourceid_from_legacyid(relation['resourceinstanceidfrom'])
+            # If resourceinstancefrom is None then either:
+            # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
+            # 2.) a uuid was passed in and it is not associated with a resource instance
+            if resourceinstancefrom == None:
+                self.errors.append({'datatype':'legacyid', 'value':relation['resourceinstanceidfrom'], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+
+
+            # Repeat steps from above with resourceinstanceto.
+            try:
+                resourceinstanceto = uuid.UUID(relation['resourceinstanceidto'])
+                try:
+                    Resource.objects.get(resourceinstanceid=resourceinstanceto)
+                except:
+                    resourceinstanceto = None
+            except:
+                resourceinstanceto = get_resourceid_from_legacyid(relation['resourceinstanceidto'])
+
+            if resourceinstanceto == None:
+                self.errors.append({'datatype':'legacyid', 'value':relation['resourceinstanceidto'], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+
+
+            if resourceinstancefrom != None and resourceinstanceto != None:
+                relation = ResourceXResource(
+                    resourceinstanceidfrom = Resource(resourceinstancefrom),
+                    resourceinstanceidto = Resource(resourceinstanceto),
+                    relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                    datestarted = relation['datestarted'],
+                    dateended = relation['dateended'],
+                    notes = relation['notes']
+                )
+                relation.save()
 
     def report_errors(self):
         if len(self.errors) == 0:

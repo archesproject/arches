@@ -121,6 +121,7 @@ class BusinessDataImporter(object):
                 print path + ' is not a valid path'
 
     def import_business_data(self, file_format=None, business_data=None, mapping=None, bulk=False):
+        reader = None
         start = time()
 
         if file_format == None:
@@ -130,10 +131,12 @@ class BusinessDataImporter(object):
         if mapping == None:
             mapping = self.mapping
         if file_format == 'json':
-            ArchesFileReader().import_business_data(business_data, mapping)
+            reader = ArchesFileReader()
+            reader.import_business_data(business_data, mapping)
         elif file_format == 'csv':
             if mapping != None:
-                CsvReader().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
+                reader = CsvReader()
+                reader.import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
             else:
                 print '*'*80
                 print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
@@ -149,54 +152,14 @@ class BusinessDataImporter(object):
             #     sys.exit()
             pass
 
-        self.import_relations()
-
         elapsed = (time() - start)
         print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
-    def import_relations(self, relations=None):
-        if relations == None:
-            relations = self.relations
+        # Import resource to resource relationships
+        reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
 
-        def get_resourceid_from_legacyid(legacyid):
-            where_query = []
-            for config in self.relation_configs:
-                where_query.append('tiledata @> \'{"%s":"%s"}\''%(config['relation_node_id'], legacyid))
+        reader.report_errors()
 
-            cursor = connection.cursor()
-            sql = """SELECT t.resourceinstanceid FROM tiles t
-                JOIN resource_instances r
-                ON r.resourceinstanceid = t.resourceinstanceid
-                WHERE {0}""".format(' or '.join(where_query))
-            cursor.execute(sql)
-            ret = [item[0] for item in cursor.fetchall()]
-
-            if len(ret) > 1 or len(ret) == 0:
-                print 'Either multiple resources or no resource have the legacyid {0}'.format(legacyid)
-                return None
-            else:
-                return ret[0]
-
-        for relation in relations:
-            try:
-               resourceinstancefrom = uuid.UUID(relation['resourceinstanceidfrom'])
-            except:
-               resourceinstancefrom = get_resourceid_from_legacyid(relation['resourceinstanceidfrom'])
-
-            try:
-               resourceinstanceto = uuid.UUID(relation['resourceinstanceidto'])
-            except:
-               resourceinstanceto = get_resourceid_from_legacyid(relation['resourceinstanceidto'])
-
-            relation = ResourceXResource(
-                resourceinstanceidfrom = Resource(resourceinstancefrom),
-                resourceinstanceidto = Resource(resourceinstanceto),
-                relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
-                datestarted = relation['datestarted'],
-                dateended = relation['dateended'],
-                notes = relation['notes']
-            )
-            relation.save()
 
 class ResourceLoader(object):
 

@@ -349,4 +349,4 @@ class CsvReader(Reader):
                     print message
 
         finally:
-            self.report_errors()
+            pass
