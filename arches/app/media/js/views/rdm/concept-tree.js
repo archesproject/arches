@@ -13,10 +13,11 @@ define([
 
         initialize: function(options) {
             var self = this;
+            this.model = options.model;
 
-            this.$el.tree({
+            this.tree = this.$el.tree({
                 dragAndDrop: true,
-                dataUrl: arches.urls.concept_tree,
+                dataUrl: options.url,
                 data: [],
                 autoOpen: false
             });
@@ -40,7 +41,6 @@ define([
 
             self.$el.tree(
                 'loadDataFromUrl',
-                arches.urls.concept_tree,
                 null,
                 function() {
                     var node;

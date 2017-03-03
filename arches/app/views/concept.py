@@ -104,11 +104,11 @@ def concept(request, conceptid):
         this_concept = Concept().get(id=conceptid)
 
         if f == 'html':
-            if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
+            if (mode == 'semantic' or mode == '') and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
                 concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                     include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                     depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-            else:
+            elif mode == 'collections':
                 concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                     include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                     depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
@@ -125,7 +125,7 @@ def concept(request, conceptid):
                 if value.category == 'label':
                     labels.append(value)
 
-            if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
+            if (mode == 'semantic' or mode == '') and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
                 if concept_graph.nodetype == 'ConceptScheme':
                     parent_relations = relationtypes.filter(category='Properties')
                 else:
@@ -146,7 +146,7 @@ def concept(request, conceptid):
                     'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                     'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 })
-            else:
+            elif mode == 'collections':
                 return render(request, 'views/rdm/entitytype-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -414,10 +414,10 @@ def search_sparql_endpoint_for_concepts(request):
     results = provider.search_for_concepts(request.GET.get('terms'))
     return JSONResponse(results)
 
-def concept_tree(request):
+def concept_tree(request, mode):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
+    concepts = Concept({'id': conceptid}).concept_tree(lang=lang, mode=mode)
     return JSONResponse(concepts, indent=4)
 
 def get_preflabel_from_valueid(valueid, lang):
