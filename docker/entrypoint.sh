@@ -7,7 +7,7 @@ activate_virtualenv() {
 install_dev_requirements() {
 	echo ""
 	echo ""
-	echo ----- DJANGO_MODE = DEV, so installing additional dev requirements... -----
+	echo "----- DJANGO_MODE = DEV, so installing additional dev requirements... -----"
 	echo ""
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 }
@@ -15,7 +15,7 @@ install_dev_requirements() {
 run_tests() {
 	echo ""
 	echo ""
-	echo ----- RUNNING ARCHES TESTS -----
+	echo "----- RUNNING ARCHES TESTS -----"
 	echo ""
 	cd ${ARCHES_ROOT}
 	python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -24,7 +24,7 @@ run_tests() {
 collect_static(){
 	echo ""
 	echo ""
-	echo ----- Collecting Django static files -----
+	echo "----- Collecting Django static files -----"
 	echo ""
 	python ${ARCHES_ROOT}/manage.py collectstatic --noinput
 }
@@ -32,7 +32,7 @@ collect_static(){
 run_django_server() {
 	echo ""
 	echo ""
-	echo ----- *** Running Django server *** -----
+	echo "----- *** Running Django server *** -----"
 	echo ""
 	exec python ${ARCHES_ROOT}/manage.py runserver 0.0.0.0:8000
 }

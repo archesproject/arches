@@ -39,7 +39,7 @@ To run Arches without docker-compose (see above):
 (Assuming you have a Postgresql and Elasticsearch server already running.)
 ```
 	docker run arches/arches:latest \
-		PGPASSWORD=SecretPassword1@ \
+        PGPASSWORD=SecretPassword1@ \
         PGDBNAME=arches \
         PGHOST=your-postgres-server.com \
         PGPORT=5432 \
