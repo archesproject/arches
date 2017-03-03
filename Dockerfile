@@ -28,52 +28,20 @@ RUN apt-get update -y &&\
 		libpq-dev \
 		libgeos-3.5.0 \
 		openjdk-8-jre-headless \
-		git-all \
-		zlib1g-dev \
-		clang \
-		make \
-		pkg-config &&\
+		git-all &&\
 	curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
 	apt-get install nodejs &&\
 	npm install -g bower &&\
 	wget https://bootstrap.pypa.io/get-pip.py &&\
-	python get-pip.py &&\
+	python get-pip.py
+
+	
+## Install virtualenv
+WORKDIR ${WEB_ROOT}
+RUN pip install virtualenv==15.1.0 &&\
+	virtualenv ENV &&\
+	. ENV/bin/activate &&\
 	pip install -U pip setuptools
-
-	
-## Install Mapnik
-# Boost
-# RUN apt-get -qq install -y libboost-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev
-
-# Mapnik dependencies
-# RUN apt-get -qq install --yes  libsqlite3-dev libgdal-dev libcairo-dev python-cairo-dev postgresql-contrib 
-
-# sudo apt-get install -y libmapnik2.2
-
-RUN apt-get install -y libboost-all-dev \
-	libicu-dev \
-	libfreetype6-dev \
-	libxml2-dev \
-	libharfbuzz-dev \
-	libtiff5-dev \
-	libpng12-dev \
-	libproj-dev
-	
-	
-ENV MAPNIK_VERSION=v3.0.12
-RUN git clone https://github.com/mapnik/mapnik.git mapnik &&\
-	cd mapnik &&\
-	git checkout ${MAPNIK_VERSION} &&\
-	# git fetch --tags &&\
-	# git checkout tags/${MAPNIK_VERSION} &&\
-	git submodule update --init &&\
-	# bash -c ". bootstrap.sh &&\
-	# ./configure CUSTOM_CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=0' &&\
-	./configure &&\
-	make &&\
-	# make test &&\
-	make install
-
 	
 ## Install Postgresql client
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
