@@ -28,7 +28,11 @@ RUN apt-get update -y &&\
 		libpq-dev \
 		libgeos-3.5.0 \
 		openjdk-8-jre-headless \
-		git-all &&\
+		git-all \
+		zlib1g-dev \
+        clang \
+        make \
+        pkg-config &&\
 	curl -sL https://deb.nodesource.com/setup_6.x | bash - &&\
 	apt-get install nodejs &&\
 	npm install -g bower &&\
@@ -41,7 +45,10 @@ WORKDIR ${WEB_ROOT}
 RUN pip install virtualenv==15.1.0 &&\
 	virtualenv ENV &&\
 	. ENV/bin/activate &&\
-	pip install -U pip setuptools
+	pip install -U pip \
+	setuptools &&\
+	pip install requests
+	
 	
 ## Install Postgresql client
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
@@ -49,7 +56,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc
 	apt-get update -y &&\
 	apt-get install -y postgresql-client-9.6
 
-
+	
 ## Clean up obsolete folders and packages
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -rf ${INSTALL_DIR}/tmp
