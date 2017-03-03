@@ -138,13 +138,25 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, bulk=False):
         # errors = businessDataValidator(self.business_data)
+        def get_resourceid_from_legacyid(legacyid):
+            ret = Resource.objects.filter(legacyid=legacyid)
+
+            if len(ret) > 1:
+                resourceid = None
+            elif len(ret) == 0:
+                resourceid = uuid.uuid4()
+            else:
+                resourceid = ret[0].resourceinstanceid
+
+            return resourceid
+
         try:
             with transaction.atomic():
                 save_count = 0
                 try:
                    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
                 except:
-                   resourceinstanceid = uuid.uuid4()
+                   resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -225,7 +237,7 @@ class CsvReader(Reader):
                         try:
                            resourceinstanceid = uuid.UUID(row['ResourceID'])
                         except:
-                           resourceinstanceid = uuid.uuid4()
+                           resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping)
