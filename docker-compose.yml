@@ -34,7 +34,7 @@ services:
     db:
       container_name: db
       restart: always
-      image: mdillon/postgis:9.5
+      image: mdillon/postgis:9.6
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql

@@ -79,7 +79,6 @@ RUN git clone https://github.com/mapnik/mapnik.git mapnik &&\
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
-	apt-get install -y postgresql-client-9.5
 
 
 ## Install virtualenv and Arches dependencies
@@ -108,6 +107,7 @@ RUN pip install virtualenv==13.1.2 &&\
 		'mapbox-vector-tile==0.5.0' \
 		mapnik \
 		python-dateutil
+	apt-get install -y postgresql-client-9.6
 
 
 ## Clean up obsolete folders and packages
