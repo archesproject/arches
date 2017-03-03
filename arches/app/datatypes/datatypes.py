@@ -490,8 +490,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                              "DIN Offc Pro Medium",
                              "Arial Unicode MS Bold"
                          ],
-                         "text-size": 12
+                         "text-size": 10
                      },
+                     "paint": {
+                        "text-color": "#fff"
+                    },
                      "filter": ["all", [">", "total", 1]]
                  }
             ]""" % {

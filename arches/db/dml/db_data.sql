@@ -3439,27 +3439,23 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                    "stops": [
                        [
                            0,
-                           "#ffffb2"
+                           "#54278f"
                        ],
                        [
                            10,
-                           "#fed976"
+                           "#756bb1"
                        ],
                        [
                            50,
-                           "#feb24c"
+                           "#9e9ac8"
                        ],
                        [
                            200,
-                           "#fd8d3c"
+                           "#cbc9e2"
                        ],
                        [
                            500,
-                           "#f03b20"
-                       ],
-                       [
-                           1000,
-                           "#bd0026"
+                           "#f2f0f7"
                        ]
                    ]
                },
@@ -3477,7 +3473,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                        ]
                    ]
                },
-               "fill-extrusion-opacity": 0.4
+               "fill-extrusion-opacity": 0.7
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
@@ -3501,7 +3497,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 2,
+               "icon-size": 1,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
@@ -3526,7 +3522,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 3,
+               "icon-size": 2,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
