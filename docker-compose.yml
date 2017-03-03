@@ -1,8 +1,8 @@
 version: '2'
 services:
 
-    web:
-      container_name: web
+    arches:
+      container_name: arches
       restart: always
       image: arches/arches:latest
       build: 
@@ -10,10 +10,10 @@ services:
         dockerfile: ./Dockerfile
       command: bash -c  "sleep 15 && /install/entrypoint.sh"
       volumes:
-        - web-log:/arches/arches/logs
-        - web-static:/static_root
-        - web-uploadedfiles:/web_root/arches/arches/uploadedfiles
-        - web-virtualenv:/web_root/ENV
+        - arches-log:/arches/arches/logs
+        - arches-static:/static_root
+        - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
+        - arches-virtualenv:/web_root/ENV
       environment:
         - PGPASSWORD=
         - PGDBNAME=arches
@@ -76,10 +76,10 @@ services:
 
         
 volumes:
-    web-log:
-    web-static:
-    web-uploadedfiles:
-    web-virtualenv:
+    arches-log:
+    arches-static:
+    arches-uploadedfiles:
+    arches-virtualenv:
     postgres-data:
     postgres-log:
     elasticsearch-data:
