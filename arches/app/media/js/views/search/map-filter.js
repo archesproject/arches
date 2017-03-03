@@ -41,10 +41,6 @@ function(ko, BaseFilter, arches) {
             this.minZoom = arches.mapDefaultMinZoom;
             this.maxZoom = arches.mapDefaultMaxZoom;
             this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
-            console.log(this.defaultZoom)
-            console.log(this.minZoom)
-            console.log(this.maxZoom)
-            console.log(this.defaultCenter)
         },
 
         restoreState: function(query) {
