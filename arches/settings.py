@@ -79,17 +79,6 @@ ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
 LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
 
-DEFAULT_MAP_X = 0
-DEFAULT_MAP_Y = 0
-DEFAULT_MAP_ZOOM = 0
-MAP_MIN_ZOOM = 0
-MAP_MAX_ZOOM = 19
-MAP_LAYER_FEATURE_LIMIT = 10000
-MAP_EXTENT = ''
-
-RESOURCE_MARKER_ICON_UNICODE = '\uf060'
-RESOURCE_MARKER_ICON_FONT = 'octicons'
-RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
@@ -398,17 +387,23 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
+# Default map settings for search and map layer manager pages
+DEFAULT_MAP_X = 0
+DEFAULT_MAP_Y = 0
+DEFAULT_MAP_ZOOM = 0
+MAP_MIN_ZOOM = 0
+MAP_MAX_ZOOM = 20
 
 # bounds for search results hex binning fabric
 # a smaller bbox will give you less distortion in hexes and better performance
 HEX_BIN_BOUNDS = (-122, -52, 128, 69)
 # size to use for hex binning search results on map (in km)
-HEX_BIN_SIZE = 100
+HEX_BIN_SIZE = 50
 # binning uses elasticsearch GeoHash grid aggregation.
 # precision for binning is set based on GeoHash precision, see this table:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
 # high precision binning may result in performance issues.
-HEX_BIN_PRECISION = 5
+HEX_BIN_PRECISION = 4
 
 SEARCH_PAGE_DEFAULT_ZOOM = 0
 SEARCH_PAGE_MIN_ZOOM = 0
