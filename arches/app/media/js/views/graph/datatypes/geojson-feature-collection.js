@@ -99,11 +99,11 @@ define([
                     "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
                     "layers": basemapLayers.concat(displayLayers)
                 };
-                this.zoom = ko.observable(0);
-                this.minZoom = ko.observable(0);
-                this.maxZoom = ko.observable(20);
-                this.centerX = ko.observable(-80);
-                this.centerY = ko.observable(0);
+                this.zoom = ko.observable(arches.mapDefaultZoom);
+                this.minZoom = ko.observable(arches.mapDefaultMinZoom);
+                this.maxZoom = ko.observable(arches.mapDefaultMaxZoom);
+                this.centerX = ko.observable(arches.mapDefaultX);
+                this.centerY = ko.observable(arches.mapDefaultY);
                 this.pitch = ko.observable(0);
                 this.bearing = ko.observable(0);
 

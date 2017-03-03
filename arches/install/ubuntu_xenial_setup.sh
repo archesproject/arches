@@ -63,7 +63,7 @@ function main {
   sudo apt-get install -y libpq-dev
 
   sudo apt-get install python-pip -y
-  pip install virtualenv==13.1.2
+  pip install virtualenv==15.1.0
 
   install_postgres
   install_bower

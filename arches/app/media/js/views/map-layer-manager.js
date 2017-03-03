@@ -16,16 +16,17 @@ define([
         map: null,
         geomNodes: [],
         loading: ko.observable(false),
-        zoom: ko.observable(0),
-        minZoom: ko.observable(0),
-        maxZoom: ko.observable(20),
-        centerX: ko.observable(-80),
-        centerY: ko.observable(0),
+        zoom: ko.observable(arches.mapDefaultZoom),
+        minZoom: ko.observable(arches.mapDefaultMinZoom),
+        maxZoom: ko.observable(arches.mapDefaultMaxZoom),
+        centerX: ko.observable(arches.mapDefaultX),
+        centerY: ko.observable(arches.mapDefaultY),
         pitch: ko.observable(0),
         bearing: ko.observable(0),
         iconFilter: ko.observable(''),
         selectedList: ko.observable()
     };
+
     vm.icons = ko.computed(function () {
         return _.filter(data.icons, function (icon) {
             return icon.name.indexOf(vm.iconFilter()) >= 0;

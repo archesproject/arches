@@ -36,10 +36,11 @@ function(ko, BaseFilter, arches) {
                     'opacity': 100
                 };
             });
-            this.defaultZoom = arches.searchPageDefaultZoom;
-            this.minZoom = arches.searchPageMinZoom;
-            this.maxZoom = arches.searchPageMaxZoom;
-            this.defaultCenter = arches.searchPageDefaultCenter;
+
+            this.defaultZoom = arches.mapDefaultZoom;
+            this.minZoom = arches.mapDefaultMinZoom;
+            this.maxZoom = arches.mapDefaultMaxZoom;
+            this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
         },
 
         restoreState: function(query) {
