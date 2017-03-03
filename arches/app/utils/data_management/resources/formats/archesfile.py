@@ -95,7 +95,7 @@ class ArchesFileReader(Reader):
                         resourceinstance, created = ResourceInstance.objects.update_or_create(
                             resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
                             graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
-                            resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
+                            legacyid = resource['resourceinstance']['legacyid']
                         )
                         if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
                             reporter.update_resources_saved()
@@ -291,7 +291,7 @@ class ArchesFileReader(Reader):
                     newresourceinstance = ResourceInstance.objects.create(
                         resourceinstanceid = resourceinstanceid,
                         graph_id = target_resource_model,
-                        resourceinstancesecurity = None
+                        legacyid = None
                     )
                     if len(ResourceInstance.objects.filter(resourceinstanceid=resourceinstanceid)) == 1:
                         reporter.update_resources_saved()

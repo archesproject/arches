@@ -69,7 +69,7 @@ class CsvWriter(Writer):
             other_group_record = {}
             resourceid = resource['_source']['resourceinstanceid']
             resource_graphid = resource['_source']['graph_id']
-            resource_security = resource['_source']['resourceinstancesecurity']
+            legacyid = resource['_source']['legacyid']
             csv_record['ResourceID'] = resourceid
             other_group_record['ResourceID'] = resourceid
 
@@ -116,12 +116,12 @@ class CsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, resources, target_resource_model, bulk):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk):
         # create a resource instance
         newresourceinstance = Resource(
             resourceinstanceid=resourceinstanceid,
             graph_id=target_resource_model,
-            resourceinstancesecurity=None
+            legacyid=legacyid
         )
         # add the tiles to the resource instance
         newresourceinstance.tiles = populated_tiles
@@ -219,7 +219,7 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, resources, target_resource_model, bulk)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
                         try:
@@ -334,8 +334,8 @@ class CsvReader(Reader):
                         populate_tile(source_data, target_tile)
 
                     previous_row_resourceid = row['ResourceID']
-
-                self.save_resource(populated_tiles, resourceinstanceid, resources, target_resource_model, bulk)
+                    legacyid = row['ResourceID']
+                self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
 
                 if bulk:
                     Resource.bulk_save(resources=resources)

@@ -68,59 +68,40 @@ class Reader(object):
     def import_relations(self, relation_configs=None, relations=None):
 
         def get_resourceid_from_legacyid(legacyid):
-            where_query = []
-            if relation_configs != None:
-                for config in relation_configs:
-                    where_query.append('tiledata @> \'{"%s":"%s"}\''%(config['relation_node_id'], legacyid))
+            ret = Resource.objects.filter(legacyid=legacyid)
 
-                cursor = connection.cursor()
-                sql = """SELECT t.resourceinstanceid FROM tiles t JOIN resource_instances r
-                         ON r.resourceinstanceid = t.resourceinstanceid WHERE {0}""".format(' or '.join(where_query))
-                cursor.execute(sql)
-                ret = [item[0] for item in cursor.fetchall()]
-
-                if len(ret) > 1 or len(ret) == 0:
-                    return None
-                else:
-                    return ret[0]
+            if len(ret) > 1 or len(ret) == 0:
+                return None
             else:
-                self.errors.append({'datatype': 'relation config file', 'value': '', 'source':'', 'message': 'A relation_config file is required if you are trying to import relations via a legacyid.'})
+                return ret[0].resourceinstanceid
 
         for relation in relations:
 
-            # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
-            try:
-                # Test if resourceinstanceid from relations file is a UUID.
-                resourceinstancefrom = uuid.UUID(relation['resourceinstanceidfrom'])
+            def validate_resourceinstanceid(resourceinstanceid, key):
+                # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
                 try:
-                    # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
-                    Resource.objects.get(resourceinstanceid=resourceinstancefrom)
+                    # Test if resourceinstanceid from relations file is a UUID.
+                    newresourceinstanceid = uuid.UUID(resourceinstanceid)
+                    try:
+                        # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
+                        Resource.objects.get(resourceinstanceid=resourceinstanceid)
+                    except:
+                        # If resourceinstanceid is not associated with a resource instance then set resourceinstanceid to None
+                        newresourceinstanceid = None
                 except:
-                    # If resourceintssanceid is not associated with a resource instance then set resourceinstanceid to None
-                    resourceinstancefrom = None
-            except:
-                # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
-                resourceinstancefrom = get_resourceid_from_legacyid(relation['resourceinstanceidfrom'])
-            # If resourceinstancefrom is None then either:
-            # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
-            # 2.) a uuid was passed in and it is not associated with a resource instance
-            if resourceinstancefrom == None:
-                self.errors.append({'datatype':'legacyid', 'value':relation['resourceinstanceidfrom'], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
+                    newresourceinstanceid = get_resourceid_from_legacyid(resourceinstanceid)
 
+                # If resourceinstancefrom is None then either:
+                # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
+                # 2.) a uuid was passed in and it is not associated with a resource instance
+                if newresourceinstanceid == None:
+                    self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
 
-            # Repeat steps from above with resourceinstanceto.
-            try:
-                resourceinstanceto = uuid.UUID(relation['resourceinstanceidto'])
-                try:
-                    Resource.objects.get(resourceinstanceid=resourceinstanceto)
-                except:
-                    resourceinstanceto = None
-            except:
-                resourceinstanceto = get_resourceid_from_legacyid(relation['resourceinstanceidto'])
+                return newresourceinstanceid
 
-            if resourceinstanceto == None:
-                self.errors.append({'datatype':'legacyid', 'value':relation['resourceinstanceidto'], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
-
+            resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
+            resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
 
             if resourceinstancefrom != None and resourceinstanceto != None:
                 relation = ResourceXResource(
