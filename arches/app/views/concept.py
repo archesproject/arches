@@ -41,7 +41,7 @@ class RDMView(BaseManagerView):
         languages = models.DLanguage.objects.all()
 
         concept_schemes = []
-        for concept in models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode')):
+        for concept in models.Concept.objects.filter(nodetype='ConceptScheme'):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
         context = self.get_context_data(
@@ -99,19 +99,13 @@ def concept(request, conceptid):
                     'default_report': True
                 })
 
-        ret = []
-        labels = []
-        this_concept = Concept().get(id=conceptid)
+        
+            labels = []
+            #concept_graph = Concept().get(id=conceptid)
 
-        if f == 'html':
-            if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-            else:
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
+            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
 
             languages = models.DLanguage.objects.all()
             valuetypes = models.DValueType.objects.all()
@@ -125,7 +119,7 @@ def concept(request, conceptid):
                 if value.category == 'label':
                     labels.append(value)
 
-            if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
+            if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
                 if concept_graph.nodetype == 'ConceptScheme':
                     parent_relations = relationtypes.filter(category='Properties')
                 else:
@@ -146,7 +140,7 @@ def concept(request, conceptid):
                     'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                     'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 })
-            else:
+            elif mode == 'collections':
                 return render(request, 'views/rdm/entitytype-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -161,23 +155,7 @@ def concept(request, conceptid):
                 })
 
 
-        if f == 'skos':
-            include_parentconcepts = False
-            include_subconcepts = True
-            depth_limit = None
-            
-            if this_concept.nodetype == 'ConceptScheme':
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-            else:
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=False,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
-
-            skos = SKOSWriter()
-            return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
-
+        ret = []
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None, lang=lang)
@@ -251,6 +229,24 @@ def concept(request, conceptid):
                 return JSONResponse(concept)
 
     return HttpResponseNotFound
+
+def export(request, conceptid):
+    concept_graphs = [Concept().get(id=conceptid, include_subconcepts=True,
+        include_parentconcepts=False, include_relatedconcepts=True,
+        depth_limit=None, up_depth_limit=None)]
+
+    skos = SKOSWriter()
+    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
+
+def export_collections(request):
+    concept_graphs = []
+    for concept in models.Concept.objects.filter(nodetype_id='Collection'):
+        concept_graphs.append(Concept().get(id=concept.pk, include_subconcepts=True,
+            include_parentconcepts=False, include_relatedconcepts=False,
+            depth_limit=None, up_depth_limit=None, semantic=False))
+
+    skos = SKOSWriter()
+    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
 def manage_parents(request, conceptid):
     #  need to check user credentials here
@@ -414,10 +410,10 @@ def search_sparql_endpoint_for_concepts(request):
     results = provider.search_for_concepts(request.GET.get('terms'))
     return JSONResponse(results)
 
-def concept_tree(request):
+def concept_tree(request, mode):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
+    concepts = Concept({'id': conceptid}).concept_tree(lang=lang, mode=mode)
     return JSONResponse(concepts, indent=4)
 
 def get_preflabel_from_valueid(valueid, lang):
