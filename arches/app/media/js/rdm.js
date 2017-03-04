@@ -28,12 +28,12 @@ require([
         var conceptTree = new ConceptTree({
             el: $('#jqtree')[0],
             model: concept,
-            url: arches.urls.concept_tree
+            url: arches.urls.concept_tree + 'semantic'
         });
         var dropdownTree = new ConceptTree({
             el: $('#ddtree')[0],
             model: concept,
-            url: arches.urls.dropdown_tree
+            url: arches.urls.concept_tree + 'collections'
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
