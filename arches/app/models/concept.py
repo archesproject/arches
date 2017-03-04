@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000003',
     '00000000-0000-0000-0000-000000000004',
     '00000000-0000-0000-0000-000000000006'
 )
@@ -537,7 +536,7 @@ class Concept(object):
 
             if mode == 'semantic':
                 conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'))
-            if mode == 'dropdown':
+            if mode == 'collections':
                 conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype = 'member') | Q(relationtype = 'hasCollection') )
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
@@ -573,7 +572,7 @@ class Concept(object):
                 concepts = models.Concept.objects.filter(nodetype='ConceptScheme')
                 for conceptmodel in concepts:
                     graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
-            if mode == 'dropdown':
+            if mode == 'collections':
                 concepts = models.Concept.objects.filter(nodetype='Collection')
                 for conceptmodel in concepts:
                     graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=0))

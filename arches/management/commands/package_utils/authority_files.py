@@ -104,7 +104,6 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         collector_concept.legacyoid = auth_doc_file_name.split('.')[0]
         collector_concept.addvalue({'value':display_file_name, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
         collector_concept.save()
-        lookups.add_relationship(source='00000000-0000-0000-0000-000000000003', type='hasCollection', target=collector_concept.id)
 
     else:
         top_concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')

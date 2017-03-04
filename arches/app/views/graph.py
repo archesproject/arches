@@ -141,10 +141,7 @@ class GraphManagerView(GraphBaseView):
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
         lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
-        for concept in top_concepts:
-            if concept.label == 'Dropdown Lists':
-                concept_collections = concept.children
+        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -324,10 +321,7 @@ class CardView(GraphBaseView):
         map_sources = models.MapSources.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
-        for concept in top_concepts:
-            if concept.label == 'Dropdown Lists':
-                concept_collections = concept.children
+        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
