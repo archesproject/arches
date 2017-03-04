@@ -46,14 +46,6 @@ class AuthTests(ArchesTestCase):
         self.user = User.objects.create_user('test', 'test@archesproject.org', 'password')
         self.user.save()
 
-        cmd = PackageCommand()
-        try: 
-            Group.objects.get(name='edit')
-            Group.objects.get(name='read')
-        except:
-            cmd.create_groups()
-            cmd.create_users()
-
         self.anonymous_user = User.objects.get(username='anonymous')
 
     def test_login(self):

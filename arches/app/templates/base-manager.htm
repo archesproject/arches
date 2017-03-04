@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 
@@ -341,6 +342,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
+                                        {% if request.user|has_group:"Resource Editor" %}
                                         <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
                                             <a href="/resource" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
@@ -363,8 +365,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- /ko -->
                                             </ul>
                                         </li>
+                                        {% endif %}
 
                                         <!--Menu list item-->
+                                        {% if request.user|has_group:"Graph Editor" %}
                                         <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
                                             <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
                                                 <i class="fa fa-bookmark"></i>
@@ -381,9 +385,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </li>
                                             </ul>
                                         </li>
+                                        {% endif %}
 
 
                                         <!--Menu list item-->
+                                        {% if request.user|has_group:"System Administrator" %}
                                         <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
                                             <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
@@ -392,8 +398,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                         </li>
+                                        {% endif %}
+
 
                                         <!--Menu list item-->
+                                        {% if request.user|has_group:"Application Administrator" %}
                                         <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
                                                 <i class="fa fa-server"></i>
@@ -413,6 +422,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </li>
                                             </ul>
                                         </li>
+                                        {% endif %}
+
 
                                         <!--Menu list item-->
                                         <li>
@@ -444,6 +455,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                         </li>
 
+                                        {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
 
                                         <!-- Tools -->
@@ -455,10 +467,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
                                                     RDM
-
                                                 </span>
                                             </a>
                                         </li>
+                                        {% endif %}
 
                                     </ul>
                                 </div>
