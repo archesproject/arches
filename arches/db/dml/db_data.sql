@@ -93,7 +93,6 @@ INSERT INTO d_relation_types VALUES ('hasTopConcept', 'Properties', 'skos');
 INSERT INTO d_relation_types VALUES ('hasCollection', 'Entitytype Relations', 'arches');
 
 --OWL Class types and Arches specific types
-INSERT INTO d_node_types VALUES ('GroupingNode', 'arches');
 INSERT INTO d_node_types VALUES ('ConceptScheme', 'skos');
 INSERT INTO d_node_types VALUES ('Concept', 'skos');
 INSERT INTO d_node_types VALUES ('Collection', 'skos');
@@ -134,7 +133,7 @@ INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.p
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link', 'datatypes.py', 'BaseDataType', null, null, null, FALSE);
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'Collection', 'DROPDOWNS');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'Concept', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES CONCEPT');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'Collection', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES COLLECTION');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptScheme', 'CANDIDATES');

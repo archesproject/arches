@@ -41,7 +41,7 @@ class RDMView(BaseManagerView):
         languages = models.DLanguage.objects.all()
 
         concept_schemes = []
-        for concept in models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode')):
+        for concept in models.Concept.objects.filter(nodetype='ConceptScheme'):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
         context = self.get_context_data(
