@@ -111,7 +111,13 @@ To get the container id:```docker ps```
 For more information, see the [```docker exec``` command documentation](https://docs.docker.com/engine/reference/commandline/exec/)
 
 
-	
+
+## Housekeeping
+A cleanup script is provided in [docker/cleanup.ps1](docker/cleanup.ps1).
+This can be run on any OS and removes old Docker containers, unused images, etc.
+
+
+
 ## Development
 For development environments, it is advisable to mount your source code into the container for instant code editing without rebuilding Docker image. 
 Additionally, this will allow you to 'catch' the source code created with the `arches-project create` command. 
