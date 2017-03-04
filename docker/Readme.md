@@ -79,6 +79,7 @@ The following settings are used in the example settings_local.py:
 	- PGHOST=<Postgresql database host address>
 	- PGPORT=<Postgresql database host port>
 	- ESHOST=<Elasticsearch host address>
+	- ESPORT=<Elasticsearch port>
 	- DJANGO_MODE=<PROD or DEV, use PROD for production (=live) environments>
 	- DJANGO_DEBUG=<True or False, use False for production environments>
 	- DOMAIN_NAMES=<Domain names used to reach Arches, use localhost for development environments>

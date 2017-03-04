@@ -33,7 +33,7 @@ DATABASES = {
 }
 
 ELASTICSEARCH_HOSTS = [
-    { 'host': get_env_variable('ESHOST'), 'port': ELASTICSEARCH_HTTP_PORT }
+    { 'host': get_env_variable('ESHOST'), 'port': get_env_variable('ESPORT') }
 ]
 
 MAPBOX_API_KEY = get_env_variable('MAPBOX_API_KEY')
