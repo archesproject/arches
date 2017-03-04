@@ -136,27 +136,67 @@ class CsvReader(Reader):
             newresourceinstance.save()
 
 
-    def import_business_data(self, business_data=None, mapping=None, bulk=False):
+    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
-        def get_resourceid_from_legacyid(legacyid):
-            ret = Resource.objects.filter(legacyid=legacyid)
 
-            if len(ret) > 1:
-                resourceid = None
-            elif len(ret) == 0:
-                resourceid = uuid.uuid4()
-            else:
-                resourceid = ret[0].resourceinstanceid
+        # def get_resourceid_from_legacyid(legacyid, overwrite):
+        #     # Get resources with the given legacyid
+        #     ret = Resource.objects.filter(legacyid=legacyid)
+        #
+        #     # If more than one resource is returned than make resource = None. This should never actually happen.
+        #     if len(ret) > 1:
+        #         resourceid = None
+        #     # If no resource is returned with the given legacyid then create an archesid for the resource.
+        #     elif len(ret) == 0:
+        #         resourceid = uuid.uuid4()
+        #     # If a resource is returned with the give legacyid then return its archesid
+        #     else:
+        #         if overwrite = True:
+        #             ret.objects.delete()
+        #         resourceid = ret[0].resourceinstanceid
+        #
+        #     return resourceid
 
-            return resourceid
+        def process_resourceid(resourceid, overwrite):
+            # Test if resourceid is a UUID.
+            try:
+                resourceinstanceid = uuid.UUID(resourceid)
+                # If resourceid is a UUID check if it is already an arches resource.
+                try:
+                    ret = Resource.objects.filter(resourceinstanceid=resourceid)
+                    # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
+                    if overwrite == 'overwrite':
+                        # resource.objects.delete()
+                        Resource(str(ret[0].resourceinstanceid)).delete()
+                    resourceinstanceid = resourceinstanceid
+                # If resourceid is not a UUID create one.
+                except:
+                    resourceinstanceid = resourceinstanceid
+            except:
+                # Get resources with the given legacyid
+                ret = Resource.objects.filter(legacyid=resourceid)
+                # If more than one resource is returned than make resource = None. This should never actually happen.
+                if len(ret) > 1:
+                    resourceinstanceid = None
+                # If no resource is returned with the given legacyid then create an archesid for the resource.
+                elif len(ret) == 0:
+                    resourceinstanceid = uuid.uuid4()
+                # If a resource is returned with the give legacyid then return its archesid
+                else:
+                    if overwrite == 'overwrite':
+                        Resource(str(ret[0].resourceinstanceid)).delete()
+                    resourceinstanceid = ret[0].resourceinstanceid
+
+            return resourceinstanceid
 
         try:
             with transaction.atomic():
                 save_count = 0
-                try:
-                   resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
-                except:
-                   resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
+                # try:
+                #    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
+                # except:
+                #    resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
+                resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -234,10 +274,11 @@ class CsvReader(Reader):
                         self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
-                        try:
-                           resourceinstanceid = uuid.UUID(row['ResourceID'])
-                        except:
-                           resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
+                        # try:
+                        #    resourceinstanceid = uuid.UUID(row['ResourceID'])
+                        # except:
+                        #    resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
+                        resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping)

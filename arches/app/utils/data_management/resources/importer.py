@@ -120,7 +120,7 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, bulk=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
         reader = None
         start = time()
 
@@ -136,7 +136,7 @@ class BusinessDataImporter(object):
         elif file_format == 'csv':
             if mapping != None:
                 reader = CsvReader()
-                reader.import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
+                reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
             else:
                 print '*'*80
                 print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
@@ -152,11 +152,11 @@ class BusinessDataImporter(object):
             #     sys.exit()
             pass
 
-        elapsed = (time() - start)
-        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
-
         # Import resource to resource relationships
         reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
+
+        elapsed = (time() - start)
+        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
         reader.report_errors()
 
