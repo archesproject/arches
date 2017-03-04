@@ -265,7 +265,7 @@
                 ],
                 "resourceinstance": {
                     "resourceinstanceid": "147b0000-bc03-11e6-af48-80e6500ee4e4",
-                    "resourceinstancesecurity": null,
+                    "legacyid": null,
                     "graph_id": "6e77a868-bbe0-11e6-973a-685b3597724b"
                 }
             },
@@ -418,7 +418,7 @@
                 ],
                 "resourceinstance": {
                     "resourceinstanceid": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
-                    "resourceinstancesecurity": null,
+                    "legacyid": null,
                     "graph_id": "6e77a868-bbe0-11e6-973a-685b3597724b"
                 }
             }
