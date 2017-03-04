@@ -10,9 +10,10 @@ require([
     'views/rdm/modals/export-scheme-form',
     'views/rdm/modals/delete-scheme-form',
     'views/rdm/modals/import-scheme-form',
+    'views/rdm/modals/add-collection-form',
     'views/base-manager',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, BaseManagerView) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, BaseManagerView) {
     $(document).ready(function() {
         window.onpopstate = function(event) {
           //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
@@ -183,6 +184,19 @@ require([
             form.modal.modal('show');
             form.on({
                 'conceptSchemeAdded': function(){
+                    window.location.reload();
+                }
+            })
+        });
+
+        $('a[data-toggle="#add-collection-form"]').on( "click", function(){
+            var self = this;
+            var form = new AddCollectionForm({
+                el: $('#add-collection-form')
+            });
+            form.modal.modal('show');
+            form.on({
+                'collectionAdded': function(){
                     window.location.reload();
                 }
             })
