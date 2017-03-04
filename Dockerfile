@@ -68,8 +68,8 @@ WORKDIR ${ARCHES_ROOT}
 
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 	bower --allow-root install &&\
-	python setup.py install &&\
-	python setup.py develop
+	python setup.py install
+	
 		
 		
 # Add Docker-related files

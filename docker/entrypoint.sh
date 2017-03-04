@@ -99,6 +99,7 @@ run_django_server() {
 activate_virtualenv
 init_arches
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+	set_dev_mode
 	install_dev_requirements
 elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 	collect_static
