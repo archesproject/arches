@@ -32,9 +32,7 @@ require([
         });
         var dropdownTree = new ConceptTree({
             el: $('#ddtree')[0],
-            model: new ConceptModel({
-                id: '00000000-0000-0000-0000-000000000003'
-            }),
+            model: concept,
             url: arches.urls.dropdown_tree
         });
         var conceptReport = new ConceptReport({
@@ -188,6 +186,10 @@ require([
                     window.location.reload();
                 }
             })
+        });
+
+        $('a[data-toggle="#export-all-collections"]').on( "click", function(){
+            window.open(arches.urls.export_concept_collections,'_blank');
         });
 
         new BaseManagerView();

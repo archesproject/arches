@@ -574,8 +574,13 @@ class Concept(object):
                 for conceptmodel in concepts:
                     graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
             if mode == 'dropdown':
-                concepts = models.Concept.objects.filter(nodetype='GroupingNode')
-                graph = _findNarrowerConcept(concepts[0].pk, depth_limit=1).children
+                concepts = models.Concept.objects.filter(nodetype='Collection')
+                for conceptmodel in concepts:
+                    graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=0))
+
+                graph = sorted(graph, key=lambda concept: concept.label)
+                #graph = _findNarrowerConcept(concepts[0].pk, depth_limit=1).children
+
         else:
             graph = _findNarrowerConcept(self.id, depth_limit=1).children
             # concepts = _findNarrowerConcept(self.id, depth_limit=1)

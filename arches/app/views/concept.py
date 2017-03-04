@@ -99,19 +99,13 @@ def concept(request, conceptid):
                     'default_report': True
                 })
 
-        ret = []
-        labels = []
-        this_concept = Concept().get(id=conceptid)
+        
+            labels = []
+            #concept_graph = Concept().get(id=conceptid)
 
-        if f == 'html':
-            if (mode == 'semantic' or mode == '') and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-            elif mode == 'collections':
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
+            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=(mode == 'semantic' or mode == ''))
 
             languages = models.DLanguage.objects.all()
             valuetypes = models.DValueType.objects.all()
@@ -125,7 +119,7 @@ def concept(request, conceptid):
                 if value.category == 'label':
                     labels.append(value)
 
-            if (mode == 'semantic' or mode == '') and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
+            if (mode == 'semantic' or mode == '') and (concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType'):
                 if concept_graph.nodetype == 'ConceptScheme':
                     parent_relations = relationtypes.filter(category='Properties')
                 else:
@@ -161,23 +155,7 @@ def concept(request, conceptid):
                 })
 
 
-        if f == 'skos':
-            include_parentconcepts = False
-            include_subconcepts = True
-            depth_limit = None
-            
-            if this_concept.nodetype == 'ConceptScheme':
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
-            else:
-                concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=False,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
-
-            skos = SKOSWriter()
-            return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
-
+        ret = []
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None, lang=lang)
@@ -251,6 +229,24 @@ def concept(request, conceptid):
                 return JSONResponse(concept)
 
     return HttpResponseNotFound
+
+def export(request, conceptid):
+    concept_graphs = [Concept().get(id=conceptid, include_subconcepts=True,
+        include_parentconcepts=False, include_relatedconcepts=True,
+        depth_limit=None, up_depth_limit=None)]
+
+    skos = SKOSWriter()
+    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
+
+def export_collections(request):
+    concept_graphs = []
+    for concept in models.Concept.objects.filter(nodetype_id='Collection'):
+        concept_graphs.append(Concept().get(id=concept.pk, include_subconcepts=True,
+            include_parentconcepts=False, include_relatedconcepts=False,
+            depth_limit=None, up_depth_limit=None, semantic=False))
+
+    skos = SKOSWriter()
+    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
 def manage_parents(request, conceptid):
     #  need to check user credentials here
