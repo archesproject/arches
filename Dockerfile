@@ -88,4 +88,4 @@ EXPOSE 8000
 
 
 # Set default workdir
-WORKDIR ${WEB_ROOT}
+WORKDIR ${ARCHES_ROOT}
