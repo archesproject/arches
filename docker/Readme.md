@@ -58,32 +58,12 @@ docker run arches/arches:latest \
 ## Initialize
 **On first run** Arches needs to initialize the database and Elasticsearch. 
 
-For your convenience, a script is provided in this Docker image that does the initialization for you: ```install/init_arches.sh```
-(In the source code: [docker/init_arches.sh](/docker/init_arches.sh) )
-This will run:
-```
-python manage.py packages -o setup
-manage.py packages -o import_graphs
-```  
+For your convenience, this initialization is done when you first run Arches.
+(See [docker/entrypoint.sh](/docker/entrypoint.sh) in the source code)
 
-**Be aware that this script deletes any existing Arches database.** Only run this once. 
+The initialization can be forced by setting the environment variable FORCE_DB_INIT before starting the Arches container.
 
-You can run this script using `docker-compose.yml` or in a `docker run` command (but be careful to remove it after first run):  
-
-When using `docker-compose.yml` (see above), change this line:
-`command: bash -c  "sleep 15 && /install/entrypoint.sh"`
-into
-`command: bash -c  "sleep 15 && /install/init_arches.sh && /install/entrypoint.sh"`
-
-When using `docker run` (see below): 
-```
-docker run arches/arches:latest \
-	[rest of command] \
-	/install/init_arches.sh
-```
-
-Alternatively, run this script or its commands manually from inside your Arches container while Postgresql and Elasticsearch are running.
-(See paragraph 'Connect to your container' below).
+**Be aware that this script deletes any existing database with the name set in the PGDBNAME environment variable.** 
 
 
 
@@ -93,6 +73,7 @@ This settings file complements the default settings.py and overrides the followi
 
 The following settings are used in the example settings_local.py:
 
+	- FORCE_DB_INIT=<Optional: force the initialization of Postgresql and Elasticsearch on startup>
 	- PGPASSWORD=<Postgresql database password>
 	- PGDBNAME=<Postgresql database name>
 	- PGHOST=<Postgresql database host address>

@@ -15,6 +15,7 @@ services:
         - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
         - arches-virtualenv:/web_root/ENV
       environment:
+        - FORCE_DB_INIT=False
         - PGPASSWORD=
         - PGDBNAME=arches
         - PGHOST=db

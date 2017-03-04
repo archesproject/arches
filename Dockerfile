@@ -74,7 +74,6 @@ RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 		
 # Add Docker-related files
 COPY docker/entrypoint.sh ${INSTALL_DIR}/entrypoint.sh
-COPY docker/init_arches.sh ${INSTALL_DIR}/init_arches.sh
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 RUN	chmod -R 700 ${INSTALL_DIR} &&\
 	dos2unix ${INSTALL_DIR}/*
