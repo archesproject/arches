@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000003',
     '00000000-0000-0000-0000-000000000004',
     '00000000-0000-0000-0000-000000000006'
 )
@@ -511,7 +510,7 @@ class Concept(object):
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 delete_concept_values_index(concepts_to_delete)
 
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE, mode='semantic'):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -535,7 +534,10 @@ class Concept(object):
             ret.id = label.conceptid
             ret.labelid = label.id
 
-            conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
+            if mode == 'semantic':
+                conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'))
+            if mode == 'collections':
+                conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype = 'member') | Q(relationtype = 'hasCollection') )
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
             else:
@@ -566,9 +568,18 @@ class Concept(object):
 
         graph = []
         if self.id == None or self.id == '' or self.id == 'None' or self.id == top_concept:
-            concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
-            for conceptmodel in concepts:
-                graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+            if mode == 'semantic':
+                concepts = models.Concept.objects.filter(nodetype='ConceptScheme')
+                for conceptmodel in concepts:
+                    graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+            if mode == 'collections':
+                concepts = models.Concept.objects.filter(nodetype='Collection')
+                for conceptmodel in concepts:
+                    graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=0))
+
+                graph = sorted(graph, key=lambda concept: concept.label)
+                #graph = _findNarrowerConcept(concepts[0].pk, depth_limit=1).children
+
         else:
             graph = _findNarrowerConcept(self.id, depth_limit=1).children
             # concepts = _findNarrowerConcept(self.id, depth_limit=1)

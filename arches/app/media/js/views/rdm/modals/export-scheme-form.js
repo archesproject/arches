@@ -26,7 +26,7 @@ define(['jquery', 'backbone', 'arches', 'models/value'], function ($, Backbone, 
                 },
                 submitHandler: function(form) {
                     var scheme = $(form).find("[name=scheme_dd]").val();
-                    window.open(arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', scheme) + '?f=skos','_blank');
+                    window.open(arches.urls.export_concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', scheme),'_blank');
                     self.modal.modal('hide');
                 }
             });            

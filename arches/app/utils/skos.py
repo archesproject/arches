@@ -161,16 +161,16 @@ class SKOSReader(object):
                     self.nodes.append(concept)
 
 
-            # Search for ConceptSchemes first
-            for s, v, o in graph.triples((None, SKOS.hasCollection, None)):
+            # Search for SKOS.Collections
+            for s, v, o in graph.triples((None, RDF.type , SKOS.Collection)):
                 #print "%s %s %s " % (s,v,o)
                 concept = Concept({
-                    'id': self.generate_uuid_from_subject(baseuuid, o),
-                    'legacyoid': str(o),
+                    'id': self.generate_uuid_from_subject(baseuuid, s),
+                    'legacyoid': str(s),
                     'nodetype': 'Collection'
                 })
                 # loop through all the elements within a <skos:Concept> element
-                for predicate, object in graph.predicate_objects(subject = o):
+                for predicate, object in graph.predicate_objects(subject = s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
                         if hasattr(object, 'language') and object.language not in allowed_languages:
                             newlang = models.DLanguage()
@@ -188,7 +188,6 @@ class SKOSReader(object):
                             concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
                 
                 self.nodes.append(concept)
-                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'hasCollection', 'target': self.generate_uuid_from_subject(baseuuid, o)})
             
             for s, v, o in graph.triples((None, SKOS.member, None)):
                 #print "%s %s %s " % (s,v,o)
@@ -260,7 +259,7 @@ class SKOSWriter(object):
     def __init__(self):
         self.concept_list = []
 
-    def write(self, concept_graph, format='pretty-xml'):
+    def write(self, concept_graphs, format='pretty-xml'):
         serializer = JSONSerializer()
 
         #get empty RDF graph
@@ -278,55 +277,56 @@ class SKOSWriter(object):
         rdf_graph.add((Arches guid, SKOS.prefLabel, Literal('Stone',lang=en)))
         """
 
-        if concept_graph.nodetype == 'ConceptScheme':
-            scheme_id = concept_graph.id
+        if not isinstance(concept_graphs, list):
+            concept_graphs = [concept_graphs]
 
-            def build_skos(node):
-                if node.nodetype == 'Concept':
-                    rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
+        for concept_graph in concept_graphs:
+            if concept_graph.nodetype == 'ConceptScheme':
+                scheme_id = concept_graph.id
 
-                for subconcept in node.subconcepts:
-                    rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
+                def build_skos(node):
+                    if node.nodetype == 'Concept':
+                        rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
 
-                for relatedconcept in node.relatedconcepts:
-                    rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))
+                    for subconcept in node.subconcepts:
+                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
 
-                for value in node.values:
-                    jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
-                    if value.category == 'label' or value.category == 'note':
-                        if node.nodetype == 'ConceptScheme':
-                            if value.type == 'prefLabel':
-                                rdf_graph.add((ARCHES[node.id], DCTERMS.title, Literal(jsonLiteralValue, lang = value.language)))
-                            elif value.type == 'scopeNote':
-                                rdf_graph.add((ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang = value.language)))
-                        else:
-                            rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
-                    else:
-                        rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(jsonLiteralValue, lang = value.language)))
+                    for relatedconcept in node.relatedconcepts:
+                        rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))
 
-                rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
-
-
-            concept_graph.traverse(build_skos)
-            return rdf_graph.serialize(format=format)
-
-        elif concept_graph.nodetype == 'GroupingNode':
-            scheme_id = concept_graph.id
-
-            def build_skos(node):
-                for subconcept in node.subconcepts:
-                    rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
-
-                rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
-                if node.nodetype == 'Collection':
                     for value in node.values:
+                        jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
                         if value.category == 'label' or value.category == 'note':
-                            jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
-                            rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
-    
+                            if node.nodetype == 'ConceptScheme':
+                                if value.type == 'prefLabel':
+                                    rdf_graph.add((ARCHES[node.id], DCTERMS.title, Literal(jsonLiteralValue, lang = value.language)))
+                                elif value.type == 'scopeNote':
+                                    rdf_graph.add((ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang = value.language)))
+                            else:
+                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+                        else:
+                            rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(jsonLiteralValue, lang = value.language)))
 
+                    rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
 
-            concept_graph.traverse(build_skos)
-            return rdf_graph.serialize(format=format)
-        else:
-            raise Exception('Only ConceptSchemes and Collections can be written to SKOS RDF files.')
+                concept_graph.traverse(build_skos)
+
+            elif concept_graph.nodetype == 'Collection':
+                scheme_id = concept_graph.id
+
+                def build_skos(node):
+                    for subconcept in node.subconcepts:
+                        rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
+
+                    rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
+                    if node.nodetype == 'Collection':
+                        for value in node.values:
+                            if value.category == 'label' or value.category == 'note':
+                                jsonLiteralValue = serializer.serialize({'value': value.value, 'id': value.id})
+                                rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+        
+                concept_graph.traverse(build_skos)
+            else:
+                raise Exception('Only ConceptSchemes and Collections can be written to SKOS RDF files.')
+            
+        return rdf_graph.serialize(format=format)
