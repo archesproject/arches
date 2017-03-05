@@ -1,0 +1,381 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <title>Arches | Heritage Data Management</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+</head>
+
+<!--
+The #page-top ID is part of the scrolling feature.
+The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
+-->
+
+<body id="body" data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery">
+
+    <!--=== Header ===-->
+    <nav class="one-page-header navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+
+            <div class="menu-container page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <a class="navbar-brand" style="padding-top: 5px;" href="#intro">
+                    <img src="{% static 'img/landing/disco_light.png' %}" style="height: 36px; width: 36px;" alt="Logo">
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <div class="menu-container">
+                    <ul class="nav navbar-nav">
+                        <li class="page-scroll">
+                            <a href="#about">About Arches</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="#services">Capabilities</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="#news">News</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="{% url 'search_home' %}">Search</a>
+                        </li>
+                        {% if user.username != 'anonymous' %}
+                        <li class="page-scroll">
+                            <a href="{% url 'graph' '' %}">{% trans "Manage Data" %}</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-scroll">
+                            <a id="auth-link" href="{% url 'auth' %}?next={% url 'graph' '' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    <!--=== End Header ===-->
+
+    <!-- Intro Section -->
+    <section id="intro" class="intro-section">
+        <div class="fullscreenbanner-container">
+            <div class="fullscreenbanner">
+                <ul>
+                    <!-- SLIDE 1 -->
+                    <li data-transition="slideright" data-slotamount="5" data-masterspeed="700" data-title="Slide 1">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'img/landing/moses.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start" delay="4500" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1000" data-easing="Back.easeInOut" data-endspeed="300">
+                            Arches
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="3000" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            Data Management and Integration
+                            <br> For Cultural Heritage Conservation Scientists.
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
+                            {% if user.username == 'anonymous' %}
+                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Login</a></span>
+                            {% endif %}
+                            {% if user.username != 'anonymous' %}
+                            <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Manage Data</a></span>
+                            {% endif %}
+                        </div>
+                    </li>
+
+                    <!-- SLIDE 2 -->
+                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="1000" data-title="Slide 2">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'img/landing/vesuvius.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
+                            Easy, Secure Data Management
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            Easily Manage Laboratory Instrument Datasets
+                            <br> Link Your Data to Art Works and Iconography
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
+                        </div>
+                    </li>
+
+                    <!-- SLIDE 3 -->
+                    <li data-transition="slideup" data-slotamount="5" data-masterspeed="700" data-title="Slide 3">
+                        <!-- MAIN IMAGE -->
+                        <img src="{% static 'img/landing/caffeine.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+
+                        <!-- LAYERS -->
+                        <div class="tp-caption rs-caption-1 sft start" data-x="center" data-hoffset="0" data-y="110" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
+                            Data Discovery
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-2 sfb" data-x="center" data-hoffset="0" data-y="210" data-speed="800" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            Easily Find Relevant Projects, Artistic Works
+                            <br> and Retrieve Data for Interpretation and Analysis
+                        </div>
+
+                        <!-- LAYER -->
+                        <div class="tp-caption rs-caption-3 sfb" data-x="center" data-hoffset="0" data-y="370" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Search Arches</a></span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="tp-bannertimer tp-bottom"></div>
+            </div>
+        </div>
+    </section>
+    <!-- End Intro Section -->
+
+
+    <!--  About Section -->
+    <section class="about-section section-first" style="padding-top: 0px;">
+
+
+        <div id="about" class="about-image bg-grey">
+            <div class="container">
+                <div class="title-v1">
+                    <h1>What is Arches</h1>
+                    <p>Arches is <strong>Awesome</strong> technology designed to ease Cultural Heritage data management.
+                        <br> Use Arches to organize your project objectives, instruments, datasets, and interpreations.</p>
+                </div>
+                <div class="img-center">
+                    <img class="img-responsive" src="{% static 'img/landing/disco.jpg' %}" alt="">
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!--  About Section -->
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container content-lg">
+            <div class="title-v1">
+                <h2>Capabilities</h2>
+                <p>Arches can do things to <strong> streamline your work</strong> so that you can focus on understanding your data.
+                    <br> Build interoperable, shareable, and secure <strong> research data repositories</strong> as a natural part of your workflow.</p>
+            </div>
+
+            <div class="row service-box-v1">
+                <div class="col-md-4 col-sm-6">
+                    <div class="service-block service-block-default">
+                        <i class="icon-custom icon-lg icon-bg-u rounded-x fa fa-lightbulb-o"></i>
+                        <h2 class="heading-md">Manage Research Projects</h2>
+                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine. Fusce dapibus</p>
+                        <ul class="list-unstyled">
+                            <li>Heritage Objects</li>
+                            <li>Research Objectives</li>
+                            <li>Digital Lab Notebook</li>
+                            <li>Notes &amp; Documents</li>
+                            <li>Share &amp; Collaborate</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="service-block service-block-default">
+                        <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-present"></i>
+                        <h2 class="heading-sm">Instruments &amp; Datasets</h2>
+                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine usce dapibus elit nondapibus</p>
+                        <ul class="list-unstyled">
+                            <li>Manage Lab Instruments</li>
+                            <li>Update Settings</li>
+                            <li>Easy Dataset Import</li>
+                            <li>View &amp; Manage Data</li>
+                            <li>Easy Access</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <div class="service-block service-block-default">
+                        <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-rocket"></i>
+                        <h2 class="heading-sm">Interpretations &amp; Results</h2>
+                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine. Fusce dapibus</p>
+                        <ul class="list-unstyled">
+                            <li>Manage Data Interpretations</li>
+                            <li>Index Results to Heritage Objects</li>
+                            <li>Tie Results to Iconography </li>
+                            <li>Centralize Results</li>
+                            <li>Publish Results</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Services Section -->
+
+    <!-- News Section -->
+    <section id="news" class="news-section bg-grey">
+        <div class="container content-lg">
+            <div class="title-v1">
+                <h2>Latest News</h2>
+                <p>At vero eos et accusamus et iusto odio <strong>things</strong> dignissimos ducimus qui blanditiis praesentium voluptatum deleniti.
+                    <br> deleniti atque <strong>successful</strong> corrupti quos dolores. </p>
+            </div>
+
+            <div class="row news-v1">
+                <div class="col-md-4 md-margin-bottom-40">
+                    <div class="news-v1-in">
+                        <img class="img-responsive" src="{% static 'img/landing/img1.jpg' %}" alt="">
+                        <h3><a href="#">At vero eos et accusamus</a></h3>
+                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
+                        <ul class="list-inline news-v1-info">
+                            <li><span>By</span> <a href="#">Arches Project Team</a></li>
+                            <li>|</li>
+                            <li><i class="fa fa-clock-o"></i> March 02, 2016</li>
+                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 14</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4 md-margin-bottom-40">
+                    <div class="news-v1-in">
+                        <img class="img-responsive" src="{% static 'img/landing/img4.jpg' %}" alt="">
+                        <h3><a href="#">Voluptatum deleniti atque</a></h3>
+                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
+                        <ul class="list-inline news-v1-info">
+                            <li><span>By</span> <a href="#">Catherine Patterson</a></li>
+                            <li>|</li>
+                            <li><i class="fa fa-clock-o"></i> July 02, 2015</li>
+                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 07</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="news-v1-in">
+                        <img class="img-responsive" src="{% static 'img/landing/img3.jpg' %}" alt="">
+                        <h3><a href="#">Accusamus et iusto odio dignissimos</a></h3>
+                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
+                        <ul class="list-inline news-v1-info">
+                            <li><span>By</span> <a href="#">Karen Trentleman</a></li>
+                            <li>|</li>
+                            <li><i class="fa fa-clock-o"></i> July 02, 2015</li>
+                            <li class="pull-right"><a href="#"><i class="fa fa-comments-o"></i> 22</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End News Section -->
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="contacts-section">
+        <div class="copyright-section">
+            <p>2016 &copy; All Rights Reserved. </p>
+            <ul class="social-icons">
+                <li>
+                    <a href="#" data-original-title="Facebook" class="social_facebook rounded-x"></a>
+                </li>
+                <li>
+                    <a href="#" data-original-title="Twitter" class="social_twitter rounded-x"></a>
+                </li>
+                <li>
+                    <a href="#" data-original-title="Goole Plus" class="social_googleplus rounded-x"></a>
+                </li>
+                <li>
+                    <a href="#" data-original-title="Pinterest" class="social_pintrest rounded-x"></a>
+                </li>
+                <li>
+                    <a href="#" data-original-title="Linkedin" class="social_linkedin rounded-x"></a>
+                </li>
+            </ul>
+            <span class="page-scroll"><a href="#intro"><i class="fa fa-angle-double-up back-to-top"></i></a></span>
+        </div>
+    </section>
+    <!-- End Contact Section -->
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.0/jquery-migrate.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/smoothscroll/1.3.8/SmoothScroll.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-parallax/1.1.3/jquery-parallax-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
+    <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution.min.js' %}"></script>
+    <script src="{% static 'plugins/cube-portfolio/cubeportfolio/js/jquery.cubeportfolio.min.js' %}"></script>
+    <script src="{% static 'plugins/one.app.js' %}"></script>
+    <script src="{% static 'plugins/pace-loader.js' %}"></script>
+    <script src="{% static 'plugins/owl-carousel.js' %}"></script>
+    <script src="{% static 'plugins/style-switcher.js' %}"></script>
+    <script src="{% static 'plugins/revolution-slider.js' %}"></script>
+    <script src="{% static 'plugins/cube-portfolio-lightbox.js' %}"></script>
+
+
+    <script>
+        jQuery(document).ready(function() {
+            App.init();
+            App.initCounter();
+            App.initParallaxBg();
+            OwlCarousel.initOwlCarousel();
+            StyleSwitcher.initStyleSwitcher();
+            RevolutionSlider.initRSfullScreen();
+        });
+    </script>
+
+</body>
+
+</html>

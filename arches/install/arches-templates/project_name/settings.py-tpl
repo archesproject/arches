@@ -15,8 +15,9 @@ APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 FUNCTION_TEMPLATES = os.path.join(APP_ROOT, 'functions', 'templates')
+PROJECT_TEMPLATES = os.path.join(APP_ROOT, 'templates')
 TEMPLATES[0]['DIRS'].append(FUNCTION_TEMPLATES)
-
+TEMPLATES[0]['DIRS'].insert(0, PROJECT_TEMPLATES)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
 
