@@ -73,7 +73,7 @@ class ResourceEditorView(BaseManagerView):
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = Resource.objects.create(graph_id=graphid)
             resource_instance.index()
-            return redirect('Resource Editor', resourceid=resource_instance.pk)
+            return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
