@@ -19,18 +19,26 @@ require([
           //window.location = document.location;
         };
 
+        var mode = 'semantic';
+
         // Models and views
         var concept = new ConceptModel({
             id: $('#selected-conceptid').val()
         });
         var conceptTree = new ConceptTree({
             el: $('#jqtree')[0],
-            model: concept
+            model: concept,
+            url: arches.urls.concept_tree + 'semantic'
+        });
+        var dropdownTree = new ConceptTree({
+            el: $('#ddtree')[0],
+            model: concept,
+            url: arches.urls.concept_tree + 'collections'
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
             model: concept,
-            mode: ''
+            mode: 'semantic'
         });
         var conceptsearch = new ConceptSearch({
             el: $('#rdm-concept-search-container')[0],
@@ -64,7 +72,19 @@ require([
             'conceptSelected': function(conceptid){
                 concept.clear();
                 concept.set('id', conceptid);
-                conceptReport.mode = '';
+                conceptReport.mode = 'semantic';
+                conceptReport.render();
+            }
+        });
+
+        dropdownTree.on({
+            'conceptMoved': function() {
+                conceptReport.render();
+            },
+            'conceptSelected': function(conceptid){
+                concept.clear();
+                concept.set('id', conceptid);
+                conceptReport.mode = 'collections';
                 conceptReport.render();
             }
         });
@@ -74,14 +94,15 @@ require([
                 concept.clear();
                 concept.set('id', conceptid);
 
-                //conceptTree.render();
+                conceptReport.mode = 'semantic';
                 conceptReport.render();
             },
             'dropdownConceptSelected': function(conceptid) {
                 concept.clear();
                 concept.set('id', conceptid);
 
-                conceptReport.render('dropdown');
+                conceptReport.mode = 'collections';
+                conceptReport.render();
             },
             'parentsChanged': function() {
                 //conceptTree.render();
@@ -98,6 +119,25 @@ require([
             conceptTree.render();
             conceptReport.render();
         }, conceptsearch);
+
+
+        $('a[href="#rdm-panel"]').on( "click", function(){
+            var selectedNode = conceptTree.tree.tree('getSelectedNode');
+            concept.clear();
+            concept.set('id', selectedNode.id || '');
+           
+            conceptReport.mode = 'semantic';
+            conceptReport.render();
+        });
+
+        $('a[href="#dropdown-panel"]').on( "click", function(){
+            var selectedNode = dropdownTree.tree.tree('getSelectedNode');
+            concept.clear();
+            concept.set('id', selectedNode.id || '');
+            
+            conceptReport.mode = 'collections';
+            conceptReport.render();
+        });
 
         $('a[data-toggle="#add-scheme-form"]').on( "click", function(){
             var self = this;
@@ -146,6 +186,10 @@ require([
                     window.location.reload();
                 }
             })
+        });
+
+        $('a[data-toggle="#export-all-collections"]').on( "click", function(){
+            window.open(arches.urls.export_concept_collections,'_blank');
         });
 
         new BaseManagerView();

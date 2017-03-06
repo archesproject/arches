@@ -30,7 +30,7 @@ from django.views.generic import View
 from django.db import transaction
 from django.conf import settings
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class TileData(View):
     action = 'update_tile'
 

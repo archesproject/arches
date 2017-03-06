@@ -541,7 +541,7 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column='graphid')
-    resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
+    legacyid = models.TextField(blank=True, unique=True, null=True)
 
     class Meta:
         managed = True

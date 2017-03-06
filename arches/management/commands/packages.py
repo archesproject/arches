@@ -95,7 +95,7 @@ class Command(BaseCommand):
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
 
-        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default='overwrite',
+        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default='',
             help='Whether to overwrite existing concepts with ones being imported or not.')
 
         parser.add_argument('-st', '--stage', action='store', dest='stage', default='keep',
@@ -164,7 +164,7 @@ class Command(BaseCommand):
             self.import_graphs(options['source'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'], options['config_file'], options['bulk_load'])
+            self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
@@ -348,14 +348,19 @@ class Command(BaseCommand):
             print '{0} is not a valid export file format.'.format(file_format)
 
     def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
+        if overwrite == '':
+            overwrite = 'overwrite'
+
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, config_file=None, bulk_load=False):
+    def import_business_data(self, data_source, config_file=None, overwrite='append', bulk_load=False):
         """
         Imports business data from all formats
         """
+        if overwrite == '':
+            overwrite = 'append'
         if data_source == '':
             print '*'*80
             print 'No data source indicated. Please rerun command with \'-s\' parameter.'
@@ -366,7 +371,7 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path, config_file).import_business_data(bulk=bulk_load)
+                BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
 
     def import_graphs(self, data_source=''):
         """

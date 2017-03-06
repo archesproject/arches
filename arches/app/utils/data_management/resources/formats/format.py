@@ -1,11 +1,16 @@
-from django.conf import settings
+import uuid
 from arches.app.models.concept import Concept
+from arches.app.models.models import ResourceXResource
+from arches.app.models.resource import Resource
+from arches.app.models.models import Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
+from django.db import connection, transaction
 from django.utils.translation import ugettext as _
 
 class ResourceImportReporter:
@@ -59,6 +64,55 @@ class Reader(object):
 
     def import_business_data(self):
         pass
+
+    def import_relations(self, relation_configs=None, relations=None):
+
+        def get_resourceid_from_legacyid(legacyid):
+            ret = Resource.objects.filter(legacyid=legacyid)
+
+            if len(ret) > 1 or len(ret) == 0:
+                return None
+            else:
+                return ret[0].resourceinstanceid
+
+        for relation in relations:
+
+            def validate_resourceinstanceid(resourceinstanceid, key):
+                # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
+                try:
+                    # Test if resourceinstanceid from relations file is a UUID.
+                    newresourceinstanceid = uuid.UUID(resourceinstanceid)
+                    try:
+                        # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
+                        Resource.objects.get(resourceinstanceid=resourceinstanceid)
+                    except:
+                        # If resourceinstanceid is not associated with a resource instance then set resourceinstanceid to None
+                        newresourceinstanceid = None
+                except:
+                    # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
+                    newresourceinstanceid = get_resourceid_from_legacyid(resourceinstanceid)
+
+                # If resourceinstancefrom is None then either:
+                # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
+                # 2.) a uuid was passed in and it is not associated with a resource instance
+                if newresourceinstanceid == None:
+                    self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+
+                return newresourceinstanceid
+
+            resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
+            resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
+
+            if resourceinstancefrom != None and resourceinstanceto != None:
+                relation = ResourceXResource(
+                    resourceinstanceidfrom = Resource(resourceinstancefrom),
+                    resourceinstanceidto = Resource(resourceinstanceto),
+                    relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                    datestarted = relation['datestarted'],
+                    dateended = relation['dateended'],
+                    notes = relation['notes']
+                )
+                relation.save()
 
     def report_errors(self):
         if len(self.errors) == 0:

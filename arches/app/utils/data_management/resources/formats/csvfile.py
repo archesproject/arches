@@ -69,7 +69,7 @@ class CsvWriter(Writer):
             other_group_record = {}
             resourceid = resource['_source']['resourceinstanceid']
             resource_graphid = resource['_source']['graph_id']
-            resource_security = resource['_source']['resourceinstancesecurity']
+            legacyid = resource['_source']['legacyid']
             csv_record['ResourceID'] = resourceid
             other_group_record['ResourceID'] = resourceid
 
@@ -116,12 +116,12 @@ class CsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, resources, target_resource_model, bulk):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk):
         # create a resource instance
         newresourceinstance = Resource(
             resourceinstanceid=resourceinstanceid,
             graph_id=target_resource_model,
-            resourceinstancesecurity=None
+            legacyid=legacyid
         )
         # add the tiles to the resource instance
         newresourceinstance.tiles = populated_tiles
@@ -136,12 +136,67 @@ class CsvReader(Reader):
             newresourceinstance.save()
 
 
-    def import_business_data(self, business_data=None, mapping=None, bulk=False):
+    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
+
+        # def get_resourceid_from_legacyid(legacyid, overwrite):
+        #     # Get resources with the given legacyid
+        #     ret = Resource.objects.filter(legacyid=legacyid)
+        #
+        #     # If more than one resource is returned than make resource = None. This should never actually happen.
+        #     if len(ret) > 1:
+        #         resourceid = None
+        #     # If no resource is returned with the given legacyid then create an archesid for the resource.
+        #     elif len(ret) == 0:
+        #         resourceid = uuid.uuid4()
+        #     # If a resource is returned with the give legacyid then return its archesid
+        #     else:
+        #         if overwrite = True:
+        #             ret.objects.delete()
+        #         resourceid = ret[0].resourceinstanceid
+        #
+        #     return resourceid
+
+        def process_resourceid(resourceid, overwrite):
+            # Test if resourceid is a UUID.
+            try:
+                resourceinstanceid = uuid.UUID(resourceid)
+                # If resourceid is a UUID check if it is already an arches resource.
+                try:
+                    ret = Resource.objects.filter(resourceinstanceid=resourceid)
+                    # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
+                    if overwrite == 'overwrite':
+                        # resource.objects.delete()
+                        Resource(str(ret[0].resourceinstanceid)).delete()
+                    resourceinstanceid = resourceinstanceid
+                # If resourceid is not a UUID create one.
+                except:
+                    resourceinstanceid = resourceinstanceid
+            except:
+                # Get resources with the given legacyid
+                ret = Resource.objects.filter(legacyid=resourceid)
+                # If more than one resource is returned than make resource = None. This should never actually happen.
+                if len(ret) > 1:
+                    resourceinstanceid = None
+                # If no resource is returned with the given legacyid then create an archesid for the resource.
+                elif len(ret) == 0:
+                    resourceinstanceid = uuid.uuid4()
+                # If a resource is returned with the give legacyid then return its archesid
+                else:
+                    if overwrite == 'overwrite':
+                        Resource(str(ret[0].resourceinstanceid)).delete()
+                    resourceinstanceid = ret[0].resourceinstanceid
+
+            return resourceinstanceid
+
         try:
             with transaction.atomic():
                 save_count = 0
-                resourceinstanceid = uuid.uuid4()
+                # try:
+                #    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
+                # except:
+                #    resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
+                resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -216,13 +271,14 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        self.save_resource(populated_tiles, resourceinstanceid, resources, target_resource_model, bulk)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
-                        if type(uuid.UUID(row['ResourceID'])) == uuid.UUID:
-                            resourceinstanceid = uuid.UUID(row['ResourceID'])
-                        else:
-                            resourceinstanceid = uuid.uuid4()
+                        # try:
+                        #    resourceinstanceid = uuid.UUID(row['ResourceID'])
+                        # except:
+                        #    resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
+                        resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping)
@@ -331,8 +387,8 @@ class CsvReader(Reader):
                         populate_tile(source_data, target_tile)
 
                     previous_row_resourceid = row['ResourceID']
-
-                self.save_resource(populated_tiles, resourceinstanceid, resources, target_resource_model, bulk)
+                    legacyid = row['ResourceID']
+                self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
@@ -346,4 +402,4 @@ class CsvReader(Reader):
                     print message
 
         finally:
-            self.report_errors()
+            pass
