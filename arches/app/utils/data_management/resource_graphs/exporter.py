@@ -64,8 +64,8 @@ def r2r_constraints_for_export(resource_graph):
 
 def get_card_x_node_x_widget_data_for_export(resource_graph):
     cards_x_nodes_x_widgets = []
-    for card in  resource_graph['cards']:
-        cards_x_nodes_x_widgets = CardXNodeXWidget.objects.filter(card=card['cardid'])
+    nodeids = [node['nodeid'] for node in resource_graph['nodes']]
+    cards_x_nodes_x_widgets = CardXNodeXWidget.objects.filter(node_id__in=nodeids)
     return cards_x_nodes_x_widgets
 
 def get_forms_for_export(resource_graph):
