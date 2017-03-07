@@ -136,7 +136,5 @@ This will mount the root folder and your settings file into your container.
 ## See also
 docker-compose.yml uses a number of other Docker images.
 
-Nginx: https://hub.docker.com/r/cvast/cvast-nginx/ 
-LetsEncrypt: https://hub.docker.com/r/cvast/cvast-letsencrypt/
 ElasticSearch: https://hub.docker.com/_/elasticsearch/
 Postgresql & PostGIS: https://hub.docker.com/r/mdillon/postgis/

@@ -57,23 +57,6 @@ services:
         - "9300:9300"
       environment:
         - TZ=EST
-    
-    letsencrypt:
-      container_name: letsencrypt
-      image: cvast/cvast-letsencrypt:1.1
-      volumes:
-        - nginx-root:/var/www
-        - letsencrypt-config:/etc/letsencrypt
-        - letsencrypt-log:/var/log/letsencrypt
-        - letsencrypt-workdir:/var/lib/letsencrypt
-      command: get_certificate
-      environment:
-        - LETSENCRYPT_EMAIL=vmeijer@usf.edu
-        - DOMAIN_NAMES=localhost
-        - PRODUCTION_MODE=False
-        # - FORCE_RENEWAL=False
-        - PERSISTENT_MODE=True
-        - TZ=EST
 
         
 volumes:
