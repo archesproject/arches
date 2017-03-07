@@ -47,7 +47,7 @@ class CsvWriter(Writer):
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value)
+        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type)
         return value
 
     def write_resources(self, resources, resource_export_configs=None):
