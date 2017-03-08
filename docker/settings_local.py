@@ -42,7 +42,8 @@ MAPBOX_API_KEY = get_env_variable('MAPBOX_API_KEY')
 
 ALLOWED_HOSTS = get_env_variable('DOMAIN_NAMES').split()
 
-# Fix for AWS ELB returning false bad health: ALLOWS_HOSTS did not allow ELB's private ip
+# Fix for AWS ELB returning false bad health: ELB contacts EC2 instances through their private ip.
+# An AWS service is called to get this private IP of the current EC2 node. Then the IP is added to ALLOWS_HOSTS so that Django answers to it.
 EC2_PRIVATE_IP = None
 try:
     EC2_PRIVATE_IP = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
