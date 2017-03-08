@@ -12,6 +12,7 @@ from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from shapely.geometry import asShape
+from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -46,7 +47,7 @@ class StringDataType(BaseDataType):
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
 
-    def transform_export_values(self, value):
+    def transform_export_values(self, value, *args, **kwargs):
         return value.encode('utf8')
 
     def get_search_term(self, nodevalue):
@@ -138,7 +139,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         return arches_geojson
 
-    def transform_export_values(self, value):
+    def transform_export_values(self, value, *args, **kwargs):
         wkt_geoms = []
         for feature in value['features']:
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
