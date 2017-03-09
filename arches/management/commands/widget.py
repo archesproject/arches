@@ -86,9 +86,9 @@ class Command(BaseCommand):
             details = json.load(f)
 
         instance = models.Widget.objects.get(name=details["name"])
-        instance.datatype = details['datatype'],
-        instance.helptext = details['helptext'],
-        instance.defaultconfig = details['defaultconfig'],
+        instance.datatype = details['datatype']
+        instance.helptext = details['helptext']
+        instance.defaultconfig = details['defaultconfig']
         instance.component = details['component']
         instance.save()
 
