@@ -111,6 +111,7 @@
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
                                         <li><a href="javascript:void(0);" data-toggle="#add-collection-form">{% trans "Add Collection" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#delete-collection-form">{% trans "Delete Collection" %}</a></li>
                                         <li><a href="javascript:void(0);" data-toggle="#export-all-collections">{% trans "Export All Collections" %}</a></li>
                                         <li class="divider"></li>
                                         <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
@@ -189,5 +190,10 @@
 <div id="add-collection-form">
     {% include "views/rdm/modals/add-collection-form.htm" %}
 </div>
+
+<div id="delete-collection-form">
+    {% include "views/rdm/modals/delete-collection-form.htm" %}
+</div>
+
 
 {% endblock main_content %}
