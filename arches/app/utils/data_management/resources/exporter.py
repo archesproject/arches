@@ -103,7 +103,7 @@ class ResourceExporter(object):
     #     return business_data_dict
 
     def get_resources_for_export(self, query=None, configs=None, graph=None):
-        if query == None and configs != []:
+        if query == None and graph == None and configs != []:
             results = {}
             results['hits']= {}
             results['hits']['hits'] = []
@@ -116,7 +116,7 @@ class ResourceExporter(object):
                 resource_instance_dict['_source']['tiles'] = JSONSerializer().serializeToPython(models.TileModel.objects.filter(resourceinstance_id=resource_instance_dict['_source']['resourceinstanceid']))
                 results['hits']['hits'].append(resource_instance_dict)
             resources = results['hits']['hits']
-        elif graph != None:
+        elif graph != None and query == None:
             resources = [str(resourceid) for resourceid in models.ResourceInstance.objects.filter(graph_id=graph).values_list('resourceinstanceid', flat=True)]
         else:
             se = SearchEngineFactory().create()

@@ -23,7 +23,7 @@ class BaseDataType(object):
         """
         return value
 
-    def transform_export_values(self, value):
+    def transform_export_values(self, value, *args, **kwargs):
         """
         Transforms values from probably string/wkt representation to specified
         datatype in arches

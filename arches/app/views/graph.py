@@ -60,7 +60,7 @@ class GraphBaseView(BaseManagerView):
         return context
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -119,7 +119,7 @@ class GraphSettingsView(GraphBaseView):
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
@@ -131,7 +131,7 @@ class GraphManagerView(GraphBaseView):
 
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = ('About the Arches Designer','')
+            context['nav']['help'] = ('About the Arches Designer','help/arches-designer-help.htm')
 
             return render(request, 'views/graph.htm', context)
 
@@ -175,7 +175,7 @@ class GraphManagerView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
 
     action = 'update_node'
@@ -271,7 +271,7 @@ class GraphDataView(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -286,12 +286,12 @@ class CardManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Cards','')
+        context['nav']['help'] = ('Managing Cards','help/card-manager-help.htm')
 
         return render(request, 'views/graph/card-manager.htm', context)
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
@@ -342,7 +342,7 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Cards and Widgets','')
+        context['nav']['help'] = ('Configuring Cards and Widgets','help/card-designer-help.htm')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -356,7 +356,7 @@ class CardView(GraphBaseView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormManagerView(GraphBaseView):
     action = 'add_form'
 
@@ -371,7 +371,7 @@ class FormManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Using the Form Manager','')
+        context['nav']['help'] = ('Using the Menu Manager','help/menu-manager-help.htm')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -392,7 +392,7 @@ class FormManagerView(GraphBaseView):
                 ret = form
         return JSONResponse(ret)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
@@ -412,7 +412,7 @@ class FormView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Forms','')
+        context['nav']['help'] = ('Configuring Menus','help/menu-designer-help.htm')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
@@ -445,7 +445,7 @@ class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -467,7 +467,7 @@ class ReportManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Reports','')
+        context['nav']['help'] = ('Managing Reports','help/report-manager-help.htm')
 
         return render(request, 'views/graph/report-manager.htm', context)
 
@@ -479,7 +479,7 @@ class ReportManagerView(GraphBaseView):
         report.save()
         return JSONResponse(report)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
@@ -513,7 +513,7 @@ class ReportEditorView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Editing Reports','')
+        context['nav']['help'] = ('Designing Reports','help/report-designer-help.htm')
 
         return render(request, 'views/graph/report-editor.htm', context)
 
@@ -537,7 +537,7 @@ class ReportEditorView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FunctionManagerView(GraphBaseView):
     action = ''
 
@@ -553,7 +553,7 @@ class FunctionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Functions','')
+        context['nav']['help'] = ('Managing Functions','help/function-help.htm')
 
         return render(request, 'views/graph/function-manager.htm', context)
 

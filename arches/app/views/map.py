@@ -29,7 +29,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.JSONResponse import JSONResponse
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Application Administrator'), name='dispatch')
 class MapLayerManagerView(BaseManagerView):
     def get(self, request):
         datatype_factory = DataTypeFactory()

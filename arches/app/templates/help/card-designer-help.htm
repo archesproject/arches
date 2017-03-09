@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Card Designer Overview</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% if not graph.isresource %}Use the Card Designer to edit this Branch's Card.{% else %}Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click "Return to Cards" to go back and choose a new Card to edit.{% endif %}</p>
+            <p>The Card Designer interface is split into three sections, as shown in the image below.</p>
+            <p><a href="/media/img/help/card-designer-panes.png" target="_blank"><img src="/media/img/help/card-designer-panes.png"></img></a></p>
+            <p>The <strong>Contents</strong> panel show all Widgets within this Card. In some cases, a third, over-arching tier is added to this heirarchy, called a "Card Container". This happens when multiple Cards are used to organize complex Branches.</p>
+            <p>The <strong>Manager</strong> panel is where you will make changes to a Card Container, Card, or Widget. Select an item in the contents panel, or in the preview, and you will see the manager panel update based on your selection.</p>
+            <p>The <strong>Preview</strong> allows you to see the Card just as a user would encounter it while creating a new resource. As you make changes in the contents or manager panels, you'll see the the preview update accordingly.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Using the Contents Panel</h4></a>
+        <div class="ep-help-topic-content">
+            <p>This panel displays all of the components present in this Card. Note that there are two forms this heirarchy may take.</p>
+            <div class="col-xs-12">
+                <h5>Example 1: Card with Widgets</h5>
+            </div>
+            <div class="col-xs-6">
+                <p>A Card will have one or more Widgets in it. You can reorder these widgets by moving them in the contents panel, or in the card preview.</p>
+                <p>Note that different icons are used for different types of Widgets.</p>
+            </div>
+            <div class="col-xs-6">
+                <p><a href="/media/img/help/reorganize-contents-card.gif" target="_blank"><img class="reloadable-img"src="/media/img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></a></p>
+            </div>
+            <div class="col-xs-12">
+                <h5>Example 2: Card Container with Cards</h5>
+            </div>
+            <div class="col-xs-6">
+                <p>In some cases, a complex Branch will have a Card Container, which aggregates multiple Cards (and their Widgets) in order to thematically organize data entry. These Cards will appear as "tabs" in the preview. You can reorder these tabs just as you would Widgets.</p>
+                <p>Note that different icons are used for different types of Widgets.</p>
+            </div>
+            <div class="col-xs-6">
+                <p><a href="/media/img/help/reorganize-contents-card-container.gif" target="_blank"><img class="reloadable-img"src="/media/img/help/reorganize-contents-card-container.gif" style="border: 2px solid #eee"></img></a></p>
+            </div>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Managing Card Containers and Cards</h4></a>
+        <div class="ep-help-topic-content">
+            <h4>Settings (Card Containers and Cards)</h4>
+            <p>Whether it is a Card Container or just a Card, the top-level item of your contents panel will have important configuration settings.</p>
+            <p><em>There is currently <a href="https://github.com/archesproject/arches/issues/1618">an issue</a> with some of these settings not showing up as needed, so this documentation will be finished after that issue is addressed.</em></p>
+            <h4>Permissions (Card Containers and Cards)</h4>
+            <p><em>This section will be filled out after permissions have been implemented throughout the app.</em></p>
+            <h4>Help Text (Cards only)</h4>
+            <p>To aid data entry users when using the Widgets in this Card, you may want to add some extra guidance. Use the <strong>Enable Card-Level Help</strong> setting to do so, and design the content of this guidance with the Card-Level Help menu.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Widgets</h4></a>
+        <div class="ep-help-topic-content">
+            <p>Widgets are data entry helpers for each node that collects information; it's often easier to pick a date from a calendar than to type it in, for example. Generally, the datatype of the node will determine which Widget template is used. However, in the case of a concept that will be picked from a list, you can choose a dropdown menu or a set of radio buttons, and for free text you can choose a basic text box or a rich text editor.</p>
+            <p>In the Widget Manager, you can further refine how a user will interact with a Widget. Note that in every case you can enter a custom label, but other settings depend on the Widget template. Many of these settings are optional, and all come with acceptable defaults.</p>
+            <h4>Text Widgets</h4>
+            <p>
+                <strong>Placeholder</strong> - create a default text prompt<br>
+                <strong>Max Length</strong> - set the maximum number of characters allowed<br>
+                <strong>Template</strong> - choose between a simple input box or a right text editor<br>
+            </p>
+            <h4>Concept Widgets</h4>
+            <p>
+                <strong>Placeholder</strong> - create a default text prompt<br>
+                <strong>Concept Collection</strong> - choose which set of concepts the user will pick from (also defined in the Graph Designer)<br>
+                <strong>Template</strong> - choose between a dropdown menu or a radio button selection<br>
+            </p>
+            <h4>Date Widget</h4>
+            <p>
+                <strong>Minimum Date</strong> - set the minimum for a range of allowed dates<br>
+                <strong>Maximum Date</strong> - set the maximum for a range of allowed dates<br>
+                <strong>View Mode</strong> - set how the date calendar should appear when first opened<br>
+                <strong>Date Format</strong> - set the way this date is displayed in reports and forms (note that all dates are stored as YYYY-MM-DD:TT00:00:00 in the database)<br>
+            </p>
+            <h4>Map Widget</h4>
+            <p>
+                <strong>Position</strong> - set the default map center<br>
+                <strong>Zoom</strong> - set the default zoom level<br>
+                <strong>Geocoder</strong> - choose which geocoding engine to use, or disable if desired<br>
+                <strong>Resource Properties</strong> - set the color of the drawing tools, and choose which geometry types are allowed<br>
+            </p>
+        </div>
+    </div>
+</div>
+

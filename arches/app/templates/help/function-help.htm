@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <div class="">
+            <p>Functions are discrete operations that can be associated with a Resource Model and are run on specific nodes or nodegroups whenever a user clicks creates or modify's a Resource. Here in the Function Manager you will associate Functions with this Resource Model and configure them appropriately.</p>
+            <p>To add a Function to this Resource Model, click on it in Function Library, and notice that it is added to the list of Selected Functions. To delete a Function, use the <i class="ion-ios-trash add-tooltip" style="color:lightcoral;"></i> symbol in the upper right corner.
+            <div>
+                <p><a href="javascript:void(0)" class="ep-help-topic-toggle">show demonstration</a></p>
+                <p><a href="/media/img/help/add-remove-function.gif" target="_blank"><img class="reloadable-img ep-help-topic-content" src="/media/img/help/add-remove-function.gif"></img></a></p>
+            </div>
+            <p>Arches comes with three default functions (see below). However, functions are envisioned as the hook through which developers can easily customize Arches capabilities, because new Functions can be added to your individual Arches installation. Learn more <a href="https://github.com/archesproject/arches/wiki/Writing-and-Registering-New-Functions">here</a>.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Define Resource Descriptors</h4></a>
+        <div class="ep-help-topic-content">
+            <p>This function will generate one or more descriptors for Resources that are created with this Resource Model. These descriptors are used throughout the database interface, but are not saved as part of the resource. This gives you control over the way Resources are identified and described in search results and elsewhere.</p>
+            <p>Once added to the Resource Model, use the appropriate tab to configure a descriptor template. Choose a nodegroup, and variables corresponding to each node in that node group will be added to the template, demarcated with <code>&lt; &gt;</code>. You can rearrange these variables and add text to customize the descriptor.</p>
+            <p>Note that if there are multiple instances of a given nodegroup in a Resource, the first one added will be used to create these descriptors. To manually change this, edit the Resource in question and drag the desired tile to the top of the list.</p>
+            <hr>
+            <h5>Example</h5>
+            <p>Consider a Resource where the <strong>Appellation</strong> node value is <em>Folsom School</em> and <strong>Appellation Type</strong> node value is <em>Primary</em>.</p>
+            <p>Selecting the <strong>Appellation</strong> nodegroup will populate the template with <code>&lt;Appellation Type&gt;, &lt;Appellation&gt;</code>. The resulting descriptor would read <em>Primary, Folsom School</em>. Changing the template to <code>Building Name: &lt;Appellation&gt;</code> would yield <em>Building Name: Folsom School</em>.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Define Required Nodes</h4></a>
+        <div class="ep-help-topic-content">
+            <p>By defining required nodes within your Resource Model, you can enforce that specific nodes within the same nodegroup are collected concurrently. For example, you may want to disallow users from saving an Appellation without adding an Appellation Type at the same time. To do this, you would add the Define Required Nodes fuction, and configure it by selecting the Appellation and Appellation Type nodes.</p>
+            <p><a href="/media/img/help/required-nodes-function.gif" target="_blank"><img class="reloadable-img ep-help-topic-content" src="/media/img/help/required-nodes-function.gif"></img></a></p>
+            <p>You can add more than one enforcement rule to this function. Just go down the list of node groups and select any nodes that should be collected together. Remember, these rules are only enforced within nodegroups, not across the entire graph of the Resource Model.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Local File Upload</h4></a>
+        <div class="ep-help-topic-content">
+            <p>This function performs the actual file upload that must occur in order to upload a digital file, like an image, to your database. In Triggering Nodegroups you must select the nodegroup that contains the file-list node. Select multiple nodegroups if there are multiple file-upload nodes this Resource Model's graph.</p>
+        </div>
+    </div>
+</div>

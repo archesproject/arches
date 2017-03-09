@@ -17,7 +17,10 @@ class BaseConceptDataType(BaseDataType):
             self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
             return self.value_lookup[valueid]
 
-    def get_concept_export_value(self, valueid, concept_export_value_type):
+    def get_concept_export_value(self, valueid, *args, **kwargs):
+        concept_export_value_type = None
+        if 'concept_export_value_type' in kwargs:
+            concept_export_value_type = kwargs.get('concept_export_value_type')
         ret = ''
         if concept_export_value_type != None:
             if concept_export_value_type == "label" or concept_export_value_type == "both":
@@ -51,7 +54,9 @@ class ConceptDataType(BaseConceptDataType):
     def transform_import_values(self, value):
         return value.strip()
 
-    def transform_export_values(self, value):
+    def transform_export_values(self, value, *args, **kwargs):
+        if 'concept_export_value_type' in kwargs:
+            concept_export_value_type = kwargs.get('concept_export_value_type')
         return self.get_concept_export_value(value, concept_export_value_type)
 
     def get_pref_label(self, nodevalue, lang='en-US'):
@@ -66,7 +71,7 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
-    def transform_export_values(self, value):
+    def transform_export_values(self, value, concept_export_value_type):
         new_values = []
         for val in value:
             new_val = self.get_concept_export_value(val, concept_export_value_type)

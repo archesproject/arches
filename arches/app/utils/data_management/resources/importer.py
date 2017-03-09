@@ -30,6 +30,7 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import ResourceXResource
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from copy import deepcopy
@@ -37,7 +38,7 @@ from copy import deepcopy
 
 class BusinessDataImporter(object):
 
-    def __init__(self, file=None, mapping_file=None, relations_file=None):
+    def __init__(self, file=None, mapping_file=None, relations_file=None, relation_config_file=None):
         self.business_data = ''
         self.mapping = None
         self.graphs = ''
@@ -45,6 +46,7 @@ class BusinessDataImporter(object):
         self.business_data = ''
         self.file_format = ''
         self.relations = ''
+        self.relation_configs = None
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
@@ -72,10 +74,23 @@ class BusinessDataImporter(object):
             except:
                 pass
 
+        if relation_config_file == None:
+            try:
+                relation_config_file = [file[0].split('.')[0] + '.relation_config']
+            except:
+                pass
+
         for path in relations_file:
             if os.path.exists(path):
                 if isfile(join(path)):
                     self.relations = csv.DictReader(open(relations_file[0], 'r'))
+
+        for path in relation_config_file:
+            if os.path.exists(path):
+                if isfile(join(path)):
+                    self.relation_configs = json.load(open(path, 'r'))
+                else:
+                    self.relation_configs = None
 
         for path in mapping_file:
             if os.path.exists(path):
@@ -105,7 +120,8 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, bulk=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
+        reader = None
         start = time()
 
         if file_format == None:
@@ -115,10 +131,12 @@ class BusinessDataImporter(object):
         if mapping == None:
             mapping = self.mapping
         if file_format == 'json':
-            ArchesFileReader().import_business_data(business_data, mapping)
+            reader = ArchesFileReader()
+            reader.import_business_data(business_data, mapping)
         elif file_format == 'csv':
             if mapping != None:
-                CsvReader().import_business_data(business_data=business_data, mapping=mapping, bulk=bulk)
+                reader = CsvReader()
+                reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
             else:
                 print '*'*80
                 print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
@@ -134,15 +152,14 @@ class BusinessDataImporter(object):
             #     sys.exit()
             pass
 
+        # Import resource to resource relationships
+        reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
+
         elapsed = (time() - start)
         print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
-    def import_relations(self, relations=None):
-        if relations == None:
-            relations = self.relations
+        reader.report_errors()
 
-        for relation in relations:
-            print relation
 
 class ResourceLoader(object):
 

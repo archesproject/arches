@@ -37,7 +37,7 @@ from elasticsearch import Elasticsearch
 
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         instance_summaries = []
@@ -66,7 +66,7 @@ class ResourceListView(BaseManagerView):
         return render(request, 'views/resource.htm', context)
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
@@ -129,7 +129,7 @@ class ResourceEditorView(BaseManagerView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
@@ -139,7 +139,7 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
@@ -186,7 +186,7 @@ class ResourceReportView(BaseManagerView):
 
         return render(request, 'views/resource/report.htm', context)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
