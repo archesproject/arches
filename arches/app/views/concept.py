@@ -44,12 +44,17 @@ class RDMView(BaseManagerView):
         for concept in models.Concept.objects.filter(nodetype='ConceptScheme'):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
+        collections = []
+        for concept in models.Concept.objects.filter(nodetype='Collection'):
+            collections.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
         context = self.get_context_data(
             main_script='rdm',
             active_page='RDM',
             languages=languages,
             conceptid=conceptid,
             concept_schemes=concept_schemes,
+            collections=collections,
             CORE_CONCEPTS=CORE_CONCEPTS,
         )
 
@@ -202,29 +207,29 @@ def concept(request, conceptid):
 
     if request.method == 'DELETE':
         data = JSONDeserializer().deserialize(request.body)
-
         if data:
             with transaction.atomic():
-
                 concept = Concept(data)
-
                 delete_self = data['delete_self'] if 'delete_self' in data else False
                 if not (delete_self and concept.id in CORE_CONCEPTS):
-                    in_use = False
-                    if delete_self:
-                        check_concept = Concept().get(data['id'], include_subconcepts=True)
-                        in_use = check_concept.check_if_concept_in_use()
-                    if 'subconcepts' in data:
-                        for subconcept in data['subconcepts']:
-                            if in_use == False:
-                                check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
-                                in_use = check_concept.check_if_concept_in_use()
-
-                    if in_use == False:
-                        concept.delete_index(delete_self=delete_self)
+                    if concept.nodetype == 'Collection':
                         concept.delete(delete_self=delete_self)
                     else:
-                        return JSONResponse({"in_use": in_use})
+                        in_use = False
+                        if delete_self:
+                            check_concept = Concept().get(data['id'], include_subconcepts=True)
+                            in_use = check_concept.check_if_concept_in_use()
+                        if 'subconcepts' in data:
+                            for subconcept in data['subconcepts']:
+                                if in_use == False:
+                                    check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
+                                    in_use = check_concept.check_if_concept_in_use()
+
+                        if in_use == False:
+                            concept.delete_index(delete_self=delete_self)
+                            concept.delete(delete_self=delete_self)
+                        else:
+                            return JSONResponse({"in_use": in_use})
 
                 return JSONResponse(concept)
 
