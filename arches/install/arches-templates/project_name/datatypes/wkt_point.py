@@ -2,21 +2,21 @@ from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from django.core.exceptions import ValidationError
 
-text_widget = models.Widget.objects.get(name='text-widget')
+wkt_point_widget = models.Widget.objects.get(name='wkt-point-widget')
 
 details = {
-    'datatype': 'sample',
+    'datatype': 'wkt-point',
     'iconclass': 'fa fa-file-code-o',
     'modulename': 'datatypes.py',
-    'classname': 'SampleDataType',
-    'defaultwidget': text_widget,
+    'classname': 'WKTPointDataType',
+    'defaultwidget': wkt_point_widget,
     'defaultconfig': None,
     'configcomponent': None,
     'configname': None,
     'isgeometric': False
     }
 
-class SampleDataType(BaseDataType):
+class WKTPointDataType(BaseDataType):
     def validate(self, value, source=None):
         """
         Confirm your datatype meets validation criteria

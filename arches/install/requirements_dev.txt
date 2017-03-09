@@ -1,7 +1,6 @@
 sphinx==1.2.2
 sphinx_rtd_theme
 fabric
-honcho
 livereload
 webtest
 django-webtest
