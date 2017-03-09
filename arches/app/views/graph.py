@@ -131,7 +131,7 @@ class GraphManagerView(GraphBaseView):
 
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = ('About the Arches Designer','')
+            context['nav']['help'] = ('About the Arches Designer','help/arches-designer-help.htm')
 
             return render(request, 'views/graph.htm', context)
 
@@ -286,7 +286,7 @@ class CardManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Cards','')
+        context['nav']['help'] = ('Managing Cards','help/card-manager-help.htm')
 
         return render(request, 'views/graph/card-manager.htm', context)
 
@@ -342,7 +342,7 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Cards and Widgets','')
+        context['nav']['help'] = ('Configuring Cards and Widgets','help/card-designer-help.htm')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -371,7 +371,7 @@ class FormManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Using the Form Manager','')
+        context['nav']['help'] = ('Using the Menu Manager','help/menu-manager-help.htm')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -412,7 +412,7 @@ class FormView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Forms','')
+        context['nav']['help'] = ('Configuring Menus','help/menu-designer-help.htm')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
@@ -467,7 +467,7 @@ class ReportManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Reports','')
+        context['nav']['help'] = ('Managing Reports','help/report-manager-help.htm')
 
         return render(request, 'views/graph/report-manager.htm', context)
 
@@ -513,7 +513,7 @@ class ReportEditorView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Editing Reports','')
+        context['nav']['help'] = ('Designing Reports','help/report-designer-help.htm')
 
         return render(request, 'views/graph/report-editor.htm', context)
 
@@ -553,7 +553,7 @@ class FunctionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Functions','')
+        context['nav']['help'] = ('Managing Functions','help/function-help.htm')
 
         return render(request, 'views/graph/function-manager.htm', context)
 

@@ -27,7 +27,7 @@ setup(
     author='Farallon Geographics, Inc',
     author_email='dev@fargeo.com',
     license='GNU AGPL',
-    scripts=['arches/install/arches-app', 'arches/install/arches-project'],
+    scripts=['arches/install/arches-project'],
 
     cmdclass={'install': post_install},
 

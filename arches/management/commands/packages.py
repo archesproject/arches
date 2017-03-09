@@ -339,6 +339,10 @@ class Command(BaseCommand):
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
+            if file_format == 'json':
+                config_file = None
+            elif file_format == 'csv':
+                graph = None
             data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
 
             for file in data:
