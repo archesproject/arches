@@ -73,6 +73,16 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(guest_group)
 
+    admin_user = User.objects.using(db_alias).get(username='admin')
+    admin_user.groups.add(graph_editor_group)
+    admin_user.groups.add(resource_editor_group)
+    admin_user.groups.add(rdm_admin_group)
+    admin_user.groups.add(app_admin_group)
+    admin_user.groups.add(sys_admin_group)
+    admin_user.groups.add(mobile_project_admin_group)
+    admin_user.groups.add(crowdsource_editor_group)
+    admin_user.groups.add(guest_group)
+
 
 class Migration(migrations.Migration):
 
