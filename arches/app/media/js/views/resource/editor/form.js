@@ -203,7 +203,7 @@ define([
          * save the outer most tile if it doesn't already exist
          * @memberof Form.prototype
          * @param  {object} parentTile a reference to the outer most tile, used to determine if that tile needs to be saved as well
-         * @param  {boolean} cardinality the cardinaltiy code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
+         * @param  {boolean} cardinality the cardinality code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
          * @param  {object} tile the tile to add/save
          * @return {null}
          */
@@ -310,7 +310,7 @@ define([
          * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
          * @param  {boolean} justremove if true, remove without deleting, else delete from the database
-         * @param  {boolean} cardinality the cardinaltiy code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
+         * @param  {boolean} cardinality the cardinality code of the tile being managed (1-, n-, 1-1, 1-n, n-1, n-n)
          * @return {null}
          */
         deleteTile: function(parentTile, tile, justremove, cardinality){
@@ -474,12 +474,19 @@ define([
          * @return {null}
          */
         clearTile: function(tile){
-            // remove any child tile instances
+            // clear any child tile instances
             _.each(tile.tiles, function(innerTile, nodegroup_id, list){
-                innerTile.removeAll();
+                if(this.getTileCardinality(nodegroup_id) === '1'){
+                    _.each(innerTile(), function(tile){
+                        this.clearTile(tile);
+                    }, this);
+
+                }else{
+                    innerTile.removeAll();
+                }
             }, this);
 
-            // remove any data on the tile itself
+            // clear any data on the tile itself
             _.each(tile.data, function(value, key, list){
                 value(null);
             }, this);
@@ -488,6 +495,26 @@ define([
             if(ko.isObservable(tile.dirty) && !ko.isComputed(tile.dirty)){
                 tile.dirty(false);
             }
+        },
+
+        /**
+         * finds the cardinality of a given nodegroup
+         * @memberof Form.prototype
+         * @param  {string} nodegroup_id the id of the nodegroup 
+         * @return {string} either 'n' or '1', or '' if the cardinality wasn't found
+         */
+        getTileCardinality: function(nodegroup_id){
+            var cardinality = '';
+            var getCardinality = function(cards, nodegroup_id){
+                cards().forEach(function(card){
+                    if (card.get('nodegroup_id') === nodegroup_id){
+                        cardinality = card.get('cardinality')();
+                    }
+                    getCardinality(card.get('cards'), nodegroup_id);
+                })
+            }
+            getCardinality(this.cards, nodegroup_id);
+            return cardinality;
         }
     });
 
