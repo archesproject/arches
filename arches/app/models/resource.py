@@ -195,8 +195,8 @@ class Resource(models.ResourceInstance):
         se = SearchEngineFactory().create()
         query = Query(se, limit=limit, start=start)
         bool_filter = Bool()
-        bool_filter.filter(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid))
-        bool_filter.filter(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid))
+        bool_filter.should(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid))
+        bool_filter.should(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid))
         query.add_query(bool_filter)
         resource_relations = query.search(index='resource_relations', doc_type='all')
         ret['total'] = resource_relations['hits']['total']
