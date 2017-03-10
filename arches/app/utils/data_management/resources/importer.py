@@ -123,42 +123,61 @@ class BusinessDataImporter(object):
     def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
         reader = None
         start = time()
+        cursor = connection.cursor()
 
-        if file_format == None:
-            file_format = self.file_format
-        if business_data == None:
-            business_data = self.business_data
-        if mapping == None:
-            mapping = self.mapping
-        if file_format == 'json':
-            reader = ArchesFileReader()
-            reader.import_business_data(business_data, mapping)
-        elif file_format == 'csv':
-            if mapping != None:
-                reader = CsvReader()
-                reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
-            else:
-                print '*'*80
-                print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-                print '*'*80
-                sys.exit()
-        elif file_format == 'shp':
-            # if mapping != None:
-            #     SHPFileImporter().import_business_data(business_data, mapping)
-            # else:
-            #     print '*'*80
-            #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-            #     print '*'*80
-            #     sys.exit()
+        sql = """
+            ALTER TABLE tiles DISABLE TRIGGER refresh_mv_geojson_geoms_trigger;
+        """
+        cursor.execute(sql)
+
+        try:
+            if file_format == None:
+                file_format = self.file_format
+            if business_data == None:
+                business_data = self.business_data
+            if mapping == None:
+                mapping = self.mapping
+            if file_format == 'json':
+                reader = ArchesFileReader()
+                reader.import_business_data(business_data, mapping)
+            elif file_format == 'csv':
+                if mapping != None:
+                    reader = CsvReader()
+                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
+                else:
+                    print '*'*80
+                    print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                    print '*'*80
+                    sys.exit()
+            elif file_format == 'shp':
+                # if mapping != None:
+                #     SHPFileImporter().import_business_data(business_data, mapping)
+                # else:
+                #     print '*'*80
+                #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                #     print '*'*80
+                #     sys.exit()
+                pass
+
+            # Import resource to resource relationships
+            reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
+
+            elapsed = (time() - start)
+            print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
+
+            reader.report_errors()
+        except:
             pass
-
-        # Import resource to resource relationships
-        reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
-
-        elapsed = (time() - start)
-        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
-
-        reader.report_errors()
+        finally:
+            sql = """
+                ALTER TABLE tiles ENABLE TRIGGER ALL;
+            """
+            cursor.execute(sql)
+            sql = """
+                REFRESH MATERIALIZED VIEW mv_geojson_geoms
+            """
+            cursor.execute(sql)
+            pass
 
 
 class ResourceLoader(object):
