@@ -12,6 +12,7 @@ from django.db import connection, transaction
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.models import Concept
@@ -26,6 +27,7 @@ from formats.shpfile import ShapeReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 from arches.app.models.tile import Tile
+from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
@@ -124,12 +126,7 @@ class BusinessDataImporter(object):
         reader = None
         start = time()
         cursor = connection.cursor()
-
-        sql = """
-            ALTER TABLE tiles DISABLE TRIGGER refresh_mv_geojson_geoms_trigger;
-        """
-        cursor.execute(sql)
-
+        
         try:
             if file_format == None:
                 file_format = self.file_format
@@ -169,14 +166,11 @@ class BusinessDataImporter(object):
         except:
             pass
         finally:
-            sql = """
-                ALTER TABLE tiles ENABLE TRIGGER ALL;
-            """
-            cursor.execute(sql)
-            sql = """
-                REFRESH MATERIALIZED VIEW mv_geojson_geoms
-            """
-            cursor.execute(sql)
+            datatype_factory = DataTypeFactory()
+            datatypes = DDataType.objects.all()
+            for datatype in datatypes:
+                datatype_instance = datatype_factory.get_instance(datatype.datatype)
+                datatype_instance.after_update_all()
             pass
 
 

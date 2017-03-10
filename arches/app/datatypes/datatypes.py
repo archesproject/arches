@@ -11,6 +11,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
+from django.db import connection, transaction
 from shapely.geometry import asShape
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
@@ -520,6 +521,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "icon": layer_icon,
             "addtomap": node.config['addToMap'],
         }
+
+    def after_update_all(self):
+        cursor = connection.cursor()
+        sql = """
+            REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+        """
+        cursor.execute(sql)
 
 
 class FileListDataType(BaseDataType):
