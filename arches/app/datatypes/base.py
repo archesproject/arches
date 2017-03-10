@@ -16,6 +16,12 @@ class BaseDataType(object):
         """
         pass
 
+    def after_update_all(self):
+        """
+        Refreshes mv_geojson_geoms materialized view after save.
+        """
+        pass
+
     def transform_import_values(self, value):
         """
         Transforms values from probably string/wkt representation to specified

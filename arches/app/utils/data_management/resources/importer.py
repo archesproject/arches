@@ -12,6 +12,7 @@ from django.db import connection, transaction
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.models import Concept
@@ -26,6 +27,7 @@ from formats.shpfile import ShapeReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 from arches.app.models.tile import Tile
+from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
@@ -123,42 +125,53 @@ class BusinessDataImporter(object):
     def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
         reader = None
         start = time()
+        cursor = connection.cursor()
+        
+        try:
+            if file_format == None:
+                file_format = self.file_format
+            if business_data == None:
+                business_data = self.business_data
+            if mapping == None:
+                mapping = self.mapping
+            if file_format == 'json':
+                reader = ArchesFileReader()
+                reader.import_business_data(business_data, mapping)
+            elif file_format == 'csv':
+                if mapping != None:
+                    reader = CsvReader()
+                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
+                else:
+                    print '*'*80
+                    print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                    print '*'*80
+                    sys.exit()
+            elif file_format == 'shp':
+                # if mapping != None:
+                #     SHPFileImporter().import_business_data(business_data, mapping)
+                # else:
+                #     print '*'*80
+                #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                #     print '*'*80
+                #     sys.exit()
+                pass
 
-        if file_format == None:
-            file_format = self.file_format
-        if business_data == None:
-            business_data = self.business_data
-        if mapping == None:
-            mapping = self.mapping
-        if file_format == 'json':
-            reader = ArchesFileReader()
-            reader.import_business_data(business_data, mapping)
-        elif file_format == 'csv':
-            if mapping != None:
-                reader = CsvReader()
-                reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
-            else:
-                print '*'*80
-                print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-                print '*'*80
-                sys.exit()
-        elif file_format == 'shp':
-            # if mapping != None:
-            #     SHPFileImporter().import_business_data(business_data, mapping)
-            # else:
-            #     print '*'*80
-            #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-            #     print '*'*80
-            #     sys.exit()
+            # Import resource to resource relationships
+            reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
+
+            elapsed = (time() - start)
+            print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
+
+            reader.report_errors()
+        except:
             pass
-
-        # Import resource to resource relationships
-        reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
-
-        elapsed = (time() - start)
-        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
-
-        reader.report_errors()
+        finally:
+            datatype_factory = DataTypeFactory()
+            datatypes = DDataType.objects.all()
+            for datatype in datatypes:
+                datatype_instance = datatype_factory.get_instance(datatype.datatype)
+                datatype_instance.after_update_all()
+            pass
 
 
 class ResourceLoader(object):

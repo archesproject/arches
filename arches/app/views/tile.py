@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.utils.JSONResponse import JSONResponse
@@ -43,6 +44,11 @@ class TileData(View):
                 with transaction.atomic():
                     try:
                         tile.save(request=request)
+                        datatype_factory = DataTypeFactory()
+                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+                        for node in nodegroup.node_set.all():
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            datatype.after_update_all()
                         clean_resource_cache(tile)
                     except ValidationError as e:
                         return JSONResponse({'status':'false','message':e.args}, status=500)
@@ -74,9 +80,14 @@ class TileData(View):
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
+                nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                 tile = Tile.objects.get(tileid = data['tileid'])
                 clean_resource_cache(tile)
                 tile.delete(request=request)
+                datatype_factory = DataTypeFactory()
+                for node in nodegroup.node_set.all():
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    datatype.after_update_all()
 
             return JSONResponse(tile)
 
