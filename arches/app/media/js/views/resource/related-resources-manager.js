@@ -65,13 +65,13 @@ define([
                         }, this)
                         var sorted = _(relationshipsWithResource).chain()
                             .sortBy(function(relate) {
-                                return relate.resource.primaryname;
+                                return relate.resource.displayname;
                             })
                             .sortBy(function(relate) {
                                 return relate.relationshiptype;
                             }).value();
                         this.resourceRelationships(sorted);
-                        this.primaryname = data.resource_instance.primaryname;
+                        this.displayname = data.resource_instance.displayname;
                         this.graphid = data.resource_instance.graph_id;
                     },
                     get: function() {

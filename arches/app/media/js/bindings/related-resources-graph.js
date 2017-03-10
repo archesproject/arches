@@ -309,7 +309,7 @@ define([
                                         id: newNodeId,
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
-                                        name: related_resource.primaryname,
+                                        name: related_resource.displayname,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: null
