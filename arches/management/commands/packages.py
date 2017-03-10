@@ -192,7 +192,6 @@ class Command(BaseCommand):
         """
         self.setup_elasticsearch(install_location=es_install_location, port=settings.ELASTICSEARCH_HTTP_PORT)
         self.setup_db(package_name)
-        self.generate_procfile(package_name, es_install_location=es_install_location)
 
     def install(self, package_name):
         """
@@ -224,7 +223,6 @@ class Command(BaseCommand):
         else:
             p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
         return p
-        #os.system('honcho start')
 
     def setup_db(self, package_name):
         """
@@ -251,26 +249,6 @@ class Command(BaseCommand):
 
     def delete_indexes(self):
         management.call_command('es', operation='delete_indexes')
-
-    def generate_procfile(self, package_name, es_install_location=None):
-        """
-        Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
-
-        """
-
-        python_exe = os.path.abspath(sys.executable)
-
-        contents = []
-        if es_install_location:
-            contents.append('\nelasticsearch: %s' % os.path.join(es_install_location, 'bin', 'elasticsearch'))
-        contents.append('django: %s manage.py runserver' % (python_exe))
-        contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
-
-        package_root = settings.PACKAGE_ROOT
-        if hasattr(settings, 'SUBPACKAGE_ROOT'):
-            package_root = settings.SUBPACKAGE_ROOT
-
-        utils.write_to_file(os.path.join(package_root, '..', 'Procfile'), '\n'.join(contents))
 
     def get_elasticsearch_install_location(self, package_name):
         """

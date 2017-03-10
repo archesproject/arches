@@ -1,0 +1,68 @@
+$ virtualenv env
+$ source env/bin/activate
+(env)$ cd arches
+
+# Install arches and create a new project
+(env)$ python setup.py install  #Later this will be `pip install arches`
+(env)$ cd [to where you want to create your project]
+(env)$ arches-project create mynewproject
+(env)$ cd mynewproject
+
+In your settings use the default arches settings for your database and elasticsearch ports.
+If you want to run more that one project on a machine, you will have to modify these to avoid conflicts
+
+# install and run elasticsearch
+(env)$ python manage.py es install
+(env)$ ./elasticsearch-5.2.1/bin/elasticsearch -d
+
+# set up your database, import graphs and start your django server
+(env)$ python manage.py packages -o setup_db
+(env)$ python manage.py packages -o import_graphs
+(env)$ python manage.py runserver
+
+# to add a function ...
+#list the names of functions you have registered:
+(env)$ python manage.py fn list
+
+#register a new function (-s [the path to your function's py file]):
+(env)$ python manage.py fn register --source /Users/me/Documents/projects/mynewproject/mynewproject/functions/sample_function.py
+
+#navigate to your graph's function manager to confim that your new function is there and working. If it's not, you may want to unregister your function and make additional changes.
+#to unregister your function, simply run:
+(env)$ python manage.py fn unregister --name 'Sample Function'
+
+# to add a function ...
+#list the names of functions you have registered:
+(env)$ python manage.py fn list
+
+#register a new function (-s [the path to your function's py file]):
+(env)$ python manage.py fn register --source /Users/me/Documents/projects/mynewproject/mynewproject/functions/sample_function.py
+
+#to unregister your function, simply run:
+(env)$ python manage.py fn unregister --name 'Sample Function'
+
+# to add a datatype ...
+#list the names of datatypes you have registered:
+(env)$ python manage.py fn list
+
+#register a new datatype (-s [the path to your datatype's py file]):
+(env)$ python manage.py datatype register --source /Users/me/Documents/projects/mynewproject/mynewproject/datatypes/wkt_point.py
+
+#make changes to your datatype's properties (-s [the path to your datatype's .py file]):
+(env)$ python manage.py datatype update --source /Users/me/Documents/projects/mynewproject/mynewproject/datatypes/wkt_point.py
+
+#to unregister your datatype, simply run:
+(env)$ python manage.py datatype unregister -d 'wkt-point'
+
+# to add a widget ...
+#list the names of widgets you have registered:
+(env)$ python manage.py fn list
+
+#register a new widget (-s [the path to your widget's .json file]):
+(env)$ python manage.py widget register --source /Users/me/Documents/projects/mynewproject/mynewproject/widgets/wkt_point.json
+
+#make changes to your widget's properties (-s [the path to your widget's .json file]):
+(env)$ python manage.py widget update --source /Users/me/Documents/projects/mynewproject/mynewproject/widgets/wkt_point.json
+
+#to unregister your widget, simply run:
+(env)$ python manage.py widget unregister -n 'wkt-point-widget'

@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000005',
     '00000000-0000-0000-0000-000000000006'
 )
 
@@ -151,7 +152,7 @@ class Concept(object):
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id,
-                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts,
+                            include_subconcepts=include_subconcepts,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
@@ -265,6 +266,18 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             for key, concept in concepts_to_delete.iteritems():
+                # delete only member relationships if the nodetype == Collection
+                if concept.nodetype == 'Collection':
+                    concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1, semantic=False)
+                    def find_concepts(concept):
+                        if len(concept.parentconcepts) <= 1:
+                            for subconcept in concept.subconcepts:
+                                conceptrelation = models.Relation.objects.get(conceptfrom=concept.id, conceptto=subconcept.id, relationtype='member')
+                                conceptrelation.delete()
+                                find_concepts(subconcept)
+
+                    find_concepts(concept)
+
                 models.Concept.objects.get(pk=key).delete()
         return
 
@@ -321,6 +334,9 @@ class Concept(object):
 
                 concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
                 concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+
+        if concept.nodetype == 'Collection':
+            concepts_to_delete[concept.id] = concept
 
         return concepts_to_delete
 
