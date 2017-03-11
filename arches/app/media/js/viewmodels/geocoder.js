@@ -119,6 +119,8 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
                 self.map.flyTo({
                     center: centerPoint
                 });
+            } else {
+                self.map.removeLayer('geocode-point');
             }
         });
 
