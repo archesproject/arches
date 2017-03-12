@@ -579,7 +579,7 @@ class Graph(models.GraphModel):
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
-                edge.ontologyproperty = node.get('parentproperty')
+                edge.ontologyproperty = node.get('parentproperty', None)
 
         self.populate_null_nodegroups()
 
@@ -1079,7 +1079,22 @@ class Graph(models.GraphModel):
 
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass not in ontology_classes:
-                    raise ValidationError(_("{0} is not a valid {1} ontology class".format(node.ontologyclass, self.ontology.ontologyid)))
+                    raise ValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name))
+
+            for edge_id, edge in self.edges.iteritems():
+                print 'checking %s-%s-%s' % (edge.domainnode.ontologyclass,edge.ontologyproperty, edge.rangenode.ontologyclass)
+                if edge.ontologyproperty is None:
+                    raise ValidationError(_("You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty))
+                property_found = False
+                ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
+                for classes in ontology_classes.target['down']:
+                    if classes['ontology_property'] == edge.ontologyproperty:
+                        property_found = True
+                        if edge.rangenode.ontologyclass not in classes['ontology_classes']:
+                            raise ValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty))
+
+                if not property_found:
+                    raise ValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name))
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
