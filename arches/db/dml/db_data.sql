@@ -3382,38 +3382,6 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
--- CREATE OR REPLACE FUNCTION refresh_mv_geojson_geoms() RETURNS trigger AS
--- $$
--- DECLARE
---     geojson_node_count integer;
--- BEGIN
---     IF (TG_OP = 'DELETE') THEN
---         geojson_node_count = (select count(*)
---         	from nodes n
---         	where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = OLD.nodegroupid);
---     ELSE
---         geojson_node_count = (select count(*)
---             from nodes n
---             where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = NEW.nodegroupid);
---     END IF;
---
---     IF (geojson_node_count > 0) THEN
---         REFRESH MATERIALIZED VIEW mv_geojson_geoms;
---     END IF;
---
---     RETURN NULL;
--- END;
--- $$
--- LANGUAGE plpgsql ;
---
--- CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
---    ON tiles FOR EACH ROW
---    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
-
--- delete from map_layers where name = 'Search Results';
-
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
        {
