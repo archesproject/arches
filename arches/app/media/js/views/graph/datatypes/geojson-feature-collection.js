@@ -65,7 +65,9 @@ define([
                 if (!defaultBasemap) {
                     defaultBasemap = this.basemaps[0];
                 }
-                this.selectedBasemapName(defaultBasemap.name);
+                if (defaultBasemap) {
+                    this.selectedBasemapName(defaultBasemap.name);
+                }
                 var getBasemapLayers = function () {
                     return _.filter(self.basemaps, function(layer) {
                         return layer.name === self.selectedBasemapName();
