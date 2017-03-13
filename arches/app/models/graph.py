@@ -469,6 +469,32 @@ class Graph(models.GraphModel):
                 )
             function_copy.save()
 
+    def copy_forms(self, other_graph, card_map):
+        """
+        Copies the forms and card relationships from a different graph and relates them to this graph.
+
+        """
+
+        for form in other_graph.form_set.all():
+            form_copy = models.Form(
+                title=form.title,
+                subtitle=form.subtitle,
+                iconclass=form.iconclass,
+                visible=form.visible,
+                sortorder=form.sortorder,
+                graph=self
+                )
+            form_copy.save()
+            for form_x_card in form.formxcard_set.all():
+                card = models.CardModel.objects.get(pk=card_map[form_x_card.card_id])
+                form_x_card_copy = models.FormXCard(
+                    form=form_copy,
+                    card=card,
+                    sortorder=form_x_card.sortorder
+                )
+                form_x_card_copy.save()
+
+
     def copy(self):
         """
         returns an unsaved copy of self
@@ -502,6 +528,7 @@ class Graph(models.GraphModel):
                         card.pk = new_id
                         card.nodegroup = node.nodegroup
                         card.graph = copy_of_self
+
             else:
                 node.nodegroup = None
 
@@ -522,7 +549,7 @@ class Graph(models.GraphModel):
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
-        return copy_of_self
+        return copy_of_self, card_map
 
     def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
