@@ -26,7 +26,7 @@ define([
             var texts;
             var selectedNode;
             var force = d3.layout.force()
-                .charge(-270)
+                .charge(-500)
                 .linkDistance(200)
                 .gravity(0.05)
                 .friction(0.55)
