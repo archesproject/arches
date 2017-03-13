@@ -36,13 +36,10 @@ class GraphTests(ArchesTestCase):
 
         cls.NODE_NODETYPE_GRAPHID = '22000000-0000-0000-0000-000000000001'
         cls.SINGLE_NODE_GRAPHID = '22000000-0000-0000-0000-000000000000'
-        cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID = "11111111-0000-0000-0000-191919191919"
-        cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
     @classmethod
     def tearDownClass(cls):
         cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
-        cls.deleteGraph(cls.HERITAGE_RESOURCE_FIXTURE_GRAPH_ID)
 
     def setUp(self):
         graph = Graph.new()
@@ -169,8 +166,10 @@ class GraphTests(ArchesTestCase):
         the nodes as opposed to a node with the same attribute values
 
         """
-        root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
-        graph = Graph.objects.get(graphid=root.graph.graphid)
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
 
@@ -298,7 +297,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
-        appended_graph = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        appended_graph = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
@@ -325,7 +324,7 @@ class GraphTests(ArchesTestCase):
 
 
         # confirm that a non-grouped node takes on the parent group when appended
-        appended_branch = graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        appended_branch = graph.append_branch('L54_is_same-as', graphid=self.SINGLE_NODE_GRAPHID)
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
         self.assertEqual(len(graph.cards), 2)
@@ -346,13 +345,13 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.objects.get(node=self.rootNode)
         graph.isresource = True
-        self.assertIsNotNone(graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID))
+        self.assertIsNotNone(graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID))
 
         # try to append to any other node that is not the root
         for node in graph.nodes.itervalues():
             if node is not graph.root:
                 with self.assertRaises(ValidationError):
-                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+                    graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
         # try to append a non-grouped graph
         with self.assertRaises(ValidationError):
@@ -370,19 +369,19 @@ class GraphTests(ArchesTestCase):
 
         # test that we can't append a card to a graph that is a card that at it's root is not semantic
         with self.assertRaises(ValidationError):
-            graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+            graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
 
         # test that we can't append a card as a child to another card
         graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         for node in graph.nodes.itervalues():
             if node != graph.root:
                 with self.assertRaises(ValidationError):
-                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+                    graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
 
         # create card collector graph to use for appending on to other graphs
         collector_graph = Graph.new()
-        collector_graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        collector_graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         collector_graph.save()
 
         # test that we can't append a card collector on to a graph that is a card
@@ -474,26 +473,26 @@ class GraphTests(ArchesTestCase):
         # test moving a single node to another branch
         # this node should be grouped with it's new parent nodegroup
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-        branch_one = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_one = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         for node in branch_one.nodes.itervalues():
             if node is branch_one.root:
                 node.name = 'branch_one_root'
             else:
                 node.name = 'branch_one_child'
-        branch_two = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_two = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         for node in branch_two.nodes.itervalues():
             if node is branch_two.root:
                 node.name = 'branch_two_root'
             else:
                 node.name = 'branch_two_child'
-        branch_three = graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        branch_three = graph.append_branch('L54_is_same-as', graphid=self.SINGLE_NODE_GRAPHID)
         branch_three.root.name = 'branch_three_root'
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
         branch_three_nodeid = branch_three.nodes.iterkeys().next()
         branch_one_rootnodeid = branch_one.root.nodeid
-        graph.move_node(branch_three_nodeid, 'P1_is_identified_by', branch_one_rootnodeid)
+        graph.move_node(branch_three_nodeid, 'L54_is_same-as', branch_one_rootnodeid)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
@@ -514,8 +513,8 @@ class GraphTests(ArchesTestCase):
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
         with self.assertRaises(ValidationError):
-            graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid)
-        graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid, skip_validation=True)
+            graph.move_node(branch_one_rootnodeid, 'L54_is_same-as', branch_two_rootnodeid)
+        graph.move_node(branch_one_rootnodeid, 'L54_is_same-as', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
         self.assertEqual(len(graph.nodes), 6)
 
