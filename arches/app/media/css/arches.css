@@ -930,6 +930,16 @@ a.select2-search-choice-close {
     text-overflow: ellipsis;
 }
 
+.crud-card-link {
+    position: absolute; 
+    top: 25px; 
+    right: 15px; 
+    color: #fff; 
+    font-size: 9px;
+    background: #3acaa1;
+    padding: 3px 5px;
+}
+
 .permission-level-icon {
     height: 20px;
     margin-top: -5px;
@@ -4467,6 +4477,18 @@ div.row.widget-wrapper {
 
 .related-resources-container .pagination .active a {
     z-index: 1;
+}
+
+.related-resources-nodes {
+    position: absolute; 
+    width: 275px; 
+    top: 0px; 
+    right: 0px; 
+    height: 100vh; 
+    background: #fff; 
+    z-index: 2; 
+    opacity: 0.9; 
+    border-left: 1px solid #ddd;
 }
 
 .relation-properties-buttons {
