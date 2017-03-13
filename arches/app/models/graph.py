@@ -455,6 +455,20 @@ class Graph(models.GraphModel):
 
         self.ontology = None
 
+    def copy_functions(self, other_graph):
+        """
+        Copies the graph_x_function relationships from a different graph and relates
+        the same functions to this graph.
+
+        """
+        for function_x_graph in other_graph.functionxgraph_set.all():
+            function_copy = models.FunctionXGraph(
+                function=function_x_graph.function,
+                config=function_x_graph.config,
+                graph=self
+                )
+            function_copy.save()
+
     def copy(self):
         """
         returns an unsaved copy of self

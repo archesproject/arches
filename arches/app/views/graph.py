@@ -258,6 +258,7 @@ class GraphDataView(View):
             elif self.action == 'clone_graph':
                 ret = graph.copy()
                 ret.save()
+                ret.copy_functions(graph)
 
         return JSONResponse(ret)
 
