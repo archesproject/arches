@@ -45,8 +45,7 @@ class TileData(View):
                     try:
                         tile.save(request=request)
                         datatype_factory = DataTypeFactory()
-                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                        for node in nodegroup.node_set.all():
+                        for node in tile.nodegroup.node_set.all():
                             datatype = datatype_factory.get_instance(node.datatype)
                             datatype.after_update_all()
                         clean_resource_cache(tile)
@@ -85,7 +84,7 @@ class TileData(View):
                 clean_resource_cache(tile)
                 tile.delete(request=request)
                 datatype_factory = DataTypeFactory()
-                for node in nodegroup.node_set.all():
+                for node in tile.nodegroup.node_set.all():
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.after_update_all()
 
