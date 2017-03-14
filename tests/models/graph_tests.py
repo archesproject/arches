@@ -197,7 +197,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.new(name='TEST RESOURCE')
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        graph_copy = graph.copy()
+        graph_copy, id_maps = graph.copy()
 
         self.assertEqual(len(graph_copy.nodes), 3)
         self.assertEqual(len(graph_copy.edges), 2)
@@ -391,7 +391,7 @@ class GraphTests(ArchesTestCase):
             graph.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card collector to another card collector
-        collector_copy = collector_graph.copy()
+        collector_copy, id_maps = collector_graph.copy()
         with self.assertRaises(ValidationError):
             collector_copy.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
