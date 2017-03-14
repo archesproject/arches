@@ -620,7 +620,7 @@
                     "edgeid": "c5a2d7b8-fadd-11e6-b1d6-6c4008b05c4c",
                     "domainnode_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
                     "rangenode_id": "c5a2b1dc-fadd-11e6-a726-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -629,7 +629,7 @@
                     "edgeid": "c5a2dc7a-fadd-11e6-bce7-6c4008b05c4c",
                     "domainnode_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
                     "rangenode_id": "c5a2b530-fadd-11e6-b5f6-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -656,7 +656,7 @@
                     "edgeid": "444eebee-fad7-11e6-8590-6c4008b05c4c",
                     "domainnode_id": "ff62303a-fa12-11e6-a889-6c4008b05c4c",
                     "rangenode_id": "444ed2e3-fad7-11e6-8431-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -665,7 +665,7 @@
                     "edgeid": "c5a2ddf8-fadd-11e6-a308-6c4008b05c4c",
                     "domainnode_id": "ff62303a-fa12-11e6-a889-6c4008b05c4c",
                     "rangenode_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -674,7 +674,7 @@
                     "edgeid": "444ee900-fad7-11e6-9c8c-6c4008b05c4c",
                     "domainnode_id": "444ed2e3-fad7-11e6-8431-6c4008b05c4c",
                     "rangenode_id": "444edae6-fad7-11e6-b824-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -692,7 +692,7 @@
                     "edgeid": "32f2e491-fae4-11e6-8f97-6c4008b05c4c",
                     "domainnode_id": "ff62303a-fa12-11e6-a889-6c4008b05c4c",
                     "rangenode_id": "32f2d663-fae4-11e6-83ad-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -701,7 +701,7 @@
                     "edgeid": "c5a2da05-fadd-11e6-b199-6c4008b05c4c",
                     "domainnode_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
                     "rangenode_id": "c5a2a2e8-fadd-11e6-9849-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -791,7 +791,7 @@
                     "edgeid": "c5a2da87-fadd-11e6-86a7-6c4008b05c4c",
                     "domainnode_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
                     "rangenode_id": "c5a2ad9c-fadd-11e6-a65a-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -845,7 +845,7 @@
                     "edgeid": "444ee9bd-fad7-11e6-a256-6c4008b05c4c",
                     "domainnode_id": "444ed2e3-fad7-11e6-8431-6c4008b05c4c",
                     "rangenode_id": "444ed78a-fad7-11e6-b6f6-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 },
                 {
@@ -854,7 +854,7 @@
                     "edgeid": "feb96dd9-fa14-11e6-9065-6c4008b05c4c",
                     "domainnode_id": "ff62303a-fa12-11e6-a889-6c4008b05c4c",
                     "rangenode_id": "feb95991-fa14-11e6-974f-6c4008b05c4c",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "P140i_was_attributed_by",
                     "description": null
                 }
             ],
