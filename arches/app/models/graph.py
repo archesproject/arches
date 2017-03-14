@@ -592,7 +592,8 @@ class Graph(models.GraphModel):
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
-                edge.ontologyproperty = node.get('parentproperty', None)
+                if 'parentproperty' in node:
+                    edge.ontologyproperty = node.get('parentproperty', None)
 
         self.populate_null_nodegroups()
 
@@ -1052,13 +1053,13 @@ class Graph(models.GraphModel):
 
         if self.isresource == True:
             if self.root.is_collector == True:
-                raise ValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)))
+                raise ValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)), 997)
             if self.root.datatype != 'semantic':
-                raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."))
+                raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."), 998)
         else:
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:
-                    raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."))
+                    raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
 
 
         # validates that a node group that has child node groups is not itself a child node group
@@ -1082,7 +1083,7 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
                 for node_id, node in self.nodes.iteritems():
                     if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-                        raise ValidationError(_("A parent node group must only contain semantic nodes."))
+                        raise ValidationError(_("A parent node group must only contain semantic nodes."), 1000)
 
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
@@ -1092,30 +1093,31 @@ class Graph(models.GraphModel):
 
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass not in ontology_classes:
-                    raise ValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name))
+                    raise ValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name), 1001)
 
             for edge_id, edge in self.edges.iteritems():
                 #print 'checking %s-%s-%s' % (edge.domainnode.ontologyclass,edge.ontologyproperty, edge.rangenode.ontologyclass)
                 if edge.ontologyproperty is None:
-                    raise ValidationError(_("You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty))
+                    raise ValidationError(_("You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1002)
                 property_found = False
                 ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
                 for classes in ontology_classes.target['down']:
                     if classes['ontology_property'] == edge.ontologyproperty:
                         property_found = True
                         if edge.rangenode.ontologyclass not in classes['ontology_classes']:
-                            raise ValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty))
+                            raise ValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1003)
 
                 if not property_found:
-                    raise ValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name))
+                    raise ValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name), 1004)
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
-                    raise ValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."))
+                    raise ValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005)
 
 
 class ValidationError(Exception):
-    def __init__(self, value):
+    def __init__(self, value, code=None):
         self.value = value
+        self.code = code
     def __str__(self):
         return repr(self.value)
