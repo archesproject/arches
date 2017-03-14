@@ -45,7 +45,6 @@
             "reports": [],
             "iconclass": "",
             "functions": [],
-            "domain_connections": [],
             "nodegroups": [
                 {
                     "cardinality": "1",

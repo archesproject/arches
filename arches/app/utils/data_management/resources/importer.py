@@ -126,7 +126,7 @@ class BusinessDataImporter(object):
         reader = None
         start = time()
         cursor = connection.cursor()
-        
+
         try:
             if file_format == None:
                 file_format = self.file_format
@@ -163,15 +163,13 @@ class BusinessDataImporter(object):
             print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
             reader.report_errors()
-        except:
-            pass
+
         finally:
             datatype_factory = DataTypeFactory()
             datatypes = DDataType.objects.all()
             for datatype in datatypes:
                 datatype_instance = datatype_factory.get_instance(datatype.datatype)
                 datatype_instance.after_update_all()
-            pass
 
 
 class ResourceLoader(object):

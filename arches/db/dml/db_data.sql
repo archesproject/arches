@@ -124,8 +124,8 @@ INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'd
     "advancedStyling": false,
     "advancedStyle": ""
 }', 'views/graph/datatypes/geojson-feature-collection', 'geojson-feature-collection-datatype-config', TRUE, '10000000-0000-0000-0000-000000000007');
-INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
 INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000015');
 INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000006');
@@ -3381,38 +3381,6 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
     				 WHERE n_1.datatype = 'geojson-feature-collection'::text)))) > 0 AND n.datatype = 'geojson-feature-collection'::text;
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
-
--- CREATE OR REPLACE FUNCTION refresh_mv_geojson_geoms() RETURNS trigger AS
--- $$
--- DECLARE
---     geojson_node_count integer;
--- BEGIN
---     IF (TG_OP = 'DELETE') THEN
---         geojson_node_count = (select count(*)
---         	from nodes n
---         	where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = OLD.nodegroupid);
---     ELSE
---         geojson_node_count = (select count(*)
---             from nodes n
---             where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = NEW.nodegroupid);
---     END IF;
---
---     IF (geojson_node_count > 0) THEN
---         REFRESH MATERIALIZED VIEW mv_geojson_geoms;
---     END IF;
---
---     RETURN NULL;
--- END;
--- $$
--- LANGUAGE plpgsql ;
---
--- CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
---    ON tiles FOR EACH ROW
---    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
-
--- delete from map_layers where name = 'Search Results';
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[

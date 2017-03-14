@@ -104,6 +104,7 @@ def get_graphs_for_export(graphids=None):
             function_ids.append(function['function_id'])
         resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(function_ids)
         del resource_graph['functions']
+        del resource_graph['domain_connections']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
         resource_graph['forms'] = get_forms_for_export(resource_graph)
         resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
