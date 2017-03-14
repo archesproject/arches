@@ -579,6 +579,7 @@ class Graph(models.GraphModel):
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
+        copy_of_self.name += _(' (Clone)')
         return copy_of_self, card_map, node_map, nodegroup_map
 
     def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
