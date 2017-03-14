@@ -591,7 +591,6 @@ class Graph(models.GraphModel):
             edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
-        copy_of_self.name += _(' (Clone)')
 
         return {'copy': copy_of_self, 'cards': card_map, 'nodes': node_map, 'nodegroups': nodegroup_map}
 

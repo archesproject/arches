@@ -56,14 +56,16 @@ def import_graph(graphs):
         if default_configs != None:
             if configs == None:
                 configs = {}
-            try:
-                configs.has_key('')
-            except AttributeError:
-                configs = JSONDeserializer().deserialize(configs)
+            else:
+                try:
+                    configs.has_key('') #Checking if configs is a dict-like object
+                except AttributeError:
+                    configs = JSONDeserializer().deserialize(configs)
             for default_key in default_configs:
                 if default_key not in configs:
                     configs[default_key] = default_configs[default_key]
-        return configs
+                    print configs
+        return JSONSerializer().serialize(configs)
 
     with transaction.atomic():
         errors = []
