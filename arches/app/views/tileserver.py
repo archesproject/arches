@@ -94,7 +94,6 @@ def clean_resource_cache(tile):
         datatype = datatype_factory.get_instance(node.datatype)
         if datatype.should_cache(node) and datatype.should_manage_cache(node):
             bounds = datatype.get_bounds(tile, node)
-
             if bounds is not None:
                 zooms = range(20)
                 config = TileStache.parseConfig(
@@ -117,7 +116,9 @@ def clean_resource_cache(tile):
 
                 for (offset, count, coord) in coordinates:
                     config.cache.remove(layer, coord, format)
-
+    for key, tile_list in tile.tiles.iteritems():
+        for child_tile in tile_list:
+            clean_resource_cache(child_tile)
 
 def seed_resource_cache():
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
