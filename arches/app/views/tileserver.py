@@ -30,7 +30,7 @@ def get_tileserver_config(layer_id):
         "cache": settings.TILE_CACHE_CONFIG,
         "layers": {}
     }
-    config_dict["layers"][layer_id] = layer_config
+    config_dict["layers"][str(layer_id)] = layer_config
     return config_dict
 
 
