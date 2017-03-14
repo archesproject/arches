@@ -3431,11 +3431,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                        ],
                        [
                            1000,
-                           65535
+                           1
                        ]
                    ]
                },
-               "fill-extrusion-opacity": 0.7
+               "fill-extrusion-opacity": 0.5
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
