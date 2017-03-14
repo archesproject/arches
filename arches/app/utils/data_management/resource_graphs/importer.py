@@ -53,17 +53,23 @@ class GraphImportReporter:
 def import_graph(graphs):
     reporter = GraphImportReporter(graphs)
     def check_default_configs(default_configs, configs):
+        config_is_string = False
         if default_configs != None:
             if configs == None:
                 configs = {}
             try:
                 configs.has_key('')
             except AttributeError:
+                config_is_string = True
                 configs = JSONDeserializer().deserialize(configs)
             for default_key in default_configs:
                 if default_key not in configs:
                     configs[default_key] = default_configs[default_key]
-        return JSONSerializer().serialize(configs)
+        if config_is_string == True:
+            result = JSONSerializer().serialize(configs)
+        else:
+            result = configs
+        return result
 
     with transaction.atomic():
         errors = []
