@@ -40,18 +40,19 @@ class TileData(View):
             json = request.POST.get('data', None)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
+                tile_id = data['tileid']
+                if tile_id != None and tile_id != '':
+                    old_tile = Tile.objects.get(pk=tile_id)
+                    clean_resource_cache(old_tile)
                 tile = Tile(data)
                 with transaction.atomic():
                     try:
                         tile.save(request=request)
-                        datatype_factory = DataTypeFactory()
-                        for node in tile.nodegroup.node_set.all():
-                            datatype = datatype_factory.get_instance(node.datatype)
-                            datatype.after_update_all()
-                        clean_resource_cache(tile)
                     except ValidationError as e:
                         return JSONResponse({'status':'false','message':e.args}, status=500)
 
+                tile.after_update_all()
+                clean_resource_cache(tile)
                 return JSONResponse(tile)
 
         if self.action == 'reorder_tiles':
@@ -83,10 +84,7 @@ class TileData(View):
                 tile = Tile.objects.get(tileid = data['tileid'])
                 clean_resource_cache(tile)
                 tile.delete(request=request)
-                datatype_factory = DataTypeFactory()
-                for node in tile.nodegroup.node_set.all():
-                    datatype = datatype_factory.get_instance(node.datatype)
-                    datatype.after_update_all()
+                tile.after_update_all()
 
             return JSONResponse(tile)
 

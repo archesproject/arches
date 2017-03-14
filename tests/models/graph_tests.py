@@ -22,7 +22,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
-from arches.app.models.graph import Graph, ValidationError
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -350,17 +350,17 @@ class GraphTests(ArchesTestCase):
         # try to append to any other node that is not the root
         for node in graph.nodes.itervalues():
             if node is not graph.root:
-                with self.assertRaises(ValidationError):
+                with self.assertRaises(GraphValidationError):
                     graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
         # try to append a non-grouped graph
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
 
         graph = Graph.objects.get(graphid=self.SINGLE_NODE_GRAPHID)
         # test that we can't append a single non-grouped node to a graph that is a single non grouped node
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
         graph = Graph.new()
@@ -368,14 +368,14 @@ class GraphTests(ArchesTestCase):
         graph.update_node(JSONSerializer().serializeToPython(graph.root))
 
         # test that we can't append a card to a graph that is a card that at it's root is not semantic
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
 
         # test that we can't append a card as a child to another card
         graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         for node in graph.nodes.itervalues():
             if node != graph.root:
-                with self.assertRaises(ValidationError):
+                with self.assertRaises(GraphValidationError):
                     graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
 
@@ -386,18 +386,19 @@ class GraphTests(ArchesTestCase):
 
         # test that we can't append a card collector on to a graph that is a card
         graph = Graph.new()
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card collector to another card collector
+
         collector_copy = collector_graph.copy()['copy']
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             collector_copy.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card to a node in a child card within a card collector
         for node in collector_graph.nodes.itervalues():
             if node != collector_graph.root:
-                with self.assertRaises(ValidationError):
+                with self.assertRaises(GraphValidationError):
                     collector_graph.append_branch('P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
 
     def test_node_update(self):
@@ -512,7 +513,7 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.move_node(branch_one_rootnodeid, 'L54_is_same-as', branch_two_rootnodeid)
         graph.move_node(branch_one_rootnodeid, 'L54_is_same-as', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
@@ -541,7 +542,7 @@ class GraphTests(ArchesTestCase):
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
         # have to set the parentnodegroup nodes to semantic datatype to pass validation
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(GraphValidationError):
             graph.save()
         for node in branch_two.nodes.itervalues():
             node.datatype = 'semantic'
@@ -894,7 +895,7 @@ class GraphTests(ArchesTestCase):
         new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1001)
@@ -908,7 +909,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch(None, graphid=self.NODE_NODETYPE_GRAPHID)
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1002)
@@ -922,7 +923,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1003)
@@ -936,7 +937,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch('some invalid property', graphid=self.NODE_NODETYPE_GRAPHID)
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1004)
@@ -958,7 +959,7 @@ class GraphTests(ArchesTestCase):
         graph.root.datatype = 'semantic'
         graph.root.save()
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
         self.assertEqual(the_exception.code, 1005)
