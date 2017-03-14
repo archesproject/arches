@@ -121,7 +121,7 @@
                     "nodegroup_id": "4b6ab187-fadc-11e6-8575-6c4008b05c4c",
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     },
                     "parentproperty": "P140_assigned_attribute_to",
                     "name": "Langauges"

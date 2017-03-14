@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, NodeGroup, DDataType, Widget, ReportTemplate, Function
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
@@ -53,12 +53,26 @@ class GraphImportReporter:
 def import_graph(graphs):
     reporter = GraphImportReporter(graphs)
 
+    def check_default_configs(default_configs, configs):
+        if default_configs != None:
+            if configs == None:
+                configs = {}
+            for default_key in default_configs:
+                if default_key not in configs:
+                    configs[default_key] = default_configs[default_key]
+        return configs
+
     with transaction.atomic():
         errors = []
         for resource in graphs:
             reporter.name = resource['name']
             reporter.resource_model = resource['isresource']
             graph = Graph(resource)
+
+            for node in graph.nodes.values():
+                node_config = node.config
+                default_config = DDataType.objects.get(datatype=node.datatype).defaultconfig
+                node.config = check_default_configs(default_config, node_config)
 
             if not hasattr(graph, 'cards'):
                 errors.append('{0} graph has no attribute cards'.format(graph.name))
@@ -73,6 +87,9 @@ def import_graph(graphs):
                 errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
             else:
                 for card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+                    card_x_node_x_widget_config = card_x_node_x_widget['config']
+                    default_config = Widget.objects.get(widgetid=card_x_node_x_widget['widget_id']).defaultconfig
+                    card_x_node_x_widget['config'] = check_default_configs(default_config, card_x_node_x_widget_config)
                     cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
 
             if not hasattr(graph, 'forms'):
@@ -92,6 +109,9 @@ def import_graph(graphs):
                 errors.append('{0} graph has no attribute reports'.format(graph.name))
             else:
                 for report in graph.reports:
+                    report_config = report['config']
+                    default_config = ReportTemplate.objects.get(templateid=report['template_id']).defaultconfig
+                    report['config'] = check_default_configs(default_config, report_config)
                     report = Report.objects.update_or_create(**report)
                     reporter.update_reports_saved()
 
