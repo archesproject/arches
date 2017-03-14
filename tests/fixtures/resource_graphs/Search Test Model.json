@@ -51,7 +51,7 @@
                     "nodegroup_id": "7a182580-fa60-11e6-96d1-14109fd34195",
                     "graph_id": "e503a445-fa5f-11e6-afa8-14109fd34195",
                     "config": {
-                        "topConcept": null
+                        "rdmCollection": null
                     },
                     "parentproperty": null,
                     "name": "Cultural Period Concept"

@@ -493,7 +493,7 @@
           "nodegroup_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": "97a4cbc3-59e5-4271-b849-a8635d137d26"
+            "rdmCollection": "97a4cbc3-59e5-4271-b849-a8635d137d26"
           },
           "parentproperty": "P2_has_type",
           "name": "Geometry Qualifier"
@@ -508,7 +508,7 @@
           "nodegroup_id": "0b21f11b-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P15_was_influenced_by",
           "name": "Evaluation Criteria Type"
@@ -523,7 +523,7 @@
           "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "External Source"
@@ -603,7 +603,7 @@
           "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Construction Technique"
@@ -670,7 +670,7 @@
           "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Ancillary Feature Use Type"
@@ -737,7 +737,7 @@
           "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Material"
@@ -752,7 +752,7 @@
           "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Heritage Resource Use Type"
@@ -780,7 +780,7 @@
           "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Measurement Type"
@@ -925,7 +925,7 @@
           "nodegroup_id": "2b7d0a81-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": "84e94d9a-0243-4bd8-8a84-3db288da9388"
+            "rdmCollection": "84e94d9a-0243-4bd8-8a84-3db288da9388"
           },
           "parentproperty": "P2_has_type",
           "name": "Address Type"
@@ -966,7 +966,7 @@
           "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Style Cultural Period"
@@ -994,7 +994,7 @@
           "nodegroup_id": "0b21f124-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P15_was_influenced_by",
           "name": "Integrity Type"
@@ -1061,7 +1061,7 @@
           "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Ancillary Feature Type"
@@ -1089,7 +1089,7 @@
           "nodegroup_id": "15189051-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Name Type"
@@ -1104,7 +1104,7 @@
           "nodegroup_id": "f743547b-b8fa-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "External Identifier Type"
@@ -1197,7 +1197,7 @@
           "nodegroup_id": "0b21f115-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P15_was_influenced_by",
           "name": "Eligibility Requirement Type"
@@ -1238,7 +1238,7 @@
           "nodegroup_id": "26cc935f-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Ancillary Feature Cultural Period"
@@ -1253,7 +1253,7 @@
           "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Heritage Resource Type"
@@ -1268,7 +1268,7 @@
           "nodegroup_id": "3a323a1d-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Keyword"
@@ -1296,7 +1296,7 @@
           "nodegroup_id": "01180e8d-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77"
+            "rdmCollection": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77"
           },
           "parentproperty": "P91_has_unit",
           "name": "Measurement Unit"
@@ -1363,7 +1363,7 @@
           "nodegroup_id": "64c8ac03-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Modification Type"
@@ -1391,7 +1391,7 @@
           "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Style"
@@ -1406,7 +1406,7 @@
           "nodegroup_id": "4211c75d-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "End of Existence Type"
@@ -1421,7 +1421,7 @@
           "nodegroup_id": "2b7d0a84-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": "e8cdeabd-f63d-4077-b05f-50274742f519"
+            "rdmCollection": "e8cdeabd-f63d-4077-b05f-50274742f519"
           },
           "parentproperty": "P2_has_type",
           "name": "Administrative Subdivision Type"
@@ -1449,7 +1449,7 @@
           "nodegroup_id": "0b21f112-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P141_assigned",
           "name": "Status"
@@ -1490,7 +1490,7 @@
           "nodegroup_id": "5b97e186-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Recommendation Type"
@@ -1505,7 +1505,7 @@
           "nodegroup_id": "5b97e177-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Threat Type"
@@ -1546,7 +1546,7 @@
           "nodegroup_id": "516cfbb9-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Beginning of Existence Type"
@@ -1574,7 +1574,7 @@
           "nodegroup_id": "aef7716f-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Component Type"
@@ -1589,7 +1589,7 @@
           "nodegroup_id": "5b97e183-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Condition Type"
@@ -1604,7 +1604,7 @@
           "nodegroup_id": "26cc9362-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Style Use Type"
@@ -1619,7 +1619,7 @@
           "nodegroup_id": "95577331-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Type of Designation or Protection"
@@ -1673,7 +1673,7 @@
           "nodegroup_id": "a191c5bb-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Description Type"
@@ -1714,7 +1714,7 @@
           "nodegroup_id": "26cc9365-b8fc-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P42_assigned",
           "name": "Heritage Resource Type Cultural Period"
@@ -1755,7 +1755,7 @@
           "nodegroup_id": "1ffacb51-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Resource Type Classification"
@@ -1783,7 +1783,7 @@
           "nodegroup_id": "5b97e174-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": null
+            "rdmCollection": null
           },
           "parentproperty": "P2_has_type",
           "name": "Disturbance Type"
@@ -1811,7 +1811,7 @@
           "nodegroup_id": "2b7d0a78-b8fb-11e6-84a5-026d961c88e6",
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "config": {
-            "topConcept": "647aa600-029e-4b40-93f9-f6a188598351"
+            "rdmCollection": "647aa600-029e-4b40-93f9-f6a188598351"
           },
           "parentproperty": "P2_has_type",
           "name": "Setting Type"

@@ -77,8 +77,21 @@ class Graph(models.GraphModel):
                 for card in args[0]["cards"]:
                     self.add_card(card)
 
+                def check_default_configs(default_configs, configs):
+                    if default_configs != None:
+                        if configs == None:
+                            configs = {}
+                        for default_key in default_configs:
+                            if default_key not in configs:
+                                configs[default_key] = default_configs[default_key]
+                    return configs
+
                 if 'functions_x_graphs' in args[0]:
                     for function in args[0]["functions_x_graphs"]:
+                        function_x_graph_config = function['config']
+                        default_config = models.Function.objects.get(functionid=function['function_id']).defaultconfig
+                        function['config'] = check_default_configs(default_config, function_x_graph_config)
+
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
