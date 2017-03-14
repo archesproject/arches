@@ -255,14 +255,13 @@
 }
 
 .card-help-panel {
-    width: 40%;
     max-width: 275px;
     min-width: 250px;
     padding-top: 0;
     top: 0px;
     position: absolute;
     bottom: 0px;
-    right: -20px;
+    right: 0px;
     background: #37495b;
     opacity: .9;
     z-index: 500;
@@ -3947,7 +3946,7 @@ ul .card-tree-list a .node-subname {
 
 .tertiary-panel {
     position: absolute;
-    top: 105px;
+    top: 55px;
     left: 499px;
     bottom: 0;
     z-index: 50;
@@ -4479,6 +4478,14 @@ div.row.widget-wrapper {
     z-index: 1;
 }
 
+.dataTables_info {
+    margin-top: 10px;
+}
+
+.dataTables_paginate {
+    margin-bottom: 140px;
+}
+
 .related-resources-nodes {
     position: absolute; 
     width: 275px; 
@@ -4529,7 +4536,6 @@ div.row.widget-wrapper {
 }
 
 .rr-drag-panel-target {
-    height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
     border-bottom-width: 0px;
@@ -6321,7 +6327,7 @@ table.table.dataTable {
   border: solid 1px #BBBBBB;
   padding: 6px;
   background: rgba(256, 256, 256, 0.8);
-  color: #808080;
+  color: #434343;
   border-radius: 2px;
   pointer-events: none;
   box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);

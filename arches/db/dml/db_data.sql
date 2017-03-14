@@ -3400,25 +3400,25 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                    "property": "doc_count",
                    "stops": [
                        [
-                           0,
-                           "#54278f"
-                       ],
-                       [
-                           10,
-                           "#756bb1"
-                       ],
-                       [
-                           50,
-                           "#9e9ac8"
-                       ],
-                       [
-                           200,
-                           "#cbc9e2"
-                       ],
-                       [
-                           500,
-                           "#f2f0f7"
-                       ]
+                            0,
+                            "#f2f0f7"
+                        ],
+                        [
+                            10,
+                            "#cbc9e2"
+                        ],
+                        [
+                            50,
+                            "#9e9ac8"
+                        ],
+                        [
+                            200,
+                            "#756bb1"
+                        ],
+                        [
+                            500,
+                            "#54278f"
+                        ]
                    ]
                },
                "fill-extrusion-height": {
