@@ -52,11 +52,14 @@ class GraphImportReporter:
 
 def import_graph(graphs):
     reporter = GraphImportReporter(graphs)
-
     def check_default_configs(default_configs, configs):
         if default_configs != None:
             if configs == None:
                 configs = {}
+            try:
+                configs.has_key('')
+            except AttributeError:
+                configs = JSONDeserializer().deserialize(configs)
             for default_key in default_configs:
                 if default_key not in configs:
                     configs[default_key] = default_configs[default_key]
