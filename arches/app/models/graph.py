@@ -649,7 +649,7 @@ class Graph(models.GraphModel):
 
         found = False
         if self.ontology is not None and graphToAppend.ontology is None:
-            raise ValidationError(_('The graph you wish to append needs to define an ontology'))
+            raise GraphValidationError(_('The graph you wish to append needs to define an ontology'))
 
         if self.ontology is not None and graphToAppend.ontology is not None:
             for domain_connection in graphToAppend.get_valid_domain_ontology_classes():
@@ -662,32 +662,32 @@ class Graph(models.GraphModel):
                     break
 
             if not found:
-                raise ValidationError(_('Ontology rules don\'t allow this graph to be appended'))
+                raise GraphValidationError(_('Ontology rules don\'t allow this graph to be appended'))
         if self.isresource:
             if(nodeToAppendTo != self.root):
-                raise ValidationError(_('Can\'t append a graph to a resource except at the root'))
+                raise GraphValidationError(_('Can\'t append a graph to a resource except at the root'))
             else:
                 if typeOfGraphToAppend == 'undefined':
-                    raise ValidationError(_('Can\'t append an undefined graph to a resource graph'))
+                    raise GraphValidationError(_('Can\'t append an undefined graph to a resource graph'))
         else: # self graph is a Graph
             graph_type = self.is_type()
             if graph_type == 'undefined':
-                raise ValidationError(_('Can\'t append any graph to an undefined graph'))
+                raise GraphValidationError(_('Can\'t append any graph to an undefined graph'))
             elif graph_type == 'card':
                 if typeOfGraphToAppend == 'card':
                     if nodeToAppendTo == self.root:
                         if not self.is_group_semantic(nodeToAppendTo):
-                            raise ValidationError(_('Can only append a card type graph to a semantic group'))
+                            raise GraphValidationError(_('Can only append a card type graph to a semantic group'))
                     else:
-                        raise ValidationError(_('Can only append to the root of the graph'))
+                        raise GraphValidationError(_('Can only append to the root of the graph'))
                 elif typeOfGraphToAppend == 'card_collector':
-                    raise ValidationError(_('Can\'t append a card collector type graph to a card type graph'))
+                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card type graph'))
             elif graph_type == 'card_collector':
                 if typeOfGraphToAppend == 'card_collector':
-                    raise ValidationError(_('Can\'t append a card collector type graph to a card collector type graph'))
+                    raise GraphValidationError(_('Can\'t append a card collector type graph to a card collector type graph'))
                 if self.is_node_in_child_group(nodeToAppendTo):
                     if typeOfGraphToAppend == 'card':
-                        raise ValidationError(_('Can only append an undefined type graph to a child within a card collector type graph'))
+                        raise GraphValidationError(_('Can only append an undefined type graph to a child within a card collector type graph'))
         return True
 
     def is_type(self):
@@ -1040,13 +1040,13 @@ class Graph(models.GraphModel):
 
         if self.isresource == True:
             if self.root.is_collector == True:
-                raise ValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)), 997)
+                raise GraphValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)), 997)
             if self.root.datatype != 'semantic':
-                raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."), 998)
+                raise GraphValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."), 998)
         else:
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:
-                    raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
+                    raise GraphValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."), 999)
 
 
         # validates that a node group that has child node groups is not itself a child node group
@@ -1060,7 +1060,7 @@ class Graph(models.GraphModel):
         # for parent in parentnodegroups:
         #     for child in parentnodegroups:
         #         if parent.parentnodegroup_id == child.nodegroupid:
-        #             raise ValidationError(_("A parent node group cannot be a child of another node group."))
+        #             raise GraphValidationError(_("A parent node group cannot be a child of another node group."))
 
 
 
@@ -1070,7 +1070,7 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
                 for node_id, node in self.nodes.iteritems():
                     if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-                        raise ValidationError(_("A parent node group must only contain semantic nodes."), 1000)
+                        raise GraphValidationError(_("A parent node group must only contain semantic nodes."), 1000)
 
 
         # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
@@ -1080,31 +1080,32 @@ class Graph(models.GraphModel):
 
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass not in ontology_classes:
-                    raise ValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name), 1001)
+                    raise GraphValidationError(_("'{0}' is not a valid {1} ontology class").format(node.ontologyclass, self.ontology.name), 1001)
 
             for edge_id, edge in self.edges.iteritems():
                 #print 'checking %s-%s-%s' % (edge.domainnode.ontologyclass,edge.ontologyproperty, edge.rangenode.ontologyclass)
                 if edge.ontologyproperty is None:
-                    raise ValidationError(_("You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1002)
+                    raise GraphValidationError(_("You must specify an ontology property. Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1002)
                 property_found = False
                 ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
                 for classes in ontology_classes.target['down']:
                     if classes['ontology_property'] == edge.ontologyproperty:
                         property_found = True
                         if edge.rangenode.ontologyclass not in classes['ontology_classes']:
-                            raise ValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1003)
+                            raise GraphValidationError(_("Your graph isn't semantically valid. Entity domain '{0}' and Entity range '{1}' can not be related via Property '{2}'.").format(edge.domainnode.ontologyclass, edge.rangenode.ontologyclass, edge.ontologyproperty), 1003)
 
                 if not property_found:
-                    raise ValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name), 1004)
+                    raise GraphValidationError(_("'{0}' is not a valid {1} ontology property").format(edge.ontologyproperty, self.ontology.name), 1004)
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
-                    raise ValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005)
+                    raise GraphValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005)
 
 
-class ValidationError(Exception):
-    def __init__(self, value, code=None):
-        self.value = value
+class GraphValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Graph Validation Error")
+        self.message = message
         self.code = code
     def __str__(self):
-        return repr(self.value)
+        return repr(self.message)

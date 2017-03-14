@@ -22,8 +22,20 @@ require([
     });
 
     var nextSelection = null;
-    graphModel.on('changed', function(model, options){
+    graphModel.on('changed', function(model, response){
         viewModel.graphView.redraw(true);
+        viewModel.alert(null);
+        loading(false);
+        if(response.status != 200){
+            var errorMessageTitle = arches.requestFailed.title
+            var errorMessageText = arches.requestFailed.text
+            viewModel.alert(null);
+            if (response.responseJSON) {
+              errorMessageTitle = response.responseJSON.title
+              errorMessageText = response.responseJSON.message
+            }
+            viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+        }
     });
     graphModel.on('select-node', function(node){
         nextSelection = node;
@@ -76,13 +88,6 @@ require([
         viewModel: viewModel
     });
 
-    viewModel.nodeForm.failed.subscribe(function(failed) {
-        if (failed) {
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
-        } else {
-            pageView.viewModel.alert(null);
-        }
-    });
 
     viewModel.nodeForm.closeClicked.subscribe(function(closeClicked) {
         var node = viewModel.nodeForm.node();
