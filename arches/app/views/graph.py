@@ -256,10 +256,11 @@ class GraphDataView(View):
                 graph.save()
 
             elif self.action == 'clone_graph':
-                ret, card_map = graph.copy()
+                ret, card_map, node_map, nodegroup_map = graph.copy()
                 ret.save()
-                ret.copy_functions(graph)
-                ret.copy_forms(graph, card_map)
+                ret.copy_functions(graph, [node_map, nodegroup_map])
+                form_map = ret.copy_forms(graph, card_map)
+                ret.copy_reports(graph, [form_map, card_map, node_map])
 
         return JSONResponse(ret)
 

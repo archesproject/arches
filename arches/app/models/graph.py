@@ -24,6 +24,7 @@ from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
 from django.utils.translation import ugettext as _
+import json
 
 
 class Graph(models.GraphModel):
@@ -455,16 +456,29 @@ class Graph(models.GraphModel):
 
         self.ontology = None
 
-    def copy_functions(self, other_graph):
+    def replace_config_ids(self, config, maps=[]):
+        """
+        Replaces node, nodegroup, card, and formids in configuration json objects during
+        graph cloning/copying
+        """
+        str_forms_config = json.dumps(config)
+        for map in maps:
+            for k, v in map.iteritems():
+                str_forms_config = str_forms_config.replace(unicode(k), unicode(v))
+        return json.loads(str_forms_config)
+
+
+    def copy_functions(self, other_graph, id_maps=[]):
         """
         Copies the graph_x_function relationships from a different graph and relates
         the same functions to this graph.
 
         """
         for function_x_graph in other_graph.functionxgraph_set.all():
+            config_copy = self.replace_config_ids(function_x_graph.config, id_maps)
             function_copy = models.FunctionXGraph(
                 function=function_x_graph.function,
-                config=function_x_graph.config,
+                config=config_copy,
                 graph=self
                 )
             function_copy.save()
@@ -474,7 +488,7 @@ class Graph(models.GraphModel):
         Copies the forms and card relationships from a different graph and relates them to this graph.
 
         """
-
+        form_map = {}
         for form in other_graph.form_set.all():
             form_copy = models.Form(
                 title=form.title,
@@ -485,6 +499,7 @@ class Graph(models.GraphModel):
                 graph=self
                 )
             form_copy.save()
+            form_map[form.formid] = form_copy.formid
             for form_x_card in form.formxcard_set.all():
                 card = models.CardModel.objects.get(pk=card_map[form_x_card.card_id])
                 form_x_card_copy = models.FormXCard(
@@ -493,7 +508,20 @@ class Graph(models.GraphModel):
                     sortorder=form_x_card.sortorder
                 )
                 form_x_card_copy.save()
+        return form_map
 
+    def copy_reports(self, other_graph, id_maps=[]):
+        for report in other_graph.report_set.all():
+            forms_config_copy = self.replace_config_ids(report.formsconfig, id_maps)
+            config_copy = self.replace_config_ids(report.config, id_maps)
+            models.Report(
+                name=report.name,
+                template=report.template,
+                graph=self,
+                config=report.config,
+                formsconfig=forms_config_copy,
+                active=report.active
+            ).save()
 
     def copy(self):
         """
@@ -501,7 +529,7 @@ class Graph(models.GraphModel):
 
         """
 
-        new_nodegroups = {}
+        nodegroup_map = {}
 
         copy_of_self = deepcopy(self)
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
@@ -521,6 +549,8 @@ class Graph(models.GraphModel):
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
+                if old_nodegroup_id not in nodegroup_map:
+                    nodegroup_map[old_nodegroup_id] = node.nodegroup_id
                 for card in copy_of_self.cards.itervalues():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()
@@ -549,7 +579,7 @@ class Graph(models.GraphModel):
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
-        return copy_of_self, card_map
+        return copy_of_self, card_map, node_map, nodegroup_map
 
     def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
