@@ -1,16 +1,15 @@
-# from arches.app.models.models import VwExportNodes as Node
-# from arches.app.models.models import VwExportEdges as Edges
 import csv
-from pprint import pprint as pp
 import os
 import json
 import uuid
 import csv
 import zipfile
+from django.conf import settings
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from pprint import pprint as pp
 from collections import OrderedDict
 from operator import itemgetter
 
@@ -90,11 +89,11 @@ def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
     if graphids == None or graphids[0] == 'all' or graphids == ['']:
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(name='Arches configuration'))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
     elif graphids[0] == 'resources':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(name='Arches configuration'))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
     elif graphids[0] == 'branches':
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(name='Arches configuration'))
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
     else:
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
 
@@ -121,7 +120,7 @@ def create_mapping_configuration_file(graphid, data_dir=None):
     export_json = OrderedDict()
     if graphid != False:
         if graphid == None or graphid == 'all' or graphid == ['']:
-            node_query = Node.objects.filter(graph_id__isresource=True).exclude(graph_id='22000000-0000-0000-0000-000000000002').order_by('name')
+            node_query = Node.objects.filter(graph_id__isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('name')
         else:
             node_query = Node.objects.filter(graph_id=graphid).exclude(datatype='semantic').order_by('name')
 
