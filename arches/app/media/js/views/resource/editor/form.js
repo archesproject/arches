@@ -233,9 +233,10 @@ define([
                   (cardinality === '1-n' && !!tile.tileid())){
                     updatingTile = true;
                 }
-                console.log('cardinality: ' + cardinality)
-                console.log('savingParentTile: ' + savingParentTile)
-                console.log('updatingTile: ' + updatingTile)
+                
+                // console.log('cardinality: ' + cardinality)
+                // console.log('savingParentTile: ' + savingParentTile)
+                // console.log('updatingTile: ' + updatingTile)
 
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
