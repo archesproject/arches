@@ -883,3 +883,82 @@ class GraphTests(ArchesTestCase):
         for card in graph.cards.itervalues():
             if card.nodegroup.parentnodegroup is None:
                 self.assertEqual(graph.get_root_card(), card)
+
+    def test_graph_validation_of_invalid_ontology_class(self):
+        """
+        test to make sure invalid ontology classes aren't allowed
+
+        """
+        
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
+        graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
+        
+        with self.assertRaises(ValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1001)
+
+    def test_graph_validation_of_null_ontology_property(self):
+        """
+        test to make sure null ontology properties aren't allowed
+
+        """
+        
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch(None, graphid=self.NODE_NODETYPE_GRAPHID)
+        
+        with self.assertRaises(ValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1002)
+
+    def test_graph_validation_of_incorrect_ontology_property(self):
+        """
+        test to make sure a valid ontology property but incorrect use of the property fails
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        
+        with self.assertRaises(ValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1003)
+
+    def test_graph_validation_of_invalid_ontology_property(self):
+        """
+        test to make sure we use a valid ontology property value
+
+        """
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch('some invalid property', graphid=self.NODE_NODETYPE_GRAPHID)
+        
+        with self.assertRaises(ValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1004)
+
+    def test_graph_validation_of_branch_with_ontology_appended_to_graph_with_no_ontology(self):
+        """
+        test to make sure we can't append a branch with ontology defined to a graph with no ontology defined
+
+        """
+
+        graph = Graph.new()
+        graph.name = "TEST GRAPH"
+        graph.ontology = None
+        graph.save()
+
+        graph.root.name = 'ROOT NODE'
+        graph.root.description = 'Test Root Node'
+        graph.root.ontologyclass = 'E1_CRM_Entity'
+        graph.root.datatype = 'semantic'
+        graph.root.save()
+        
+        with self.assertRaises(ValidationError) as cm:
+            graph.save()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.code, 1005)
