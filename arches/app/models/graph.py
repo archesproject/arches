@@ -428,7 +428,7 @@ class Graph(models.GraphModel):
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
 
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
-            branch_copy = branch_graph.copy()
+            branch_copy = branch_graph.copy()['copy']
             branch_copy.root.istopnode = False
 
             newEdge = models.Edge(
@@ -593,7 +593,7 @@ class Graph(models.GraphModel):
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
         copy_of_self.name += _(' (Clone)')
 
-        return copy_of_self, {'cards': card_map, 'nodes': node_map, 'nodegroups': nodegroup_map}
+        return {'copy': copy_of_self, 'cards': card_map, 'nodes': node_map, 'nodegroups': nodegroup_map}
 
     def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
