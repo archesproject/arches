@@ -63,7 +63,7 @@ def import_graph(graphs):
             for default_key in default_configs:
                 if default_key not in configs:
                     configs[default_key] = default_configs[default_key]
-        return configs
+        return JSONSerializer().serialize(configs)
 
     with transaction.atomic():
         errors = []
