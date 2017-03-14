@@ -3384,7 +3384,25 @@ CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-       {
+        {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "all",
+                [
+                    ">",
+                    "doc_count",
+                    0
+                ]
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 0.5
+            },
+            "type": "line",
+            "id": "search-results-hex-outline"
+        },
+        {
            "layout": {},
            "source": "search-results-hex",
            "filter": [
