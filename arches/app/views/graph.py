@@ -250,8 +250,6 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == 'append_branch':
-                    import ipdb
-                    ipdb.set_trace()
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
                     graph.save()
 
@@ -260,8 +258,12 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == 'clone_graph':
-                    ret = graph.copy()
+                    clone_data = graph.copy()
+                    ret = clone_data['copy']
                     ret.save()
+                    ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
+                    form_map = ret.copy_forms(graph, clone_data['cards'])
+                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
 
             return JSONResponse(ret)
         except GraphValidationError as e:

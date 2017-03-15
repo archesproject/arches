@@ -196,7 +196,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.new(name='TEST RESOURCE')
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        graph_copy = graph.copy()
+        graph_copy = graph.copy()['copy']
 
         self.assertEqual(len(graph_copy.nodes), 3)
         self.assertEqual(len(graph_copy.edges), 2)
@@ -390,7 +390,8 @@ class GraphTests(ArchesTestCase):
             graph.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
         # test that we can't append a card collector to another card collector
-        collector_copy = collector_graph.copy()
+
+        collector_copy = collector_graph.copy()['copy']
         with self.assertRaises(GraphValidationError):
             collector_copy.append_branch('P1_is_identified_by', graphid=collector_graph.graphid)
 
@@ -889,11 +890,11 @@ class GraphTests(ArchesTestCase):
         test to make sure invalid ontology classes aren't allowed
 
         """
-        
+
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         new_node = graph.add_node({'nodeid':uuid.uuid1()}) # A blank node with no ontology class is specified
         graph.add_edge({'domainnode_id':self.rootNode.pk, 'rangenode_id':new_node.pk, 'ontologyproperty':None})
-        
+
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
@@ -904,10 +905,10 @@ class GraphTests(ArchesTestCase):
         test to make sure null ontology properties aren't allowed
 
         """
-        
+
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch(None, graphid=self.NODE_NODETYPE_GRAPHID)
-        
+
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
@@ -921,7 +922,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        
+
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
@@ -935,7 +936,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.objects.get(graphid=self.rootNode.graph_id)
         graph.append_branch('some invalid property', graphid=self.NODE_NODETYPE_GRAPHID)
-        
+
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
@@ -957,7 +958,7 @@ class GraphTests(ArchesTestCase):
         graph.root.ontologyclass = 'E1_CRM_Entity'
         graph.root.datatype = 'semantic'
         graph.root.save()
-        
+
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
         the_exception = cm.exception
