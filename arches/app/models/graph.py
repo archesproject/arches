@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+import json
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
@@ -24,7 +25,6 @@ from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
 from django.utils.translation import ugettext as _
-import json
 
 
 class Graph(models.GraphModel):
