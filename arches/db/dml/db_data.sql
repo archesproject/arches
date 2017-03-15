@@ -3457,7 +3457,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
-       },
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Markers', '[
        {
            "id": "search-results-points-markers",
            "type": "symbol",
@@ -3477,7 +3481,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 1,
+               "icon-size": 2,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
@@ -3502,10 +3506,10 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 2,
+               "icon-size": 3,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
            "paint": {}
        }
-   ]', TRUE, 'ion-search', TRUE, TRUE);
+   ]', TRUE, 'ion-ios-location', TRUE, TRUE);
