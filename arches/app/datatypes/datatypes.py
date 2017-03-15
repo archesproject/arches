@@ -197,13 +197,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 WHERE nodeid = '%s'
             )
 
-            SELECT tileid::text,
-            		resourceinstanceid::text,
-            		nodeid::text,
-            		graphid::text,
-            		node_name,
-            		graph_name,
-            		false AS poly_outline,
+            SELECT node_name,
+                    resourceinstanceid::text,
+                    false AS poly_outline,
             		row_number() over () as __id__,
             		1 as total,
             		ST_Centroid(geom) AS __geometry__,
@@ -213,12 +209,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             UNION
 
-            SELECT '' as tileid,
-            		'' as resourceinstanceid,
-            		'' as nodeid,
-            		'' as graphid,
-            		'' as node_name,
-            		'' as graph_name,
+            SELECT '' as node_name,
+                    '' as resourceinstanceid,
             		false AS poly_outline,
             		row_number() over () as __id__,
             		count(*) as total,
@@ -245,12 +237,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             sql_list.append(sql_string)
 
         sql_list.append("""
-            SELECT tileid::text,
+            SELECT node_name,
                     resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
                     false AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -259,12 +247,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 FROM mv_geojson_geoms
                 WHERE nodeid = '%s'
             UNION
-            SELECT tileid::text,
+            SELECT node_name,
                     resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
                     true AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,

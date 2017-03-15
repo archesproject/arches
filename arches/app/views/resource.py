@@ -144,6 +144,8 @@ class ResourceDescriptors(View):
         if resourceid is not None:
             resource = Resource.objects.get(pk=resourceid)
             return JSONResponse({
+                'graphid': resource.graph.pk,
+                'graph_name': resource.graph.name,
                 'displaydescription': resource.displaydescription,
                 'map_popup': resource.map_popup,
                 'displayname': resource.displayname,

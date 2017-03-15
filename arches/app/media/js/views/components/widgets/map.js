@@ -1111,13 +1111,12 @@ define([
                 var resourceLookup = {};
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoveredSearchResults;
-                    var hoveredSearchResult;
                     var hoverData = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
                     }) || _.find(features, function(feature) {
                         return feature.layer.id === 'search-results-hex';
                     }) || null;
+
                     if (hoverData && hoverData.properties) {
                         hoverData = hoverData.properties;
                         var resourceId = hoverData.resourceinstanceid;
@@ -1129,21 +1128,27 @@ define([
                                 hoverData.displaydescription = '';
                                 hoverData.map_popup = '';
                                 hoverData.displayname = '';
+                                hoverData.graphid = '';
+                                hoverData.graph_name = '';
                                 hoverData = ko.mapping.fromJS(hoverData);
                                 resourceLookup[resourceId] = hoverData;
                                 $.get(arches.urls.resource_descriptors + resourceId, function (data) {
                                     resourceLookup[resourceId].displaydescription(data.displaydescription);
                                     resourceLookup[resourceId].map_popup(data.map_popup);
                                     resourceLookup[resourceId].displayname(data.displayname);
+                                    resourceLookup[resourceId].graphid(data.graphid);
+                                    resourceLookup[resourceId].graph_name(data.graph_name);
                                     resourceLookup[resourceId].loading(false);
                                 });
                             }
                         }
                     }
+
                     if (self.hoverData() !== hoverData) {
                         self.hoverData(hoverData);
                     }
                 }, this);
+
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickFeature = _.find(features, function(feature) {
