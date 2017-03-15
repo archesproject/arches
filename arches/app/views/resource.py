@@ -140,6 +140,20 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
+class ResourceDescriptors(View):
+    def get(self, request, resourceid=None):
+        if resourceid is not None:
+            resource = Resource.objects.get(pk=resourceid)
+            return JSONResponse({
+                'graphid': resource.graph.pk,
+                'graph_name': resource.graph.name,
+                'displaydescription': resource.displaydescription,
+                'map_popup': resource.map_popup,
+                'displayname': resource.displayname,
+            })
+
+        return HttpResponseNotFound()
+
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):

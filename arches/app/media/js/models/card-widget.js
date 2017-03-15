@@ -81,8 +81,10 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             var self = this;
 
             _.each(attributes, function(value, key){
-                if (key === 'config' && typeof value === 'string') {
-                    value = JSON.parse(value);
+                if (key === 'config') {
+                    if (typeof value === 'string') {
+                        value = JSON.parse(value);
+                    }
                     var configKeys = [];
                     _.each(value, function(configVal, configKey) {
                         value[configKey] = ko.observable(configVal);
@@ -127,7 +129,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
-                    ret[key] = JSON.stringify(this.configJSON())
+                    ret[key] = this.configJSON()
                 }
             }
             return ret;

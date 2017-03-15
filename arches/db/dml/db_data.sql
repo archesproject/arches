@@ -3296,13 +3296,9 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
            ST_SetSRID(
                st_geomfromgeojson((json_array_elements(t.tiledata::json -> n.nodeid::text -> 'features') -> 'geometry')::text),
                4326
-           ), 900913)::geometry(Geometry,900913) AS geom,
-       n.name as node_name,
-       g.graphid,
-       g.name as graph_name
+           ), 900913)::geometry(Geometry,900913) AS geom
       FROM tiles t
     	LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-        LEFT JOIN graphs g ON n.graphid = g.graphid
      WHERE (( SELECT count(*) AS count
     		  FROM jsonb_object_keys(t.tiledata) jsonb_object_keys(jsonb_object_keys)
     		 WHERE (jsonb_object_keys.jsonb_object_keys IN ( SELECT n_1.nodeid::text AS nodeid
@@ -3386,7 +3382,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
-       },
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Markers', '[
        {
            "id": "search-results-points-markers",
            "type": "symbol",
@@ -3406,7 +3406,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 1,
+               "icon-size": 2,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
@@ -3431,10 +3431,10 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 2,
+               "icon-size": 3,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
            "paint": {}
        }
-   ]', TRUE, 'ion-search', TRUE, TRUE);
+   ]', TRUE, 'ion-ios-location', TRUE, TRUE);
