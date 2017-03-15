@@ -156,7 +156,7 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = ''
+            tile.data[str(node.nodeid)] = None
 
         return tile
 
