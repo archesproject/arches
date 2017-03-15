@@ -114,6 +114,7 @@ class Card(models.CardModel):
                         self.nodes.append(node_model)
 
             else:
+                print 'here' * 100
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
@@ -266,6 +267,12 @@ class Card(models.CardModel):
         ret['widgets'] = self.widgets
         ret['groups'] = self.groups
         ret['users'] = self.users
+        
+        self.graph = Graph.objects.get(graphid=self.graph_id)
+        if self.graph.ontology and self.graph.isresource:
+            edge = self.get_edge_to_parent()
+            ret['ontologyproperty'] = edge.ontologyproperty
+        
         # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
         for node in ret['nodes']:
