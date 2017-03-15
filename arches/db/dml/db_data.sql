@@ -3368,12 +3368,9 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
                st_geomfromgeojson((json_array_elements(t.tiledata::json -> n.nodeid::text -> 'features') -> 'geometry')::text),
                4326
            ), 900913)::geometry(Geometry,900913) AS geom,
-       n.name as node_name,
-       g.graphid,
-       g.name as graph_name
+       n.name as node_name
       FROM tiles t
     	LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-        LEFT JOIN graphs g ON n.graphid = g.graphid
      WHERE (( SELECT count(*) AS count
     		  FROM jsonb_object_keys(t.tiledata) jsonb_object_keys(jsonb_object_keys)
     		 WHERE (jsonb_object_keys.jsonb_object_keys IN ( SELECT n_1.nodeid::text AS nodeid

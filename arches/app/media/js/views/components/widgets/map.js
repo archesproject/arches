@@ -138,7 +138,7 @@ define([
                 anchorLayerId: this.anchorLayerId
             });
 
-            this.hoverFeature = ko.observable(null);
+            this.hoverData = ko.observable(null);
 
             // TODO: This should be a system config rather than hard-coded here
             this.geocoderProviders = ko.observableArray([{
@@ -1108,26 +1108,47 @@ define([
                     self.applySearchBuffer(val)
                 });
 
+                var resourceLookup = {};
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoveredSearchResults;
-                    var hoveredSearchResult;
-                    var hoverFeature = _.find(features, function(feature) {
+                    var hoverData = _.find(features, function(feature) {
                         return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
                     }) || _.find(features, function(feature) {
                         return feature.layer.id === 'search-results-hex';
                     }) || null;
-                    if (self.hoverFeature() !== hoverFeature) {
-                        if (hoverFeature) {
-                            var hoveredSearchResults = _.filter(self.results.results(), function(f){return f.resourceinstanceid === hoverFeature.properties.resourceinstanceid})
-                            hoveredSearchResult = hoveredSearchResults.length < 1 || hoveredSearchResults[0]
-                            if (hoveredSearchResult){
-                                hoverFeature.properties['map_popup'] = hoveredSearchResult.map_popup
+
+                    if (hoverData && hoverData.properties) {
+                        hoverData = hoverData.properties;
+                        var resourceId = hoverData.resourceinstanceid;
+                        if (resourceId) {
+                            if (resourceLookup[resourceId]) {
+                                hoverData = resourceLookup[resourceId];
+                            } else {
+                                hoverData.loading = true;
+                                hoverData.displaydescription = '';
+                                hoverData.map_popup = '';
+                                hoverData.displayname = '';
+                                hoverData.graphid = '';
+                                hoverData.graph_name = '';
+                                hoverData = ko.mapping.fromJS(hoverData);
+                                resourceLookup[resourceId] = hoverData;
+                                $.get(arches.urls.resource_descriptors + resourceId, function (data) {
+                                    resourceLookup[resourceId].displaydescription(data.displaydescription);
+                                    resourceLookup[resourceId].map_popup(data.map_popup);
+                                    resourceLookup[resourceId].displayname(data.displayname);
+                                    resourceLookup[resourceId].graphid(data.graphid);
+                                    resourceLookup[resourceId].graph_name(data.graph_name);
+                                    resourceLookup[resourceId].loading(false);
+                                });
                             }
                         }
-                        self.hoverFeature(hoverFeature);
+                    }
+
+                    if (self.hoverData() !== hoverData) {
+                        self.hoverData(hoverData);
                     }
                 }, this);
+
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickFeature = _.find(features, function(feature) {
