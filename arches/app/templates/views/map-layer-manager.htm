@@ -90,7 +90,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
                 <div class="ep-card-crud-container">
-                    <!-- ko if: selection() -->
                     <div class="panel">
                         <!-- ko if: selection().nodeid -->
                         <div class="panel-heading">
@@ -264,10 +263,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <!-- /ko -->
                     </div>
-                    <!-- /ko -->
-                    <!-- ko if: !selection() -->
-                    {% trans "No matching layers" %}
-                    <!-- /ko -->
                 </div>
             </div>
         </div>
