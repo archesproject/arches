@@ -32,7 +32,7 @@ define(['jquery',
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
-                this.mapLinkPoint = ko.observable(null);
+                this.mapLinkData = ko.observable(null);
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -102,6 +102,13 @@ define(['jquery',
                     if (result._source.points.length > 0) {
                         point = result._source.points[0]
                     }
+                    var mapData = result._source.geometries.reduce(function (fc1, fc2) {
+                        fc1.features = fc1.features.concat(fc2.features);
+                        return fc1;
+                    }, {
+                      "type": "FeatureCollection",
+                      "features": []
+                    });
                     this.results.push({
                         displayname: result._source.displayname,
                         resourceinstanceid: result._source.resourceinstanceid,
@@ -115,7 +122,7 @@ define(['jquery',
                         relatable: relatable,
                         point: point,
                         mapLinkClicked: function () {
-                            self.mapLinkPoint(point);
+                            self.mapLinkData(mapData);
                         }
                     });
                 }, this);
