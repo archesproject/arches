@@ -316,7 +316,13 @@ class CardView(GraphBaseView):
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-        ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
+
+        ontology_properties = []
+        parent_node = self.graph.get_parent_node(card.nodegroup_id)
+        for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
+            if parent_node.ontologyclass in item['ontology_classes']:
+                ontology_properties.append(item['ontology_property'])
+        ontology_properties = sorted(ontology_properties, key=lambda item: item)
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
