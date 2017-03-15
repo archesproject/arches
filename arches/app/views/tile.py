@@ -80,8 +80,8 @@ class TileData(View):
             data = JSONDeserializer().deserialize(json)
 
             with transaction.atomic():
-                nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                 tile = Tile.objects.get(tileid = data['tileid'])
+                nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                 clean_resource_cache(tile)
                 tile.delete(request=request)
                 tile.after_update_all()
