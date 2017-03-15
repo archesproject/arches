@@ -191,14 +191,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         config = node.config
 
         cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
+            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
                 WHERE nodeid = '%s'
             )
 
-            SELECT node_name,
-                    resourceinstanceid::text,
+            SELECT resourceinstanceid::text,
                     false AS poly_outline,
             		row_number() over () as __id__,
             		1 as total,
@@ -209,8 +208,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             UNION
 
-            SELECT '' as node_name,
-                    '' as resourceinstanceid,
+            SELECT '' as resourceinstanceid,
             		false AS poly_outline,
             		row_number() over () as __id__,
             		count(*) as total,
@@ -237,8 +235,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             sql_list.append(sql_string)
 
         sql_list.append("""
-            SELECT node_name,
-                    resourceinstanceid::text,
+            SELECT resourceinstanceid::text,
                     false AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -247,8 +244,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 FROM mv_geojson_geoms
                 WHERE nodeid = '%s'
             UNION
-            SELECT node_name,
-                    resourceinstanceid::text,
+            SELECT resourceinstanceid::text,
                     true AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
