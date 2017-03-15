@@ -344,8 +344,8 @@ INSERT INTO cards(cardid, name, description, instructions,
 
 -- end for forms.py
 
-INSERT INTO resource_instances(resourceinstanceid, graphid)
-    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002');
+INSERT INTO resource_instances(resourceinstanceid, graphid, createdtime)
+    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002', now());
 
 INSERT INTO icons(name, cssclass)
     VALUES ('cc', 'fa fa-cc');

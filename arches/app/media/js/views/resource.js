@@ -29,7 +29,8 @@ require([
                             "previous": '<i class="fa fa-angle-left"></i>',
                             "next": '<i class="fa fa-angle-right"></i>'
                         }
-                    }
+                    },
+                    "order": [[ 3, "desc" ]]
                 }
             });
 

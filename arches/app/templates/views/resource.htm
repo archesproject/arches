@@ -117,21 +117,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <th>Resource Id</th>
                                 <th>Resource Name</th>
                                 <th>Resource Type</th>
-                                <th class="min-desktop">Last Edit</th>
-                                <th class="min-tablet">Editor</th>
+                                <th class="min-desktop">Created</th>
                                 <th class="min-tablet"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for summary in instance_summaries %}
+                            {% for resource in resource_instances %}
                             <tr>
-                                <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' summary.id %}')">{{summary.id}}</a></td>
-                                <td>{{summary.name}}</td>
-                                <td>{{summary.type}}</td>
-                                <td>{{summary.last_edited}}</td>
-                                <td>{{summary.editor}}</td>
+                                <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' resource.pk %}')">{{resource.pk}}</a></td>
+                                <td>{{resource.name}}</td>
+                                <td>{{resource.graph.name}}</td>
+                                <td>{{resource.createdtime}}</td>
                                 <td>
-                                    <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' summary.id %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
+                                    <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' resource.pk %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
                                 </td>
                             </tr>
                             {% endfor %}
