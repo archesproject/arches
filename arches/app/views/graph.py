@@ -250,8 +250,6 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == 'append_branch':
-                    import ipdb
-                    ipdb.set_trace()
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
                     graph.save()
 
