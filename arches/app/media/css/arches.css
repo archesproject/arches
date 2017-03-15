@@ -255,14 +255,13 @@
 }
 
 .card-help-panel {
-    width: 40%;
     max-width: 275px;
     min-width: 250px;
     padding-top: 0;
     top: 0px;
     position: absolute;
     bottom: 0px;
-    right: -20px;
+    right: 0px;
     background: #37495b;
     opacity: .9;
     z-index: 500;
@@ -3947,7 +3946,7 @@ ul .card-tree-list a .node-subname {
 
 .tertiary-panel {
     position: absolute;
-    top: 105px;
+    top: 55px;
     left: 499px;
     bottom: 0;
     z-index: 50;
@@ -4479,6 +4478,14 @@ div.row.widget-wrapper {
     z-index: 1;
 }
 
+.dataTables_info {
+    margin-top: 10px;
+}
+
+.dataTables_paginate {
+    margin-bottom: 140px;
+}
+
 .related-resources-nodes {
     position: absolute; 
     width: 275px; 
@@ -4529,7 +4536,6 @@ div.row.widget-wrapper {
 }
 
 .rr-drag-panel-target {
-    height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
     border-bottom-width: 0px;
@@ -5410,6 +5416,7 @@ span.basemap-unselected {
     position: absolute;
     top: 15px;
     right: 10px;
+    padding: 0px 5px;
 }
 
 .overlay-toggle-icon {
@@ -5878,6 +5885,9 @@ span.basemap-unselected {
     font-weight:bold;
     background: #dbf1f5;
 }
+.hover-panel-small {
+    width: 250px;
+}
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
@@ -5974,9 +5984,6 @@ span.basemap-unselected {
     margin-top: 10px;
 }
 
-.search-listing:hover {
-    cursor: move;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -6192,7 +6199,11 @@ span.basemap-unselected {
 }
 
 .search-listing:hover {
-	cursor: move;
+	border: 1px solid steelblue;
+}
+
+.search-listing:active {
+    border: 1px solid steelblue;
 }
 
 .search-listing-title {
@@ -6205,10 +6216,7 @@ span.basemap-unselected {
 	padding: 10px 5px 0px 10px;
 }
 
-.search-listing-icon {
-	transform: translate(0, -2px);
-    font-size: 13px;
-}
+
 
 .search-listing-body {
     height: 4.6em;
@@ -6321,7 +6329,7 @@ table.table.dataTable {
   border: solid 1px #BBBBBB;
   padding: 6px;
   background: rgba(256, 256, 256, 0.8);
-  color: #808080;
+  color: #434343;
   border-radius: 2px;
   pointer-events: none;
   box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);

@@ -13,6 +13,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             params.configKeys = ['placeholder', 'width', 'min', 'max'];
 
             WidgetViewModel.apply(this, [params]);
+            var self = this;
+            if (ko.isObservable(this.value)) {
+                this.value.subscribe(function(val){
+                    if (self.value()){
+                        self.value(Number(val))
+                    }
+                }, self);
+            };
         },
         template: { require: 'text!widget-templates/number' }
     });

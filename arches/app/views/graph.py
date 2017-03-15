@@ -30,7 +30,7 @@ from django.views.generic import View, TemplateView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
@@ -227,39 +227,47 @@ class GraphDataView(View):
 
     def post(self, request, graphid=None):
         ret = {}
-        if self.action == 'import_graph':
-            graph_file = request.FILES.get('importedGraph').read()
-            graphs = JSONDeserializer().deserialize(graph_file)['graph']
-            ret = GraphImporter.import_graph(graphs)
-        else:
-            if graphid is not None:
-                graph = Graph.objects.get(graphid=graphid)
-            data = JSONDeserializer().deserialize(request.body)
 
-            if self.action == 'new_graph':
-                isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource Model') if isresource else _('New Branch')
-                author = request.user.first_name + ' ' + request.user.last_name
-                ret = Graph.new(name=name,is_resource=isresource,author=author)
+        try:
+            if self.action == 'import_graph':
+                graph_file = request.FILES.get('importedGraph').read()
+                graphs = JSONDeserializer().deserialize(graph_file)['graph']
+                ret = GraphImporter.import_graph(graphs)
+            else:
+                if graphid is not None:
+                    graph = Graph.objects.get(graphid=graphid)
+                data = JSONDeserializer().deserialize(request.body)
 
-            elif self.action == 'update_node':
-                graph.update_node(data)
-                ret = graph
-                graph.save()
+                if self.action == 'new_graph':
+                    isresource = data['isresource'] if 'isresource' in data else False
+                    name = _('New Resource Model') if isresource else _('New Branch')
+                    author = request.user.first_name + ' ' + request.user.last_name
+                    ret = Graph.new(name=name,is_resource=isresource,author=author)
 
-            elif self.action == 'append_branch':
-                ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
-                graph.save()
+                elif self.action == 'update_node':
+                    graph.update_node(data)
+                    ret = graph
+                    graph.save()
 
-            elif self.action == 'move_node':
-                ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
-                graph.save()
+                elif self.action == 'append_branch':
+                    ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                    graph.save()
 
-            elif self.action == 'clone_graph':
-                ret = graph.copy()
-                ret.save()
+                elif self.action == 'move_node':
+                    ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+                    graph.save()
 
-        return JSONResponse(ret)
+                elif self.action == 'clone_graph':
+                    clone_data = graph.copy()
+                    ret = clone_data['copy']
+                    ret.save()
+                    ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
+                    form_map = ret.copy_forms(graph, clone_data['cards'])
+                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+
+            return JSONResponse(ret)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)

@@ -3384,7 +3384,25 @@ CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-       {
+        {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "all",
+                [
+                    ">",
+                    "doc_count",
+                    0
+                ]
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 0.5
+            },
+            "type": "line",
+            "id": "search-results-hex-outline"
+        },
+        {
            "layout": {},
            "source": "search-results-hex",
            "filter": [
@@ -3400,25 +3418,25 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                    "property": "doc_count",
                    "stops": [
                        [
-                           0,
-                           "#54278f"
-                       ],
-                       [
-                           10,
-                           "#756bb1"
-                       ],
-                       [
-                           50,
-                           "#9e9ac8"
-                       ],
-                       [
-                           200,
-                           "#cbc9e2"
-                       ],
-                       [
-                           500,
-                           "#f2f0f7"
-                       ]
+                            0,
+                            "#f2f0f7"
+                        ],
+                        [
+                            10,
+                            "#cbc9e2"
+                        ],
+                        [
+                            50,
+                            "#9e9ac8"
+                        ],
+                        [
+                            200,
+                            "#756bb1"
+                        ],
+                        [
+                            500,
+                            "#54278f"
+                        ]
                    ]
                },
                "fill-extrusion-height": {
@@ -3439,7 +3457,11 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
-       },
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Markers', '[
        {
            "id": "search-results-points-markers",
            "type": "symbol",
@@ -3459,7 +3481,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 1,
+               "icon-size": 2,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
@@ -3484,10 +3506,10 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 2,
+               "icon-size": 3,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
            "paint": {}
        }
-   ]', TRUE, 'ion-search', TRUE, TRUE);
+   ]', TRUE, 'ion-ios-location', TRUE, TRUE);
