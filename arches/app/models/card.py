@@ -114,6 +114,7 @@ class Card(models.CardModel):
                         self.nodes.append(node_model)
 
             else:
+                print 'here' * 100
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
@@ -123,6 +124,8 @@ class Card(models.CardModel):
                 self.cardinality = self.nodegroup.cardinality
                 self.groups = self.get_group_permissions(self.nodegroup)
                 self.users = self.get_user_permissions(self.nodegroup)
+
+        self.graph = Graph.objects.get(graphid=self.graph_id)
 
     def get_group_permissions(self, nodegroup=None):
         """
@@ -198,8 +201,7 @@ class Card(models.CardModel):
         Saves an a card and it's parent ontology property back to the db
 
         """
-        self.graph = Graph.objects.get(graphid=self.graph_id)
-
+        
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
@@ -266,6 +268,12 @@ class Card(models.CardModel):
         ret['widgets'] = self.widgets
         ret['groups'] = self.groups
         ret['users'] = self.users
+        ret['ontologyproperty'] = self.ontologyproperty
+        
+        if self.graph.ontology and self.graph.isresource:
+            edge = self.get_edge_to_parent()
+            ret['ontologyproperty'] = edge.ontologyproperty
+        
         # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
         for node in ret['nodes']:
