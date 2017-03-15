@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://www.archesproject.org/6645acc4-fded-412a-a758-fe3a0524d34d">
+    <skos:prefLabel xml:lang="en-US">{"id": "27c67c7d-76b8-46ac-9209-7b6a7d593f2f", "value": "Grade II Listed Building"}</skos:prefLabel>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71">
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/e888da30-e042-4129-a4b2-aff0d766d6be"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/a2c6e2fa-daec-4b72-ac88-f93fe5f0678b"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/1f4c420b-6be5-467c-ac1e-b685bb83b77e"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/e84c91dd-a1c4-4002-ae31-2eaecc7d514b"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/c2325a54-dcd9-4453-8f7b-f0c2287ed6ae"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/80e01022-589a-40b4-8264-4fcd4217c40f"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/7d9260ac-f405-49e6-ab42-9bc8570c6c34"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/779e474b-285b-48ef-a294-d367aa4afdbd"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/86f9ece7-f39a-4c88-9dbd-643f67578374"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/ca4c994b-1129-4b52-a2aa-9fea0e15d6d2"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/b5dc0ea3-de45-4985-883a-160177974862"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/7d53f0ba-40c5-4aaa-8f43-f4e9952b695a"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/8d98afda-4e6c-4cce-b1dc-7127711caeff"/>
+        <dcterms:title xml:lang="en-US">{"id": "9ac89b9f-01c7-4fe7-9090-cb8e028c23c4", "value": "HER_Designation_Type"}</dcterms:title>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/7d9260ac-f405-49e6-ab42-9bc8570c6c34">
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/a7e25b97-b31f-487d-a8b7-8aaa59f2caee">
+        <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+        <skos:prefLabel xml:lang="en-US">{"id": "b6c6ce15-c9fb-4b80-99c1-ecba3d729ad3", "value": "Protected Place"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/2ae3bb4c-a1ac-4e34-844f-81efc874c644">
+        <skos:prefLabel xml:lang="en-US">{"id": "6f9c3238-7eed-499c-96ac-6b827d964cc9", "value": "Controlled Site"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-US">{"id": "8880db4a-5568-45e6-b3cd-403c6e95e109", "value": "Protection of Military Remains"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/8d98afda-4e6c-4cce-b1dc-7127711caeff">
+    <skos:prefLabel xml:lang="en">{"id": "bf1646b9-b052-4206-97d5-c8b4dd061f4e", "value": "Building at Risk"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/7711eef0-7449-43f4-a37a-f22222bc9140">
+    <skos:prefLabel xml:lang="en-US">{"id": "bc836164-c145-4698-92dd-c478036746c9", "value": "Natural Site"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/16334bbd-9dbc-4f39-8e09-6b9650300c4d">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "bc908dbc-45ff-426c-8713-f622907730ab", "value": "Grade I Listed Building"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/779e474b-285b-48ef-a294-d367aa4afdbd">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "557875d1-2752-48ba-81e6-7e7d86a25b9a", "value": "Conservation Area"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/e888da30-e042-4129-a4b2-aff0d766d6be">
+    <skos:narrower rdf:resource="http://www.archesproject.org/7711eef0-7449-43f4-a37a-f22222bc9140"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/673951a2-fe65-4c4f-9562-81e1403257d8">
+        <skos:prefLabel xml:lang="en-US">{"id": "3eb84c72-4ba8-42d9-b1a6-32dab63d84b5", "value": "Cultural Site"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "be4add44-6c3f-478d-8a62-7adbb9717204", "value": "World Heritage Site"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/98005193-c81f-4e49-bf8b-6a5fb25bbdde">
+    <skos:prefLabel xml:lang="en-US">{"id": "cbe0dc98-3b34-45ac-a861-e425fe713c1c", "value": "Grade I Registered Park and Garden"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/a9297cc0-e6dc-430b-8a9f-03f19c01a1e0">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "bc1776e9-885b-48ca-83cd-0f2d5e5ac783", "value": "Grade II Registered Park and Garden"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/86f9ece7-f39a-4c88-9dbd-643f67578374">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "c3880abb-bf83-40fe-9c5f-2057f99800b5", "value": "Registered Battlefield"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/a2c6e2fa-daec-4b72-ac88-f93fe5f0678b">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:narrower rdf:resource="http://www.archesproject.org/16334bbd-9dbc-4f39-8e09-6b9650300c4d"/>
+    <skos:narrower rdf:resource="http://www.archesproject.org/6645acc4-fded-412a-a758-fe3a0524d34d"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/1121c2a9-447b-44de-a782-9a6fecce9db7">
+        <skos:prefLabel xml:lang="en-US">{"id": "8f2b7449-f970-4924-8449-8efa07a2fbb0", "value": "Grade II* Listed Building"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-US">{"id": "c588d072-432f-46c1-ab87-f2118fbd747e", "value": "Listed Building"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/ca4c994b-1129-4b52-a2aa-9fea0e15d6d2">
+    <skos:altLabel xml:lang="en-US">{"id": "37b15fb0-3dd6-48f1-8739-02761597e4ac", "value": "Scheduled Ancient Monument"}</skos:altLabel>
+    <skos:prefLabel xml:lang="en-US">{"id": "44f4e1ab-f0de-42e7-82a4-98156e9eac4d", "value": "Scheduled Monument"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/b5dc0ea3-de45-4985-883a-160177974862">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "9b32117e-5a0b-42d3-8498-0292d70a4906", "value": "Locally Listed Building"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/e84c91dd-a1c4-4002-ae31-2eaecc7d514b">
+    <skos:prefLabel xml:lang="en-US">{"id": "9f6edfac-0b48-44bf-8519-c214db8f4ab5", "value": "Area of Outstanding Natural Beauty"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/7d53f0ba-40c5-4aaa-8f43-f4e9952b695a">
+    <skos:prefLabel xml:lang="en-US">{"id": "e7478b01-da78-404a-b5c8-d58280d1c719", "value": "Site of Special Scientific Interest"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/c2325a54-dcd9-4453-8f7b-f0c2287ed6ae">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "7c1fef48-698f-4714-b0e4-c851f682e5b3", "value": "National Park"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/80e01022-589a-40b4-8264-4fcd4217c40f">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "b024b84f-ec65-4fc4-b9fc-c038dd1116ca", "value": "Protected Wreck"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/b3bb385b-4783-47b0-a379-3128de17fb9d">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "69367d88-1ee9-4943-a44e-d96bfeb2b081", "value": "Grade II* Registered Park and Garden"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/1f4c420b-6be5-467c-ac1e-b685bb83b77e">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/ba2ec54d-d53e-4a09-af8f-c57811e29e71"/>
+    <skos:narrower rdf:resource="http://www.archesproject.org/b3bb385b-4783-47b0-a379-3128de17fb9d"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "94267bb1-9341-45f0-a1c4-12a8bbca5ea5", "value": "Registered Park and Garden"}</skos:prefLabel>
+    <skos:narrower rdf:resource="http://www.archesproject.org/98005193-c81f-4e49-bf8b-6a5fb25bbdde"/>
+    <skos:narrower rdf:resource="http://www.archesproject.org/a9297cc0-e6dc-430b-8a9f-03f19c01a1e0"/>
+  </skos:Concept>
+</rdf:RDF>

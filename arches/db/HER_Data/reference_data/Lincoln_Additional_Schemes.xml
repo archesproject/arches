@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://www.archesproject.org/996a04aa-f611-46df-9fe0-a5a340da2f05">
+    <skos:prefLabel xml:lang="en">{"id": "595e8d0e-27e6-48bf-b709-4440ca5ff860", "value": "Unknown Accuracy"}</skos:prefLabel>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16">
+        <dcterms:title xml:lang="en">{"id": "1a2c145f-32f5-4b51-b666-4749d50dcd60", "value": "Lincoln Additional Schemes"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/9a43c03f-c763-48c4-b59a-01dc9804d0be"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/e0b4383c-5969-467f-be2d-c16a9bf618f2">
+    <skos:prefLabel xml:lang="en">{"id": "38cc0cb2-1e87-4138-9503-cb1673980f91", "value": "Accurate to Decade"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/2bc8d971-7e7b-47b1-8f18-ccf9d579e3f9">
+    <skos:prefLabel xml:lang="en">{"id": "394c182b-fdbb-4239-a5c2-8f44a3eaff5d", "value": "Accurate to Millenium"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/eefb9e25-0cfa-4359-8bc1-d23cb4dd97c7">
+    <skos:prefLabel xml:lang="en">{"id": "b8b074ba-8899-4ae3-9017-aab1342ab3cc", "value": "Accurate to Day"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/d29a605f-1b09-4552-868f-65331fa48f85">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+    <skos:prefLabel xml:lang="en">{"id": "a65753a5-c15b-4d07-a33b-459418b5156b", "value": "Accurate to Century"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/9a43c03f-c763-48c4-b59a-01dc9804d0be">
+    <skos:narrower rdf:resource="http://www.archesproject.org/996a04aa-f611-46df-9fe0-a5a340da2f05"/>
+    <skos:narrower rdf:resource="http://www.archesproject.org/d29a605f-1b09-4552-868f-65331fa48f85"/>
+    <skos:prefLabel xml:lang="en">{"id": "7dbd1d85-7e7f-4d5e-b4a3-dabebbfbb46e", "value": "Date Precision Type"}</skos:prefLabel>
+    <skos:narrower rdf:resource="http://www.archesproject.org/e0b4383c-5969-467f-be2d-c16a9bf618f2"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/1d219d4b-0b3c-4084-935f-f75b1fdd550e">
+        <skos:prefLabel xml:lang="en">{"id": "80282a6a-460c-4fe7-ae6b-7370662415d5", "value": "Accurate to Month"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://www.archesproject.org/2bc8d971-7e7b-47b1-8f18-ccf9d579e3f9"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="http://www.archesproject.org/6da82289-a235-4446-ba8c-db86e57ee17a">
+        <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+        <skos:prefLabel xml:lang="en">{"id": "6f941ebf-bad2-444a-a8f8-e4393a5fb2ac", "value": "Accurate to Year"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower rdf:resource="http://www.archesproject.org/eefb9e25-0cfa-4359-8bc1-d23cb4dd97c7"/>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/3a9d5062-b45f-4d64-b6e0-1d06210f2e16"/>
+  </skos:Concept>
+</rdf:RDF>
