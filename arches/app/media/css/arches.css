@@ -5885,6 +5885,9 @@ span.basemap-unselected {
     font-weight:bold;
     background: #dbf1f5;
 }
+.hover-panel-small {
+    width: 250px;
+}
 .hover-feature-info {
     position: absolute;
     z-index: 1000;

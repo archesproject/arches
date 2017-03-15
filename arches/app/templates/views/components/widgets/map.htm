@@ -164,11 +164,13 @@
             <!--/ko-->
 
             <!-- ko if: hoverFeature().properties.doc_count -->
-            <div class="hover-feature-title-bar">
-                <div class="hover-feature-title">Binned Search Results</div>
-            </div>
-            <div class="hover-feature-body">
-                <div data-bind="text: 'count: ' + hoverFeature().properties.doc_count"></div>
+            <div class="hover-panel-small">
+                <div class="hover-feature-title-bar">
+                    <div class="hover-feature-title">Search Results</div>
+                </div>
+                <div class="hover-feature-body">
+                    <span>This cell contains</span><span class="text-semibold" data-bind="text: ' ' + hoverFeature().properties.doc_count"></span><span> result(s)</span>
+                </div>
             </div>
             <!--/ko-->
         </div>
