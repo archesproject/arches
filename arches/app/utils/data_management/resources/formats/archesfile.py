@@ -218,7 +218,7 @@ class ArchesFileReader(Reader):
                                                 for tiledata in source_tile['data']:
                                                     for nodeid in tiledata.keys():
                                                         if nodeid in target_tile.data:
-                                                            if target_tile.data[nodeid] == '':
+                                                            if target_tile.data[nodeid] == None:
                                                                 target_tile.data[nodeid] = tiledata[nodeid]
                                                                 for key in tiledata.keys():
                                                                     if key == nodeid:
@@ -243,7 +243,7 @@ class ArchesFileReader(Reader):
                                                             for data in source_tile['data']:
                                                                 for nodeid in data.keys():
                                                                     if nodeid in prototype_tile.data.keys():
-                                                                        if prototype_tile.data[nodeid] == '':
+                                                                        if prototype_tile.data[nodeid] == None:
                                                                             prototype_tile_copy.data[nodeid] = data[nodeid]
                                                                             for key in data.keys():
                                                                                 if key == nodeid:
@@ -255,7 +255,7 @@ class ArchesFileReader(Reader):
                                                                     source_tile['data'].remove(data)
 
                                                             for key in prototype_tile_copy.data.keys():
-                                                                if prototype_tile_copy.data[key] != '':
+                                                                if prototype_tile_copy.data[key] != None:
                                                                     childtile_empty = False
                                                             if prototype_tile_copy.data == {} or childtile_empty:
                                                                 prototype_tile_copy = None

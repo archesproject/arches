@@ -92,6 +92,11 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
+        if self.data != {}:
+            for nodeid, value in self.data.iteritems():
+                datatype_factory = DataTypeFactory()
+                datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
+                datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
         if index:
             self.index()
@@ -156,7 +161,7 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = ''
+            tile.data[str(node.nodeid)] = None
 
         return tile
 
