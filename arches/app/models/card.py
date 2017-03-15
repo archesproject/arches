@@ -114,7 +114,6 @@ class Card(models.CardModel):
                         self.nodes.append(node_model)
 
             else:
-                print 'here' * 100
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
