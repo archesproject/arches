@@ -3367,8 +3367,7 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
            ST_SetSRID(
                st_geomfromgeojson((json_array_elements(t.tiledata::json -> n.nodeid::text -> 'features') -> 'geometry')::text),
                4326
-           ), 900913)::geometry(Geometry,900913) AS geom,
-       n.name as node_name
+           ), 900913)::geometry(Geometry,900913) AS geom
       FROM tiles t
     	LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
      WHERE (( SELECT count(*) AS count
