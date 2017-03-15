@@ -69,6 +69,13 @@ class BaseDataType(object):
         """
         return None
 
+    def convert_value(self, tile, nodeid):
+        """
+        Converts '' values to null when saving a tile.
+        """
+        if tile.data[nodeid] == '':
+            tile.data[nodeid] = None
+
     def get_map_source(self, node=None, preview=False):
         """
         Gets the map source definition to add to the map for a given node

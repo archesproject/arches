@@ -193,10 +193,6 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
-                # try:
-                #    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
-                # except:
-                #    resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
                 resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
                 blanktilecache = {}
                 populated_nodegroups = {}
@@ -277,10 +273,6 @@ class CsvReader(Reader):
                         self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
-                        # try:
-                        #    resourceinstanceid = uuid.UUID(row['ResourceID'])
-                        # except:
-                        #    resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
                         resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
@@ -320,7 +312,7 @@ class CsvReader(Reader):
                                             for source_key in source_tile.keys():
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if target_tile.data[source_key] == '':
+                                                    if target_tile.data[source_key] == None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(node_datatypes[source_key], source_tile[source_key], row_number)
                                                         target_tile.data[source_key] = value['value']
@@ -350,7 +342,7 @@ class CsvReader(Reader):
                                                     for source_column in source_data:
                                                         for source_key in source_column.keys():
                                                             if source_key == target_key:
-                                                                if prototype_tile_copy.data[source_key] == '':
+                                                                if prototype_tile_copy.data[source_key] == None:
                                                                     value = transform_value(node_datatypes[source_key], source_column[source_key], row_number)
                                                                     prototype_tile_copy.data[source_key] = value['value']
                                                                     # target_tile.request = value['request']
@@ -360,7 +352,7 @@ class CsvReader(Reader):
 
 
                                             if prototype_tile_copy.data != {}:
-                                                if len([item for item in prototype_tile_copy.data.values() if item != '']) > 0:
+                                                if len([item for item in prototype_tile_copy.data.values() if item != None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                         childtile.append(prototype_tile_copy)
 
