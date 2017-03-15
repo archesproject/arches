@@ -5416,6 +5416,7 @@ span.basemap-unselected {
     position: absolute;
     top: 15px;
     right: 10px;
+    padding: 0px 5px;
 }
 
 .overlay-toggle-icon {
@@ -5980,9 +5981,6 @@ span.basemap-unselected {
     margin-top: 10px;
 }
 
-.search-listing:hover {
-    cursor: move;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -6198,7 +6196,11 @@ span.basemap-unselected {
 }
 
 .search-listing:hover {
-	cursor: move;
+	border: 1px solid steelblue;
+}
+
+.search-listing:active {
+    border: 1px solid steelblue;
 }
 
 .search-listing-title {
@@ -6211,10 +6213,7 @@ span.basemap-unselected {
 	padding: 10px 5px 0px 10px;
 }
 
-.search-listing-icon {
-	transform: translate(0, -2px);
-    font-size: 13px;
-}
+
 
 .search-listing-body {
     height: 4.6em;
