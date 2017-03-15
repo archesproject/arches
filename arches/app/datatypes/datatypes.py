@@ -191,7 +191,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         config = node.config
 
         cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
+            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
                 WHERE nodeid = '%s'
