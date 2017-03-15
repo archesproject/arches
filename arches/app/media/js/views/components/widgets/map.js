@@ -457,6 +457,22 @@ define([
 
                 this.map.on('load', function() {
                     if (!self.configForm) {
+                        var zoomToGeoJSON = function (data, fly) {
+                            var method = fly ? 'flyTo' : 'jumpTo';
+                            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+                            var tr = self.map.transform;
+                            var nw = tr.project(bounds.getNorthWest());
+                            var se = tr.project(bounds.getSouthEast());
+                            var size = se.sub(nw);
+                            var scaleX = (tr.width - 80) / size.x;
+                            var scaleY = (tr.height - 80) / size.y;
+
+                            var options = {
+                                center: tr.unproject(nw.add(se).div(2)),
+                                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), ko.unwrap(self.maxZoom))
+                            };
+                            self.map[method](options);
+                        };
                         var source = self.map.getSource('resource')
                         var features = [];
                         var result = {
@@ -579,10 +595,8 @@ define([
                                 var pointData = getSearchPointsGeoJSON();
                                 pointSource.setData(pointData)
                             });
-                            self.results.mapLinkPoint.subscribe(function(point) {
-                                self.map.flyTo({
-                                    center: [point.lon, point.lat]
-                                });
+                            self.results.mapLinkData.subscribe(function(data) {
+                                zoomToGeoJSON(data, true);
                             });
                         }
 
@@ -613,19 +627,7 @@ define([
 
                         if (data) {
                             if (data.features.length > 0) {
-                                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-                                var tr = this.transform;
-                                var nw = tr.project(bounds.getNorthWest());
-                                var se = tr.project(bounds.getSouthEast());
-                                var size = se.sub(nw);
-                                var scaleX = (tr.width - 80) / size.x;
-                                var scaleY = (tr.height - 80) / size.y;
-
-                                var options = {
-                                    center: tr.unproject(nw.add(se).div(2)),
-                                    zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), Infinity)
-                                };
-                                self.map.jumpTo(options);
+                                zoomToGeoJSON(data);
                             }
                         }
                     }
