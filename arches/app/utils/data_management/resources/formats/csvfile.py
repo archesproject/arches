@@ -193,10 +193,6 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
-                # try:
-                #    resourceinstanceid = uuid.UUID(business_data[0]['ResourceID'])
-                # except:
-                #    resourceinstanceid = get_resourceid_from_legacyid(business_data[0]['ResourceID'])
                 resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
                 blanktilecache = {}
                 populated_nodegroups = {}
@@ -277,10 +273,6 @@ class CsvReader(Reader):
                         self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
                         # reset values for next resource instance
                         populated_tiles = []
-                        # try:
-                        #    resourceinstanceid = uuid.UUID(row['ResourceID'])
-                        # except:
-                        #    resourceinstanceid = get_resourceid_from_legacyid(row['ResourceID'])
                         resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
