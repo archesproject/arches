@@ -211,7 +211,6 @@
             "id": "7e086247-9d3a-11e6-80f2-6c4008b05c4c"
         }],
         "cards": [{
-            "itemtext": null,
             "functions": [],
             "graph_id": "02c2ce82-96f0-11e6-a300-6c4008b05c4c",
             "description": "Represents a single node in a graph",
@@ -226,7 +225,6 @@
             "active": true,
             "instructions": null
         }, {
-            "itemtext": null,
             "functions": [],
             "graph_id": "02c2ce82-96f0-11e6-a300-6c4008b05c4c",
             "description": "Represents a single node in a graph",
@@ -241,7 +239,6 @@
             "active": true,
             "instructions": null
         }, {
-            "itemtext": null,
             "functions": [],
             "graph_id": "02c2ce82-96f0-11e6-a300-6c4008b05c4c",
             "description": "Location description of a resource.  Includes map, addresses, admin areas, and property ownership",
@@ -256,7 +253,6 @@
             "active": true,
             "instructions": null
         }, {
-            "itemtext": null,
             "functions": [],
             "graph_id": "02c2ce82-96f0-11e6-a300-6c4008b05c4c",
             "description": "Represents a single node in a graph",
@@ -271,7 +267,6 @@
             "active": true,
             "instructions": null
         }, {
-            "itemtext": null,
             "functions": [],
             "graph_id": "02c2ce82-96f0-11e6-a300-6c4008b05c4c",
             "description": "Represents a single node in a graph",

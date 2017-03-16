@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
-from django.conf import settings as app_settings
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -140,7 +140,7 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         context = self.get_context_data(
@@ -313,8 +313,8 @@ class CardView(GraphBaseView):
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
-        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         ontology_properties = []
@@ -487,7 +487,7 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()

@@ -192,7 +192,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
                     "description": "Describes the time span and type of an Activity Resource.",
@@ -207,7 +206,6 @@
                     "name": "Activity Phase"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",

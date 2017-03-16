@@ -89,7 +89,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
                     "description": "Used to define legal privileges associated with an Information Resource.",

@@ -304,7 +304,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "description": "",
@@ -319,7 +318,6 @@
                     "name": "Settings System Defaults"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -334,7 +332,6 @@
                     "name": "Language Codes"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -349,7 +346,6 @@
                     "name": "App Names"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -364,7 +360,6 @@
                     "name": "SPARQL Providers"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "d8fd2b0f-fad8-11e6-8ebc-6c4008b05c4c",
                     "description": "Represents a single node in a graph",

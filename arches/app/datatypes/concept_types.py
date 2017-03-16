@@ -1,7 +1,7 @@
 import uuid
 from arches.app.models import models
 from arches.app.datatypes.base import BaseDataType
-from arches.app.views.concept import get_preflabel_from_valueid
+from arches.app.models.concept import get_preflabel_from_valueid
 from django.core.exceptions import ObjectDoesNotExist
 
 

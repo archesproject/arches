@@ -544,7 +544,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "2926c069-a06d-11e6-84a5-026d961c88e6",
                     "description": "",
@@ -559,7 +558,6 @@
                     "name": "Style"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "2926c069-a06d-11e6-84a5-026d961c88e6",
                     "description": "",
@@ -574,7 +572,6 @@
                     "name": "Related/Ancillary Feature"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "2926c069-a06d-11e6-84a5-026d961c88e6",
                     "description": "Phase Type Assignments for Heritage Resource E18.\n\nConnects via P92i",
@@ -589,7 +586,6 @@
                     "name": "Heritage Resource Phase Type"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "2926c069-a06d-11e6-84a5-026d961c88e6",
                     "description": "",

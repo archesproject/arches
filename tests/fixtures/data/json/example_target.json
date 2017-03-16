@@ -2702,7 +2702,6 @@
       ],
       "cards": [
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the physical location of a resource.\n\nRelates to Activity E7 with P7\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\nRelates to Actor E39 with P74 (this restricts the place to former and current residences, which can be as broad or narrow)\nRelates to Historical Event E5 with P7\nRelates to Information Resource E73 with P67",
@@ -2717,7 +2716,6 @@
           "name": "Place"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2732,7 +2730,6 @@
           "name": "Condition Description"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "This branch evaluates instances of Heritage Resource E18 and Heritage Resource Group E27\n\nRelates to E18 and E27 resource models via P140i.",
@@ -2747,7 +2744,6 @@
           "name": "Evaluation"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the type and time span of the beginning of a resource's existence.\n\nRelates to the Actor resource model E39 via P92i.\nRelates to Historic Event E5 and Activity E7 via p116i.",
@@ -2762,7 +2758,6 @@
           "name": "Beginning of Existence"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2777,7 +2772,6 @@
           "name": "Date Assessed"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2792,7 +2786,6 @@
           "name": "Evaluation Criteria"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
@@ -2807,7 +2800,6 @@
           "name": "Condition Assessment"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "",
@@ -2822,7 +2814,6 @@
           "name": "Related/Ancillary Feature"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
@@ -2837,7 +2828,6 @@
           "name": "Keyword"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2852,7 +2842,6 @@
           "name": "Period of Significance"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2867,7 +2856,6 @@
           "name": "Integrity"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2882,7 +2870,6 @@
           "name": "Condition Image"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2897,7 +2884,6 @@
           "name": "Address"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2912,7 +2898,6 @@
           "name": "Administration Subdivision"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2927,7 +2912,6 @@
           "name": "Description Location"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2942,7 +2926,6 @@
           "name": "Reasons"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2957,7 +2940,6 @@
           "name": "Setting Type"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2972,7 +2954,6 @@
           "name": "Spatial Location"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -2987,7 +2968,6 @@
           "name": "Threat Type"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Captures information about special status, protection, or privileges afforded under law.",
@@ -3002,7 +2982,6 @@
           "name": "Right"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
@@ -3017,7 +2996,6 @@
           "name": "End of Existence"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i",
@@ -3032,7 +3010,6 @@
           "name": "Modification Event"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Intended to be evolution from v3 description branch. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).\n\nConnects to all resources with P140i",
@@ -3047,7 +3024,6 @@
           "name": "Description"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "",
@@ -3062,7 +3038,6 @@
           "name": "Designation or Protection"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Physical thing on a heritage resource.",
@@ -3077,7 +3052,6 @@
           "name": "Component"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "",
@@ -3092,7 +3066,6 @@
           "name": "Style"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3107,7 +3080,6 @@
           "name": "Management Recommendation"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3122,7 +3094,6 @@
           "name": "Eligibility Requirements"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
@@ -3137,7 +3108,6 @@
           "name": "Measurement"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3152,7 +3122,6 @@
           "name": "Condition"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Used to identify an Information Resource.",
@@ -3167,7 +3136,6 @@
           "name": "External Identifier"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3182,7 +3150,6 @@
           "name": "Evaluation Date"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Describes the type of resource.",
@@ -3197,7 +3164,6 @@
           "name": "Resource Type Classification"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3212,7 +3178,6 @@
           "name": "Status"
         },
         {
-          "itemtext": "a really long name that goes on and on and on",
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "The name of a resource.",
@@ -3227,7 +3192,6 @@
           "name": "Name"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "",
@@ -3242,7 +3206,6 @@
           "name": "Heritage Resource Type"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",
@@ -3257,7 +3220,6 @@
           "name": "Disturbance Type"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Phase Type Assignments for Heritage Resource E18.\n\nConnects via P92i",
@@ -3272,7 +3234,6 @@
           "name": "Heritage Resource Phase Type"
         },
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
           "description": "Represents a single node in a graph",

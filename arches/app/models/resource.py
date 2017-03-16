@@ -22,12 +22,13 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
+
 
 class Resource(models.ResourceInstance):
 
@@ -131,7 +132,7 @@ class Resource(models.ResourceInstance):
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
-            se.index_data('strings', 'term', term, id=uuid.uuid4())
+            se.index_data('strings', 'term', term, id=unicode(term['nodeid'])+unicode(term['tileid']))
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -164,7 +165,7 @@ class Resource(models.ResourceInstance):
                     datatype_instance.append_to_document(document, nodevalue)
                     term = datatype_instance.get_search_term(nodevalue)
                     if term is not None:
-                        terms.append({'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid})
+                        terms.append({'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id})
 
         return document, terms
 
@@ -178,6 +179,13 @@ class Resource(models.ResourceInstance):
         related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
         for rr in related_resources['resource_relationships']:
             models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.filter(Terms(field='resourceinstanceid', terms=[self.resourceinstanceid]))
+        query.add_query(bool_query)
+        results = query.search(index='strings', doc_type='term')['hits']['hits']
+        for result in results:
+            se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
         super(Resource, self).delete()
 

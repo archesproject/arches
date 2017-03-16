@@ -43,6 +43,7 @@ def prepare_term_index(create=False):
                     'nodegroupid': {'type': 'keyword'},
                     'tileid': {'type': 'keyword'},
                     'nodeid': {'type': 'keyword'},
+                    'resourceinstanceid': {'type': 'keyword'},
                     'value': {
                         'analyzer': 'standard',
                         'type': 'text',

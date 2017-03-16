@@ -14,6 +14,8 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
 @import url(../bower_components/codemirror/theme/monokai.css);
+@import url(../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css);
+@import url(../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css);
 
 
 /*  Summernote Overrides */
@@ -89,7 +91,8 @@
     max-width: 100%;
     top: 39px;
     right: -10px;
-    height: 100vh;
+    bottom: 0;
+    padding: 0;
 }
 
 /*Remove pointer from Mega drop panel button*/
@@ -3001,9 +3004,9 @@ span.editable-card i.fa.fa-align-justify:hover{
     float: left;
     margin: 3px;
 }
-
-.recent-additions-container {
+.navbar-top-links .dropdown-menu .recent-additions-container {
     margin-top: 10px;
+    padding: 0 30px;
 }
 .card-grid{
     -ms-flex: 1;
@@ -4548,6 +4551,7 @@ div.row.widget-wrapper {
 
 .recent-edits-panel {
     margin-left: 50px;
+    overflow-y: auto;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {

@@ -146,7 +146,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "fcbecfc1-a08f-11e6-84a5-026d961c88e6",
                     "description": "Physical thing on a heritage resource. Connect to Heritage Resource E18 via P46",

@@ -232,7 +232,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "29289df0-bbf4-11e6-84a5-026d961c88e6",
                     "description": "Describes the location of an information resource. Relates to Information Resource E73 with P67",
@@ -247,7 +246,6 @@
                     "name": "Place 3"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "29289df0-bbf4-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -262,7 +260,6 @@
                     "name": "Administration Subdivision"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "29289df0-bbf4-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -277,7 +274,6 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "29289df0-bbf4-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
