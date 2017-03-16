@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid, re
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils.http import urlencode
@@ -67,12 +68,15 @@ class SKOSReader(object):
 
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
+        default_lang = settings.LANGUAGE_CODE
 
         value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(Q(namespace = 'skos') | Q(namespace = 'arches'))
         skos_value_types_list = list(skos_value_types.values_list('valuetype', flat=True))
         skos_value_types = {valuetype.valuetype: valuetype for valuetype in skos_value_types}
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
+
+
 
         # relation_types = models.DRelationType.objects.all()
         # skos_relation_types = relation_types.filter(namespace = 'skos')
@@ -89,15 +93,13 @@ class SKOSReader(object):
                     'legacyoid': str(scheme),
                     'nodetype': 'ConceptScheme'
                 })
+                import ipdb
+                ipdb.set_trace()
+
 
                 for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
-                        if hasattr(object, 'language') and object.language not in allowed_languages:
-                            newlang = models.DLanguage()
-                            newlang.pk = object.language
-                            newlang.languagename = object.language
-                            newlang.isdefault = False
-                            newlang.save()
+                        if not self.language_exists(object, allowed_languages):
                             allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                         try:
@@ -105,10 +107,10 @@ class SKOSReader(object):
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, '')) # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             val = self.unwrapJsonLiteral(object)
                             if predicate == DCTERMS.title:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': 'prefLabel', 'category': value_type.category})
+                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': 'prefLabel', 'category': value_type.category})
                                 print 'Casting dcterms:title to skos:prefLabel'
                             elif predicate == DCTERMS.description:
-                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': 'scopeNote', 'category': value_type.category})
+                                concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
                                 print 'Casting dcterms:description to skos:scopeNote'
                         except:
                             pass
@@ -137,12 +139,7 @@ class SKOSReader(object):
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject = s):
                         if str(SKOS) in predicate or str(ARCHES) in predicate:
-                            if hasattr(object, 'language') and object.language not in allowed_languages:
-                                newlang = models.DLanguage()
-                                newlang.pk = object.language
-                                newlang.languagename = object.language
-                                newlang.isdefault = False
-                                newlang.save()
+                            if not self.language_exists(object, allowed_languages):
                                 allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                             relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
@@ -150,7 +147,7 @@ class SKOSReader(object):
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types[relation_or_value_type]
                                 val = self.unwrapJsonLiteral(object)
-                                concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                                concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
                             elif predicate == SKOS.broader:
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
                             elif predicate == SKOS.narrower:
@@ -172,12 +169,7 @@ class SKOSReader(object):
                 # loop through all the elements within a <skos:Concept> element
                 for predicate, object in graph.predicate_objects(subject = s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
-                        if hasattr(object, 'language') and object.language not in allowed_languages:
-                            newlang = models.DLanguage()
-                            newlang.pk = object.language
-                            newlang.languagename = object.language
-                            newlang.isdefault = False
-                            newlang.save()
+                        if not self.language_exists(object, allowed_languages):
                             allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                         relation_or_value_type = predicate.replace(SKOS, '').replace(ARCHES, '')  # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
@@ -185,7 +177,7 @@ class SKOSReader(object):
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types[relation_or_value_type]
                             val = self.unwrapJsonLiteral(object)
-                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
+                            concept.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': value_type.valuetype, 'category': value_type.category})
                 
                 self.nodes.append(concept)
             
@@ -253,6 +245,17 @@ class SKOSReader(object):
             return matches.group(0)
         else:
             return str(uuid.uuid3(baseuuid, str(subject)))
+
+
+    def language_exists(self, rdf_tag, allowed_languages):
+        if hasattr(rdf_tag, 'language') and rdf_tag.language not in allowed_languages and rdf_tag.language is not None and rdf_tag.language.strip() != '':
+            newlang = models.DLanguage()
+            newlang.pk = rdf_tag.language
+            newlang.languagename = rdf_tag.language
+            newlang.isdefault = False
+            newlang.save()
+            return False
+        return True
 
 
 class SKOSWriter(object):
