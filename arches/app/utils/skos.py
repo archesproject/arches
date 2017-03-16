@@ -93,9 +93,6 @@ class SKOSReader(object):
                     'legacyoid': str(scheme),
                     'nodetype': 'ConceptScheme'
                 })
-                import ipdb
-                ipdb.set_trace()
-
 
                 for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
