@@ -19,12 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-{% block css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" >
-    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" >
-{% endblock css %}
-
 {% block title %}
 {{ block.super }}
 {% trans "Resource Manager" %}
