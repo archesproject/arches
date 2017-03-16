@@ -271,7 +271,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <td>{{resource.graph.name}}</td>
                                                         <td>{{resource.createdtime}}</td>
                                                         <td>
-                                                            <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' resource.pk %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
+                                                            <a href="{% url 'resource_report' resource.pk %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
                                                         </td>
                                                     </tr>
                                                     {% endfor %}
