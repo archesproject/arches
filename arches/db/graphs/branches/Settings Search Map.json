@@ -187,7 +187,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -202,7 +201,6 @@
                     "name": "Providers"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -217,7 +215,6 @@
                     "name": "Map"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
                     "description": "Initial settings for Arches map in the Search UI",

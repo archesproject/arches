@@ -164,7 +164,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
                     "description": "",
@@ -179,7 +178,6 @@
                     "name": "Designation or Protection"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
                     "description": "Captures information about special status, protection, or privileges afforded under law.\n\nApplies to: Heritage Resource, Heritage Resource Model",

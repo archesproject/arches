@@ -197,7 +197,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": "",
                     "helpenabled": false,
                     "graph_id": "b3061969-a77b-11e6-84a5-026d961c88e6",
                     "description": "Phase Type Assignment for the Actor resource model.\n\nConnects to Actor E39 via P41i",

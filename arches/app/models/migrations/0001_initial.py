@@ -61,7 +61,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
     graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
     graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
-    
+
     resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
     rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
     app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
@@ -228,7 +228,6 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
-                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',

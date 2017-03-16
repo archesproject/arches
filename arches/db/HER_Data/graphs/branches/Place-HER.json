@@ -567,7 +567,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Describes the physical location of a heritage resource or heritage resource group.  Includes extra nodes for cadastral information.\n\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\n",
@@ -582,7 +581,6 @@
                     "name": "Place-HER"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -597,7 +595,6 @@
                     "name": "Address"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -612,7 +609,6 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -627,7 +623,6 @@
                     "name": "Administration Subdivision"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "",
@@ -642,7 +637,6 @@
                     "name": "Land Class"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -657,7 +651,6 @@
                     "name": "Description Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3aee704e-f972-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",

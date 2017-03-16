@@ -129,7 +129,6 @@
       ],
       "cards": [
         {
-          "itemtext": null,
           "helpenabled": false,
           "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",

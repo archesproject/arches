@@ -134,7 +134,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": true,
                     "graph_id": "4f565430-fad7-11e6-9950-6c4008b05c4c",
                     "description": "Configuration Settings for temporal search",

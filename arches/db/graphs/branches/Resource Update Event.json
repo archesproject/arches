@@ -100,7 +100,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "fb06d30b-a088-11e6-84a5-026d961c88e6",
                     "description": "This is intended as a sub-branch to Resource Creation Event within the Information Resource Resource Model.  Stores the date when an update to the information resource occurred.",

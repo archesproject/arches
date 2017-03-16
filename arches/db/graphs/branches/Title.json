@@ -89,7 +89,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "fe350939-97d3-11e6-84a5-026d961c88e6",
                     "description": "Describes the title of an Information Resource.",
