@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Term, Query
+from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
@@ -953,6 +953,42 @@ class ConceptValue(object):
             return Concept(result['top_concept'])
         else:
             return None
+
+
+def get_preflabel_from_conceptid(conceptid, lang):
+    ret = None
+    default = {
+        "category": "",
+        "conceptid": "",
+        "language": "",
+        "value": "",
+        "type": "",
+        "id": ""
+    }
+    se = SearchEngineFactory().create()
+    query = Query(se)
+    bool_query = Bool()
+    bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
+    bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
+    query.add_query(bool_query)
+    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
+    for preflabel in preflabels:
+        default = preflabel['_source']
+        # get the label in the preferred language, otherwise get the label in the default language
+        if preflabel['_source']['language'] == lang:
+            return preflabel['_source']
+        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+            ret = preflabel['_source']
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+            ret = preflabel['_source']
+    return default if ret == None else ret
+
+
+def get_concept_label_from_valueid(valueid):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return concept_label['_source']
 
 
 def get_preflabel_from_valueid(valueid, lang):
