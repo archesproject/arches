@@ -64,8 +64,15 @@ class TileTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         sql = """
-        TRUNCATE public.graphs CASCADE;
-        TRUNCATE public.node_groups CASCADE;
+        DELETE FROM public.node_groups
+        WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR
+        nodegroupid = '32999999-0000-0000-0000-000000000000' OR
+        nodegroupid = '19999999-0000-0000-0000-000000000000' OR
+        nodegroupid = '21111111-0000-0000-0000-000000000000';
+        
+        DELETE FROM public.resource_instances
+        WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
+
         """
 
         cursor = connection.cursor()

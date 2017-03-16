@@ -58,11 +58,10 @@ class GraphManagerViewTests(ArchesTestCase):
         self.appended_branch_2 = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
-        self.ROOT_ID = graph.root.nodeid #'d8f4db21-343e-4af3-8857-f7322dc9eb4b'
+        self.ROOT_ID = graph.root.nodeid 
         self.GRAPH_ID = str(graph.pk)
         self.NODE_COUNT = 5
 
-        self.ARCHES_CONFIG_ID = '20000000-0000-0000-0000-000000000000'
         self.client = Client()
 
     def tearDown(self):
@@ -105,7 +104,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = json.loads(response.context['graph_json'])
 
         graph['name'] = 'new graph name'
-        post_data = {'graph':graph, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}
+        post_data = {'graph':graph, 'relatable_resource_ids': [str(self.ROOT_ID)]}
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
@@ -113,7 +112,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.assertTrue(response_json['success'])
         self.assertEqual(response_json['graph']['name'], 'new graph name')
-        self.assertTrue(self.ARCHES_CONFIG_ID in response_json['relatable_resource_ids'])
+        self.assertTrue(str(self.ROOT_ID) in response_json['relatable_resource_ids'])
 
     def test_node_update(self):
         """
