@@ -42,7 +42,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True

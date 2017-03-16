@@ -251,7 +251,6 @@ class Graph(models.GraphModel):
             card.active = cardobj.get('active','')
             card.visible = cardobj.get('visible','')
             card.sortorder = cardobj.get('sortorder','')
-            card.itemtext = cardobj.get('itemtext','')
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id','')))
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
 

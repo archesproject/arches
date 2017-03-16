@@ -118,7 +118,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "abfca179-a78f-11e6-84a5-026d961c88e6",
                     "description": "This branch describes the publication of an Information Resource.\n\nConnects to Information Resource (E73) with -P128",
@@ -133,7 +132,6 @@
                     "name": "Publication Event"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "abfca179-a78f-11e6-84a5-026d961c88e6",
                     "description": "",

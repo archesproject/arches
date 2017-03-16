@@ -228,7 +228,6 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
-                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',

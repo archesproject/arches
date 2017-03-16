@@ -177,7 +177,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "e503a445-fa5f-11e6-afa8-14109fd34195",
                     "description": "Represents a node and node type pairing",
@@ -192,7 +191,6 @@
                     "name": "Node/Node Type"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "e503a445-fa5f-11e6-afa8-14109fd34195",
                     "description": "Represents a node and node type pairing",
@@ -207,7 +205,6 @@
                     "name": "Node/Node Type"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "e503a445-fa5f-11e6-afa8-14109fd34195",
                     "description": "Represents a node and node type pairing",
@@ -222,7 +219,6 @@
                     "name": "Node/Node Type"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "e503a445-fa5f-11e6-afa8-14109fd34195",
                     "description": "Represents a node and node type pairing",

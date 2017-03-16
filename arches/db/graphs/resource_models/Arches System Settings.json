@@ -902,7 +902,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Configuration settings for search returns",
@@ -917,7 +916,6 @@
                     "name": "Settings Basic Search"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "",
@@ -932,7 +930,6 @@
                     "name": "Settings System Defaults"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -947,7 +944,6 @@
                     "name": "Map"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -962,7 +958,6 @@
                     "name": "Web Analytics"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -977,7 +972,6 @@
                     "name": "App Names"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -992,7 +986,6 @@
                     "name": "SPARQL Providers"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": true,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Configuration Settings for temporal search",
@@ -1007,7 +1000,6 @@
                     "name": "Settings Time Search"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -1022,7 +1014,6 @@
                     "name": "Language Codes"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Represents a single node in a graph",
@@ -1037,7 +1028,6 @@
                     "name": "Geocode Providers"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "Initial settings for Arches map in the Search UI",
@@ -1052,7 +1042,6 @@
                     "name": "Settings Search Map"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "description": "System configuration for saving searches",
