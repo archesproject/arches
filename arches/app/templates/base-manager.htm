@@ -248,9 +248,36 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
                                     <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
                                 </a>
-                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim recent-edits-panel" data-bind="visible:recentsActive()">
+                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim recent-edits-panel" style="display:none;" data-bind="visible:recentsActive()">
                                     <!-- Resource Records Table, this should probably be split out into a separate .htm-->
                                     <div class="pad-all">
+                                        <div class="resource-grid-title">{% trans "Recently Added Resources" %}</div>
+                                        <div class="recent-additions-container">
+                                            <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Resource Id</th>
+                                                        <th>Resource Name</th>
+                                                        <th>Resource Type</th>
+                                                        <th class="min-desktop">Created</th>
+                                                        <th class="min-tablet"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for resource in resource_instances %}
+                                                    <tr>
+                                                        <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' resource.pk %}')">{{resource.pk}}</a></td>
+                                                        <td>{{resource.displayname}}</td>
+                                                        <td>{{resource.graph.name}}</td>
+                                                        <td>{{resource.createdtime}}</td>
+                                                        <td>
+                                                            <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' resource.pk %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </li>

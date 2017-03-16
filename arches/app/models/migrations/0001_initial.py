@@ -61,7 +61,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
     graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
     graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
-    
+
     resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
     rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
     app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
@@ -580,6 +580,7 @@ class Migration(migrations.Migration):
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacyid', models.TextField(blank=True, unique=True, null=True)),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('createdtime', models.DateTimeField(auto_now_add=True)),
             ],
             options={
                 'db_table': 'resource_instances',

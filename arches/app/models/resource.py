@@ -22,9 +22,9 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction

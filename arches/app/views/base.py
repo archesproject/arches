@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 from arches.app.models import models
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -31,6 +32,10 @@ class BaseManagerView(TemplateView):
         context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['graph_models'] = models.GraphModel.objects.all()
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
+        if 'Resource Editor' in self.request.user.user_groups:
+            context['resource_instances'] = Resource.objects.all().order_by('-createdtime')[:100]
+        else:
+            context['resource_instances'] = []
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
             'title':'',
