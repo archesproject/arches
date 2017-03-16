@@ -1054,7 +1054,6 @@ a.select2-search-choice-close {
     text-overflow: ellipsis;
     stroke: steelblue;
 }
-
 .link {
     fill: none;
     stroke: #bbb;
@@ -2614,7 +2613,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     padding-left: 10px;
 }
 .node-current {
-    /* Fill color should match node-current-over */
     stroke: #b3b3b3;
     stroke-width: 2px;
     fill: #dcecfa;
@@ -2630,21 +2628,20 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     text-anchor: middle;
     pointer-events: none;
 }
-.node-current-over, .node-ancestor-over {
-    /* The currently selected/moused-over node */
-    stroke: #000;
-    stroke-width: 3px;
-    fill: #dcecfa;
+.node-descendent {
+    stroke: #ededed;
+    fill: #fefefe;
     opacity: 1.;
+    stroke-width: 4px;
     cursor: pointer;
 }
-.node-current-neighbor, .node-ancestor-neighbor {
-    /* The neighboring nodes of the selected/moused-over node */
-    stroke: #115fa5;
-    stroke-width: 3px;
-    fill: #dcecfa;
+.node-descendent-label {
+    font-size: 12px;
+    font-weight: 400;
+    fill: #c2c2c2;
     opacity: 1.;
-    cursor: pointer;
+    text-anchor: middle;
+    pointer-events: none;
 }
 .node-ancestor {
     /* Nodes that are unselected or not highlighted as neighbors during mousover */
@@ -2658,21 +2655,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-size: 16px;
     font-weight: 300;
     fill: #a2a2a2;
-    opacity: 1.;
-    text-anchor: middle;
-    pointer-events: none;
-}
-.node-descendent {
-    stroke: #ededed;
-    fill: #fefefe;
-    opacity: 1.;
-    stroke-width: 4px;
-    cursor: pointer;
-}
-.node-descendent-label {
-    font-size: 12px;
-    font-weight: 400;
-    fill: #c2c2c2;
     opacity: 1.;
     text-anchor: middle;
     pointer-events: none;
@@ -2709,7 +2691,26 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     padding: 15px;
 }
-
+.node-selected {
+    fill: #aacdec;
+    stroke: #115fa5;
+}
+.node-current-over, .node-ancestor-over {
+    /* The currently selected/moused-over node */
+    stroke: #000;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+.node-current-neighbor, .node-ancestor-neighbor {
+    /* The neighboring nodes of the selected/moused-over node */
+    stroke: #115fa5;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
 .node-descendent-over, .node-descendent-neighbor {
     stroke: #115fa5;
     stroke-width: 8px;
