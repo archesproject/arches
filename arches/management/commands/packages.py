@@ -354,6 +354,10 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+            else:
+                print '*'*80
+                print 'No file found at indicated location: {0}'.format(path)
+                print '*'*80
 
     def import_graphs(self, data_source=''):
         """
