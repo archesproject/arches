@@ -225,7 +225,7 @@
 
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
                 <!-- ko foreach: basemaps -->
-                <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap">
+                <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap, css:{'selected': name === self.basemap()}">
                     <div class="map-overlay-vis-toogle text-center">
                         <i class="ion-checkmark-circled" data-bind="css:{'basemap-unselected': name !== self.basemap()}"></i>
                     </div>
