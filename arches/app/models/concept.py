@@ -953,3 +953,10 @@ class ConceptValue(object):
             return Concept(result['top_concept'])
         else:
             return None
+
+
+def get_preflabel_from_valueid(valueid, lang):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)

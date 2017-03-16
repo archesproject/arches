@@ -42,7 +42,6 @@ class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(
             main_script='views/resource',
-            resource_instances=Resource.objects.all().order_by('-createdtime')[:100],
         )
 
         context['nav']['icon'] = "fa fa-bookmark"
