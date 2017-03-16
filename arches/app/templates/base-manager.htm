@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
 
                     <!-- ko if: alert() -->
-                    <div data-bind="visible: alert().active" class="relative">
+                    <div data-bind="visible: alert().active" style="display: none;" class="relative">
                         <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
                             <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
                             <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
