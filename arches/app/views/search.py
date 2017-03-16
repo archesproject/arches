@@ -289,8 +289,8 @@ def build_search_results_dsl(request):
                     public."values" v2
                 WHERE
                     v.conceptid = v2.conceptid and
-                    v.valuetype = 'min year' and
-                    v2.valuetype = 'max year'
+                    v.valuetype = 'min_year' and
+                    v2.valuetype = 'max_year'
             ) as value
             WHERE overlap = true;
         """

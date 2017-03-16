@@ -89,7 +89,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": "",
                     "helpenabled": false,
                     "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
                     "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",

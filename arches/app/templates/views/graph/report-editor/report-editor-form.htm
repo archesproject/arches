@@ -15,7 +15,7 @@
             <input type="text" placeholder="{% trans "Report Title" %}" class="form-control input-md widget-input" data-bind="value: report.get('name'), valueUpdate: 'keyup'">
         </div>
 
-        
+
     </div>
 
     <div class='report-preview' data-bind='component: {
@@ -75,20 +75,5 @@
         </div>
         <!-- /ko -->
     </div>
-    <!-- /ko -->
-
-    <!-- ko if: selection() === 'footer' -->
-    <div class="library-title-block">
-        <h4 class="title-block-title"> {% trans "Footer" %}</h4>
-    </div>
-
-    <div class='report-preview' data-bind='component: {
-        name: reportLookup[report.get("template_id")()].componentname,
-        params: {
-            report: report,
-            configForm: true,
-            configType: "footer"
-        }
-    }'></div>
     <!-- /ko -->
 </div>

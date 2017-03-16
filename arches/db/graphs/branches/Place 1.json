@@ -332,7 +332,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Describes the physical location of a heritage resource or heritage resource group.  Includes extra nodes for cadastral information.\n\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\n",
@@ -347,7 +346,6 @@
                     "name": "Place 1"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -362,7 +360,6 @@
                     "name": "Cadastral Reference"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -377,7 +374,6 @@
                     "name": "Setting Type"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -392,7 +388,6 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -407,7 +402,6 @@
                     "name": "Address"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -422,7 +416,6 @@
                     "name": "Description Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "9bda3163-97cb-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",

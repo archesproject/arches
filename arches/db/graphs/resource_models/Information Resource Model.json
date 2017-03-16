@@ -1271,7 +1271,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1286,7 +1285,6 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Describes the location of an information resource. Relates to Information Resource E73 with P67",
@@ -1301,7 +1299,6 @@
                     "name": "Place 3"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "",
@@ -1316,7 +1313,6 @@
                     "name": "Publication Date"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Used to hold identifiers necessary to link a given resource to records in an external (perhaps legacy) system.",
@@ -1331,7 +1327,6 @@
                     "name": "External Identifier"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
@@ -1346,7 +1341,6 @@
                     "name": "Keyword"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Describes the creators, contributors, type, and date of a creation and/or update event of an information resource.",
@@ -1361,7 +1355,6 @@
                     "name": "Information Resource Creation Event"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Defines time span for which the Information Resource is relevant.\nApplies to: Information Resource",
@@ -1376,7 +1369,6 @@
                     "name": "Temporal Coverage"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Describes the title of an Information Resource.",
@@ -1391,7 +1383,6 @@
                     "name": "Title"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1406,7 +1397,6 @@
                     "name": "Description Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "This branch describes the language of an Information Resource.",
@@ -1421,7 +1411,6 @@
                     "name": "Language"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "An object or substance used to record and accumulate data",
@@ -1436,7 +1425,6 @@
                     "name": "Information Carrier"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Generic branch for capturing free-form written descriptive information.\nIntended to be evolution from v3 description branch from HIP 3. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).  \n\nThis branch meets technical business rules for CRM compliance but CRM experts have said that this is an inappropriate implementation of E62.\n\nConnects to all resources with P140i",
@@ -1451,7 +1439,6 @@
                     "name": "Description"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "This branch describes the publication of an Information Resource.\n\nConnects to Information Resource (E73) with -P128",
@@ -1466,7 +1453,6 @@
                     "name": "Publication Event"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Used to define legal privileges associated with an Information Resource.",
@@ -1481,7 +1467,6 @@
                     "name": "Information Resource Copyright"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",

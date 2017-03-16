@@ -41,21 +41,8 @@ from elasticsearch import Elasticsearch
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
-        instance_summaries = []
-        for resource_instance in Resource.objects.all():
-            instance_summaries.append({
-                'id': resource_instance.pk,
-                'name': resource_instance.displayname,
-                'type': resource_instance.graph.name,
-                'last_edited': '',
-                'qc': '',
-                'public': '',
-                'editor': ''
-            })
-
         context = self.get_context_data(
             main_script='views/resource',
-            instance_summaries=instance_summaries,
         )
 
         context['nav']['icon'] = "fa fa-bookmark"

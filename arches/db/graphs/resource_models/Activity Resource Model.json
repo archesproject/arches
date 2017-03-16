@@ -1018,7 +1018,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1033,7 +1032,6 @@
                     "name": "Administration Subdivision"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Used to hold identifiers necessary to link a given resource to records in an external (perhaps legacy) system.",
@@ -1048,7 +1046,6 @@
                     "name": "External Identifier"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1063,7 +1060,6 @@
                     "name": "Address"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "An informative word used for resource information retrieval that indicates the content of a resource.\n\nRelates to resources via P2.",
@@ -1078,7 +1074,6 @@
                     "name": "Keyword"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Describes the time span and type of an Activity Resource.",
@@ -1093,7 +1088,6 @@
                     "name": "Activity Phase"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Start/End dates for resources.  Assumed to be typed and within calendar time. \n\nConnects to Activity (E7) and Historical Event (E5) resource models via P114\nConnects to Heritage Resource (E18) and Heritage Resource Group (E27) resource models via P12i\nConnects to Actor (E39) resource model via P11i",
@@ -1108,7 +1102,6 @@
                     "name": "Existence"
                 },
                 {
-                    "itemtext": "",
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
@@ -1123,7 +1116,6 @@
                     "name": "Name"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1138,7 +1130,6 @@
                     "name": "Description Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "For Actor resources: Describes the former and current residences of an Actor resource. Relates to Actor E39 with P74 \nFor Activity and Historic Event: Describes the location of where an activity or historic event took place. Relates to Activity E7 with P7. Relates to Historical Event E5 with P7\n",
@@ -1153,7 +1144,6 @@
                     "name": "Place 2"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1168,7 +1158,6 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Generic branch for capturing free-form written descriptive information.\nIntended to be evolution from v3 description branch from HIP 3. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).  \n\nThis branch meets technical business rules for CRM compliance but CRM experts have said that this is an inappropriate implementation of E62.\n\nConnects to all resources with P140i",
@@ -1183,7 +1172,6 @@
                     "name": "Description"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",
@@ -1198,7 +1186,6 @@
                     "name": "Cadastral Reference"
                 },
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
                     "description": "Represents a single node in a graph",

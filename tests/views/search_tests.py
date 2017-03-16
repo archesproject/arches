@@ -51,7 +51,7 @@ class SearchTests(ArchesTestCase):
 
         cls.client = Client()
         cls.client.login(username='admin', password='admin')
-        
+
         models.ResourceInstance.objects.all().delete()
         with open(os.path.join('tests/fixtures/resource_graphs/Search Test Model.json'), 'rU') as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -83,7 +83,7 @@ class SearchTests(ArchesTestCase):
                             "value": "1950",
                             "language": "en-US",
                             "category": "note",
-                            "type": "min year",
+                            "type": "min_year",
                             "id": "",
                             "conceptid": ""
                         },
@@ -91,7 +91,7 @@ class SearchTests(ArchesTestCase):
                             "value": "1980",
                             "language": "en-US",
                             "category": "note",
-                            "type": "max year",
+                            "type": "max_year",
                             "id": "",
                             "conceptid": ""
                         }
@@ -135,7 +135,7 @@ class SearchTests(ArchesTestCase):
 
         # add delay to allow for indexes to be updated
         time.sleep(1)
-        
+
     @classmethod
     def tearDownClass(cls):
         pass

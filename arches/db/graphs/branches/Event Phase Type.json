@@ -219,7 +219,6 @@
             ],
             "cards": [
                 {
-                    "itemtext": null,
                     "helpenabled": false,
                     "graph_id": "db074691-9640-11e6-8a28-026d961c88e6",
                     "description": "Describes a Historical Event Type within a given timespan/phase. \n\nConnects to the Historical Event resource model via P10",
