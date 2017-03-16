@@ -1110,46 +1110,50 @@ define([
                 });
 
                 var resourceLookup = {};
+                var isFeatureVisible = function (feature) {
+                    var overlay = _.find(self.overlays(), function(overlay) {
+                        return _.find(overlay.layer_definitions, function (layer) {
+                            return layer.id === feature.layer.id;
+                        });
+                    });
+                    return !overlay.invisible();
+                }
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
-                    var hoverData = _.find(features, function(feature) {
-                        return feature.properties.resourceinstanceid;
+                    var hoverData = null;
+                    var hoverFeature = _.find(features, function(feature) {
+                        if (feature.properties.resourceinstanceid) {
+                            return isFeatureVisible(feature);
+                        }
                     }) || _.find(features, function(feature) {
-                        return feature.layer.id === 'search-results-hex';
+                        if (feature.layer.id === 'search-results-hex') {
+                            return isFeatureVisible(feature);
+                        }
                     }) || null;
 
-                    if (hoverData && hoverData.properties) {
-                        var overlay = _.find(self.overlays(), function(overlay) {
-                            return _.find(overlay.layer_definitions, function (layer) {
-                                return layer.id === hoverData.layer.id;
-                            });
-                        });
-                        if (overlay.invisible()) {
-                            hoverData = null;
-                        } else {
-                            hoverData = hoverData.properties;
-                            var resourceId = hoverData.resourceinstanceid;
-                            if (resourceId) {
-                                if (resourceLookup[resourceId]) {
-                                    hoverData = resourceLookup[resourceId];
-                                } else {
-                                    hoverData.loading = true;
-                                    hoverData.displaydescription = '';
-                                    hoverData.map_popup = '';
-                                    hoverData.displayname = '';
-                                    hoverData.graphid = '';
-                                    hoverData.graph_name = '';
-                                    hoverData = ko.mapping.fromJS(hoverData);
-                                    resourceLookup[resourceId] = hoverData;
-                                    $.get(arches.urls.resource_descriptors + resourceId, function (data) {
-                                        resourceLookup[resourceId].displaydescription(data.displaydescription);
-                                        resourceLookup[resourceId].map_popup(data.map_popup);
-                                        resourceLookup[resourceId].displayname(data.displayname);
-                                        resourceLookup[resourceId].graphid(data.graphid);
-                                        resourceLookup[resourceId].graph_name(data.graph_name);
-                                        resourceLookup[resourceId].loading(false);
-                                    });
-                                }
+                    if (hoverFeature && hoverFeature.properties) {
+                        hoverData = hoverFeature.properties;
+                        var resourceId = hoverData.resourceinstanceid;
+                        if (resourceId) {
+                            if (resourceLookup[resourceId]) {
+                                hoverData = resourceLookup[resourceId];
+                            } else {
+                                hoverData.loading = true;
+                                hoverData.displaydescription = '';
+                                hoverData.map_popup = '';
+                                hoverData.displayname = '';
+                                hoverData.graphid = '';
+                                hoverData.graph_name = '';
+                                hoverData = ko.mapping.fromJS(hoverData);
+                                resourceLookup[resourceId] = hoverData;
+                                $.get(arches.urls.resource_descriptors + resourceId, function (data) {
+                                    resourceLookup[resourceId].displaydescription(data.displaydescription);
+                                    resourceLookup[resourceId].map_popup(data.map_popup);
+                                    resourceLookup[resourceId].displayname(data.displayname);
+                                    resourceLookup[resourceId].graphid(data.graphid);
+                                    resourceLookup[resourceId].graph_name(data.graph_name);
+                                    resourceLookup[resourceId].loading(false);
+                                });
                             }
                         }
                     }
