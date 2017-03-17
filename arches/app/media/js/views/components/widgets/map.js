@@ -102,7 +102,6 @@ define([
                 }
                 return result;
             }, this)
-
             this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.selectedBasemap = this.basemap;
@@ -1219,7 +1218,14 @@ define([
                 self.map.on('draw.selectionchange', self.updateFeatureStyles());
 
                 if (this.context === 'search-filter') {
-                    self.map.on('moveend', this.searchByExtent)
+                    self.map.on('dragend', this.searchByExtent);
+                    self.map.on('zoomend', this.searchByExtent);
+                    self.map.on('rotateend', this.searchByExtent);
+                    self.map.on('pitch', this.searchByExtent);
+                    this.resizeOnChange.subscribe(function(){
+                        setTimeout(this.searchByExtent, 600);
+                    }, self);
+                    $(window).on("resize", this.searchByExtent);
                 } else {
                     self.map.on('moveend', this.updateConfigs());
                 }
