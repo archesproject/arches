@@ -80,6 +80,7 @@ class ResourceEditorView(BaseManagerView):
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+            displayname = Resource.objects.get(pk=resourceid).displayname
 
             context = self.get_context_data(
                 main_script='views/resource/editor',
@@ -96,6 +97,7 @@ class ResourceEditorView(BaseManagerView):
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
+                displayname=displayname,
             )
 
             if graph.iconclass:
