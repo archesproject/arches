@@ -122,7 +122,8 @@ class CsvReader(Reader):
             newresourceinstance = Resource(
                 resourceinstanceid=resourceinstanceid,
                 graph_id=target_resource_model,
-                legacyid=legacyid
+                legacyid=legacyid,
+                createdtime=datetime.datetime.now()
             )
             # add the tiles to the resource instance
             newresourceinstance.tiles = populated_tiles
@@ -139,24 +140,6 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
-
-        # def get_resourceid_from_legacyid(legacyid, overwrite):
-        #     # Get resources with the given legacyid
-        #     ret = Resource.objects.filter(legacyid=legacyid)
-        #
-        #     # If more than one resource is returned than make resource = None. This should never actually happen.
-        #     if len(ret) > 1:
-        #         resourceid = None
-        #     # If no resource is returned with the given legacyid then create an archesid for the resource.
-        #     elif len(ret) == 0:
-        #         resourceid = uuid.uuid4()
-        #     # If a resource is returned with the give legacyid then return its archesid
-        #     else:
-        #         if overwrite = True:
-        #             ret.objects.delete()
-        #         resourceid = ret[0].resourceinstanceid
-        #
-        #     return resourceid
 
         def process_resourceid(resourceid, overwrite):
             # Test if resourceid is a UUID.
@@ -203,6 +186,21 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
+                resourceids = []
+                non_contiguous_resource_ids = []
+
+                for row_number, row in enumerate(business_data):
+                    # Check contiguousness of csv file.
+                    if row['ResourceID'] != previous_row_resourceid and row['ResourceID'] in resourceids:
+                        non_contiguous_resource_ids.append(row['ResourceID'])
+                    else:
+                        resourceids.append(row['ResourceID'])
+
+                if len(non_contiguous_resource_ids) > 0:
+                    print '*'*80
+                    print 'ERROR: Resources in your csv file are non-contiguous. Please sort your csv file by ResourceID and try import again.'
+                    print '*'*80
+                    sys.exit()
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:
