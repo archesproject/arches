@@ -118,11 +118,13 @@ class CsvReader(Reader):
 
     def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk):
         # create a resource instance only if there are populated_tiles
+        errors = []
         if len(populated_tiles) > 0:
             newresourceinstance = Resource(
                 resourceinstanceid=resourceinstanceid,
                 graph_id=target_resource_model,
-                legacyid=legacyid
+                legacyid=legacyid,
+                createdtime=datetime.datetime.now()
             )
             # add the tiles to the resource instance
             newresourceinstance.tiles = populated_tiles
@@ -135,6 +137,11 @@ class CsvReader(Reader):
                     del resources[:]  #clear out the array
             else:
                 newresourceinstance.save()
+        else:
+            errors.append({'type': 'WARNING', 'message': 'No resource created for legacyid: {0}. Make sure there is data to be imported for this resource and it is mapped properly in your mapping file.'.format(legacyid)})
+            if len(errors) > 0:
+                self.errors += errors
+
 
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
@@ -237,10 +244,9 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append({'value': value, 'message': e, 'source': source, 'datatype':'unknown'})
-
-                        if len(errors) > 0:
-                            self.errors += errors
+                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format('unknown', value, source, e)})
+                            if len(errors) > 0:
+                                self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
 
