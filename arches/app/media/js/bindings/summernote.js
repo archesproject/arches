@@ -17,6 +17,14 @@ define([
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
+            $('.note-codable').on( "keyup", function(text){
+                text.currentTarget.value = text.currentTarget.value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                console.log(text.currentTarget.value)
+            })
+            $('.note-codable').on( "paste", function(text){
+                text.currentTarget.value = text.currentTarget.value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                console.log(text.currentTarget.value)
+            })
             options = (typeof options === 'object') ? options : {};
             options = _.defaults(options, {
                 height: 150,
