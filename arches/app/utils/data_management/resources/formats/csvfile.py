@@ -122,8 +122,7 @@ class CsvReader(Reader):
             newresourceinstance = Resource(
                 resourceinstanceid=resourceinstanceid,
                 graph_id=target_resource_model,
-                legacyid=legacyid,
-                createdtime=datetime.datetime.now()
+                legacyid=legacyid
             )
             # add the tiles to the resource instance
             newresourceinstance.tiles = populated_tiles
@@ -150,7 +149,6 @@ class CsvReader(Reader):
                     ret = Resource.objects.filter(resourceinstanceid=resourceid)
                     # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
                     if overwrite == 'overwrite':
-                        # resource.objects.delete()
                         Resource(str(ret[0].resourceinstanceid)).delete()
                     resourceinstanceid = resourceinstanceid
                 # If resourceid is not a UUID create one.
@@ -186,15 +184,19 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
+
+                # This code can probably be moved into it's own module.
                 resourceids = []
                 non_contiguous_resource_ids = []
+                previous_row_for_validation = None
 
                 for row_number, row in enumerate(business_data):
                     # Check contiguousness of csv file.
-                    if row['ResourceID'] != previous_row_resourceid and row['ResourceID'] in resourceids:
+                    if row['ResourceID'] != previous_row_for_validation and row['ResourceID'] in resourceids:
                         non_contiguous_resource_ids.append(row['ResourceID'])
                     else:
                         resourceids.append(row['ResourceID'])
+                    previous_row_for_validation = row['ResourceID']
 
                 if len(non_contiguous_resource_ids) > 0:
                     print '*'*80
