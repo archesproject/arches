@@ -298,15 +298,6 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def load_concept_scheme(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
-        load(data_source)
-
     def index_database(self, package_name):
         """
         Runs the index_database command found in package_utils
