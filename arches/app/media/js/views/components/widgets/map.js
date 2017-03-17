@@ -122,7 +122,7 @@ define([
             this.buffer = ko.observable(100.0);
             this.queryFeature;
             this.extentSearch = ko.observable(false);
-
+            this.geojsonString = ko.observable();
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
@@ -310,6 +310,20 @@ define([
                 }
             }
 
+            this.updateDrawLayerWithJson = function(val){
+                    console.log(val)
+                    try {
+                        var data = JSON.parse(val)
+                        console.log(data)
+                        self.draw.add(data)
+                        self.saveGeometries()()
+                    } catch(err) {
+                        console.log('invalid json')
+                    }
+            }
+
+
+            this.geojsonString.subscribe(this.updateDrawLayerWithJson, self)
             /**
              * Creates the map layer for the resource with widget configs
              * @return {object}
@@ -421,6 +435,7 @@ define([
                     id: 'Polygon'
                 }]
             };
+
 
             /**
              * prepares the map for the widget after the mapbox bindingHandler has instantiated a map object
@@ -930,6 +945,7 @@ define([
                     var self = this;
                     return function() {
                         var currentDrawing = self.draw.getAll()
+                        console.log('cd', currentDrawing)
                         if (self.value.features !== undefined) {
                             _.each(self.value.features(), function(feature) {
                                 self.value.features.pop()
