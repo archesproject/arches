@@ -116,7 +116,7 @@ class CsvWriter(Writer):
 
 class CsvReader(Reader):
 
-    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk):
+    def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count):
         # create a resource instance only if there are populated_tiles
         errors = []
         if len(populated_tiles) > 0:
@@ -133,7 +133,6 @@ class CsvReader(Reader):
                 resources.append(newresourceinstance)
                 if len(resources) == settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources)
-                    print _('%s resources saved' % save_count)
                     del resources[:]  #clear out the array
             else:
                 newresourceinstance.save()
@@ -142,6 +141,9 @@ class CsvReader(Reader):
             if len(errors) > 0:
                 self.errors += errors
 
+
+        if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
+            print '%s resources processed' % str(save_count)
 
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
@@ -274,9 +276,8 @@ class CsvReader(Reader):
                     if row['ResourceID'] != previous_row_resourceid and previous_row_resourceid is not None:
 
                         save_count = save_count + 1
-                        if save_count%250 == 0:
-                            print str(save_count) + ' resources processed'
-                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
+                        self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
+                        
                         # reset values for next resource instance
                         populated_tiles = []
                         resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
@@ -392,7 +393,7 @@ class CsvReader(Reader):
                     legacyid = row['ResourceID']
 
                 if 'legacyid' in locals():
-                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk)
+                    self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
