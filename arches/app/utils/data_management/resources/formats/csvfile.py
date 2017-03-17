@@ -118,11 +118,13 @@ class CsvReader(Reader):
 
     def save_resource(self, populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count):
         # create a resource instance only if there are populated_tiles
+        errors = []
         if len(populated_tiles) > 0:
             newresourceinstance = Resource(
                 resourceinstanceid=resourceinstanceid,
                 graph_id=target_resource_model,
-                legacyid=legacyid
+                legacyid=legacyid,
+                createdtime=datetime.datetime.now()
             )
             # add the tiles to the resource instance
             newresourceinstance.tiles = populated_tiles
@@ -134,6 +136,11 @@ class CsvReader(Reader):
                     del resources[:]  #clear out the array
             else:
                 newresourceinstance.save()
+        else:
+            errors.append({'type': 'WARNING', 'message': 'No resource created for legacyid: {0}. Make sure there is data to be imported for this resource and it is mapped properly in your mapping file.'.format(legacyid)})
+            if len(errors) > 0:
+                self.errors += errors
+
 
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
             print '%s resources processed' % str(save_count)
@@ -141,24 +148,6 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
-
-        # def get_resourceid_from_legacyid(legacyid, overwrite):
-        #     # Get resources with the given legacyid
-        #     ret = Resource.objects.filter(legacyid=legacyid)
-        #
-        #     # If more than one resource is returned than make resource = None. This should never actually happen.
-        #     if len(ret) > 1:
-        #         resourceid = None
-        #     # If no resource is returned with the given legacyid then create an archesid for the resource.
-        #     elif len(ret) == 0:
-        #         resourceid = uuid.uuid4()
-        #     # If a resource is returned with the give legacyid then return its archesid
-        #     else:
-        #         if overwrite = True:
-        #             ret.objects.delete()
-        #         resourceid = ret[0].resourceinstanceid
-        #
-        #     return resourceid
 
         def process_resourceid(resourceid, overwrite):
             # Test if resourceid is a UUID.
@@ -169,7 +158,6 @@ class CsvReader(Reader):
                     ret = Resource.objects.filter(resourceinstanceid=resourceid)
                     # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
                     if overwrite == 'overwrite':
-                        # resource.objects.delete()
                         Resource(str(ret[0].resourceinstanceid)).delete()
                     resourceinstanceid = resourceinstanceid
                 # If resourceid is not a UUID create one.
@@ -206,6 +194,25 @@ class CsvReader(Reader):
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
 
+                # This code can probably be moved into it's own module.
+                resourceids = []
+                non_contiguous_resource_ids = []
+                previous_row_for_validation = None
+
+                for row_number, row in enumerate(business_data):
+                    # Check contiguousness of csv file.
+                    if row['ResourceID'] != previous_row_for_validation and row['ResourceID'] in resourceids:
+                        non_contiguous_resource_ids.append(row['ResourceID'])
+                    else:
+                        resourceids.append(row['ResourceID'])
+                    previous_row_for_validation = row['ResourceID']
+
+                if len(non_contiguous_resource_ids) > 0:
+                    print '*'*80
+                    print 'ERROR: Resources in your csv file are non-contiguous. Please sort your csv file by ResourceID and try import again.'
+                    print '*'*80
+                    sys.exit()
+
                 def cache(blank_tile):
                     if blank_tile.data != {}:
                         for key in blank_tile.data.keys():
@@ -239,10 +246,9 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append({'value': value, 'message': e, 'source': source, 'datatype':'unknown'})
-
-                        if len(errors) > 0:
-                            self.errors += errors
+                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format('unknown', value, source, e)})
+                            if len(errors) > 0:
+                                self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
 

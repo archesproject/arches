@@ -61,6 +61,7 @@ class BusinessDataImporter(object):
                 print '*'*80
                 print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
                 print '*'*80
+                sys.exit()
         else:
             try:
                 mapping_file = [mapping_file]
@@ -68,6 +69,7 @@ class BusinessDataImporter(object):
                 print '*'*80
                 print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
                 print '*'*80
+                sys.exit()
 
         if relations_file == None:
             try:

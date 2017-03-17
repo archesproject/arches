@@ -3797,7 +3797,7 @@
                     "edgeid": "93a3a630-fd59-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "93a3a61b-fd59-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3824,7 +3824,7 @@
                     "edgeid": "c31ba540-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "c31ba521-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3851,7 +3851,7 @@
                     "edgeid": "78f4cb12-fd61-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "78f4cb0d-fd61-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3869,7 +3869,7 @@
                     "edgeid": "6b5d6a5f-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a3c-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3896,7 +3896,7 @@
                     "edgeid": "6b5d6a55-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a30-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3914,7 +3914,7 @@
                     "edgeid": "6b5d6a56-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a27-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3995,7 +3995,7 @@
                     "edgeid": "6b5d6a5a-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a2d-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4022,7 +4022,7 @@
                     "edgeid": "6b5d6a54-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a39-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4175,7 +4175,7 @@
                     "edgeid": "6b5d6a62-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a2a-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4184,7 +4184,7 @@
                     "edgeid": "6b5d6a63-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a36-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4193,7 +4193,7 @@
                     "edgeid": "93a3a62f-fd59-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "93a3a61b-fd59-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "93a3a61e-fd59-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4211,7 +4211,7 @@
                     "edgeid": "6b5d6a64-fd4d-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "6b5d6a33-fd4d-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4337,7 +4337,7 @@
                     "edgeid": "2292af7d-fd55-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "2292af6b-fd55-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4364,7 +4364,7 @@
                     "edgeid": "26243e46-fd58-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "3af584c2-fd4d-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "26243e3f-fd58-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -4412,7 +4412,7 @@
             ],
             "cards": [
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "",
                     "visible": true,
@@ -4426,7 +4426,7 @@
                     "name": "Find Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Phase Type Assignments for Heritage Resource E18.\n\nConnects via P92i",
                     "visible": true,
@@ -4440,7 +4440,7 @@
                     "name": "Find Phase Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4454,7 +4454,7 @@
                     "name": "Cadastral Reference"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Describes the physical location of a heritage resource or heritage resource group.  Includes extra nodes for cadastral information.\n\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\n",
                     "visible": true,
@@ -4468,7 +4468,7 @@
                     "name": "Location"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
                     "visible": true,
@@ -4482,7 +4482,7 @@
                     "name": "Condition Assessment"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
                     "visible": true,
@@ -4496,7 +4496,7 @@
                     "name": "Place Name"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Physical thing on a heritage resource. Connect to Heritage Resource E18 via P46",
                     "visible": true,
@@ -4510,7 +4510,7 @@
                     "name": "Component"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Start/End dates for resources.  Assumed to be typed and within calendar time. \n\nConnects to Activity (E7) and Historical Event (E5) resource models via P114\nConnects to Heritage Resource (E18) and Heritage Resource Group (E27) resource models via P12i\nConnects to Actor (E39) resource model via P11i",
                     "visible": true,
@@ -4524,7 +4524,7 @@
                     "name": "Start and End Dates"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage",
                     "visible": true,
@@ -4538,7 +4538,7 @@
                     "name": "HER Record Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "",
                     "visible": true,
@@ -4552,7 +4552,7 @@
                     "name": "Recovery"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Used to hold identifiers necessary to link a given resource to records in an external (perhaps legacy) system.",
                     "visible": true,
@@ -4566,7 +4566,7 @@
                     "name": "External Identifier"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4580,7 +4580,7 @@
                     "name": "Description Location"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4594,7 +4594,7 @@
                     "name": "Administration Subdivision"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
                     "visible": true,
@@ -4608,7 +4608,7 @@
                     "name": "Name"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
                     "visible": true,
@@ -4622,7 +4622,7 @@
                     "name": "Measurement"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4636,7 +4636,7 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "This branch contains both a description and the content of an inscription on a find. ",
                     "visible": true,
@@ -4650,7 +4650,7 @@
                     "name": "Inscription"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4664,7 +4664,7 @@
                     "name": "Address"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage",
                     "visible": true,
@@ -4678,7 +4678,7 @@
                     "name": "Location Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "3af584c3-fd4d-11e6-9e3e-026d961c88e6",
                     "description": "Generic branch for capturing free-form written descriptive information.\nIntended to be evolution from v3 description branch from HIP 3. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).  \n\nThis branch meets technical business rules for CRM compliance but CRM experts have said that this is an inappropriate implementation of E62.\n\nConnects to all resources with P140i",
                     "visible": true,
