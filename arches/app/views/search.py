@@ -429,8 +429,8 @@ def time_wheel_config(request):
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
         # round min and max date to the nearest 1000 years
-        min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
-        max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
+        min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
+        max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
 
         query = Query(se, limit=0)
         for millennium in range(int(min_date),int(max_date)+1000,1000):
