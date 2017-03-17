@@ -65,7 +65,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def import_relations(self, relation_configs=None, relations=None):
+    def import_relations(self, relations=None):
 
         def get_resourceid_from_legacyid(legacyid):
             ret = Resource.objects.filter(legacyid=legacyid)
