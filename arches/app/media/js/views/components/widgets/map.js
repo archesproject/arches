@@ -102,7 +102,6 @@ define([
                 }
                 return result;
             }, this)
-
             this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.selectedBasemap = this.basemap;
@@ -139,6 +138,11 @@ define([
             });
 
             this.hoverData = ko.observable(null);
+            this.clickData = ko.observable(null);
+            this.popupData = ko.computed(function () {
+                var hoverData = self.hoverData();
+                return hoverData ? hoverData : self.clickData();
+            });
 
             // TODO: This should be a system config rather than hard-coded here
             this.geocoderProviders = ko.observableArray([{
@@ -1110,6 +1114,29 @@ define([
                 });
 
                 var resourceLookup = {};
+                var lookupResourceData = function (resourceData) {
+                    var resourceId = resourceData.resourceinstanceid;
+                    if (resourceLookup[resourceId]) {
+                        return resourceLookup[resourceId];
+                    }
+                    resourceData.loading = true;
+                    resourceData.displaydescription = '';
+                    resourceData.map_popup = '';
+                    resourceData.displayname = '';
+                    resourceData.graphid = '';
+                    resourceData.graph_name = '';
+                    resourceData = ko.mapping.fromJS(resourceData);
+                    resourceLookup[resourceId] = resourceData;
+                    $.get(arches.urls.resource_descriptors + resourceId, function (data) {
+                        resourceLookup[resourceId].displaydescription(data.displaydescription);
+                        resourceLookup[resourceId].map_popup(data.map_popup);
+                        resourceLookup[resourceId].displayname(data.displayname);
+                        resourceLookup[resourceId].graphid(data.graphid);
+                        resourceLookup[resourceId].graph_name(data.graph_name);
+                        resourceLookup[resourceId].loading(false);
+                    });
+                    return resourceLookup[resourceId];
+                }
                 var isFeatureVisible = function (feature) {
                     var overlay = _.find(self.overlays(), function(overlay) {
                         return _.find(overlay.layer_definitions, function (layer) {
@@ -1121,6 +1148,7 @@ define([
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var hoverData = null;
+                    var clickable = false;
                     var hoverFeature = _.find(features, function(feature) {
                         if (feature.properties.resourceinstanceid) {
                             return isFeatureVisible(feature);
@@ -1133,56 +1161,53 @@ define([
 
                     if (hoverFeature && hoverFeature.properties) {
                         hoverData = hoverFeature.properties;
-                        var resourceId = hoverData.resourceinstanceid;
-                        if (resourceId) {
-                            if (resourceLookup[resourceId]) {
-                                hoverData = resourceLookup[resourceId];
-                            } else {
-                                hoverData.loading = true;
-                                hoverData.displaydescription = '';
-                                hoverData.map_popup = '';
-                                hoverData.displayname = '';
-                                hoverData.graphid = '';
-                                hoverData.graph_name = '';
-                                hoverData = ko.mapping.fromJS(hoverData);
-                                resourceLookup[resourceId] = hoverData;
-                                $.get(arches.urls.resource_descriptors + resourceId, function (data) {
-                                    resourceLookup[resourceId].displaydescription(data.displaydescription);
-                                    resourceLookup[resourceId].map_popup(data.map_popup);
-                                    resourceLookup[resourceId].displayname(data.displayname);
-                                    resourceLookup[resourceId].graphid(data.graphid);
-                                    resourceLookup[resourceId].graph_name(data.graph_name);
-                                    resourceLookup[resourceId].loading(false);
-                                });
-                            }
+                        if (hoverFeature.properties.resourceinstanceid) {
+                            hoverData = lookupResourceData(hoverData);
+                            clickable = true;
                         }
                     }
 
                     if (self.hoverData() !== hoverData) {
                         self.hoverData(hoverData);
                     }
+                    self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                 }, this);
 
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
+                    var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
-                        return feature.layer.id.indexOf('resources') === 0;
-                    }) || null;
-                    if (clickFeature && clickFeature.properties.total > 1) {
-                        var coordinates = JSON.parse(clickFeature.properties.extent).coordinates;
-                        if (Array.isArray(coordinates[0])) {
-                            coordinates = coordinates[0];
-                        } else {
-                            coordinates = [coordinates];
+                        if (feature.properties.resourceinstanceid) {
+                            return isFeatureVisible(feature);
                         }
+                    }) || _.find(features, function(feature) {
+                        if (feature.properties.total > 1) {
+                            return isFeatureVisible(feature);
+                        }
+                    }) || null;
+                    if (clickFeature) {
+                        if (clickFeature.properties.resourceinstanceid) {
+                            clickData = lookupResourceData(clickFeature.properties);
+                        } else if (clickFeature.properties.total > 1) {
+                            var coordinates = JSON.parse(clickFeature.properties.extent).coordinates;
+                            if (Array.isArray(coordinates[0])) {
+                                coordinates = coordinates[0];
+                            } else {
+                                coordinates = [coordinates];
+                            }
 
-                        var bounds = coordinates.reduce(function(bounds, coord) {
-                            return bounds.extend(coord);
-                        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+                            var bounds = coordinates.reduce(function(bounds, coord) {
+                                return bounds.extend(coord);
+                            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
-                        map.fitBounds(bounds, {
-                            padding: 20
-                        });
+                            map.fitBounds(bounds, {
+                                padding: 20
+                            });
+                        }
+                    }
+
+                    if (self.clickData() !== clickData) {
+                        self.clickData(clickData);
                     }
                 });
 
@@ -1193,7 +1218,14 @@ define([
                 self.map.on('draw.selectionchange', self.updateFeatureStyles());
 
                 if (this.context === 'search-filter') {
-                    self.map.on('moveend', this.searchByExtent)
+                    self.map.on('dragend', this.searchByExtent);
+                    self.map.on('zoomend', this.searchByExtent);
+                    self.map.on('rotateend', this.searchByExtent);
+                    self.map.on('pitch', this.searchByExtent);
+                    this.resizeOnChange.subscribe(function(){
+                        setTimeout(this.searchByExtent, 600);
+                    }, self);
+                    $(window).on("resize", this.searchByExtent);
                 } else {
                     self.map.on('moveend', this.updateConfigs());
                 }
