@@ -2644,8 +2644,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     pointer-events: none;
 }
 .node-ancestor {
-    stroke: #ededed;
-    fill: #fefefe;
+    /* Nodes that are unselected or not highlighted as neighbors during mousover */
+    stroke: #b3b3b3;
+    fill: #dcecfa;
     opacity: 1.;
     stroke-width: 1px;
     cursor: pointer;
@@ -2668,6 +2669,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke-dasharray: 8, 5;
 }
 .linkMouseover {
+    /*Styles the link between selected/moused-over nodes*/
     stroke: #a1a1a1;
     stroke-opacity: .6;
     stroke-width: 5px;
@@ -2694,6 +2696,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #115fa5;
 }
 .node-current-over, .node-ancestor-over {
+    /* The currently selected/moused-over node */
     stroke: #000;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2701,6 +2704,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 .node-current-neighbor, .node-ancestor-neighbor {
+    /* The neighboring nodes of the selected/moused-over node */
     stroke: #115fa5;
     stroke-width: 3px;
     fill: #dcecfa;

@@ -137,9 +137,6 @@ define([
                     .attr("class", function(d){
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
-                    .attr("style", function(d){
-                        return "fill:" + modelMap[d.entitytypeid].color + ";";
-                    })
                     .on("mouseover", function(d){
                         vis.selectAll("circle")
                             .attr("class", function(d1){
@@ -150,9 +147,6 @@ define([
                                     className += '-neighbor';
                                 }
                                 return className;
-                            })
-                            .attr("style", function(d1){
-                                return "fill:" + modelMap[d.entitytypeid].color + ";"
                             });
                         vis.selectAll("line")
                             .attr('class', function(l) {
