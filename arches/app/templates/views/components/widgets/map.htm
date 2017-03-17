@@ -147,46 +147,54 @@
             <!--/ko-->
         </div>
 
-        <!-- ko if: hoverData() !== null -->
+        <!-- ko if: popupData() !== null -->
         <div class="hover-feature-info">
-            <!-- ko if: hoverData().graph_name -->
-                <!-- ko if: hoverData().loading() -->
+            <!-- ko if: popupData().graph_name -->
+                <!-- ko if: popupData().loading() -->
                 <div class="hover-feature-body hover-feature-loading">
                     <i class="fa fa-spin fa-spinner"></i>
                     {% trans "Loading..." %}
                 </div>
                 <!--/ko-->
 
-                <!-- ko if: !hoverData().loading() -->
+                <!-- ko if: !popupData().loading() -->
                 <div class="hover-feature-title-bar">
                     <div class="hover-feature-title">
-                        <span data-bind="text: hoverData().displayname"></span>
+                        <span data-bind="text: popupData().displayname"></span>
+                        <i class="ion-ios-close pull-right add-tooltip"
+                            style="cursor: pointer;"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            data-original-title="add overlay"
+                            data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                        ></i>
                     </div>
                 </div>
                 <div class="hover-feature-body">
                     <div>
                         {% trans "Resource ID:" %}
-                        <span data-bind="text: hoverData().resourceinstanceid"></span>
+                        <span data-bind="text: popupData().resourceinstanceid"></span>
                     </div>
                     <div>
                         {% trans "Resource Model:" %}
-                        <span data-bind="text: hoverData().graph_name"></span>
+                        <span data-bind="text: popupData().graph_name"></span>
                     </div>
-                    <div class="hover-feature" data-bind="text: hoverData().map_popup"></div>
+                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
                 </div>
                 <!--/ko-->
             <!--/ko-->
 
-            <!-- ko if: hoverData().doc_count -->
+            <!-- ko if: popupData().doc_count -->
             <div class="hover-panel-small">
                 <div class="hover-feature-title-bar">
                     <div class="hover-feature-title">Search Results</div>
                 </div>
                 <div class="hover-feature-body">
-                    <span>This cell contains</span><span class="text-semibold" data-bind="text: ' ' + hoverData().doc_count"></span><span> result(s)</span>
+                    <span>This cell contains</span><span class="text-semibold" data-bind="text: ' ' + popupData().doc_count"></span><span> result(s)</span>
                 </div>
             </div>
             <!--/ko-->
+
         </div>
         <!--/ko-->
 
