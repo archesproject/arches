@@ -81,6 +81,8 @@ class ResourceEditorView(BaseManagerView):
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
             displayname = Resource.objects.get(pk=resourceid).displayname
+            if displayname == 'undefined':
+                displayname = 'Unnamed Resource' 
 
             context = self.get_context_data(
                 main_script='views/resource/editor',
