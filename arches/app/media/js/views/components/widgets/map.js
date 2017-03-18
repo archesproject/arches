@@ -949,7 +949,6 @@ define([
                     var self = this;
                     return function() {
                         var currentDrawing = self.draw.getAll()
-                        console.log('cd', currentDrawing)
                         if (self.value.features !== undefined) {
                             _.each(self.value.features(), function(feature) {
                                 self.value.features.pop()
