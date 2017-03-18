@@ -5,6 +5,7 @@ import json
 import uuid
 import importlib
 import datetime
+import unicodecsv
 from time import time
 from os.path import isfile, join
 from django.conf import settings
@@ -103,7 +104,7 @@ class BusinessDataImporter(object):
                             if 'business_data' in archesfile.keys():
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
-                        data = csv.DictReader(open(file[0], 'r'))
+                        data = unicodecsv.DictReader(open(file[0], 'r'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
                 else:
                     print str(file) + ' is not a valid file'
@@ -134,15 +135,6 @@ class BusinessDataImporter(object):
                     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
                     print '*'*80
                     sys.exit()
-            elif file_format == 'shp':
-                # if mapping != None:
-                #     SHPFileImporter().import_business_data(business_data, mapping)
-                # else:
-                #     print '*'*80
-                #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-                #     print '*'*80
-                #     sys.exit()
-                pass
 
             # Import resource to resource relationships
             reader.import_relations(relations=self.relations)
