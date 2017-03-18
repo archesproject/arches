@@ -183,7 +183,13 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
-                resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
+                try:
+                    resourceinstanceid = process_resourceid(business_data[0]['ResourceID'], overwrite)
+                except KeyError:
+                    print '*'*80
+                    print 'ERROR: No column \'ResourceID\' found in business data file. Please add a \'ResourceID\' column with a unique resource identifier.'
+                    print '*'*80
+                    sys.exit()
                 blanktilecache = {}
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
@@ -224,8 +230,13 @@ class CsvReader(Reader):
                                 if key not in blanktilecache:
                                     blanktilecache[str(key)] = blank_tile
 
-                def column_names_to_targetids(row, mapping):
+                def column_names_to_targetids(row, mapping, row_number):
+                    errors = []
                     new_row = []
+                    if 'ADDITIONAL' in row or 'MISSING' in row:
+                        errors.append({'type': 'WARNING', 'message': 'No resource created for ResourceID {0}. Line {1} has additional or missing columns.'.format(row['ResourceID'], str(int(row_number.split('on line ')[1])))})
+                        if len(errors) > 0:
+                            self.errors += errors
                     for key, value in row.iteritems():
                         if value != '':
                             for row in mapping['nodes']:
@@ -246,7 +257,7 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format('unknown', value, source, e)})
+                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
                             if len(errors) > 0:
                                 self.errors += errors
                     else:
@@ -277,17 +288,23 @@ class CsvReader(Reader):
 
                         save_count = save_count + 1
                         self.save_resource(populated_tiles, resourceinstanceid, legacyid, resources, target_resource_model, bulk, save_count)
-                        
+
                         # reset values for next resource instance
                         populated_tiles = []
                         resourceinstanceid = process_resourceid(row['ResourceID'], overwrite)
                         populated_nodegroups[resourceinstanceid] = []
 
-                    source_data = column_names_to_targetids(row, mapping)
+                    source_data = column_names_to_targetids(row, mapping, row_number)
 
                     if len(source_data) > 0:
                         if source_data[0].keys():
-                            target_resource_model = all_nodes.get(nodeid=source_data[0].keys()[0]).graph_id
+                            try:
+                                target_resource_model = all_nodes.get(nodeid=source_data[0].keys()[0]).graph_id
+                            except:
+                                print '*'*80
+                                print 'ERROR: No resource model found. Please make sure the resource model this business data is mapped to has been imported into Arches.'
+                                print '*'*80
+                                sys.exit()
 
                         target_tile = get_blank_tile(source_data)
 
