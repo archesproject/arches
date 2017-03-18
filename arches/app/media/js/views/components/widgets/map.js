@@ -1016,7 +1016,7 @@ define([
                     var coords4326;
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
-                        if (val > 0) {
+                        if (val >= 0) {
                             var transformer = proj4('EPSG:4326','EPSG:3857');
                             coords = self.queryFeature.geometry.coordinates;
                             switch (self.queryFeature.geometry.type) {
@@ -1032,14 +1032,9 @@ define([
                             var jstsFeature = reader.read(prebufferFeature)
                             var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
                             var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature =     {
-                                      "type": "Feature",
-                                      "properties": {},
-                                      "geometry": {
-                                        "type": "Polygon",
-                                        "coordinates": coords4326
-                                      }
-                                    }
+                            var bufferFeature = turf.polygon(coords4326);
+
+
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
@@ -1110,8 +1105,15 @@ define([
                 })
 
                 this.buffer.subscribe(function(val) {
-                    self.applySearchBuffer(val)
-                });
+                    var maxBuffer = 100000;
+                    if(val < 0){
+                        this.buffer(0)
+                    }else if(val > maxBuffer){
+                        this.buffer(maxBuffer)
+                    }else{
+                        this.applySearchBuffer(val)
+                    }
+                }, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
