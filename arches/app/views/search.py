@@ -25,7 +25,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Polygon
 from django.db import connection
 from django.db.models import Max, Min
 from django.http import HttpResponseNotFound
@@ -366,6 +366,7 @@ def buffer(request):
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
+    geom = GEOSGeometry(geojson, srid=4326)
 
     try:
         width = float(width)
@@ -373,17 +374,14 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
-        geom = GEOSGeometry(geojson, srid=4326)
-        geom.transform(3857)
-
         if unit == 'ft':
             width = width/3.28084
+        
+        geom.transform(3857)
+        geom = geom.buffer(width)
+        geom.transform(4326)
 
-        buffered_geom = geom.buffer(width)
-        buffered_geom.transform(4326)
-        return buffered_geom
-    else:
-        return GEOSGeometry(geojson)
+    return geom
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
@@ -429,8 +427,8 @@ def time_wheel_config(request):
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
         # round min and max date to the nearest 1000 years
-        min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
-        max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
+        min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
+        max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
 
         query = Query(se, limit=0)
         for millennium in range(int(min_date),int(max_date)+1000,1000):

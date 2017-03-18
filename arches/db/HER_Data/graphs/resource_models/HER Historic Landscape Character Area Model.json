@@ -3616,7 +3616,7 @@
                     "edgeid": "ef7ff9f4-fed2-11e6-9e3e-026d961c88e6",
                     "domainnode_id": "ef7ff9c8-fed2-11e6-9e3e-026d961c88e6",
                     "rangenode_id": "ef7ff9d5-fed2-11e6-9e3e-026d961c88e6",
-                    "ontologyproperty": null,
+                    "ontologyproperty": "L54_is_same-as",
                     "description": null
                 },
                 {
@@ -3870,7 +3870,7 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "",
                     "visible": true,
@@ -3884,7 +3884,7 @@
                     "name": "Land Class"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Generic branch for capturing free-form written descriptive information.\nIntended to be evolution from v3 description branch from HIP 3. Created semantic description node with description string and description type hanging off of it. Description (semantic node) becomes a grouping node (type and string).  \n\nThis branch meets technical business rules for CRM compliance but CRM experts have said that this is an inappropriate implementation of E62.\n\nConnects to all resources with P140i",
                     "visible": true,
@@ -3898,7 +3898,7 @@
                     "name": "Description"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Phase Type Assignments for Heritage Resource Group E27\n\nConnects via P92i",
                     "visible": true,
@@ -3912,7 +3912,7 @@
                     "name": "HER HLCA Phase Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Used to hold identifiers necessary to link a given resource to records in an external (perhaps legacy) system.",
                     "visible": true,
@@ -3926,7 +3926,7 @@
                     "name": "External Identifier"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Generic branch for capturing codes for a resource.\n\nConnects to all resources with P140i",
                     "visible": true,
@@ -3940,7 +3940,7 @@
                     "name": "HER Code Assignment"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -3954,7 +3954,7 @@
                     "name": "Spatial Location"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
                     "visible": true,
@@ -3968,7 +3968,7 @@
                     "name": "Measurement"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -3982,7 +3982,7 @@
                     "name": "Cadastral Reference"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
                     "visible": true,
@@ -3996,7 +3996,7 @@
                     "name": "Name"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4010,7 +4010,7 @@
                     "name": "Description Location"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "",
                     "visible": true,
@@ -4024,7 +4024,7 @@
                     "name": "Historic Landscape Character Area  Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,
@@ -4038,7 +4038,7 @@
                     "name": "Administration Subdivision"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Describes the physical location of a heritage resource or heritage resource group.  Includes extra nodes for cadastral information.\n\nRelates to Heritage Resource E18 with P53\nRelates to Heritage Resource Group E27 with P89\n",
                     "visible": true,
@@ -4052,7 +4052,7 @@
                     "name": "Place-HER"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "",
                     "visible": true,
@@ -4066,7 +4066,7 @@
                     "name": "HER Classification by Map Source"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage",
                     "visible": true,
@@ -4080,7 +4080,7 @@
                     "name": "HER Record Type"
                 },
                 {
-                    "helpenabled": false, 
+                    "helpenabled": false,
                     "graph_id": "a36e7137-fed2-11e6-9e3e-026d961c88e6",
                     "description": "Represents a single node in a graph",
                     "visible": true,

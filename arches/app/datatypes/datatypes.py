@@ -42,7 +42,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -68,7 +68,7 @@ class NumberDataType(BaseDataType):
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'source': source, 'value': value, 'message': 'not a properly formatted number', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number')})
         return errors
 
     def transform_import_values(self, value):
@@ -103,13 +103,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
                     message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
-                    errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
             except:
                 message = 'Not a properly formatted geometry'
-                errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         for feature in value['features']:
             geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
