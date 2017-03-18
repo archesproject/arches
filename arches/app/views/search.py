@@ -25,7 +25,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Polygon
 from django.db import connection
 from django.db.models import Max, Min
 from django.http import HttpResponseNotFound
@@ -366,6 +366,7 @@ def buffer(request):
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
+    geom = GEOSGeometry(geojson, srid=4326)
 
     try:
         width = float(width)
@@ -373,17 +374,14 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
-        geom = GEOSGeometry(geojson, srid=4326)
-        geom.transform(3857)
-
         if unit == 'ft':
             width = width/3.28084
+        
+        geom.transform(3857)
+        geom = geom.buffer(width)
+        geom.transform(4326)
 
-        buffered_geom = geom.buffer(width)
-        buffered_geom.transform(4326)
-        return buffered_geom
-    else:
-        return GEOSGeometry(geojson)
+    return geom
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
@@ -479,8 +477,6 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
         else:
             d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
 
-    d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
-    
     return d3ItemInstance
 
 
