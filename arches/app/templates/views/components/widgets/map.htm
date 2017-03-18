@@ -333,12 +333,12 @@
             <!-- /ko -->
 
             <!--ko if: context !== 'search-filter' -->
-            <div class="map-draw-tools-item relative editing-tool">
-                <div class="map-draw-tools-item-icon text-center">
-                    <i class='ios-code-working'></i>
+            <div class="map-json-tool-item relative editing-tool">
+                <div class="map-json-tool-item-icon text-center">
+                    <i class='ion-code-working'></i>
                 </div>
-                <div class="map-overlay-name">
-                    <input id="" placeholder="{% trans " Enter GeoJson " %}" class="form-control input-md widget-input map-query-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'">
+                <div class="map-overlay-name map-json-tool">
+                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
                 </div>
             </div>
 

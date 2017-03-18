@@ -311,13 +311,17 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val){
-                    console.log(val)
                     try {
                         var data = JSON.parse(val)
-                        console.log(data)
-                        self.draw.add(data)
-                        self.saveGeometries()()
+                        try {
+                            self.draw.add(data)
+                            self.saveGeometries()()
+                        } catch(err) {
+                            console.log(err)
+                            console.log('invalid geometry')
+                        }
                     } catch(err) {
+                        console.log(err)
                         console.log('invalid json')
                     }
             }
