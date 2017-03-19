@@ -731,7 +731,7 @@ define([
                     });
                     if (selectedDrawTool === 'delete') { //it has no geom type, so must be trash
                         self.draw.trash();
-                        self.drawMode('simple_select');
+                        self.drawMode(undefined);
                     }
                     else if (selectedDrawTool === 'edit') { //it has no geom type, so must be trash
                         self.draw.changeMode('simple_select')

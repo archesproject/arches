@@ -47,7 +47,7 @@
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
-                    <div class="geometry-edit-button-group">
+                    <div class="geometry-edit-button-group" data-bind= "visible: !mapControls.mapControlsExpanded()">
 
                         <div class="btn-group">
                             <!-- ko foreach: { data: [$data], as: 'self' } -->
