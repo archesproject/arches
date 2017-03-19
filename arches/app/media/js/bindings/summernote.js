@@ -15,16 +15,9 @@ define([
     */
     ko.bindingHandlers.summernote = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+            console.log('initing')
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
-            $('.note-codable').on( "keyup", function(text){
-                text.currentTarget.value = text.currentTarget.value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                console.log(text.currentTarget.value)
-            })
-            $('.note-codable').on( "paste", function(text){
-                text.currentTarget.value = text.currentTarget.value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                console.log(text.currentTarget.value)
-            })
             options = (typeof options === 'object') ? options : {};
             options = _.defaults(options, {
                 height: 150,
@@ -45,6 +38,15 @@ define([
             };
 
             $element.summernote(options);
+
+            function clearScriptTags(){
+                var noteCodable = $('textarea.note-codable')
+                noteCodable.val(noteCodable.val().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
+                console.log('Script tags are not permitted in the code editor')
+            }
+
+            $('.btn-codeview').on( "mousedown", clearScriptTags)
+            $('textarea.note-codable').on( "keypress", clearScriptTags)
 
             if (ko.isObservable(options.value)) {
                 options.value.subscribe(function(value) {
