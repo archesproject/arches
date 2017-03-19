@@ -21,6 +21,7 @@ from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.forms import Form
@@ -49,7 +50,7 @@ class ResourceListView(BaseManagerView):
         context['nav']['title'] = "Resource Manager"
         context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = ('Creating and Editing Resources','')
+        context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
         return render(request, 'views/resource.htm', context)
 
@@ -107,7 +108,7 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = True
             context['nav']['edit_history'] = True
-            context['nav']['help'] = ('Creating and Editing Resources','')
+            context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
             return render(request, 'views/resource/editor.htm', context)
 
@@ -188,6 +189,7 @@ class ResourceReportView(BaseManagerView):
             context['nav']['icon'] = graph.iconclass
         context['nav']['title'] = graph.name
         context['nav']['res_edit'] = True
+        context['nav']['print'] = True
         context['nav']['print'] = True
 
         return render(request, 'views/resource/report.htm', context)
