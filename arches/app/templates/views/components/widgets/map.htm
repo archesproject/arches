@@ -47,10 +47,21 @@
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
-                    <div class="btn-group geometry-edit-button-group">
-                        <button class="btn btn-sm btn-mint">New</button>
-                        <button class="btn btn-sm btn-default">Delete</button>
-                        <button class="btn btn-sm btn-default">Edit</button>
+                    <div class="geometry-edit-button-group">
+
+                        <div class="btn-group">
+                            <!-- ko foreach: { data: [$data], as: 'self' } -->
+                            <!-- ko foreach: geometryTypes -->
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
+                            </button>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'delete')}">{% trans "Delete" %}</button>
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'edit')}, css: {'btn-mint':drawMode() === 'simple_select' || drawMode() === 'direct_select' || drawMode() === undefined}">{% trans "Edit" %}</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -342,7 +353,7 @@
                 </div>
             </div>
 
-            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool(undefined, 'delete'), css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
                 </div>
