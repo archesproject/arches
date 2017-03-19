@@ -15,6 +15,7 @@ define([
     */
     ko.bindingHandlers.summernote = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+            console.log('initing')
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
             options = (typeof options === 'object') ? options : {};
@@ -37,6 +38,15 @@ define([
             };
 
             $element.summernote(options);
+
+            function clearScriptTags(){
+                var noteCodable = $('textarea.note-codable')
+                noteCodable.val(noteCodable.val().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
+                console.log('Script tags are not permitted in the code editor')
+            }
+
+            $('.btn-codeview').on( "mousedown", clearScriptTags)
+            $('textarea.note-codable').on( "keypress", clearScriptTags)
 
             if (ko.isObservable(options.value)) {
                 options.value.subscribe(function(value) {
