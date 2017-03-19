@@ -26,7 +26,7 @@ class WKTPointDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
         return errors
 
     def append_to_document(self, document, nodevalue):

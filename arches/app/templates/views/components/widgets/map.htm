@@ -333,6 +333,15 @@
             <!-- /ko -->
 
             <!--ko if: context !== 'search-filter' -->
+            <div class="map-json-tool-item relative editing-tool">
+                <div class="map-json-tool-item-icon text-center">
+                    <i class='ion-code-working'></i>
+                </div>
+                <div class="map-overlay-name map-json-tool">
+                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                </div>
+            </div>
+
             <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
@@ -350,7 +359,7 @@
                         <a id="" class="" href=""><span>{% trans "Buffer(ft)" %}<span></a>
                     </div>
                     <div>
-                        <input type="number" min=0.0 id="" placeholder="{% trans " buffer " %}" class="form-control input-md widget-input map-query-tool-input" data-bind="value: buffer, valueUpdate: 'keyup'">
+                        <input type="number" min=0.0 id="" placeholder="{% trans " buffer " %}" class="form-control input-md widget-input map-query-tool-input" data-bind="textInput: buffer">
                     </div>
                 </div>
             </div>

@@ -48,7 +48,7 @@ class ConceptDataType(BaseConceptDataType):
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
             message = "Not a valid domain value"
-            errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
         return errors
 
     def transform_import_values(self, value):

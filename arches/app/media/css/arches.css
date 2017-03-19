@@ -2644,8 +2644,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     pointer-events: none;
 }
 .node-ancestor {
-    stroke: #ededed;
-    fill: #fefefe;
+    /* Nodes that are unselected or not highlighted as neighbors during mousover */
+    stroke: #b3b3b3;
+    fill: #dcecfa;
     opacity: 1.;
     stroke-width: 1px;
     cursor: pointer;
@@ -2668,6 +2669,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke-dasharray: 8, 5;
 }
 .linkMouseover {
+    /*Styles the link between selected/moused-over nodes*/
     stroke: #a1a1a1;
     stroke-opacity: .6;
     stroke-width: 5px;
@@ -2694,6 +2696,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #115fa5;
 }
 .node-current-over, .node-ancestor-over {
+    /* The currently selected/moused-over node */
     stroke: #000;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2701,6 +2704,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 .node-current-neighbor, .node-ancestor-neighbor {
+    /* The neighboring nodes of the selected/moused-over node */
     stroke: #115fa5;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -5469,7 +5473,7 @@ span.basemap-unselected {
     position: absolute;
     top: 14px;
     left: 60px;
-    width: 160px;
+    width: 180px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -5549,6 +5553,50 @@ span.basemap-unselected {
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool {
+    position: absolute;
+    height: 120px;
+    top: 10px;
+    left: 60px;
+    width: 180px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool-item {
+    width: 249px;
+    height: 100px;
+    padding: 7px;
+    background: #fbfbfb;
+    color: #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
+.map-json-tool-item-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 100px;
+    padding-top: 13px;
+    font-size: 19px;
+    border-right: 1px solid #ddd;
+    color: inherit;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.form-control.map-json-tool-input {
+    width: 180px;
+    height: 80px;
+    font-size: 14px;
+    white-space: nowrap;
+    /*overflow: hidden;*/
     text-overflow: ellipsis;
 }
 
