@@ -249,7 +249,7 @@
         {
             "arches_nodeid": "08448369-fa1f-11e6-9e3e-026d961c88e6", 
             "arches_node_name": "Title Type", 
-            "file_field_name": "TITLE_TYPE
+            "file_field_name": "TITLE_TYPE"
         }
     ]
 }
