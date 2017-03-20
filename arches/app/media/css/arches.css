@@ -5648,6 +5648,10 @@ span.basemap-unselected {
   visibility: hidden;
 }
 
+.widget-wrapper .mapboxgl-map {
+    z-index: 10;
+}
+
 .map-overlay-item-tools-panel .noUi-base {
     background: #489EED;
     /*-webkit-transition: background 450ms;*/
