@@ -103,6 +103,10 @@ class Reader(object):
 
             resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
             resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
+            if relation['datestarted'] == '':
+                relation['datestarted'] = None
+            if relation['dateended'] == '':
+                relation['dateended'] = None
 
             if resourceinstancefrom != None and resourceinstanceto != None:
                 relation = ResourceXResource(
