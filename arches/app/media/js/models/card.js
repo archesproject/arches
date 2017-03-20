@@ -33,7 +33,6 @@ define(['arches',
             this.set('cardinality', ko.observable());
             this.set('visible', ko.observable());
             this.set('active', ko.observable());
-            this.set('itemtext', ko.observable());
             this.set('ontologyproperty', ko.observable());
             this.set('sortorder', ko.observable());
 
@@ -150,7 +149,6 @@ define(['arches',
                     case 'cardinality':
                     case 'visible':
                     case 'active':
-                    case 'itemtext':
                     case 'ontologyproperty':
                     case 'sortorder':
                         this.get(key)(value);

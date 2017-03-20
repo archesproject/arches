@@ -7,7 +7,12 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/summernote'], f
     * @param {function} params.config - observable containing config object
     */
     return ko.components.register('rich-text-widget', {
-        viewModel: WidgetViewModel,
+        viewModel: function(params){
+            WidgetViewModel.apply(this, [params]);
+            this.value.subscribe(function(val){
+                console.log(val)
+            })
+        },
         template: { require: 'text!widget-templates/rich-text' }
     });
 });

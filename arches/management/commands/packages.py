@@ -192,7 +192,6 @@ class Command(BaseCommand):
         """
         self.setup_elasticsearch(install_location=es_install_location, port=settings.ELASTICSEARCH_HTTP_PORT)
         self.setup_db(package_name)
-        self.generate_procfile(package_name, es_install_location=es_install_location)
 
     def install(self, package_name):
         """
@@ -224,7 +223,6 @@ class Command(BaseCommand):
         else:
             p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
         return p
-        #os.system('honcho start')
 
     def setup_db(self, package_name):
         """
@@ -251,26 +249,6 @@ class Command(BaseCommand):
 
     def delete_indexes(self):
         management.call_command('es', operation='delete_indexes')
-
-    def generate_procfile(self, package_name, es_install_location=None):
-        """
-        Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
-
-        """
-
-        python_exe = os.path.abspath(sys.executable)
-
-        contents = []
-        if es_install_location:
-            contents.append('\nelasticsearch: %s' % os.path.join(es_install_location, 'bin', 'elasticsearch'))
-        contents.append('django: %s manage.py runserver' % (python_exe))
-        contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
-
-        package_root = settings.PACKAGE_ROOT
-        if hasattr(settings, 'SUBPACKAGE_ROOT'):
-            package_root = settings.SUBPACKAGE_ROOT
-
-        utils.write_to_file(os.path.join(package_root, '..', 'Procfile'), '\n'.join(contents))
 
     def get_elasticsearch_install_location(self, package_name):
         """
@@ -320,15 +298,6 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def load_concept_scheme(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
-        load(data_source)
-
     def index_database(self, package_name):
         """
         Runs the index_database command found in package_utils
@@ -349,7 +318,10 @@ class Command(BaseCommand):
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
         else:
+            print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
+            print '*'*80
+            sys.exit()
 
     def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
         if overwrite == '':
@@ -359,16 +331,20 @@ class Command(BaseCommand):
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, config_file=None, overwrite='append', bulk_load=False):
+    def import_business_data(self, data_source, config_file=None, overwrite=None, bulk_load=False):
         """
         Imports business data from all formats
         """
         if overwrite == '':
-            overwrite = 'append'
+            print '*'*80
+            print 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.'
+            print '*'*80
+            sys.exit()
         if data_source == '':
             print '*'*80
             print 'No data source indicated. Please rerun command with \'-s\' parameter.'
             print '*'*80
+            sys.exit()
 
         if isinstance(data_source, basestring):
             data_source = [data_source]
@@ -376,6 +352,11 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+            else:
+                print '*'*80
+                print 'No file found at indicated location: {0}'.format(path)
+                print '*'*80
+                sys.exit()
 
     def import_graphs(self, data_source=''):
         """

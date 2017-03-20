@@ -56,12 +56,14 @@ define([
                     return datatype();
                 },
                 write: function(value) {
-                    var datatypeRecord = self.datatypelookup[value];
-                    if (datatypeRecord) {
-                        var defaultConfig = datatypeRecord.defaultconfig;
-                        self.setupConfig(defaultConfig);
+                    if (datatype() !== value) {
+                        var datatypeRecord = self.datatypelookup[value];
+                        if (datatypeRecord) {
+                            var defaultConfig = datatypeRecord.defaultconfig;
+                            self.setupConfig(defaultConfig);
+                        }
+                        datatype(value);
                     }
-                    datatype(value);
                 },
                 owner: this
             });
@@ -204,7 +206,7 @@ define([
 
         setupConfig: function(config) {
             var self = this;
-            self.configKeys.removeAll();
+            var keys = [];
             _.each(config, function(configVal, configKey) {
                 if (!ko.isObservable(self.config[configKey])) {
                     self.config[configKey] = Array.isArray(configVal) ?
@@ -213,8 +215,9 @@ define([
                 } else {
                     self.config[configKey](configVal);
                 }
-                self.configKeys.push(configKey);
+                keys.push(configKey);
             });
+            self.configKeys(keys);
         },
 
         /**

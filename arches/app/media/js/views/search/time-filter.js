@@ -3,11 +3,12 @@ define([
     'knockout',
     'moment',
     'views/search/base-filter',
+    'arches',
     'bindings/datepicker',
     'bindings/chosen',
     'bindings/time-wheel'
 ],
-function(_, ko, moment, BaseFilter) {
+function(_, ko, moment, BaseFilter, arches) {
     return BaseFilter.extend({
         initialize: function(options) {
             var self = this;
@@ -75,7 +76,7 @@ function(_, ko, moment, BaseFilter) {
                 }
                 return ko.toJSON(this.filter);
             }, this).extend({ deferred: true });
-            
+
             BaseFilter.prototype.initialize.call(this, options);
         },
 
@@ -83,7 +84,7 @@ function(_, ko, moment, BaseFilter) {
             var self = this;
             $.ajax({
                 type: "GET",
-                url: 'search/time_wheel_config',
+                url: arches.urls.time_wheel_config,
                 success: function(response) {
                     self.wheelConfig(response);
                 },

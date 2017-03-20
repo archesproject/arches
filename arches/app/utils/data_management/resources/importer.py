@@ -5,6 +5,7 @@ import json
 import uuid
 import importlib
 import datetime
+import unicodecsv
 from time import time
 from os.path import isfile, join
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.db import connection, transaction
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.models import Concept
@@ -26,6 +28,7 @@ from formats.shpfile import ShapeReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 from arches.app.models.tile import Tile
+from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
@@ -38,7 +41,7 @@ from copy import deepcopy
 
 class BusinessDataImporter(object):
 
-    def __init__(self, file=None, mapping_file=None, relations_file=None, relation_config_file=None):
+    def __init__(self, file=None, mapping_file=None, relations_file=None):
         self.business_data = ''
         self.mapping = None
         self.graphs = ''
@@ -46,7 +49,6 @@ class BusinessDataImporter(object):
         self.business_data = ''
         self.file_format = ''
         self.relations = ''
-        self.relation_configs = None
 
         if not file:
             file = settings.BUSINESS_DATA_FILES
@@ -60,6 +62,7 @@ class BusinessDataImporter(object):
                 print '*'*80
                 print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
                 print '*'*80
+                sys.exit()
         else:
             try:
                 mapping_file = [mapping_file]
@@ -67,6 +70,7 @@ class BusinessDataImporter(object):
                 print '*'*80
                 print "ERROR: Mapping file is missing or improperly named. Make sure you have mapping file with the same basename as your business data file and the extension .mapping"
                 print '*'*80
+                sys.exit()
 
         if relations_file == None:
             try:
@@ -74,23 +78,10 @@ class BusinessDataImporter(object):
             except:
                 pass
 
-        if relation_config_file == None:
-            try:
-                relation_config_file = [file[0].split('.')[0] + '.relation_config']
-            except:
-                pass
-
         for path in relations_file:
             if os.path.exists(path):
                 if isfile(join(path)):
                     self.relations = csv.DictReader(open(relations_file[0], 'r'))
-
-        for path in relation_config_file:
-            if os.path.exists(path):
-                if isfile(join(path)):
-                    self.relation_configs = json.load(open(path, 'r'))
-                else:
-                    self.relation_configs = None
 
         for path in mapping_file:
             if os.path.exists(path):
@@ -113,7 +104,7 @@ class BusinessDataImporter(object):
                             if 'business_data' in archesfile.keys():
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
-                        data = csv.DictReader(open(file[0], 'r'))
+                        data = unicodecsv.DictReader(open(file[0], 'r'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
                 else:
                     print str(file) + ' is not a valid file'
@@ -123,42 +114,42 @@ class BusinessDataImporter(object):
     def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False):
         reader = None
         start = time()
+        cursor = connection.cursor()
 
-        if file_format == None:
-            file_format = self.file_format
-        if business_data == None:
-            business_data = self.business_data
-        if mapping == None:
-            mapping = self.mapping
-        if file_format == 'json':
-            reader = ArchesFileReader()
-            reader.import_business_data(business_data, mapping)
-        elif file_format == 'csv':
-            if mapping != None:
-                reader = CsvReader()
-                reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
-            else:
-                print '*'*80
-                print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-                print '*'*80
-                sys.exit()
-        elif file_format == 'shp':
-            # if mapping != None:
-            #     SHPFileImporter().import_business_data(business_data, mapping)
-            # else:
-            #     print '*'*80
-            #     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
-            #     print '*'*80
-            #     sys.exit()
-            pass
+        try:
+            if file_format == None:
+                file_format = self.file_format
+            if business_data == None:
+                business_data = self.business_data
+            if mapping == None:
+                mapping = self.mapping
+            if file_format == 'json':
+                reader = ArchesFileReader()
+                reader.import_business_data(business_data, mapping)
+            elif file_format == 'csv':
+                if mapping != None:
+                    reader = CsvReader()
+                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
+                else:
+                    print '*'*80
+                    print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'
+                    print '*'*80
+                    sys.exit()
 
-        # Import resource to resource relationships
-        reader.import_relations(relation_configs=self.relation_configs, relations=self.relations)
+            # Import resource to resource relationships
+            reader.import_relations(relations=self.relations)
 
-        elapsed = (time() - start)
-        print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
+            elapsed = (time() - start)
+            print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
 
-        reader.report_errors()
+            reader.report_errors()
+
+        finally:
+            datatype_factory = DataTypeFactory()
+            datatypes = DDataType.objects.all()
+            for datatype in datatypes:
+                datatype_instance = datatype_factory.get_instance(datatype.datatype)
+                datatype_instance.after_update_all()
 
 
 class ResourceLoader(object):

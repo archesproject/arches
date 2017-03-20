@@ -11,6 +11,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
+from django.db import connection, transaction
 from shapely.geometry import asShape
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
@@ -41,7 +42,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -67,7 +68,7 @@ class NumberDataType(BaseDataType):
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'source': source, 'value': value, 'message': 'not a properly formatted number', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number')})
         return errors
 
     def transform_import_values(self, value):
@@ -102,13 +103,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
                     message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
-                    errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
             except:
                 message = 'Not a properly formatted geometry'
-                errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         for feature in value['features']:
             geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
@@ -190,19 +191,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         config = node.config
 
         cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
+            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
                 WHERE nodeid = '%s'
             )
 
-            SELECT tileid::text,
-            		resourceinstanceid::text,
-            		nodeid::text,
-            		graphid::text,
-            		node_name,
-            		graph_name,
-            		false AS poly_outline,
+            SELECT resourceinstanceid::text,
+                    false AS poly_outline,
             		row_number() over () as __id__,
             		1 as total,
             		ST_Centroid(geom) AS __geometry__,
@@ -212,12 +208,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             UNION
 
-            SELECT '' as tileid,
-            		'' as resourceinstanceid,
-            		'' as nodeid,
-            		'' as graphid,
-            		'' as node_name,
-            		'' as graph_name,
+            SELECT '' as resourceinstanceid,
             		false AS poly_outline,
             		row_number() over () as __id__,
             		count(*) as total,
@@ -244,12 +235,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             sql_list.append(sql_string)
 
         sql_list.append("""
-            SELECT tileid::text,
-                    resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
+            SELECT resourceinstanceid::text,
                     false AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -258,12 +244,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 FROM mv_geojson_geoms
                 WHERE nodeid = '%s'
             UNION
-            SELECT tileid::text,
-                    resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
+            SELECT resourceinstanceid::text,
                     true AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -520,6 +501,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "icon": layer_icon,
             "addtomap": node.config['addToMap'],
         }
+
+    def after_update_all(self):
+        cursor = connection.cursor()
+        sql = """
+            REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+        """
+        cursor.execute(sql)
 
 
 class FileListDataType(BaseDataType):

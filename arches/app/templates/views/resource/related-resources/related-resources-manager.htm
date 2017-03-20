@@ -1,13 +1,17 @@
 {% load i18n %}
 <div id="related-resources-drag-panel" class="search-container related-resources-container">
 
+    
+    
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
     	resourceId: currentResource().resourceinstanceid,
-    	resourceName: currentResource().primaryname,
+    	resourceName: currentResource().displayname,
     	resourceTypeId: currentResource().graphid
     }">
-    	<div class="node_info" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
+    	
+        <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
+        <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
     		<dl style="margin-bottom: 0;">
     			<dd class="arches-concept-heirarchy">
     				<div>
@@ -18,7 +22,7 @@
     				</div>
     				<div>
     					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
-    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded' %}</small>
+    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded!' %}</small>
     				</div>
     				<div>
     					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
@@ -26,9 +30,43 @@
     			</dd>
     		</dl>
     	</div>
+
+        <!-- Resource Node Search/Listing -->
+        <div class="related-resources-nodes form-list">
+
+            <div class="layer-list">
+                <!-- Layer Filter -->
+                <div class="list-filter" data-bind="" style="margin-right: 15px; margin-left: 15px;">
+                    <input type="text" class="form-control" style="" placeholder="Find a resource..." data-bind="">
+
+                    <!-- Clear Search -->
+                    <span class="clear-node-search" data-bind=""><i class="fa fa-times-circle"></i></span>
+                </div>
+
+            </div>
+            
+            <!-- Resource Nodes -->
+            <div class="report-image-grid relative">
+                <div class="grid" style="margin-left: 0px;">
+                    
+                    <div class="library-card selected-card relative" data-bind="">
+                        <div class="crud-card-main" style="left: 5px;">
+                            <a class="listitem_name" data-bind="">Resource Name Goes Here</a>
+                        </div>
+                        
+                        <div class="crud-card-subtitle" style="left: 5px;" data-bind="">
+                            10 out of 200 relations loaded
+                        </div>
+                        <div class="crud-card-link">add</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
     </div>
     <!--/ko-->
 
+    
     <!-- Drag Panel -->
     <div class="relative">
 
@@ -38,20 +76,33 @@
             <div class="related-resources-header">
             	<h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
+                <!--ko if: !showGraph() -->
             	<div class="btn-group rr-display-toggle">
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
             	</div>
+                <!--/ko-->
+
+                <!--ko if: showGraph() -->
+                <div class="btn-group rr-display-toggle" style="right: 260px;">
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+                </div>
+                <!--/ko-->
 
                 <div class="relative">
 
                     <!--Documentation dropdown-->
                     <!--ko if: resourceEditorContext -->
                     <div class="related-resources-relationship">
+                            
                             <div class="mega-dropdown related-reources-crud-link">
+                                
+                                <!--ko if: !showGraph() -->
                                 <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
                                     <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
                                 </a>
+
                                 <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
                                     <div class="clearfix">
                                         <div class="settings-config-panel relative">
@@ -75,7 +126,7 @@
                                                     </div>
                                                     <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
                                                         <div class="selected-resource">
-                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.primaryname'></span>
+                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.displayname'></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -143,6 +194,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!--/ko-->
                             </div>
                     </div>
 
@@ -170,7 +222,7 @@
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
                                               jQueryUI: true,
-                                              scrollY: 250,
+                                              scrollY: 350,
                                               paging: true,
                                               dom: 'rtip',
                                               columns:[
@@ -187,7 +239,7 @@
                             }">
                                 <td>
                                     <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
-                                    <span data-bind="text: resource.primaryname"></span>
+                                    <span data-bind="text: resource.displayname"></span>
                                 </td>
                                 <td>
                                     <span data-bind="text: preflabel.value"></span>
@@ -228,7 +280,7 @@
             <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
             <div class="rr-grid-item" data-bind="">
                 <div class="rr-listing">
-                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: primaryname"></span></h3>
+                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: displayname"></span></h3>
                     <div class="search-listing-body">TODO: Primary description goes here</div>
                     <div class="search-listing-footer">Footer details here</div>
                 </div>

@@ -1,0 +1,340 @@
+{
+    "graph": [
+        {
+            "subtitle": "Describes the creators, contributors, type, and date of a creation and/or update event of an information resource.", 
+            "functions_x_graphs": [], 
+            "mapfeaturecolor": null, 
+            "isresource": false, 
+            "forms_x_cards": [], 
+            "relatable_resource_model_ids": [], 
+            "reports": [], 
+            "iconclass": "fa fa-magic", 
+            "nodegroups": [
+                {
+                    "cardinality": "1", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "author": " GCI", 
+            "deploymentfile": null, 
+            "forms": [], 
+            "version": "", 
+            "nodes": [
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E50_Date", 
+                    "nodeid": "9151e343-9565-11e6-b664-024f9e178154", 
+                    "datatype": "date", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "P78_is_identified_by", 
+                    "name": "Date of Creation"
+                }, 
+                {
+                    "is_collector": true, 
+                    "description": "", 
+                    "istopnode": true, 
+                    "ontologyclass": "E65_Creation", 
+                    "nodeid": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "datatype": "semantic", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "", 
+                    "name": "Resource Creation Event"
+                }, 
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E39_Actor", 
+                    "nodeid": "a27ca1a3-0cd4-11e7-a04b-026d961c88e6", 
+                    "datatype": "semantic", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "P14_carried_out_by", 
+                    "name": "Creator"
+                }, 
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E82_Actor_Appellation", 
+                    "nodeid": "6ef5418b-0cd5-11e7-a04b-026d961c88e6", 
+                    "datatype": "string", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "P1_is_identified_by", 
+                    "name": "Creator Name"
+                }, 
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E55_Type", 
+                    "nodeid": "1df12201-9565-11e6-b664-024f9e178154", 
+                    "datatype": "concept", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": {
+                        "rdmCollection": "fb67e800-51cd-4890-9ec3-92b49d46ab5f"
+                    }, 
+                    "parentproperty": "P42_assigned", 
+                    "name": "Information Resource Type"
+                }, 
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E52_Time-Span", 
+                    "nodeid": "7b3fa437-9565-11e6-b664-024f9e178154", 
+                    "datatype": "semantic", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "P4_has_time-span", 
+                    "name": "Time Span of Resource Creation Event"
+                }, 
+                {
+                    "is_collector": false, 
+                    "description": "Represents a single node in a graph", 
+                    "istopnode": false, 
+                    "ontologyclass": "E17_Type_Assignment", 
+                    "nodeid": "01e90759-9565-11e6-b664-024f9e178154", 
+                    "datatype": "semantic", 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "config": null, 
+                    "parentproperty": "P41i_was_classified_by", 
+                    "name": "Information Resource Type Assignment"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "description": "Describes the creators, contributors, type, and date of a creation and/or update event of an information resource.", 
+            "resource_2_resource_constraints": [], 
+            "edges": [
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "7b3fa438-9565-11e6-b664-024f9e178154", 
+                    "domainnode_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "rangenode_id": "7b3fa437-9565-11e6-b664-024f9e178154", 
+                    "ontologyproperty": "P4_has_time-span", 
+                    "description": null
+                }, 
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "a27ca1a4-0cd4-11e7-a04b-026d961c88e6", 
+                    "domainnode_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "rangenode_id": "a27ca1a3-0cd4-11e7-a04b-026d961c88e6", 
+                    "ontologyproperty": "P14_carried_out_by", 
+                    "description": null
+                }, 
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "6ef5418c-0cd5-11e7-a04b-026d961c88e6", 
+                    "domainnode_id": "a27ca1a3-0cd4-11e7-a04b-026d961c88e6", 
+                    "rangenode_id": "6ef5418b-0cd5-11e7-a04b-026d961c88e6", 
+                    "ontologyproperty": "P1_is_identified_by", 
+                    "description": null
+                }, 
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "1df12202-9565-11e6-b664-024f9e178154", 
+                    "domainnode_id": "01e90759-9565-11e6-b664-024f9e178154", 
+                    "rangenode_id": "1df12201-9565-11e6-b664-024f9e178154", 
+                    "ontologyproperty": "P42_assigned", 
+                    "description": null
+                }, 
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "9151e344-9565-11e6-b664-024f9e178154", 
+                    "domainnode_id": "7b3fa437-9565-11e6-b664-024f9e178154", 
+                    "rangenode_id": "9151e343-9565-11e6-b664-024f9e178154", 
+                    "ontologyproperty": "P78_is_identified_by", 
+                    "description": null
+                }, 
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "edgeid": "01e9075a-9565-11e6-b664-024f9e178154", 
+                    "domainnode_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "rangenode_id": "01e90759-9565-11e6-b664-024f9e178154", 
+                    "ontologyproperty": "P41i_was_classified_by", 
+                    "description": null
+                }
+            ], 
+            "maplinewidth": null, 
+            "mappointsize": null, 
+            "graphid": "b048668d-9564-11e6-b664-024f9e178154", 
+            "name": "Information Resource Creation Event", 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000004", 
+                    "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c28e6", 
+                    "label": "Date of Creation", 
+                    "node_id": "9151e343-9565-11e6-b664-024f9e178154", 
+                    "sortorder": 1, 
+                    "config": {
+                        "dateFormat": "YYYY-MM-DD", 
+                        "maxDate": false, 
+                        "label": "Date of Creation", 
+                        "viewMode": "days", 
+                        "placeholder": "Enter date", 
+                        "minDate": false
+                    }, 
+                    "id": "b311010d-b8f3-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000002", 
+                    "card_id": "4ff978bb-9bd4-11e6-84a5-026d961c28e6", 
+                    "label": "Information Resource Type", 
+                    "node_id": "1df12201-9565-11e6-b664-024f9e178154", 
+                    "sortorder": 0, 
+                    "config": {
+                        "placeholder": "Select type", 
+                        "options": [
+                            {
+                                "conceptid": "09b66145-55a5-43bc-9424-97baec841f20", 
+                                "text": "Collection", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "9f5825fb-5553-4fe9-8309-d740282439f5"
+                            }, 
+                            {
+                                "conceptid": "ba3b2ae6-e8cc-4b77-bf68-46546d253bdb", 
+                                "text": "Dataset", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "28cdf7f6-399b-4504-ac9b-28e1d113ea02"
+                            }, 
+                            {
+                                "conceptid": "f4355315-c730-406b-80a3-55c5b68ded8a", 
+                                "text": "Document/Text", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "63318d3f-1365-42c2-925d-319925b2562f"
+                            }, 
+                            {
+                                "text": "Image", 
+                                "conceptid": "b3e954db-4dc7-4c1c-a047-193869bd5a3b", 
+                                "collector": "collector", 
+                                "children": [
+                                    {
+                                        "conceptid": "eb32c4c4-8380-442d-bb7d-8af88beca7a2", 
+                                        "text": "Moving Image", 
+                                        "children": [], 
+                                        "sortorder": "", 
+                                        "collector": "", 
+                                        "id": "0bac4a54-abd8-4914-ad1e-585e20e6ef49"
+                                    }, 
+                                    {
+                                        "conceptid": "d2451fe2-9bae-475f-bf81-d24360dae506", 
+                                        "text": "Still Image", 
+                                        "children": [], 
+                                        "sortorder": "", 
+                                        "collector": "", 
+                                        "id": "4d4c617a-87f8-4fdc-b2c7-6331f1d5dc4c"
+                                    }
+                                ], 
+                                "sortorder": ""
+                            }, 
+                            {
+                                "conceptid": "b29787b4-faa6-4298-8b02-45c579fecedd", 
+                                "text": "Interactive Resource", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "b7571f75-40ac-4a77-b9ca-d7657ef49686"
+                            }, 
+                            {
+                                "conceptid": "93bbd08b-c251-49ca-b02c-20fda63a0bca", 
+                                "text": "Physical Object", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "24dd90c7-5056-400d-86b3-0f8c8d8b3895"
+                            }, 
+                            {
+                                "conceptid": "dbab682c-0690-4bdc-8c79-dc5e2fec4122", 
+                                "text": "Service", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "6e13d181-23d2-4b9e-84b9-41289270eb95"
+                            }, 
+                            {
+                                "conceptid": "ef8390ae-7d7c-47e0-b96e-5f964fa5fc62", 
+                                "text": "Software", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "f9adf4d7-c0d9-49ce-8f81-cf020d0a24e4"
+                            }, 
+                            {
+                                "conceptid": "598e1809-4704-470a-886e-eb37f45f8cc1", 
+                                "text": "Sound", 
+                                "children": [], 
+                                "sortorder": "", 
+                                "collector": "", 
+                                "id": "d6f33829-46b7-4c78-93a6-b1afbd9f1898"
+                            }
+                        ], 
+                        "label": "Information Resource Type"
+                    }, 
+                    "id": "b311010e-b8f3-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "cards": [
+                {
+                    "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                    "helpenabled": false, 
+                    "description": "Describes the creators, contributors, type, and date of a creation and/or update event of an information resource.", 
+                    "visible": true, 
+                    "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                    "helptext": null, 
+                    "sortorder": null, 
+                    "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c28e6", 
+                    "helptitle": null, 
+                    "instructions": "Describe the information resource  and its date of creation", 
+                    "active": true, 
+                    "name": "Information Resource Creation Event"
+                }
+            ], 
+            "root": {
+                "is_collector": true, 
+                "description": "", 
+                "istopnode": true, 
+                "ontologyclass": "E65_Creation", 
+                "nodeid": "b048668c-9564-11e6-b664-024f9e178154", 
+                "datatype": "semantic", 
+                "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
+                "graph_id": "b048668d-9564-11e6-b664-024f9e178154", 
+                "config": null, 
+                "name": "Resource Creation Event"
+            }, 
+            "isactive": true, 
+            "deploymentdate": null
+        }
+    ], 
+    "metadata": {
+        "git hash": "6724325 2017-03-16 17:06:31 -0700", 
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "os version": "4.4.0-66-generic", 
+        "os": "Linux"
+    }
+}

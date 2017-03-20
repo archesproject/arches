@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.utils.JSONResponse import JSONResponse
@@ -39,14 +40,19 @@ class TileData(View):
             json = request.POST.get('data', None)
             if json != None:
                 data = JSONDeserializer().deserialize(json)
+                tile_id = data['tileid']
+                if tile_id != None and tile_id != '':
+                    old_tile = Tile.objects.get(pk=tile_id)
+                    clean_resource_cache(old_tile)
                 tile = Tile(data)
                 with transaction.atomic():
                     try:
                         tile.save(request=request)
-                        clean_resource_cache(tile)
                     except ValidationError as e:
                         return JSONResponse({'status':'false','message':e.args}, status=500)
 
+                tile.after_update_all()
+                clean_resource_cache(tile)
                 return JSONResponse(tile)
 
         if self.action == 'reorder_tiles':
@@ -75,8 +81,10 @@ class TileData(View):
 
             with transaction.atomic():
                 tile = Tile.objects.get(tileid = data['tileid'])
+                nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                 clean_resource_cache(tile)
                 tile.delete(request=request)
+                tile.after_update_all()
 
             return JSONResponse(tile)
 

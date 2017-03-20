@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Term, Query
+from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000005',
     '00000000-0000-0000-0000-000000000006'
 )
 
@@ -151,7 +152,7 @@ class Concept(object):
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id,
-                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts,
+                            include_subconcepts=include_subconcepts,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
@@ -265,6 +266,18 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             for key, concept in concepts_to_delete.iteritems():
+                # delete only member relationships if the nodetype == Collection
+                if concept.nodetype == 'Collection':
+                    concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1, semantic=False)
+                    def find_concepts(concept):
+                        if len(concept.parentconcepts) <= 1:
+                            for subconcept in concept.subconcepts:
+                                conceptrelation = models.Relation.objects.get(conceptfrom=concept.id, conceptto=subconcept.id, relationtype='member')
+                                conceptrelation.delete()
+                                find_concepts(subconcept)
+
+                    find_concepts(concept)
+
                 models.Concept.objects.get(pk=key).delete()
         return
 
@@ -321,6 +334,9 @@ class Concept(object):
 
                 concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
                 concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+
+        if concept.nodetype == 'Collection':
+            concepts_to_delete[concept.id] = concept
 
         return concepts_to_delete
 
@@ -937,3 +953,46 @@ class ConceptValue(object):
             return Concept(result['top_concept'])
         else:
             return None
+
+
+def get_preflabel_from_conceptid(conceptid, lang):
+    ret = None
+    default = {
+        "category": "",
+        "conceptid": "",
+        "language": "",
+        "value": "",
+        "type": "",
+        "id": ""
+    }
+    se = SearchEngineFactory().create()
+    query = Query(se)
+    bool_query = Bool()
+    bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
+    bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
+    query.add_query(bool_query)
+    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
+    for preflabel in preflabels:
+        default = preflabel['_source']
+        # get the label in the preferred language, otherwise get the label in the default language
+        if preflabel['_source']['language'] == lang:
+            return preflabel['_source']
+        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+            ret = preflabel['_source']
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+            ret = preflabel['_source']
+    return default if ret == None else ret
+
+
+def get_concept_label_from_valueid(valueid):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return concept_label['_source']
+
+
+def get_preflabel_from_valueid(valueid, lang):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)

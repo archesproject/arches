@@ -42,7 +42,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -542,6 +541,7 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column='graphid')
     legacyid = models.TextField(blank=True, unique=True, null=True)
+    createdtime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = True

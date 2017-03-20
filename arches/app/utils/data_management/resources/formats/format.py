@@ -65,7 +65,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def import_relations(self, relation_configs=None, relations=None):
+    def import_relations(self, relations=None):
 
         def get_resourceid_from_legacyid(legacyid):
             ret = Resource.objects.filter(legacyid=legacyid)
@@ -96,7 +96,8 @@ class Reader(object):
                 # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
                 # 2.) a uuid was passed in and it is not associated with a resource instance
                 if newresourceinstanceid == None:
-                    self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    self.errors.append({'type':'ERROR', 'message': 'Relation not created, either zero or multiple resources have this legacyid: {0}'.format(relation[key])})
 
                 return newresourceinstanceid
 
@@ -122,7 +123,7 @@ class Reader(object):
             with open('arches/logs/resource_import.log', 'w') as f:
                 for error in self.errors:
                     try:
-                        f.write(_('ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])))
+                        f.write(_('{0}: {1}\n'.format(error['type'], error['message'])))
                     except TypeError as e:
                         f.write(e + unicode(error))
 

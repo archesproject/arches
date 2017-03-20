@@ -26,7 +26,7 @@ define([
             var texts;
             var selectedNode;
             var force = d3.layout.force()
-                .charge(-270)
+                .charge(-500)
                 .linkDistance(200)
                 .gravity(0.05)
                 .friction(0.55)
@@ -137,9 +137,6 @@ define([
                     .attr("class", function(d){
                         return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                     })
-                    .attr("style", function(d){
-                        return "fill:" + modelMap[d.entitytypeid].color + ";";
-                    })
                     .on("mouseover", function(d){
                         vis.selectAll("circle")
                             .attr("class", function(d1){
@@ -150,9 +147,6 @@ define([
                                     className += '-neighbor';
                                 }
                                 return className;
-                            })
-                            .attr("style", function(d1){
-                                return "fill:" + modelMap[d.entitytypeid].color + ";"
                             });
                         vis.selectAll("line")
                             .attr('class', function(l) {
@@ -309,7 +303,7 @@ define([
                                         id: newNodeId,
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
-                                        name: related_resource.primaryname,
+                                        name: related_resource.displayname,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: null

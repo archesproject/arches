@@ -16,6 +16,12 @@ class BaseDataType(object):
         """
         pass
 
+    def after_update_all(self):
+        """
+        Refreshes mv_geojson_geoms materialized view after save.
+        """
+        pass
+
     def transform_import_values(self, value):
         """
         Transforms values from probably string/wkt representation to specified
@@ -62,6 +68,13 @@ class BaseDataType(object):
         nodeid, name, layerdefinitions, isoverlay, icon
         """
         return None
+
+    def convert_value(self, tile, nodeid):
+        """
+        Converts '' values to null when saving a tile.
+        """
+        if tile.data[nodeid] == '':
+            tile.data[nodeid] = None
 
     def get_map_source(self, node=None, preview=False):
         """

@@ -1,0 +1,249 @@
+{
+    "graph": [
+        {
+            "subtitle": "Captures conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group",
+            "functions_x_graphs": [],
+            "mapfeaturecolor": null,
+            "isresource": false,
+            "forms_x_cards": [],
+            "relatable_resource_model_ids": [],
+            "reports": [],
+            "iconclass": "fa fa-clipboard",
+            "nodegroups": [
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " GCI",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E49_Time_Appellation",
+                    "nodeid": "5efd667f-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "date",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "P78_is_identified_by",
+                    "name": "Date Condition Assessed"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E55_Type",
+                    "nodeid": "5efd667a-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "concept",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": {
+                        "rdmCollection": null
+                    },
+                    "parentproperty": "P2_has_type",
+                    "name": "Condition Type"
+                },
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E14_Condition_Assessment",
+                    "nodeid": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Condition Assessment"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E62_String",
+                    "nodeid": "5efd667e-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "string",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "P3_has_note",
+                    "name": "Condition Description"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E52_Time-Span",
+                    "nodeid": "5efd667b-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "P4_has_time-span",
+                    "name": "Condition Time Span "
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E3_Condition_State",
+                    "nodeid": "5efd667c-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "P35_has_identified",
+                    "name": "Condition State"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "5efd6680-fd54-11e6-9e3e-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Condition Description Assignment"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
+            "resource_2_resource_constraints": [],
+            "edges": [
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd668d-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd6680-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd667e-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P3_has_note",
+                    "description": null
+                },
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd668f-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd667c-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd6680-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd6690-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd667c-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd667b-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P4_has_time-span",
+                    "description": null
+                },
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd668c-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd667c-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P35_has_identified",
+                    "description": null
+                },
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd668e-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd667c-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd667a-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P2_has_type",
+                    "description": null
+                },
+                {
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "name": null,
+                    "edgeid": "5efd6691-fd54-11e6-9e3e-026d961c88e6",
+                    "domainnode_id": "5efd667b-fd54-11e6-9e3e-026d961c88e6",
+                    "rangenode_id": "5efd667f-fd54-11e6-9e3e-026d961c88e6",
+                    "ontologyproperty": "P78_is_identified_by",
+                    "description": null
+                }
+            ],
+            "maplinewidth": null,
+            "mappointsize": null,
+            "graphid": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+            "name": "Condition Assessment - HER",
+            "cards_x_nodes_x_widgets": [
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000004",
+                    "card_id": "5efd6679-fd54-11e6-9e3e-026d961c88e6",
+                    "label": "Date Condition Assessed",
+                    "node_id": "5efd667f-fd54-11e6-9e3e-026d961c88e6",
+                    "sortorder": 0,
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Date Condition Assessed\"}",
+                    "id": "5efd6686-fd54-11e6-9e3e-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000005",
+                    "card_id": "5efd6679-fd54-11e6-9e3e-026d961c88e6",
+                    "label": "Condition Description",
+                    "node_id": "5efd667e-fd54-11e6-9e3e-026d961c88e6",
+                    "sortorder": 3,
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Condition Description\"}",
+                    "id": "5efd668a-fd54-11e6-9e3e-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000009",
+                    "card_id": "5efd6679-fd54-11e6-9e3e-026d961c88e6",
+                    "label": "Condition",
+                    "node_id": "5efd667a-fd54-11e6-9e3e-026d961c88e6",
+                    "sortorder": 1,
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"16a462cb-cf4c-4959-8991-8d46c041dd6c\",\"text\":\"good\",\"id\":\"5c459cec-0e3f-4f5f-99e5-e4608530508b\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"863baf30-f9c1-4762-a1fc-57d400294bb4\",\"text\":\"fair\",\"id\":\"44dbe54e-0bf2-4ee9-9ae1-ad7ddd0a53a6\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3bcf52dc-f8c8-4cb3-9240-44abb7d11c94\",\"text\":\"poor\",\"id\":\"4e4e7fbf-d0f6-4f86-8005-b1b52de0aa14\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b33f47c0-f0db-4c79-bc71-deae8813e2ce\",\"text\":\"very bad\",\"id\":\"6df218a4-1056-4c7d-8519-b013a80384c4\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]}],\"label\":\"Condition\"}",
+                    "id": "5efd6687-fd54-11e6-9e3e-026d961c88e6"
+                }
+            ],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                    "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
+                    "visible": true,
+                    "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "5efd6679-fd54-11e6-9e3e-026d961c88e6",
+                    "helptitle": null,
+                    "instructions": "One assessment of condition at a particular point in time. ",
+                    "active": true,
+                    "name": "Condition Assessment - HER"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E14_Condition_Assessment",
+                "nodeid": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                "datatype": "semantic",
+                "nodegroup_id": "5efd6677-fd54-11e6-9e3e-026d961c88e6",
+                "graph_id": "5efd6676-fd54-11e6-9e3e-026d961c88e6",
+                "config": null,
+                "name": "Condition Assessment"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "7c666bd 2017-02-22 16:50:30 -0800",
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+        "os version": "4.4.0-64-generic",
+        "os": "Linux"
+    }
+}

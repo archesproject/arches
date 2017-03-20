@@ -14,6 +14,8 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
 @import url(../bower_components/codemirror/theme/monokai.css);
+@import url(../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css);
+@import url(../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css);
 
 
 /*  Summernote Overrides */
@@ -89,7 +91,8 @@
     max-width: 100%;
     top: 39px;
     right: -10px;
-    height: 100vh;
+    bottom: 0;
+    padding: 0;
 }
 
 /*Remove pointer from Mega drop panel button*/
@@ -255,14 +258,13 @@
 }
 
 .card-help-panel {
-    width: 40%;
     max-width: 275px;
     min-width: 250px;
     padding-top: 0;
     top: 0px;
     position: absolute;
     bottom: 0px;
-    right: -20px;
+    right: 0px;
     background: #37495b;
     opacity: .9;
     z-index: 500;
@@ -928,6 +930,16 @@ a.select2-search-choice-close {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.crud-card-link {
+    position: absolute;
+    top: 25px;
+    right: 15px;
+    color: #fff;
+    font-size: 9px;
+    background: #3acaa1;
+    padding: 3px 5px;
 }
 
 .permission-level-icon {
@@ -2632,8 +2644,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     pointer-events: none;
 }
 .node-ancestor {
-    stroke: #ededed;
-    fill: #fefefe;
+    /* Nodes that are unselected or not highlighted as neighbors during mousover */
+    stroke: #b3b3b3;
+    fill: #dcecfa;
     opacity: 1.;
     stroke-width: 1px;
     cursor: pointer;
@@ -2656,6 +2669,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke-dasharray: 8, 5;
 }
 .linkMouseover {
+    /*Styles the link between selected/moused-over nodes*/
     stroke: #a1a1a1;
     stroke-opacity: .6;
     stroke-width: 5px;
@@ -2682,6 +2696,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #115fa5;
 }
 .node-current-over, .node-ancestor-over {
+    /* The currently selected/moused-over node */
     stroke: #000;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2689,6 +2704,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 .node-current-neighbor, .node-ancestor-neighbor {
+    /* The neighboring nodes of the selected/moused-over node */
     stroke: #115fa5;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2989,9 +3005,9 @@ span.editable-card i.fa.fa-align-justify:hover{
     float: left;
     margin: 3px;
 }
-
-.recent-additions-container {
+.navbar-top-links .dropdown-menu .recent-additions-container {
     margin-top: 10px;
+    padding: 0 30px;
 }
 .card-grid{
     -ms-flex: 1;
@@ -3937,7 +3953,7 @@ ul .card-tree-list a .node-subname {
 
 .tertiary-panel {
     position: absolute;
-    top: 105px;
+    top: 55px;
     left: 499px;
     bottom: 0;
     z-index: 50;
@@ -4469,6 +4485,26 @@ div.row.widget-wrapper {
     z-index: 1;
 }
 
+.dataTables_info {
+    margin-top: 10px;
+}
+
+.dataTables_paginate {
+    margin-bottom: 140px;
+}
+
+.related-resources-nodes {
+    position: absolute;
+    width: 275px;
+    top: 0px;
+    right: 0px;
+    height: 100vh;
+    background: #fff;
+    z-index: 2;
+    opacity: 0.9;
+    border-left: 1px solid #ddd;
+}
+
 .relation-properties-buttons {
     display: flex;
     flex-direction: row;
@@ -4507,7 +4543,6 @@ div.row.widget-wrapper {
 }
 
 .rr-drag-panel-target {
-    height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
     border-bottom-width: 0px;
@@ -4517,6 +4552,7 @@ div.row.widget-wrapper {
 
 .recent-edits-panel {
     margin-left: 50px;
+    overflow-y: auto;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {
@@ -5388,6 +5424,7 @@ span.basemap-unselected {
     position: absolute;
     top: 15px;
     right: 10px;
+    padding: 0px 5px;
 }
 
 .overlay-toggle-icon {
@@ -5436,7 +5473,7 @@ span.basemap-unselected {
     position: absolute;
     top: 14px;
     left: 60px;
-    width: 160px;
+    width: 180px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -5516,6 +5553,50 @@ span.basemap-unselected {
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool {
+    position: absolute;
+    height: 120px;
+    top: 10px;
+    left: 60px;
+    width: 180px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool-item {
+    width: 249px;
+    height: 100px;
+    padding: 7px;
+    background: #fbfbfb;
+    color: #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
+.map-json-tool-item-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 100px;
+    padding-top: 13px;
+    font-size: 19px;
+    border-right: 1px solid #ddd;
+    color: inherit;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.form-control.map-json-tool-input {
+    width: 180px;
+    height: 80px;
+    font-size: 14px;
+    white-space: nowrap;
+    /*overflow: hidden;*/
     text-overflow: ellipsis;
 }
 
@@ -5856,6 +5937,9 @@ span.basemap-unselected {
     font-weight:bold;
     background: #dbf1f5;
 }
+.hover-panel-small {
+    width: 250px;
+}
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
@@ -5952,9 +6036,6 @@ span.basemap-unselected {
     margin-top: 10px;
 }
 
-.search-listing:hover {
-    cursor: move;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -6170,7 +6251,11 @@ span.basemap-unselected {
 }
 
 .search-listing:hover {
-	cursor: move;
+	border: 1px solid steelblue;
+}
+
+.search-listing:active {
+    border: 1px solid steelblue;
 }
 
 .search-listing-title {
@@ -6183,10 +6268,7 @@ span.basemap-unselected {
 	padding: 10px 5px 0px 10px;
 }
 
-.search-listing-icon {
-	transform: translate(0, -2px);
-    font-size: 13px;
-}
+
 
 .search-listing-body {
     height: 4.6em;
@@ -6299,7 +6381,7 @@ table.table.dataTable {
   border: solid 1px #BBBBBB;
   padding: 6px;
   background: rgba(256, 256, 256, 0.8);
-  color: #808080;
+  color: #434343;
   border-radius: 2px;
   pointer-events: none;
   box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);
@@ -6522,8 +6604,10 @@ table.table.dataTable {
     background: #f9f9f9;
     margin-bottom: 0px;
 }
-
-
+.hover-feature-loading {
+    padding: 25px;
+    font-size: 16px;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

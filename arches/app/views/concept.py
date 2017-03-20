@@ -26,7 +26,7 @@ from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
-from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
+from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -44,12 +44,17 @@ class RDMView(BaseManagerView):
         for concept in models.Concept.objects.filter(nodetype='ConceptScheme'):
             concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
+        collections = []
+        for concept in models.Concept.objects.filter(nodetype='Collection'):
+            collections.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
         context = self.get_context_data(
             main_script='rdm',
             active_page='RDM',
             languages=languages,
             conceptid=conceptid,
             concept_schemes=concept_schemes,
+            collections=collections,
             CORE_CONCEPTS=CORE_CONCEPTS,
         )
 
@@ -99,7 +104,7 @@ def concept(request, conceptid):
                     'default_report': True
                 })
 
-        
+
             labels = []
             #concept_graph = Concept().get(id=conceptid)
 
@@ -202,29 +207,29 @@ def concept(request, conceptid):
 
     if request.method == 'DELETE':
         data = JSONDeserializer().deserialize(request.body)
-
         if data:
             with transaction.atomic():
-
                 concept = Concept(data)
-
                 delete_self = data['delete_self'] if 'delete_self' in data else False
                 if not (delete_self and concept.id in CORE_CONCEPTS):
-                    in_use = False
-                    if delete_self:
-                        check_concept = Concept().get(data['id'], include_subconcepts=True)
-                        in_use = check_concept.check_if_concept_in_use()
-                    if 'subconcepts' in data:
-                        for subconcept in data['subconcepts']:
-                            if in_use == False:
-                                check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
-                                in_use = check_concept.check_if_concept_in_use()
-
-                    if in_use == False:
-                        concept.delete_index(delete_self=delete_self)
+                    if concept.nodetype == 'Collection':
                         concept.delete(delete_self=delete_self)
                     else:
-                        return JSONResponse({"in_use": in_use})
+                        in_use = False
+                        if delete_self:
+                            check_concept = Concept().get(data['id'], include_subconcepts=True)
+                            in_use = check_concept.check_if_concept_in_use()
+                        if 'subconcepts' in data:
+                            for subconcept in data['subconcepts']:
+                                if in_use == False:
+                                    check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
+                                    in_use = check_concept.check_if_concept_in_use()
+
+                        if in_use == False:
+                            concept.delete_index(delete_self=delete_self)
+                            concept.delete(delete_self=delete_self)
+                        else:
+                            return JSONResponse({"in_use": in_use})
 
                 return JSONResponse(concept)
 
@@ -415,12 +420,6 @@ def concept_tree(request, mode):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(lang=lang, mode=mode)
     return JSONResponse(concepts, indent=4)
-
-def get_preflabel_from_valueid(valueid, lang):
-    se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
-    if concept_label['found']:
-        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()

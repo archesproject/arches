@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="http://www.archesproject.org/fd2d0994-89e8-421c-8628-be0012c33307">
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662">
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/9f40d563-7a2d-42f8-8ed4-0c1ebedc05f5"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/89876fb9-abde-42dc-8172-dafe14bea086"/>
+        <dcterms:description xml:lang="en-US">{"id": "9e708de0-e8ea-41aa-8bb4-d3a3b0bc8e25", "value": "Taken from CLEAN_tbl_Sources"}</dcterms:description>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/4a326537-b9a3-419f-8b3d-c71a04f86591"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/40cabacd-e6a5-40dd-adc7-3de7e763ec87"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/1520df30-1a6a-4b8b-9b6b-b00ddf0528f7"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/441d3277-b94a-444e-94bc-bc8f4d26e492"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/0a9f1847-c6b4-4777-ba77-afa6148394c1"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/c00bd3af-7c7e-4ab2-90ce-e6ea18ca5741"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/e2cb4150-6dc4-45ee-9041-6142757cec20"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/4580a99c-0fc9-4107-bcd4-6d111aa4924c"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/bf18e563-75c0-485d-979c-e1331eb0d3ec"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/8ecc22c8-b10a-4b93-bf36-b1b8d1660b35"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/d996b1b6-b51f-48b0-b759-e31c8cf26e7b"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/37dfc256-3b0f-4141-b35c-89bd0f91a8ad"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/c30838a8-0462-48ee-8eb6-299a75627a1f"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/4c01c97e-9c51-4e72-a006-51bf4b0ec877"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/089d1253-4f14-481d-915f-c82fec53121f"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/eef38701-38ef-477e-80b9-d5ff90895ad8"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/80986deb-57f6-48ae-9c1f-928754c5bad2"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/eea0fd57-45b9-4489-b100-3838b462d9a8"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/b3cf2aa4-af04-4c67-8935-9beea43af289"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/7786a165-43ef-499c-9d32-e9e0f0c9a195"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/75bc5f18-4449-4879-8e44-d9b87c6103ee"/>
+        <dcterms:title xml:lang="en-US">{"id": "cdff554f-745a-4453-a3a2-167fecfa1fd4", "value": "Lincoln_Source_Type"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/7c126c4d-47e8-475b-8724-8628d35f817c"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/fd2d0994-89e8-421c-8628-be0012c33307"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/f68bf6fc-ed4c-4069-86cf-13d2262ecf95"/>
+        <skos:hasTopConcept rdf:resource="http://www.archesproject.org/bd122cb4-dc05-4a9c-b8f3-5b900a4138bb"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-US">{"id": "80a7a095-7a4a-4a9c-9785-8606c0666431", "value": "Manuscript"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/0a9f1847-c6b4-4777-ba77-afa6148394c1">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "01615d56-93cd-4782-808a-3ffc38db8e52", "value": "Image"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/1520df30-1a6a-4b8b-9b6b-b00ddf0528f7">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "d8758d02-b9af-4c87-b0f9-aa7179c394ed", "value": "Typescript"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/eea0fd57-45b9-4489-b100-3838b462d9a8">
+    <skos:prefLabel xml:lang="en-US">{"id": "cc039083-b667-414b-8c4b-31a613997113", "value": "Report"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/4c01c97e-9c51-4e72-a006-51bf4b0ec877">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "46b56f0c-d885-4833-b6bf-d4d60ef33497", "value": "Letter"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/f68bf6fc-ed4c-4069-86cf-13d2262ecf95">
+    <skos:prefLabel xml:lang="en-US">{"id": "339b2016-ac6d-4bb9-b413-03f371356264", "value": "Newsletter"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/441d3277-b94a-444e-94bc-bc8f4d26e492">
+    <skos:prefLabel xml:lang="en-US">{"id": "f8c8fd89-9488-4785-bc59-a0edc8f1df2c", "value": "Plan"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/89876fb9-abde-42dc-8172-dafe14bea086">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "d70d6d88-0c5f-4cf5-80ff-005b3db7cedc", "value": "Newspaper"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/bd122cb4-dc05-4a9c-b8f3-5b900a4138bb">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "8e0d4c95-9dec-4a4c-a5fc-56341e7f4bde", "value": "Notebook"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/bf18e563-75c0-485d-979c-e1331eb0d3ec">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "b01ca8a5-f56d-44f4-a969-cf62847fc6e5", "value": "Book"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/eef38701-38ef-477e-80b9-d5ff90895ad8">
+    <skos:prefLabel xml:lang="en-US">{"id": "f5b49afe-d8e3-47d5-83d1-0f4dc4186df2", "value": "Serial"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/4580a99c-0fc9-4107-bcd4-6d111aa4924c">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "426a3c56-b588-4b18-928a-89f97fe70fab", "value": "Paper"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/37dfc256-3b0f-4141-b35c-89bd0f91a8ad">
+    <skos:prefLabel xml:lang="en-US">{"id": "5e450037-4d7a-4e01-9cb7-487bfa33b5e2", "value": "Magazine"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/c00bd3af-7c7e-4ab2-90ce-e6ea18ca5741">
+    <skos:prefLabel xml:lang="en-US">{"id": "b49febe0-f74b-4074-a82b-b71c2a700a36", "value": "Information sheet"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/8ecc22c8-b10a-4b93-bf36-b1b8d1660b35">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "8e0701b2-6656-418d-8a8e-56a2dbe4757d", "value": "Painting"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/d996b1b6-b51f-48b0-b759-e31c8cf26e7b">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "647a86c4-c924-4258-92d1-693e92b31b3f", "value": "Drawing"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/9f40d563-7a2d-42f8-8ed4-0c1ebedc05f5">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "f9259f53-f9ff-41a0-914f-56e79e1fca15", "value": "Journal"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/80986deb-57f6-48ae-9c1f-928754c5bad2">
+    <skos:prefLabel xml:lang="en-US">{"id": "eefe1d6b-3484-498f-9160-4bd0f7ff30e6", "value": "Proceedings"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/b3cf2aa4-af04-4c67-8935-9beea43af289">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "eed680f5-aab9-430a-8eb1-ad38c18753ce", "value": "Photograph"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/40cabacd-e6a5-40dd-adc7-3de7e763ec87">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "5bb9b440-8213-477a-814d-165f36dac68a", "value": "Engraving"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/e2cb4150-6dc4-45ee-9041-6142757cec20">
+    <skos:prefLabel xml:lang="en-US">{"id": "262ed470-bf1e-411e-96cc-744326ca764c", "value": "Monograph"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/4a326537-b9a3-419f-8b3d-c71a04f86591">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "d59d283c-f907-4aa6-9105-3cd9a3cb9afd", "value": "Map"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/c30838a8-0462-48ee-8eb6-299a75627a1f">
+    <skos:prefLabel xml:lang="en-US">{"id": "6689ab8d-e3c9-4dee-acfc-b6f6cdf320dc", "value": "Booklet"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/7786a165-43ef-499c-9d32-e9e0f0c9a195">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "978a91c3-db52-4ca6-8c0d-d608b83f78e5", "value": "Transactions"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/7c126c4d-47e8-475b-8724-8628d35f817c">
+    <skos:prefLabel xml:lang="en-US">{"id": "07ba0c05-7f53-4f21-8d7f-cf3337d8de72", "value": "Pamphlet"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/089d1253-4f14-481d-915f-c82fec53121f">
+    <skos:prefLabel xml:lang="en-US">{"id": "770e202f-f7ca-4b90-87d4-f3e9e652ed01", "value": "Webpage"}</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://www.archesproject.org/75bc5f18-4449-4879-8e44-d9b87c6103ee">
+    <skos:inScheme rdf:resource="http://www.archesproject.org/33ef7ec0-3063-4f33-9012-796cd347c662"/>
+    <skos:prefLabel xml:lang="en-US">{"id": "5b77640a-7329-41b5-8c0f-50c3e4e25e47", "value": "Unknown"}</skos:prefLabel>
+  </skos:Concept>
+</rdf:RDF>
