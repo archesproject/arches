@@ -60,7 +60,7 @@
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'delete')}">{% trans "Delete" %}</button>
-                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'edit')}, css: {'btn-mint':drawMode() === 'simple_select' || drawMode() === 'direct_select' || drawMode() === undefined}">{% trans "Edit" %}</button>
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'end')}">{% trans "Close" %}</button>
                         </div>
                     </div>
                 </div>
@@ -353,7 +353,7 @@
                 </div>
             </div>
 
-            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool(undefined, 'delete'), css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
                 </div>

@@ -729,11 +729,11 @@ define([
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
-                    if (selectedDrawTool === 'delete') { //it has no geom type, so must be trash
+                    if (selectedDrawTool === 'delete') {
                         self.draw.trash();
-                        self.drawMode(undefined);
+                        self.drawMode('simple_select');
                     }
-                    else if (selectedDrawTool === 'edit') { //it has no geom type, so must be trash
+                    else if (selectedDrawTool === 'end') {
                         self.draw.changeMode('simple_select')
                         self.drawMode(undefined);
                     }
@@ -743,7 +743,11 @@ define([
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                         } else if (self.geometryTypeDetails[selectedDrawTool].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
-                            self.drawMode(undefined);
+                            if (self.mapControls.mapControlsExpanded()) {
+                                self.drawMode(undefined);
+                            } else {
+                                self.drawMode('simple_select')
+                            }
                         } else {
                             self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
