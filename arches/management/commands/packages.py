@@ -340,23 +340,33 @@ class Command(BaseCommand):
             print 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.'
             print '*'*80
             sys.exit()
+
         if data_source == '':
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
-            sys.exit()
+            data_source = settings.BUSINESS_DATA_FILES
 
         if isinstance(data_source, basestring):
             data_source = [data_source]
 
-        for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
-            else:
-                print '*'*80
-                print 'No file found at indicated location: {0}'.format(path)
-                print '*'*80
-                sys.exit()
+        if data_source != ():
+            for path in data_source:
+                if os.path.isabs(path):
+                    if os.path.isfile(os.path.join(path)):
+                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+                    else:
+                        print '*'*80
+                        print 'No file found at indicated location: {0}'.format(path)
+                        print '*'*80
+                        sys.exit()
+                else:
+                    print '*'*80
+                    print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                    print '*'*80
+                    sys.exit()
+        else:
+            print '*'*80
+            print 'No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.'
+            print '*'*80
+            sys.exit()
 
     def import_graphs(self, data_source=''):
         """
