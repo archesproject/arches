@@ -136,8 +136,8 @@ class BusinessDataImporter(object):
                     print '*'*80
                     sys.exit()
 
-            # Import resource to resource relationships
-            reader.import_relations(relations=self.relations)
+            # Import resource to resource relationships (moved to seperate command)
+            # reader.import_relations(relations=self.relations)
 
             elapsed = (time() - start)
             print 'Time to import_business_data = {0}'.format(datetime.timedelta(seconds=elapsed))
