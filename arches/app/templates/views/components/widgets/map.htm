@@ -34,8 +34,8 @@
                         <!-- ko if: drawMode() === 'draw_line_string'-->
                         <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
-                        <!-- ko if: drawMode() === 'simple_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a " %}<span data-bind="text: selectedFeatureType"></span>.
+                        <!-- ko if: drawMode() === 'simple_select' -->
+                        <strong>{% trans "Edit Mode" %}</strong>
                         <!-- ko if: selectedFeatureType() !== 'point'-->
                         <span>{% trans "Click and drag to move." %}</span>
                         <!-- /ko -->
