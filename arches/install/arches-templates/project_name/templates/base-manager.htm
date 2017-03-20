@@ -1,0 +1,512 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+
+{% block body %}
+
+    <div class="wrapper">
+
+        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
+
+            {% block navheader %}
+            <header id="navbar">
+
+                <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
+                    <div class="navbar-header">
+                        <a href="{% url 'home' %}" class="navbar-brand">
+                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
+                            <div class="brand-title">
+                                <span class="brand-text">Arches</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </header>
+            {% endblock navheader %}
+
+
+            <div class="boxed">
+                <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
+
+                    <!-- ko if: alert() -->
+                    <div data-bind="visible: alert().active" class="relative">
+                        <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
+                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+
+                            <div class="ep-form-alert-default-dismiss">
+                                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                            </div>
+
+                            <div class="ep-form-alert-buttons">
+                                <!-- ko if: alert().cancel -->
+                                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                                <!-- /ko -->
+                                <!-- ko if: alert().ok -->
+                                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    {% block login_header %}
+                    <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
+                        <ul class="nav navbar-top-links pull-left">
+                            <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
+                                <a class="mainnav-toggle" href="#">
+                                    <i class="fa fa-navicon fa-lg"></i>
+                                </a>
+                            </li>
+                            <li class="hidden-xs" data-bind="if: showTabs()">
+                                <a id="toggle-aside" href="#">
+                                    <i id="toggle-aside-icon" class="fa fa-lg" data-bind="css: { 'fa-toggle-on': tabsActive(), 'fa-toggle-off': !tabsActive() }, click: function () { tabsActive(!tabsActive()) }"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-top-links pull-right">
+                            <li class="">
+                                <a href="#" class="main-navbar-item" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
+                                    <div class="text-center" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+                                      <i class="ion-search main-navbar-icon"></i>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li class="dropdown">
+                                <a id="demo-lang-switch" class="lang-selector dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <span class="lang-selected">
+                                        <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                                        <span class="lang-id">EN</span>
+                                        <span class="lang-name">English</span>
+                                    </span>
+                                </a>
+
+                                <ul class="head-list dropdown-menu with-arrow">
+                                    <li>
+                                        <a href="#" class="active">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                                            <span class="lang-id">EN</span>
+                                            <span class="lang-name">English</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/france.png" alt="France">
+                                            <span class="lang-id">FR</span>
+                                            <span class="lang-name">Fran&ccedil;ais</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/germany.png" alt="Germany">
+                                            <span class="lang-id">DE</span>
+                                            <span class="lang-name">Deutsch</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/italy.png" alt="Italy">
+                                            <span class="lang-id">IT</span>
+                                            <span class="lang-name">Italiano</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/spain.png" alt="Spain">
+                                            <span class="lang-id">ES</span>
+                                            <span class="lang-name">Espa&ntilde;ol</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <a class="" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right" style="background-color: transparent;">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                </span>
+                                <div class="username hidden-xs">
+                                {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
+                            </a>
+                            <li id="dropdown-user" class="dropdown">
+
+                                <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
+
+                                    <div class="pad-all bord-btm">
+                                        <p class="text-lg text-muted text-thin mar-btm">750Gb of 1,000Gb Used</p>
+                                        <div class="progress progress-sm">
+                                            <div class="progress-bar" style="width: 70%;">
+                                                <span class="sr-only">70%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <ul class="head-list">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user fa-fw fa-lg"></i> Profile
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="badge badge-danger pull-right">9</span>
+                                                <i class="fa fa-envelope fa-fw fa-lg"></i> Messages
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="label label-success pull-right">New</span>
+                                                <i class="fa fa-gear fa-fw fa-lg"></i> Settings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-question-circle fa-fw fa-lg"></i> Help
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-lock fa-fw fa-lg"></i> Lock screen
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="pad-all text-right">
+                                        <a href="pages-login.html" class="btn btn-primary">
+                                            <i class="fa fa-sign-out fa-fw"></i> Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endblock login_header %}
+
+                    {% block header %}
+                    <div class="ep-toolbar">
+
+                        <!-- Tools Menu -->
+                        {% if nav.menu %}
+                        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+                            <div class="">{% trans "Manage" %}
+                                <i class="ion-more"></i>
+                            </div>
+                        </a>
+                            {% if main_script == 'views/resource/editor' %}
+                                {% include 'navbar/resource-manage-menu.htm' %}
+                            {% else %}
+                                {% include 'navbar/graph-manage-menu.htm' %}
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Page Title and Icon -->
+                        <div class="ep-tools-title">
+                            <h1 class="page-header text-overflow ep-graph-title">
+                                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                                <span>{% trans nav.title %}</span>
+                            </h1>
+                        </div>
+
+                        <!-- Login -->
+                        {% if nav.login %}
+                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                                {% if user.username == 'anonymous' %}
+                                <h5 class="hidden-xs">{% trans "Login" %}</h5>
+                                {% else %}
+                                <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.username }}</h5>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        <!-- Recently Added -->
+                        {% if nav.edit_history and 'Resource Editor' in user.user_groups %}
+                        <ul class="nav navbar-top-links pull-left">
+                            <li class="mega-dropdown open">
+                                <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
+                                    <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
+                                </a>
+                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim recent-edits-panel" data-bind="visible:recentsActive()">
+                                    <!-- Resource Records Table, this should probably be split out into a separate .htm-->
+                                    <div class="pad-all">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        {% endif %}
+
+                        <!-- Search Bar -->
+                        {% if nav.search %}
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+                              <i class="ion-search"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        <!-- cursory implementation of this button, need to fix the permissions test -->
+                        {% if nav.res_edit and user.username != 'anonymous' %}
+                        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
+                              <i class="ion-edit"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.print %}
+                        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Print">
+                              <i class="ion-printer"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.help.0 != '' %}
+                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+                              <i class="ion-help"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div id="ep-help-panel" class="ep-help" style="display:none">
+                        <div class="ep-help-header" style="padding-right:0px">
+                            <div class="ep-help-title">
+                                <span>{% trans nav.help.0 %}</span>
+                            </div>
+                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
+                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Close Help">
+                                  <i class="fa fa-times-circle fa-lg"></i>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- help content loaded from contextually referenced template -->
+                        <div class="ep-help-body" style="float:left">
+                            {% if nav.help.1 %}
+                                {% include nav.help.1 %}
+                            {% endif %}
+                            <h5>for more documentation, visit <a href="https://arches4.readthedocs.io/en/latest/">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                        </div>
+                    </div>
+                    {% endblock header %}
+
+                    {% block main_content %}
+                    {% endblock main_content %}
+                </div>
+
+                {% block mainnav %}
+                <nav id="mainnav-container">
+                    <div id="mainnav">
+                        {% block navbar %}
+                        <div id="mainnav-menu-wrap">
+                            <div class="nano">
+                                <div class="nano-content" tabindex="0">
+                                    <ul id="mainnav-menu" class="list-group">
+
+                                        <!-- Tools -->
+                                        <li class="list-header">Tools</li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-tachometer"></i>
+                                                <span class="menu-title">
+                                                    <strong>Dashboard</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        {% if request.user|has_group:"Resource Editor" %}
+                                        <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="/resource" data-bind="click: navigate.bind(this, '/resource') ">
+                                                <i class="fa fa-building-o"></i>
+                                                <span class="menu-title">
+                                                    <strong>Add New Resource</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                                <!-- ko foreach: allGraphs -->
+                                                <!-- ko if: isresource -->
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource'),
+                                                        css: { 'arches-menu-item-disabled': disable_instance_creation },
+                                                        attr: {
+                                                            href: disable_instance_creation ? '#' : ('/graph/' + graphid + '/add_resource')
+                                                        }">
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- /ko -->
+                                            </ul>
+                                        </li>
+                                        {% endif %}
+
+                                        <!--Menu list item-->
+                                        {% if request.user|has_group:"Graph Editor" %}
+                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
+                                                <i class="fa fa-bookmark"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Arches Designer" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endif %}
+
+
+                                        <!--Menu list item-->
+                                        {% if request.user|has_group:"System Administrator" %}
+                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>System Settings</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        {% endif %}
+
+
+                                        <!--Menu list item-->
+                                        {% if request.user|has_group:"Application Administrator" %}
+                                        <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
+                                                <i class="fa fa-server"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Map Layer Manager" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph#basemaps" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Basemaps" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#overlays')">{% trans "Overlays" %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endif %}
+
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-globe"></i>
+                                                <span class="menu-title">
+                                                    <strong>Field Project Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-cloud-upload"></i>
+                                                <span class="menu-title">
+                                                    <strong>Import/Export Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user-md"></i>
+                                                <span class="menu-title">
+                                                    <strong>Profile Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        {% if request.user|has_group:"RDM Administrator" %}
+                                        <li class="list-divider-dark"></li>
+
+                                        <!-- Tools -->
+                                        <li class="list-header">Modules</li>
+
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
+                                                <i class="fa fa-align-left"></i>
+                                                <span class="menu-title">
+                                                    RDM
+                                                </span>
+                                            </a>
+                                        </li>
+                                        {% endif %}
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endblock navbar %}
+                    </div>
+                </nav>
+                {% endblock mainnav %}
+
+                {% block aside_container %}
+                <aside id="aside-container" style="position: fixed;">
+                    <div id="aside">
+                        {% block tabs %}
+                        {% endblock tabs %}
+                    </div>
+                </aside>
+                {% endblock aside_container %}
+            </div>
+
+            <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+        </div>
+
+    </div>
+
+{% endblock body %}
+
+
+{% block pre_require_js %}
+    <script>
+        {% autoescape off %}
+        define('view-data', [], function () {
+            return {
+                graphs: {{graphs}}
+            };
+        });
+        {% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

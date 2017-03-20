@@ -20,7 +20,7 @@ def install():
 
         # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
         tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
-        os.system("pip install -b %s setuptools --no-use-wheel --upgrade" % (tmpinstalldir))
+        os.system("pip install -b %s setuptools --upgrade" % (tmpinstalldir))
         os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
         if settings.MODE == 'DEV':
             os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
@@ -29,21 +29,6 @@ def install():
         #INSTALLING CUSTOM DJANGO EDITS/PATCHES
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(django_install_location, 'contrib', 'auth'))
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(django_install_location, 'contrib', 'admin', 'static', 'admin', 'css'))
-
-        # GET ELASTICSEARCH
-        download_elasticsearch(install_dir)
-
-        # INSTALL PSYCOPG2
-        if sys.platform == 'win32':
-            is_64bit_python = sys.maxsize > 2**32
-            if os.path.exists('C:\Program Files (x86)') and is_64bit_python:
-                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/2.6.1/psycopg2-2.6.1.win-amd64-py2.7-pg9.4.4-release.exe")
-            else:
-                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/2.6.1/psycopg2-2.6.1.win32-py2.7-pg9.4.4-release.exe")
-        else:
-            # Install psycopg2 through pip - Works fine if the correct header files are present
-            # See http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
-            os.system("pip install psycopg2==2.6.1")
 
 def site_packages_dir():
     if sys.platform == 'win32':
@@ -154,7 +139,7 @@ def get_elasticsearch_download_url(install_dir):
 ------------------------------------------------------------------------------------------------------
     ERROR: There was an error getting the url for Elastic search from the requirements.txt file
     Make sure the requirements.txt file contains a line similar to the following line,\nincluding the pound symbol (#) but not the double quotes (") and where the x.x.x represent the version number:
-        "# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-x.x.x.zip"
+        "# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-x.x.x.zip"
 ----------------------------------------------------------------------------------------------------\n""")
 
 def get_version(version=None):

@@ -73,7 +73,6 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
-        # self.itemtext
         # end from models.CardModel
         self.cardinality = ''
         self.cards = []
@@ -113,8 +112,6 @@ class Card(models.CardModel):
                         node_model.config = node.get('config', None)
                         self.nodes.append(node_model)
 
-                self.graph = Graph.objects.get(graphid=self.graph_id)
-
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
@@ -122,14 +119,11 @@ class Card(models.CardModel):
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
 
-                self.graph = Graph.objects.get(graphid=self.graph_id)
-
-                if self.graph.ontology and self.graph.isresource:
-                    self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
-
                 self.cardinality = self.nodegroup.cardinality
                 self.groups = self.get_group_permissions(self.nodegroup)
                 self.users = self.get_user_permissions(self.nodegroup)
+
+        self.graph = Graph.objects.get(graphid=self.graph_id)
 
     def get_group_permissions(self, nodegroup=None):
         """
@@ -270,13 +264,17 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
-        ret['ontologyproperty'] = self.ontologyproperty
         ret['groups'] = self.groups
         ret['users'] = self.users
+        ret['ontologyproperty'] = self.ontologyproperty
 
-        # provide a models.CardXNodeXWidget model for every node 
+        if self.graph.ontology and self.graph.isresource:
+            edge = self.get_edge_to_parent()
+            ret['ontologyproperty'] = edge.ontologyproperty
+
+        # provide a models.CardXNodeXWidget model for every node
         # even if a widget hasn't been configured
-        for node in ret['nodes']: 
+        for node in ret['nodes']:
             found = False
             for widget in ret['widgets']:
                 if node.nodeid == widget.node_id:
@@ -291,9 +289,6 @@ class Card(models.CardModel):
                     widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
                     widget_model.label = node.name
                     ret['widgets'].append(widget_model)
-
-        if self.ontologyproperty:
-            ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret
 

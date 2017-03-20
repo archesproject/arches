@@ -1,5 +1,9 @@
 # initially from
 # https://github.com/Victory/django-travis-saucelabs/blob/master/mysite/saucetests/tests.py
+
+# these tests can be run from the command line via
+# python manage.py test tests/ui/page_tests.py --pattern="*.py" --settings="tests.test_settings"
+
 import os
 import sys
 import uuid
@@ -101,7 +105,7 @@ class UITest(StaticLiveServerTestCase):
         self.driver.implicitly_wait(5)
 
     def setUpLocal(self):
-        management.call_command('packages', operation='import_json', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         self.driver = getattr(webdriver, self.browser)()
         self.driver.implicitly_wait(3)
 
@@ -173,8 +177,7 @@ class UITest(StaticLiveServerTestCase):
         #Navigate to the card manager and click on the correspoding card for the node created above
         card_page = CardPage(self.driver, self.live_server_url, graph_id)
         card_id = card_page.select_card(node_ids)
-
-        card_designer_page = CardDesignerPage(self.driver, self.live_server_url, card_id)
+        card_designer_page = CardDesignerPage(self.driver, self.live_server_url, resource_graph_id)
         map_widget = card_designer_page.add_widget(MapWidget)
 
         results = {}
@@ -182,13 +185,9 @@ class UITest(StaticLiveServerTestCase):
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
         results['added overlay'] = map_widget.add_overlay(1)
-        map_tools_working = True
-        for k, v in results.iteritems():
-            if v != True:
-                map_tools_working = False
-        print 'map tools results', results
 
-        self.assertTrue(map_tools_working)
+        print results
+        self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_make_form(self):
         print "Testing form creation"
@@ -214,7 +213,7 @@ class UITest(StaticLiveServerTestCase):
             uuid.UUID(form_id)
         except:
             form_id_is_valid = False
-        form_page.configure_form("Form A")
+        form_page.configure_form("FormA")
 
         self.assertTrue(form_id_is_valid)
 
@@ -253,14 +252,10 @@ class UITest(StaticLiveServerTestCase):
         results['opened maptools'] = map_widget.open_tools()
         results['added basemap'] = map_widget.add_basemap()
         results['added overlay'] = map_widget.add_overlay(2)
-        map_tools_working = True
-        for k, v in results.iteritems():
-            if v != True:
-                map_tools_working = False
-        print 'map tools results in report manager', results
-        report_editor_page.save_report("Report A")
+        report_editor_page.save_report("ReportA")
 
-        self.assertTrue(map_tools_working)
+        print results
+        self.assertTrue(results['opened maptools'] == True and results['added basemap'] == True and results['added overlay'] == True)
 
     def test_add_resource(self):
         print "Testing resource instance creation and crud"
@@ -281,7 +276,7 @@ class UITest(StaticLiveServerTestCase):
         #Navigate to the report manager and click on the correspoding card for the node created above
         form_page = FormPage(self.driver, self.live_server_url, resource_graph_id)
         form_id = form_page.add_new_form()
-        form_page.configure_form("Form B")
+        form_page.configure_form("FormB")
 
         report_manager_page = ReportManagerPage(self.driver, self.live_server_url, resource_graph_id)
         report_id = report_manager_page.add_new_report()
@@ -291,7 +286,7 @@ class UITest(StaticLiveServerTestCase):
         map_widget = report_editor_page.add_widget(MapWidget)
         map_widget.open_tools()
         map_widget.add_overlay(2)
-        report_editor_page.save_report("Report B")
+        report_editor_page.save_report("ReportB")
 
         resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
         resource_instance_id = resource_manager_page.add_new_resource()
@@ -308,7 +303,7 @@ class UITest(StaticLiveServerTestCase):
     #     page.login('admin', 'admin')
     #
     #     #Create a new branch model
-    #     # management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+    #     # management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')
     #     # graph_page = GraphPage(self.driver, self.live_server_url)
     #     # resource_graph_id = graph_page.import_arches_json()
     #

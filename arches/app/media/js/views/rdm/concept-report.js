@@ -130,16 +130,12 @@ define([
 
         conceptSelected: function(e) {
             var data = $(e.target).data();
-            this.mode = '';
-
             this.trigger('conceptSelected', data.conceptid);
         },
 
         dropdownConceptSelected: function(e) {
             var data = $(e.target).data();
-            this.mode = 'dropdown';
-
-            this.trigger('conceptSelected', data.conceptid);
+            this.trigger('dropdownConceptSelected', data.conceptid);
         },
 
         addChildConcept: function(e){
@@ -257,14 +253,15 @@ define([
 
                     if (data.action === 'delete-value') {
                         model = new ValueModel(data);
-                        self.model.set('values', [model]);
+                        model.delete();
+                        self.render();
                     }
                     if (data.action === 'delete-relationship') {
                         model = new ConceptModel(data);
                         self.model.set('relatedconcepts', [model]);
+                        self.model.delete();
                     }
 
-                    self.model.delete();
                 });
                 modal.modal('hide');                
             }            

@@ -60,7 +60,7 @@ def search(request):
     return render(request, 'views/search.htm')
 
 def widget(request, template="text"):
-    return render(request, 'views/forms/widgets/%s.htm' % template)
+    return render(request, 'views/components/widgets/%s.htm' % template)
 
 def report_templates(request, template="text"):
     return render(request, 'views/report-templates/%s.htm' % template)

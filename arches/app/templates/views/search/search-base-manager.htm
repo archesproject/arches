@@ -1,0 +1,78 @@
+{% load i18n %}
+<div class="content-panel" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
+
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+
+        <div class="" style="display: inline-block; padding-left: 15px; padding-top: 10px; margin-bottom: 15px; margin-right: 20px;">
+            <div class="search-bar relative" style="margin-top: 0px; width: 375px;" data-bind="with: termFilter">
+                {% include 'views/search/term-filter.htm' %}
+            </div>
+        </div>
+
+        <div class="" style="margin-top: -5px;">
+            <div class="btn-group">
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="map filter" data-bind="css: {'active': selectedTab() === mapFilter}, click: function(){selectedTab(mapFilter)}"><i class="fa fa-map-marker"></i></a>
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="time filter" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}"><i class="fa fa-calendar"></i></a>
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="saved searches" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}"><i class="ion-ios-heart"></i></a>
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="advanced" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}"><i class="ion-plus-round"></i></a>
+                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}"><i class="fa fa-code-fork"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex">
+        <div class="flex">
+
+            <!--Form Listing -->
+            <div class="left-column-crud-container search-control-container" data-bind="with: searchResults, css: { 'slide': !resultsExpanded() }">
+                <!-- Title Block -->
+                <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                <div id="search-results-container">
+                    <span class="resource-selector-button pull-right" data-bind="with:$parent.resourceTypeFilter">
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "Select..." %} <i class="dropdown-caret fa fa-caret-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#" data-bind="click: selectModelType.bind($data, null)">{% trans "All resources" %}</a></li>
+                                <!-- ko foreach: $root.resources -->
+                                <li><a href="#" data-bind="text: name, click: $parent.selectModelType.bind($parent)"></a></li>
+                                <!-- /ko -->
+                            </ul>
+                        </div>
+                    </span>
+                    {% include 'views/search/search-results.htm' %}
+                </div>
+            </div>
+
+            <!-- Card Container -->
+            <div class="card-form-preview-container">
+                <div class="tab-content relative">
+                    <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}">
+
+                        <div class="search-results-button" data-bind="click: function () { resultsExpanded(!resultsExpanded()); }">
+                            <a class="" href="#"><i class="search-results-button-icon" data-bind="css: resultsExpanded() ? 'ion-arrow-left-b': 'ion-arrow-right-b'"></i></a>
+                        </div>
+                        <!-- ko with: mapFilter -->
+                        {% include 'views/search/map-filter.htm' %}
+                        <!-- /ko -->
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === timeFilter}, with: timeFilter">
+                        {% include 'views/search/time-filter.htm' %}
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === savedSearches}, with: savedSearches">
+                        <div>save my search</div>
+                    </div>
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
+                        <div>perform complex search</div>
+                    </div>
+                    <!-- ko if: selectedTab() === relatedResourcesManager -->
+                    <div class="tab-pane" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, with: relatedResourcesManager">
+                        {% include 'views/resource/related-resources/related-resources-manager.htm' %}
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

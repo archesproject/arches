@@ -1,0 +1,153 @@
+{
+    "graph": [
+        {
+            "subtitle": "Default configuration for Search",
+            "functions_x_graphs": [],
+            "mapfeaturecolor": "#FF0000",
+            "isresource": false,
+            "forms_x_cards": [],
+            "relatable_resource_model_ids": [],
+            "reports": [],
+            "iconclass": "fa fa-dashboard",
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " ",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "afe4d1f5-fad8-11e6-92df-6c4008b05c4c",
+                    "datatype": "number",
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "MaxExportResults"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "554e4647-fad8-11e6-991e-6c4008b05c4c",
+                    "datatype": "number",
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "MaxResultsPerPage"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "73dac791-fad8-11e6-af5f-6c4008b05c4c",
+                    "datatype": "number",
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "MaxDropdownResults"
+                },
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Basic Search Settings"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "Configuration settings for search returns",
+            "resource_2_resource_constraints": [],
+            "edges": [
+                {
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "73dac9ae-fad8-11e6-95ba-6c4008b05c4c",
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "rangenode_id": "73dac791-fad8-11e6-af5f-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "554e4807-fad8-11e6-9824-6c4008b05c4c",
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "rangenode_id": "554e4647-fad8-11e6-991e-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "afe4d44c-fad8-11e6-804f-6c4008b05c4c",
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "rangenode_id": "afe4d1f5-fad8-11e6-92df-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                }
+            ],
+            "maplinewidth": 1,
+            "mappointsize": 3,
+            "graphid": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+            "name": "Settings Basic Search",
+            "cards_x_nodes_x_widgets": [],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                    "description": "Configuration settings for search returns",
+                    "visible": true,
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "f4b2da05-fad7-11e6-8cb0-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": null,
+                    "active": true,
+                    "name": "Settings Basic Search"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E13_Attribute_Assignment",
+                "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                "datatype": "semantic",
+                "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c",
+                "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c",
+                "config": null,
+                "name": "Basic Search Settings"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "0ffff60 2017-02-24 11:14:14 -0800",
+        "db": "PostgreSQL 9.6.1 on x86_64-apple-darwin14.5.0, compiled by Apple LLVM version 7.0.0 (clang-700.1.76), 64-bit",
+        "os version": "15.6.0",
+        "os": "Darwin"
+    }
+}

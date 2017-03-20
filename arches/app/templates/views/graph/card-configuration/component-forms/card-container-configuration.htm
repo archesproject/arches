@@ -28,14 +28,16 @@
     <div id="cc-settings" class="tab-pane fade in active">
 
         <!-- Card Container Property -->
+        {% if graph.isresource and graph.ontology_id %}
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Relation to Resource" %}
             </div>
-            <div data-bind="with: card">
-                <select class="resources" data-bind="value: $data.get('ontologyproperty'), options: $data.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div>
+                <select class="resources" data-bind="value: card().get('ontologyproperty'), options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
+        {% endif %}
 
         <!-- Card Container Name -->
         <div class="node-widget-label" style="">

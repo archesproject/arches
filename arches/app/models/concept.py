@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Match, Query
+from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
@@ -36,8 +36,8 @@ logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000003',
     '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000005',
     '00000000-0000-0000-0000-000000000006'
 )
 
@@ -119,7 +119,7 @@ class Concept(object):
         if semantic == True:
             pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
         else:
-            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member') | Q(relationtype = 'hasCollection')
 
         if self.id != '':
             nodetype = kwargs.pop('nodetype', self.nodetype)
@@ -152,7 +152,7 @@ class Concept(object):
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id,
-                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts,
+                            include_subconcepts=include_subconcepts,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel,
                             nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
@@ -266,6 +266,18 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             for key, concept in concepts_to_delete.iteritems():
+                # delete only member relationships if the nodetype == Collection
+                if concept.nodetype == 'Collection':
+                    concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1, semantic=False)
+                    def find_concepts(concept):
+                        if len(concept.parentconcepts) <= 1:
+                            for subconcept in concept.subconcepts:
+                                conceptrelation = models.Relation.objects.get(conceptfrom=concept.id, conceptto=subconcept.id, relationtype='member')
+                                conceptrelation.delete()
+                                find_concepts(subconcept)
+
+                    find_concepts(concept)
+
                 models.Concept.objects.get(pk=key).delete()
         return
 
@@ -322,6 +334,9 @@ class Concept(object):
 
                 concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
                 concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+
+        if concept.nodetype == 'Collection':
+            concepts_to_delete[concept.id] = concept
 
         return concepts_to_delete
 
@@ -493,21 +508,25 @@ class Concept(object):
 
     def delete_index(self, delete_self=False):
 
-        def deleteconcepts(concepts_to_delete):
-            for key, concept in concepts_to_delete.iteritems():
-                for conceptvalue in concept.values:
-                    conceptvalue.delete_index()
+        def delete_concept_values_index(concepts_to_delete):
+            se = SearchEngineFactory().create()
+            for concept in concepts_to_delete.itervalues():
+                query = Query(se, start=0, limit=10000)
+                term = Term(field='conceptid', term=concept.id)
+                query.add_query(term)
+                query.delete(index='strings', doc_type='concept')
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
-            deleteconcepts(concepts_to_delete)
+            delete_concept_values_index(concepts_to_delete)
 
         else:
+            delete_concept_values_index({self.id: self})
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
-                deleteconcepts(concepts_to_delete)
+                delete_concept_values_index(concepts_to_delete)
 
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE, mode='semantic'):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -531,7 +550,10 @@ class Concept(object):
             ret.id = label.conceptid
             ret.labelid = label.id
 
-            conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
+            if mode == 'semantic':
+                conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'))
+            if mode == 'collections':
+                conceptrealations = models.Relation.objects.filter(Q(conceptfrom = conceptid), Q(relationtype = 'member') | Q(relationtype = 'hasCollection') )
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
             else:
@@ -561,14 +583,23 @@ class Concept(object):
                 return child_concept
 
         graph = []
-        #if self.id == None or self.id == '' or self.id == top_concept:
-        concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
-        for conceptmodel in concepts:
-            graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
-        #else:
-            #graph = [_findNarrowerConcept(self.id, depth_limit=1)]
-            #concepts = _findNarrowerConcept(self.id, depth_limit=1)
-            #graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
+        if self.id == None or self.id == '' or self.id == 'None' or self.id == top_concept:
+            if mode == 'semantic':
+                concepts = models.Concept.objects.filter(nodetype='ConceptScheme')
+                for conceptmodel in concepts:
+                    graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+            if mode == 'collections':
+                concepts = models.Concept.objects.filter(nodetype='Collection')
+                for conceptmodel in concepts:
+                    graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=0))
+
+                graph = sorted(graph, key=lambda concept: concept.label)
+                #graph = _findNarrowerConcept(concepts[0].pk, depth_limit=1).children
+
+        else:
+            graph = _findNarrowerConcept(self.id, depth_limit=1).children
+            # concepts = _findNarrowerConcept(self.id, depth_limit=1)
+            # graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
 
         return graph
 
@@ -672,19 +703,20 @@ class Concept(object):
             return self
 
     def check_if_concept_in_use(self):
-        """Checks  if a concept or any of its subconcepts is in use by a resource"""
+        """Checks  if a concept or any of its subconcepts is in use by a resource instance"""
 
         in_use = False
+        cursor = connection.cursor()
         for value in self.values:
-            try:
-                recs = models.Domains.objects.filter(val=value.id)
-                if len(recs) > 0:
-                    in_use = True
-                    break
-                else:
-                    pass
-            except Exception, e:
-                print e
+            sql = """
+                SELECT count(*) from tiles t, jsonb_each_text(t.tiledata) as json_data
+                WHERE json_data.value = '%s'
+            """ % value.id
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            if rows[0][0] > 0:
+                in_use = True
+                break
         if in_use != True:
             for subconcept in self.subconcepts:
                 in_use = subconcept.check_if_concept_in_use()
@@ -904,24 +936,63 @@ class ConceptValue(object):
             if scheme == None:
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
 
-            se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
-            se.index_data('concept_labels', scheme.id, data, 'id')
-            # don't create terms for entity type concepts
-            if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
-                se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
+            data['top_concept'] = scheme.id
+            se.index_data('strings', 'concept', data, 'id')
 
     def delete_index(self):
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
-        phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
-        query.add_query(phrase)
-        query.delete(index='concept_labels')
-        se.delete_terms(self.id)
+        term = Term(field='id', term=self.id)
+        query.add_query(term)
+        query.delete(index='strings', doc_type='concept')
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
-        result = se.search(index='concept_labels', id=self.id)
+        result = se.search(index='strings', doc_type='concept', id=self.id)
         if result['found']:
-            return Concept(result['_type'])
+            return Concept(result['top_concept'])
         else:
             return None
+
+
+def get_preflabel_from_conceptid(conceptid, lang):
+    ret = None
+    default = {
+        "category": "",
+        "conceptid": "",
+        "language": "",
+        "value": "",
+        "type": "",
+        "id": ""
+    }
+    se = SearchEngineFactory().create()
+    query = Query(se)
+    bool_query = Bool()
+    bool_query.must(Match(field='type', query='prefLabel', type='phrase'))
+    bool_query.filter(Terms(field='conceptid', terms=[conceptid]))
+    query.add_query(bool_query)
+    preflabels = query.search(index='strings', doc_type='concept')['hits']['hits']
+    for preflabel in preflabels:
+        default = preflabel['_source']
+        # get the label in the preferred language, otherwise get the label in the default language
+        if preflabel['_source']['language'] == lang:
+            return preflabel['_source']
+        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
+            ret = preflabel['_source']
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+            ret = preflabel['_source']
+    return default if ret == None else ret
+
+
+def get_concept_label_from_valueid(valueid):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return concept_label['_source']
+
+
+def get_preflabel_from_valueid(valueid, lang):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
+    if concept_label['found']:
+        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)

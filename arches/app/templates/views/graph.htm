@@ -24,15 +24,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graphs" %}
 {% endblock title %}
 
+{% block login_header %}{% endblock login_header %}
+
 {% block main_content %}
 <div class="scroll-y">
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
-        <div class="page-title-block">
-            <div class="center-div" style="padding-top: 0px; padding-left: 28px;">
-                <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> {% trans "Arches Designer" %}</h1>
-                <p class="arches-panel-subtitle">{% trans "Design new data types to include in your inventory" %}</p>
-            </div>
-        </div>
 
         <!-- Toolbar -->
         <div class="relative resource-toolbar" style="">
@@ -120,12 +116,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                             <!-- /ko -->
                             <!-- ko if: $parent.showResources() -->
-                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/form_manager') }, attr: { href: graphid + '/form_manager' }"><i class="fa fa-files-o"></i> {% trans "Manage Forms" %}</a>
+                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/form_manager') }, attr: { href: graphid + '/form_manager' }"><i class="fa fa-files-o"></i> {% trans "Manage Menus" %}</a>
                             </li>
                             <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/report_manager') }, attr: { href: graphid + '/report_manager' }"><i class="fa fa-book"></i> {% trans "Manage Reports" %}</a>
                             </li>
                              <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/function_manager') }, attr: { href: graphid + '/function_manager' }"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
                             </li>
+                          </li>
+                           <li><a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
+                          </li>
                             <!-- /ko -->
                             <li class="divider"></li>
                             <li><a href="#" data-bind="click:exportGraph">{% trans "Export" %}</a>
@@ -147,7 +146,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-
+    
 {% endblock main_content %}
 
 {% block pre_require_js %}

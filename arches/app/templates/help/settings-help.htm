@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <p>These settings will create important metadata for this {% if graph.isresource %}Resource Model{% else %}Branch{% endif %}. With a few exceptions, these are the same settings you will be able to define for a {% if graph.isresource %}Branch{% else %}Resource Model{% endif %} as well.</p>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Identifiers</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                <strong>Name</strong> - Used to identify this {%if graph.isresource%}Resource Model{%else%}Branch{%endif%} throughout the app interface. Default is {%if graph.isresource%}"New Resource Model"{%else%}"New Branch"{%endif%}.<br>
+                <strong>Subtitle</strong> - optional subtitle, displayed on the Arches Designer home page<br>
+                <strong>Ontology</strong> - Decide whether an ontology will be enforced in this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph. To learn more about what this means, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>. By default, you are allowed to choose between using the CIDOC CRM v6.2, or using no ontology. <em>Note that once a node has been added to this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph the <em>Ontology</em> setting becomes fixed.</em><br>
+                <strong>Root Class</strong> - This setting is only necessary if an <em>Ontology</em> has been chosen. Define the ontology class of the root node for this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph.
+            </p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Icon</h4></a>
+        <div class="ep-help-topic-content">
+            <p>Both Resource Models and Branches should be identified by an icon, which is used throughout the app interface. You can browse the icons to select one, or type in the search bar to filter them.</p>
+            <p><em>Arches uses the <a href="http://fontawesome.io/">Font Awesome</a> icon library; custom icons are not supported.</em></p>
+        </div>
+    </div>
+    {% if graph.isresource %}
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Appearance</h4></a>
+        <div class="ep-help-topic-content">
+            <p>Define the appearance of Resources that are created using this Resource Model when they are displayed on a map. This setting may be modified after resources have been created using this model.</p>
+            <p>
+                <strong>Color</strong> - color of map symbol. You can use the color picker, enter an rgba value (red, green, blue, alpha), or enter a standard hex color code (#203731 or #FFB612, for example).<br>
+                <strong>Point Size</strong> - size of point marker, if point is shown on map<br>
+                <strong>Line Width</strong> - width of line, if line geometry is used on map<br>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Description</h4></a>
+        <div class="ep-help-topic-content">
+            <p>You can optionally add an <strong>Author</strong> and <strong>Abstract</strong> to this {%if graph.isresource%}Resource Model{%else%}Branch{%endif%}. These settings are especially helpful if multiple resource designers are working on the same Arches installation.</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Status</h4></a>
+        <div class="ep-help-topic-content">
+            <p>
+                {% if not graph.isresource %}
+                <strong>Editable</strong> - Until a Branch is set to Editable, you will not be able to add it to a Resource Models. Keep a Branch <em>Non-Editable</em> until you are ready for it to be used.</br>
+                {% else %}
+                <strong>Editable</strong> - You will only be able to create Resources using this Resource Model until you have set its status to <em>Editable</em>. Use <em>Non-Editable</em> while designing a Resource Model over an extended period of time.</br>
+                <strong>Resource models that may be related</strong> - Choose what other which Resource Models can be related to this one.</br>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+

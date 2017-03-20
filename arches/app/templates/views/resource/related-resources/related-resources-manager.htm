@@ -1,0 +1,292 @@
+{% load i18n %}
+<div id="related-resources-drag-panel" class="search-container related-resources-container">
+
+    
+    
+    <!--ko if: showGraph() -->
+    <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
+    	resourceId: currentResource().resourceinstanceid,
+    	resourceName: currentResource().displayname,
+    	resourceTypeId: currentResource().graphid
+    }">
+    	
+        <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
+        <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
+    		<dl style="margin-bottom: 0;">
+    			<dd class="arches-concept-heirarchy">
+    				<div>
+    					<a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
+    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded!' %}</small>
+    				</div>
+    				<div>
+    					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
+    				</div>
+    			</dd>
+    		</dl>
+    	</div>
+
+        <!-- Resource Node Search/Listing -->
+        <div class="related-resources-nodes form-list">
+
+            <div class="layer-list">
+                <!-- Layer Filter -->
+                <div class="list-filter" data-bind="" style="margin-right: 15px; margin-left: 15px;">
+                    <input type="text" class="form-control" style="" placeholder="Find a resource..." data-bind="">
+
+                    <!-- Clear Search -->
+                    <span class="clear-node-search" data-bind=""><i class="fa fa-times-circle"></i></span>
+                </div>
+
+            </div>
+            
+            <!-- Resource Nodes -->
+            <div class="report-image-grid relative">
+                <div class="grid" style="margin-left: 0px;">
+                    
+                    <div class="library-card selected-card relative" data-bind="">
+                        <div class="crud-card-main" style="left: 5px;">
+                            <a class="listitem_name" data-bind="">Resource Name Goes Here</a>
+                        </div>
+                        
+                        <div class="crud-card-subtitle" style="left: 5px;" data-bind="">
+                            10 out of 200 relations loaded
+                        </div>
+                        <div class="crud-card-link">add</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+
+    
+    <!-- Drag Panel -->
+    <div class="relative">
+
+        <!-- Target -->
+        <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
+
+            <div class="related-resources-header">
+            	<h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
+
+                <!--ko if: !showGraph() -->
+            	<div class="btn-group rr-display-toggle">
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+            	</div>
+                <!--/ko-->
+
+                <!--ko if: showGraph() -->
+                <div class="btn-group rr-display-toggle" style="right: 260px;">
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
+                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+                </div>
+                <!--/ko-->
+
+                <div class="relative">
+
+                    <!--Documentation dropdown-->
+                    <!--ko if: resourceEditorContext -->
+                    <div class="related-resources-relationship">
+                            
+                            <div class="mega-dropdown related-reources-crud-link">
+                                
+                                <!--ko if: !showGraph() -->
+                                <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
+                                    <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
+                                </a>
+
+                                <div id="rr-properties-id" class="dropdown-menu mega-dropdown-menu dropdown-shim dropdown-crud" style="padding-left: 15px;" data-bind="css: {'display-related-resource-properties': propertiesDialogOpen()}">
+                                    <div class="clearfix">
+                                        <div class="settings-config-panel relative">
+
+                                            <div class="related-resources-title-container">
+                                                <h3 class="search-title">Relationship details</h3>
+                                                <div class="relation-properties-buttons">
+                                                    <div class="relation-properties-button">
+                                                        <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save</button>
+                                                    </div>
+                                                    <div class="relation-properties-button">
+                                                        <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Relationship participants -->
+
+                                                <div class="resource-relation-description">
+                                                    <div class="target-resource">
+                                                        <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                                    </div>
+                                                    <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
+                                                        <div class="selected-resource">
+                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.displayname'></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            <div class="settings-crud-panel">
+                                                <div class="col-xs-12">
+                                                    <form class="widgets">
+                                                        <div class="row widget-container">
+                                                            <div class="form-group">
+                                                                <div class="row widget-wrapper">
+                                                                    <div class="form-group">
+                                                                        <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                                        <div class="col-xs-12">
+                                                                            <input style="width:30%; display:inline-block;"
+                                                                                data-bind="select2: {
+                                                                                    select2Config: {
+                                                                                        clickBubble: true,
+                                                                                        data: relationshipTypes,
+                                                                                        value: relatedProperties.relationship_type,
+                                                                                        multiple: false,
+                                                                                        placeholder: relationshipTypePlaceholder
+                                                                                    }
+                                                                                }">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row widget-container shim">
+                                                            <div class="form-group">
+                                                                <div class="relative" style="">
+                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                            </label>
+                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                                            </label>
+                                                                </div>
+
+                                                                <div class="relative">
+                                                                    <div class="col-xs-6">
+                                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date from" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.datefrom">
+                                                                    </div>
+                                                                    <div class="col-xs-6">
+                                                                        <input type="text" class="form-control input-lg widget-input" placeholder="date to" data-bind="datepicker: {format: 'YYYY-MM-DD'}, value: relatedProperties.dateto">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row widget-container">
+                                                            <div class="form-group">
+                                                                <div class="relative">
+                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
+                                                                </div>
+
+                                                                <div class="col-xs-12">
+                                                                    <input type="text" id="editor1" class="form-control input-lg widget-input" data-bind="textInput: relatedProperties.notes">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ko-->
+                            </div>
+                    </div>
+
+                    <button class="btn btn-sm btn-mint btn-labeled fa fa-code-fork related-resources-delete" data-bind="click: function(){deleteRelationships()}, visible: selected().length > 0">Delete Selected</button>
+
+                    <!-- /ko -->
+                    <!--Documentation dropdown-->
+                </div>
+          </div>
+
+
+
+            <div class="rr-result-grid-container" data-bind="visible: !showGraph()">
+                <div>
+                    <!--ko if: resourceRelationships().length > 0 -->
+                    <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th class="rr-tab-field">{% trans "Resource ID" %}</th>
+                                <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                                <th class="rr-tab-field">{% trans "From" %}</th>
+                                <th class="rr-tab-field">{% trans "To" %}</th>
+                                <th class="rr-tab-field">{% trans "Notes" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
+                                              jQueryUI: true,
+                                              scrollY: 350,
+                                              paging: true,
+                                              dom: 'rtip',
+                                              columns:[
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width: '100px'},
+                                                  {width:'100px'}
+                                              ]
+                                          }
+                                      }">
+                            <tr class="rr-table-row" data-bind="click: function () {
+                                selected(!selected());
+                            }">
+                                <td>
+                                    <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
+                                    <span data-bind="text: resource.displayname"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: preflabel.value"></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: datestarted'></span>
+                                </td>
+                                <td>
+                                    <span data-bind='text: dateended'></span>
+                                </td>
+                                <td>
+                                    <span class="rr-text-notes" data-bind='text: notes'></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--/ko -->
+
+                    <!--ko if: resourceRelationships().length === 0 -->
+                    <div class="rr-panel-note">{% trans "No Resources Selected..." %}</div>
+                    <!--/ko-->
+                </div>
+
+            </div>
+
+            <!-- Message -->
+            <!--ko if: resourceEditorContext -->
+            <div class="rr-card-message-placement">
+                <p class="text-center">
+                    <!-- Drag&amp;Drop resources onto this area and describe how they relate to one another -->
+                </p>
+            </div>
+            <!--/ko-->
+        </div>
+
+        <!-- ko if: resourceEditorContext -->
+        <div id="report-image-grid" class="report-image-grid rr-grid rr-image-grid">
+            <!-- ko foreach: { data: searchResults.relationshipCandidates, as: 'candidate' } -->
+            <div class="rr-grid-item" data-bind="">
+                <div class="rr-listing">
+                    <h3 class="search-listing-title"><i class="search-listing-icon" data-bind="css: iconclass"></i><span data-bind="text: displayname"></span></h3>
+                    <div class="search-listing-body">TODO: Primary description goes here</div>
+                    <div class="search-listing-footer">Footer details here</div>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+</div>

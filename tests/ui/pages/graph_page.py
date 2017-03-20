@@ -61,4 +61,4 @@ class GraphPage(BasePage):
     #     path_to_file = os.path.join(test_settings.TEST_ROOT, 'fixtures', 'resource_graphs', 'Cardinality Test Model.json')
     #     file_input.send_keys(path_to_file)
 
-    #     management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+    #     management.call_command('packages', operation='import_graphs', source='tests/fixtures/resource_graphs/archesv4_resource.json')

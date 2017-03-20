@@ -1,0 +1,16 @@
+{
+  "filetype": "archesjson",
+  "resource_model_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+  "nodes": [
+    {
+      "data_type": "",
+      "data_length": "",
+      "arches_nodeid": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+      "arches_node_name": "single n",
+      "value_type": "",
+      "export": "",
+      "file_field_name": "Source Parent"
+    }
+  ],
+  "resource_model_name": "Target"
+}

@@ -1,0 +1,429 @@
+{
+    "business_data": {
+        "relations": [],
+        "resources": [
+            {
+                "tiles": [
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "c15f5dae-bbe8-11e6-9251-685b3597724b",
+                        "tileid": "f1ccc1bf-51be-47b0-a365-88efedb2320e",
+                        "data": {
+                            "c15f5dae-bbe8-11e6-9251-685b3597724b": "210",
+                            "c15f6268-bbe8-11e6-99a2-685b3597724b": "04705f94-7f76-4021-8490-12546cd323f9"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "b21ac3f3-bbe5-11e6-a2a9-685b3597724b",
+                        "tileid": "fdb8b9f0-b6b4-4cbb-8ef1-9dd7464f5b9f",
+                        "data": {
+                            "b21ac3f3-bbe5-11e6-a2a9-685b3597724b": [
+                                "6f76a6ca-b551-4d1c-8e74-2bf10f5bd643",
+                                "d651332a-e3f8-446e-90af-f073d0c40ef1",
+                                "eedea8fa-792c-4116-bd84-9c864c31e833"
+                            ]
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "d295a74c-bbe1-11e6-a411-685b3597724b",
+                        "tileid": "3be405ae-7e36-4d59-9cb8-327062cb5659",
+                        "data": {
+                            "d295bf35-bbe1-11e6-b4a9-685b3597724b": "1933-01-01",
+                            "d295b387-bbe1-11e6-ad41-685b3597724b": "2016-12-06"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "2da8510c-bbe5-11e6-b33d-685b3597724b",
+                        "tileid": "bddb7cce-ebdd-413a-a4a2-9e7032089c3c",
+                        "data": {
+                            "2da85870-bbe5-11e6-948c-685b3597724b": "0ffac292-c081-4790-9c69-73cb1ff1c33f",
+                            "2da8510c-bbe5-11e6-b33d-685b3597724b": "North Beach"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "2da8510c-bbe5-11e6-b33d-685b3597724b",
+                        "tileid": "0b606b6c-3e45-4cc7-9916-58b546e2f4e4",
+                        "data": {
+                            "2da85870-bbe5-11e6-948c-685b3597724b": "65d9bdc4-3b80-454b-b951-e8c730b74e81",
+                            "2da8510c-bbe5-11e6-b33d-685b3597724b": "San Francisco"
+                        },
+                        "sortorder": 1
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "8a3e77fd-bbe5-11e6-ba50-685b3597724b",
+                        "tileid": "7bf68221-6227-4b04-80ff-8cc073882256",
+                        "data": {
+                            "8a3e81c2-bbe5-11e6-8d56-685b3597724b": "536b57df-3f2f-4ac2-b50f-cc56c718e2d0",
+                            "8a3e77fd-bbe5-11e6-ba50-685b3597724b": {
+                                "type": "FeatureCollection",
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "type": "Point",
+                                            "coordinates": [
+                                                -122.40582025058931,
+                                                37.802366427412466
+                                            ]
+                                        },
+                                        "type": "Feature",
+                                        "id": "20a845cf09f40a9344f31e93910c5947",
+                                        "properties": {}
+                                    },
+                                    {
+                                        "geometry": {
+                                            "type": "Polygon",
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        -122.40475134507503,
+                                                        37.80375671305001
+                                                    ],
+                                                    [
+                                                        -122.40623959044493,
+                                                        37.80360729108253
+                                                    ],
+                                                    [
+                                                        -122.40619025634426,
+                                                        37.80349035194054
+                                                    ],
+                                                    [
+                                                        -122.40626425749525,
+                                                        37.80339290251413
+                                                    ],
+                                                    [
+                                                        -122.40664248560027,
+                                                        37.80313303674836
+                                                    ],
+                                                    [
+                                                        -122.40671648675126,
+                                                        37.80295762683964
+                                                    ],
+                                                    [
+                                                        -122.40667537500073,
+                                                        37.802600309070286
+                                                    ],
+                                                    [
+                                                        -122.40650270564842,
+                                                        37.80261330247397
+                                                    ],
+                                                    [
+                                                        -122.40636292569656,
+                                                        37.80185968127974
+                                                    ],
+                                                    [
+                                                        -122.40621492339459,
+                                                        37.801827197434605
+                                                    ],
+                                                    [
+                                                        -122.40617381164401,
+                                                        37.80171675225465
+                                                    ],
+                                                    [
+                                                        -122.40470201097438,
+                                                        37.801872674813694
+                                                    ],
+                                                    [
+                                                        -122.4047266780247,
+                                                        37.80195063596976
+                                                    ],
+                                                    [
+                                                        -122.40481712387589,
+                                                        37.80195063596976
+                                                    ],
+                                                    [
+                                                        -122.4048089015258,
+                                                        37.80200910678282
+                                                    ],
+                                                    [
+                                                        -122.40522824138141,
+                                                        37.80195063596976
+                                                    ],
+                                                    [
+                                                        -122.40537624368339,
+                                                        37.8027562297641
+                                                    ],
+                                                    [
+                                                        -122.40500623792845,
+                                                        37.802801706571
+                                                    ],
+                                                    [
+                                                        -122.40503090497879,
+                                                        37.80295762683964
+                                                    ],
+                                                    [
+                                                        -122.40541735543393,
+                                                        37.80291864680335
+                                                    ],
+                                                    [
+                                                        -122.40546668953458,
+                                                        37.80311354677909
+                                                    ],
+                                                    [
+                                                        -122.4046526768737,
+                                                        37.80323048651768
+                                                    ],
+                                                    [
+                                                        -122.40475134507503,
+                                                        37.80375671305001
+                                                    ]
+                                                ]
+                                            ]
+                                        },
+                                        "type": "Feature",
+                                        "id": "ab9670cf9038c7d8d31786742c057603",
+                                        "properties": {}
+                                    },
+                                    {
+                                        "geometry": {
+                                            "type": "Polygon",
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        -122.4046526768737,
+                                                        37.80323048651768
+                                                    ],
+                                                    [
+                                                        -122.4046362321735,
+                                                        37.80324347981063
+                                                    ],
+                                                    [
+                                                        -122.40464445452358,
+                                                        37.80324347981063
+                                                    ],
+                                                    [
+                                                        -122.4046526768737,
+                                                        37.80323048651768
+                                                    ]
+                                                ]
+                                            ]
+                                        },
+                                        "type": "Feature",
+                                        "id": "dd63939d52700eb452b010a7c5cfcc84",
+                                        "properties": {}
+                                    }
+                                ]
+                            }
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "b2b796ba-bbe6-11e6-9dbc-685b3597724b",
+                        "tileid": "6fb22c84-538d-46d3-9ddf-8e5d160096ef",
+                        "data": {
+                            "b2b79cfa-bbe6-11e6-a69e-685b3597724b": "Lillian Coit Memorial Tower",
+                            "b2b79c1e-bbe6-11e6-b1fd-685b3597724b": "123456",
+                            "b2b79afa-bbe6-11e6-a7bd-685b3597724b": "Coit Tower"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "812877ca-bbe5-11e6-96de-685b3597724b",
+                        "tileid": "c4202b53-6da9-4fc0-bbb2-6ab6ea116208",
+                        "data": {},
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": "c4202b53-6da9-4fc0-bbb2-6ab6ea116208",
+                        "nodegroup_id": "81285fae-bbe5-11e6-8d35-685b3597724b",
+                        "tileid": "6b2ce104-2550-4e90-87b5-06566b8547d7",
+                        "data": {
+                            "812881e6-bbe5-11e6-8a60-685b3597724b": "Telegraph Hill"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                        "parenttile_id": "c4202b53-6da9-4fc0-bbb2-6ab6ea116208",
+                        "nodegroup_id": "8128737a-bbe5-11e6-90b8-685b3597724b",
+                        "tileid": "5b0b2512-2a5b-495c-ad0f-ca60233d8a2c",
+                        "data": {
+                            "8128737a-bbe5-11e6-90b8-685b3597724b": "1 Telegraph Hill Blvd, San Francisco, CA 94133",
+                            "81287f97-bbe5-11e6-a1fd-685b3597724b": "fca22099-63d5-49eb-9e25-702d5efe663c"
+                        },
+                        "sortorder": 0
+                    }
+                ],
+                "resourceinstance": {
+                    "resourceinstanceid": "147b0000-bc03-11e6-af48-80e6500ee4e4",
+                    "legacyid": null,
+                    "graph_id": "6e77a868-bbe0-11e6-973a-685b3597724b"
+                }
+            },
+            {
+                "tiles": [
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "b2b796ba-bbe6-11e6-9dbc-685b3597724b",
+                        "tileid": "6037a30e-5963-42f1-8536-a0d7972869b3",
+                        "data": {
+                            "b2b79cfa-bbe6-11e6-a69e-685b3597724b": "San Francisco-Oakland Bay Bridge",
+                            "b2b79c1e-bbe6-11e6-b1fd-685b3597724b": "987654",
+                            "b2b79afa-bbe6-11e6-a7bd-685b3597724b": "Bay Bridge"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "c15f5dae-bbe8-11e6-9251-685b3597724b",
+                        "tileid": "0008d885-5048-4e2f-ac28-c86506026cbb",
+                        "data": {
+                            "c15f5dae-bbe8-11e6-9251-685b3597724b": "190",
+                            "c15f6268-bbe8-11e6-99a2-685b3597724b": "04705f94-7f76-4021-8490-12546cd323f9"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "d295a74c-bbe1-11e6-a411-685b3597724b",
+                        "tileid": "ab523390-25e9-4251-b249-f75b1806205a",
+                        "data": {
+                            "d295bf35-bbe1-11e6-b4a9-685b3597724b": "1936-11-12",
+                            "d295b387-bbe1-11e6-ad41-685b3597724b": "2016-12-06"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "b21ac3f3-bbe5-11e6-a2a9-685b3597724b",
+                        "tileid": "fb212eb5-65fc-4aae-938d-9e5566f50a2c",
+                        "data": {
+                            "b21ac3f3-bbe5-11e6-a2a9-685b3597724b": [
+                                "3b4bddbb-0ca6-44d5-8622-ce9982412883",
+                                "10ac2b9b-3425-4c3c-9b5c-983bb16f93d3",
+                                "052e8714-3f19-4179-b1f9-dcbe45df673e"
+                            ]
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "812877ca-bbe5-11e6-96de-685b3597724b",
+                        "tileid": "f5e82967-5bc6-4ae4-8ae6-921978944e3c",
+                        "data": {},
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": "f5e82967-5bc6-4ae4-8ae6-921978944e3c",
+                        "nodegroup_id": "81285fae-bbe5-11e6-8d35-685b3597724b",
+                        "tileid": "50abaff3-aee0-47cb-bac5-46d966913cd8",
+                        "data": {
+                            "812881e6-bbe5-11e6-8a60-685b3597724b": "Between San Francisco and Oakland along interstate 80."
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": "f5e82967-5bc6-4ae4-8ae6-921978944e3c",
+                        "nodegroup_id": "8128737a-bbe5-11e6-90b8-685b3597724b",
+                        "tileid": "2b799ee5-c7b0-4b3f-8b62-5ab78fbc72c1",
+                        "data": {
+                            "8128737a-bbe5-11e6-90b8-685b3597724b": "1 Interstate 80",
+                            "81287f97-bbe5-11e6-a1fd-685b3597724b": "fca22099-63d5-49eb-9e25-702d5efe663c"
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": "f5e82967-5bc6-4ae4-8ae6-921978944e3c",
+                        "nodegroup_id": "8128737a-bbe5-11e6-90b8-685b3597724b",
+                        "tileid": "a696184c-792d-4111-9f1f-60f5b0fd832f",
+                        "data": {
+                            "8128737a-bbe5-11e6-90b8-685b3597724b": "610 Mission Street",
+                            "81287f97-bbe5-11e6-a1fd-685b3597724b": "77e31bd2-84d7-406c-a4de-2a6d53fe9693"
+                        },
+                        "sortorder": 1
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "8a3e77fd-bbe5-11e6-ba50-685b3597724b",
+                        "tileid": "87c0ad91-edaf-4d1a-9907-04375ebffa39",
+                        "data": {
+                            "8a3e81c2-bbe5-11e6-8d56-685b3597724b": "13f40c49-fc82-4d5b-8ba3-b31d97aaf1c8",
+                            "8a3e77fd-bbe5-11e6-ba50-685b3597724b": {
+                                "type": "FeatureCollection",
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "type": "LineString",
+                                            "coordinates": [
+                                                [
+                                                    -122.38760288303695,
+                                                    37.789201290589105
+                                                ],
+                                                [
+                                                    -122.36036800118944,
+                                                    37.81387942047944
+                                                ],
+                                                [
+                                                    -122.35312202345023,
+                                                    37.81812322771573
+                                                ],
+                                                [
+                                                    -122.350123687834,
+                                                    37.81891274633152
+                                                ],
+                                                [
+                                                    -122.33000985307504,
+                                                    37.82167599498584
+                                                ]
+                                            ]
+                                        },
+                                        "type": "Feature",
+                                        "id": "be10736835333cbe5838513b609315e6",
+                                        "properties": {}
+                                    }
+                                ]
+                            }
+                        },
+                        "sortorder": 0
+                    },
+                    {
+                        "resourceinstance_id": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                        "parenttile_id": null,
+                        "nodegroup_id": "2da8510c-bbe5-11e6-b33d-685b3597724b",
+                        "tileid": "0c9b1d54-950f-455a-81a8-5faf58f79b5d",
+                        "data": {
+                            "2da85870-bbe5-11e6-948c-685b3597724b": "65d9bdc4-3b80-454b-b951-e8c730b74e81",
+                            "2da8510c-bbe5-11e6-b33d-685b3597724b": "San Francisco-Oakland plan area"
+                        },
+                        "sortorder": 0
+                    }
+                ],
+                "resourceinstance": {
+                    "resourceinstanceid": "cbcb4c8c-bc04-11e6-91b1-80e6500ee4e4",
+                    "legacyid": null,
+                    "graph_id": "6e77a868-bbe0-11e6-973a-685b3597724b"
+                }
+            }
+        ]
+    },
+    "graph": [],
+    "reference_data": []
+}

@@ -26,16 +26,9 @@ def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
 
-    path_to_ontologies = os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
-    extensions = [
-        os.path.join(path_to_ontologies, 'CRMsci_v1.2.3.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMarchaeo_v1.4.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMgeo_v1.2.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMdig_v3.2.1.rdfs.xml'),
-        os.path.join(path_to_ontologies, 'CRMinf_v0.7.rdfs.xml')
-    ]
-    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'),
-        version='6.2', ontology_name='CIDOC CRM v6.2', id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions))
+    extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
+    management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
+        version=settings.ONTOLOGY_BASE_VERSION, ontology_name=settings.ONTOLOGY_BASE_NAME, id=settings.ONTOLOGY_BASE_ID, extensions=','.join(extensions))
 
 def reverse_func(apps, schema_editor):
     Ontology = apps.get_model("models", "Ontology")
@@ -49,9 +42,9 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     User = apps.get_model("auth", "User")
     Permission = apps.get_model("auth", "Permission")
     try:
-        read_perm = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
-        write_perm = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
-        delete_perm = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        write_nodegroup = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        delete_nodegroup = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
     except Permission.DoesNotExist:
         if with_create_permissions:
             # Manually run create_permissions
@@ -65,18 +58,31 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
         else:
             raise
 
-    edit_group = Group.objects.using(db_alias).create(name='edit')
-    edit_group.permissions.add(read_perm, write_perm, delete_perm)
 
-    read_group = Group.objects.using(db_alias).create(name='read')
-    read_group.permissions.add(read_perm)
+    graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
+    graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
 
-    admin_user = User.objects.using(db_alias).get(username='admin')
-    admin_user.groups.add(edit_group)
-    admin_user.groups.add(read_group)
+    resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
+    rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
+    app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
+    sys_admin_group = Group.objects.using(db_alias).create(name='System Administrator')
+    mobile_project_admin_group = Group.objects.using(db_alias).create(name='Mobile Project Administrator')
+    crowdsource_editor_group = Group.objects.using(db_alias).create(name='Crowdsource Editor')
+    guest_group = Group.objects.using(db_alias).create(name='Guest')
 
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
-    anonymous_user.groups.add(read_group)
+    anonymous_user.groups.add(guest_group)
+
+    admin_user = User.objects.using(db_alias).get(username='admin')
+    admin_user.groups.add(graph_editor_group)
+    admin_user.groups.add(resource_editor_group)
+    admin_user.groups.add(rdm_admin_group)
+    admin_user.groups.add(app_admin_group)
+    admin_user.groups.add(sys_admin_group)
+    admin_user.groups.add(mobile_project_admin_group)
+    admin_user.groups.add(crowdsource_editor_group)
+    admin_user.groups.add(guest_group)
+
 
 class Migration(migrations.Migration):
 
@@ -222,7 +228,6 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
-                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
@@ -268,9 +273,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
+                ('modulename', models.TextField(blank=True, null=True)),
+                ('classname', models.TextField(blank=True, null=True)),
+                ('configcomponent', models.TextField(blank=True, null=True)),
                 ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
+                ('isgeometric', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'd_data_types',
@@ -568,8 +577,9 @@ class Migration(migrations.Migration):
             name='ResourceInstance',
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('resourceinstancesecurity', models.TextField(blank=True, null=True)),
+                ('legacyid', models.TextField(blank=True, unique=True, null=True)),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('createdtime', models.DateTimeField(auto_now_add=True)),
             ],
             options={
                 'db_table': 'resource_instances',
@@ -597,7 +607,7 @@ class Migration(migrations.Migration):
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
                 ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.TileModel')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
-                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=0)),
             ],
             options={
                 'db_table': 'tiles',
@@ -641,6 +651,8 @@ class Migration(migrations.Migration):
                 ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
                 ('icon', models.TextField(default=None)),
+                ('activated', models.BooleanField(default=True)),
+                ('addtomap', models.BooleanField(default=False)),
             ],
             options={
                 'db_table': 'map_layers',
@@ -664,11 +676,24 @@ class Migration(migrations.Migration):
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
+                ('config', JSONField(db_column='config')),
                 ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
                 ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
             ],
             options={
                 'db_table': 'tileserver_layers',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='GraphXMapping',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('mapping', JSONField(blank=True, db_column='mapping')),
+            ],
+            options={
+                'db_table': 'graphs_x_mapping_file',
                 'managed': True,
             },
         ),
@@ -777,6 +802,10 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='relation',
             unique_together=set([('conceptfrom', 'conceptto', 'relationtype')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='functionxgraph',
+            unique_together=set([('function', 'graph')]),
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),

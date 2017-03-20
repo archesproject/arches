@@ -23,6 +23,8 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
+import os, json, uuid
+from tests import test_settings
 from django.db import connection
 from django.core import management
 from tests.base_test import ArchesTestCase
@@ -31,13 +33,18 @@ from arches.app.models import models
 
 
 # these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 class TileTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        management.call_command('packages', operation='import_graphs', data_source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        
         sql = """
+        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
+            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
+
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
 
@@ -58,10 +65,13 @@ class TileTests(ArchesTestCase):
     def tearDownClass(cls):
         sql = """
         DELETE FROM public.node_groups
-        WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR 
-        nodegroupid = '32999999-0000-0000-0000-000000000000' OR 
-        nodegroupid = '19999999-0000-0000-0000-000000000000' OR 
-        nodegroupid = '21111111-0000-0000-0000-000000000000'
+        WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR
+        nodegroupid = '32999999-0000-0000-0000-000000000000' OR
+        nodegroupid = '19999999-0000-0000-0000-000000000000' OR
+        nodegroupid = '21111111-0000-0000-0000-000000000000';
+        
+        DELETE FROM public.resource_instances
+        WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
 
         """
 
@@ -130,33 +140,20 @@ class TileTests(ArchesTestCase):
 
         json = {
             "tiles": {
-                "19999999-0000-0000-0000-000000000000": [{
+                "72048cb3-adbc-11e6-9ccf-14109fd34195": [{
                     "tiles": {},
                     "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
                     "parenttile_id": '',
-                    "nodegroup_id": "19999999-0000-0000-0000-000000000000",
+                    "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
                     "tileid": "",
                     "data": {
-                      "20000000-0000-0000-0000-000000000004": "TEST 1",
-                      "20000000-0000-0000-0000-000000000002": "TEST 2",
-                      "20000000-0000-0000-0000-000000000003": "TEST 3"
-                    }
-                }],
-                "32999999-0000-0000-0000-000000000000": [{
-                    "tiles": {},
-                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-                    "parenttile_id": '',
-                    "nodegroup_id": "32999999-0000-0000-0000-000000000000",
-                    "tileid": "",
-                    "data": {
-                      "20000000-0000-0000-0000-000000000004": "TEST 4",
-                      "20000000-0000-0000-0000-000000000002": "TEST 5",
+                      "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
                     }
                 }]
             },
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
             "parenttile_id": '',
-            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+            "nodegroup_id": "7204869c-adbc-11e6-8bec-14109fd34195",
             "tileid": "",
             "data": {}
         }
@@ -165,7 +162,7 @@ class TileTests(ArchesTestCase):
         t.save(index=False)
 
         tiles = Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
-        self.assertEqual(tiles.count(), 3)
+        self.assertEqual(tiles.count(), 2)
 
     def test_simple_get(self):
         """
@@ -174,13 +171,12 @@ class TileTests(ArchesTestCase):
         """
 
         json = {
-            "tiles": {},
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
             "parenttile_id": '',
-            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
             "data": {
-              "20000000-0000-0000-0000-000000000004": "TEST 1"
+              "72048cb3-adbc-11e6-9ccf-14109fd34195": "TEST 1"
             }
         }
 
@@ -190,7 +186,7 @@ class TileTests(ArchesTestCase):
         t2 = Tile.objects.get(tileid=t.tileid)
 
         self.assertEqual(t.tileid, t2.tileid)
-        self.assertEqual(t2.data["20000000-0000-0000-0000-000000000004"], "TEST 1")
+        self.assertEqual(t2.data["72048cb3-adbc-11e6-9ccf-14109fd34195"], "TEST 1")
 
     # def test_validation(self):
     #     """

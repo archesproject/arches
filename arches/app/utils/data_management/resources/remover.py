@@ -1,31 +1,39 @@
-from django.conf import settings
-from django.db import connection, transaction
+from arches.app.models import models
 from arches.app.models.resource import Resource
-import arches.app.models.models as archesmodels
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query
 from django.db.models import Q
-from django.db.models import Count
-from optparse import make_option
-from django.core.management.base import BaseCommand, CommandError
+from django.db import connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 
 
-def delete_resources(load_id):
-    """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
-    resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
-    resourceids = set([editlog.resourceid for editlog in resources_for_removal])
-    for r_id in resourceids:
-        try:
-            resource = Resource(r_id)
-            resource.delete_index()
-            note = '{0} Deleted'.format(load_id)
-            resource.delete_all_resource_relationships()
-            resource.delete(note=note)
-        except ObjectDoesNotExist:
-            print 'Entity does not exist. Nothing to delete'
+# def delete_resources(load_id):
+#     """Takes the load id stored in the note column of the edit log and deletes each resource with that id"""
+#     resources_for_removal = archesmodels.EditLog.objects.filter( Q(note=load_id) )
+#     resourceids = set([editlog.resourceid for editlog in resources_for_removal])
+#     for r_id in resourceids:
+#         try:
+#             resource = Resource(r_id)
+#             resource.delete_index()
+#             note = '{0} Deleted'.format(load_id)
+#             resource.delete_all_resource_relationships()
+#             resource.delete(note=note)
+#         except ObjectDoesNotExist:
+#             print 'Entity does not exist. Nothing to delete'
 
+def clear_resources():
+    """Removes all resource instances from your db and elasticsearch resource index"""
+    se = SearchEngineFactory().create()
+    match_all_query = Query(se)
+    match_all_query.delete(index='strings', doc_type='term')
+    match_all_query.delete(index='resource')
+    match_all_query.delete(index='resource_relations')
 
-def truncate_resources():
-    """Deletes ALL resources in your database. Use with caution!"""
+    print 'deleting', Resource.objects.count(), 'resources'
     cursor = connection.cursor()
-    cursor.execute("""TRUNCATE data.entities CASCADE;""" )
-    print 'Resources Truncated'
+    cursor.execute("TRUNCATE public.resource_instances CASCADE;" )
+    print Resource.objects.count(), 'resources remaining'
+
+    print 'deleting', models.ResourceXResource.objects.count(), 'resource relationships'
+    cursor.execute("TRUNCATE public.resource_x_resource CASCADE;" )
+    print models.ResourceXResource.objects.count(), 'resource relationships remaining'

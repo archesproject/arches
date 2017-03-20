@@ -68,7 +68,7 @@ require([
                     jsonCache(jsonData());
                     pageView.viewModel.loading(false);
                 },
-                failure: function(response) {
+                error: function(response) {
                     pageView.viewModel.loading(false);
                 }
             });

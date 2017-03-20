@@ -26,16 +26,17 @@ Replace this with more appropriate tests for your application.
 from tests.base_test import ArchesTestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
 from arches.app.views.main import auth
-from arches.app.views.concept import rdm
+from arches.app.views.concept import RDMView
 from arches.app.views.resources import resource_manager
-from django.contrib.sessions.middleware import SessionMiddleware
 from arches.app.utils.set_anonymous_user import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
 
 # these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests/views/auth_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class AuthTests(ArchesTestCase):
@@ -44,14 +45,6 @@ class AuthTests(ArchesTestCase):
         self.client = Client()
         self.user = User.objects.create_user('test', 'test@archesproject.org', 'password')
         self.user.save()
-
-        cmd = PackageCommand()
-        try: 
-            Group.objects.get(name='edit')
-            Group.objects.get(name='read')
-        except:
-            cmd.create_groups()
-            cmd.create_users()
 
         self.anonymous_user = User.objects.get(username='anonymous')
 
@@ -92,7 +85,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.get(reverse('rdm', args=['']))
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
@@ -102,7 +96,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.get(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}))
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
@@ -143,7 +138,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.post(reverse('rdm', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}), concept)
         request.user = AnonymousUser()
         apply_middleware(request)
-        response = rdm(request)
+        view = RDMView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))

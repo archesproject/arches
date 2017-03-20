@@ -82,7 +82,7 @@
         <!-- /ko -->
 
         <!-- ko if: tiles.length === 0 -->
-        <div class="row rp-report-tile" style="color: #808080">
+        <div class="row rp-report-tile rp-no-data">
             {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
         </div>
         <!-- /ko -->
@@ -90,18 +90,10 @@
     {% endblock body %}
 </div>
 
-{% block footer %}
-{% endblock footer %}
-
 {% endblock report %}
 <!-- /ko -->
 
 <!-- ko if: configForm && (configType === 'header') -->
 {% block header_form %}
 {% endblock header_form %}
-<!-- /ko -->
-
-<!-- ko if: configForm && (configType === 'footer') -->
-{% block footer_form %}
-{% endblock footer_form %}
 <!-- /ko -->

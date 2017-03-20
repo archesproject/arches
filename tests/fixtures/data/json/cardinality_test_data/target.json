@@ -1,0 +1,481 @@
+{
+  "business_data": [],
+  "graph": [
+    {
+      "subtitle": "",
+      "mapfeaturecolor": "#FF0000",
+      "isresource": true,
+      "forms_x_cards": [],
+      "reports": [],
+      "iconclass": "",
+      "functions": [],
+      "nodegroups": [
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "8e673623-c6e2-11e6-92cf-685b3597724b",
+          "parentnodegroup_id": "8e673200-c6e2-11e6-9548-685b3597724b"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+          "parentnodegroup_id": "8e673e11-c6e2-11e6-9b54-685b3597724b"
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "8e673a21-c6e2-11e6-a15b-685b3597724b",
+          "parentnodegroup_id": "8e674217-c6e2-11e6-ad72-685b3597724b"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "8e674600-c6e2-11e6-a906-685b3597724b",
+          "parentnodegroup_id": null
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "8e674da8-c6e2-11e6-bc55-685b3597724b",
+          "parentnodegroup_id": "8e675173-c6e2-11e6-9bcb-685b3597724b"
+        },
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "parentnodegroup_id": null
+        }
+      ],
+      "author": " ",
+      "deploymentfile": null,
+      "forms": [],
+      "version": "",
+      "nodes": [
+        {
+          "is_collector": false,
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": null,
+          "nodeid": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "datatype": "semantic",
+          "nodegroup_id": null,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": "",
+          "name": "Target"
+        },
+        {
+          "is_collector": true,
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e673623-c6e2-11e6-92cf-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e673623-c6e2-11e6-92cf-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "child 1-1"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "datatype": "semantic",
+          "nodegroup_id": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "parent n-1"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "datatype": "semantic",
+          "nodegroup_id": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "parent 1-n"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "single n"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "datatype": "semantic",
+          "nodegroup_id": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "parent 1-1"
+        },
+        {
+          "is_collector": true,
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e673a21-c6e2-11e6-a15b-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e673a21-c6e2-11e6-a15b-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "child n-1"
+        },
+        {
+          "is_collector": true,
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "child n-n"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e674600-c6e2-11e6-a906-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e674600-c6e2-11e6-a906-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "single 1"
+        },
+        {
+          "is_collector": true,
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e674da8-c6e2-11e6-bc55-685b3597724b",
+          "datatype": "string",
+          "nodegroup_id": "8e674da8-c6e2-11e6-bc55-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "child 1-n"
+        },
+        {
+          "is_collector": true,
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": null,
+          "nodeid": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "datatype": "semantic",
+          "nodegroup_id": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "config": null,
+          "parentproperty": null,
+          "name": "parent n-n"
+        }
+      ],
+      "ontology_id": null,
+      "description": "Model to test the 6 different combinations of card container and child card cardinality",
+      "edges": [
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e6784bd-c6e2-11e6-a422-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e6786a3-c6e2-11e6-8062-685b3597724b",
+          "domainnode_id": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "rangenode_id": "8e673a21-c6e2-11e6-a15b-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e678533-c6e2-11e6-b030-685b3597724b",
+          "domainnode_id": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "rangenode_id": "8e674da8-c6e2-11e6-bc55-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e678794-c6e2-11e6-a1d7-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e67871e-c6e2-11e6-b43c-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e6783ae-c6e2-11e6-8aae-685b3597724b",
+          "domainnode_id": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "rangenode_id": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e6785b5-c6e2-11e6-a38a-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e67862e-c6e2-11e6-987a-685b3597724b",
+          "domainnode_id": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "rangenode_id": "8e673623-c6e2-11e6-92cf-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e6782dc-c6e2-11e6-8b93-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e674600-c6e2-11e6-a906-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        },
+        {
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "name": null,
+          "edgeid": "8e678438-c6e2-11e6-8844-685b3597724b",
+          "domainnode_id": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+          "rangenode_id": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+          "ontologyproperty": null,
+          "description": null
+        }
+      ],
+      "maplinewidth": 1,
+      "mappointsize": 3,
+      "graphid": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+      "name": "Target",
+      "cards_x_nodes_x_widgets": [],
+      "cards": [
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card container that has a cardinality of 'n' and a child card with cardinality of '1'",
+          "visible": true,
+          "nodegroup_id": "8e674217-c6e2-11e6-ad72-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e6744dc-c6e2-11e6-8dc2-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario n-1"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card container that has a cardinality of 'n' and a child card with cardinality of 'n'",
+          "visible": true,
+          "nodegroup_id": "8e673e11-c6e2-11e6-9b54-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e674061-c6e2-11e6-93dc-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario n-n"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "Represents a single node in a graph",
+          "visible": true,
+          "nodegroup_id": "8e673a21-c6e2-11e6-a15b-685b3597724b",
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "8e673cd1-c6e2-11e6-84fa-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Inner Card"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "Represents a single node in a graph",
+          "visible": true,
+          "nodegroup_id": "8e674da8-c6e2-11e6-bc55-685b3597724b",
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "8e674f91-c6e2-11e6-a4be-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Inner Card"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "Represents a single node in a graph",
+          "visible": true,
+          "nodegroup_id": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "8e674c05-c6e2-11e6-8092-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Inner Card"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "Represents a single node in a graph",
+          "visible": true,
+          "nodegroup_id": "8e673623-c6e2-11e6-92cf-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e6738ae-c6e2-11e6-86c5-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Inner Card"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card that has a cardinality of '1' and no child cards",
+          "visible": true,
+          "nodegroup_id": "8e674600-c6e2-11e6-a906-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e67488a-c6e2-11e6-a603-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario 1-"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card that has a cardinality of 'n' and no child cards",
+          "visible": true,
+          "nodegroup_id": "8e672c7d-c6e2-11e6-958d-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e672fe3-c6e2-11e6-b2a5-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario n-"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card container that has a cardinality of '1' and a child card with cardinality of 'n'",
+          "visible": true,
+          "nodegroup_id": "8e675173-c6e2-11e6-9bcb-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e6753f0-c6e2-11e6-b03a-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario 1-n"
+        },
+        {
+          "helpenabled": false,
+          "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+          "description": "A card container that has a cardinality of '1' and a child card with cardinality of '1'",
+          "visible": true,
+          "nodegroup_id": "8e673200-c6e2-11e6-9548-685b3597724b",
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "8e673461-c6e2-11e6-964c-685b3597724b",
+          "helptitle": null,
+          "instructions": null,
+          "active": true,
+          "name": "Scenario 1-1"
+        }
+      ],
+      "root": {
+        "is_collector": false,
+        "description": "",
+        "istopnode": true,
+        "ontologyclass": null,
+        "nodeid": "8e67553d-c6e2-11e6-94dd-685b3597724b",
+        "datatype": "semantic",
+        "nodegroup_id": null,
+        "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+        "config": null,
+        "name": "Target"
+      },
+      "isactive": true,
+      "deploymentdate": null
+    }
+  ],
+  "reference_data": []
+}

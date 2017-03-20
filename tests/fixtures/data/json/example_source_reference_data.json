@@ -1,0 +1,1027 @@
+{
+    "business_data": {
+        "relations": [],
+        "resources": []
+    },
+    "graph": [],
+    "reference_data": [
+        {
+            "nodetype": "ConceptScheme",
+            "legacyoid": "ARCHES",
+            "relatedconcepts": [],
+            "id": "00000000-0000-0000-0000-000000000001",
+            "parentconcepts": [],
+            "values": [
+                {
+                    "category": "label",
+                    "conceptid": "00000000-0000-0000-0000-000000000001",
+                    "language": "en-US",
+                    "value": "Arches",
+                    "type": "prefLabel",
+                    "id": "d09d5178-bc0a-11e6-9065-63d83fdb43d7"
+                },
+                {
+                    "category": "label",
+                    "conceptid": "00000000-0000-0000-0000-000000000001",
+                    "language": "en-US",
+                    "value": "Arches",
+                    "type": "prefLabel",
+                    "id": "3c69101c-bc02-11e6-a061-bfa96b116347"
+                },
+                {
+                    "category": "label",
+                    "conceptid": "00000000-0000-0000-0000-000000000001",
+                    "language": "en-US",
+                    "value": "Arches",
+                    "type": "prefLabel",
+                    "id": "376c88bc-9d5a-11e6-9d62-8ff96adae058"
+                }
+            ],
+            "hassubconcepts": true,
+            "relationshiptype": "",
+            "subconcepts": [
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "ADDRESS_TYPE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "84e94d9a-0243-4bd8-8a84-3db288da9388",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "84e94d9a-0243-4bd8-8a84-3db288da9388",
+                            "language": "en-US",
+                            "value": "Address Type",
+                            "type": "prefLabel",
+                            "id": "326d88e2-da44-4ed3-86e7-f83e55e917aa"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADDRESS_TYPE:2",
+                            "relatedconcepts": [],
+                            "id": "fa7ccda5-2462-49d9-b141-71d54ed46f0e",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "fa7ccda5-2462-49d9-b141-71d54ed46f0e",
+                                    "language": "en-US",
+                                    "value": "Alternative",
+                                    "type": "prefLabel",
+                                    "id": "77e31bd2-84d7-406c-a4de-2a6d53fe9693"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADDRESS_TYPE:1",
+                            "relatedconcepts": [],
+                            "id": "270b00cc-3cbe-46e5-9f24-bb89323114e4",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "270b00cc-3cbe-46e5-9f24-bb89323114e4",
+                                    "language": "en-US",
+                                    "value": "Primary",
+                                    "type": "prefLabel",
+                                    "id": "fca22099-63d5-49eb-9e25-702d5efe663c"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "ADMINISTRATIVE_SUBDIVISION_TYPE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "e8cdeabd-f63d-4077-b05f-50274742f519",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "e8cdeabd-f63d-4077-b05f-50274742f519",
+                            "language": "en-US",
+                            "value": "Administrative Subdivision Type",
+                            "type": "prefLabel",
+                            "id": "91ff4400-ee85-40b5-8afe-35813aec1415"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADMINISTRATIVE_SUBDIVISION:1",
+                            "relatedconcepts": [],
+                            "id": "2e88dc8a-d66c-4d7b-a8ed-bbd1295fa450",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "2e88dc8a-d66c-4d7b-a8ed-bbd1295fa450",
+                                    "language": "en-US",
+                                    "value": "Community Plan Area",
+                                    "type": "prefLabel",
+                                    "id": "65d9bdc4-3b80-454b-b951-e8c730b74e81"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADMINISTRATIVE_SUBDIVISION:2",
+                            "relatedconcepts": [],
+                            "id": "16d8d88b-6fb4-4e66-9a8c-06db57a1cbb1",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "16d8d88b-6fb4-4e66-9a8c-06db57a1cbb1",
+                                    "language": "en-US",
+                                    "value": "Council District",
+                                    "type": "prefLabel",
+                                    "id": "5ad194a8-bf5e-4a06-9dd6-3b94b55f8f1e"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADMINISTRATIVE_SUBDIVISION:4",
+                            "relatedconcepts": [],
+                            "id": "6d72003a-f981-418f-ace7-040e7888b396",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "6d72003a-f981-418f-ace7-040e7888b396",
+                                    "language": "en-US",
+                                    "value": "Neighborhood",
+                                    "type": "prefLabel",
+                                    "id": "0ffac292-c081-4790-9c69-73cb1ff1c33f"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "ADMINISTRATIVE_SUBDIVISION:3",
+                            "relatedconcepts": [],
+                            "id": "db9cf580-23e5-4763-b141-35eca42f77fd",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "db9cf580-23e5-4763-b141-35eca42f77fd",
+                                    "language": "en-US",
+                                    "value": "Neighborhood Council",
+                                    "type": "prefLabel",
+                                    "id": "35ca4dc5-a229-45ea-a2eb-79e586b4a925"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "GEOMETRY_QUALIFIER_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "97a4cbc3-59e5-4271-b849-a8635d137d26",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "97a4cbc3-59e5-4271-b849-a8635d137d26",
+                            "language": "en-US",
+                            "value": "Geometry Qualifier",
+                            "type": "prefLabel",
+                            "id": "27552bd0-594f-456d-b3c5-e3dab5e33df9"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:9",
+                            "relatedconcepts": [],
+                            "id": "9b02c210-2e8a-45de-8c76-fb23f9230325",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "9b02c210-2e8a-45de-8c76-fb23f9230325",
+                                    "language": "en-US",
+                                    "value": "access point",
+                                    "type": "prefLabel",
+                                    "id": "a54d76df-ab3a-4213-babc-2c23f7884944"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:4",
+                            "relatedconcepts": [],
+                            "id": "4d57dacb-67cf-446e-9a73-2b3d7fab210d",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "4d57dacb-67cf-446e-9a73-2b3d7fab210d",
+                                    "language": "en-US",
+                                    "value": "buffer polygon",
+                                    "type": "prefLabel",
+                                    "id": "462e6f69-0336-46d2-b93f-422021f246c2"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:11",
+                            "relatedconcepts": [],
+                            "id": "3357f459-c2c7-40fa-97f3-e863e46fc53c",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "3357f459-c2c7-40fa-97f3-e863e46fc53c",
+                                    "language": "en-US",
+                                    "value": "center line",
+                                    "type": "prefLabel",
+                                    "id": "13f40c49-fc82-4d5b-8ba3-b31d97aaf1c8"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:7",
+                            "relatedconcepts": [],
+                            "id": "5174db53-996f-4cd0-8088-1f1856bb3388",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "5174db53-996f-4cd0-8088-1f1856bb3388",
+                                    "language": "en-US",
+                                    "value": "center point",
+                                    "type": "prefLabel",
+                                    "id": "be9ad0de-efbb-40a3-95e0-17a58183685d"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:3",
+                            "relatedconcepts": [],
+                            "id": "239dee49-22e3-4402-be51-ea8630078db5",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "239dee49-22e3-4402-be51-ea8630078db5",
+                                    "language": "en-US",
+                                    "value": "circumscribed polygon",
+                                    "type": "prefLabel",
+                                    "id": "43eebfc6-5f8d-4302-a5f0-2ac20c6f878b"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:10",
+                            "relatedconcepts": [],
+                            "id": "a6abdc53-8ca3-47ca-add7-66b0060710d5",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "a6abdc53-8ca3-47ca-add7-66b0060710d5",
+                                    "language": "en-US",
+                                    "value": "facade point",
+                                    "type": "prefLabel",
+                                    "id": "cb8a2933-289e-453b-8f51-e9e10f60c36e"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:2",
+                            "relatedconcepts": [],
+                            "id": "35ef95b0-cccf-41ed-bca5-a06f25a5c67b",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "35ef95b0-cccf-41ed-bca5-a06f25a5c67b",
+                                    "language": "en-US",
+                                    "value": "footprint polygon",
+                                    "type": "prefLabel",
+                                    "id": "f1b5d6cc-34c4-4ca0-8b00-53b4fc761f9b"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:1",
+                            "relatedconcepts": [],
+                            "id": "6d2a90ae-9c2e-43b4-92a6-e90c2e796fb8",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "6d2a90ae-9c2e-43b4-92a6-e90c2e796fb8",
+                                    "language": "en-US",
+                                    "value": "perimeter polygon",
+                                    "type": "prefLabel",
+                                    "id": "536b57df-3f2f-4ac2-b50f-cc56c718e2d0"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:5",
+                            "relatedconcepts": [],
+                            "id": "57297aa1-476c-47d2-9e29-a5b8ce3032c9",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "57297aa1-476c-47d2-9e29-a5b8ce3032c9",
+                                    "language": "en-US",
+                                    "value": "property line",
+                                    "type": "prefLabel",
+                                    "id": "559b9a05-b546-474a-9f79-7478a6a14f30"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:6",
+                            "relatedconcepts": [],
+                            "id": "93a9f882-e017-412f-9eb5-1d548588fcd9",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "93a9f882-e017-412f-9eb5-1d548588fcd9",
+                                    "language": "en-US",
+                                    "value": "site datum point",
+                                    "type": "prefLabel",
+                                    "id": "724ac5ab-7f25-4b6d-b24f-a3d5297ecbb6"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "GEOMETRY_QUALIFIER:8",
+                            "relatedconcepts": [],
+                            "id": "30b3fab3-ada9-4f4d-913d-386433556b20",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "30b3fab3-ada9-4f4d-913d-386433556b20",
+                                    "language": "en-US",
+                                    "value": "vicinity point",
+                                    "type": "prefLabel",
+                                    "id": "455471fe-c24e-49ca-aee0-c31b6055cff6"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv",
+                    "relatedconcepts": [],
+                    "id": "00000000-0000-0000-0000-000000000005",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "00000000-0000-0000-0000-000000000005",
+                            "language": "en-US",
+                            "value": "Resource To Resource Relationship Types",
+                            "type": "prefLabel",
+                            "id": "d09d59c0-bc0a-11e6-9065-dfd98f42a410"
+                        }
+                    ],
+                    "hassubconcepts": false,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": []
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "SETTING_TYPE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "647aa600-029e-4b40-93f9-f6a188598351",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "647aa600-029e-4b40-93f9-f6a188598351",
+                            "language": "en-US",
+                            "value": "Setting Type",
+                            "type": "prefLabel",
+                            "id": "ed18fd24-3065-4ce6-9692-d6271f6588ad"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:1",
+                            "relatedconcepts": [],
+                            "id": "571b7bc2-ea1d-444c-bd25-8605992c17fe",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "571b7bc2-ea1d-444c-bd25-8605992c17fe",
+                                    "language": "en-US",
+                                    "value": "Attached 1 side",
+                                    "type": "prefLabel",
+                                    "id": "3b4bddbb-0ca6-44d5-8622-ce9982412883"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:2",
+                            "relatedconcepts": [],
+                            "id": "c8d10070-7047-449d-b16a-1cde35d82ec0",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "c8d10070-7047-449d-b16a-1cde35d82ec0",
+                                    "language": "en-US",
+                                    "value": "Attached 2 sides",
+                                    "type": "prefLabel",
+                                    "id": "10ac2b9b-3425-4c3c-9b5c-983bb16f93d3"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:3",
+                            "relatedconcepts": [],
+                            "id": "6d99f497-64b5-425a-8520-4102bf292b0b",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "6d99f497-64b5-425a-8520-4102bf292b0b",
+                                    "language": "en-US",
+                                    "value": "Corner",
+                                    "type": "prefLabel",
+                                    "id": "eedea8fa-792c-4116-bd84-9c864c31e833"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:4",
+                            "relatedconcepts": [],
+                            "id": "ad1fc0e4-c208-4677-8ff3-10804083bffc",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "ad1fc0e4-c208-4677-8ff3-10804083bffc",
+                                    "language": "en-US",
+                                    "value": "Flush at sidewalk",
+                                    "type": "prefLabel",
+                                    "id": "052e8714-3f19-4179-b1f9-dcbe45df673e"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:5",
+                            "relatedconcepts": [],
+                            "id": "fd064e45-0bcc-4c9b-a8ef-2f959ff2be15",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "fd064e45-0bcc-4c9b-a8ef-2f959ff2be15",
+                                    "language": "en-US",
+                                    "value": "Hillside",
+                                    "type": "prefLabel",
+                                    "id": "6f76a6ca-b551-4d1c-8e74-2bf10f5bd643"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "SETTING_TYPE:6",
+                            "relatedconcepts": [],
+                            "id": "43dc13ef-a79b-4bf5-a890-2b2177099abe",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "43dc13ef-a79b-4bf5-a890-2b2177099abe",
+                                    "language": "en-US",
+                                    "value": "Setback from sidewalk",
+                                    "type": "prefLabel",
+                                    "id": "d651332a-e3f8-446e-90af-f073d0c40ef1"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "UNIT_OF_MEASUREMENT_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77",
+                            "language": "en-US",
+                            "value": "Unit Of Measurement",
+                            "type": "prefLabel",
+                            "id": "f221d8c9-9cdf-4625-94f7-41c4a5b239f5"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:1",
+                            "relatedconcepts": [],
+                            "id": "0e492db2-a026-4d6b-81f5-e409775be21f",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "0e492db2-a026-4d6b-81f5-e409775be21f",
+                                    "language": "en-US",
+                                    "value": "inches",
+                                    "type": "prefLabel",
+                                    "id": "5509b823-7ace-4253-a3e5-0ebb5b976392"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "0e492db2-a026-4d6b-81f5-e409775be21f",
+                                    "language": "en-US",
+                                    "value": "1",
+                                    "type": "sortorder",
+                                    "id": "eacdd6e8-18ec-40ac-90a6-a463047fd8f3"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:10",
+                            "relatedconcepts": [],
+                            "id": "14923c78-a07a-478f-9d5b-d054de6d98e4",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "14923c78-a07a-478f-9d5b-d054de6d98e4",
+                                    "language": "en-US",
+                                    "value": "meters",
+                                    "type": "prefLabel",
+                                    "id": "b7611b55-55e2-4889-b923-687a89765c02"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "14923c78-a07a-478f-9d5b-d054de6d98e4",
+                                    "language": "en-US",
+                                    "value": "metres",
+                                    "type": "altLabel",
+                                    "id": "cc83eab0-f752-479d-9977-69894fb715c3"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "14923c78-a07a-478f-9d5b-d054de6d98e4",
+                                    "language": "en-US",
+                                    "value": "10",
+                                    "type": "sortorder",
+                                    "id": "9e8c42d4-e51e-4bc5-beec-0523e302e156"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:11",
+                            "relatedconcepts": [],
+                            "id": "ef64d304-a3c8-450a-a4cd-4462bbd00262",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "ef64d304-a3c8-450a-a4cd-4462bbd00262",
+                                    "language": "en-US",
+                                    "value": "kilometers",
+                                    "type": "prefLabel",
+                                    "id": "928219af-a567-40c0-a9ad-8640c8afc800"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "ef64d304-a3c8-450a-a4cd-4462bbd00262",
+                                    "language": "en-US",
+                                    "value": "kilometres",
+                                    "type": "altLabel",
+                                    "id": "66a099c7-2b63-44fc-9aeb-35d87f01217d"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "ef64d304-a3c8-450a-a4cd-4462bbd00262",
+                                    "language": "en-US",
+                                    "value": "11",
+                                    "type": "sortorder",
+                                    "id": "ee55a043-50e8-47d1-93df-cc39b0d8451e"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:12",
+                            "relatedconcepts": [],
+                            "id": "5a2383f4-10d8-41d8-8a2b-c66b4919b955",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "5a2383f4-10d8-41d8-8a2b-c66b4919b955",
+                                    "language": "en-US",
+                                    "value": "grams",
+                                    "type": "prefLabel",
+                                    "id": "d7a48024-8240-40b9-b8db-dce1067721fa"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "5a2383f4-10d8-41d8-8a2b-c66b4919b955",
+                                    "language": "en-US",
+                                    "value": "12",
+                                    "type": "sortorder",
+                                    "id": "27112a45-e149-43bc-b912-eb82befbca29"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:13",
+                            "relatedconcepts": [],
+                            "id": "67ffe1c8-3399-481c-87c8-65a0b61bf868",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "67ffe1c8-3399-481c-87c8-65a0b61bf868",
+                                    "language": "en-US",
+                                    "value": "kilograms",
+                                    "type": "prefLabel",
+                                    "id": "1064db18-7c59-4e02-9080-d1664bb3742e"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "67ffe1c8-3399-481c-87c8-65a0b61bf868",
+                                    "language": "en-US",
+                                    "value": "13",
+                                    "type": "sortorder",
+                                    "id": "6cf3fa6b-7eb1-49c8-94c2-382e54eb929f"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:2",
+                            "relatedconcepts": [],
+                            "id": "73f04aea-6da6-4b06-aa2e-332126f3a240",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "73f04aea-6da6-4b06-aa2e-332126f3a240",
+                                    "language": "en-US",
+                                    "value": "feet",
+                                    "type": "prefLabel",
+                                    "id": "04705f94-7f76-4021-8490-12546cd323f9"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "73f04aea-6da6-4b06-aa2e-332126f3a240",
+                                    "language": "en-US",
+                                    "value": "2",
+                                    "type": "sortorder",
+                                    "id": "cda88bac-d06b-4d09-aecd-ddc34d2cc256"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:3",
+                            "relatedconcepts": [],
+                            "id": "00d2586d-0739-45f5-8812-993ae25a540e",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "00d2586d-0739-45f5-8812-993ae25a540e",
+                                    "language": "en-US",
+                                    "value": "yards",
+                                    "type": "prefLabel",
+                                    "id": "9eb07bbd-70d6-4929-8d0f-fdd2ffdbf616"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "00d2586d-0739-45f5-8812-993ae25a540e",
+                                    "language": "en-US",
+                                    "value": "3",
+                                    "type": "sortorder",
+                                    "id": "92b519f0-b44f-4d2e-b9f0-8193f126bff0"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:4",
+                            "relatedconcepts": [],
+                            "id": "bf2c2b08-9a80-4a01-b063-2cac9fb16eac",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "bf2c2b08-9a80-4a01-b063-2cac9fb16eac",
+                                    "language": "en-US",
+                                    "value": "miles",
+                                    "type": "prefLabel",
+                                    "id": "b555a5f5-4ac5-43c9-b6f0-8582e06bd2b1"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "bf2c2b08-9a80-4a01-b063-2cac9fb16eac",
+                                    "language": "en-US",
+                                    "value": "4",
+                                    "type": "sortorder",
+                                    "id": "1187bc6b-5bfe-4a27-84da-e73a153017c6"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:5",
+                            "relatedconcepts": [],
+                            "id": "a65d1d4a-04b9-4ae5-9ee6-be8cba3da3f0",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "a65d1d4a-04b9-4ae5-9ee6-be8cba3da3f0",
+                                    "language": "en-US",
+                                    "value": "ounces",
+                                    "type": "prefLabel",
+                                    "id": "fda6e884-8eae-4c13-8490-1ff30b6c8246"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "a65d1d4a-04b9-4ae5-9ee6-be8cba3da3f0",
+                                    "language": "en-US",
+                                    "value": "5",
+                                    "type": "sortorder",
+                                    "id": "0c7e9f6c-7bf1-4602-a125-7329f9459cd1"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:6",
+                            "relatedconcepts": [],
+                            "id": "ce8628de-2c44-48ca-a2ee-40375a27c5d5",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "ce8628de-2c44-48ca-a2ee-40375a27c5d5",
+                                    "language": "en-US",
+                                    "value": "pounds",
+                                    "type": "prefLabel",
+                                    "id": "b9214765-3e1f-4a25-a57e-dfb8af66ad6d"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "ce8628de-2c44-48ca-a2ee-40375a27c5d5",
+                                    "language": "en-US",
+                                    "value": "6",
+                                    "type": "sortorder",
+                                    "id": "72e85ff1-965c-46df-8fd6-0fe149c17ad8"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:7",
+                            "relatedconcepts": [],
+                            "id": "701743e7-595b-4a8b-9576-3d46fa52b14c",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "701743e7-595b-4a8b-9576-3d46fa52b14c",
+                                    "language": "en-US",
+                                    "value": "tons",
+                                    "type": "prefLabel",
+                                    "id": "ccd30536-474c-496b-a617-538750c5a714"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "701743e7-595b-4a8b-9576-3d46fa52b14c",
+                                    "language": "en-US",
+                                    "value": "7",
+                                    "type": "sortorder",
+                                    "id": "744e0203-55f7-4f92-b625-55943dea9a44"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:8",
+                            "relatedconcepts": [],
+                            "id": "a048b03a-f279-454b-baa3-253891cf47bb",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "a048b03a-f279-454b-baa3-253891cf47bb",
+                                    "language": "en-US",
+                                    "value": "millimeters",
+                                    "type": "prefLabel",
+                                    "id": "bd87e569-754e-4738-ad22-887be1feb92b"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "a048b03a-f279-454b-baa3-253891cf47bb",
+                                    "language": "en-US",
+                                    "value": "millimetres",
+                                    "type": "altLabel",
+                                    "id": "be6ca9df-4f53-40e4-9953-e7219e3fad69"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "a048b03a-f279-454b-baa3-253891cf47bb",
+                                    "language": "en-US",
+                                    "value": "8",
+                                    "type": "sortorder",
+                                    "id": "6dcd1b45-de80-4cab-ae54-c3349dbcb189"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "UNIT_OF_MEASUREMENT:9",
+                            "relatedconcepts": [],
+                            "id": "5884d60d-1b8c-40fc-99c8-055bca602fa7",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "5884d60d-1b8c-40fc-99c8-055bca602fa7",
+                                    "language": "en-US",
+                                    "value": "centimeters",
+                                    "type": "prefLabel",
+                                    "id": "41722438-4e84-45ed-a3b5-f12e04dcfd5c"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "5884d60d-1b8c-40fc-99c8-055bca602fa7",
+                                    "language": "en-US",
+                                    "value": "centimetres",
+                                    "type": "altLabel",
+                                    "id": "18ba7bef-dd5b-4441-ad0c-93113c1ac54d"
+                                },
+                                {
+                                    "category": "undefined",
+                                    "conceptid": "5884d60d-1b8c-40fc-99c8-055bca602fa7",
+                                    "language": "en-US",
+                                    "value": "9",
+                                    "type": "sortorder",
+                                    "id": "634c1636-2c8b-48b5-b5a7-bc33a76c141e"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

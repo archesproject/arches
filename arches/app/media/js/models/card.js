@@ -33,7 +33,6 @@ define(['arches',
             this.set('cardinality', ko.observable());
             this.set('visible', ko.observable());
             this.set('active', ko.observable());
-            this.set('itemtext', ko.observable());
             this.set('ontologyproperty', ko.observable());
             this.set('sortorder', ko.observable());
 
@@ -59,6 +58,16 @@ define(['arches',
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
             });
+
+            this.expanded = ko.pureComputed(function() {
+                var expanded = false;
+                _.each(this.get('widgets')(), function(widget) {
+                    if (widget.expanded()) {
+                        expanded = true;
+                    }
+                });
+                return expanded;
+            }, this)
 
             this.parse(attributes);
 
@@ -140,7 +149,6 @@ define(['arches',
                     case 'cardinality':
                     case 'visible':
                     case 'active':
-                    case 'itemtext':
                     case 'ontologyproperty':
                     case 'sortorder':
                         this.get(key)(value);

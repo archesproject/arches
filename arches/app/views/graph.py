@@ -17,8 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import itertools
+import zipfile
 import json
-from django.conf import settings as app_settings
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -29,17 +30,22 @@ from django.views.generic import View, TemplateView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
-from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
@@ -54,12 +60,12 @@ class GraphBaseView(BaseManagerView):
         return context
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -71,6 +77,7 @@ class GraphSettingsView(GraphBaseView):
                     'graph': res,
                     'is_relatable': (node_model in relatable_resources)
                 })
+
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
 
@@ -81,8 +88,13 @@ class GraphSettingsView(GraphBaseView):
             ontologies=JSONSerializer().serialize(ontologies),
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count()
+            node_count=models.Node.objects.filter(graph=self.graph).count(),
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
+
         return render(request, 'views/graph/graph-settings.htm', context)
 
     def post(self, request, graphid):
@@ -107,10 +119,7 @@ class GraphSettingsView(GraphBaseView):
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
 
-
-
-
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
@@ -119,6 +128,11 @@ class GraphManagerView(GraphBaseView):
                 main_script='views/graph',
                 root_nodes=JSONSerializer().serialize(root_nodes),
             )
+
+            context['nav']['title'] = 'Arches Designer'
+            context['nav']['icon'] = 'fa-bookmark'
+            context['nav']['help'] = ('About the Arches Designer','help/arches-designer-help.htm')
+
             return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)
@@ -126,11 +140,8 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
-        for concept in top_concepts:
-            if concept.label == 'Dropdown Lists':
-                concept_collections = concept.children
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -149,8 +160,12 @@ class GraphManagerView(GraphBaseView):
             branch_list={
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
-            }
+            },
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['help'] = ('Using the Graph Manager','help/graph-designer-help.htm')
+        context['nav']['menu'] = True
 
         return render(request, 'views/graph/graph-manager.htm', context)
 
@@ -160,7 +175,7 @@ class GraphManagerView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class GraphDataView(View):
 
     action = 'update_node'
@@ -169,12 +184,35 @@ class GraphDataView(View):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
             graph['metadata'] = ArchesFileExporter().export_metadata()
-            f = JSONSerializer().serialize(graph)
+            f = JSONSerializer().serialize(graph, indent=4)
             graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 
             response = HttpResponse(f, content_type='json/plain')
             response['Content-Disposition'] = 'attachment; filename="%s.json"' %(graph_name)
             return response
+        elif self.action == 'export_mapping_file':
+            files_for_export = create_mapping_configuration_file(graphid)
+            file_name = Graph.objects.get(graphid=graphid).name
+
+            buffer = StringIO()
+
+            with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
+                for f in files_for_export:
+                    f['outputfile'].seek(0)
+                    zip.writestr(f['name'], f['outputfile'].read())
+
+            zip.close()
+            buffer.flush()
+            zip_stream = buffer.getvalue()
+            buffer.close()
+
+            response = HttpResponse()
+            response['Content-Disposition'] = 'attachment; filename=' + file_name + '.zip'
+            response['Content-length'] = str(len(zip_stream))
+            response['Content-Type'] = 'application/zip'
+            response.write(zip_stream)
+            return response
+
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
@@ -189,39 +227,47 @@ class GraphDataView(View):
 
     def post(self, request, graphid=None):
         ret = {}
-        if self.action == 'import_graph':
-            graph_file = request.FILES.get('importedGraph').read()
-            graphs = JSONDeserializer().deserialize(graph_file)['graph']
-            ret = GraphImporter.import_graph(graphs)
-        else:
-            if graphid is not None:
-                graph = Graph.objects.get(graphid=graphid)
-            data = JSONDeserializer().deserialize(request.body)
 
-            if self.action == 'new_graph':
-                isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource Model') if isresource else _('New Branch')
-                author = request.user.first_name + ' ' + request.user.last_name
-                ret = Graph.new(name=name,is_resource=isresource,author=author)
+        try:
+            if self.action == 'import_graph':
+                graph_file = request.FILES.get('importedGraph').read()
+                graphs = JSONDeserializer().deserialize(graph_file)['graph']
+                ret = GraphImporter.import_graph(graphs)
+            else:
+                if graphid is not None:
+                    graph = Graph.objects.get(graphid=graphid)
+                data = JSONDeserializer().deserialize(request.body)
 
-            elif self.action == 'update_node':
-                graph.update_node(data)
-                ret = graph
-                graph.save()
+                if self.action == 'new_graph':
+                    isresource = data['isresource'] if 'isresource' in data else False
+                    name = _('New Resource Model') if isresource else _('New Branch')
+                    author = request.user.first_name + ' ' + request.user.last_name
+                    ret = Graph.new(name=name,is_resource=isresource,author=author)
 
-            elif self.action == 'append_branch':
-                ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
-                graph.save()
+                elif self.action == 'update_node':
+                    graph.update_node(data)
+                    ret = graph
+                    graph.save()
 
-            elif self.action == 'move_node':
-                ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
-                graph.save()
+                elif self.action == 'append_branch':
+                    ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                    graph.save()
 
-            elif self.action == 'clone_graph':
-                ret = graph.copy()
-                ret.save()
+                elif self.action == 'move_node':
+                    ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+                    graph.save()
 
-        return JSONResponse(ret)
+                elif self.action == 'clone_graph':
+                    clone_data = graph.copy()
+                    ret = clone_data['copy']
+                    ret.save()
+                    ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
+                    form_map = ret.copy_forms(graph, clone_data['cards'])
+                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+
+            return JSONResponse(ret)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
@@ -233,7 +279,7 @@ class GraphDataView(View):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -246,10 +292,14 @@ class CardManagerView(GraphBaseView):
             branches=JSONSerializer().serialize(branch_graphs),
         )
 
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Cards','help/card-manager-help.htm')
+
         return render(request, 'views/graph/card-manager.htm', context)
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
@@ -258,16 +308,21 @@ class CardView(GraphBaseView):
             # assume this is a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         self.graph = Graph.objects.get(graphid=card.graph_id)
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
-        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
-        for concept in top_concepts:
-            if concept.label == 'Dropdown Lists':
-                concept_collections = concept.children
+        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+
+        ontology_properties = []
+        parent_node = self.graph.get_parent_node(card.nodegroup_id)
+        for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
+            if parent_node.ontologyclass in item['ontology_classes']:
+                ontology_properties.append(item['ontology_property'])
+        ontology_properties = sorted(ontology_properties, key=lambda item: item)
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -282,7 +337,12 @@ class CardView(GraphBaseView):
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
+            ontology_properties=JSONSerializer().serialize(ontology_properties),
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Configuring Cards and Widgets','help/card-designer-help.htm')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -296,19 +356,22 @@ class CardView(GraphBaseView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormManagerView(GraphBaseView):
     action = 'add_form'
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-
         context = self.get_context_data(
             main_script='views/graph/form-manager',
             forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
 			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Using the Menu Manager','help/menu-manager-help.htm')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -324,12 +387,12 @@ class FormManagerView(GraphBaseView):
                     formModel.save()
                 ret = data['forms']
             if self.action == 'add_form':
-                form = models.Form(title=_('New Form'), graph=graph)
+                form = models.Form(title=_('New Menu'), graph=graph)
                 form.save()
                 ret = form
         return JSONResponse(ret)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
@@ -346,6 +409,10 @@ class FormView(GraphBaseView):
             cards=JSONSerializer().serialize(cards),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Configuring Menus','help/menu-designer-help.htm')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
@@ -378,7 +445,7 @@ class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
@@ -387,7 +454,6 @@ class ReportManagerView(GraphBaseView):
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
@@ -399,6 +465,10 @@ class ReportManagerView(GraphBaseView):
             widgets=widgets,
          )
 
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Reports','help/report-manager-help.htm')
+
         return render(request, 'views/graph/report-manager.htm', context)
 
     def post(self, request, graphid):
@@ -409,7 +479,7 @@ class ReportManagerView(GraphBaseView):
         report.save()
         return JSONResponse(report)
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
@@ -417,7 +487,7 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -441,6 +511,10 @@ class ReportEditorView(GraphBaseView):
             map_sources=map_sources,
          )
 
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Designing Reports','help/report-designer-help.htm')
+
         return render(request, 'views/graph/report-editor.htm', context)
 
     def post(self, request, reportid):
@@ -463,7 +537,7 @@ class ReportEditorView(GraphBaseView):
         return JSONResponse({'succces':True})
 
 
-@method_decorator(group_required('edit'), name='dispatch')
+@method_decorator(group_required('Graph Editor'), name='dispatch')
 class FunctionManagerView(GraphBaseView):
     action = ''
 
@@ -476,6 +550,10 @@ class FunctionManagerView(GraphBaseView):
             applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
             function_templates=models.Function.objects.exclude(component__isnull=True),
         )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Functions','help/function-help.htm')
 
         return render(request, 'views/graph/function-manager.htm', context)
 

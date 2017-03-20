@@ -1,0 +1,99 @@
+{% load staticfiles %}
+{% load i18n %}
+<div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+    <div class="panel ep-menu-panel relative" style="">
+
+        <!-- Menu List -->
+        <div class="panel-body">
+           <ul class="list-group ep-menu-list">
+                <!-- Menu Item -->
+                <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
+                    <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
+                </li>
+
+                <!-- Menu Item -->
+                <li id="settings-manager" class="edit-menu-item {% if main_script == "views/graph/graph-settings" %} selected{% endif %}">
+
+                    <a href="{% url 'graph_settings' graphid %}" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-wrench"></i> {% trans "Settings" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Asset Name, Settings, Relations" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                {% block card_manager_menu_item %}
+                <li id="card-manager" class="edit-menu-item{% if main_script == "views/graph/card-manager" %} selected{% endif %}{% if not graph.isresource and not root_node.is_collector %} disabled{% endif %}">
+                    <a {% if graph.isresource or root_node.is_collector %}
+                        href="{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"
+                        {% else %}
+                        href="#"
+                        {% endif %}>
+
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-file-o"></i> {% if graph.isresource %}{% trans "Cards" %}{% else %}{% trans "Card" %}{% endif %}</div>
+                            <span class="text-muted menu-item-subtitle">{% if graph.isresource %}{% trans "Configure data entry cards" %}{% else %}{% trans "Configure data entry card" %}{% endif %}</span>
+                        </div>
+                    </a>
+                </li>
+                {% endblock card_manager_menu_item %}
+
+                {% if graph.isresource %}
+                <!-- Menu Item -->
+                <li id="form-manager" class="edit-menu-item">
+                    <a href="{% url 'form_manager' graphid %}" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Menus" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create data entry menus" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'report_manager' graphid %}" data-bind="click:function () { navigate('{% url 'report_manager' graphid %}'); }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Menu Item -->
+                <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
+                    <a href="{% url 'graph' graphid %}" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-footer ep-menu-footer hidden">
+
+            footer
+        </div>
+    </div>
+</div>

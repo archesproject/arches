@@ -1,0 +1,584 @@
+{% extends "views/components/widgets/base.htm" %} {% load i18n %} {% block form %}
+
+<div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
+    <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+
+    <div class="relative" data-bind="mapboxgl: {
+        mapOptions: {
+            style: mapStyle,
+            zoom: zoom,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            centerX: centerX,
+            centerY: centerY,
+            pitch: pitch,
+            bearing: bearing
+        },
+        afterRender: function(map){
+            setupMap(map);
+        }
+    }, css: getContextCss()">
+
+        <!--ko if: drawMode -->
+        <!--ko if: context !== 'search-filter' -->
+        <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
+            <div class="alert-wrap in animated jellyIn">
+                <div class="alert alert-warning relative" role="alert">
+                    <div class="media">
+                        <!-- ko if: drawMode() === 'draw_point'  -->
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_polygon'-->
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating polygons. Click the Polygon tool to exit." %}
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_line_string'-->
+                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'simple_select' -->
+                        <strong>{% trans "Edit Mode" %}</strong>
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>{% trans "Click and drag to move." %}</span>
+                        <!-- /ko -->
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>{% trans "Or, click it again to edit verticies." %}</span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'direct_select'-->
+                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
+                        <!-- /ko -->
+                    </div>
+                    <div class="geometry-edit-button-group" data-bind= "visible: !mapControls.mapControlsExpanded()">
+
+                        <div class="btn-group">
+                            <!-- ko foreach: { data: [$data], as: 'self' } -->
+                            <!-- ko foreach: geometryTypes -->
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
+                            </button>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'delete')}">{% trans "Delete" %}</button>
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'end')}">{% trans "Close" %}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <div class="overlay-selection-container scroll-y" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+          <!-- ko foreach: { data: [$data], as: 'self' } -->
+          <div data-bind="with: overlayLibraryList">
+           <!-- Title -->
+           <div class="overlay-title">
+               Map Overlay Library
+               <span class="pull-right"><i class="overlay-close ion-close-round" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
+           </div>
+           <!-- Filter -->
+           <div class="overlay-filter-container">
+               <div class="list-filter">
+                   <input type="text" class="form-control overlay-filter" style="" placeholder="{% trans "Find an Overlay" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+                   <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+               </div>
+           </div>
+
+           <div class="overlay-list-container">
+                <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: {data: items}">
+                     <div class="overlay-card" style="" data-bind="click: self.exchangeOverlay, css: {'selected': checkedOutOfLibrary}, visible: $data.filtered() == false">
+                         <div class="overlay-card-item">
+                             <div class="overlay-card-vis-toggle">
+                                 <i class="ion-checkmark-circled"></i>
+                             </div>
+                             <div class="overlay-card-main" style="">
+                                 <a id="" class="" style="" href="#"><span data-bind="text: name"></span>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+           </div>
+
+         </div>
+         <!--/ko-->
+        </div>
+
+        <!-- Geocode Panel -->
+        <div class="geocode-container" data-bind="css : {
+            'geocode-container-shim': mapControls.mapControlsExpanded,
+            'hide-geocoder': geocoderVisible
+        }, with: geocoder">
+            <!-- ko if: options().length > 0 -->
+            <a href="#" data-bind="click: function () {
+                query('');
+            }">
+                <i class="fa fa-close geocode-clear"></i>
+            </a>
+            <!--/ko-->
+
+            <input type="text" class="form-control input-md widget-input" data-bind="
+                attr: {
+                    placeholder: placeholder
+                },
+                value: query,
+                valueUpdate: 'keyup',
+                hasFocus: isFocused,
+                event: {
+                    'keydown': handleKeys
+                }
+            ">
+
+            <!-- ko if: isFocused -->
+                <!-- ko if: loading -->
+                <div class="geocoder-results panel">
+                    <div class="geocoder-result-item">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        {% trans "searching...." %}
+                    </div>
+                </div>
+                <!--/ko-->
+
+                <!-- ko if: options().length > 0 -->
+                <div class="geocoder-results panel" data-bind="foreach: options">
+                    <div class="geocoder-result-item" data-bind="
+                        click:$parent.selection,
+                        event: {
+                            'mouseover': $parent.focusItem
+                        },
+                        css: {
+                            'selected-geocoder-result': $data === $parent.selection(),
+                            'focused-geocoder-result': $data === $parent.focusItem()
+                        }
+                    ">
+                        <span data-bind="text: text"></span>
+                    </div>
+                </div>
+                <!--/ko-->
+            <!--/ko-->
+        </div>
+
+        <!-- ko if: popupData() !== null -->
+        <div class="hover-feature-info">
+            <!-- ko if: popupData().graph_name -->
+                <!-- ko if: popupData().loading() -->
+                <div class="hover-feature-body hover-feature-loading">
+                    <i class="fa fa-spin fa-spinner"></i>
+                    {% trans "Loading..." %}
+                </div>
+                <!--/ko-->
+
+                <!-- ko if: !popupData().loading() -->
+                <div class="hover-feature-title-bar">
+                    <div class="hover-feature-title">
+                        <span data-bind="text: popupData().displayname"></span>
+                        <i class="ion-ios-close pull-right add-tooltip"
+                            style="cursor: pointer;"
+                            data-placement="left"
+                            data-toggle="tooltip"
+                            data-original-title="add overlay"
+                            data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                        ></i>
+                    </div>
+                </div>
+                <div class="hover-feature-body">
+                    <div>
+                        {% trans "Resource ID:" %}
+                        <span data-bind="text: popupData().resourceinstanceid"></span>
+                    </div>
+                    <div>
+                        {% trans "Resource Model:" %}
+                        <span data-bind="text: popupData().graph_name"></span>
+                    </div>
+                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
+                </div>
+                <!--/ko-->
+            <!--/ko-->
+
+            <!-- ko if: popupData().doc_count -->
+            <div class="hover-panel-small">
+                <div class="hover-feature-title-bar">
+                    <div class="hover-feature-title">Search Results</div>
+                </div>
+                <div class="hover-feature-body">
+                    <span>This cell contains</span><span class="text-semibold" data-bind="text: ' ' + popupData().doc_count"></span><span> result(s)</span>
+                </div>
+            </div>
+            <!--/ko-->
+
+        </div>
+        <!--/ko-->
+
+        <div id="map-widget-container" class="relative">
+
+            <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapControls.mapControlsExpanded, 'hide-maptools': mapControls.mapControlsHidden}">
+                <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+            </div>
+
+            <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400">
+              <ul class="map-widget-toolbar-list" style="">
+                <li class="map-widget-toolbar-item text-center basemaps-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'active': !mapControls.mapControlPanels.basemaps()}">
+                    <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
+                </li>
+                <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('overlays')}, css : { 'active': !mapControls.mapControlPanels.overlays()}">
+                    <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
+                </li>
+                <!-- ko ifnot: featureEditingDisabled -->
+                <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('maptools')}, css : {'active': !mapControls.mapControlPanels.maptools() }">
+                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans toolType %}', placement: 'bottom' }"></i></a>
+                </li>
+                <!-- /ko -->
+                <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
+                    <a id="l" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
+                </li>
+                <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapControls.mapControlsExpanded}">
+                    <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                </li>
+              </ul>
+            </div>
+
+            <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControls.mapControlPanels.basemaps}">
+                <div class="map-widget-panel-title">
+                    <h4 class="">{% trans "Basemaps" %}</h4>
+                </div>
+
+                <!-- ko foreach: { data: [$data], as: 'self' } -->
+                <!-- ko foreach: basemaps -->
+                <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap, css:{'selected': name === self.basemap()}">
+                    <div class="map-overlay-vis-toogle text-center">
+                        <i class="ion-checkmark-circled" data-bind="css:{'basemap-unselected': name !== self.basemap()}"></i>
+                    </div>
+                    <div class="map-overlay-name">
+                        <a id="" class="" href=""><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+
+        <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
+            <div class="map-widget-panel-title">
+                <h4 class="" data-bind="click: toggleOverlaySelector">{% trans "Overlays" %}
+                  <i class="ion-ios-plus pull-right add-tooltip"
+                    data-placement="left"
+                    data-toggle="tooltip"
+                    data-original-title="add overlay"
+                    ></i></h4>
+            </div>
+          <!--ko let: { self: $data }-->
+            <div data-bind="sortable: overlays">
+                <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css:{'overlay-invisible':invisible}, click: toggleOverlayVisibility">
+                        <i data-bind="css: icon"></i>
+                    </div>
+                    <div class="map-overlay-name" data-bind="click: toggleOverlayVisibility">
+                        <a class="" href=""><span data-bind="text:name"><span></a>
+                    </div>
+                    <div class="map-overlay-item-tools">
+                        <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools, css:{'overlay-invisible':invisible}">
+                            <!-- ko if: showingTools() === false  -->
+                            <i class="ion-arrow-left-b overlay-toggle-icon" data-bind="showingTools()"></i>
+                            <!-- /ko -->
+                            <!-- ko if: showingTools() !== false  -->
+                            <i class="ion-arrow-down-b overlay-toggle-icon"></i>
+                            <!-- /ko -->
+                        </a>
+                    </div>
+                    <div class="map-overlay-item-tools-panel" data-bind="fadeVisible: showingTools, delay:300, fade: 200">
+
+                        <div class="overlay-slider">
+                            <div data-bind="noUiSlider: {
+                                start: opacity,
+                                range: {
+                                  'min': 0,
+                                  'max': 100
+                                },
+                                connect: 'lower'
+                            }"></div>
+                        </div>
+
+                        <div class="overlay-tool-group">
+                            <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
+                            <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'up') }">
+                                <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                            </a>
+                            <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'down') }">
+                                <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+
+        <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.maptools}">
+            <div class="map-widget-panel-title">
+                <span><h4 class="tooltype" data-bind='text: toolType'></h4><a class="href-button toggle-map-size pull-right" href="#" data-bind="click: function () {
+                    expanded(!expanded());}"><i class="fa fa-arrows-alt"></i> <span data-bind="text: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}'"></span></a></span>
+            </div>
+
+            <!--ko if: context === 'search-filter' -->
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: toggleExtentSearch, css:{'map-draw-tools-active': extentSearch}">
+                <div class="map-draw-tools-item-icon text-center">
+                    <i class="ion-checkmark-circled"></i>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span>{% trans "Search Map Extent" %}<span></a>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko foreach: { data: [$data], as: 'self' } -->
+            <!-- ko foreach: geometryTypes -->
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
+                <div class="map-draw-tools-item-icon text-center">
+                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span data-bind='text: self.geometryTypeDetails[$data.id].name'><span></a>
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+
+            <!--ko if: context !== 'search-filter' -->
+            <div class="map-json-tool-item relative editing-tool">
+                <div class="map-json-tool-item-icon text-center">
+                    <i class='ion-code-working'></i>
+                </div>
+                <div class="map-overlay-name map-json-tool">
+                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                </div>
+            </div>
+
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+                <div class="map-draw-tools-item-icon text-center">
+                    <i class='ion-trash-a'></i>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span>{% trans "Delete" %}<span></a>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!--ko if: context === 'search-filter' -->
+            <div class="map-draw-tools-item relative query-tool">
+                <div class="map-query-tool">
+                    <div class="map-query-tool-name">
+                        <a id="" class="" href=""><span>{% trans "Buffer(ft)" %}<span></a>
+                    </div>
+                    <div>
+                        <input type="number" min=0.0 id="" placeholder="{% trans " buffer " %}" class="form-control input-md widget-input map-query-tool-input" data-bind="textInput: buffer">
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+
+        </div>
+
+        <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.legend}">
+            <div class="map-widget-panel-title">
+                <h4 class="">{% trans "Legend" %}</h4>
+            </div>
+            <div data-bind="sortable: overlays">
+                <div class="map-widget-overlay-item relative">
+                    <div class="map-overlay-vis-toogle text-center">
+                        <i data-bind="css: icon, style: {color: color}"></i>
+                    </div>
+                    <div class="map-overlay-name">
+                        <a class="" href=""><span data-bind="text:name"><span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay-container" style="display: none;">
+        <h3 class="panel-title card-main-title">{% trans  "Overlays" %}<i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
+        <div id="report-image-grid" class="report-image-grid">
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="foreach: summaryDetails">
+  <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
+</dd>
+{% endblock report %}
+
+{% block config_form %}
+<div class="control-label map-config-header">{% trans "Map Properties" %}</div>
+
+<div class="panel-group accordion" id="accordion">
+
+    <!--ko if: context === 'report-header' -->
+    <div class="panel">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-controls" aria-expanded="false" class="collapsed">{% trans "Map Controls" %}</a>
+            </h4>
+        </div>
+        <div class="panel-collapse collapse" id="map-config-controls" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                  <div class="control-label">
+                      {% trans "Map Tools" %}
+                  </div>
+                  <div class="col-xs-12 pad-no crud-widget-container">
+
+                      <div class="toggle-container">
+                          <span class="switch switch-small" data-bind="css: {'on': mapControlsHidden}, click: mapControls.toggleMapControlsVisibility"><small></small></span>
+                          <p class="arches-toggle-sm">{% trans "Hide basemap, overlay controls" %}</p>
+                      </div>
+                  </div>
+                </div>
+            </div>
+    </div>
+    <!-- /ko -->
+
+    <div class="panel">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">{% trans "Position" %}</a>
+            </h4>
+        </div>
+        <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Map Center Longitude" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Map Center Latitude" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Pitch" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Bearing" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">Zoom</a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-zoom" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Default Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Min Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: minZoom, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Max Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: maxZoom, valueUpdate: 'keyup'">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">Geocoder</a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-geocoder" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Default Geocoder" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoderProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
+                </div>
+                <div class="control-label">
+                    {% trans "Geocoder Placehoder" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Geocoder Availability" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+
+                    <div class="toggle-container">
+                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: function () { geocoderVisible(!geocoderVisible()) }"><small></small></span>
+                        <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">{% trans "Resource Properties" %}</a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-resource-style" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">{% trans "Color" %}</div>
+
+                <div class="col-xs-12 pad-no crud-widget-container">
+                  <div class="colorpicker-component input-group">
+                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: featureColor, format:'rgba'}">
+                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: featureColor}"></i></span>
+                  </div>
+                </div>
+
+                <div class="control-label">{% trans "Point Size" %}</div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featurePointSize, valueUpdate: 'keyup'">
+                </div>
+
+                <div class="control-label">{% trans "Line Width" %}</div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: featureLineWidth, valueUpdate: 'keyup'">
+                </div>
+
+                <div class="control-label">{% trans "Available Geometry Types" %}</div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input id="select2Input2" data-bind="
+                      select2v4Data: geometryTypes,
+                      select2v4: geomTypeSelectSetup" style="width: 100%">
+                    </input>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock config_form %}

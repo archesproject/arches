@@ -5,6 +5,12 @@ Overview
 What is Arches?
 ===============
 
+Arches is a web-based, geospatial information system for cultural heritage inventory and management. The platform is purpose-built for the international cultural heritage field, and it is designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts.
+
+Arches allows administrators to create their own database schema, and manage their own thesauri, while end users can search, explore and download the resources directly. In this way Arches is not only a robust and easy to use inventory system, it is also a perfect way to publish and disseminate your organization's cultural heritage information.
+
+To try Arches out, you can view the v4 demo installation, go to the Arches project page for more background, or join our Google Group to engage with the active Arches community.
+
 Arches is a web framework for Django and is designed to make it easier to build applications that need:
 
     * **Geospatial data management** and geoprocessing like a GIS (Geograhic Information System) offers, but with a much more flexible approach for modeling the geometries associated with a resource.
@@ -41,4 +47,15 @@ Arches is primarily intended for software developers who need to build flexible 
 
 The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows.  
 
-One major exception to this rule is the Reference Data Manager (RDM).  The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application. 
+One major exception to this rule is the Reference Data Manager (RDM).  The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application.
+
+Contributing To Arches
+======================
+
+Arches is open source software, which means that with your help it will continue to evolve and improve. Contributions to the project can take a few different forms:
+
++ **Translations** We are always hoping to bring Arches to new audiences around the world. Please get in touch from the main Arches website to express your interest in helping with translations.
++ **Bug Reports** Reporting bugs is strongly encouraged, and can be made at the official Arches GitHub repository. Please read this article before reporting issues.
++ **Code Contributions** For developers, good guidelines on how to contribute to the Arches code-base can be found here.
+
+current repo status (insert the coverage status graphic from github here? I’d vote to leave that on github itself)

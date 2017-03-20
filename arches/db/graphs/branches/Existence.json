@@ -1,0 +1,302 @@
+{
+    "graph": [
+        {
+            "subtitle": "Beginning and End of Existence of a resource",
+            "mapfeaturecolor": "#FF0000",
+            "isresource": false,
+            "forms_x_cards": [],
+            "reports": [],
+            "iconclass": "fa fa-asterisk",
+            "functions": [],
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": "GCI",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E49_Time_Appellation",
+                    "nodeid": "fec59911-c309-11e6-84a5-026d961c88e6",
+                    "datatype": "date",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P78_is_identified_by",
+                    "name": "End Date of Existence"
+                },
+                {
+                    "is_collector": false,
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": "E64_End_of_Existence",
+                    "nodeid": "67c91af8-b1ea-11e6-9ea8-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P115i_is_finished_by",
+                    "name": "End of Existence"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E49_Time_Appellation",
+                    "nodeid": "b4660c9d-c309-11e6-84a5-026d961c88e6",
+                    "datatype": "date",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P78_is_identified_by",
+                    "name": "Start Date of Existence"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E52_Time-Span",
+                    "nodeid": "e0a42033-c309-11e6-84a5-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P4_has_time-span",
+                    "name": "End of Existence Time Span"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E52_Time-Span",
+                    "nodeid": "93d88e5b-c309-11e6-84a5-026d961c88e6",
+                    "datatype": "semantic",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P4_has_time-span",
+                    "name": "Beginning of Existence Time Span"
+                },
+                {
+                    "is_collector": false,
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": "E55_Type",
+                    "nodeid": "3920defd-b1ea-11e6-b168-6c4008b05c4c",
+                    "datatype": "concept",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": {
+                        "rdmCollection": "216ee2fb-4197-4f84-84dd-3a38d59480fb"
+                    },
+                    "parentproperty": "P2_has_type",
+                    "name": "Start Date Type"
+                },
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E5_Event",
+                    "nodeid": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Existence Event"
+                },
+                {
+                    "is_collector": false,
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": "E63_Beginning_of_Existence",
+                    "nodeid": "3920d9a1-b1ea-11e6-9fac-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P116i_is_started_by",
+                    "name": "Beginning of Existence"
+                },
+                {
+                    "is_collector": false,
+                    "description": "",
+                    "istopnode": false,
+                    "ontologyclass": "E55_Type",
+                    "nodeid": "67c91fd9-b1ea-11e6-8b2c-6c4008b05c4c",
+                    "datatype": "concept",
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "config": {
+                        "rdmCollection": "873866bb-d7c6-46a7-94fd-8a085d8eff57"
+                    },
+                    "parentproperty": "P2_has_type",
+                    "name": "End Date Type"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "Start/End dates for resources.  Assumed to be typed and within calendar time. \n\nConnects to Activity (E7) and Historical Event (E5) resource models via P114\nConnects to Heritage Resource (E18) and Heritage Resource Group (E27) resource models via P12i\nConnects to Actor (E39) resource model via P11i",
+            "edges": [
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "e0a42034-c309-11e6-84a5-026d961c88e6",
+                    "domainnode_id": "67c91af8-b1ea-11e6-9ea8-6c4008b05c4c",
+                    "rangenode_id": "e0a42033-c309-11e6-84a5-026d961c88e6",
+                    "ontologyproperty": "P4_has_time-span",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "93d88e5c-c309-11e6-84a5-026d961c88e6",
+                    "domainnode_id": "3920d9a1-b1ea-11e6-9fac-6c4008b05c4c",
+                    "rangenode_id": "93d88e5b-c309-11e6-84a5-026d961c88e6",
+                    "ontologyproperty": "P4_has_time-span",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "3920e26b-b1ea-11e6-b21a-6c4008b05c4c",
+                    "domainnode_id": "3920d9a1-b1ea-11e6-9fac-6c4008b05c4c",
+                    "rangenode_id": "3920defd-b1ea-11e6-b168-6c4008b05c4c",
+                    "ontologyproperty": "P2_has_type",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "fec59912-c309-11e6-84a5-026d961c88e6",
+                    "domainnode_id": "e0a42033-c309-11e6-84a5-026d961c88e6",
+                    "rangenode_id": "fec59911-c309-11e6-84a5-026d961c88e6",
+                    "ontologyproperty": "P78_is_identified_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "67c922bd-b1ea-11e6-9fca-6c4008b05c4c",
+                    "domainnode_id": "67c91af8-b1ea-11e6-9ea8-6c4008b05c4c",
+                    "rangenode_id": "67c91fd9-b1ea-11e6-8b2c-6c4008b05c4c",
+                    "ontologyproperty": "P2_has_type",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "3920e442-b1ea-11e6-9822-6c4008b05c4c",
+                    "domainnode_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "rangenode_id": "3920d9a1-b1ea-11e6-9fac-6c4008b05c4c",
+                    "ontologyproperty": "P116i_is_started_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "67c92411-b1ea-11e6-a938-6c4008b05c4c",
+                    "domainnode_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "rangenode_id": "67c91af8-b1ea-11e6-9ea8-6c4008b05c4c",
+                    "ontologyproperty": "P115i_is_finished_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "b4660c9e-c309-11e6-84a5-026d961c88e6",
+                    "domainnode_id": "93d88e5b-c309-11e6-84a5-026d961c88e6",
+                    "rangenode_id": "b4660c9d-c309-11e6-84a5-026d961c88e6",
+                    "ontologyproperty": "P78_is_identified_by",
+                    "description": null
+                }
+            ],
+            "maplinewidth": 1,
+            "mappointsize": 3,
+            "graphid": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+            "name": "Existence",
+            "cards_x_nodes_x_widgets": [
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000004",
+                    "card_id": "ec7003d1-b1e9-11e6-9fcd-6c4008b05c4c",
+                    "label": "End Date of Existence",
+                    "node_id": "fec59911-c309-11e6-84a5-026d961c88e6",
+                    "sortorder": 2,
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"End Date of Existence\"}",
+                    "id": "633da53b-c3d5-11e6-84a5-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000002",
+                    "card_id": "ec7003d1-b1e9-11e6-9fcd-6c4008b05c4c",
+                    "label": "Start Date Type",
+                    "node_id": "3920defd-b1ea-11e6-b168-6c4008b05c4c",
+                    "sortorder": 1,
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"226bb292-4def-484f-8c6b-6eab8dd48c03\",\"text\":\"Birth Date\",\"id\":\"73e5204c-0635-478b-a369-91d5cde5c68f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cf3683e1-6969-47b4-8cda-c61753819ec7\",\"text\":\"Built Date\",\"id\":\"29adbea8-891a-44bf-b0c5-8912d118f629\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"11303e6e-9ea1-4b4c-8e2d-c0fa7c9db390\",\"text\":\"Creation Date\",\"id\":\"cf4d3fee-1c66-499c-a087-13eb3a069807\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0560b41b-123e-413b-ac75-eeb09d7b9de7\",\"text\":\"Formation Date\",\"id\":\"af52d238-b9ce-47bd-ba71-585d007d090b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9963003a-f6ae-4792-ad5d-44e4b04da1ea\",\"text\":\"Start Date\",\"id\":\"af8e248f-28c9-4c97-b57b-add942b8e009\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Start Date Type\"}",
+                    "id": "633da539-c3d5-11e6-84a5-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000002",
+                    "card_id": "ec7003d1-b1e9-11e6-9fcd-6c4008b05c4c",
+                    "label": "End Date Type",
+                    "node_id": "67c91fd9-b1ea-11e6-8b2c-6c4008b05c4c",
+                    "sortorder": 3,
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"393e8c52-11c9-4163-8670-8680c895e8f3\",\"text\":\"Death Date\",\"id\":\"9697e0bd-15ea-476f-94fb-092a351418d9\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"edf1336f-df77-48ad-a992-a27111031404\",\"text\":\"Demolition Date\",\"id\":\"6449c50e-289c-425d-aac1-50e2ce070100\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0af60c1e-947c-4e9b-80ce-96a8d76ebf5b\",\"text\":\"Destruction Date\",\"id\":\"f21fd154-a96d-4b50-9fa9-dbab3c54d441\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0f24c72b-c065-42b6-869f-ba107440376f\",\"text\":\"Dissolution Date\",\"id\":\"24807451-df89-4cf1-99a2-18967b43fe40\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0f0126f2-1f26-431f-b0f3-06fcbd172162\",\"text\":\"End Date\",\"id\":\"2195c931-95b0-4c91-9a1d-7607d56d1377\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"End Date Type\"}",
+                    "id": "633da53a-c3d5-11e6-84a5-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000004",
+                    "card_id": "ec7003d1-b1e9-11e6-9fcd-6c4008b05c4c",
+                    "label": "Start Date of Existence",
+                    "node_id": "b4660c9d-c309-11e6-84a5-026d961c88e6",
+                    "sortorder": 0,
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Start Date of Existence\"}",
+                    "id": "633da538-c3d5-11e6-84a5-026d961c88e6"
+                }
+            ],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                    "description": "Start/End dates for resources.  Assumed to be typed and within calendar time. \n\nConnects to Activity (E7) and Historical Event (E5) resource models via P114\nConnects to Heritage Resource (E18) and Heritage Resource Group (E27) resource models via P12i\nConnects to Actor (E39) resource model via P11i",
+                    "visible": true,
+                    "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "ec7003d1-b1e9-11e6-9fcd-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": "Record the start and end dates of the resource's existence.",
+                    "active": true,
+                    "name": "Existence"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E5_Event",
+                "nodeid": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                "datatype": "semantic",
+                "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c",
+                "graph_id": "ec6f8126-b1e9-11e6-9c89-6c4008b05c4c",
+                "config": null,
+                "name": "Existence Event"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+        "os version": "4.4.0-45-generic",
+        "os": "Linux"
+    }
+}

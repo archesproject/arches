@@ -1,0 +1,76 @@
+{
+    "type": "vector",
+    "layers": [
+        {
+            "layout": {
+                "visibility": "visible"
+            },
+            "source": "all-resources",
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "Point"
+                ],
+                [
+                    "==",
+                    "total",
+                    1
+                ]
+            ],
+            "paint": {
+                "circle-blur": {
+                    "type": "exponential",
+                    "stops": [
+                        [
+                            0,
+                            5
+                        ],
+                        [
+                            10,
+                            0
+                        ]
+                    ]
+                },
+                "circle-color": "rgba(256,0,0,1)",
+                "circle-radius": {
+                    "type": "exponential",
+                    "stops": [
+                        [
+                            0,
+                            22
+                        ],
+                        [
+                            10,
+                            5
+                        ]
+                    ]
+                }
+            },
+            "source-layer": "all-resources",
+            "type": "circle",
+            "id": "all-resources-points"
+        }
+    ],
+    "config": {
+        "provider": {
+            "class": "TileStache.Goodies.VecTiles:Provider",
+            "kwargs": {
+                "dbinfo": {
+                    "host": "localhost",
+                    "user": "postgres",
+                    "password": "postgis",
+                    "database": "arches",
+                    "port": "5432"
+                },
+                "queries": [
+                    "SELECT tileid::text, resourceinstanceid::text, nodeid::text, graphid::text, node_name, graph_name, false AS poly_outline, row_number() over () as __id__, 1 as total, geom AS __geometry__, '' AS extent FROM mv_geojson_geoms UNION SELECT tileid::text, resourceinstanceid::text, nodeid::text, graphid::text, node_name, graph_name, true AS poly_outline, row_number() over () as __id__, 1 as total, ST_ExteriorRing(geom) AS __geometry__, '' AS extent FROM mv_geojson_geoms WHERE ST_GeometryType(geom) = 'ST_Polygon'"
+                ]
+            }
+        },
+        "allowed origin": "*",
+        "compress": true,
+        "write cache": false
+    }
+}

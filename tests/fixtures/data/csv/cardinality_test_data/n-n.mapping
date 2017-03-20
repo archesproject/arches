@@ -1,0 +1,25 @@
+{
+  "filetype": "archesjson",
+  "resource_model_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+  "nodes": [
+    {
+      "data_type": "",
+      "data_length": "",
+      "arches_nodeid": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+      "arches_node_name": "child n-n",
+      "value_type": "",
+      "export": "",
+      "file_field_name": "Source Child 1"
+    },
+    {
+      "data_type": "",
+      "data_length": "",
+      "arches_nodeid": "8e6749ca-c6e2-11e6-817b-685b3597724b",
+      "arches_node_name": "child n-n",
+      "value_type": "",
+      "export": "",
+      "file_field_name": "Source Child 2"
+    }
+  ],
+  "resource_model_name": "Target"
+}

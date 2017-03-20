@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <p>The Graph Designer allows you to create, modify, and view the graph for a Resource Model or Branch. You are currently editing a {% if graph.isresource %}Resource Model{% else %}Branch{% endif %}, so note that the Graph Manager functions differently when editing a {% if graph.isresource %}Branch{% else %}Resource Model{% endif %}.</p>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Graph Designer Overview</h4></a>
+        <div class="ep-help-topic-content">
+            <p>The interface is split into three sections, as shown in the image below.
+            <p><a href="/media/img/help/graph-manager-panes.png" target="_blank"><img src="/media/img/help/graph-manager-panes.png"></img></a></p>
+            <p>
+                <strong>Node List</strong> - This panel lists all of the nodes present in this {% if graph.isresource %}Resource Model's{% else %}Branch's{% endif %} graph. You can select a node in the Node List to open the Node Manager.<br>
+                <strong>Graph</strong> This panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.<br>
+                <strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new {% if graph.isresource %}Branches{% else %}nodes{% endif %}, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:
+            </p>
+            <div class="col-xs-6">
+                <p><a href="/media/img/help/node-manager.png" target="_blank"><img src="/media/img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
+            </div>
+            <div class="col-xs-6">
+                <p>
+                    <strong>Node Name</strong> - Used to identify this node within the graph interface. In other parts of app, custom labels can be used in place of this name. Node names need not be unique across a graph, but it will make everything easier if they are.<br>
+                    <strong>CRM Class</strong> - (only present if this {% if graph.isresource %}Resource Model{% else %}Branch{% endif %} uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
+                    <strong>Relationship from ...</strong> - (only present if this {% if graph.isresource %}Resource Model{% else %}Branch{% endif %} uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
+                    <strong>Data type</strong> - Choose what type of data will be collected in this node. See below for more information.<br>
+                    <strong>Make Sub-Card</strong> - NEEDS TO BE UPDATED - when the card collection/card terminology is fully implemented. -----OLD This setting defines data collection grouping for this node. Read more about what this means in the Cards documentation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Editing a Branch's Graph</h4></a>
+        <div class="ep-help-topic-content">
+            <p>To build the graph of a Branch, your main course of action will be adding nodes, naming them, and defining their data type. If your Branch uses an ontology, you'll also need to define the CRM class and property of each new node. When choosing classes and properties, the interface will automatically enforce preloaded ontological rules.</p>
+            <p>Below you can see a simple example of adding a node to a graph.</p>
+            <p><a href="/media/img/help/add-node-to-branch.gif" target="_blank"><img class="reloadable-img" src="/media/img/help/add-node-to-branch.gif"></a></img></p>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Editing a Resouce Model's Graph</h4></a>
+        <div class="ep-help-topic-content">
+            <p>When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times.</p>
+            <p>As shown below, you must select the top node and then use <i class="ion-ios-plus"></i> to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch.</p>
+            <p><a href="/media/img/help/add-graph-branch.gif" target="_blank"><img class="reloadable-img" src="/media/img/help/add-graph-branch.gif"></img></a></p>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>About Data Types</h4></a>
+        <div class="ep-help-topic-content">
+            <p>Choosing a node's <strong>Data Type</strong> is the first step toward defining how that information will be collected. A few data types are intuitive ('string', 'number', 'date'), but here's an explanation for the less familiar types.</p>
+            <p>
+                <em>geojson-feature-collection</em> - Stores geographic coordinates, and is used to show a resource on the map.<br>
+                <em>concept</em> - Constrains the node to store one of a series of choices provided by the Reference Data Manager. This data functionally operates like a dropdown list or pick list. You'll further be prompted to choose a <strong>Concept Collection</strong>, where you'll choose which series of concepts to use.<br>
+                <em>concept-list</em> - Same as above, but the user will be able to select multiple concepts.<br>
+                <em>domain-value</em> - Like 'concept', choose this to present the user with a dropdown menu. Unlike 'concept' this dropdown menu will not come from your system-wide controlled vocubulary, but from a list of values that you define here.<br>
+                <em>domain-value-list</em> - Same as above, but the user will be able to select multiple domain-values.<br>
+                <em>boolean</em> - Use this to record a simple "yes or no" or "true or false" value.<br>
+                <em>file-list</em> - Allows this node to store one or mores files. Use this to upload images, documents, etc.<br>
+                <em>semantic</em> - A 'semantic' node <strong>does not store data</strong>. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of <em>every</em> graph is a semantic node.
+            </p>
+        </div>
+    </div>
+</div>
+

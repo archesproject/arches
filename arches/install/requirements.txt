@@ -1,5 +1,6 @@
 Django==1.9.2
-elasticsearch>=2.0.0,<3.0.0
+psycopg2==2.6.1
+elasticsearch>=5.0.0,<6.0.0
 xlrd==0.9.4
 Pillow==3.1.0
 rdflib
@@ -13,7 +14,9 @@ shapely
 python-memcached
 mapbox-vector-tile==0.5.0
 mapnik
+python-dateutil
+SPARQLWrapper==1.8.0
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.3.5/elasticsearch-2.3.5.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.zip

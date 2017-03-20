@@ -10,6 +10,7 @@ define(['knockout', 'underscore'], function (ko, _) {
     var WidgetViewModel = function(params) {
         var self = this;
         this.state = params.state || 'form';
+        this.expanded = params.expanded || ko.observable(false);
         this.value = params.value || ko.observable(null);
         this.formData = params.formData || new FormData();
         this.form = params.form || null;

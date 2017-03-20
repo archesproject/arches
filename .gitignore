@@ -2,7 +2,6 @@
 virtualenv/ENV*
 tests/elasticsearch
 tests/logs
-Procfile
 arches/db/install/install_db.sql
 arches/db/install/truncate_db.sql
 arches/install/elasticsearch-*.zip
@@ -11,6 +10,7 @@ arches.egg*
 arches/elasticsearch
 arches/uploadedfiles
 arches/settings_local.py
+tests/settings_local.py
 arches/logs/authority_file_errors.txt
 .coverage
 arches.log
@@ -22,3 +22,5 @@ arches/Net_files
 .idea
 arches/app/media/bower_components
 arches/tileserver/cache
+docs/_build
+arches/logs/*.log

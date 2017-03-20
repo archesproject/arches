@@ -1,0 +1,128 @@
+{
+    "graph": [
+        {
+            "subtitle": "Used to define legal privileges associated with an Information Resource.",
+            "mapfeaturecolor": null,
+            "isresource": false,
+            "forms_x_cards": [],
+            "reports": [],
+            "iconclass": "fa fa-copyright",
+            "functions": [],
+            "nodegroups": [
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " GCI",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E30_Right",
+                    "nodeid": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "datatype": "string",
+                    "nodegroup_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Copyright Description"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E55_Type",
+                    "nodeid": "6b220cc7-963f-11e6-8a28-026d961c88e6",
+                    "datatype": "concept-list",
+                    "nodegroup_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+                    "config": {
+                        "rdmCollection": null
+                    },
+                    "parentproperty": "P2_has_type",
+                    "name": "Copyright Type"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "Used to define legal privileges associated with an Information Resource.",
+            "edges": [
+                {
+                    "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+                    "name": null,
+                    "edgeid": "6b220cc8-963f-11e6-8a28-026d961c88e6",
+                    "domainnode_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "rangenode_id": "6b220cc7-963f-11e6-8a28-026d961c88e6",
+                    "ontologyproperty": "P2_has_type",
+                    "description": null
+                }
+            ],
+            "maplinewidth": null,
+            "mappointsize": null,
+            "graphid": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+            "name": "Information Resource Copyright",
+            "cards_x_nodes_x_widgets": [
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000005",
+                    "card_id": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
+                    "label": "Copyright Description",
+                    "node_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "sortorder": 1,
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"label\":\"Copyright Description\"}",
+                    "id": "1429ad60-b8f5-11e6-84a5-026d961c88e6"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000012",
+                    "card_id": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
+                    "label": "Copyright Type",
+                    "node_id": "6b220cc7-963f-11e6-8a28-026d961c88e6",
+                    "sortorder": 0,
+                    "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"Copyright Type\"}",
+                    "id": "1429ad61-b8f5-11e6-84a5-026d961c88e6"
+                }
+            ],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+                    "description": "Used to define legal privileges associated with an Information Resource.",
+                    "visible": true,
+                    "nodegroup_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "08cfb2fb-963f-11e6-8a28-026d961c88e6",
+                    "helptitle": null,
+                    "instructions": "Describe the copyright for the information resource.",
+                    "active": true,
+                    "name": "Information Resource Copyright"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E30_Right",
+                "nodeid": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                "datatype": "string",
+                "nodegroup_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6",
+                "graph_id": "08cfb2f9-963f-11e6-8a28-026d961c88e6",
+                "config": null,
+                "name": "Copyright Description"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
+        "os version": "4.4.0-45-generic",
+        "os": "Linux"
+    }
+}
