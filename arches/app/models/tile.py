@@ -22,6 +22,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 
@@ -108,12 +109,25 @@ class Tile(models.TileModel):
 
 
     def delete(self, *args, **kwargs):
+        se = SearchEngineFactory().create()
         request = kwargs.pop('request', None)
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.delete(*args, request=request, **kwargs)
+
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
+        query.add_query(bool_query)
+        results = query.search(index='strings', doc_type='term')['hits']['hits']
+        for result in results:
+            se.delete(index='strings', doc_type='term', id=result['_id'])
+
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
+        resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+        resource.index()
+
 
     def index(self):
         """
