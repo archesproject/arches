@@ -1,72 +1,72 @@
 {% load i18n %}
 <div id="related-resources-drag-panel" class="search-container related-resources-container">
 
-    
-    
+
+
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
     	resourceId: currentResource().resourceinstanceid,
     	resourceName: currentResource().displayname,
-    	resourceTypeId: currentResource().graphid
+    	resourceTypeId: currentResource().graphid,
+        nodeList: graphNodeList
     }">
-    	
-        <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
-        <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
-    		<dl style="margin-bottom: 0;">
-    			<dd class="arches-concept-heirarchy">
-    				<div>
-    					<a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
-    				</div>
-    				<div>
-    					<small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
-    				</div>
-    				<div>
-    					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
-    					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded!' %}</small>
-    				</div>
-    				<div>
-    					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
-    				</div>
-    			</dd>
-    		</dl>
-    	</div>
 
-        <!-- Resource Node Search/Listing -->
-        <div class="related-resources-nodes form-list">
+    <!-- ko foreach: { data: [$data], as: 'self' } -->
+    <div data-bind="with: fdgNodeListViewList"></div>
+    <!--/ko-->
+                    <!-- <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
+                		<dl style="margin-bottom: 0;">
+                			<dd class="arches-concept-heirarchy">
+                				<div>
+                					<a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
+                				</div>
+                				<div>
+                					<small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
+                				</div>
+                				<div>
+                					<small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
+                					<small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded!' %}</small>
+                				</div>
+                				<div>
+                					<small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
+                				</div>
+                			</dd>
+                		</dl>
+                	</div>
 
-            <div class="layer-list">
-                <!-- Layer Filter -->
-                <div class="list-filter" data-bind="" style="margin-right: 15px; margin-left: 15px;">
-                    <input type="text" class="form-control" style="" placeholder="Find a resource..." data-bind="">
+                    <div class="related-resources-nodes form-list">
 
-                    <!-- Clear Search -->
-                    <span class="clear-node-search" data-bind=""><i class="fa fa-times-circle"></i></span>
-                </div>
+                        <div class="layer-list">
 
-            </div>
-            
-            <!-- Resource Nodes -->
-            <div class="report-image-grid relative">
-                <div class="grid" style="margin-left: 0px;">
-                    
-                    <div class="library-card selected-card relative" data-bind="">
-                        <div class="crud-card-main" style="left: 5px;">
-                            <a class="listitem_name" data-bind="">Resource Name Goes Here</a>
+                            <div class="list-filter" data-bind="" style="margin-right: 15px; margin-left: 15px;">
+                                <input type="text" class="form-control" style="" placeholder="Find a resource..." data-bind="">
+
+                                <span class="clear-node-search" data-bind=""><i class="fa fa-times-circle"></i></span>
+                            </div>
+
                         </div>
-                        
-                        <div class="crud-card-subtitle" style="left: 5px;" data-bind="">
-                            10 out of 200 relations loaded
+
+                        <div class="report-image-grid relative">
+                            <div class="grid" style="margin-left: 0px;">
+
+                                <div class="library-card selected-card relative" data-bind="">
+                                    <div class="crud-card-main" style="left: 5px;">
+                                        <a class="listitem_name" data-bind="">Resource Name Goes Here</a>
+                                    </div>
+
+                                    <div class="crud-card-subtitle" style="left: 5px;" data-bind="">
+                                        10 out of 200 relations loaded
+                                    </div>
+                                    <div class="crud-card-link">add</div>
+                                </div>
+
+                            </div>
                         </div>
-                        <div class="crud-card-link">add</div>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
+                    </div> -->
     </div>
     <!--/ko-->
 
-    
+
     <!-- Drag Panel -->
     <div class="relative">
 
@@ -95,9 +95,9 @@
                     <!--Documentation dropdown-->
                     <!--ko if: resourceEditorContext -->
                     <div class="related-resources-relationship">
-                            
+
                             <div class="mega-dropdown related-reources-crud-link">
-                                
+
                                 <!--ko if: !showGraph() -->
                                 <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
                                     <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}

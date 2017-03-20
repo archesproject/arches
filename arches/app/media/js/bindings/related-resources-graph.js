@@ -34,6 +34,7 @@ define([
                 .theta(0.8)
                 .size([width, height]);
 
+            var nodeList = options.nodeList
             var redraw = function() {
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
@@ -337,6 +338,8 @@ define([
                                     linkMap[sourceId.id+'_'+targetId.id] = true;
                                 }
                             });
+                            nodeList(nodeList().concat(nodes))
+                            console.log(nodeList())
 
                             callback({
                                 nodes: nodes,

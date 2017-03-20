@@ -20,6 +20,15 @@ define([
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(false);
+            this.graphNodeList = ko.observableArray();
+
+            this.graphNodeList.subscribe(function(val){
+                console.log('array', val);
+            })
+
+            this.fdgNodeListView = new ListView({
+                items: self.graphNodeList
+            });
 
             _.each(this.relatedProperties, function(prop, key) {
                 if (ko.isObservable(prop)) {
