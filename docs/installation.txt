@@ -5,44 +5,44 @@ Installation
 System Requirements
 ===================
 
-Arches works on Linux, Windows, or Mac OSX, but some of its dependencies may be more difficult to install on certain operating systems. Most enterprise-level installations of Arches have been created on Linux servers.
+Arches works on Linux, Windows, or macOS, but some of its dependencies may be more difficult to install on certain operating systems. Most enterprise-level installations of Arches have been created on Linux servers.
 
 To begin development or make a test installation of Arches, you will need the following:
 
 + **2gb disk space**
-	+ 1.5gb for all dependencies (Postgres/PostGIS, Python, GEOS, etc.) and 300mb for Arches.
+	+ 1.5gb for all dependencies and 600mb for Arches.
 	+ In production, the amount of disk space you need will depend on the number of resources in your database, specifically uploaded images or media files.
 
-+ **1gb memory (RAM)**
-	
-	+ In production, we advise 4-16gb of memory, primarily to support ElasticSearch.
++ **4gb memory (RAM)**
+	+ This recommendation is calculated by the fact that ElasticSearch requires 2gb to run, and as per `ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
+	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch#running-elasticsearch>`_.
+	+ In production, you may want to increase your memory, and allow ElasticSearch to use more than its default.
 
 ----------------
 
-*When viewing Arches, please note that it has been developed for modern browsers -- Chrome, Firefox, Internet Explorer (10 or higher), Safari, etc.*
+*Please note that Arches 4.0.0 beta release is only fully supported in Chrome.*
 
 Dependencies
 ============
 
-* PostgreSQL relational database (version 9.5)
-* PostGIS (version 2.x) spatial module for PostgreSQL
-* Python (version 2.7.6 - there seem to be issues with later versions of python) 
-* GEOS
+* **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is [Postgres.app](http://postgresapp.com). For Windows, use the [EnterpriseDB installers](https://www.postgresql.org/download/windows/), and use Stack Builder (included) to get PostGIS.
+* **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the OSgeo4W installer, and choose to install the GDAL package.
+* **Python 2.7.x** Installation instructions here: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
+* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. To be safe, you may as well upgrade pip right away. Once installed, run `python -m pip install --upgrade pip`. In Python 2.7.9 and later, pip is included by default.
+* **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
+* **Mapnik** Installation instructions here: http://mapnik.org/pages/downloads.html. *Windows installation of Mapnik is currently under development.*
+* **JDK** Use the installers found here: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
+* **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ regarding Arches and Elasticsearch.
 
-These instructions will provide some guidance on installing 
-the required dependencies and getting Arches up and running quickly.
+These instructions will provide some guidance on installing the required dependencies and getting Arches up and running quickly.
 
+* `Installing Dependencies Ubuntu <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Ubuntu>`_
+* `Installing Dependencies macOS <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-macOS>`_
+* `Installing Dependencies Windows <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows>`_
 
-.. toctree::
-   :maxdepth: 1
-
-   installing-dependencies-linux
-   installing-dependencies-windows
-
-
-Using the Installer
+Installing Arches
 ===================
 
 Once you have all of the dependencies installed, you can use the Arches installer that can be found here: ________
 
-To install Arches directly from our GitHub repo, follow our dev installation guide which is located `here <https://github.com/archesproject/arches/wiki/Dev-Installation>`_ in our GitHub repo wiki.
+To install Arches directly from our GitHub repo, follow our dev installation guide which is located `here <https://github.com/archesproject/arches/wiki/Developer-Installation>`_ in our GitHub repo wiki.

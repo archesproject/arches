@@ -5291,6 +5291,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
+    z-index: 10;
     position: absolute;
     top: 60px;
     left: 10px;
@@ -5646,6 +5647,10 @@ span.basemap-unselected {
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
   visibility: hidden;
+}
+
+.widget-wrapper .mapboxgl-map {
+    z-index: 10;
 }
 
 .map-overlay-item-tools-panel .noUi-base {
