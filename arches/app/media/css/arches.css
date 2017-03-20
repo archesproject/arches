@@ -5291,6 +5291,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
+    z-index: 10;
     position: absolute;
     top: 60px;
     left: 10px;
