@@ -15,7 +15,6 @@ define([
     */
     ko.bindingHandlers.summernote = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
-            console.log('initing')
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
             options = (typeof options === 'object') ? options : {};
