@@ -4166,6 +4166,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	padding: 10px 25px;
 	color: #fff;
 	transition: all .40s ease;
+    overflow: hidden;
 }
 .alert-active .ep-form-alert {
     display: block;
@@ -4210,6 +4211,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .ep-form-alert-text {
 	font-size: 12px;
 	font-weight: 400;
+    overflow: hidden;
 }
 .ep-form-alert-default-dismiss {
 	position: absolute;
