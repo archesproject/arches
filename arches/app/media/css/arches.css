@@ -6343,7 +6343,8 @@ span.basemap-unselected {
 }
 
 .time-wheel-wrap .chart path {
-  stroke: #fff;
+    cursor: pointer;
+    stroke: #fff;
 }
 
 .time-wheel-wrap .trail {
