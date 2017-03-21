@@ -5407,12 +5407,14 @@ span.basemap-unselected {
     width: 249px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
 }
-
+.map-widget-overlay-item.selected {
+    background: #fff;
+}
 .map-widget-overlay-item:hover {
-    background: #fafafa;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -5433,6 +5435,15 @@ span.basemap-unselected {
 
 .overlay-toggle-icon {
     font-size: 17px;
+}
+
+#overlays-panel div .map-widget-overlay-item {
+    background: #fff;
+}
+
+#overlays-panel div .overlay-invisible{
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
 }
 
 .show-tools {
@@ -6042,7 +6053,7 @@ span.basemap-unselected {
     border-left-width: 0px;
     padding-left: 6px;
     padding-top: 6px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .search-results-panel-closed {
