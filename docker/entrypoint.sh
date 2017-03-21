@@ -21,7 +21,6 @@ run_arches_init_commands() {
 	setup_arches
 	import_graphs
 	import_reference_data 'arches/db/schemes/arches_concept_scheme.rdf'
-	import_reference_data 'arches/db/schemes/dropdowns.rdf'
 }
 
 db_exists() {
