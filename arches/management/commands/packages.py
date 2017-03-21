@@ -31,6 +31,7 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
@@ -52,7 +53,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -165,6 +166,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
+
+        if options['operation'] == 'import_business_data_relations':
+            self.import_business_data_relations(options['source'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
@@ -367,6 +371,30 @@ class Command(BaseCommand):
             print 'No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.'
             print '*'*80
             sys.exit()
+
+    def import_business_data_relations(self, data_source):
+        """
+        Imports business data relations
+        """
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
+        for path in data_source:
+            if os.path.isabs(path):
+                if os.path.isfile(os.path.join(path)):
+                    relations = csv.DictReader(open(path, 'r'))
+                    RelationImporter().import_relations(relations)
+                else:
+                    print '*'*80
+                    print 'No file found at indicated location: {0}'.format(path)
+                    print '*'*80
+                    sys.exit()
+            else:
+                print '*'*80
+                print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                print '*'*80
+                sys.exit()
+
 
     def import_graphs(self, data_source=''):
         """

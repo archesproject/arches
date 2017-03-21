@@ -4166,6 +4166,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	padding: 10px 25px;
 	color: #fff;
 	transition: all .40s ease;
+    overflow: hidden;
 }
 .alert-active .ep-form-alert {
     display: block;
@@ -4210,6 +4211,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .ep-form-alert-text {
 	font-size: 12px;
 	font-weight: 400;
+    overflow: hidden;
 }
 .ep-form-alert-default-dismiss {
 	position: absolute;
@@ -4300,6 +4302,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .switch-section {
     position: relative;
+    margin-bottom: 300px;
 }
 .switch-section.disabled::before {
     content: '.';
@@ -5943,13 +5946,14 @@ span.basemap-unselected {
     background: #dbf1f5;
 }
 .hover-panel-small {
-    width: 250px;
+
 }
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
     left: 30px;
     margin: 10px;
+    width: 400px;
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
@@ -5960,25 +5964,39 @@ span.basemap-unselected {
     height: 40px;
     padding: 10px;
     background: #ebebeb;
+    max-width: 400px;
 }
 .hover-feature-title {
     font-size: 15px;
+    max-width: 360px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
-    max-width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 10; /* number of lines to show */
-    line-height: 1.2em;        /* fallback */
-    max-height: 12em;       /* fallback */
 }
 .hover-feature {
     font-size: 13px;
     color: #555;
     font-weight: 500;
+    margin-bottom: 20px;
+    width: 380px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4; /* number of lines to show */
+    line-height: 1.2em;        /* fallback */
+    max-height: 12em;       /* fallback */
+}
+.hover-panel-dismiss {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+.hover-feature-metadata{
+    margin-bottom: -4px;
 }
 .search-results {
     -ms-flex: 0 0 400px;
@@ -6069,6 +6087,7 @@ span.basemap-unselected {
     left: -5px;
     right: -15px;
     top: -25px;
+    z-index: 1;
 }
 
 
