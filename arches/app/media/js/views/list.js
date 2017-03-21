@@ -32,7 +32,6 @@ define([
         filter_function: function(newValue){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
-                console.log(item)
                 var name = typeof item.name === 'string' ? item.name : item.name();
                 if (!item.filtered) {
                     item.filtered = ko.observable();

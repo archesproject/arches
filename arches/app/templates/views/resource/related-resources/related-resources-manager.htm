@@ -39,13 +39,12 @@
 
             <div class="layer-list">
 
-                <div class="list-filter">
+                <div class="list-filter fdg-node-filter">
                     <input type="text" class="form-control" style="z-index=100" placeholder="{% trans "Find resource" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
                     <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                 </div>
 
             </div>
-
 
 
             <!-- <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: {data: items}">
@@ -65,7 +64,7 @@
                 <div class="report-image-grid relative">
                     <div class="grid" style="margin-left: 0px;" data-bind="foreach: {data: items}">
 
-                        <div class="library-card selected-card relative" data-bind="">
+                        <div class="library-card selected-card relative" data-bind="click: function(e){console.log(e.filtered());}, visible: filtered() == false">
                             <div class="crud-card-main" style="left: 5px;">
                                 <a class="listitem_name" data-bind="text: name"></a>
                             </div>

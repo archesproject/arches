@@ -25,6 +25,7 @@ define([
 
             this.graphNodeList.subscribe(function(val){
                 console.log('array', val);
+                console.log('len', val.length)
             })
 
             this.fdgNodeListView = new ListView({

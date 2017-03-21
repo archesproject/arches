@@ -35,6 +35,7 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
+            nodeList([])
             var redraw = function() {
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
@@ -339,7 +340,7 @@ define([
                                 }
                             });
                             nodeList(nodeList().concat(nodes))
-                            console.log(nodeList())
+                            console.log('ajax', nodeList())
 
                             callback({
                                 nodes: nodes,

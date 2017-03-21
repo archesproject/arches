@@ -2612,6 +2612,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-size: 11px;
     padding-left: 10px;
 }
+
+.layer-list .fdg-node-filter {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
 .node-current {
     stroke: #b3b3b3;
     stroke-width: 2px;
@@ -4503,7 +4509,7 @@ div.row.widget-wrapper {
     right: 0px;
     height: 100vh;
     background: #fff;
-    z-index: 2;
+    z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
 }
