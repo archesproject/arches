@@ -35,9 +35,14 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
-            nodeList.subscribe(function(node){
-                console.log(node)
-            })
+            nodeList.subscribe(function(list){
+                _.each(list, function(item){
+                    item.selected.subscribe(function(val){
+                        console.log(item)
+                        console.log(val)
+                    }, this)
+                })
+            }, this)
             nodeList([])
             var redraw = function() {
                 vis.attr("transform",
