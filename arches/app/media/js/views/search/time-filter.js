@@ -22,16 +22,19 @@ function(_, ko, moment, BaseFilter, arches) {
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
             this.breadCrumb = ko.observable();
+            this.selectedPeriod = ko.observable();
             this.wheelConfig = ko.observable();
             this.getTimeWheelConfig();
-            this.selectPeriod = function (d) {
-                var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
-                var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
-                self.dateRangeType('custom');
-                self.filter.fromDate(end);
-                self.filter.toDate(end);
-                self.filter.fromDate(start);
-            }
+            this.selectedPeriod.subscribe(function (d) {
+                if (d) {
+                    var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
+                    var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
+                    self.dateRangeType('custom');
+                    self.filter.fromDate(end);
+                    self.filter.toDate(end);
+                    self.filter.fromDate(start);
+                }
+            })
 
             this.dateRangeType.subscribe(function(value) {
                 var today = moment();
@@ -125,6 +128,7 @@ function(_, ko, moment, BaseFilter, arches) {
             this.filter.inverted(false);
             this.dateRangeType('custom');
             this.termFilter.removeTag(this.name);
+            this.selectedPeriod(null);
             return;
         }
     });
