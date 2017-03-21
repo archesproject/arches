@@ -61,10 +61,12 @@
                  </div>
             </div> -->
             <!-- Resource Nodes -->
+
+            <!-- ko foreach: { data: [$data], as: 'self' } -->
                 <div class="report-image-grid relative">
                     <div class="grid" style="margin-left: 0px;" data-bind="foreach: {data: items}">
 
-                        <div class="library-card selected-card relative" data-bind="click: function(e){console.log(e.filtered());}, visible: filtered() == false">
+                        <div class="library-card relative" data-bind="click: function(e){_.each(self.selectedItems(), function(item){item.selected(false)}); e.selected(true)}, visible: filtered() == false, css:{'selected': selected()== true}">
                             <div class="crud-card-main" style="left: 5px;">
                                 <a class="listitem_name" data-bind="text: name"></a>
                             </div>
@@ -77,6 +79,7 @@
 
                     </div>
                 </div>
+            <!--/ko-->
             </div>
 
         </div>

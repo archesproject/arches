@@ -35,6 +35,9 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
+            nodeList.subscribe(function(node){
+                console.log(node)
+            })
             nodeList([])
             var redraw = function() {
                 vis.attr("transform",
@@ -145,6 +148,11 @@ define([
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
                                     className += '-over';
+                                    _.each(nodeList(), function(n){
+                                        if (n.entityid === d.entityid){
+                                            n.selected(true)
+                                        } else {n.selected(false)}
+                                    })
                                 } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
                                     className += '-neighbor';
                                 }
@@ -163,6 +171,11 @@ define([
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === selectedNode) {
                                     className += '-over';
+                                    _.each(nodeList(), function(n){
+                                        if (n.entityid === d.entityid){
+                                            n.selected(true)
+                                        } else {n.selected(false)}
+                                    })
                                 }
                                 return className;
                             });
