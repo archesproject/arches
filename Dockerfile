@@ -3,13 +3,13 @@ USER root
 
 ## Setting default environment variables
 ENV WEB_ROOT=/web_root
-ENV INSTALL_DIR=/install
+ENV DOCKER_DIR=/docker
 # Root project folder
 ENV ARCHES_ROOT=${WEB_ROOT}/arches
 
 
 ## Install dependencies
-WORKDIR ${INSTALL_DIR}/tmp
+WORKDIR /tmp
 RUN apt-get update -y &&\
 	apt-get upgrade -y &&\
 	apt-get install -y wget \
@@ -60,7 +60,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc
 	
 ## Clean up obsolete folders and packages
 RUN rm -rf /var/lib/apt/lists/*
-RUN rm -rf ${INSTALL_DIR}/tmp
+RUN rm -rf /tmp/*
 
 
 # Install the Arches application
@@ -70,18 +70,17 @@ WORKDIR ${ARCHES_ROOT}
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 	bower --allow-root install &&\
 	python setup.py install
-	
 		
 		
 # Add Docker-related files
-COPY docker/entrypoint.sh ${INSTALL_DIR}/entrypoint.sh
+COPY docker/entrypoint.sh ${DOCKER_DIR}/entrypoint.sh
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
-RUN	chmod -R 700 ${INSTALL_DIR} &&\
-	dos2unix ${INSTALL_DIR}/*
+RUN	chmod -R 700 ${DOCKER_DIR} &&\
+	dos2unix ${DOCKER_DIR}/*
 
 	
 # Set entrypoint
-CMD ${INSTALL_DIR}/entrypoint.sh
+CMD ${DOCKER_DIR}/entrypoint.sh
 
 
 # Expose port 8000
