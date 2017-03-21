@@ -38,18 +38,12 @@ define([
 
             $element.summernote(options);
 
-            function clearScriptTags(){
-                var noteCodable = $('textarea.note-codable')
-                noteCodable.val(noteCodable.val().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''))
-                console.log('Script tags are not permitted in the code editor')
-            }
-
-            $('.btn-codeview').on( "mousedown", clearScriptTags)
-            $('textarea.note-codable').on( "keypress", clearScriptTags)
-
             if (ko.isObservable(options.value)) {
                 options.value.subscribe(function(value) {
                     var currentContent = $element.summernote('code');
+                    if (value) {
+                        value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                    }
                     if (value !== currentContent) {
                         $element.summernote('code', value);
                     }
