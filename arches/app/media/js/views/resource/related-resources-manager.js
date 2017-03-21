@@ -4,11 +4,12 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'views/list',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, Backbone, ko, koMapping, arches) {
+], function($, Backbone, ko, koMapping, arches, ListView) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
