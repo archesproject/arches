@@ -34,8 +34,8 @@
                         <!-- ko if: drawMode() === 'draw_line_string'-->
                         <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
-                        <!-- ko if: drawMode() === 'simple_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing a " %}<span data-bind="text: selectedFeatureType"></span>.
+                        <!-- ko if: drawMode() === 'simple_select' -->
+                        <strong>{% trans "Edit Mode" %}</strong>
                         <!-- ko if: selectedFeatureType() !== 'point'-->
                         <span>{% trans "Click and drag to move." %}</span>
                         <!-- /ko -->
@@ -47,10 +47,21 @@
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
-                    <div class="btn-group geometry-edit-button-group">
-                        <button class="btn btn-sm btn-mint">New</button>
-                        <button class="btn btn-sm btn-default">Delete</button>
-                        <button class="btn btn-sm btn-default">Edit</button>
+                    <div class="geometry-edit-button-group" data-bind= "visible: !mapControls.mapControlsExpanded()">
+
+                        <div class="btn-group">
+                            <!-- ko foreach: { data: [$data], as: 'self' } -->
+                            <!-- ko foreach: geometryTypes -->
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
+                            </button>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'delete')}">{% trans "Delete" %}</button>
+                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'end')}">{% trans "Close" %}</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,8 +171,8 @@
                 <!-- ko if: !popupData().loading() -->
                 <div class="hover-feature-title-bar">
                     <div class="hover-feature-title">
-                        <span data-bind="text: popupData().displayname"></span>
-                        <i class="ion-ios-close pull-right add-tooltip"
+                        <span class="" data-bind="text: popupData().displayname"></span>
+                        <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
                             style="cursor: pointer;"
                             data-placement="left"
                             data-toggle="tooltip"
@@ -171,15 +182,15 @@
                     </div>
                 </div>
                 <div class="hover-feature-body">
-                    <div>
+                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
+                    <div class="hover-feature-metadata">
                         {% trans "Resource ID:" %}
                         <span data-bind="text: popupData().resourceinstanceid"></span>
                     </div>
-                    <div>
+                    <div class="hover-feature-metadata">
                         {% trans "Resource Model:" %}
                         <span data-bind="text: popupData().graph_name"></span>
                     </div>
-                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
                 </div>
                 <!--/ko-->
             <!--/ko-->
@@ -342,7 +353,7 @@
                 </div>
             </div>
 
-            <div class="map-draw-tools-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
+            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>
                 </div>

@@ -697,12 +697,18 @@ define([
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
+                this.switchToEditMode = function() {
+                    self.draw.changeMode('simple_select')
+                    self.drawMode(undefined);
+                }
+
                 /**
                  * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
                  * @param  {string} selectedDrawTool the draw tool name selected in the map controls
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
+                    self = self || this;
                     if (this.context === 'search-filter') {
                         this.extentSearch(false);
                         this.draw.deleteAll();
@@ -723,16 +729,25 @@ define([
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
-                    if (self.geometryTypeDetails[selectedDrawTool] === undefined) { //it has no geom type, so must be trash
+                    if (selectedDrawTool === 'delete') {
                         self.draw.trash();
-                        self.drawMode(null);
-                    } else {
+                        self.drawMode('simple_select');
+                    }
+                    else if (selectedDrawTool === 'end') {
+                        self.draw.changeMode('simple_select')
+                        self.drawMode(undefined);
+                    }
+                    else {
                         if (!self.drawMode()) {
                             self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                         } else if (self.geometryTypeDetails[selectedDrawTool].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
-                            self.drawMode(undefined);
+                            if (self.mapControls.mapControlsExpanded()) {
+                                self.drawMode(undefined);
+                            } else {
+                                self.drawMode('simple_select')
+                            }
                         } else {
                             self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
