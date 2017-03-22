@@ -13,7 +13,6 @@ services:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
         - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
-        - arches-virtualenv:/web_root/ENV
       environment:
         - FORCE_DB_INIT=False
         - PGPASSWORD=
