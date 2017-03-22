@@ -2,19 +2,20 @@ import uuid
 import json
 import decimal
 import importlib
-from django.conf import settings
+from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from shapely.geometry import asShape
-from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -86,9 +87,8 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-
     def append_to_document(self, document, nodevalue):
-        document['dates'].append(nodevalue)
+        document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
