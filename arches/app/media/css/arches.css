@@ -6207,7 +6207,11 @@ span.basemap-unselected {
 	font-weight: 500;
 	display: table-cell;
 }
-
+.time-wheel-display-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
 .rr-display-toggle {
     position: absolute;
     top: -7px;

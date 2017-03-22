@@ -21,6 +21,7 @@ function(_, ko, moment, BaseFilter, arches) {
             }
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
+            this.showWheel = ko.observable(false);
             this.breadCrumb = ko.observable();
             this.selectedPeriod = ko.observable();
             this.wheelConfig = ko.observable();
