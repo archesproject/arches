@@ -255,16 +255,16 @@ def build_search_results_dsl(request):
         now = str(datetime.utcnow())
         start_date = None
         end_date = None
+        start_year = 'null'
+        end_year = 'null'
         try:
             # start_date = parser.parse(temporal_filter['fromDate'])
             # start_date = start_date.isoformat()
             sd = FlexiDate.from_str(temporal_filter['fromDate'])
             start_date = int((sd.as_float()-1970)*31556952*1000)
-            try:
-                #start_year = parser.parse(start_date).year
-                start_year = sd.year
-            except:
-                start_year = 'null'
+            
+            #start_year = parser.parse(start_date).year
+            start_year = sd.year
         except:
             pass
 
@@ -273,11 +273,9 @@ def build_search_results_dsl(request):
             # end_date = end_date.isoformat()
             ed = FlexiDate.from_str(temporal_filter['toDate'])
             end_date = int((ed.as_float()-1970)*31556952*1000)
-            try:
-                #end_year = parser.parse(end_date).year
-                end_year = ed.year
-            except:
-                end_year = 'null'
+            
+            #end_year = parser.parse(end_date).year
+            end_year = ed.year
         except:
             pass
 
