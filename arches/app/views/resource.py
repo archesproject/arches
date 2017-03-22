@@ -83,8 +83,8 @@ class ResourceEditorView(BaseManagerView):
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
-                displayname = 'Unnamed Resource' 
-
+                displayname = 'Unnamed Resource'
+            date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -94,6 +94,7 @@ class ResourceEditorView(BaseManagerView):
                 forms=JSONSerializer().serialize(forms_w_cards),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
+                date_nodes=date_nodes,
                 map_layers=map_layers,
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
