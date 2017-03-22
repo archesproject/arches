@@ -24,7 +24,11 @@ then
 
     arches-project create myproject
     
-enter the new `myproject` directory, and run
+enter the new `myproject` directory
+
+    cd myproject
+    
+and run
 
     python manage.py runserver
     
