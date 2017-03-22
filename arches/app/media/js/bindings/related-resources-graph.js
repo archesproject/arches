@@ -66,8 +66,19 @@ define([
             nodeList.subscribe(function(list){
                 _.each(list, function(item){
                     item.selected.subscribe(updateSelected(item), this)
+                    item.summary = ko.computed(function() {
+                        var result;
+                        if (item.relationCount) {
+                            result = item.relationCount.loaded + " of " + item.relationCount.total;
+                        } else {
+                            result = "no result"
+                        };
+                        return result;
+                    }, this);
                 })
             }, this)
+
+
 
             nodeList([])
 
@@ -182,7 +193,6 @@ define([
                                     className += '-over';
                                     _.each(nodeList(), function(n){
                                         if (n.entityid === d.entityid){
-                                            console.log(n)
                                             n.selected(true)
                                         } else {n.selected(false)}
                                     })
