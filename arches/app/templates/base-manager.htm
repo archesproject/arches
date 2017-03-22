@@ -419,7 +419,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"System Administrator" %}
                                         <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                            <a href="#">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>System Settings</strong>
