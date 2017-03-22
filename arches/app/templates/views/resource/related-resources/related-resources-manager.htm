@@ -46,20 +46,6 @@
 
             </div>
 
-
-            <!-- <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: {data: items}">
-                 <div class="overlay-card" style="" data-bind="click: self.exchangeOverlay, css: {'selected': checkedOutOfLibrary}, visible: $data.filtered() == false">
-                     <div class="overlay-card-item">
-                         <div class="overlay-card-vis-toggle">
-                             <i class="ion-checkmark-circled"></i>
-                         </div>
-                         <div class="overlay-card-main" style="">
-                             <a id="" class="" style="" href="#"><span data-bind="text: name"></span>
-                             </a>
-                         </div>
-                     </div>
-                 </div>
-            </div> -->
             <!-- Resource Nodes -->
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
@@ -92,22 +78,13 @@
         <!-- Target -->
         <div id="rr-manager-content-id" class="relative rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
-            <div class="related-resources-header">
+            <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}">
             	<h3 class="related-resources-title">{% trans "Related Resources" %}</h3>
 
-                <!--ko if: !showGraph() -->
-            	<div class="btn-group rr-display-toggle">
+            	<div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
             	</div>
-                <!--/ko-->
-
-                <!--ko if: showGraph() -->
-                <div class="btn-group rr-display-toggle" style="right: 260px;">
-                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
-                    <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
-                </div>
-                <!--/ko-->
 
                 <div class="relative">
 
@@ -115,7 +92,7 @@
                     <!--ko if: resourceEditorContext -->
                     <div class="related-resources-relationship">
 
-                            <div class="mega-dropdown related-reources-crud-link">
+                            <div class="mega-dropdown related-reources-crud-link" data-bind="visible: showGraph() == false">
 
                                 <!--ko if: !showGraph() -->
                                 <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">

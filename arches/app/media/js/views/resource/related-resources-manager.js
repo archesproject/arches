@@ -23,11 +23,6 @@ define([
             this.showGraph = ko.observable(false);
             this.graphNodeList = ko.observableArray();
 
-            this.graphNodeList.subscribe(function(val){
-                console.log('array', val);
-                console.log('len', val.length)
-            })
-
             this.fdgNodeListView = new ListView({
                 items: self.graphNodeList
             });
