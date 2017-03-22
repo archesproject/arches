@@ -23,7 +23,7 @@ def get_tileserver_config(layer_id):
         datatype = datatype_factory.get_instance(node.datatype)
         layer_config = datatype.get_layer_config(node)
     except Exception:
-        layer_model = models.TileserverLayers.objects.get(name=layer_id)
+        layer_model = models.TileserverLayer.objects.get(name=layer_id)
         layer_config = layer_model.config
 
     config_dict = {
