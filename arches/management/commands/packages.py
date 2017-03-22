@@ -204,7 +204,6 @@ class Command(BaseCommand):
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
 
-
     def setup(self, package_name, es_install_location=None):
         """
         Installs Elasticsearch into the package directory and
