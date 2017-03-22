@@ -211,7 +211,7 @@ define([
                     current = current.parent;
                 }
 
-                sequenceArray.push(count + ' resources')
+                sequenceArray.push(count + ' hits')
 
                 breadCrumb(sequenceArray.join(' - '));
 

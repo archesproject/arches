@@ -14,7 +14,7 @@ shapely
 python-memcached
 mapbox-vector-tile==0.5.0
 mapnik
-python-dateutil
+flexidate
 SPARQLWrapper==1.8.0
 
 # Leave the following line commented so that pip install will ignore this
