@@ -182,6 +182,7 @@ define([
                                     className += '-over';
                                     _.each(nodeList(), function(n){
                                         if (n.entityid === d.entityid){
+                                            console.log(n)
                                             n.selected(true)
                                         } else {n.selected(false)}
                                     })

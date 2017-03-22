@@ -34,6 +34,7 @@ define([
                     });
                 };
             });
+            
             this.searchResults.relationshipCandidates.subscribe(function(val) {
                 if (val.length > 0) {
                     self.saveRelationships(val)

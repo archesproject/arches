@@ -40,7 +40,7 @@
             <div class="layer-list">
 
                 <div class="list-filter fdg-node-filter">
-                    <input type="text" class="form-control" style="z-index=100" placeholder="{% trans "Find resource" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+                    <input type="text" class="form-control" style="z-index=100" placeholder="{% trans "Find a resource" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
                     <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
                 </div>
 
@@ -57,10 +57,15 @@
                                 <a class="listitem_name" data-bind="text: name"></a>
                             </div>
 
-                            <div class="crud-card-subtitle" style="left: 5px;" data-bind="">
-                                10 out of 200 relations loaded
+                            <div class="crud-card-subtitle" style="left: 5px;">
+                                <!--ko ifnot: relationCount == null -->
+                                <span data-bind="text: name"></span><span data-bind="text: relationCount.loaded"></span> {% trans 'out of' %} <span data-bind="text: relationCount.total"></span> {% trans 'relations loaded' %}
+                                <!--/ko-->
+                                <!--ko if: relationCount == null -->
+                                {% trans '0 out of 0 relations loaded' %}
+                                <!--/ko-->
                             </div>
-                            <div class="crud-card-link">add</div>
+                            <!-- <div class="crud-card-link">add</div> -->
                         </div>
 
                     </div>
