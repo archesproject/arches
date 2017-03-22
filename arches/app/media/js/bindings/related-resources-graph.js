@@ -34,6 +34,54 @@ define([
                 .theta(0.8)
                 .size([width, height]);
 
+            var nodeList = options.nodeList
+
+            var selectNode = function(d){
+                vis.selectAll("circle")
+                    .attr("class", function(d1){
+                        var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
+                        if (d1 === d) {
+                            className += '-over';
+                        } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
+                            className += '-neighbor';
+                        }
+                        return className;
+                    });
+                vis.selectAll("line")
+                    .attr('class', function(l) {
+                        return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
+                    });
+                updateNodeInfo(d);
+            }
+
+            var updateSelected = function(item) {
+                var item = item;
+                return function(val){
+                    if (val === true) {
+                        selectNode(item);
+                    }
+                }
+            }
+
+            nodeList.subscribe(function(list){
+                _.each(list, function(item){
+                    item.selected.subscribe(updateSelected(item), this)
+                    item.summary = ko.computed(function() {
+                        var result;
+                        if (item.relationCount) {
+                            result = item.relationCount.loaded + " of " + item.relationCount.total;
+                        } else {
+                            result = "no result"
+                        };
+                        return result;
+                    }, this);
+                })
+            }, this)
+
+
+
+            nodeList([])
+
             var redraw = function() {
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
@@ -143,6 +191,11 @@ define([
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
                                     className += '-over';
+                                    _.each(nodeList(), function(n){
+                                        if (n.entityid === d.entityid){
+                                            n.selected(true)
+                                        } else {n.selected(false)}
+                                    })
                                 } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
                                     className += '-neighbor';
                                 }
@@ -161,6 +214,11 @@ define([
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === selectedNode) {
                                     className += '-over';
+                                    _.each(nodeList(), function(n){
+                                        if (n.entityid === d.entityid){
+                                            n.selected(true)
+                                        } else {n.selected(false)}
+                                    })
                                 }
                                 return className;
                             });
@@ -337,6 +395,7 @@ define([
                                     linkMap[sourceId.id+'_'+targetId.id] = true;
                                 }
                             });
+                            nodeList(nodeList().concat(nodes))
 
                             callback({
                                 nodes: nodes,
