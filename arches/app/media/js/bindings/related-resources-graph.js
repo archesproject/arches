@@ -66,19 +66,12 @@ define([
             nodeList.subscribe(function(list){
                 _.each(list, function(item){
                     item.selected.subscribe(updateSelected(item), this)
-                    item.summary = ko.computed(function() {
-                        var result;
-                        if (item.relationCount) {
-                            result = item.relationCount.loaded + " of " + item.relationCount.total;
-                        } else {
-                            result = "no result"
-                        };
-                        return result;
-                    }, this);
+                    if (item.relationCount) {
+                        item.loaded(item.relationCount.loaded)
+                        item.total(item.relationCount.total)
+                    }
                 })
             }, this)
-
-
 
             nodeList([])
 
@@ -218,6 +211,10 @@ define([
                                         if (n.entityid === d.entityid){
                                             n.selected(true)
                                         } else {n.selected(false)}
+                                        if (n.relationCount) {
+                                            n.loaded(n.relationCount.loaded)
+                                            n.total(n.relationCount.total)
+                                        }
                                     })
                                 }
                                 return className;

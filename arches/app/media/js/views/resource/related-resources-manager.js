@@ -4,12 +4,12 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'views/list',
+    'views/resource/related-resources-node-list',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, Backbone, ko, koMapping, arches, ListView) {
+], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -23,7 +23,7 @@ define([
             this.showGraph = ko.observable(false);
             this.graphNodeList = ko.observableArray();
 
-            this.fdgNodeListView = new ListView({
+            this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
 
@@ -34,13 +34,14 @@ define([
                     });
                 };
             });
-            
+
             this.searchResults.relationshipCandidates.subscribe(function(val) {
                 if (val.length > 0) {
                     self.saveRelationships(val)
                 }
             }, self);
             this.resourceRelationships = ko.observableArray();
+
             this.selected = ko.computed(function() {
                 return _.filter(
                     this.resourceRelationships(),
