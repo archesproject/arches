@@ -19,7 +19,18 @@ function(_, ko, moment, BaseFilter, arches) {
                 dateNodeId: ko.observable(null),
                 inverted: ko.observable(false)
             }
-
+            this.filter.fromDate.subscribe(function (fromDate) {
+                var toDate = self.filter.toDate();
+                if (fromDate && toDate && toDate < fromDate) {
+                    self.filter.toDate(fromDate);
+                }
+            });
+            this.filter.toDate.subscribe(function (toDate) {
+                var fromDate = self.filter.fromDate();
+                if (fromDate && toDate && fromDate > toDate) {
+                    self.filter.fromDate(toDate);
+                }
+            })
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
             this.showWheel = ko.observable(false);
