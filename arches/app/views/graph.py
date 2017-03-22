@@ -318,9 +318,9 @@ class CardView(GraphBaseView):
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         ontology_properties = []
-        parent_node = self.graph.get_parent_node(card.nodegroup_id)
+        card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
         for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
-            if parent_node.ontologyclass in item['ontology_classes']:
+            if card_root_node.ontologyclass in item['ontology_classes']:
                 ontology_properties.append(item['ontology_property'])
         ontology_properties = sorted(ontology_properties, key=lambda item: item)
 
