@@ -40,8 +40,8 @@ function(_, ko, moment, BaseFilter, arches) {
             this.getTimeWheelConfig();
             this.selectedPeriod.subscribe(function (d) {
                 if (d) {
-                    var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
-                    var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
+                    var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
+                    var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
                     self.dateRangeType('custom');
                     self.filter.fromDate(end);
                     self.filter.toDate(end);
