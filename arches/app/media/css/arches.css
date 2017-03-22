@@ -2612,6 +2612,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-size: 11px;
     padding-left: 10px;
 }
+
+.layer-list .fdg-node-filter {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
 .node-current {
     stroke: #b3b3b3;
     stroke-width: 2px;
@@ -4052,6 +4058,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 }
 
 
+
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {
     color: #999;
 }
@@ -4503,7 +4510,7 @@ div.row.widget-wrapper {
     right: 0px;
     height: 100vh;
     background: #fff;
-    z-index: 2;
+    z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
 }
@@ -5407,12 +5414,14 @@ span.basemap-unselected {
     width: 249px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
 }
-
+.map-widget-overlay-item.selected {
+    background: #fff;
+}
 .map-widget-overlay-item:hover {
-    background: #fafafa;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -5433,6 +5442,15 @@ span.basemap-unselected {
 
 .overlay-toggle-icon {
     font-size: 17px;
+}
+
+#overlays-panel div .map-widget-overlay-item {
+    background: #fff;
+}
+
+#overlays-panel div .overlay-invisible{
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
 }
 
 .show-tools {
@@ -6042,7 +6060,7 @@ span.basemap-unselected {
     border-left-width: 0px;
     padding-left: 6px;
     padding-top: 6px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .search-results-panel-closed {
@@ -6196,11 +6214,19 @@ span.basemap-unselected {
 	font-weight: 500;
 	display: table-cell;
 }
-
+.time-wheel-display-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
 .rr-display-toggle {
     position: absolute;
     top: -7px;
     right: 170px;
+}
+
+.rr-display-toggle.open-graph {
+    right: 20px;
 }
 
 .related-resources-title {
@@ -6343,7 +6369,8 @@ span.basemap-unselected {
 }
 
 .time-wheel-wrap .chart path {
-  stroke: #fff;
+    cursor: pointer;
+    stroke: #fff;
 }
 
 .time-wheel-wrap .trail {
@@ -6380,6 +6407,11 @@ table.table.dataTable {
     position: relative;
     z-index: 2;
 }
+
+.related-resources-header.open-graph {
+    width: calc(100% - 245px);
+}
+
 
 .nodeLabels {
     font-size: 11px;
