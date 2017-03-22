@@ -466,7 +466,7 @@ class Command(BaseCommand):
                     tile_size = 512
             if config is not None:
                 with transaction.atomic():
-                    tileserver_layer = models.TileserverLayers(
+                    tileserver_layer = models.TileserverLayer(
                         name=layer_name,
                         path=path,
                         config=config
@@ -478,8 +478,8 @@ class Command(BaseCommand):
                         ],
                         "tileSize": tile_size
                     }
-                    map_source = models.MapSources(name=layer_name, source=source_dict)
-                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                    map_source = models.MapSource(name=layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
                     map_source.save()
                     map_layer.save()
                     tileserver_layer.map_layer = map_layer
@@ -496,15 +496,15 @@ class Command(BaseCommand):
                         if 'source' in layer:
                             layer['source'] = layer['source'] + '-' + layer_name
                     for source_name, source_dict in data['sources'].iteritems():
-                        map_source = models.MapSources.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
-                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
+                        map_source = models.MapSource.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
                     map_layer.save()
 
 
     def delete_tileserver_layer(self, layer_name=False):
         if layer_name != False:
             with transaction.atomic():
-                tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
+                tileserver_layer = models.TileserverLayer.objects.get(name=layer_name)
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()

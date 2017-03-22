@@ -49,8 +49,8 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
 
         context = self.get_context_data(
