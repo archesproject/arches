@@ -19,6 +19,7 @@ function(_, ko, moment, BaseFilter, arches) {
                 dateNodeId: ko.observable(null),
                 inverted: ko.observable(false)
             }
+
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
             this.showWheel = ko.observable(false);
