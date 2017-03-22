@@ -352,7 +352,7 @@ CONCEPT_SCHEME_LOCATIONS = (
     # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
 )
 
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.

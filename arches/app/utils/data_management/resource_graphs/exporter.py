@@ -82,8 +82,8 @@ def get_report_data_for_export(resource_graph):
     reports = Report.objects.filter(graph_id=resource_graph['graphid'])
     return reports
 
-def get_function_x_graph_data_for_export(functionids):
-    return FunctionXGraph.objects.filter(function_id__in=functionids)
+def get_function_x_graph_data_for_export(functionids, graphid):
+    return FunctionXGraph.objects.filter(function_id__in=functionids, graph_id=graphid)
 
 def get_graphs_for_export(graphids=None):
     graphs = {}
@@ -101,7 +101,7 @@ def get_graphs_for_export(graphids=None):
         function_ids = []
         for function in resource_graph['functions']:
             function_ids.append(function['function_id'])
-        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(function_ids)
+        resource_graph['functions_x_graphs'] = get_function_x_graph_data_for_export(function_ids, resource_graph['graphid'])
         del resource_graph['functions']
         del resource_graph['domain_connections']
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)

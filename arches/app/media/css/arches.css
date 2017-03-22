@@ -2612,6 +2612,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-size: 11px;
     padding-left: 10px;
 }
+
+.layer-list .fdg-node-filter {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
 .node-current {
     stroke: #b3b3b3;
     stroke-width: 2px;
@@ -4052,6 +4058,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 }
 
 
+
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {
     color: #999;
 }
@@ -4166,6 +4173,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	padding: 10px 25px;
 	color: #fff;
 	transition: all .40s ease;
+    overflow: hidden;
 }
 .alert-active .ep-form-alert {
     display: block;
@@ -4210,6 +4218,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .ep-form-alert-text {
 	font-size: 12px;
 	font-weight: 400;
+    overflow: hidden;
 }
 .ep-form-alert-default-dismiss {
 	position: absolute;
@@ -4300,6 +4309,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .switch-section {
     position: relative;
+    margin-bottom: 300px;
 }
 .switch-section.disabled::before {
     content: '.';
@@ -4500,7 +4510,7 @@ div.row.widget-wrapper {
     right: 0px;
     height: 100vh;
     background: #fff;
-    z-index: 2;
+    z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
 }
@@ -5291,6 +5301,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
+    z-index: 10;
     position: absolute;
     top: 60px;
     left: 10px;
@@ -5403,12 +5414,14 @@ span.basemap-unselected {
     width: 249px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
 }
-
+.map-widget-overlay-item.selected {
+    background: #fff;
+}
 .map-widget-overlay-item:hover {
-    background: #fafafa;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -5429,6 +5442,15 @@ span.basemap-unselected {
 
 .overlay-toggle-icon {
     font-size: 17px;
+}
+
+#overlays-panel div .map-widget-overlay-item {
+    background: #fff;
+}
+
+#overlays-panel div .overlay-invisible{
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
 }
 
 .show-tools {
@@ -5473,7 +5495,7 @@ span.basemap-unselected {
     position: absolute;
     top: 14px;
     left: 60px;
-    width: 160px;
+    width: 180px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -5556,6 +5578,50 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
+.map-json-tool {
+    position: absolute;
+    height: 120px;
+    top: 10px;
+    left: 60px;
+    width: 180px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool-item {
+    width: 249px;
+    height: 100px;
+    padding: 7px;
+    background: #fbfbfb;
+    color: #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
+.map-json-tool-item-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 100px;
+    padding-top: 13px;
+    font-size: 19px;
+    border-right: 1px solid #ddd;
+    color: inherit;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.form-control.map-json-tool-input {
+    width: 180px;
+    height: 80px;
+    font-size: 14px;
+    white-space: nowrap;
+    /*overflow: hidden;*/
+    text-overflow: ellipsis;
+}
+
 .map-widget-icon:hover {
     color: rgba(255, 255, 255, 1);
 }
@@ -5602,6 +5668,10 @@ span.basemap-unselected {
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
   visibility: hidden;
+}
+
+.widget-wrapper .mapboxgl-map {
+    z-index: 10;
 }
 
 .map-overlay-item-tools-panel .noUi-base {
@@ -5894,13 +5964,14 @@ span.basemap-unselected {
     background: #dbf1f5;
 }
 .hover-panel-small {
-    width: 250px;
+
 }
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
     left: 30px;
     margin: 10px;
+    width: 400px;
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
@@ -5911,25 +5982,39 @@ span.basemap-unselected {
     height: 40px;
     padding: 10px;
     background: #ebebeb;
+    max-width: 400px;
 }
 .hover-feature-title {
     font-size: 15px;
+    max-width: 360px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
-    max-width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 10; /* number of lines to show */
-    line-height: 1.2em;        /* fallback */
-    max-height: 12em;       /* fallback */
 }
 .hover-feature {
     font-size: 13px;
     color: #555;
     font-weight: 500;
+    margin-bottom: 20px;
+    width: 380px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4; /* number of lines to show */
+    line-height: 1.2em;        /* fallback */
+    max-height: 12em;       /* fallback */
+}
+.hover-panel-dismiss {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+.hover-feature-metadata{
+    margin-bottom: -4px;
 }
 .search-results {
     -ms-flex: 0 0 400px;
@@ -5975,7 +6060,7 @@ span.basemap-unselected {
     border-left-width: 0px;
     padding-left: 6px;
     padding-top: 6px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .search-results-panel-closed {
@@ -6020,6 +6105,7 @@ span.basemap-unselected {
     left: -5px;
     right: -15px;
     top: -25px;
+    z-index: 1;
 }
 
 
@@ -6128,11 +6214,19 @@ span.basemap-unselected {
 	font-weight: 500;
 	display: table-cell;
 }
-
+.time-wheel-display-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
 .rr-display-toggle {
     position: absolute;
     top: -7px;
     right: 170px;
+}
+
+.rr-display-toggle.open-graph {
+    right: 20px;
 }
 
 .related-resources-title {
@@ -6275,7 +6369,8 @@ span.basemap-unselected {
 }
 
 .time-wheel-wrap .chart path {
-  stroke: #fff;
+    cursor: pointer;
+    stroke: #fff;
 }
 
 .time-wheel-wrap .trail {
@@ -6312,6 +6407,11 @@ table.table.dataTable {
     position: relative;
     z-index: 2;
 }
+
+.related-resources-header.open-graph {
+    width: calc(100% - 245px);
+}
+
 
 .nodeLabels {
     font-size: 11px;

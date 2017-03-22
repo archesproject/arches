@@ -3,7 +3,7 @@ import json
 import decimal
 import importlib
 from flexidate import FlexiDate
-from datetime import datetime
+from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -579,11 +579,11 @@ class FileListDataType(BaseDataType):
             # tile_file['width'] =  1280
             # tile_file['accepted'] =  True
             tile_file['type'] =  mime.guess_type(file_path)[0]
-            tile_file['type'] = '' if tile_file['type'] == None else file_tile['type']
+            tile_file['type'] = '' if tile_file['type'] == None else tile_file['type']
             tile_data.append(tile_file)
             file_path = 'uploadedfiles/' + str(tile_file['name'])
             fileid = tile_file['file_id']
-            File.objects.get_or_create(fileid=fileid, path=file_path)
+            models.File.objects.get_or_create(fileid=fileid, path=file_path)
 
         result = json.loads(json.dumps(tile_data))
         return result
