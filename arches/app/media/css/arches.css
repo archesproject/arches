@@ -4052,7 +4052,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 .list-group-item .selected, .card-tree-list.selected, .ep-card-crud-panel .library-title-block {
     background: #f8f8f8;
 }
-.library-card.selected {
+.library-card.relative.selected {
     background: #ffffff;
     border-left: 5px solid steelblue;
 }
@@ -4513,6 +4513,7 @@ div.row.widget-wrapper {
     z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
+    overflow-y: scroll;
 }
 
 .relation-properties-buttons {
@@ -6350,7 +6351,7 @@ span.basemap-unselected {
 .time-wheel-wrap {
   float: left;
   width: 750px;
-  margin-top: 25px;
+  margin-top: 0px;
   margin-bottom: 100px;
 }
 
