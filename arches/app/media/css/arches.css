@@ -334,7 +334,7 @@ input[type="checkbox"] {
 }
 .scroll-y {
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .scroll-y-hidden {
     overflow-y: hidden;
@@ -1930,6 +1930,7 @@ div.dropdown-menu.open {
 }
 .nano>.nano-content {
     font-size: 11px;
+    overflow-y: auto;
 }
 ul .collapse li {
     height: 25px;
@@ -3651,7 +3652,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 275px;
     padding: 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -3664,7 +3665,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 200px;
     padding: 0px 7px 7px 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 .form-list{
@@ -3693,7 +3694,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 7px;
     color: #666;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
+    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -4976,7 +4978,7 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     height: 375px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .overlay-filter {
@@ -5055,14 +5057,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-card:hover div div {
     color: rgb(102, 102, 102);
-}
-
-
-.overlay-list-container {
-    padding-top: 0px;
-    padding-left: 0px;
-    height: 375px;
-    overflow-y: scroll;
 }
 
 .overlay-filter {
@@ -5228,7 +5222,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 50px;
     width: 249px;
     height: 450px;
-    overflow-y: scroll;
+    overflow-y: auto;
     right: 0px;
     padding: 0px;
     background: transparent;
