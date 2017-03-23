@@ -71,7 +71,7 @@ class MapLayerManagerView(BaseManagerView):
 
         context['nav']['title'] = _('Map Layer Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Map Layer Manager'),'')
+        context['nav']['help'] = (_('Map Layer Manager'),'help/map-manager-help.htm')
 
         return render(request, 'views/map-layer-manager.htm', context)
 
