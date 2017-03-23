@@ -481,6 +481,8 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
         else:
             d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
 
+    d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
+
     return d3ItemInstance
 
 
