@@ -846,6 +846,10 @@ a.select2-search-choice-close {
     color: #fff;
     background-color: #fbfbfb;
 }
+.library-card.selected.selected-card {
+    background: #fff;
+    border-left: 5px solid steelblue;
+}
 .library-card:hover {
     background-color: #fff;
     cursor: pointer;
