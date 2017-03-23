@@ -17,12 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
-
+import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.module_loading import import_string
-import os, sys, subprocess
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db
@@ -36,7 +35,6 @@ import arches.management.commands.package_utils.resource_graphs as resource_grap
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.models import models
-import csv, json
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.skos import SKOSReader
@@ -53,7 +51,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -187,6 +185,24 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
+
+        if options['operation'] == 'update_project_templates':
+            self.update_project_templates()
+
+    def update_project_templates(self):
+        """
+        Moves files from the arches project to the arches-templates directory to
+        ensure that they remain in sync.
+
+        """
+        files = [
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
+            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
+            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
+            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
+            ]
+        for f in files:
+            shutil.copyfile(f['src'], f['dst'])
 
     def setup(self, package_name, es_install_location=None):
         """
