@@ -33,3 +33,6 @@ STATIC_ROOT = '/var/www/media'
 # ROOT_DIR = ''
 # PACKAGE_NAME = ''
 # SEARCH_BACKEND = ''
+
+# DEFAULT_SEARCH_BASEMAP_NAME = "streets" #ie 'streets', 'stamen-terrain', 'mapzen', 'Emerald', 'Light Streets'
+# DEFAULT_SEARCH_GEOCODER = "BingGeocoder"
