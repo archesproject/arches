@@ -396,6 +396,9 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+DEFAULT_SEARCH_BASEMAP_NAME = "streets" #ie 'streets', 'stamen-terrain', 'mapzen','Emerald','Light Streets'
+DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
+
 # bounds for search results hex binning fabric
 # a smaller bbox will give you less distortion in hexes and better performance
 HEX_BIN_BOUNDS = (-122, -52, 128, 69)
