@@ -198,7 +198,7 @@ class Command(BaseCommand):
         files = [
             {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'arches/app/templates/base.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
+            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
             {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
             ]
         for f in files:
