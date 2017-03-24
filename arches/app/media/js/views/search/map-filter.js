@@ -22,11 +22,6 @@ function(ko, BaseFilter, arches) {
                 return !layer.isoverlay;
             });
 
-
-            this.defaultBasemap = _.find(basemaps, function (basemap) {
-                return basemap.name === arches.basemapDefault;
-            });
-
             if (!this.defaultBasemap) {
                 this.defaultBasemap = _.find(basemaps, function (basemap) {
                     return basemap.addtomap;
