@@ -1,4 +1,5 @@
 recursive-include arches *
+include README.md
 exclude arches/logs/*.txt
 recursive-exclude tests *
 recursive-exclude virtualenv *

@@ -26,7 +26,7 @@ from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
-from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
+from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -104,7 +104,7 @@ def concept(request, conceptid):
                     'default_report': True
                 })
 
-        
+
             labels = []
             #concept_graph = Concept().get(id=conceptid)
 
@@ -420,12 +420,6 @@ def concept_tree(request, mode):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(lang=lang, mode=mode)
     return JSONResponse(concepts, indent=4)
-
-def get_preflabel_from_valueid(valueid, lang):
-    se = SearchEngineFactory().create()
-    concept_label = se.search(index='strings', doc_type='concept', id=valueid)
-    if concept_label['found']:
-        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)
 
 def get_concept_label_from_valueid(valueid):
     se = SearchEngineFactory().create()

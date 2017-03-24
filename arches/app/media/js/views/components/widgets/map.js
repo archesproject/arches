@@ -102,7 +102,6 @@ define([
                 }
                 return result;
             }, this)
-
             this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.selectedBasemap = this.basemap;
@@ -123,7 +122,7 @@ define([
             this.buffer = ko.observable(100.0);
             this.queryFeature;
             this.extentSearch = ko.observable(false);
-
+            this.geojsonString = ko.observable();
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
@@ -138,7 +137,12 @@ define([
                 anchorLayerId: this.anchorLayerId
             });
 
-            this.hoverFeature = ko.observable(null);
+            this.hoverData = ko.observable(null);
+            this.clickData = ko.observable(null);
+            this.popupData = ko.computed(function () {
+                var hoverData = self.hoverData();
+                return hoverData ? hoverData : self.clickData();
+            });
 
             // TODO: This should be a system config rather than hard-coded here
             this.geocoderProviders = ko.observableArray([{
@@ -306,6 +310,24 @@ define([
                 }
             }
 
+            this.updateDrawLayerWithJson = function(val){
+                    try {
+                        var data = JSON.parse(val)
+                        try {
+                            self.draw.add(data)
+                            self.saveGeometries()()
+                        } catch(err) {
+                            console.log(err)
+                            console.log('invalid geometry')
+                        }
+                    } catch(err) {
+                        console.log(err)
+                        console.log('invalid json')
+                    }
+            }
+
+
+            this.geojsonString.subscribe(this.updateDrawLayerWithJson, self)
             /**
              * Creates the map layer for the resource with widget configs
              * @return {object}
@@ -418,6 +440,7 @@ define([
                 }]
             };
 
+
             /**
              * prepares the map for the widget after the mapbox bindingHandler has instantiated a map object
              * @param  {object} map map object created in ko.bindingHandler
@@ -457,6 +480,22 @@ define([
 
                 this.map.on('load', function() {
                     if (!self.configForm) {
+                        var zoomToGeoJSON = function (data, fly) {
+                            var method = fly ? 'flyTo' : 'jumpTo';
+                            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+                            var tr = self.map.transform;
+                            var nw = tr.project(bounds.getNorthWest());
+                            var se = tr.project(bounds.getSouthEast());
+                            var size = se.sub(nw);
+                            var scaleX = (tr.width - 80) / size.x;
+                            var scaleY = (tr.height - 80) / size.y;
+
+                            var options = {
+                                center: tr.unproject(nw.add(se).div(2)),
+                                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), ko.unwrap(self.maxZoom))
+                            };
+                            self.map[method](options);
+                        };
                         var source = self.map.getSource('resource')
                         var features = [];
                         var result = {
@@ -542,6 +581,7 @@ define([
                                 _.each(agg.results, function (result) {
                                     _.each(result._source.points, function (pt) {
                                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                                            resourceinstanceid: result._id,
                                             highlight: false
                                         }));
                                         features.push(feature);
@@ -579,10 +619,8 @@ define([
                                 var pointData = getSearchPointsGeoJSON();
                                 pointSource.setData(pointData)
                             });
-                            self.results.mapLinkPoint.subscribe(function(point) {
-                                self.map.flyTo({
-                                    center: [point.lon, point.lat]
-                                });
+                            self.results.mapLinkData.subscribe(function(data) {
+                                zoomToGeoJSON(data, true);
                             });
                         }
 
@@ -613,19 +651,7 @@ define([
 
                         if (data) {
                             if (data.features.length > 0) {
-                                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
-                                var tr = this.transform;
-                                var nw = tr.project(bounds.getNorthWest());
-                                var se = tr.project(bounds.getSouthEast());
-                                var size = se.sub(nw);
-                                var scaleX = (tr.width - 80) / size.x;
-                                var scaleY = (tr.height - 80) / size.y;
-
-                                var options = {
-                                    center: tr.unproject(nw.add(se).div(2)),
-                                    zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), Infinity)
-                                };
-                                self.map.jumpTo(options);
+                                zoomToGeoJSON(data);
                             }
                         }
                     }
@@ -671,12 +697,18 @@ define([
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
+                this.switchToEditMode = function() {
+                    self.draw.changeMode('simple_select')
+                    self.drawMode(undefined);
+                }
+
                 /**
                  * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
                  * @param  {string} selectedDrawTool the draw tool name selected in the map controls
                  * @return {null}
                  */
                 this.selectEditingTool = function(self, selectedDrawTool) {
+                    self = self || this;
                     if (this.context === 'search-filter') {
                         this.extentSearch(false);
                         this.draw.deleteAll();
@@ -697,16 +729,25 @@ define([
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
-                    if (self.geometryTypeDetails[selectedDrawTool] === undefined) { //it has no geom type, so must be trash
+                    if (selectedDrawTool === 'delete') {
                         self.draw.trash();
-                        self.drawMode(null);
-                    } else {
+                        self.drawMode('simple_select');
+                    }
+                    else if (selectedDrawTool === 'end') {
+                        self.draw.changeMode('simple_select')
+                        self.drawMode(undefined);
+                    }
+                    else {
                         if (!self.drawMode()) {
                             self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                         } else if (self.geometryTypeDetails[selectedDrawTool].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
-                            self.drawMode(undefined);
+                            if (self.mapControls.mapControlsExpanded()) {
+                                self.drawMode(undefined);
+                            } else {
+                                self.drawMode('simple_select')
+                            }
                         } else {
                             self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                             self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
@@ -1009,7 +1050,7 @@ define([
                     var coords4326;
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
-                        if (val > 0) {
+                        if (val >= 0) {
                             var transformer = proj4('EPSG:4326','EPSG:3857');
                             coords = self.queryFeature.geometry.coordinates;
                             switch (self.queryFeature.geometry.type) {
@@ -1025,14 +1066,9 @@ define([
                             var jstsFeature = reader.read(prebufferFeature)
                             var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
                             var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature =     {
-                                      "type": "Feature",
-                                      "properties": {},
-                                      "geometry": {
-                                        "type": "Polygon",
-                                        "coordinates": coords4326
-                                      }
-                                    }
+                            var bufferFeature = turf.polygon(coords4326);
+
+
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
@@ -1103,49 +1139,111 @@ define([
                 })
 
                 this.buffer.subscribe(function(val) {
-                    self.applySearchBuffer(val)
-                });
-
-                self.map.on('mousemove', function(e) {
-                    var features = self.map.queryRenderedFeatures(e.point);
-                    var hoveredSearchResults;
-                    var hoveredSearchResult;
-                    var hoverFeature = _.find(features, function(feature) {
-                        return feature.layer.id.indexOf('resources') === 0 && feature.properties.total === 1;
-                    }) || _.find(features, function(feature) {
-                        return feature.layer.id === 'search-results-hex';
-                    }) || null;
-                    if (self.hoverFeature() !== hoverFeature) {
-                        if (hoverFeature) {
-                            var hoveredSearchResults = _.filter(self.results.results(), function(f){return f.resourceinstanceid === hoverFeature.properties.resourceinstanceid})
-                            hoveredSearchResult = hoveredSearchResults.length < 1 || hoveredSearchResults[0]
-                            if (hoveredSearchResult){
-                                hoverFeature.properties['map_popup'] = hoveredSearchResult.map_popup
-                            }
-                        }
-                        self.hoverFeature(hoverFeature);
+                    var maxBuffer = 100000;
+                    if(val < 0){
+                        this.buffer(0)
+                    }else if(val > maxBuffer){
+                        this.buffer(maxBuffer)
+                    }else{
+                        this.applySearchBuffer(val)
                     }
                 }, this);
+
+                var resourceLookup = {};
+                var lookupResourceData = function (resourceData) {
+                    var resourceId = resourceData.resourceinstanceid;
+                    if (resourceLookup[resourceId]) {
+                        return resourceLookup[resourceId];
+                    }
+                    resourceData.loading = true;
+                    resourceData.displaydescription = '';
+                    resourceData.map_popup = '';
+                    resourceData.displayname = '';
+                    resourceData.graphid = '';
+                    resourceData.graph_name = '';
+                    resourceData = ko.mapping.fromJS(resourceData);
+                    resourceLookup[resourceId] = resourceData;
+                    $.get(arches.urls.resource_descriptors + resourceId, function (data) {
+                        resourceLookup[resourceId].displaydescription(data.displaydescription);
+                        resourceLookup[resourceId].map_popup(data.map_popup);
+                        resourceLookup[resourceId].displayname(data.displayname);
+                        resourceLookup[resourceId].graphid(data.graphid);
+                        resourceLookup[resourceId].graph_name(data.graph_name);
+                        resourceLookup[resourceId].loading(false);
+                    });
+                    return resourceLookup[resourceId];
+                }
+                var isFeatureVisible = function (feature) {
+                    var overlay = _.find(self.overlays(), function(overlay) {
+                        return _.find(overlay.layer_definitions, function (layer) {
+                            return layer.id === feature.layer.id;
+                        });
+                    });
+                    return !overlay.invisible();
+                }
+                self.map.on('mousemove', function(e) {
+                    var features = self.map.queryRenderedFeatures(e.point);
+                    var hoverData = null;
+                    var clickable = false;
+                    var hoverFeature = _.find(features, function(feature) {
+                        if (feature.properties.resourceinstanceid) {
+                            return isFeatureVisible(feature);
+                        }
+                    }) || _.find(features, function(feature) {
+                        if (feature.layer.id === 'search-results-hex') {
+                            return isFeatureVisible(feature);
+                        }
+                    }) || null;
+
+                    if (hoverFeature && hoverFeature.properties) {
+                        hoverData = hoverFeature.properties;
+                        if (hoverFeature.properties.resourceinstanceid) {
+                            hoverData = lookupResourceData(hoverData);
+                            clickable = true;
+                        }
+                    }
+
+                    if (self.hoverData() !== hoverData) {
+                        self.hoverData(hoverData);
+                    }
+                    self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
+                }, this);
+
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
+                    var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
-                        return feature.layer.id.indexOf('resources') === 0;
-                    }) || null;
-                    if (clickFeature && clickFeature.properties.total > 1) {
-                        var coordinates = JSON.parse(clickFeature.properties.extent).coordinates;
-                        if (Array.isArray(coordinates[0])) {
-                            coordinates = coordinates[0];
-                        } else {
-                            coordinates = [coordinates];
+                        if (feature.properties.resourceinstanceid) {
+                            return isFeatureVisible(feature);
                         }
+                    }) || _.find(features, function(feature) {
+                        if (feature.properties.total > 1) {
+                            return isFeatureVisible(feature);
+                        }
+                    }) || null;
+                    if (clickFeature) {
+                        if (clickFeature.properties.resourceinstanceid) {
+                            clickData = lookupResourceData(clickFeature.properties);
+                        } else if (clickFeature.properties.total > 1) {
+                            var coordinates = JSON.parse(clickFeature.properties.extent).coordinates;
+                            if (Array.isArray(coordinates[0])) {
+                                coordinates = coordinates[0];
+                            } else {
+                                coordinates = [coordinates];
+                            }
 
-                        var bounds = coordinates.reduce(function(bounds, coord) {
-                            return bounds.extend(coord);
-                        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+                            var bounds = coordinates.reduce(function(bounds, coord) {
+                                return bounds.extend(coord);
+                            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
-                        map.fitBounds(bounds, {
-                            padding: 20
-                        });
+                            map.fitBounds(bounds, {
+                                padding: 20
+                            });
+                        }
+                    }
+
+                    if (self.clickData() !== clickData) {
+                        self.clickData(clickData);
                     }
                 });
 
@@ -1156,7 +1254,14 @@ define([
                 self.map.on('draw.selectionchange', self.updateFeatureStyles());
 
                 if (this.context === 'search-filter') {
-                    self.map.on('moveend', this.searchByExtent)
+                    self.map.on('dragend', this.searchByExtent);
+                    self.map.on('zoomend', this.searchByExtent);
+                    self.map.on('rotateend', this.searchByExtent);
+                    self.map.on('pitch', this.searchByExtent);
+                    this.resizeOnChange.subscribe(function(){
+                        setTimeout(this.searchByExtent, 600);
+                    }, self);
+                    $(window).on("resize", this.searchByExtent);
                 } else {
                     self.map.on('moveend', this.updateConfigs());
                 }

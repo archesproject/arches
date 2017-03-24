@@ -35,6 +35,7 @@ define([
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.ready = ko.observable(false);
+            this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
         },
 
@@ -53,6 +54,7 @@ define([
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,
                 success: function(response) {
                     window.location.hash = formid;
+                    self.formTiles.removeAll();
                     self.ready(false);
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
@@ -133,6 +135,7 @@ define([
                 this.initTiles(tile.tiles);
             }
             tile.formData = new FormData();
+            this.formTiles.push(tile);
             return tile;
         },
 
@@ -233,9 +236,10 @@ define([
                   (cardinality === '1-n' && !!tile.tileid())){
                     updatingTile = true;
                 }
-                console.log('cardinality: ' + cardinality)
-                console.log('savingParentTile: ' + savingParentTile)
-                console.log('updatingTile: ' + updatingTile)
+
+                // console.log('cardinality: ' + cardinality)
+                // console.log('savingParentTile: ' + savingParentTile)
+                // console.log('updatingTile: ' + updatingTile)
 
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
@@ -500,7 +504,7 @@ define([
         /**
          * finds the cardinality of a given nodegroup
          * @memberof Form.prototype
-         * @param  {string} nodegroup_id the id of the nodegroup 
+         * @param  {string} nodegroup_id the id of the nodegroup
          * @return {string} either 'n' or '1', or '' if the cardinality wasn't found
          */
         getTileCardinality: function(nodegroup_id){

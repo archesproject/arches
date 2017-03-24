@@ -24,7 +24,6 @@ from django.core import management
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.management.commands.package_utils import authority_files
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import  BusinessDataImporter
 

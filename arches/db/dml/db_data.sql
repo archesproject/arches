@@ -63,8 +63,8 @@ INSERT INTO d_value_types VALUES ('collector', 'undefined', null, 'arches', 'tex
 
 --ARCHES PROPERTIES
 INSERT INTO d_value_types VALUES ('sortorder', 'undefined', null, 'arches', 'text');
-INSERT INTO d_value_types VALUES ('min year', 'undefined', null, 'arches', 'text');
-INSERT INTO d_value_types VALUES ('max year', 'undefined', null, 'arches', 'text');
+INSERT INTO d_value_types VALUES ('min_year', 'undefined', null, 'arches', 'text');
+INSERT INTO d_value_types VALUES ('max_year', 'undefined', null, 'arches', 'text');
 
 --
 -- TOC entry 3329 (class 0 OID 11000965)
@@ -124,8 +124,8 @@ INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', 'd
     "advancedStyling": false,
     "advancedStyle": ""
 }', 'views/graph/datatypes/geojson-feature-collection', 'geojson-feature-collection-datatype-config', TRUE, '10000000-0000-0000-0000-000000000007');
-INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000012');
 INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types.py', 'ConceptDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000015');
 INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000006');
@@ -275,77 +275,6 @@ INSERT INTO cards(cardid, name, description, instructions,
 -- End Node/NodeType graph
 
 
--- Arches Configuration graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass)
-    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't', 'fa fa-cogs');
-
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid, config)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
-        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"rdmCollection": null}');
-
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E46_Section_Definition', 'semantic',
-            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
-
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E42_Identifier', 'string',
-            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
-
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'concept',
-            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
-
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E42_Identifier', 'string',
-            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
-
-INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001', 'P1_is_identified_by');
-
-INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', 'P1_is_identified_by');
-
-INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003', 'P2_has_type');
-
-INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004', 'P1_is_identified_by');
-
-INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-    VALUES ('20000000-0000-0000-0000-000000000000', '', 'n');
-
-INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-    VALUES ('20000000-0000-0000-0000-000000000001', '', 'n');
-
-INSERT INTO cards(cardid, name, description, instructions,
-        nodegroupid, graphid, active, visible, helpenabled)
-    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here',
-        '20000000-0000-0000-0000-000000000001', '22000000-0000-0000-0000-000000000002', 't', 't', 'f');
-
-INSERT INTO cards(cardid, name, description, instructions,
-        nodegroupid, graphid, active, visible, helpenabled)
-    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '',
-        '20000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000002', 't', 't', 'f');
--- End Arches Configuration graph
-
-
--- for forms.py -- remove when done developing forms
-
--- INSERT INTO cards(cardid, name, description, instructions, cardinality)
---     VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '', 'n');
-
--- INSERT INTO node_groups(nodegroupid, legacygroupid)
---     VALUES ('11111111-0000-0000-0000-000000000000', '');
-
--- end for forms.py
-
-INSERT INTO resource_instances(resourceinstanceid, graphid)
-    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002');
 
 INSERT INTO icons(name, cssclass)
     VALUES ('cc', 'fa fa-cc');
@@ -2179,12 +2108,12 @@ INSERT INTO map_sources(name, source)
                "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
        }');
 
-INSERT INTO map_sources(name, source)
-  VALUES ('stamen-terrain', '{
-      "type": "raster",
-      "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
-      "tileSize": 256
-  }');
+-- INSERT INTO map_sources(name, source)
+--   VALUES ('stamen-terrain', '{
+--       "type": "raster",
+--       "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
+--       "tileSize": 256
+--   }');
 
 INSERT INTO map_sources(name, source)
   VALUES ('geocode-point', '{
@@ -2204,14 +2133,14 @@ VALUES ('search-query', '{
     }
 }');
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-    VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
-        "id": "stamen-terrain",
-        "type": "raster",
-        "source": "stamen-terrain",
-        "minzoom": 0,
-        "maxzoom": 22
-    }]', FALSE, 'fa fa-road', TRUE, FALSE);
+-- INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+--     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
+--         "id": "stamen-terrain",
+--         "type": "raster",
+--         "source": "stamen-terrain",
+--         "minzoom": 0,
+--         "maxzoom": 22
+--     }]', FALSE, 'fa fa-road', TRUE, FALSE);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
@@ -3367,13 +3296,9 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
            ST_SetSRID(
                st_geomfromgeojson((json_array_elements(t.tiledata::json -> n.nodeid::text -> 'features') -> 'geometry')::text),
                4326
-           ), 900913)::geometry(Geometry,900913) AS geom,
-       n.name as node_name,
-       g.graphid,
-       g.name as graph_name
+           ), 900913)::geometry(Geometry,900913) AS geom
       FROM tiles t
     	LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-        LEFT JOIN graphs g ON n.graphid = g.graphid
      WHERE (( SELECT count(*) AS count
     		  FROM jsonb_object_keys(t.tiledata) jsonb_object_keys(jsonb_object_keys)
     		 WHERE (jsonb_object_keys.jsonb_object_keys IN ( SELECT n_1.nodeid::text AS nodeid
@@ -3382,41 +3307,27 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
--- CREATE OR REPLACE FUNCTION refresh_mv_geojson_geoms() RETURNS trigger AS
--- $$
--- DECLARE
---     geojson_node_count integer;
--- BEGIN
---     IF (TG_OP = 'DELETE') THEN
---         geojson_node_count = (select count(*)
---         	from nodes n
---         	where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = OLD.nodegroupid);
---     ELSE
---         geojson_node_count = (select count(*)
---             from nodes n
---             where n.datatype = 'geojson-feature-collection'
---             and n.nodegroupid = NEW.nodegroupid);
---     END IF;
---
---     IF (geojson_node_count > 0) THEN
---         REFRESH MATERIALIZED VIEW mv_geojson_geoms;
---     END IF;
---
---     RETURN NULL;
--- END;
--- $$
--- LANGUAGE plpgsql ;
---
--- CREATE TRIGGER refresh_mv_geojson_geoms_trigger AFTER INSERT OR UPDATE OR DELETE
---    ON tiles FOR EACH ROW
---    EXECUTE PROCEDURE refresh_mv_geojson_geoms();
-
--- delete from map_layers where name = 'Search Results';
-
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
-       {
+        {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "all",
+                [
+                    ">",
+                    "doc_count",
+                    0
+                ]
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 0.5
+            },
+            "type": "line",
+            "id": "search-results-hex-outline"
+        },
+        {
            "layout": {},
            "source": "search-results-hex",
            "filter": [
@@ -3432,25 +3343,25 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                    "property": "doc_count",
                    "stops": [
                        [
-                           0,
-                           "#54278f"
-                       ],
-                       [
-                           10,
-                           "#756bb1"
-                       ],
-                       [
-                           50,
-                           "#9e9ac8"
-                       ],
-                       [
-                           200,
-                           "#cbc9e2"
-                       ],
-                       [
-                           500,
-                           "#f2f0f7"
-                       ]
+                            0,
+                            "#f2f0f7"
+                        ],
+                        [
+                            10,
+                            "#cbc9e2"
+                        ],
+                        [
+                            50,
+                            "#9e9ac8"
+                        ],
+                        [
+                            200,
+                            "#756bb1"
+                        ],
+                        [
+                            500,
+                            "#54278f"
+                        ]
                    ]
                },
                "fill-extrusion-height": {
@@ -3463,15 +3374,19 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
                        ],
                        [
                            1000,
-                           65535
+                           1
                        ]
                    ]
                },
-               "fill-extrusion-opacity": 0.7
+               "fill-extrusion-opacity": 0.5
            },
            "type": "fill-extrusion",
            "id": "search-results-hex"
-       },
+       }
+   ]', TRUE, 'ion-search', TRUE, TRUE);
+
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+   VALUES (public.uuid_generate_v1mc(), 'Search Markers', '[
        {
            "id": "search-results-points-markers",
            "type": "symbol",
@@ -3491,7 +3406,7 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 1,
+               "icon-size": 2,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
@@ -3516,10 +3431,10 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            ],
            "layout": {
                "icon-image": "marker-15",
-               "icon-size": 2,
+               "icon-size": 3,
                "icon-offset": [0,-6],
                "icon-allow-overlap": true
            },
            "paint": {}
        }
-   ]', TRUE, 'ion-search', TRUE, TRUE);
+   ]', TRUE, 'ion-ios-location', TRUE, TRUE);

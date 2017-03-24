@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
     'd3'
-], function($, ko, d3) {
+], function($, _, ko, d3) {
     ko.bindingHandlers.timeWheel = {
 
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
@@ -38,6 +39,9 @@ define([
             var opts = ko.unwrap(valueAccessor());
             var configJSON = opts.config();
             var breadCrumb = opts.breadCrumb;
+            var selectedPeriod = opts.selectedPeriod;
+            var total = 0;
+            var data = null;
 
             // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
             var b = {
@@ -48,7 +52,14 @@ define([
             };
 
             var vis = ko.utils.domData.get(element, 'vis');
-            vis.on("mouseleave", mouseleave);
+            vis.on("mouseleave", function () {
+                var d = selectedPeriod();
+                if (d) {
+                    highlightPeriod(d);
+                } else {
+                    clearHighlight();
+                }
+            });
 
             var partition = d3.layout.partition()
                 .sort(function(d) {
@@ -57,6 +68,14 @@ define([
                 .value(function(d) {
                     return d.size;
                 });
+
+            if (configJSON) {
+                data = partition.nodes(configJSON);
+                total = _.find(data, function(d) {
+                    return d.name === 'root';
+                }).value;
+                breadCrumb(total + ' resources');
+            }
 
             var arc = d3.svg.arc()
                 .startAngle(function(d) {
@@ -121,29 +140,26 @@ define([
                                     };
                                 })(), 300);
                             }
-                        } 
+                        }
                     });
                 };
                 return d3.rebind(cc, event, 'on');
             }
             var cc = clickcancel();
 
-            var updateChart = function (items) {
-                var root = items;
+            var updateChart = function (data) {
                 // DATA JOIN - Join new data with old elements, if any.
-                var gs = vis.selectAll("g").data(partition.nodes(root));
-                
+                var gs = vis.selectAll("g").data(data);
+
                 // ENTER
                 var g = gs.enter()
                     .append("g")
-                    .on("mouseover", mouseover)
+                    .on("mouseover", highlightPeriod)
                     .call(cc);
 
                 // click and dblclick step on each other so we need this
                 cc.on("click", function(d) {
-                    if (typeof opts.onClick === 'function') {
-                        opts.onClick(d);
-                    }
+                    selectedPeriod(d);
                 })
                 .on("dblclick", dblclick)
 
@@ -160,11 +176,11 @@ define([
                     })
                     .transition().duration(500)
                     .attr("d", arc);
-              
-              
+
+
                 // EXIT - Remove old elements as needed.
                 gs.exit().transition().duration(500).style("fill-opacity", 1e-6).remove();
-                
+
             }
 
             function dblclick(d) {
@@ -193,9 +209,9 @@ define([
                               });
                       }
                 });
-            } 
+            }
 
-            function mouseover(d) {
+            function highlightPeriod(d) {
                 count = d.value;
                 if (d.value < 1) {
                     count = "< 1";
@@ -211,13 +227,9 @@ define([
                     current = current.parent;
                 }
 
-                sequenceArray.push(count + ' resources')
+                sequenceArray.push(count + ' hits')
 
                 breadCrumb(sequenceArray.join(' - '));
-
-                // Make the breadcrumb trail visible, if it's hidden.
-                d3.select($el.find('.sequence')[0])
-                    .style("visibility", "");
 
                 // Fade all the segments.
                 d3.selectAll("path")
@@ -231,11 +243,7 @@ define([
                     .style("opacity", 1);
             }
 
-            function mouseleave(d){
-                // Hide the breadcrumb trail
-                d3.select($el.find('.sequence')[0])
-                    .style("visibility", "hidden");
-
+            function clearHighlight(){
                 // Deactivate all segments during transition.
                 d3.selectAll("path").on("mouseover", null);
 
@@ -245,13 +253,20 @@ define([
                     .duration(1000)
                     .style("opacity", 1)
                     .each("end", function() {
-                        d3.select(this).on("mouseover", mouseover);
+                        d3.select(this).on("mouseover", highlightPeriod);
                     });
-                
+
+                breadCrumb(total + ' resources')
             }
 
-            if(!!configJSON){
-                updateChart(configJSON);
+            selectedPeriod.subscribe(function(d) {
+                if (!d) {
+                    clearHighlight();
+                }
+            })
+
+            if(data){
+                updateChart(data);
             }
 
         }

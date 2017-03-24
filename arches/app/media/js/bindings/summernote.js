@@ -41,6 +41,9 @@ define([
             if (ko.isObservable(options.value)) {
                 options.value.subscribe(function(value) {
                     var currentContent = $element.summernote('code');
+                    if (value) {
+                        value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                    }
                     if (value !== currentContent) {
                         $element.summernote('code', value);
                     }

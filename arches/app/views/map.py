@@ -35,8 +35,8 @@ class MapLayerManagerView(BaseManagerView):
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by('name')
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
@@ -71,12 +71,12 @@ class MapLayerManagerView(BaseManagerView):
 
         context['nav']['title'] = _('Map Layer Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Map Layer Manager'),'')
+        context['nav']['help'] = (_('Map Layer Manager'),'help/map-manager-help.htm')
 
         return render(request, 'views/map-layer-manager.htm', context)
 
     def post(self, request, maplayerid):
-        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        map_layer = models.MapLayer.objects.get(pk=maplayerid)
         data = JSONDeserializer().deserialize(request.body)
         map_layer.name = data['name']
         map_layer.icon = data['icon']
@@ -86,14 +86,14 @@ class MapLayerManagerView(BaseManagerView):
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
-                models.MapLayers.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
+                models.MapLayer.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
         return JSONResponse({'succces':True, 'map_layer': map_layer})
 
     def delete(self, request, maplayerid):
-        map_layer = models.MapLayers.objects.get(pk=maplayerid)
+        map_layer = models.MapLayer.objects.get(pk=maplayerid)
         try:
-           tileserver_layer = models.TileserverLayers.objects.get(map_layer=map_layer)
-        except models.TileserverLayers.DoesNotExist:
+           tileserver_layer = models.TileserverLayer.objects.get(map_layer=map_layer)
+        except models.TileserverLayer.DoesNotExist:
            tileserver_layer = None
         with transaction.atomic():
             if tileserver_layer is not None:

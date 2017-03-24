@@ -17,12 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
-
+import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.module_loading import import_string
-import os, sys, subprocess
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db
@@ -31,11 +30,11 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.models import models
-import csv, json
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.skos import SKOSReader
@@ -52,7 +51,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -166,6 +165,9 @@ class Command(BaseCommand):
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
 
+        if options['operation'] == 'import_business_data_relations':
+            self.import_business_data_relations(options['source'])
+
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
 
@@ -183,6 +185,24 @@ class Command(BaseCommand):
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
+
+        if options['operation'] == 'update_project_templates':
+            self.update_project_templates()
+
+    def update_project_templates(self):
+        """
+        Moves files from the arches project to the arches-templates directory to
+        ensure that they remain in sync.
+
+        """
+        files = [
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
+            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
+            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
+            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
+            ]
+        for f in files:
+            shutil.copyfile(f['src'], f['dst'])
 
     def setup(self, package_name, es_install_location=None):
         """
@@ -298,15 +318,6 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def load_concept_scheme(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
-        load(data_source)
-
     def index_database(self, package_name):
         """
         Runs the index_database command found in package_utils
@@ -327,7 +338,10 @@ class Command(BaseCommand):
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
         else:
+            print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
+            print '*'*80
+            sys.exit()
 
     def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
         if overwrite == '':
@@ -337,23 +351,66 @@ class Command(BaseCommand):
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
 
-    def import_business_data(self, data_source, config_file=None, overwrite='append', bulk_load=False):
+    def import_business_data(self, data_source, config_file=None, overwrite=None, bulk_load=False):
         """
         Imports business data from all formats
         """
         if overwrite == '':
-            overwrite = 'append'
+            print '*'*80
+            print 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.'
+            print '*'*80
+            sys.exit()
+
         if data_source == '':
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
+            data_source = settings.BUSINESS_DATA_FILES
 
         if isinstance(data_source, basestring):
             data_source = [data_source]
 
+        if data_source != ():
+            for path in data_source:
+                if os.path.isabs(path):
+                    if os.path.isfile(os.path.join(path)):
+                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+                    else:
+                        print '*'*80
+                        print 'No file found at indicated location: {0}'.format(path)
+                        print '*'*80
+                        sys.exit()
+                else:
+                    print '*'*80
+                    print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                    print '*'*80
+                    sys.exit()
+        else:
+            print '*'*80
+            print 'No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.'
+            print '*'*80
+            sys.exit()
+
+    def import_business_data_relations(self, data_source):
+        """
+        Imports business data relations
+        """
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
         for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+            if os.path.isabs(path):
+                if os.path.isfile(os.path.join(path)):
+                    relations = csv.DictReader(open(path, 'r'))
+                    RelationImporter().import_relations(relations)
+                else:
+                    print '*'*80
+                    print 'No file found at indicated location: {0}'.format(path)
+                    print '*'*80
+                    sys.exit()
+            else:
+                print '*'*80
+                print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                print '*'*80
+                sys.exit()
+
 
     def import_graphs(self, data_source=''):
         """
@@ -425,7 +482,7 @@ class Command(BaseCommand):
                     tile_size = 512
             if config is not None:
                 with transaction.atomic():
-                    tileserver_layer = models.TileserverLayers(
+                    tileserver_layer = models.TileserverLayer(
                         name=layer_name,
                         path=path,
                         config=config
@@ -437,8 +494,8 @@ class Command(BaseCommand):
                         ],
                         "tileSize": tile_size
                     }
-                    map_source = models.MapSources(name=layer_name, source=source_dict)
-                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                    map_source = models.MapSource(name=layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
                     map_source.save()
                     map_layer.save()
                     tileserver_layer.map_layer = map_layer
@@ -455,15 +512,15 @@ class Command(BaseCommand):
                         if 'source' in layer:
                             layer['source'] = layer['source'] + '-' + layer_name
                     for source_name, source_dict in data['sources'].iteritems():
-                        map_source = models.MapSources.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
-                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
+                        map_source = models.MapSource.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
                     map_layer.save()
 
 
     def delete_tileserver_layer(self, layer_name=False):
         if layer_name != False:
             with transaction.atomic():
-                tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
+                tileserver_layer = models.TileserverLayer.objects.get(name=layer_name)
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()

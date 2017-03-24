@@ -20,12 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import csv
 import math
 from datetime import datetime
-from dateutil import parser
+from flexidate import FlexiDate 
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Polygon
 from django.db import connection
 from django.db.models import Max, Min
 from django.http import HttpResponseNotFound
@@ -49,8 +49,8 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
 
         context = self.get_context_data(
@@ -255,25 +255,29 @@ def build_search_results_dsl(request):
         now = str(datetime.utcnow())
         start_date = None
         end_date = None
+        start_year = 'null'
+        end_year = 'null'
         try:
-            start_date = parser.parse(temporal_filter['fromDate'])
-            start_date = start_date.isoformat()
-        except:
-            pass
-        try:
-            end_date = parser.parse(temporal_filter['toDate'])
-            end_date = end_date.isoformat()
+            # start_date = parser.parse(temporal_filter['fromDate'])
+            # start_date = start_date.isoformat()
+            sd = FlexiDate.from_str(temporal_filter['fromDate'])
+            start_date = int((sd.as_float()-1970)*31556952*1000)
+            
+            #start_year = parser.parse(start_date).year
+            start_year = sd.year
         except:
             pass
 
         try:
-            start_year = parser.parse(start_date).year
+            # end_date = parser.parse(temporal_filter['toDate'])
+            # end_date = end_date.isoformat()
+            ed = FlexiDate.from_str(temporal_filter['toDate'])
+            end_date = int((ed.as_float()-1970)*31556952*1000)
+            
+            #end_year = parser.parse(end_date).year
+            end_year = ed.year
         except:
-            start_year = 'null'
-        try:
-            end_year = parser.parse(end_date).year
-        except:
-            end_year = 'null'
+            pass
 
 
         # add filter for concepts that define min or max dates
@@ -289,8 +293,8 @@ def build_search_results_dsl(request):
                     public."values" v2
                 WHERE
                     v.conceptid = v2.conceptid and
-                    v.valuetype = 'min year' and
-                    v2.valuetype = 'max year'
+                    v.valuetype = 'min_year' and
+                    v2.valuetype = 'max_year'
             ) as value
             WHERE overlap = true;
         """
@@ -366,6 +370,7 @@ def buffer(request):
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
+    geom = GEOSGeometry(geojson, srid=4326)
 
     try:
         width = float(width)
@@ -373,17 +378,14 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
-        geom = GEOSGeometry(geojson, srid=4326)
-        geom.transform(3857)
-
         if unit == 'ft':
             width = width/3.28084
+        
+        geom.transform(3857)
+        geom = geom.buffer(width)
+        geom.transform(4326)
 
-        buffered_geom = geom.buffer(width)
-        buffered_geom.transform(4326)
-        return buffered_geom
-    else:
-        return GEOSGeometry(geojson)
+    return geom
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
@@ -429,8 +431,8 @@ def time_wheel_config(request):
         max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
         # round min and max date to the nearest 1000 years
-        min_date = math.ceil(math.abs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
-        max_date = math.floor(math.abs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
+        min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
+        max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
 
         query = Query(se, limit=0)
         for millennium in range(int(min_date),int(max_date)+1000,1000):
@@ -468,9 +470,9 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
         if key == 'from' or key == 'to':
             pass
         elif key == 'from_as_string':
-            d3ItemInstance.start = value
+            d3ItemInstance.start = int(value)
         elif key == 'to_as_string':
-            d3ItemInstance.end = value
+            d3ItemInstance.end = int(value)
         elif key == 'doc_count':
             d3ItemInstance.size = value
         elif key == 'key':
@@ -478,6 +480,8 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
             #d3ItemInstance.name = value
         else:
             d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
+
+    d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
 
     return d3ItemInstance
 

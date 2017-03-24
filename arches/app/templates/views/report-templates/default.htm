@@ -90,18 +90,10 @@
     {% endblock body %}
 </div>
 
-{% block footer %}
-{% endblock footer %}
-
 {% endblock report %}
 <!-- /ko -->
 
 <!-- ko if: configForm && (configType === 'header') -->
 {% block header_form %}
 {% endblock header_form %}
-<!-- /ko -->
-
-<!-- ko if: configForm && (configType === 'footer') -->
-{% block footer_form %}
-{% endblock footer_form %}
 <!-- /ko -->

@@ -19,19 +19,35 @@ function(_, ko, moment, BaseFilter, arches) {
                 dateNodeId: ko.observable(null),
                 inverted: ko.observable(false)
             }
+            this.filter.fromDate.subscribe(function (fromDate) {
+                var toDate = self.filter.toDate();
+                if (fromDate && toDate && toDate < fromDate) {
+                    self.filter.toDate(fromDate);
+                }
+            });
+            this.filter.toDate.subscribe(function (toDate) {
+                var fromDate = self.filter.fromDate();
+                if (fromDate && toDate && fromDate > toDate) {
+                    self.filter.fromDate(toDate);
+                }
+            })
             this.dateRangeType = ko.observable('custom');
             this.format = 'YYYY-MM-DD';
+            this.showWheel = ko.observable(false);
             this.breadCrumb = ko.observable();
+            this.selectedPeriod = ko.observable();
             this.wheelConfig = ko.observable();
             this.getTimeWheelConfig();
-            this.selectPeriod = function (d) {
-                var start = moment(0, 'YYYY').add(d.start, 'years').format(this.format);
-                var end = moment(0, 'YYYY').add(d.end, 'years').format(this.format);
-                self.dateRangeType('custom');
-                self.filter.fromDate(end);
-                self.filter.toDate(end);
-                self.filter.fromDate(start);
-            }
+            this.selectedPeriod.subscribe(function (d) {
+                if (d) {
+                    var start = moment(0, 'YYYY').add(d.start, 'years').format(self.format);
+                    var end = moment(0, 'YYYY').add(d.end, 'years').format(self.format);
+                    self.dateRangeType('custom');
+                    self.filter.fromDate(end);
+                    self.filter.toDate(end);
+                    self.filter.fromDate(start);
+                }
+            })
 
             this.dateRangeType.subscribe(function(value) {
                 var today = moment();
@@ -125,6 +141,7 @@ function(_, ko, moment, BaseFilter, arches) {
             this.filter.inverted(false);
             this.dateRangeType('custom');
             this.termFilter.removeTag(this.name);
+            this.selectedPeriod(null);
             return;
         }
     });

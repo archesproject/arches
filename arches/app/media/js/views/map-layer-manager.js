@@ -114,8 +114,12 @@ define([
                         arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
                             maplayerid: layer.maplayerid
                         }));
-                        var newSelection = mapLayers()[0] || vm.geomNodes[0]
-                        vm.selection(mapLayers()[0]);
+                        var selection = null;
+                        var layerList = ko.unwrap(vm.selectedList());
+                        if (layerList && layerList.length > 0) {
+                            selection = layerList[0];
+                        }
+                        vm.selection(selection);
                         pageView.viewModel.loading(false);
                     },
                     error: function(response) {
@@ -143,7 +147,9 @@ define([
     if (!defaultBasemap) {
         defaultBasemap = vm.basemaps()[0];
     }
-    vm.selectedBasemapName(defaultBasemap.name());
+    if (defaultBasemap) {
+        vm.selectedBasemapName(defaultBasemap.name());
+    }
     vm.overlays = ko.computed(function() {
         return _.filter(mapLayers(), function(layer) {
             return layer.isoverlay && !layer.is_resource_layer;
@@ -226,16 +232,16 @@ define([
         );
     });
 
-    vm.selection = ko.observable(vm.geomNodes[0] || mapLayers()[0]);
+    vm.selection = ko.observable(vm.geomNodes[0] || null);
     vm.selectedLayerJSON = ko.computed({
         read: function () {
-            if (!vm.selection().maplayerid) {
+            if (!vm.selection() || !vm.selection().maplayerid) {
                 return '[]';
             }
             return vm.selection().layerJSON();
         },
         write: function (value) {
-            if (vm.selection().maplayerid) {
+            if (vm.selection() && vm.selection().maplayerid) {
                 vm.selection().layerJSON(value);
             }
         }
@@ -270,7 +276,7 @@ define([
             displayLayers = [];
         }
         var basemapLayers = getBasemapLayers();
-        if (vm.selection().isoverlay) {
+        if (vm.selection() && vm.selection().isoverlay) {
             vm.mapStyle.layers = basemapLayers.concat(displayLayers);
         } else {
             vm.mapStyle.layers = displayLayers;
@@ -284,6 +290,14 @@ define([
     vm.selection.subscribe(updateMapStyle);
     vm.selectedLayerJSON.subscribe(updateMapStyle);
     vm.selectedList(vm.geomNodes);
+    vm.selectedList.subscribe(function (selectedList) {
+        var selection = null;
+        var layerList = ko.unwrap(vm.selectedList());
+        if (layerList && layerList.length > 0) {
+            selection = layerList[0];
+        }
+        vm.selection(selection);
+    });
     vm.listFilter = ko.observable('');
     vm.listItems = ko.computed(function () {
         var listFilter = vm.listFilter().toLowerCase();

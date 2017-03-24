@@ -22,6 +22,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 
@@ -92,6 +93,11 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
+        if self.data != {}:
+            for nodeid, value in self.data.iteritems():
+                datatype_factory = DataTypeFactory()
+                datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
+                datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
         if index:
             self.index()
@@ -103,12 +109,25 @@ class Tile(models.TileModel):
 
 
     def delete(self, *args, **kwargs):
+        se = SearchEngineFactory().create()
         request = kwargs.pop('request', None)
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.delete(*args, request=request, **kwargs)
+
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
+        query.add_query(bool_query)
+        results = query.search(index='strings', doc_type='term')['hits']['hits']
+        for result in results:
+            se.delete(index='strings', doc_type='term', id=result['_id'])
+
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
+        resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+        resource.index()
+
 
     def index(self):
         """
@@ -117,6 +136,16 @@ class Tile(models.TileModel):
         """
 
         Resource.objects.get(pk=self.resourceinstance_id).index()
+
+    def after_update_all(self):
+        nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
+        datatype_factory = DataTypeFactory()
+        for node in nodegroup.node_set.all():
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.after_update_all()
+        for key, tile_list in self.tiles.iteritems():
+            for child_tile in tile_list:
+                child_tile.after_update_all()
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
@@ -146,7 +175,7 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = ''
+            tile.data[str(node.nodeid)] = None
 
         return tile
 

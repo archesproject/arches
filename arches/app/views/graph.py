@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
-from django.conf import settings as app_settings
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -30,7 +30,7 @@ from django.views.generic import View, TemplateView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
@@ -140,7 +140,7 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
 
         context = self.get_context_data(
@@ -227,39 +227,47 @@ class GraphDataView(View):
 
     def post(self, request, graphid=None):
         ret = {}
-        if self.action == 'import_graph':
-            graph_file = request.FILES.get('importedGraph').read()
-            graphs = JSONDeserializer().deserialize(graph_file)['graph']
-            ret = GraphImporter.import_graph(graphs)
-        else:
-            if graphid is not None:
-                graph = Graph.objects.get(graphid=graphid)
-            data = JSONDeserializer().deserialize(request.body)
 
-            if self.action == 'new_graph':
-                isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource Model') if isresource else _('New Branch')
-                author = request.user.first_name + ' ' + request.user.last_name
-                ret = Graph.new(name=name,is_resource=isresource,author=author)
+        try:
+            if self.action == 'import_graph':
+                graph_file = request.FILES.get('importedGraph').read()
+                graphs = JSONDeserializer().deserialize(graph_file)['graph']
+                ret = GraphImporter.import_graph(graphs)
+            else:
+                if graphid is not None:
+                    graph = Graph.objects.get(graphid=graphid)
+                data = JSONDeserializer().deserialize(request.body)
 
-            elif self.action == 'update_node':
-                graph.update_node(data)
-                ret = graph
-                graph.save()
+                if self.action == 'new_graph':
+                    isresource = data['isresource'] if 'isresource' in data else False
+                    name = _('New Resource Model') if isresource else _('New Branch')
+                    author = request.user.first_name + ' ' + request.user.last_name
+                    ret = Graph.new(name=name,is_resource=isresource,author=author)
 
-            elif self.action == 'append_branch':
-                ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
-                graph.save()
+                elif self.action == 'update_node':
+                    graph.update_node(data)
+                    ret = graph
+                    graph.save()
 
-            elif self.action == 'move_node':
-                ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
-                graph.save()
+                elif self.action == 'append_branch':
+                    ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                    graph.save()
 
-            elif self.action == 'clone_graph':
-                ret = graph.copy()
-                ret.save()
+                elif self.action == 'move_node':
+                    ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+                    graph.save()
 
-        return JSONResponse(ret)
+                elif self.action == 'clone_graph':
+                    clone_data = graph.copy()
+                    ret = clone_data['copy']
+                    ret.save()
+                    ret.copy_functions(graph, [clone_data['nodes'], clone_data['nodegroups']])
+                    form_map = ret.copy_forms(graph, clone_data['cards'])
+                    ret.copy_reports(graph, [form_map, clone_data['cards'], clone_data['nodes']])
+
+            return JSONResponse(ret)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
@@ -301,27 +309,20 @@ class CardView(GraphBaseView):
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         self.graph = Graph.objects.get(graphid=card.graph_id)
 
-        def get_edge_to_parent():
-            for edge in self.graph.edges.itervalues():
-                if str(edge.rangenode_id) == str(card.nodegroup_id):
-                    return edge
-
-        ontologyproperty = None
-        ontology_properties = []
-
-        if self.graph.isresource:
-            parent_edge = get_edge_to_parent()
-            if parent_edge:
-                ontologyproperty = parent_edge.ontologyproperty
-                ontology_properties = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=card.nodegroup_id)]
-
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
-        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
-        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
+        resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
+
+        ontology_properties = []
+        card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
+        for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
+            if card_root_node.ontologyclass in item['ontology_classes']:
+                ontology_properties.append(item['ontology_property'])
+        ontology_properties = sorted(ontology_properties, key=lambda item: item)
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -337,7 +338,6 @@ class CardView(GraphBaseView):
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,
             ontology_properties=JSONSerializer().serialize(ontology_properties),
-            ontologyproperty=ontologyproperty,
         )
 
         context['nav']['title'] = self.graph.name
@@ -487,12 +487,12 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',

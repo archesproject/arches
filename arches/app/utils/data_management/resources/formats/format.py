@@ -65,7 +65,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def import_relations(self, relation_configs=None, relations=None):
+    def import_relations(self, relations=None):
 
         def get_resourceid_from_legacyid(legacyid):
             ret = Resource.objects.filter(legacyid=legacyid)
@@ -75,7 +75,11 @@ class Reader(object):
             else:
                 return ret[0].resourceinstanceid
 
-        for relation in relations:
+        for relation_count, relation in enumerate(relations):
+            relation_count = relation_count + 2
+            if relation_count % 500 == 0:
+                print '{0} relations saved'.format(str(relation_count))
+
 
             def validate_resourceinstanceid(resourceinstanceid, key):
                 # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
@@ -96,12 +100,20 @@ class Reader(object):
                 # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
                 # 2.) a uuid was passed in and it is not associated with a resource instance
                 if newresourceinstanceid == None:
-                    self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    errors = []
+                    # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    errors.append({'type':'ERROR', 'message': 'Relation not created, either zero or multiple resources found with legacyid: {0}'.format(relation[key])})
+                    if len(errors) > 0:
+                        self.errors += errors
 
                 return newresourceinstanceid
 
             resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
             resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
+            if relation['datestarted'] == '':
+                relation['datestarted'] = None
+            if relation['dateended'] == '':
+                relation['dateended'] = None
 
             if resourceinstancefrom != None and resourceinstanceto != None:
                 relation = ResourceXResource(
@@ -114,6 +126,8 @@ class Reader(object):
                 )
                 relation.save()
 
+        self.report_errors()
+
     def report_errors(self):
         if len(self.errors) == 0:
             print _("No import errors")
@@ -122,7 +136,7 @@ class Reader(object):
             with open('arches/logs/resource_import.log', 'w') as f:
                 for error in self.errors:
                     try:
-                        f.write(_('ERROR, datatype: {0} value: {1} {2} - {3}'.format(error['datatype'], error['value'], error['source'], error['message'])))
+                        f.write(_('{0}: {1}\n'.format(error['type'], error['message'])))
                     except TypeError as e:
                         f.write(e + unicode(error))
 

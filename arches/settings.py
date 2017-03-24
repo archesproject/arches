@@ -47,6 +47,8 @@ RESOURCE_MODEL = {
     'default': 'arches.app.models.resource.Resource'
 }
 
+SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
@@ -350,7 +352,7 @@ CONCEPT_SCHEME_LOCATIONS = (
     # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
 )
 
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -393,6 +395,8 @@ DEFAULT_MAP_Y = 0
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
+
+DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
 
 # bounds for search results hex binning fabric
 # a smaller bbox will give you less distortion in hexes and better performance

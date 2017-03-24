@@ -61,7 +61,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
     graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
     graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
-    
+
     resource_editor_group = Group.objects.using(db_alias).create(name='Resource Editor')
     rdm_admin_group = Group.objects.using(db_alias).create(name='RDM Administrator')
     app_admin_group = Group.objects.using(db_alias).create(name='Application Administrator')
@@ -228,7 +228,6 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
-                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
@@ -580,6 +579,7 @@ class Migration(migrations.Migration):
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacyid', models.TextField(blank=True, unique=True, null=True)),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('createdtime', models.DateTimeField(auto_now_add=True)),
             ],
             options={
                 'db_table': 'resource_instances',
@@ -644,7 +644,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapLayers',
+            name='MapLayer',
             fields=[
                 ('maplayerid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(unique=True)),
@@ -660,7 +660,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapSources',
+            name='MapSource',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField(unique=True)),
@@ -672,13 +672,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='TileserverLayers',
+            name='TileserverLayer',
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
                 ('config', JSONField(db_column='config')),
-                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
-                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayer')),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSource')),
             ],
             options={
                 'db_table': 'tileserver_layers',

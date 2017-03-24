@@ -42,7 +42,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -542,6 +541,7 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column='graphid')
     legacyid = models.TextField(blank=True, unique=True, null=True)
+    createdtime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = True
@@ -637,9 +637,12 @@ class Widget(models.Model):
         db_table = 'widgets'
 
 
-class MapSources(models.Model):
+class MapSource(models.Model):
     name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')
+
+    def __unicode__(self):
+        return self.name
 
     @property
     def source_json(self):
@@ -651,7 +654,7 @@ class MapSources(models.Model):
         db_table = 'map_sources'
 
 
-class MapLayers(models.Model):
+class MapLayer(models.Model):
     maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
@@ -665,17 +668,23 @@ class MapLayers(models.Model):
         json_string = json.dumps(self.layerdefinitions)
         return json_string
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         managed = True
         db_table = 'map_layers'
 
 
-class TileserverLayers(models.Model):
+class TileserverLayer(models.Model):
     name = models.TextField(unique=True)
     path = models.TextField()
     config = JSONField()
-    map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
-    map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
+    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')
+    map_source = models.ForeignKey('MapSource', db_column='map_sourceid')
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True

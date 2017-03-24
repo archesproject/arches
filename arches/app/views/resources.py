@@ -28,8 +28,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
-from arches.app.views.concept import get_preflabel_from_valueid
-from arches.app.models.concept import Concept
+from arches.app.models.concept import Concept, get_preflabel_from_valueid
 from django.http import HttpResponseNotFound
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
@@ -75,7 +74,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-    
+
     if request.method == 'GET':
         if form != None:
             lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -106,10 +105,10 @@ def related_resources(request, resourceid):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
-    
+
     if 'edit' in request.user.user_groups and request.method == 'DELETE':
         se = SearchEngineFactory().create()
-        data = JSONDeserializer().deserialize(request.body) 
+        data = JSONDeserializer().deserialize(request.body)
         entityid1 = data.get('entityid1')
         entityid2 = data.get('entityid2')
         resourcexid = data.get('resourcexid')
@@ -139,7 +138,7 @@ def get_related_resources(resourceid, lang, limit=1000, start=0):
         entityids.add(relation['_source']['entityid1'])
         entityids.add(relation['_source']['entityid2'])
     if len(entityids) > 0:
-        entityids.remove(resourceid)   
+        entityids.remove(resourceid)
 
     related_resources = se.search(index='entity', doc_type='_all', id=list(entityids))
     if related_resources:
@@ -160,7 +159,7 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
       "type": "FeatureCollection",
       "features": []
     }
-    
+
     se = SearchEngineFactory().create()
     query = Query(se, limit=limit)
 
@@ -204,12 +203,12 @@ def edit_history(request, resourceid=''):
 
         for log in models.EditLog.objects.filter(resourceid = resourceid, timestamp__in = dates).values().order_by('-timestamp', 'attributeentitytypeid'):
             if str(log['timestamp']) != current:
-                current = str(log['timestamp']) 
+                current = str(log['timestamp'])
                 ret.append({'date':str(log['timestamp'].date()), 'time': str(log['timestamp'].time().replace(microsecond=0).isoformat()), 'log': []})
                 index = index + 1
 
             ret[index]['log'].append(log)
-            
+
     return JSONResponse(ret, indent=4)
 
 def get_admin_areas(request):

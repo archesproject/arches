@@ -2,18 +2,20 @@ import uuid
 import json
 import decimal
 import importlib
-from django.conf import settings
+from flexidate import FlexiDate
+from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from shapely.geometry import asShape
-from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -42,7 +44,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'source': source, 'value': value, 'message': 'this is not a string', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -68,7 +70,7 @@ class NumberDataType(BaseDataType):
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'source': source, 'value': value, 'message': 'not a properly formatted number', 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number')})
         return errors
 
     def transform_import_values(self, value):
@@ -85,9 +87,8 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-
     def append_to_document(self, document, nodevalue):
-        document['dates'].append(nodevalue)
+        document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -103,13 +104,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
                     message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
-                    errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
             except:
                 message = 'Not a properly formatted geometry'
-                errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         for feature in value['features']:
             geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
@@ -191,19 +192,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         config = node.config
 
         cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, node_name, graphid, graph_name, cid) AS (
+            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
                 SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
             	FROM mv_geojson_geoms m
                 WHERE nodeid = '%s'
             )
 
-            SELECT tileid::text,
-            		resourceinstanceid::text,
-            		nodeid::text,
-            		graphid::text,
-            		node_name,
-            		graph_name,
-            		false AS poly_outline,
+            SELECT resourceinstanceid::text,
+                    false AS poly_outline,
             		row_number() over () as __id__,
             		1 as total,
             		ST_Centroid(geom) AS __geometry__,
@@ -213,12 +209,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             UNION
 
-            SELECT '' as tileid,
-            		'' as resourceinstanceid,
-            		'' as nodeid,
-            		'' as graphid,
-            		'' as node_name,
-            		'' as graph_name,
+            SELECT '' as resourceinstanceid,
             		false AS poly_outline,
             		row_number() over () as __id__,
             		count(*) as total,
@@ -245,12 +236,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             sql_list.append(sql_string)
 
         sql_list.append("""
-            SELECT tileid::text,
-                    resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
+            SELECT resourceinstanceid::text,
                     false AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -259,12 +245,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 FROM mv_geojson_geoms
                 WHERE nodeid = '%s'
             UNION
-            SELECT tileid::text,
-                    resourceinstanceid::text,
-                    nodeid::text,
-                    graphid::text,
-                    node_name,
-                    graph_name,
+            SELECT resourceinstanceid::text,
                     true AS poly_outline,
                     row_number() over () as __id__,
                     1 as total,
@@ -598,11 +579,11 @@ class FileListDataType(BaseDataType):
             # tile_file['width'] =  1280
             # tile_file['accepted'] =  True
             tile_file['type'] =  mime.guess_type(file_path)[0]
-            tile_file['type'] = '' if tile_file['type'] == None else file_tile['type']
+            tile_file['type'] = '' if tile_file['type'] == None else tile_file['type']
             tile_data.append(tile_file)
             file_path = 'uploadedfiles/' + str(tile_file['name'])
             fileid = tile_file['file_id']
-            File.objects.get_or_create(fileid=fileid, path=file_path)
+            models.File.objects.get_or_create(fileid=fileid, path=file_path)
 
         result = json.loads(json.dumps(tile_data))
         return result

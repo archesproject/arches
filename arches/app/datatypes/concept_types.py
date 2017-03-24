@@ -1,7 +1,7 @@
 import uuid
 from arches.app.models import models
 from arches.app.datatypes.base import BaseDataType
-from arches.app.views.concept import get_preflabel_from_valueid
+from arches.app.models.concept import get_preflabel_from_valueid
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -48,7 +48,7 @@ class ConceptDataType(BaseConceptDataType):
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
             message = "Not a valid domain value"
-            errors.append({'source': source, 'value': value, 'message': message, 'datatype': self.datatype_model.datatype})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
         return errors
 
     def transform_import_values(self, value):

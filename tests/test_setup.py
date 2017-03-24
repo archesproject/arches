@@ -8,7 +8,6 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 from arches.management.commands.package_utils import resource_graphs
-from arches.management.commands.package_utils import authority_files
 from arches.app.models.resource import Resource
 
 
@@ -20,9 +19,9 @@ def install(path_to_source_data_dir=None):
     for concept in models.Concept.objects.filter(nodetype='Concept'):
         concept.delete()
 
-    
+
     delete_index(index='concept_labels')
-    delete_index(index='term') 
+    delete_index(index='term')
     Resource().prepare_term_index(create=True)
 
     #load_resource_graphs()
@@ -33,8 +32,8 @@ def install(path_to_source_data_dir=None):
     delete_index(index='resource')
     delete_index(index='entity')
     delete_index(index='maplayers')
-    delete_index(index='resource_relations') 
-    create_indexes()   
+    delete_index(index='resource_relations')
+    create_indexes()
 
     #load_resources()
 
@@ -45,14 +44,11 @@ def import_data():
     pass
 
 def truncate_db():
-    management.call_command('packages', operation='setup_db') 
+    management.call_command('packages', operation='setup_db')
 
 def load_resource_graphs():
     resource_graphs.load_graphs(break_on_error=True)
     pass
-
-def load_authority_files(path_to_files=None):
-    authority_files.load_authority_files(path_to_files, break_on_error=True)
 
 def load_map_layers():
     pass
@@ -82,7 +78,7 @@ def load_resources(external_file=None):
     else:
         for f in settings.BUSISNESS_DATA_FILES:
             rl.load(f)
-            
+
 def execute_sql(sql):
     cursor = connection.cursor()
     cursor.execute(sql)

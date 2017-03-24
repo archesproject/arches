@@ -17,9 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.forms import Form
@@ -40,28 +42,15 @@ from elasticsearch import Elasticsearch
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
-        instance_summaries = []
-        for resource_instance in Resource.objects.all():
-            instance_summaries.append({
-                'id': resource_instance.pk,
-                'name': resource_instance.displayname,
-                'type': resource_instance.graph.name,
-                'last_edited': '',
-                'qc': '',
-                'public': '',
-                'editor': ''
-            })
-
         context = self.get_context_data(
             main_script='views/resource',
-            instance_summaries=instance_summaries,
         )
 
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = "Resource Manager"
         context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = ('Creating and Editing Resources','')
+        context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
         return render(request, 'views/resource.htm', context)
 
@@ -76,7 +65,7 @@ class ResourceEditorView(BaseManagerView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-            resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+            resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
             default_relationshiptype_valueid = None
@@ -87,12 +76,15 @@ class ResourceEditorView(BaseManagerView):
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
-            map_layers = models.MapLayers.objects.all()
-            map_sources = models.MapSources.objects.all()
+            map_layers = models.MapLayer.objects.all()
+            map_sources = models.MapSource.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
-
+            displayname = Resource.objects.get(pk=resourceid).displayname
+            if displayname == 'undefined':
+                displayname = 'Unnamed Resource'
+            date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -102,12 +94,14 @@ class ResourceEditorView(BaseManagerView):
                 forms=JSONSerializer().serialize(forms_w_cards),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
+                date_nodes=date_nodes,
                 map_layers=map_layers,
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
+                displayname=displayname,
             )
 
             if graph.iconclass:
@@ -115,7 +109,7 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = True
             context['nav']['edit_history'] = True
-            context['nav']['help'] = ('Creating and Editing Resources','')
+            context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
             return render(request, 'views/resource/editor.htm', context)
 
@@ -139,6 +133,20 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
+class ResourceDescriptors(View):
+    def get(self, request, resourceid=None):
+        if resourceid is not None:
+            resource = Resource.objects.get(pk=resourceid)
+            return JSONResponse({
+                'graphid': resource.graph.pk,
+                'graph_name': resource.graph.name,
+                'displaydescription': resource.displaydescription,
+                'map_popup': resource.map_popup,
+                'displayname': resource.displayname,
+            })
+
+        return HttpResponseNotFound()
+
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
@@ -149,14 +157,14 @@ class ResourceReportView(BaseManagerView):
         except models.Report.DoesNotExist:
            report = None
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        resource_graphs = Graph.objects.exclude(pk='22000000-0000-0000-0000-000000000002').exclude(isresource=False).exclude(isactive=False)
+        resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
         context = self.get_context_data(
             main_script='views/resource/report',
@@ -182,6 +190,7 @@ class ResourceReportView(BaseManagerView):
             context['nav']['icon'] = graph.iconclass
         context['nav']['title'] = graph.name
         context['nav']['res_edit'] = True
+        context['nav']['print'] = True
         context['nav']['print'] = True
 
         return render(request, 'views/resource/report.htm', context)

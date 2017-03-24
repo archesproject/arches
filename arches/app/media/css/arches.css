@@ -14,6 +14,8 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
 @import url(../bower_components/codemirror/theme/monokai.css);
+@import url(../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css);
+@import url(../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css);
 
 
 /*  Summernote Overrides */
@@ -89,7 +91,8 @@
     max-width: 100%;
     top: 39px;
     right: -10px;
-    height: 100vh;
+    bottom: 0;
+    padding: 0;
 }
 
 /*Remove pointer from Mega drop panel button*/
@@ -255,14 +258,13 @@
 }
 
 .card-help-panel {
-    width: 40%;
     max-width: 275px;
     min-width: 250px;
     padding-top: 0;
     top: 0px;
     position: absolute;
     bottom: 0px;
-    right: -20px;
+    right: 0px;
     background: #37495b;
     opacity: .9;
     z-index: 500;
@@ -332,7 +334,7 @@ input[type="checkbox"] {
 }
 .scroll-y {
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .scroll-y-hidden {
     overflow-y: hidden;
@@ -844,6 +846,10 @@ a.select2-search-choice-close {
     color: #fff;
     background-color: #fbfbfb;
 }
+.library-card.selected.selected-card {
+    background: #fff;
+    border-left: 5px solid steelblue;
+}
 .library-card:hover {
     background-color: #fff;
     cursor: pointer;
@@ -931,10 +937,10 @@ a.select2-search-choice-close {
 }
 
 .crud-card-link {
-    position: absolute; 
-    top: 25px; 
-    right: 15px; 
-    color: #fff; 
+    position: absolute;
+    top: 25px;
+    right: 15px;
+    color: #fff;
     font-size: 9px;
     background: #3acaa1;
     padding: 3px 5px;
@@ -1924,6 +1930,7 @@ div.dropdown-menu.open {
 }
 .nano>.nano-content {
     font-size: 11px;
+    overflow-y: auto;
 }
 ul .collapse li {
     height: 25px;
@@ -2610,6 +2617,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     font-size: 11px;
     padding-left: 10px;
 }
+
+.layer-list .fdg-node-filter {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
 .node-current {
     stroke: #b3b3b3;
     stroke-width: 2px;
@@ -2642,8 +2655,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     pointer-events: none;
 }
 .node-ancestor {
-    stroke: #ededed;
-    fill: #fefefe;
+    /* Nodes that are unselected or not highlighted as neighbors during mousover */
+    stroke: #b3b3b3;
+    fill: #dcecfa;
     opacity: 1.;
     stroke-width: 1px;
     cursor: pointer;
@@ -2666,6 +2680,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke-dasharray: 8, 5;
 }
 .linkMouseover {
+    /*Styles the link between selected/moused-over nodes*/
     stroke: #a1a1a1;
     stroke-opacity: .6;
     stroke-width: 5px;
@@ -2692,6 +2707,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     stroke: #115fa5;
 }
 .node-current-over, .node-ancestor-over {
+    /* The currently selected/moused-over node */
     stroke: #000;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2699,6 +2715,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     cursor: pointer;
 }
 .node-current-neighbor, .node-ancestor-neighbor {
+    /* The neighboring nodes of the selected/moused-over node */
     stroke: #115fa5;
     stroke-width: 3px;
     fill: #dcecfa;
@@ -2999,9 +3016,9 @@ span.editable-card i.fa.fa-align-justify:hover{
     float: left;
     margin: 3px;
 }
-
-.recent-additions-container {
+.navbar-top-links .dropdown-menu .recent-additions-container {
     margin-top: 10px;
+    padding: 0 30px;
 }
 .card-grid{
     -ms-flex: 1;
@@ -3635,7 +3652,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 275px;
     padding: 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -3648,7 +3665,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 200px;
     padding: 0px 7px 7px 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 .form-list{
@@ -3677,7 +3694,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 7px;
     color: #666;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
+    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -3947,7 +3965,7 @@ ul .card-tree-list a .node-subname {
 
 .tertiary-panel {
     position: absolute;
-    top: 105px;
+    top: 55px;
     left: 499px;
     bottom: 0;
     z-index: 50;
@@ -4040,10 +4058,11 @@ li.aside-li.active:hover, .library-dark .tab-content {
 .list-group-item .selected, .card-tree-list.selected, .ep-card-crud-panel .library-title-block {
     background: #f8f8f8;
 }
-.library-card.selected {
+.library-card.relative.selected {
     background: #ffffff;
     border-left: 5px solid steelblue;
 }
+
 
 
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {
@@ -4160,6 +4179,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	padding: 10px 25px;
 	color: #fff;
 	transition: all .40s ease;
+    overflow: hidden;
 }
 .alert-active .ep-form-alert {
     display: block;
@@ -4204,6 +4224,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .ep-form-alert-text {
 	font-size: 12px;
 	font-weight: 400;
+    overflow: hidden;
 }
 .ep-form-alert-default-dismiss {
 	position: absolute;
@@ -4294,6 +4315,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .switch-section {
     position: relative;
+    margin-bottom: 300px;
 }
 .switch-section.disabled::before {
     content: '.';
@@ -4479,16 +4501,25 @@ div.row.widget-wrapper {
     z-index: 1;
 }
 
+.dataTables_info {
+    margin-top: 10px;
+}
+
+.dataTables_paginate {
+    margin-bottom: 140px;
+}
+
 .related-resources-nodes {
-    position: absolute; 
-    width: 275px; 
-    top: 0px; 
-    right: 0px; 
-    height: 100vh; 
-    background: #fff; 
-    z-index: 2; 
-    opacity: 0.9; 
+    position: absolute;
+    width: 275px;
+    top: 0px;
+    right: 0px;
+    height: 100vh;
+    background: #fff;
+    z-index: 3;
+    opacity: 0.9;
     border-left: 1px solid #ddd;
+    overflow-y: scroll;
 }
 
 .relation-properties-buttons {
@@ -4529,7 +4560,6 @@ div.row.widget-wrapper {
 }
 
 .rr-drag-panel-target {
-    height: 100vh;
     background: #ebeef0;
     border: 1px solid #ddd;
     border-bottom-width: 0px;
@@ -4539,6 +4569,7 @@ div.row.widget-wrapper {
 
 .recent-edits-panel {
     margin-left: 50px;
+    overflow-y: auto;
 }
 
 #container .table-bordered td, #container .table-bordered th.rr-tab-field {
@@ -4947,7 +4978,7 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     height: 375px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .overlay-filter {
@@ -5026,14 +5057,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-card:hover div div {
     color: rgb(102, 102, 102);
-}
-
-
-.overlay-list-container {
-    padding-top: 0px;
-    padding-left: 0px;
-    height: 375px;
-    overflow-y: scroll;
 }
 
 .overlay-filter {
@@ -5199,7 +5222,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 50px;
     width: 249px;
     height: 450px;
-    overflow-y: scroll;
+    overflow-y: auto;
     right: 0px;
     padding: 0px;
     background: transparent;
@@ -5277,6 +5300,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
+    z-index: 10;
     position: absolute;
     top: 60px;
     left: 10px;
@@ -5389,12 +5413,14 @@ span.basemap-unselected {
     width: 249px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fafafa;
     border-bottom: 1px solid #ddd;
 }
-
+.map-widget-overlay-item.selected {
+    background: #fff;
+}
 .map-widget-overlay-item:hover {
-    background: #fafafa;
+    background: #fff;
     cursor: pointer;
 }
 
@@ -5410,10 +5436,20 @@ span.basemap-unselected {
     position: absolute;
     top: 15px;
     right: 10px;
+    padding: 0px 5px;
 }
 
 .overlay-toggle-icon {
     font-size: 17px;
+}
+
+#overlays-panel div .map-widget-overlay-item {
+    background: #fff;
+}
+
+#overlays-panel div .overlay-invisible{
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
 }
 
 .show-tools {
@@ -5458,7 +5494,7 @@ span.basemap-unselected {
     position: absolute;
     top: 14px;
     left: 60px;
-    width: 160px;
+    width: 180px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -5541,6 +5577,50 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
+.map-json-tool {
+    position: absolute;
+    height: 120px;
+    top: 10px;
+    left: 60px;
+    width: 180px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-json-tool-item {
+    width: 249px;
+    height: 100px;
+    padding: 7px;
+    background: #fbfbfb;
+    color: #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
+.map-json-tool-item-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 100px;
+    padding-top: 13px;
+    font-size: 19px;
+    border-right: 1px solid #ddd;
+    color: inherit;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.form-control.map-json-tool-input {
+    width: 180px;
+    height: 80px;
+    font-size: 14px;
+    white-space: nowrap;
+    /*overflow: hidden;*/
+    text-overflow: ellipsis;
+}
+
 .map-widget-icon:hover {
     color: rgba(255, 255, 255, 1);
 }
@@ -5587,6 +5667,10 @@ span.basemap-unselected {
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
   visibility: hidden;
+}
+
+.widget-wrapper .mapboxgl-map {
+    z-index: 10;
 }
 
 .map-overlay-item-tools-panel .noUi-base {
@@ -5878,11 +5962,15 @@ span.basemap-unselected {
     font-weight:bold;
     background: #dbf1f5;
 }
+.hover-panel-small {
+
+}
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
     left: 30px;
     margin: 10px;
+    width: 400px;
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
@@ -5893,25 +5981,39 @@ span.basemap-unselected {
     height: 40px;
     padding: 10px;
     background: #ebebeb;
+    max-width: 400px;
 }
 .hover-feature-title {
     font-size: 15px;
+    max-width: 360px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
-    max-width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 10; /* number of lines to show */
-    line-height: 1.2em;        /* fallback */
-    max-height: 12em;       /* fallback */
 }
 .hover-feature {
     font-size: 13px;
     color: #555;
     font-weight: 500;
+    margin-bottom: 20px;
+    width: 380px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4; /* number of lines to show */
+    line-height: 1.2em;        /* fallback */
+    max-height: 12em;       /* fallback */
+}
+.hover-panel-dismiss {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+.hover-feature-metadata{
+    margin-bottom: -4px;
 }
 .search-results {
     -ms-flex: 0 0 400px;
@@ -5957,7 +6059,7 @@ span.basemap-unselected {
     border-left-width: 0px;
     padding-left: 6px;
     padding-top: 6px;
-    z-index: 1;
+    z-index: 100;
 }
 
 .search-results-panel-closed {
@@ -5974,9 +6076,6 @@ span.basemap-unselected {
     margin-top: 10px;
 }
 
-.search-listing:hover {
-    cursor: move;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -6005,6 +6104,7 @@ span.basemap-unselected {
     left: -5px;
     right: -15px;
     top: -25px;
+    z-index: 1;
 }
 
 
@@ -6113,11 +6213,19 @@ span.basemap-unselected {
 	font-weight: 500;
 	display: table-cell;
 }
-
+.time-wheel-display-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
 .rr-display-toggle {
     position: absolute;
     top: -7px;
     right: 170px;
+}
+
+.rr-display-toggle.open-graph {
+    right: 20px;
 }
 
 .related-resources-title {
@@ -6192,7 +6300,11 @@ span.basemap-unselected {
 }
 
 .search-listing:hover {
-	cursor: move;
+	border: 1px solid steelblue;
+}
+
+.search-listing:active {
+    border: 1px solid steelblue;
 }
 
 .search-listing-title {
@@ -6205,10 +6317,7 @@ span.basemap-unselected {
 	padding: 10px 5px 0px 10px;
 }
 
-.search-listing-icon {
-	transform: translate(0, -2px);
-    font-size: 13px;
-}
+
 
 .search-listing-body {
     height: 4.6em;
@@ -6240,7 +6349,7 @@ span.basemap-unselected {
 .time-wheel-wrap {
   float: left;
   width: 750px;
-  margin-top: 25px;
+  margin-top: 0px;
   margin-bottom: 100px;
 }
 
@@ -6259,7 +6368,8 @@ span.basemap-unselected {
 }
 
 .time-wheel-wrap .chart path {
-  stroke: #fff;
+    cursor: pointer;
+    stroke: #fff;
 }
 
 .time-wheel-wrap .trail {
@@ -6297,6 +6407,11 @@ table.table.dataTable {
     z-index: 2;
 }
 
+.related-resources-header.open-graph {
+    width: calc(100% - 245px);
+}
+
+
 .nodeLabels {
     font-size: 11px;
     fill: #454545;
@@ -6321,7 +6436,7 @@ table.table.dataTable {
   border: solid 1px #BBBBBB;
   padding: 6px;
   background: rgba(256, 256, 256, 0.8);
-  color: #808080;
+  color: #434343;
   border-radius: 2px;
   pointer-events: none;
   box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.25);
@@ -6544,8 +6659,10 @@ table.table.dataTable {
     background: #f9f9f9;
     margin-bottom: 0px;
 }
-
-
+.hover-feature-loading {
+    padding: 25px;
+    font-size: 16px;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
