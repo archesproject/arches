@@ -16,6 +16,7 @@
 @import url(../bower_components/codemirror/theme/monokai.css);
 @import url(../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css);
 @import url(../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css);
+@import url(../bower_components/leaflet/dist/leaflet.css);
 
 
 /*  Summernote Overrides */

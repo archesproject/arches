@@ -49,7 +49,9 @@
             'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
             'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core',
             'turf': '{{ STATIC_URL }}bower_components/turf/index',
-            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash'
+            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash',
+            'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
+            'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif'
         },
         packages: [{
             name: "codemirror",
@@ -100,6 +102,9 @@
             },
             'geohash': {
                 exports: 'Geohash'
+            },
+            'leaflet-iiif': {
+                deps: ['leaflet']
             }
         }
     });
