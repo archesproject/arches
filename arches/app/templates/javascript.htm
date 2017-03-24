@@ -51,7 +51,8 @@
             'turf': '{{ STATIC_URL }}bower_components/turf/index',
             'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash',
             'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
-            'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif'
+            'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
+            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw'
         },
         packages: [{
             name: "codemirror",
@@ -104,6 +105,9 @@
                 exports: 'Geohash'
             },
             'leaflet-iiif': {
+                deps: ['leaflet']
+            },
+            'leaflet-draw': {
                 deps: ['leaflet']
             }
         }

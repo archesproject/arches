@@ -3,7 +3,8 @@ define([
     'underscore',
     'knockout',
     'leaflet',
-    'leaflet-iiif'
+    'leaflet-iiif',
+    'leaflet-draw'
 ], function($, _, ko, L) {
     ko.bindingHandlers.leafletIIIF = {
         init: function(element, valueAccessor, allBindings, viewModel) {
@@ -13,12 +14,28 @@ define([
                 zoom: 0
             });
 
-            L.tileLayer.iiif('https://stacks.stanford.edu/image/iiif/hg676jb4964%2F0380_796-44/info.json', {
-              attribution: '<a href="http://searchworks.stanford.edu/view/hg676jb4964">Martin Luther King Jr. & Joan Baez march to integrate schools, Grenada, MS, 1966</a>',
-              maxZoom: 5
-            }).addTo(map);
+            var baseLayer = L.tileLayer.iiif(
+                'https://stacks.stanford.edu/image/iiif/cv770rd9515%2F0767_23A_SM/info.json'
+            ).addTo(map);
 
-            // prevents drag events from bubbling
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                }
+            });
+
+            map.addControl(drawControl);
+
+            map.on(L.Draw.Event.CREATED, function(e) {
+                var type = e.layerType
+                var layer = e.layer;
+
+                drawnItems.addLayer(layer);
+            });
+
             $(element).mousedown(function(event) {
                 event.stopPropagation();
             });
