@@ -19,7 +19,7 @@ define([
     return ko.components.register('csv-chart-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['maxFilesize'];
+            params.configKeys = ['acceptedFiles', 'maxFilesize', 'xcol', 'ycol'];
 
             WidgetViewModel.apply(this, [params]);
 
@@ -189,7 +189,7 @@ define([
 
         },
         template: {
-            require: 'text!widget-templates/file'
+            require: 'text!widget-templates/csv-chart'
         }
     });
 });
