@@ -28,7 +28,7 @@ function(ko, BaseFilter, arches) {
                 });
             }
             if (!this.defaultBasemap) {
-                this.defaultBasemap = vm.basemaps()[0];
+                this.defaultBasemap = basemaps[0];
             }
 
             this.geocoderDefault = arches.geocoderDefault;
