@@ -7,7 +7,7 @@
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Resource Layers</h4></a>
         <div class="ep-help-topic-content">
-            <p>Resource Layers display the resource layers in your database. One Resource Layer is created for <em>each</em> <code>geojson-feature-collection</code> node in your database. You are able to customize the appearance and visibility of each Resource Layer in the following ways.</p>
+            <p>Resource Layers display the resource layers in your database. One Resource Layer is created for each node with a geospatial datatype (for example, `<code>geojson-feature-collection</code>). You are able to customize the appearance and visibility of each Resource Layer in the following ways.</p>
             <h4>Service Styling</h4>
             <p>Define the way features will look on the map. The example map has demonstration features that give you a preview of the changes you make. You can choose to use <strong>Advanced Editing</strong> to create a more nuanced style. Note that changes made in Advanced Editing will not be reflected if you switch back to basic editing. For styling reference, checkout the <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/">MapBox Style Specification</a>.</p>
             <h4>Settings</h4>
@@ -22,7 +22,7 @@
             <h4>Caching</h4>
             <p>Caching tiles will improve the speed of map rendering. However, caching is not a simple matter, and it is disabled by default. Caching is only advisable if you know what you are doing.</p>
             <h4>Permissions</h4>
-            <p>Define permissions here to hide certain Resource Layers from certain user groups.</p>
+            <p>This tab shows the permissions for the nodegroup whose geometry is displayed in this Resource Layer. Permissions are defined in the Graph Designer.</p>
         </div>
     </div>
 
