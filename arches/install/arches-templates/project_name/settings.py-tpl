@@ -30,6 +30,10 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 STATIC_ROOT = '/var/www/media'
 
+# ROOT_DIR = ''
+# PACKAGE_NAME = ''
+# SEARCH_BACKEND = ''
+
 # DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -132,6 +136,7 @@ STATIC_ROOT = '/var/www/media'
 # DEFAULT_MAP_ZOOM = 0
 # MAP_MIN_ZOOM = 0
 # MAP_MAX_ZOOM = 20
+# DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder"
 
 # bounds for search results hex binning fabric
 # a smaller bbox will give you less distortion in hexes and better performance

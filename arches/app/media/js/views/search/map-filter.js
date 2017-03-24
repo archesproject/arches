@@ -21,12 +21,18 @@ function(ko, BaseFilter, arches) {
             var basemaps = _.filter(arches.mapLayers, function(layer) {
                 return !layer.isoverlay;
             });
-            this.defaultBasemap = _.find(basemaps, function (basemap) {
-                return basemap.addtomap;
-            });
+
             if (!this.defaultBasemap) {
-                this.defaultBasemap = vm.basemaps()[0];
+                this.defaultBasemap = _.find(basemaps, function (basemap) {
+                    return basemap.addtomap;
+                });
             }
+            if (!this.defaultBasemap) {
+                this.defaultBasemap = basemaps[0];
+            }
+
+            this.geocoderDefault = arches.geocoderDefault;
+
             this.overlays = _.filter(arches.mapLayers, function(layer) {
                 return layer.isoverlay && layer.addtomap;
             }).map(function(layer) {
