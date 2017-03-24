@@ -50,7 +50,7 @@
 
             <!-- ko foreach: { data: [$data], as: 'self' } -->
                 <div class="report-image-grid relative">
-                    <div class="grid" style="margin-left: 0px;" data-bind="foreach: {data: items}">
+                    <div class="grid" style="margin-left: 0px; background: transparent;" data-bind="foreach: {data: items}">
 
                         <div class="library-card relative" data-bind="event: { mouseover: function(e){_.each(self.selectedItems(), function(item){item.selected(false)}); e.selected(true)}}, visible: filtered() == false, css:{'selected': selected()== true}">
                             <div class="crud-card-main" style="left: 5px;">

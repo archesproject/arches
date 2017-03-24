@@ -644,7 +644,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapLayers',
+            name='MapLayer',
             fields=[
                 ('maplayerid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(unique=True)),
@@ -660,7 +660,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='MapSources',
+            name='MapSource',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField(unique=True)),
@@ -672,13 +672,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='TileserverLayers',
+            name='TileserverLayer',
             fields=[
                 ('name', models.TextField(unique=True)),
                 ('path', models.TextField()),
                 ('config', JSONField(db_column='config')),
-                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayers')),
-                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSources')),
+                ('map_layer', models.ForeignKey(db_column='map_layerid', to='models.MapLayer')),
+                ('map_source', models.ForeignKey(db_column='map_sourceid', to='models.MapSource')),
             ],
             options={
                 'db_table': 'tileserver_layers',

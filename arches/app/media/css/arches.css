@@ -334,7 +334,7 @@ input[type="checkbox"] {
 }
 .scroll-y {
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .scroll-y-hidden {
     overflow-y: hidden;
@@ -845,6 +845,10 @@ a.select2-search-choice-close {
     opacity: 1.0;
     color: #fff;
     background-color: #fbfbfb;
+}
+.library-card.selected.selected-card {
+    background: #fff;
+    border-left: 5px solid steelblue;
 }
 .library-card:hover {
     background-color: #fff;
@@ -1926,6 +1930,7 @@ div.dropdown-menu.open {
 }
 .nano>.nano-content {
     font-size: 11px;
+    overflow-y: auto;
 }
 ul .collapse li {
     height: 25px;
@@ -3647,7 +3652,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 275px;
     padding: 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -3660,7 +3665,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 200px;
     padding: 0px 7px 7px 7px;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 .form-list{
@@ -3689,7 +3694,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding: 7px;
     color: #666;
     border-right: solid 1px #dddddd;
-    overflow-y: scroll;
+    overflow-y: auto;
+    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -4052,7 +4058,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 .list-group-item .selected, .card-tree-list.selected, .ep-card-crud-panel .library-title-block {
     background: #f8f8f8;
 }
-.library-card.selected {
+.library-card.relative.selected {
     background: #ffffff;
     border-left: 5px solid steelblue;
 }
@@ -4513,6 +4519,7 @@ div.row.widget-wrapper {
     z-index: 3;
     opacity: 0.9;
     border-left: 1px solid #ddd;
+    overflow-y: scroll;
 }
 
 .relation-properties-buttons {
@@ -4971,7 +4978,7 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     height: 375px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .overlay-filter {
@@ -5050,14 +5057,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-card:hover div div {
     color: rgb(102, 102, 102);
-}
-
-
-.overlay-list-container {
-    padding-top: 0px;
-    padding-left: 0px;
-    height: 375px;
-    overflow-y: scroll;
 }
 
 .overlay-filter {
@@ -5223,7 +5222,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 50px;
     width: 249px;
     height: 450px;
-    overflow-y: scroll;
+    overflow-y: auto;
     right: 0px;
     padding: 0px;
     background: transparent;
@@ -6350,7 +6349,7 @@ span.basemap-unselected {
 .time-wheel-wrap {
   float: left;
   width: 750px;
-  margin-top: 25px;
+  margin-top: 0px;
   margin-bottom: 100px;
 }
 

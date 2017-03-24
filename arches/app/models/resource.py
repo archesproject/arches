@@ -112,7 +112,7 @@ class Resource(models.ResourceInstance):
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
-                term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=uuid.uuid4(), data=term))
+                term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
 
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
@@ -132,7 +132,7 @@ class Resource(models.ResourceInstance):
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
-            se.index_data('strings', 'term', term, id=unicode(term['nodeid'])+unicode(term['tileid']))
+            se.index_data('strings', 'term', term['_source'], id=term['_id'])
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -165,7 +165,7 @@ class Resource(models.ResourceInstance):
                     datatype_instance.append_to_document(document, nodevalue)
                     term = datatype_instance.get_search_term(nodevalue)
                     if term is not None:
-                        terms.append({'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id})
+                        terms.append({'_id':unicode(nodeid)+unicode(tile.tileid), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id}})
 
         return document, terms
 

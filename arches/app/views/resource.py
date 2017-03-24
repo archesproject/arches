@@ -76,8 +76,8 @@ class ResourceEditorView(BaseManagerView):
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
-            map_layers = models.MapLayers.objects.all()
-            map_sources = models.MapSources.objects.all()
+            map_layers = models.MapLayer.objects.all()
+            map_sources = models.MapSource.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
@@ -163,8 +163,8 @@ class ResourceReportView(BaseManagerView):
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
         context = self.get_context_data(
             main_script='views/resource/report',

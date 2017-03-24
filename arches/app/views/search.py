@@ -49,8 +49,8 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
 
         context = self.get_context_data(
@@ -480,6 +480,8 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
             #d3ItemInstance.name = value
         else:
             d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
+
+    d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
 
     return d3ItemInstance
 

@@ -311,8 +311,8 @@ class CardView(GraphBaseView):
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
@@ -491,8 +491,8 @@ class ReportEditorView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
-        map_layers = models.MapLayers.objects.all()
-        map_sources = models.MapSources.objects.all()
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',

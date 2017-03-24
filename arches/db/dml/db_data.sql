@@ -2108,12 +2108,12 @@ INSERT INTO map_sources(name, source)
                "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
        }');
 
-INSERT INTO map_sources(name, source)
-  VALUES ('stamen-terrain', '{
-      "type": "raster",
-      "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
-      "tileSize": 256
-  }');
+-- INSERT INTO map_sources(name, source)
+--   VALUES ('stamen-terrain', '{
+--       "type": "raster",
+--       "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
+--       "tileSize": 256
+--   }');
 
 INSERT INTO map_sources(name, source)
   VALUES ('geocode-point', '{
@@ -2133,14 +2133,14 @@ VALUES ('search-query', '{
     }
 }');
 
-INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
-    VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
-        "id": "stamen-terrain",
-        "type": "raster",
-        "source": "stamen-terrain",
-        "minzoom": 0,
-        "maxzoom": 22
-    }]', FALSE, 'fa fa-road', TRUE, FALSE);
+-- INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
+--     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
+--         "id": "stamen-terrain",
+--         "type": "raster",
+--         "source": "stamen-terrain",
+--         "minzoom": 0,
+--         "maxzoom": 22
+--     }]', FALSE, 'fa fa-road', TRUE, FALSE);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
