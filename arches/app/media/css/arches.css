@@ -6665,6 +6665,9 @@ table.table.dataTable {
     padding: 25px;
     font-size: 16px;
 }
+.iiif-manifest-header {
+
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

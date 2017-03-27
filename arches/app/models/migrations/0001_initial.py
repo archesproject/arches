@@ -697,6 +697,18 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='IIIFManifest',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('url', models.TextField()),
+                ('icon', models.TextField(default=None)),
+            ],
+            options={
+                'db_table': 'iiif_manifests',
+                'managed': True,
+            },
+        ),
         # migrations.AlterField(
         #     model_name='edge',
         #     name='graph',
