@@ -3,10 +3,13 @@ define([
     'knockout',
     'underscore',
     'dropzone',
+    'nvd3',
     'uuid',
     'viewmodels/widget',
-    'bindings/dropzone'
-], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
+    'bindings/dropzone',
+    'bindings/nvd3-line',
+    'bindings/datatable',
+], function($, ko, _, Dropzone, nvd3, uuid, WidgetViewModel) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -129,6 +132,39 @@ define([
                     })
                 );
             });
+
+            this.chartData = ko.observable([])
+
+            this.getFileData = function(f) {
+                var self = this;
+                var url = f.url;
+                if (ko.isObservable(f.url)) {
+                    url = f.url();
+                };
+                if (url.endsWith('.csv')) {
+                    d3.csv(url, function(d) {
+                      return {
+                        x: +d.x,
+                        y: +d.y,
+                      };
+                    }, function(error, rows) {
+                        var data = _.sortBy(rows, function(a){return a['x']});
+                      self.chartData(data)
+                  });
+              } else {
+                  d3.text(url, function(text) {
+                    var rows = d3.tsv.parseRows(text).map(function(row) {
+                      return {
+                          x: +row[0],
+                          y: +row[1]
+                          }
+                    })
+                    var data = _.sortBy(rows, function(a){return a['x']});
+                    self.chartData(data);
+                  });
+              }
+
+            }
 
             this.unique_id = uuid.generate();
             this.uniqueidClass = ko.computed(function () {

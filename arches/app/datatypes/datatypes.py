@@ -587,3 +587,7 @@ class FileListDataType(BaseDataType):
 
         result = json.loads(json.dumps(tile_data))
         return result
+
+class CSVChartJsonDataType(FileListDataType):
+    def __init__(self, model=None):
+        super(CSVChartJsonDataType, self).__init__(model=model)
