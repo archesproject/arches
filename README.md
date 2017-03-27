@@ -18,7 +18,7 @@ Issue reports are encouraged.  [Please read this article](http://polite.technolo
 
 Installation is fully documented in the wiki, but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
 
-    pip install arches==4.0b1
+    pip install arches==4.0b3
     
 then
 
