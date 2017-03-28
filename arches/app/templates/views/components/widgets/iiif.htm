@@ -35,7 +35,7 @@
                         <!-- ko if: manifest.data() -->
                         <div class="map-widget-overlay-item relative" data-bind="click: self.selectedManifest, css:{'selected': manifest === self.selectedManifest()}">
                             <div class="map-overlay-vis-toogle text-center">
-                                <i class="ion-checkmark-circled" data-bind="css:{'basemap-unselected': manifest !== self.selectedManifest()}"></i>
+                                <img data-bind="attr: {'src': manifest.data().thumbnail }" style="max-height: 30px; max-width: 30px;">
                             </div>
                             <div class="map-overlay-name">
                                 <a href="#"><span data-bind="text: manifest.data().label, css:{'basemap-unselected': manifest !== self.selectedManifest()}"><span></a>
