@@ -64,15 +64,21 @@ import_reference_data() {
 init_arches_projects() { 
 	if [[ ! -z ${CUSTOM_ARCHES_PROJECTS} ]]; then
 		for project in ${CUSTOM_ARCHES_PROJECTS}; do
-			echo "Checking if Arches project "$project" exists..."
-			if [[ ! -d ${ARCHES_ROOT}/$project ]] || [[ ! "$(ls -A ${ARCHES_ROOT}/$project)" ]]; then
+			echo "Checking if Arches project "${project}" exists..."
+			if [[ ! -d ${ARCHES_ROOT}/${project} ]] || [[ ! "$(ls -A ${ARCHES_ROOT}/${project})" ]]; then
 				echo "" 
-				echo "----- Custom Arches project '$project' does not exist -----"
-				echo "----- Creating '$project'... -----"
+				echo "----- Custom Arches project '${project}' does not exist -----"
+				echo "----- Creating '${project}'... -----"
 				echo "" 
 				arches-project create ${project} --directory ${project}
+				exit_code=$?
+				if [[ ${exit_code} != 0 ]]; then
+					echo "Something went wrong when creating your Arches project: ${project}."
+					echo "Exiting..."
+					exit ${exit_code}
+				fi
 			else
-				echo "Custom Arches project '$project' already exist"
+				echo "Custom Arches project '${project}' already exist"
 			fi
 		done
 	fi

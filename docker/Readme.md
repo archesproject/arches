@@ -1,6 +1,10 @@
 # Arches in Docker
 
-This readme describes how to run Arches inside a Docker container.  
+## Before you begin
+***Note: This readme describes how to run Arches inside a Docker container.  
+It is specifically written for users wanting to implement their own customized version of Arches.
+If you are only interested in using Docker for developing the core Arches source code. please scroll down to 'Development'.***
+
 Docker is the world’s leading software containerization platform: https://www.docker.com/  
 
 Some advantages of Docker:  
@@ -11,47 +15,98 @@ Some advantages of Docker:
 
 
 This Docker image of Arches comes without Postgresql or Elasticsearch installed. 
-However, the 'Docker-compose' section below describes how you can run those with Docker as well.
+However, the tool 'docker-compose' (described below) will run these services for you.
 
 
 
-## Quick-start: docker-compose
-The easiest way to get up and running is with the tool docker-compose (which comes with the regular Docker installation).
+## Requirements
+- Docker installed on your machine
 
-With this tool you can easilly orchestrate all required apps on one server. 
-This is mostly useful for development environments, but can also be used on production setups with only one server.  
 
-An example [docker-compose.yml](../docker-compose.yml) file is provided in the Arches Git repository.  
-Be sure to set at least the PGPASSWORD and MAPBOX_API_KEY settings under the `arches` service, as well as the POSTGRES_PASSWORD setting under the `db` service (must be same as PGPASSWORD).
 
-To run Arches, Nginx, Postgres, Elasticsearch and Letsencrypt (a free certificate tool) in Docker, navigate to the root of the repository and type the following command:
-```
-docker-compose up
-```  
+## Getting Started
+1. Create your new project folder, preferably one managed by a version control system such as Git.
+
+2. Copy [docker-compose.yml](../docker-compose.yml) from the official Arches repository to the root of your project folder.
+
+3. Edit your `docker-compose.yml`  
+	Under the 'arches' service, change: 
+	```
+		image: arches/arches:latest
+	```
+	into 
+	```
+		image: <docker hub user>/<your project name>:latest
+	```
+	*Optional: You can leave `<docker hub user>/` out for now. Click [here](https://docs.docker.com/docker-hub/repos/) For more information on Docker Hub.*  
+
+	Set the `CUSTOM_ARCHES_PROJECTS` environment variable under the `arches` service:
+	```
+	    - CUSTOM_ARCHES_PROJECTS=<your project name>
+	```
+
+	*Note: `<your project name>` cannot contain dashes (-).*
+
+4. Create a copy of `docker-compose.yml` called `docker-compose-local.yml`.  
+This will be used throughout your development process and does not need to be checked in to version control. 
+
+5. Edit your `docker-compose-local.yml`  
+	Add this line under `volumes`:
+	```
+		- ./<your project name>:/web_root/arches/<your project name>
+	```
+	*Note: `<your project name>` cannot contain dashes (-). Must be the same as the value set in `CUSTOM_ARCHES_PROJECTS` above.*  
+ 
+	Set the `PGPASSWORD`, `MAPBOX_API_KEY` environment variables under the `arches` service:
+	```
+		- PGPASSWORD=<your Postgres password>
+		- MAPBOX_API_KEY=<your Mapbox API key>
+	```
+
+	Set the `POSTGRES_PASSWORD` environment variable under the `db` service:
+	```
+	    - POSTGRES_PASSWORD=<your Postgres password>
+	```
+	(must be the same as PGPASSWORD.)
+
+6. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add this line:
+	```
+		FROM arches/arches:latest
+	```
+
+7. Build your Docker image using:
+	```
+		docker-compose -f .\docker-compose-local.yml build
+	```
+
+8. Run your Docker containers using:
+	```
+		docker-compose -f .\docker-compose-local.yml up
+	```
+	This will create your Arches project and start the web server.  
+	Once that is running, you can bring it down again with ctrl + c (in Windows).  
+
+9. Add this line to your Dockerfile:
+	```
+		COPY ./<your project name> ${ARCHES_ROOT}  
+	```  
+10. Build the latest version of your Docker image using:
+	```
+		docker-compose -f .\docker-compose-local.yml build
+	```
+	This latest version of your Docker image will include your custom project.
+
+11. Optional: to run your Docker containers again:
+	```
+		docker-compose -f .\docker-compose-local.yml up
+	```
   
-**Expect to see an error saying your database does not exist. See 'Initialize' below.**
+    
+*Note 1: Point 6 will mount your Arches project from your host machine into your container. This is a way for connecting your development machine to the Docker container. It is very useful during the development process, as it allows you to edit code without having to build your Docker image after each edit. Remove this line for production environments.*
 
+*Note 2: On startup your Docker container will create an Arches project using the name specified in point 4. This will only be done if it does not already exist.*  
 
-
-## Run
-To run Arches without docker-compose (see above):
-
-(Assuming you have a Postgresql and Elasticsearch server already running.)
-```
-docker run arches/arches:latest \
-	PGPASSWORD=SecretPassword1@ \
-	PGDBNAME=arches \
-	PGHOST=your-postgres-server.com \
-	PGPORT=5432 \
-	ESHOST=your-elasticsearch-server.com \
-	DJANGO_MODE=PROD \
-	DJANGO_DEBUG=False \
-	DOMAIN_NAMES=your-arches-domain.com \
-	MAPBOX_API_KEY=<Your personal Mapbox api key> \
-	TZ=EST
-```  
-  
-**Expect to see an error saying your database does not exist. See 'Initialize' below.**
+*Note 3: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one server. It must be run from the root of your project folder.*
 
 
 
@@ -59,7 +114,7 @@ docker run arches/arches:latest \
 **On first run** Arches needs to initialize the database and Elasticsearch. 
 
 For your convenience, this initialization is done when you first run Arches.
-(See [docker/entrypoint.sh](/docker/entrypoint.sh) in the source code)
+(See [docker/entrypoint.sh](/docker/entrypoint.sh) in the official Arches source code)
 
 The initialization can be forced by setting the environment variable FORCE_DB_INIT before starting the Arches container.
 
@@ -69,9 +124,7 @@ The initialization can be forced by setting the environment variable FORCE_DB_IN
 
 ## Settings
 In order to make this Docker image portable, it is using environment variables.
-This settings file complements the default settings.py and overrides the following settings:
-
-The following settings are used in the example settings_local.py:
+This is done through a settings file that complements the default settings.py and overrides the following settings:
 
 	- FORCE_DB_INIT=<Optional: force the initialization of Postgresql and Elasticsearch on startup>
 	- PGPASSWORD=<Postgresql database password>
@@ -80,33 +133,25 @@ The following settings are used in the example settings_local.py:
 	- PGPORT=<Postgresql database host port>
 	- ESHOST=<Elasticsearch host address>
 	- ESPORT=<Elasticsearch port>
-	- DJANGO_MODE=<PROD or DEV, use PROD for production (=live) environments>
+	- DJANGO_MODE=<PROD or DEV, use PROD for production (= live) environments>
 	- DJANGO_DEBUG=<True or False, use False for production environments>
 	- DOMAIN_NAMES=<Domain names used to reach Arches, use localhost for development environments>
 	- MAPBOX_API_KEY=<Your personal Mapbox api key>
 	- TZ=<Optional: Time zone. Useful for logging the correct time. US Eastern = EST>
 
-If you would like to add settings controlled through environment variables, create a settings_local.py and mount it into your container.
-An example settings file can be found in the Arches Git repository: [docker/settings_local.py](/docker/settings_local.py). 	
-Your customized settings file can be mounted into your container.
+To see how to use environment variables in your own Arches project settings file, see this example in the Arches Git repository: [docker/settings_local.py](/docker/settings_local.py).  
 
-When using `docker-compose.yml` (see above), change this line:
-```
-volumes:
-	- /path/to/settings_local.py:/web_root/arches/arches/settings_local.py
-```
-When using `docker run` (see below): 
-```
-docker run arches/arches:latest \
-	[rest of command] \
-	-v /path/to/settings_local.py:/web_root/arches/arches/settings_local.py
-```	
 
-	
-	
+
 ## Connect to your container
-The general command to enter your running container from the command line is: ```docker exec -it <container id> bash```
-To get the container id:```docker ps```
+The general command to enter your running container from the command line is: 
+```
+	docker exec -it <container id> bash
+```
+To get the container id:
+```
+	docker ps
+```
 
 For more information, see the [```docker exec``` command documentation](https://docs.docker.com/engine/reference/commandline/exec/)
 
@@ -119,22 +164,29 @@ This can be run on any OS and removes old Docker containers, unused images, etc.
 
 
 ## Development
-For development environments, it is advisable to mount your source code into the container for instant code editing without rebuilding Docker image. 
-Additionally, this will allow you to 'catch' the source code created with the `arches-project create` command. 
+**These steps are relevant for Arches core development:**  
+For development environments, it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
-If your settings_local.py is not under /web_root/arches/arches/, be sure to also mount it to the right location in your container, otherwise it will not be picked up. In docker-compose.yml:
+1. Create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
+2. Add this line to `docker-compose-local.yml` under `volumes`:
 ```
-volumes:
 	- ./:/web_root/arches/
-	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py		
+```
+3. Build your Docker containers using:
+```
+	docker-compose -f .\docker-compose-local.yml build
+```
+4. Run your Docker containers using:
+```
+	docker-compose -f .\docker-compose-local.yml up
 ```
 
-This will mount the root folder and your settings file into your container. 
-
+This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
+  
 
 
 ## See also
 docker-compose.yml uses a number of other Docker images.
 
-ElasticSearch: https://hub.docker.com/_/elasticsearch/
+ElasticSearch: https://hub.docker.com/_/elasticsearch/  
 Postgresql & PostGIS: https://hub.docker.com/r/mdillon/postgis/
