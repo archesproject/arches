@@ -22,6 +22,7 @@ define([
                             .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
                             .showYAxis(true)        //Show the y-axis
                             .showXAxis(true)        //Show the x-axis
+                            .showLegend(false)
               ;
 
               chart.xAxis     //Chart x-axis settings
