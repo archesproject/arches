@@ -16,10 +16,6 @@ def get_env_variable(var_name):
 MODE = get_env_variable('DJANGO_MODE') #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
 DEBUG = ast.literal_eval(get_env_variable('DJANGO_DEBUG'))
 
-STATICFILES_DIRS = STATICFILES_DIRS + (
-    os.path.join(get_env_variable('WEB_ROOT'), 'ENV', 'lib', 'python2.7', 'site-packages', 'arches', 'app', 'media'),
-)
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',

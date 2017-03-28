@@ -15,7 +15,6 @@ services:
         - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
       environment:
         - FORCE_DB_INIT=False
-        - CUSTOM_ARCHES_PROJECTS=
         - PGPASSWORD=
         - PGDBNAME=arches
         - PGHOST=db
@@ -64,14 +63,7 @@ volumes:
     arches-log:
     arches-static:
     arches-uploadedfiles:
-    arches-virtualenv:
     postgres-data:
     postgres-log:
     elasticsearch-data:
     elasticsearch-config:
-    nginx-root:
-    nginx-conf:
-    nginx-logs:
-    letsencrypt-workdir:
-    letsencrypt-config:
-    letsencrypt-log:

@@ -40,9 +40,9 @@ However, the tool 'docker-compose' (described below) will run these services for
 	```
 	*Optional: You can leave `<docker hub user>/` out for now. Click [here](https://docs.docker.com/docker-hub/repos/) For more information on Docker Hub.*  
 
-	Set the `CUSTOM_ARCHES_PROJECTS` environment variable under the `arches` service:
+	Add the `ARCHES_PROJECT` environment variable under the `arches` service:
 	```
-	    - CUSTOM_ARCHES_PROJECTS=<your project name>
+	    - ARCHES_PROJECT=<your project name>
 	```
 
 	*Note: `<your project name>` cannot contain dashes (-).*
@@ -55,7 +55,7 @@ This will be used throughout your development process and does not need to be ch
 	```
 		- ./<your project name>:/web_root/arches/<your project name>
 	```
-	*Note: `<your project name>` cannot contain dashes (-). Must be the same as the value set in `CUSTOM_ARCHES_PROJECTS` above.*  
+	*Note: `<your project name>` cannot contain dashes (-). Must be the same as the value set in `ARCHES_PROJECT` above.*  
  
 	Set the `PGPASSWORD`, `MAPBOX_API_KEY` environment variables under the `arches` service:
 	```
@@ -110,6 +110,24 @@ This will be used throughout your development process and does not need to be ch
 
 
 
+## Parameter overview
+Your docker-compose.yml file expects the following Environment Variables:
+
+	- ARCHES_PROJECT=<Custom Arches project name> Used to set up your own Arches app 
+	- FORCE_DB_INIT=<True or False> Optional: force the initialization of Postgresql and Elasticsearch on startup
+	- PGPASSWORD=<Postgresql database password>
+	- PGDBNAME=<Postgresql database name>
+	- PGHOST=<Postgresql database host address>
+	- PGPORT=<Postgresql database host port>
+	- ESHOST=<Elasticsearch host address>
+	- ESPORT=<Elasticsearch port>
+	- DJANGO_MODE=<PROD or DEV> Use PROD for production (= live) environments
+	- DJANGO_DEBUG=<True or False> Use False for production environments
+	- DOMAIN_NAMES=<list of your domain names> Space separated list of domain names used to reach Arches, use 'localhost' for development environments
+	- MAPBOX_API_KEY=<Your personal Mapbox api key>
+	- TZ=<Time Zone> Optional: Useful for logging the correct time. US Eastern = EST
+
+
 ## Initialize
 **On first run** Arches needs to initialize the database and Elasticsearch. 
 
@@ -123,23 +141,11 @@ The initialization can be forced by setting the environment variable FORCE_DB_IN
 
 
 ## Settings
-In order to make this Docker image portable, it is using environment variables.
-This is done through a settings file that complements the default settings.py and overrides the following settings:
+In order to make this Docker image portable, it is using environment variables.  
+This is done through a settings_local.py file, which is copied into your new custom Arches project.  
 
-	- FORCE_DB_INIT=<Optional: force the initialization of Postgresql and Elasticsearch on startup>
-	- PGPASSWORD=<Postgresql database password>
-	- PGDBNAME=<Postgresql database name>
-	- PGHOST=<Postgresql database host address>
-	- PGPORT=<Postgresql database host port>
-	- ESHOST=<Elasticsearch host address>
-	- ESPORT=<Elasticsearch port>
-	- DJANGO_MODE=<PROD or DEV, use PROD for production (= live) environments>
-	- DJANGO_DEBUG=<True or False, use False for production environments>
-	- DOMAIN_NAMES=<Domain names used to reach Arches, use localhost for development environments>
-	- MAPBOX_API_KEY=<Your personal Mapbox api key>
-	- TZ=<Optional: Time zone. Useful for logging the correct time. US Eastern = EST>
-
-To see how to use environment variables in your own Arches project settings file, see this example in the Arches Git repository: [docker/settings_local.py](/docker/settings_local.py).  
+This settings_local.py complements the default settings.py and overrides settings with the same name.  
+You can expand it for any other settings that differ between environments.
 
 
 
