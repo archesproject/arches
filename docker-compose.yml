@@ -20,6 +20,7 @@ services:
         - PGHOST=db
         - PGPORT=5432
         - ESHOST=elasticsearch
+        - ESPORT=9200
         - DJANGO_MODE=DEV
         - DJANGO_DEBUG=True
         - DOMAIN_NAMES=localhost
