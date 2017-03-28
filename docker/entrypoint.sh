@@ -25,8 +25,6 @@ init_arches() {
 
 run_db_init_commands() {
 	setup_arches
-	import_graphs
-	import_reference_data 'arches/db/schemes/arches_concept_scheme.rdf'
 }
 
 db_exists() {
@@ -44,21 +42,6 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo "" 
 
-	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o setup"
-	python ${ARCHES_ROOT}/manage.py packages -o setup
-}
-
-import_graphs() {
-	# Import resource graphs from default folder (see RESOURCE_GRAPH_LOCATIONS in settings.py)
-	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o import_graphs"
-	python ${ARCHES_ROOT}/manage.py packages -o import_graphs
-}
-
-import_reference_data() {
-	# Import example concept schemes
-	local rdf_file="$1"
-	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o import_reference_data -s \"${rdf_file}\""
-	python ${ARCHES_ROOT}/manage.py packages -o import_reference_data -s "${rdf_file}"
 }
 
 init_arches_projects() { 
