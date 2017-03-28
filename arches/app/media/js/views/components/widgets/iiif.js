@@ -32,39 +32,46 @@ define([
             if (self.value.canvasId !== undefined) {
                 canvasId = ko.unwrap(self.value.canvasId);
             }
-            _.each(arches.iiifManifests, function (manifest) {
-                manifest.data = ko.observable(null);
-                $.get(manifest.url, function(data) {
-                    var selectedCanvas;
-                    var selectedManifest;
-                    if (data['@id'] === manifestId) {
-                        selectedManifest = manifest;
-                        _.find(data.sequences, function(sequence) {
-                            var canvas = _.find(sequence.canvases, function (canvas) {
-                                return canvas['@id'] === canvasId;
-                            });
-                            if (canvas) {
-                                selectedCanvas = canvas;
-                            }
-                            return canvas;
+            this.selectedManifest = ko.observable(null);
+            this.selectedCanvas = ko.observable(null);
+            var updateSelections = function (manifest) {
+                var selectedCanvas;
+                var selectedManifest;
+                if (manifest.data()['@id'] === manifestId) {
+                    selectedManifest = manifest;
+                    _.find(manifest.data().sequences, function(sequence) {
+                        var canvas = _.find(sequence.canvases, function (canvas) {
+                            return canvas['@id'] === canvasId;
                         });
-                    }
-                    manifest.data(data);
-                    if (selectedManifest) {
-                        self.selectedManifest(selectedManifest);
-                    }
-                    if (selectedCanvas) {
-                        self.selectedCanvas(selectedCanvas);
-                    }
-                });
+                        if (canvas) {
+                            selectedCanvas = canvas;
+                        }
+                        return canvas;
+                    });
+                }
+                if (selectedManifest) {
+                    self.selectedManifest(selectedManifest);
+                }
+                if (selectedCanvas) {
+                    self.selectedCanvas(selectedCanvas);
+                }
+            }
+            _.each(arches.iiifManifests, function (manifest) {
+                if (!manifest.data) {
+                    manifest.data = ko.observable(null);
+                    $.get(manifest.url, function(data) {
+                        manifest.data(data);
+                    });
+                }
+                if (manifest.data()) {
+                    updateSelections(manifest);
+                } else {
+                    manifest.data.subscribe(function () {
+                        updateSelections(manifest);
+                    })
+                }
             });
             this.manifests = ko.observableArray(arches.iiifManifests);
-            this.selectedManifest = ko.observable(null);
-            if (this.value.canvas) {
-                this.selectedCanvas = ko.observable(koMapping.toJS(this.value.canvas));
-            } else {
-                this.selectedCanvas = ko.observable(null);
-            }
 
             var updateFeatures = function () {
                 var features = drawnItems.toGeoJSON().features;
@@ -135,49 +142,70 @@ define([
 
             this.selectedCanvas.subscribe(function(canvas) {
                 var url;
-                if (canvas.images.length > 0){
-                    url = canvas.images[0].resource.service['@id'] + '/info.json';
+                var manifest = self.selectedManifest() ? self.selectedManifest().data() : {
+                    '@id': null,
+                    'label': null,
+                    'attribution': null
+                };
+                if (self.map && canvasLayer && self.map.hasLayer(canvasLayer)) {
+                    self.map.removeLayer(canvasLayer);
+                    canvasLayer = null;
                 }
-                var manifest = self.selectedManifest() ? self.selectedManifest().data() : null;
-                if (self.map) {
-                    self.map.removeLayer(drawnItems);
-                    if (canvasLayer && self.map.hasLayer(canvasLayer)) {
-                        self.map.removeLayer(canvasLayer);
-                        canvasLayer = null;
+                if (canvas) {
+                    if (canvas.images.length > 0){
+                        url = canvas.images[0].resource.service['@id'] + '/info.json';
                     }
-                    if (canvas.images.length > 0) {
-                        canvasLayer = L.tileLayer.iiif(
-                            canvas.images[0].resource.service['@id'] + '/info.json',
-                            { attribution: manifest['label'] + ', ' + canvas['label'] + ', ' + manifest['attribution'] }
-                        ).addTo(self.map);
+                    if (self.map) {
+                        self.map.removeLayer(drawnItems);
+                        if (canvas.images.length > 0) {
+                            canvasLayer = L.tileLayer.iiif(
+                                canvas.images[0].resource.service['@id'] + '/info.json',
+                                { attribution: manifest['label'] + ', ' + canvas['label'] + ', ' + manifest['attribution'] }
+                            ).addTo(self.map);
+                        }
+                        self.map.addLayer(drawnItems);
                     }
-                    self.map.addLayer(drawnItems);
+                } else {
+                    canvas = {
+                        '@id': null,
+                        'label': null
+                    };
+                    url = null;
                 }
                 if (self.value.canvasId !== undefined) {
                     self.value.canvasId(canvas['@id']);
                     self.value.canvasLabel(canvas['label']);
                     self.value.manifestId(manifest['@id']);
                     self.value.manifestLabel(manifest['label']);
+                    self.value.attribution(manifest['attribution']);
                     self.value.url(url);
+                    self.value.features(drawnItems.toGeoJSON().features);
                 } else {
                     var value = self.value();
-                    if (!value) {
-                        value = {};
+                    if (canvas['@id']) {
+                        if (!value) {
+                            value = {};
+                        }
+                        value.canvasId = canvas['@id'];
+                        value.canvasLabel = canvas['label'];
+                        value.manifestId = manifest['@id'];
+                        value.manifestLabel = manifest['label'];
+                        value.attribution = manifest['attribution'];
+                        value.url = url;
+                        value.features = drawnItems.toGeoJSON().features;
                     }
-                    value.canvasId = canvas['@id'];
-                    value.canvasLabel = canvas['label'];
-                    value.manifestId = manifest['@id'];
-                    value.manifestLabel = manifest['label'];
-                    value.attribution = manifest['attribution'];
-                    value.url = url;
-                    value.features = drawnItems.toGeoJSON().features;
                     self.value(value)
                 }
             });
 
             if (this.form) {
-                var dc = '';
-                var resourceSourceId = 'resources';
+                this.form.on('after-update', function(req, tile) {
+                    if (!ko.unwrap(self.value)) {
+                        drawnItems.clearLayers();
+                        self.selectedManifest(null);
+                        self.selectedCanvas(null);
+                    }
+                });
                 this.form.on('tile-reset', function(tile) {
                     drawnItems.clearLayers();
                     var features = self.value.features ? koMapping.toJS(self.value.features) : [];
@@ -196,8 +224,8 @@ define([
                     var selectedManifest = _.find(self.manifests(), function (manifest) {
                         return manifest.data()['@id'] === manifestId
                     });
+                    var selectedCanvas = null;
                     if (selectedManifest) {
-                        var selectedCanvas;
                         _.find(selectedManifest.data().sequences, function(sequence) {
                             var canvas = _.find(sequence.canvases, function (canvas) {
                                 return canvas['@id'] === canvasId;
@@ -207,11 +235,13 @@ define([
                             }
                             return canvas;
                         });
-                        self.selectedManifest(selectedManifest);
-                        if (selectedCanvas && selectedCanvas['@id'] !== self.selectedCanvas()['@id']) {
-                            self.selectedCanvas(selectedCanvas);
-                        }
                     }
+                    var currentCanvasId = self.selectedCanvas() ? self.selectedCanvas()['@id'] : null;
+                    var selectedCanvasId = selectedCanvas ? selectedCanvas['@id'] : null;
+                    if (currentCanvasId !== selectedCanvasId) {
+                        self.selectedCanvas(selectedCanvas);
+                    }
+                    self.selectedManifest(selectedManifest);
                 });
             }
         },
