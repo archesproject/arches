@@ -16,10 +16,11 @@ define([
             params.configKeys = [];
             WidgetViewModel.apply(this, [params]);
 
-            var drawnItems = self.value.features ? new L.geoJson({
+            var features = self.value.features ? koMapping.toJS(self.value.features) : [];
+            var drawnItems = new L.geoJson({
                 type: 'FeatureCollection',
-                features: koMapping.toJS(self.value.features)
-            }) : new L.FeatureGroup();
+                features: features
+            });
 
             this.expandControls = ko.observable(false);
 
@@ -140,7 +141,7 @@ define([
                 var manifest = self.selectedManifest() ? self.selectedManifest().data() : null;
                 if (self.map) {
                     self.map.removeLayer(drawnItems);
-                    if (canvasLayer) {
+                    if (canvasLayer && self.map.hasLayer(canvasLayer)) {
                         self.map.removeLayer(canvasLayer);
                         canvasLayer = null;
                     }
@@ -173,6 +174,46 @@ define([
                     self.value(value)
                 }
             });
+
+            if (this.form) {
+                var dc = '';
+                var resourceSourceId = 'resources';
+                this.form.on('tile-reset', function(tile) {
+                    drawnItems.clearLayers();
+                    var features = self.value.features ? koMapping.toJS(self.value.features) : [];
+                    drawnItems.addData({
+                        type: 'FeatureCollection',
+                        features: features
+                    });
+                    var manifestId;
+                    var canvasId;
+                    if (self.value.manifestId !== undefined) {
+                        manifestId = ko.unwrap(self.value.manifestId);
+                    }
+                    if (self.value.canvasId !== undefined) {
+                        canvasId = ko.unwrap(self.value.canvasId);
+                    }
+                    var selectedManifest = _.find(self.manifests(), function (manifest) {
+                        return manifest.data()['@id'] === manifestId
+                    });
+                    if (selectedManifest) {
+                        var selectedCanvas;
+                        _.find(selectedManifest.data().sequences, function(sequence) {
+                            var canvas = _.find(sequence.canvases, function (canvas) {
+                                return canvas['@id'] === canvasId;
+                            });
+                            if (canvas) {
+                                selectedCanvas = canvas;
+                            }
+                            return canvas;
+                        });
+                        self.selectedManifest(selectedManifest);
+                        if (selectedCanvas && selectedCanvas['@id'] !== self.selectedCanvas()['@id']) {
+                            self.selectedCanvas(selectedCanvas);
+                        }
+                    }
+                });
+            }
         },
         template: { require: 'text!widget-templates/iiif' }
     });
