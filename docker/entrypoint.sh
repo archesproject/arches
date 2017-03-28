@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set_workdir() {
+	cd ${ARCHES_ROOT}
+}
+
 activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
 }
@@ -9,15 +13,17 @@ init_arches() {
 		echo ""
 		echo "*** Warning: FORCE_DB_INIT = True ***"
 		echo "" 
-		run_arches_init_commands
+		run_db_init_commands
 	elif db_exists; then
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
 	else
-		run_arches_init_commands
+		run_db_init_commands
 	fi
+
+	init_arches_projects
 }
 
-run_arches_init_commands() {
+run_db_init_commands() {
 	setup_arches
 	import_graphs
 	import_reference_data 'arches/db/schemes/arches_concept_scheme.rdf'
@@ -53,6 +59,23 @@ import_reference_data() {
 	local rdf_file="$1"
 	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o import_reference_data -s \"${rdf_file}\""
 	python ${ARCHES_ROOT}/manage.py packages -o import_reference_data -s "${rdf_file}"
+}
+
+init_arches_projects() { 
+	if [[ ! -z ${CUSTOM_ARCHES_PROJECTS} ]]; then
+		for project in ${CUSTOM_ARCHES_PROJECTS}; do
+			echo "Checking if Arches project "$project" exists..."
+			if [[ ! -d ${ARCHES_ROOT}/$project ]] || [[ ! "$(ls -A ${ARCHES_ROOT}/$project)" ]]; then
+				echo "" 
+				echo "----- Custom Arches project '$project' does not exist -----"
+				echo "----- Creating '$project'... -----"
+				echo "" 
+				arches-project create ${project} --directory ${project}
+			else
+				echo "Custom Arches project '$project' already exist"
+			fi
+		done
+	fi
 }
 
 set_dev_mode() {
@@ -95,6 +118,7 @@ run_django_server() {
 
 
 ### Starting point ### 
+set_workdir
 activate_virtualenv
 init_arches
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
