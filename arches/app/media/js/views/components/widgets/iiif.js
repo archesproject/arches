@@ -3,18 +3,22 @@ define([
     'underscore',
     'viewmodels/widget',
     'leaflet',
+    'knockout-mapping',
     'arches',
     'leaflet-iiif',
     'leaflet-draw',
     'bindings/leaflet'
-], function (ko, _, WidgetViewModel, L, arches) {
+], function (ko, _, WidgetViewModel, L, koMapping, arches) {
     return ko.components.register('iiif-widget', {
         viewModel: function(params) {
             var self = this;
+            var canvasLayer = null;
+            var drawnItems = new L.FeatureGroup();
             params.configKeys = [];
             WidgetViewModel.apply(this, [params]);
 
             this.expandControls = ko.observable(false);
+
             _.each(arches.iiifManifests, function (manifest) {
                 manifest.data = ko.observable(null);
                 $.get(manifest.url, function(data) {
@@ -22,17 +26,30 @@ define([
                 });
             });
             this.manifests = ko.observableArray(arches.iiifManifests);
-            this.selectedCanvas = ko.observable(null);
+            this.selectedManifest = ko.observable(null);
+            if (this.value.canvas) {
+                this.selectedCanvas = ko.observable(koMapping.toJS(this.value.canvas));
+            } else {
+                this.selectedCanvas = ko.observable(null);
+            }
+
+            console.log(this.selectedCanvas())
+
             this.map = null;
-            var canvasLayer = null;
-            var drawnItems = new L.FeatureGroup();
             this.mapConfig = {
                 center: [0, 0],
                 crs: L.CRS.Simple,
                 zoom: 0,
                 afterRender: function (map) {
+                    var canvas = self.selectedCanvas();
                     self.map = map;
                     self.map.addLayer(drawnItems);
+
+                    if (canvas && canvas.images.length > 0) {
+                        canvasLayer = L.tileLayer.iiif(
+                            canvas.images[0].resource.service['@id'] + '/info.json'
+                        ).addTo(self.map);
+                    }
 
                     var drawControl = new L.Control.Draw({
                         edit: {
@@ -50,6 +67,7 @@ define([
                     });
                 }
             };
+
             this.selectedCanvas.subscribe(function(canvas) {
                 if (self.map) {
                     self.map.removeLayer(drawnItems);
@@ -64,7 +82,16 @@ define([
                     }
                     self.map.addLayer(drawnItems);
                 }
-            })
+                if (self.value.canvas !== undefined) {
+                    _.each(canvas, function(val, key) {
+                        self.value.canvas[key](val);
+                    });
+                } else {
+                    self.value({
+                        canvas: canvas
+                    })
+                }
+            });
         },
         template: { require: 'text!widget-templates/iiif' }
     });
