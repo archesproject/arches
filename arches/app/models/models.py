@@ -702,7 +702,6 @@ class GraphXMapping(models.Model):
 
 class IIIFManifest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    icon = models.TextField(default=None)
     url = models.TextField()
 
     def __unicode__(self):

@@ -119,13 +119,17 @@ define([
                         ).addTo(self.map);
                     }
 
-                    var drawControl = new L.Control.Draw({
-                        edit: {
-                            featureGroup: drawnItems
-                        }
-                    });
+                    if (self.state !== 'report') {
+                        var drawControl = new L.Control.Draw({
+                            edit: {
+                                featureGroup: drawnItems
+                            }
+                        });
 
-                    self.map.addControl(drawControl);
+                        self.map.addControl(drawControl);
+                    } else {
+                        self.map.addLayer(drawnItems);
+                    }
 
                     self.map.on(L.Draw.Event.CREATED, function(e) {
                         var type = e.layerType

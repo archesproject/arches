@@ -80,3 +80,10 @@
 {% block config_form %}
 
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <div class="relative" data-bind="leaflet: mapConfig" style="height: 300px; margin-right: 15px;"></div>
+</dd>
+{% endblock report %}

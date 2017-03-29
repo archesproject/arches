@@ -701,8 +701,7 @@ class Migration(migrations.Migration):
             name='IIIFManifest',
             fields=[
                 ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('url', models.TextField()),
-                ('icon', models.TextField(default=None)),
+                ('url', models.TextField())
             ],
             options={
                 'db_table': 'iiif_manifests',
