@@ -698,3 +698,15 @@ class GraphXMapping(models.Model):
     class Meta:
         managed = True
         db_table = 'graphs_x_mapping_file'
+
+
+class IIIFManifest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    url = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'iiif_manifests'

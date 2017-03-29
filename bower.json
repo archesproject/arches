@@ -50,7 +50,10 @@
     "codemirror": "^5.24.0",
     "turf": "https://cdnjs.cloudflare.com/ajax/libs/Turf.js/3.0.14/turf.min.js",
     "geohash": "chrisveness/latlon-geohash#1.1.0",
-    "nvd3": "^1.8.5"
+    "nvd3": "^1.8.5",
+    "leaflet": "^1.0.3",
+    "leaflet-iiif": "^1.1.1",
+    "leaflet-draw": "^0.4.9"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

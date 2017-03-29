@@ -1,0 +1,89 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+
+    <div id="map-widget-container" class="relative" style="z-index:5000">
+
+        <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : expandControls(), 'hide-maptools': expandControls()}">
+            <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: function () { expandControls(true); }"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+        </div>
+
+
+        <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+            <ul class="map-widget-toolbar-list" style="">
+                <li class="map-widget-toolbar-item text-center basemaps-map-tools" >
+                    <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip"></i></a>
+                </li>
+                <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
+                    <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+            <!-- ko foreach: { data: [$data], as: 'self' } -->
+
+                <!-- ko if: !selectedManifest() -->
+                    <div class="map-widget-panel-title">
+                        <h4 class="">{% trans "Select an object:" %}</h4>
+                    </div>
+                    <!-- ko foreach: { data: manifests, as: 'manifest' } -->
+
+                        <!-- ko if: manifest.data() -->
+                        <div class="map-widget-overlay-item relative" data-bind="click: self.selectedManifest, css:{'selected': manifest === self.selectedManifest()}">
+                            <div class="map-overlay-vis-toogle text-center">
+                                <img data-bind="attr: {'src': manifest.data().thumbnail }" style="max-height: 30px; max-width: 30px;">
+                            </div>
+                            <div class="map-overlay-name">
+                                <a href="#"><span data-bind="text: manifest.data().label, css:{'basemap-unselected': manifest !== self.selectedManifest()}"><span></a>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: selectedManifest() -->
+                    <div class="map-widget-panel-title">
+                        <a href="#" class="pull-left" data-bind="click: function() {
+                            self.selectedManifest(null);
+                        }" style="padding: 8px;">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                        <h4 class="">{% trans "Select an image:" %}</h4>
+                    </div>
+                    <!-- ko foreach: { data: selectedManifest().data().sequences, as: 'sequence' } -->
+                        <!-- ko foreach: { data: sequence.canvases, as: 'canvas' } -->
+                        <div class="map-widget-overlay-item relative" data-bind="click: self.selectedCanvas, css:{'selected': canvas === self.selectedCanvas()}">
+                            <div class="map-overlay-vis-toogle text-center">
+                                <img data-bind="attr: {'src': canvas.thumbnail }" style="max-height: 30px; max-width: 30px;">
+                            </div>
+                            <div class="map-overlay-name">
+                                <a href="#"><span data-bind="text: canvas.label, css:{'basemap-unselected': canvas !== self.selectedCanvas()}"><span></a>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+
+            <!-- /ko -->
+        </div>
+    </div>
+
+    <div class="relative" data-bind="leaflet: mapConfig" style="height: 500px;"></div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <div class="relative" data-bind="leaflet: mapConfig" style="height: 300px; margin-right: 15px;"></div>
+</dd>
+{% endblock report %}
