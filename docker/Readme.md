@@ -5,7 +5,7 @@
 It is specifically written for users wanting to implement their own customized version of Arches.
 If you are only interested in using Docker for developing the core Arches source code. please scroll down to 'Development'.***
 
-Docker is the world’s leading software containerization platform: https://www.docker.com/  
+Docker is the world’s leading software containerization platform: [docker.com](https://www.docker.com/)  
 
 Some advantages of Docker:  
 
@@ -20,14 +20,16 @@ However, the tool 'docker-compose' (described below) will run these services for
 
 
 ## Requirements
-- Docker installed on your machine
+- Docker installed on your machine: [docker.com/get-docker](https://www.docker.com/get-docker)
+
+It also helps to read up on Docker: [docker.com/engine/getstarted](https://docs.docker.com/engine/getstarted/)
 
 
 
 ## Getting Started
 1. Create your new project folder, preferably one managed by a version control system such as Git.
 
-2. Copy [docker-compose.yml](../docker-compose.yml) from the official Arches repository to the root of your project folder.
+2. Copy [docker-compose.yml](../docker-compose.yml) from the root of the official Arches repository to the root of your project folder.
 
 3. Edit your `docker-compose.yml`  
 	Under the 'arches' service, change: 
@@ -40,9 +42,10 @@ However, the tool 'docker-compose' (described below) will run these services for
 	```
 	*Optional: You can leave `<docker hub user>/` out for now. Click [here](https://docs.docker.com/docker-hub/repos/) For more information on Docker Hub.*  
 
-	Add the `ARCHES_PROJECT` environment variable under the `arches` service:
+	Add `ARCHES_PROJECT` to the '`environment:`' node under the `arches` service:
 	```
-	    - ARCHES_PROJECT=<your project name>
+		environment:
+			- ARCHES_PROJECT=<your project name>
 	```
 
 	*Note: `<your project name>` cannot contain dashes (-).*
@@ -51,21 +54,24 @@ However, the tool 'docker-compose' (described below) will run these services for
 This will be used throughout your development process and does not need to be checked in to version control. 
 
 5. Edit your `docker-compose-local.yml`  
-	Add this line under `volumes`:
+	Add this line under the `volumes` node:
 	```
-		- ./<your project name>:/web_root/arches/<your project name>
+		volumes:
+			- ./<your project name>:/web_root/arches/<your project name>
 	```
 	*Note: `<your project name>` cannot contain dashes (-). Must be the same as the value set in `ARCHES_PROJECT` above.*  
  
-	Set the `PGPASSWORD`, `MAPBOX_API_KEY` environment variables under the `arches` service:
+	Fill out the `PGPASSWORD` and `MAPBOX_API_KEY` environment variables under the `arches` service:
 	```
-		- PGPASSWORD=<your Postgres password>
-		- MAPBOX_API_KEY=<your Mapbox API key>
+		environment:
+			- PGPASSWORD=<your chosen Postgres password>
+			- MAPBOX_API_KEY=<your Mapbox API key>
 	```
+	Get your Mapbox API key here: [mapbox.com](https://www.mapbox.com/)
 
-	Set the `POSTGRES_PASSWORD` environment variable under the `db` service:
+	Fill out the `POSTGRES_PASSWORD` environment variable under the `db` service:
 	```
-	    - POSTGRES_PASSWORD=<your Postgres password>
+	    - POSTGRES_PASSWORD=<your chosen Postgres password>
 	```
 	(must be the same as PGPASSWORD.)
 
@@ -74,7 +80,8 @@ This will be used throughout your development process and does not need to be ch
 		FROM arches/arches:latest
 	```
 
-7. Build your Docker image using:
+7. Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  
+	Navigate to the root of your Arches project folder and type:
 	```
 		docker-compose -f .\docker-compose-local.yml build
 	```
@@ -84,7 +91,7 @@ This will be used throughout your development process and does not need to be ch
 		docker-compose -f .\docker-compose-local.yml up
 	```
 	This will create your Arches project and start the web server.  
-	Once that is running, you can bring it down again with ctrl + c (in Windows).  
+	Once that is running (you will see `"RUNNING DJANGO SERVER"`), you can bring it down again with ctrl + c (in Windows).  
 
 9. Add this line to your Dockerfile:
 	```
@@ -164,7 +171,7 @@ For more information, see the [```docker exec``` command documentation](https://
 
 
 ## Housekeeping
-A cleanup script is provided in [docker/cleanup.ps1](docker/cleanup.ps1).
+A cleanup script is provided in the official Arches repository: [docker/cleanup.ps1](docker/cleanup.ps1).
 This can be run on any OS and removes old Docker containers, unused images, etc.
 
 

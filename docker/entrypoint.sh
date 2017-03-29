@@ -54,8 +54,8 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo "" 
 
-	echo "Running: python ${PROJECT_ROOT}/manage.py packages -o setup"
-	python ${PROJECT_ROOT}/manage.py packages -o setup
+	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o setup"
+	python ${ARCHES_ROOT}/manage.py packages -o setup
 }
 
 init_arches_projects() { 
