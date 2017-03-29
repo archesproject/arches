@@ -152,3 +152,8 @@ STATIC_ROOT = '/var/www/media'
 # HEX_BIN_PRECISION = 4
 
 # BULK_IMPORT_BATCH_SIZE = 2000
+
+try:
+    from settings_local import *
+except ImportError:
+    pass
