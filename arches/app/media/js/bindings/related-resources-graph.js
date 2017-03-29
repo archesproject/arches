@@ -35,6 +35,7 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
+            var currentResource = options.currentResource
 
             var selectNode = function(d){
                 vis.selectAll("circle")
@@ -306,6 +307,7 @@ define([
                 var start = 0;
                 var rootNode = nodeMap[resourceId];
 
+
                 if (rootNode) {
                     if (rootNode.relationCount) {
                         load = (rootNode.relationCount.total > rootNode.relationCount.loaded && !rootNode.loading);
@@ -403,15 +405,27 @@ define([
                 }
             };
 
-            if (options.resourceId) {
-                $el.addClass('loading');
-                getResourceData(options.resourceId, options.resourceName, options.resourceTypeId, function (newData) {
-                    $el.removeClass('loading');
-                    data = newData;
-                    data.nodes[0].x = width/2;
-                    data.nodes[0].y = height/2-160;
-                    update();
-                }, true);
+            setRoot = function(val){
+                if (val.graphid !== undefined) {
+                    nodeMap = {};
+                    linkMap = {};
+                    nodeList([]);
+                    getResourceData(val.resourceinstanceid, val.displayname, val.graphid, function(newData) {
+                        $el.removeClass('loading');
+                        data = newData;
+                        data.nodes[0].x = width/2;
+                        data.nodes[0].y = height/2-160;
+                        update();
+                    }, true);
+                    }
+            };
+
+            if (currentResource().resourceinstanceid) {
+                setRoot(currentResource())
+            }
+
+            if (ko.isObservable(currentResource)) {
+                currentResource.subscribe(setRoot, this)
             }
 
             $(window).on("resize", function() {
