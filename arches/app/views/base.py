@@ -66,5 +66,6 @@ class BaseManagerView(TemplateView):
         context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers
         context['resource_map_sources'] = resource_sources
+        context['iiif_manifests'] = models.IIIFManifest.objects.all()
 
         return context
