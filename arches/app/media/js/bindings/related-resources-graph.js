@@ -35,6 +35,7 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
+            var currentResource = options.currentResource
 
             var selectNode = function(d){
                 vis.selectAll("circle")
@@ -72,6 +73,22 @@ define([
                     }
                 })
             }, this)
+
+            if (ko.isObservable(currentResource)) {
+                currentResource.subscribe(
+                    function(val){
+                        if (val.graphid !== undefined) {
+                            nodeList([])
+                            getResourceData(val.resourceinstanceid, val.displayname, val.graphid, function(newData) {
+                                $el.removeClass('loading');
+                                data = newData;
+                                data.nodes[0].x = width/2;
+                                data.nodes[0].y = height/2-160;
+                                update();
+                            }, true);
+                            } 
+                        }, this)
+            }
 
             nodeList([])
 
@@ -305,6 +322,7 @@ define([
                 var load = true;
                 var start = 0;
                 var rootNode = nodeMap[resourceId];
+
 
                 if (rootNode) {
                     if (rootNode.relationCount) {

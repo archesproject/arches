@@ -8,7 +8,8 @@
     	resourceId: currentResource().resourceinstanceid,
     	resourceName: currentResource().displayname,
     	resourceTypeId: currentResource().graphid,
-        nodeList: graphNodeList
+        nodeList: graphNodeList,
+        currentResource: newResource
     }">
 
         <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
@@ -83,7 +84,7 @@
 
             	<div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
             		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
-            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { showGraph(true); }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
+            		<button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { if (currentResource()){showGraph(true)}; }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
             	</div>
 
                 <div class="relative">
