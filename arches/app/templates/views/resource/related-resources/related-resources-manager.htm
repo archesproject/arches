@@ -5,9 +5,6 @@
 
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
-    	resourceId: currentResource().resourceinstanceid,
-    	resourceName: currentResource().displayname,
-    	resourceTypeId: currentResource().graphid,
         nodeList: graphNodeList,
         currentResource: newResource
     }">
