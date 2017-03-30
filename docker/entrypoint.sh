@@ -8,10 +8,12 @@ fi
 
 cd_arches_root() {
 	cd ${ARCHES_ROOT}
+	echo "Current work directory: ${ARCHES_ROOT}"
 }
 
 cd_project_root() {
 	cd ${PROJECT_ROOT}/${ARCHES_PROJECT}
+	echo "Current work directory: ${PROJECT_ROOT}/${ARCHES_PROJECT}"
 }
 
 activate_virtualenv() {
@@ -54,8 +56,8 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo "" 
 
-	echo "Running: python ${ARCHES_ROOT}/manage.py packages -o setup"
-	python ${ARCHES_ROOT}/manage.py packages -o setup
+	echo "Running: python manage.py packages -o setup"
+	python manage.py packages -o setup
 }
 
 init_arches_projects() { 
@@ -76,17 +78,18 @@ init_arches_projects() {
 				exit ${exit_code}
 			fi
 
-			move_settings_local
+			copy_settings_local
 		else
 			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
 		fi
 	fi
 }
 
-move_settings_local() {
+copy_settings_local() {
 	# The settings_local.py in ${ARCHES_ROOT}/arches/ gets ignored if running manage.py from a custom Arches project instead of Arches core app
 	if [[ ! -f ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py ]]; then
-		mv ${ARCHES_ROOT}/arches/settings_local.py ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py
+		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py..."
+		cp ${ARCHES_ROOT}/arches/settings_local.py ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py
 	fi
 }
 
@@ -115,7 +118,7 @@ collect_static(){
 	echo ""
 	echo "----- COLLECTING DJANGO STATIC FILES -----"
 	echo ""
-	python ${PROJECT_ROOT}/manage.py collectstatic --noinput
+	python manage.py collectstatic --noinput
 }
 
 run_django_server() {
@@ -123,7 +126,7 @@ run_django_server() {
 	echo ""
 	echo "----- *** RUNNING DJANGO SERVER *** -----"
 	echo ""
-	exec python ${PROJECT_ROOT}/manage.py runserver 0.0.0.0:8000
+	exec python manage.py runserver 0.0.0.0:8000
 }
 
 

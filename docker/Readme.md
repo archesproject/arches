@@ -74,10 +74,13 @@ This will be used throughout your development process and does not need to be ch
 	    - POSTGRES_PASSWORD=<your chosen Postgres password>
 	```
 	(must be the same as PGPASSWORD.)
+	
+	***Warning: do not check your `docker-compose-local.yml` in to source control, as it now contains passwords.***
 
-6. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add this line:
+6. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add these lines:
 	```
 		FROM arches/arches:latest
+		COPY . ${ARCHES_ROOT}
 	```
 
 7. Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  
@@ -92,18 +95,14 @@ This will be used throughout your development process and does not need to be ch
 	```
 	This will create your Arches project and start the web server.  
 	Once that is running (you will see `"RUNNING DJANGO SERVER"`), you can bring it down again with ctrl + c (in Windows).  
-
-9. Add this line to your Dockerfile:
-	```
-		COPY ./<your project name> ${ARCHES_ROOT}  
-	```  
-10. Build the latest version of your Docker image using:
+ 
+9. Build the latest version of your Docker image using:
 	```
 		docker-compose -f .\docker-compose-local.yml build
 	```
 	This latest version of your Docker image will include your custom project.
 
-11. Optional: to run your Docker containers again:
+10. Optional: to run your Docker containers again:
 	```
 		docker-compose -f .\docker-compose-local.yml up
 	```
