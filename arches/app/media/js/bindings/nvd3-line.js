@@ -36,32 +36,17 @@ define([
               /* Done setting the chart up? Time to render it!*/
               var myData = function() {
                     data( [
-                            {x:2320.00,y:3228.68},
-                            {x:2325.00,y:3102.83},
-                            {x:2330.00,y:3328.01},
-                            {x:2335.00,y:3160.01},
-                            {x:2340.00,y:3076.24},
-                            {x:2345.00,y:3161.03},
-                            {x:2350.00,y:3063.17},
-                            {x:2355.00,y:3147.99},
-                            {x:2360.00,y:3078.21},
-                            {x:2365.00,y:2980.3},
-                            {x:2370.00,y:3079.2},
-                            {x:2375.00,y:3135.95},
-                            {x:2380.00,y:3108.32},
-                            {x:2385.00,y:3151.02},
-                            {x:2390.00,y:3123.39},
-                            {x:2395.00,y:3053.53}
+                            {x:0.00,y:0.0}
                         ])
 
-                              return [
-                                {
-                                  values: data(),
-                                  key: 'Test Data',
-                                  color: '#ff7f0e'
-                                }
-                              ];
-                            };
+                      return [
+                        {
+                          values: data(),
+                          key: 'Test Data',
+                          color: '#ff7f0e'
+                        }
+                      ];
+                    };
 
             var svg = d3.select(element).append("svg:svg")
                 .datum(myData)

@@ -4883,6 +4883,11 @@ h4.report-toolbar-title {
     height: 240px
 }
 
+.csv-chart-widget-input {
+    width: 100%;
+    padding: 7px 10px 0px;
+}
+
 .map-widget-container {
     position: absolute;
     top: 10px;

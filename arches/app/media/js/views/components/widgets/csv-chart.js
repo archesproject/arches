@@ -25,8 +25,34 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize', 'xcol', 'ycol'];
 
             WidgetViewModel.apply(this, [params]);
-            this.selectedFile = ko.observable();
+            this.selectedFile = ko.observable(undefined);
             this.viewChart = ko.observable(false);
+
+            this.selection = ko.computed(function() {
+                if (this.selectedFile()) {
+                    var f = this.selectedFile()
+                    res = {
+                        upload_time: ko.unwrap(f.upload_time),
+                        size: ko.unwrap(f.size)/1024 + 'kb',
+                        url: ko.unwrap(f.url),
+                        description: "This is a description"
+                    };
+                    console.log(res)
+                    return res;
+                } else {
+                    return {
+                        upload_time: undefined,
+                        size: undefined,
+                        description: undefined
+                    }
+                }
+
+            }, this);
+
+            this.selection.subscribe(function(val){
+                console.log(val, 'has changed')
+            })
+
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
@@ -95,6 +121,17 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
+            this.datasetName = ko.observable();
+            this.datasetDescription = ko.observable();
+            this.datasetDevice = ko.observable();
+
+            [this.datasetName, this.datasetDescription, this.datasetDevice].forEach(function(obs){
+                var self = this;
+                obs.subscribe(function(val){
+                    console.log(val)
+                }, self)
+            }, this);
+
             this.filesJSON = ko.computed(function() {
                 var filesForUpload = self.filesForUpload();
                 var uploadedFiles = self.uploadedFiles();
@@ -114,7 +151,7 @@ define([
                             index: i,
                             content: URL.createObjectURL(file),
                             error: file.error,
-                            updload_time: Date.now()
+                            upload_time: Date.now()
                         };
                     })
                 ));
@@ -129,11 +166,13 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
+                console.log(self.value())
                 self.value(
                     value.filter(function(file) {
                         return file.accepted;
                     })
                 );
+                console.log(self.value())
             });
 
             this.chartData = ko.observable([])

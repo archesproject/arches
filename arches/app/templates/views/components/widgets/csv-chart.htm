@@ -33,8 +33,21 @@
                                     <div class="panel-heading">
                                         <h3 class="panel-title">Manage Dataset</h3>
                                     </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group csv-chart-widget-input">
+                                            <input type="" placeholder="{% trans " Name " %}" id="" class="form-control input-md" data-bind="value: datasetName, valueUpdate: 'keyup'">
+                                        </div>
+                                        <div class="input-group csv-chart-widget-input">
+                                            <input type="" placeholder="{% trans " Device " %}" id="" class="form-control input-md" data-bind="value: datasetDevice, valueUpdate: 'keyup'">
+                                        </div>
+                                        <div class="input-group csv-chart-widget-input">
+                                            <textarea type="" placeholder="{% trans " Description " %}" id="" class="form-control input-md" data-bind="value: datasetDescription, valueUpdate: 'keyup'"></textarea>
+                                        </div>
+                                    </div>
+
                                     <div class="pad-all" style="">
-                                        <div class="bord-top pad-ver">
+                                        <div class="pad-ver">
                                             <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                                         <i class="fa fa-plus"></i>
                                         <span>{% trans "Add files" %}...</span>
@@ -144,7 +157,7 @@
                                                                                         </div>
 
                                                                                         <div class="media-body">
-                                                                                            <p class="h3 text-thin media-heading" data-bind="text: selectedFile.upload_time"></p>
+                                                                                            <p class="h3 text-thin media-heading" data-bind="text: selection().size"></p>
                                                                                             <small class="text-uppercase">Upload date</small>
                                                                                         </div>
                                                                                     </div>
@@ -229,7 +242,7 @@
                                                                                     <span data-bind="text: name"></span>
                                                                                 </td>
                                                                                 <td>
-                                                                                    <span data-bind="text: size"></span>
+                                                                                    <span data-bind="html: size"></span>
                                                                                 </td>
                                                                             </tr>
                                                                         </tbody>
