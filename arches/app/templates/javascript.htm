@@ -49,7 +49,10 @@
             'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
             'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core',
             'turf': '{{ STATIC_URL }}bower_components/turf/index',
-            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash'
+            'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash',
+            'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
+            'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
+            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw'
         },
         packages: [{
             name: "codemirror",
@@ -100,6 +103,12 @@
             },
             'geohash': {
                 exports: 'Geohash'
+            },
+            'leaflet-iiif': {
+                deps: ['leaflet']
+            },
+            'leaflet-draw': {
+                deps: ['leaflet']
             }
         }
     });
@@ -212,6 +221,11 @@
                 'activated': true,
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
                 'is_resource_layer': true
+            },{% endfor %}{% endautoescape %}],
+            iiifManifests: [{% autoescape off %}{% for manifest in iiif_manifests %}{
+                'id': '{{ manifest.id }}',
+                'url': '{{ manifest.url }}',
+                'icon': '{{ manifest.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',
