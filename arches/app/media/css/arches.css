@@ -4879,6 +4879,10 @@ h4.report-toolbar-title {
     vertical-align: middle;
 }
 
+.csv-chart {
+    height: 240px
+}
+
 .map-widget-container {
     position: absolute;
     top: 10px;

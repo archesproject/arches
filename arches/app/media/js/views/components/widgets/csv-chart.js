@@ -25,6 +25,8 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize', 'xcol', 'ycol'];
 
             WidgetViewModel.apply(this, [params]);
+            this.selectedFile = ko.observable();
+            this.viewChart = ko.observable(false);
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
@@ -111,7 +113,8 @@ define([
                             file_id: null,
                             index: i,
                             content: URL.createObjectURL(file),
-                            error: file.error
+                            error: file.error,
+                            updload_time: Date.now()
                         };
                     })
                 ));
@@ -134,6 +137,7 @@ define([
             });
 
             this.chartData = ko.observable([])
+
 
             this.getFileData = function(f) {
                 var self = this;
@@ -161,6 +165,7 @@ define([
                     })
                     var data = _.sortBy(rows, function(a){return a['x']});
                     self.chartData(data);
+                    self.selectedFile(f);
                   });
               }
 
