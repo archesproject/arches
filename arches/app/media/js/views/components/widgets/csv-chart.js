@@ -24,7 +24,7 @@ define([
     return ko.components.register('csv-chart-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['acceptedFiles', 'maxFilesize', 'xcol', 'ycol'];
+            params.configKeys = ['acceptedFiles', 'maxFilesize'];
 
             WidgetViewModel.apply(this, [params]);
             this.selectedFile = ko.observable(undefined);
@@ -208,12 +208,9 @@ define([
 
             this.getFileData = function(f) {
                 var self = this;
-                var url = f.url;
-                var filename = f.name();
+                var url = ko.unwrap(f.url);
+                var filename = ko.unwrap(f.name);
                 var basename = filename.substr(0, filename.lastIndexOf('.')) || filename;
-                if (ko.isObservable(f.url)) {
-                    url = f.url();
-                };
                 if (url.endsWith('.csv')) {
                     d3.csv(url, function(d) {
                       return {
