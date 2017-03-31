@@ -103,7 +103,7 @@
                                 <div id="card-container" class="panel card-panel" style="border: 1px solid #ddd; border-bottom-width: 0px; margin-top: 10px;">
                                     <div class="panel-heading">
                                         <div class="" style="">
-                                            <h3 id="cc-title" class="panel-title card-main-title">Bruker AXS Handheld Inc. S1PXRF Spectrum</h3>
+                                            <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: datasetDevice"></h3>
                                         </div>
                                     </div>
 
@@ -157,8 +157,8 @@
                                                                                         </div>
 
                                                                                         <div class="media-body">
-                                                                                            <p class="h3 text-thin media-heading" data-bind="text: selection().size"></p>
-                                                                                            <small class="text-uppercase">Upload date</small>
+                                                                                            <p class="h3 text-thin media-heading" data-bind="text: selection().upload_time"></p>
+                                                                                            <small class="text-uppercase">{% trans "Upload date" %}</small>
                                                                                         </div>
                                                                                     </div>
 
@@ -235,10 +235,11 @@
                                                                                           }
                                                                                       }">
                                                                             <tr class="rr-table-row" data-bind="click: function (e) {
-                                                                                self.getFileData(e)
+                                                                                self.getFileData(e);
+                                                                                self.indicateDataTableRowSelection(e)
                                                                             }">
                                                                                 <td>
-                                                                                    <i data-bind="css: {'ion-checkmark-circled': accepted}"></i>
+                                                                                    <i data-bind="css: {'ion-checkmark-circled': _.contains(self.selectedFiles(), ko.unwrap(url))}"></i>
                                                                                     <span data-bind="text: name"></span>
                                                                                 </td>
                                                                                 <td>
@@ -255,6 +256,16 @@
                                                     </div>
 
 
+                                                </div>
+                                                <div id="metadata-card" class="tab-pane fade active in">
+                                                    <dl>
+                                                      <dt>{% trans "Name" %}</dt>
+                                                      <dd data-bind="text:datasetName"></dd>
+                                                      <dt>{% trans "Device" %}</dt>
+                                                      <dd data-bind="text:datasetDevice"></dd>
+                                                      <dt>{% trans "Description" %}</dt>
+                                                      <dd data-bind="text:datasetDescription"></dd>
+                                                    </dl>
                                                 </div>
 
                                             </div>

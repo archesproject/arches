@@ -1,15 +1,17 @@
 define([
     'jquery',
     'knockout',
+    'knockout-mapping',
     'underscore',
     'dropzone',
     'nvd3',
     'uuid',
+    'moment',
     'viewmodels/widget',
     'bindings/dropzone',
     'bindings/nvd3-line',
     'bindings/datatable',
-], function($, ko, _, Dropzone, nvd3, uuid, WidgetViewModel) {
+], function($, ko, koMapping, _, Dropzone, nvd3, uuid, moment, WidgetViewModel) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -32,12 +34,11 @@ define([
                 if (this.selectedFile()) {
                     var f = this.selectedFile()
                     res = {
-                        upload_time: ko.unwrap(f.upload_time),
+                        upload_time: moment(ko.unwrap(f.upload_time)).format('YYYY-MM-DD'),
                         size: ko.unwrap(f.size)/1024 + 'kb',
                         url: ko.unwrap(f.url),
                         description: "This is a description"
                     };
-                    console.log(res)
                     return res;
                 } else {
                     return {
@@ -49,11 +50,6 @@ define([
 
             }, this);
 
-            this.selection.subscribe(function(val){
-                console.log(val, 'has changed')
-            })
-
-
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                     if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
@@ -61,8 +57,8 @@ define([
                             self.filesForUpload.removeAll();
                         }
                         var data = req.responseJSON.data[self.node.nodeid];
-                        if (Array.isArray(data)) {
-                            self.uploadedFiles(data)
+                        if (Array.isArray(data.files)) {
+                            self.uploadedFiles(data.files)
                         }
                         self.dropzone.removeAllFiles(true);
                         self.formData.delete('file-list_' + self.node.nodeid);
@@ -70,11 +66,13 @@ define([
                 });
                 this.form.on('tile-reset', function(tile) {
                     if ((self.tile === tile || _.contains(tile.tiles, self.tile))) {
-                        if (self.filesForUpload().length > 0) {
-                            self.filesForUpload.removeAll();
-                        }
-                        if (Array.isArray(self.value())) {
-                            self.uploadedFiles(self.value())
+                        if (isObservable(self.value)) {
+                            if (self.filesForUpload().length > 0) {
+                                self.filesForUpload.removeAll();
+                            }
+                            if (Array.isArray(self.value().files)) {
+                                self.uploadedFiles(self.value().files)
+                            }
                         }
                         self.dropzone.removeAllFiles(true);
                         self.formData.delete('file-list_' + self.node.nodeid);
@@ -94,9 +92,18 @@ define([
 
             this.filesForUpload = ko.observableArray();
             this.uploadedFiles = ko.observableArray();
-            if (Array.isArray(self.value())) {
-                this.uploadedFiles(self.value());
+            if (ko.isObservable(self.value)) {
+                if (self.value()) {
+                    if (Array.isArray(self.value().files)) {
+                        this.uploadedFiles(self.value().files);
+                    }
+                }
+            } else {
+                if (Array.isArray(self.value.files())) {
+                    this.uploadedFiles(self.value.files());
+                }
             }
+
             this.removeFile = function(file) {
                 var filesForUpload = self.filesForUpload();
                 var uploadedFiles = self.uploadedFiles();
@@ -121,14 +128,28 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
-            this.datasetName = ko.observable();
-            this.datasetDescription = ko.observable();
-            this.datasetDevice = ko.observable();
+            this.selectedFiles = ko.observableArray([]);
+            this.indicateDataTableRowSelection = function(row) {
+                this.selectedFiles.removeAll();
+                this.selectedFiles.push(ko.unwrap(row.url))
+            }
+
+            if (!ko.isObservable(this.value)) {
+                this.datasetName = this.value.name;
+                this.datasetDescription = this.value.description;
+                this.datasetDevice = this.value.device;
+            } else {
+                this.datasetName = ko.observable('');
+                this.datasetDescription = ko.observable('');
+                this.datasetDevice = ko.observable('');
+            };
 
             [this.datasetName, this.datasetDescription, this.datasetDevice].forEach(function(obs){
                 var self = this;
                 obs.subscribe(function(val){
-                    console.log(val)
+                    if (ko.isObservable(self.value)){
+                        this.value({'files':this.filesJSON(), 'name':this.datasetName(), 'description':this.datasetDescription(), 'device':this.datasetDevice()})
+                    }
                 }, self)
             }, this);
 
@@ -166,13 +187,20 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                console.log(self.value())
-                self.value(
-                    value.filter(function(file) {
+                if (ko.isObservable(self.value)){
+                    self.value(
+                        {'files':value.filter(function(file) {
+                            return file.accepted;
+                        }),
+                         'name':self.datasetName(),
+                         'description':self.datasetDescription(),
+                         'device':self.datasetDevice()
+                        })
+                } else {
+                    self.value.files(value.filter(function(file) {
                         return file.accepted;
-                    })
-                );
-                console.log(self.value())
+                    }));
+                }
             });
 
             this.chartData = ko.observable([])
