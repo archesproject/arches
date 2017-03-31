@@ -209,6 +209,8 @@ define([
             this.getFileData = function(f) {
                 var self = this;
                 var url = f.url;
+                var filename = f.name();
+                var basename = filename.substr(0, filename.lastIndexOf('.')) || filename;
                 if (ko.isObservable(f.url)) {
                     url = f.url();
                 };
@@ -231,7 +233,9 @@ define([
                           }
                     })
                     var data = _.sortBy(rows, function(a){return a['x']});
-                    self.chartData(data);
+                    var series = [{values: data, key: basename, color: '#ff7f0e'}]
+
+                    self.chartData(series);
                     self.selectedFile(f);
                   });
               }

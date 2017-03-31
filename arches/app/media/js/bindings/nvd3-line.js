@@ -25,6 +25,19 @@ define([
                             .showLegend(false)
               ;
 
+            //TODO Customize the tooltip html to clarify xy values
+            //   chart.interactiveLayer.tooltip.contentGenerator(
+            //       function (d) {
+            //           var html = "<h2>"+d.value+"</h2> <ul>";
+            //           d.series.forEach(function(elem){
+            //             html += "<li><h3 style='color:"+elem.color+"'>"
+            //                     +elem.key+"</h3> : <b>"+elem.value+"</b></li>";
+            //           })
+            //           html += "</ul>"
+            //           return html;
+            //       }
+            //   );
+
               chart.xAxis     //Chart x-axis settings
                   .axisLabel('x-axis')
                   .tickFormat(d3.format('.02f'));
@@ -35,17 +48,15 @@ define([
 
               /* Done setting the chart up? Time to render it!*/
               var myData = function() {
-                    data( [
-                            {x:0.00,y:0.0}
-                        ])
+                    data([
+                      {
+                        values: [{x:0,y:0}],
+                        key: 'No Data',
+                        color: '#ff7f0e'
+                      }
+                    ]);
 
-                      return [
-                        {
-                          values: data(),
-                          key: 'Test Data',
-                          color: '#ff7f0e'
-                        }
-                      ];
+                      return data();
                     };
 
             var svg = d3.select(element).append("svg:svg")
@@ -56,13 +67,7 @@ define([
 
             data.subscribe(function(val){
                 svg = d3.select($(element).find('svg')[0])
-                getData = function(){ return [
-                  {
-                    values: val,
-                    key: 'Test Data',
-                    color: '#ff7f0e'
-                  }
-               ]};
+                getData = function(){ return val};
                 svg.datum(getData).transition().duration(800).call(chart);
                //  nv.utils.windowResize(chart.update);
             }, this);
