@@ -16,6 +16,7 @@
 @import url(../bower_components/codemirror/theme/monokai.css);
 @import url(../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css);
 @import url(../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css);
+@import url(../bower_components/nvd3/build/nv.d3.min.css);
 @import url(../bower_components/leaflet/dist/leaflet.css);
 @import url(../bower_components/leaflet-draw/dist/leaflet.draw.css);
 
@@ -4878,6 +4879,15 @@ h4.report-toolbar-title {
     vertical-align: middle;
 }
 
+.csv-chart {
+    height: 240px
+}
+
+.csv-chart-widget-input {
+    width: 100%;
+    padding: 7px 10px 0px;
+}
+
 .map-widget-container {
     position: absolute;
     top: 10px;
@@ -6665,6 +6675,79 @@ table.table.dataTable {
     padding: 25px;
     font-size: 16px;
 }
+
+/**********
+*  Axes
+*/
+
+.axis path {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+}
+
+.axis path.domain {
+  stroke-opacity: .75;
+}
+
+.axis line {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .25;
+  shape-rendering: crispEdges;
+}
+
+.axis line.zero {
+  stroke-opacity: .75;
+}
+
+
+
+/**********
+*  Line chart
+*/
+
+.point-paths path {
+  /*
+  fill: #eee;
+  stroke: #aaa;
+  */
+  stroke-opacity: 0;
+  fill-opacity: 0;
+}
+
+
+.lines path {
+  fill: none;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+
+  transition: stroke-width 250ms linear;
+  -moz-transition: stroke-width 250ms linear;
+  -webkit-transition: stroke-width 250ms linear;
+
+  transition-delay: 250ms
+  -moz-transition-delay: 250ms;
+  -webkit-transition-delay: 250ms;
+}
+
+.line.hover path {
+  stroke-width: 6px;
+}
+
+.lines .point {
+  transition: stroke-width 250ms linear;
+  -moz-transition: stroke-width 250ms linear;
+  -webkit-transition: stroke-width 250ms linear;
+}
+
+.lines .point.hover {
+  stroke-width: 20px;
+  stroke-opacity: .5;
+}
+
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
