@@ -204,7 +204,12 @@ define([
             });
 
             this.chartData = ko.observable([])
-
+            this.resize = function(){
+                window.setTimeout(function() {
+                    window.dispatchEvent(new Event('resize'))
+                    console.log('resizing')
+                }, 50)
+            }
 
             this.getFileData = function(f) {
                 var self = this;
