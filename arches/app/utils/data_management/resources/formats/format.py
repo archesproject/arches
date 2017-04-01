@@ -40,7 +40,7 @@ class ResourceImportReporter:
 
     def update_relations_saved(self, count=1):
         self.relations_saved += count
-        print self.tiles_saved
+        print _('{0} of {1} relations saved'.format(self.relations_saved, self.relations))
 
     def report_results(self):
         if self.resources > 0:
