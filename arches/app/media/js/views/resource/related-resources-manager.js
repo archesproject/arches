@@ -22,7 +22,7 @@ define([
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(false);
             this.graphNodeList = ko.observableArray();
-
+            this.newResource = ko.observableArray();
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
@@ -90,6 +90,7 @@ define([
                             })
                             .done(function(data) {
                                 this.parse(data)
+                                self.newResource(this)
                             })
                             .fail(function(data) {
                                 console.log('failed', data)

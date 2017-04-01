@@ -1,0 +1,289 @@
+{% extends "views/components/widgets/base.htm" %} {% load i18n %} {% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+
+        <div class="col-xs-12">
+
+            <div class="bord-top pad-ver">
+                <ul class="list-inline">
+                    <li class="active"><a href="#file-upload" data-toggle="tab">{% trans "Upload Files" %}</a></li>
+                    <li><a href="#manage-dataset" data-toggle="tab">{% trans "Manage Dataset" %}</a></li>
+                    <li data-bind="click: function(){resize()}"><a href="#visualize-data" data-toggle="tab" data-bind="css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
+                </ul>
+            </div>
+            <div>
+                <!--CONTENT CONTAINER-->
+                <div class="tab-content csv-chart-panel" style="margin-bottom: 20px;">
+                    <!-- Manage Data -->
+                        <div id="manage-dataset" class="tab-pane csv-chart-panel">
+
+                            <div class="form-group">
+                                <div class="input-group csv-chart-widget-input">
+                                    <input type="" placeholder="{% trans " Name " %}" id="" class="form-control input-md" data-bind="value: datasetName, valueUpdate: 'keyup'">
+                                </div>
+                                <div class="input-group csv-chart-widget-input">
+                                    <input type="" placeholder="{% trans " Device " %}" id="" class="form-control input-md" data-bind="value: datasetDevice, valueUpdate: 'keyup'">
+                                </div>
+                                <div class="input-group csv-chart-widget-input">
+                                    <textarea type="" placeholder="{% trans " Description " %}" id="" class="form-control input-md" data-bind="value: datasetDescription, valueUpdate: 'keyup'"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Dataset -->
+                        <div id="file-upload" class="dropzone tab-pane csv-chart-panel active" data-bind="dropzone: dropzoneOptions">
+                            <div class="panel">
+                                <div>
+                                    <div class="pad-ver csv-chart-panel">
+                                        <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{% trans "Add files" %}...</span>
+                                        </span>
+
+                                        <div class="btn-group pull-right">
+                                            <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">
+                                        <i class="ion ion-close"></i>
+                                    </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="dz-previews" data-bind="css: uniqueidClass">
+                                        <!-- ko foreach: filesJSON -->
+                                        <div class="media pad-top bord-top">
+                                            <div class="media-body">
+                                                <div class="media-block">
+                                                    <div class="media-left">
+                                                        <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 -->
+                                                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: ko.unwrap(url) ? url : content }">
+                                                        <!-- /ko -->
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
+                                                        <!-- ko if: $data.error -->
+                                                        <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
+                                                        <!-- /ko -->
+                                                        <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="media-right" data-bind="click: $parent.removeFile">
+                                                <button class="btn btn-xs btn-danger dz-cancel"><i class="ion ion-close"></i></button>
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visualize Dataset -->
+                        <div id="visualize-data" class="tab-pane csv-chart-panel" style="border: 1px solid #ddd; border-bottom-width: 0px; margin-top: 0px;">
+                            <div id="card-container" class="panel card-panel">
+                                <div class="panel-heading">
+                                    <div class="" style="">
+                                        <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: datasetDevice"></h3>
+                                    </div>
+                                </div>
+
+                                <!-- Alert Panel -->
+                                <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+
+                                <!-- Data Entry -->
+                                <div id="add-basemap-wizard" class="panel-body card-body fade in" style="padding-top: 0px;">
+                                    <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 10px; margin-top: -2px;">
+
+                                        <!--Nav Tabs-->
+                                        <ul class="nav nav-tabs card-nav-container" style="">
+                                            <li id="summary-group" class="active">
+                                                <a id="files-tab" data-toggle="tab" href="#files-card" class="card-tab-title">{% trans "Analytical Files" %}</a>
+                                            </li>
+                                            <li id="image-group" class="">
+                                                <a id="metadata-tab" data-toggle="tab" href="#metadata-card" class="card-tab-title">{% trans "Dataset Summary" %}</a>
+                                            </li>
+                                        </ul>
+
+                                        <div id="db-arches-app-alert" class="panel data-card-alert" style=""></div>
+
+                                        <!--Tabs Content-->
+                                        <div class="tab-content card-content-tab" style="margin-left: 0px;">
+
+                                            <!-- Files Card -->
+                                            <div id="files-card" class="tab-pane fade active in">
+                                                <div class="panel-body card-panel-body" style="">
+                                                    <div id="" class="card-content" style="padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px;">
+
+                                                        <!-- Card Level Alert -->
+                                                        <div id="summary-card-alert" class="panel install-card-alert" style="margin-bottom: 0px;"></div>
+
+                                                        <!-- File Chart -->
+                                                        <div style="">
+                                                            <div class="csv-chart" data-bind="nvd3Line: {data: chartData}"></div>
+                                                            <!--Chart information-->
+                                                            <div class="panel-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <div class="row">
+                                                                            <div class="col-xs-6">
+
+                                                                                <!-- Upload stat -->
+                                                                                <div class="pad-ver media">
+                                                                                    <div class="media-left">
+                                                                                        <span class="icon-wrap icon-wrap-xs">
+                                                                                            <i class="fa fa-cloud-upload fa-2x"></i>
+                                                                                        </span>
+                                                                                    </div>
+
+                                                                                    <div class="media-body">
+                                                                                        <p class="h3 text-thin media-heading" data-bind="text: selection().upload_time"></p>
+                                                                                        <small class="text-uppercase">{% trans "Upload date" %}</small>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!--Progress bar-->
+                                                                                <div class="progress progress-xs progress-dark-base mar-no">
+                                                                                    <div class="progress-bar progress-bar-light" style="width: 30%"></div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="col-xs-6">
+
+                                                                                <!-- Label -->
+                                                                                <div class="pad-ver media">
+                                                                                    <div class="media-right">
+                                                                                        <span class="icon-wrap icon-wrap-xs">
+                                                                                            <i class="fa fa-tag fa-2x"></i>
+                                                                                        </span>
+                                                                                    </div>
+
+                                                                                    <div class="media-body">
+                                                                                        <p class="h3 text-thin media-heading">Area 06</p>
+                                                                                        <small class="text-uppercase">Sample Id</small>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <hr class="mar-lft" style="margin-right: 25px; margin-top: 0px;">
+                                                        <!-- File List -->
+                                                        <!-- ko foreach: { data: [$data], as: 'self' } -->
+                                                        <div class="" style="">
+                                                            <div class="panel-body">
+
+                                                                <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="rr-tab-field">{% trans "Name" %}</th>
+                                                                            <th class="rr-tab-field">{% trans "Size" %}</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody data-bind="dataTablesForEach: {data: uploadedFiles, dataTableOptions: {
+                                                                                          jQueryUI: true,
+                                                                                          scrollY: 350,
+                                                                                          paging: true,
+                                                                                          dom: 'rtip',
+                                                                                          columns:[
+                                                                                              {width: '100px'},
+                                                                                              {width: '100px'}
+                                                                                          ]
+                                                                                      }
+                                                                                  }">
+                                                                        <tr class="rr-table-row" data-bind="click: function (e) {
+                                                                            self.getFileData(e);
+                                                                            self.indicateDataTableRowSelection(e)
+                                                                        }">
+                                                                            <td>
+                                                                                <i data-bind="css: {'ion-checkmark-circled': _.contains(self.selectedFiles(), ko.unwrap(url))}"></i>
+                                                                                <span data-bind="text: name"></span>
+                                                                            </td>
+                                                                            <td>
+                                                                                <span data-bind="html: size"></span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+                                                        </div>
+                                                        <!-- /ko -->
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <div id="metadata-card" class="tab-pane fade active in">
+                                                <dl>
+                                                    <dt>{% trans "Name" %}</dt>
+                                                    <dd data-bind="text:datasetName"></dd>
+                                                    <dt>{% trans "Device" %}</dt>
+                                                    <dd data-bind="text:datasetDevice"></dd>
+                                                    <dt>{% trans "Description" %}</dt>
+                                                    <dd data-bind="text:datasetDescription"></dd>
+                                                </dl>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                    </div>
+                </div>
+                <!--END CONTENT CONTAINER-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="file-widget-dz-preview"><span></span></template> {% endblock form %} {% block config_form %}
+<div class="control-label">
+    {% trans "Accepted Files" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans " Accepted Files " %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+</div>
+
+<div class="control-label">
+    {% trans "Max File Size (mb)" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans " Max File Size (mb) " %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+</div>
+{% endblock config_form %} {% block report %}
+<dt data-bind="text: label"></dt>
+
+<!-- ko if: uploadedFiles().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+
+<!-- ko foreach: reportFiles() -->
+<dd>
+    <a class="" data-bind="attr: {href: url}">
+        <i class="ion ion-forward"></i>
+        <span data-bind="text: name"></span>
+    </a>
+</dd>
+<!-- /ko -->
+
+<!-- ko if: reportImages().length > 0 -->
+<dd>
+    <div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: reportImages() -->
+        <div class="rp-image-grid-item">
+            <a id="" class="" target="_blank" data-bind="attr: {href: url}">
+                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
+            </a>
+        </div>
+        <!-- /ko -->
+    </div>
+</dd>
+<!-- /ko -->
+{% endblock report %} {% block display_value %}
+<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'"></span> {% endblock display_value %}

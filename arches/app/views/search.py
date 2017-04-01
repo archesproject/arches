@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import csv
 import math
 from datetime import datetime
-from flexidate import FlexiDate 
+from flexidate import FlexiDate
 from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -33,6 +33,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
+from arches.app.models.graph import Graph
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -52,12 +53,14 @@ class SearchView(BaseManagerView):
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+        resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
 
         context = self.get_context_data(
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',
+            resource_graphs=resource_graphs,
         )
 
         context['nav']['title'] = 'Search'
@@ -262,7 +265,7 @@ def build_search_results_dsl(request):
             # start_date = start_date.isoformat()
             sd = FlexiDate.from_str(temporal_filter['fromDate'])
             start_date = int((sd.as_float()-1970)*31556952*1000)
-            
+
             #start_year = parser.parse(start_date).year
             start_year = sd.year
         except:
@@ -273,7 +276,7 @@ def build_search_results_dsl(request):
             # end_date = end_date.isoformat()
             ed = FlexiDate.from_str(temporal_filter['toDate'])
             end_date = int((ed.as_float()-1970)*31556952*1000)
-            
+
             #end_year = parser.parse(end_date).year
             end_year = ed.year
         except:
@@ -380,7 +383,7 @@ def _buffer(geojson, width=0, unit='ft'):
     if width > 0:
         if unit == 'ft':
             width = width/3.28084
-        
+
         geom.transform(3857)
         geom = geom.buffer(width)
         geom.transform(4326)
