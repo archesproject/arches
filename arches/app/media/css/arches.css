@@ -4879,13 +4879,27 @@ h4.report-toolbar-title {
     vertical-align: middle;
 }
 
+.disabled-link {
+   pointer-events: none;
+   cursor: default;
+   color: grey;
+}
+
 .csv-chart {
     height: 240px
 }
 
 .csv-chart-widget-input {
     width: 100%;
-    padding: 7px 10px 0px;
+    padding: 0px 0px 10px;
+}
+
+.tab-content .csv-chart-panel {
+    padding-top: 0px;
+}
+
+.pad-ver .csv-chart-panel {
+    padding-top: 0px;
 }
 
 .map-widget-container {
