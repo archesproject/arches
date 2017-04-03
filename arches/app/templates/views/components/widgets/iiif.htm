@@ -73,7 +73,25 @@
         </div>
     </div>
 
-    <div class="relative" data-bind="leaflet: mapConfig" style="height: 500px;"></div>
+
+    <div class="relative" data-bind="leaflet: mapConfig" style="height: 500px;">
+        <!-- ko if: popupData() !== null -->
+        <div class="hover-feature-info">
+            <div class="hover-feature-title-bar">
+                <div class="hover-feature-title">
+                    <span class="" data-bind="text: popupData().id"></span>
+                    <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss"
+                    style="cursor: pointer;"
+                    data-placement="left"
+                    data-toggle="tooltip"
+                    data-original-title="add overlay"
+                    data-bind="visible: popupData() === clickData(), click: function () { clickData(null); }"
+                    ></i>
+                </div>
+            </div>
+        </div>
+        <!--/ko-->
+    </div>
 </div>
 {% endblock form %}
 

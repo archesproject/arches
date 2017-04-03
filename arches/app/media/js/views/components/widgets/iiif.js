@@ -4,11 +4,12 @@ define([
     'viewmodels/widget',
     'leaflet',
     'knockout-mapping',
+    'uuid',
     'arches',
     'leaflet-iiif',
     'leaflet-draw',
     'bindings/leaflet'
-], function (ko, _, WidgetViewModel, L, koMapping, arches) {
+], function (ko, _, WidgetViewModel, L, koMapping, uuid, arches) {
     return ko.components.register('iiif-widget', {
         viewModel: function(params) {
             var self = this;
@@ -17,9 +18,43 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             var features = self.value.features ? koMapping.toJS(self.value.features) : [];
+            var ignoreFeatureClick = false;
+            this.hoverData = ko.observable(null);
+            this.clickData = ko.observable(null);
+            this.popupData = ko.computed(function () {
+                var hoverData = self.hoverData();
+                return hoverData ? hoverData : self.clickData();
+            });
+            var addLayerListeners = function (layer) {
+                layer.on({
+                    mouseover: function(e) {
+                        self.hoverData(layer.feature.properties);
+                    },
+                    mouseout: function(e) {
+                        self.hoverData(null);
+                    },
+                    click: function(e) {
+                        if (!ignoreFeatureClick) {
+                            self.clickData(layer.feature.properties);
+                        }
+                    }
+                });
+            }
             var drawnItems = new L.geoJson({
                 type: 'FeatureCollection',
                 features: features
+            }, {
+                onEachFeature: function(feature, layer) {
+                    addLayerListeners(layer)
+                }
+            });
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                },
+                draw: {
+                    circle: false
+                }
             });
 
             this.expandControls = ko.observable(false);
@@ -111,6 +146,9 @@ define([
                     }
                     self.map = map;
                     self.map.addLayer(drawnItems);
+                    map.on('preclick', function(e) {
+                        self.clickData(null);
+                    });
 
                     if (url) {
                         canvasLayer = L.tileLayer.iiif(
@@ -120,16 +158,13 @@ define([
                     }
 
                     if (self.state !== 'report') {
-                        var drawControl = new L.Control.Draw({
-                            edit: {
-                                featureGroup: drawnItems
-                            },
-                            draw: {
-                                circle: false
-                            }
-                        });
-
                         self.map.addControl(drawControl);
+                        map.on('draw:deletestart', function (e) {
+                            ignoreFeatureClick = true;
+                        });
+                        map.on('draw:deletestop', function (e) {
+                            ignoreFeatureClick = false;
+                        })
                     } else {
                         self.map.addLayer(drawnItems);
                     }
@@ -137,6 +172,16 @@ define([
                     self.map.on(L.Draw.Event.CREATED, function(e) {
                         var type = e.layerType
                         var layer = e.layer;
+                        layer.feature = {
+                            type: "Feature",
+                            properties: {
+                                id: uuid.generate(),
+                                name: '',
+                                type: null
+                            }
+                        };
+
+                        addLayerListeners(layer);
 
                         drawnItems.addLayer(layer);
 
