@@ -8,6 +8,7 @@ define([
     'arches',
     'leaflet-iiif',
     'leaflet-draw',
+    'leaflet-draw-local',
     'bindings/leaflet'
 ], function (ko, _, WidgetViewModel, L, koMapping, uuid, arches) {
     return ko.components.register('iiif-widget', {
