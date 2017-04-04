@@ -1,19 +1,17 @@
 #!/bin/bash
 
-if [[ ! -z ${ARCHES_PROJECT} ]]; then
-	PROJECT_ROOT=${ARCHES_ROOT}/${ARCHES_PROJECT}
-else
-	PROJECT_ROOT=${ARCHES_ROOT}
-fi
+CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
+APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
+
 
 cd_arches_root() {
 	cd ${ARCHES_ROOT}
 	echo "Current work directory: ${ARCHES_ROOT}"
 }
 
-cd_project_root() {
-	cd ${PROJECT_ROOT}/${ARCHES_PROJECT}
-	echo "Current work directory: ${PROJECT_ROOT}/${ARCHES_PROJECT}"
+cd_app_folder() {
+	cd ${APP_FOLDER}
+	echo "Current work directory: ${APP_FOLDER}/"
 }
 
 activate_virtualenv() {
@@ -63,7 +61,7 @@ setup_arches() {
 init_arches_projects() { 
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
-		if [[ ! -d ${PROJECT_ROOT} ]] || [[ ! "$(ls -A ${PROJECT_ROOT})" ]]; then
+		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
 			echo "" 
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
@@ -87,9 +85,9 @@ init_arches_projects() {
 
 copy_settings_local() {
 	# The settings_local.py in ${ARCHES_ROOT}/arches/ gets ignored if running manage.py from a custom Arches project instead of Arches core app
-	if [[ ! -f ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py ]]; then
-		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py..."
-		cp ${ARCHES_ROOT}/arches/settings_local.py ${PROJECT_ROOT}/${ARCHES_PROJECT}/settings_local.py
+	if [[ ! -f ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py ]]; then
+		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py..."
+		cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
 	fi
 }
 
@@ -103,6 +101,15 @@ install_dev_requirements() {
 	echo "----- DJANGO_MODE = DEV, INSTALLING DEV REQUIREMENTS -----"
 	echo ""
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+}
+
+run_custom_scripts() {
+	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
+		if [[ -f ${file} ]]; then
+			echo "Running custom script: ${file}"
+			${file}
+		fi
+	done
 }
 
 run_tests() {
@@ -145,8 +152,9 @@ fi
 
 run_tests
 
-# From here on, run from ${PROJECT_ROOT}
-cd_project_root
+# From here on, run from ${APP_FOLDER}
+cd_app_folder
+run_custom_scripts
 if [[ "${DJANGO_MODE}" == "PROD" ]]; then
 	collect_static
 fi

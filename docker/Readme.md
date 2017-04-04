@@ -155,6 +155,21 @@ You can expand it for any other settings that differ between environments.
 
 
 
+## Custom scipts on startup
+On startup, you can run custom scripts before Arches is started up (called an entrypoint). 
+Any script placed in /docker/entrypoint in the Docker container is ran after the default actions, such as database initialization and the creation of a new custom Arches app. 
+
+You can mount your custom scripts into the container, e.g.:
+```
+      volumes:
+        - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
+```
+
+Useful environment variables:
+	- APP_FOLDER = The folder in your custom Arches app where your manage.py file lives. `/your_project_root/<your_project_name>`
+
+
+
 ## Connect to your container
 The general command to enter your running container from the command line is: 
 ```
