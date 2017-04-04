@@ -90,10 +90,10 @@
         <div class="hover-feature-body">
             <div>
                 <label>Name:</label>
-                <!-- ko if: popupData() !== clickData() || state !== 'report'-->
+                <!-- ko if: popupData() !== clickData() -->
                 <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
                 <!-- /ko -->
-                <!-- ko if: popupData() === clickData()  && state !== 'report'-->
+                <!-- ko if: popupData() === clickData() -->
                 <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
                 <!-- /ko -->
             </div>
@@ -135,10 +135,7 @@
                 <!-- ko if: popupData() !== clickData() -->
                 <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
                 <!-- /ko -->
-                <!-- ko if: popupData() === clickData() && state !== 'report' -->
-                <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
-                <!-- /ko -->
-                <!-- ko if: popupData() === clickData() && state === 'report' -->
+                <!-- ko if: popupData() === clickData() -->
                 <span data-bind="text: clickName() || '{% trans "Unnamed" %}'"></span>
                 <!-- /ko -->
             </div>
