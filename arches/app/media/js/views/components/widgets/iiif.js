@@ -33,6 +33,18 @@ define([
                 },
                 owner: this
             });
+            this.clickType = ko.pureComputed({
+                read: function () {
+                    return self.clickData() ? self.clickData().type :  null;
+                },
+                write: function (val) {
+                    if (self.clickData()) {
+                        self.clickData().type = val;
+                        updateFeatures();
+                    }
+                },
+                owner: this
+            });
             this.popupData = ko.computed(function () {
                 var hoverData = self.hoverData();
                 return hoverData ? hoverData : self.clickData();
