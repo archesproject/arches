@@ -97,7 +97,7 @@
                 <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
                 <!-- /ko -->
             </div>
-            <div data-bind="if: popupData() !== clickData() && state !== 'report'">
+            <div data-bind="if: popupData() !== clickData()">
                 {% trans "(Click to edit details)" %}
             </div>
         </div>
@@ -138,9 +138,6 @@
                 <!-- ko if: popupData() === clickData() -->
                 <span data-bind="text: clickName() || '{% trans "Unnamed" %}'"></span>
                 <!-- /ko -->
-            </div>
-            <div data-bind="if: popupData() !== clickData() && state !== 'report'">
-                {% trans "(Click to edit details)" %}
             </div>
         </div>
     </div>
