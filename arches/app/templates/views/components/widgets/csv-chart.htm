@@ -8,28 +8,12 @@
             <div class="bord-top pad-ver">
                 <ul class="list-inline">
                     <li class="active"><a href="#file-upload" data-toggle="tab">{% trans "Upload Files" %}</a></li>
-                    <li><a href="#manage-dataset" data-toggle="tab">{% trans "Manage Dataset" %}</a></li>
                     <li data-bind="click: function(){resize()}"><a href="#visualize-data" data-toggle="tab" data-bind="css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
                 </ul>
             </div>
             <div>
                 <!--CONTENT CONTAINER-->
                 <div class="tab-content csv-chart-panel" style="margin-bottom: 20px;">
-                    <!-- Manage Data -->
-                        <div id="manage-dataset" class="tab-pane csv-chart-panel">
-
-                            <div class="form-group">
-                                <div class="input-group csv-chart-widget-input">
-                                    <input type="" placeholder="{% trans " Name " %}" id="" class="form-control input-md" data-bind="value: datasetName, valueUpdate: 'keyup'">
-                                </div>
-                                <div class="input-group csv-chart-widget-input">
-                                    <input type="" placeholder="{% trans " Device " %}" id="" class="form-control input-md" data-bind="value: datasetDevice, valueUpdate: 'keyup'">
-                                </div>
-                                <div class="input-group csv-chart-widget-input">
-                                    <textarea type="" placeholder="{% trans " Description " %}" id="" class="form-control input-md" data-bind="value: datasetDescription, valueUpdate: 'keyup'"></textarea>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Upload Dataset -->
                         <div id="file-upload" class="dropzone tab-pane csv-chart-panel active" data-bind="dropzone: dropzoneOptions">
@@ -82,7 +66,7 @@
                             <div id="card-container" class="panel card-panel">
                                 <div class="panel-heading">
                                     <div class="" style="">
-                                        <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: datasetDevice"></h3>
+                                        <h3 id="cc-title" class="panel-title card-main-title">Chart title</h3>
                                     </div>
                                 </div>
 
@@ -93,23 +77,8 @@
                                 <div id="add-basemap-wizard" class="panel-body card-body fade in" style="padding-top: 0px;">
                                     <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 10px; margin-top: -2px;">
 
-                                        <!--Nav Tabs-->
-                                        <ul class="nav nav-tabs card-nav-container" style="">
-                                            <li id="summary-group" class="active">
-                                                <a id="files-tab" data-toggle="tab" href="#files-card" class="card-tab-title">{% trans "Analytical Files" %}</a>
-                                            </li>
-                                            <li id="image-group" class="">
-                                                <a id="metadata-tab" data-toggle="tab" href="#metadata-card" class="card-tab-title">{% trans "Dataset Summary" %}</a>
-                                            </li>
-                                        </ul>
-
                                         <div id="db-arches-app-alert" class="panel data-card-alert" style=""></div>
 
-                                        <!--Tabs Content-->
-                                        <div class="tab-content card-content-tab" style="margin-left: 0px;">
-
-                                            <!-- Files Card -->
-                                            <div id="files-card" class="tab-pane fade active in">
                                                 <div class="panel-body card-panel-body" style="">
                                                     <div id="" class="card-content" style="padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px;">
 
@@ -213,22 +182,6 @@
                                                         <!-- /ko -->
                                                     </div>
                                                 </div>
-
-
-                                            </div>
-                                            <div id="metadata-card" class="tab-pane fade active in">
-                                                <dl>
-                                                    <dt>{% trans "Name" %}</dt>
-                                                    <dd data-bind="text:datasetName"></dd>
-                                                    <dt>{% trans "Device" %}</dt>
-                                                    <dd data-bind="text:datasetDevice"></dd>
-                                                    <dt>{% trans "Description" %}</dt>
-                                                    <dd data-bind="text:datasetDescription"></dd>
-                                                </dl>
-                                            </div>
-
-                                        </div>
-
                                     </div>
 
                                 </div>
