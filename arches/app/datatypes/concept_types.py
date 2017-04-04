@@ -12,22 +12,20 @@ class BaseConceptDataType(BaseDataType):
 
     def get_value(self, valueid):
         try:
-            return self.value_lookup[valueid]
+            return self.value_lookup[valueid].value
         except:
             self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
-            return self.value_lookup[valueid]
+            return self.value_lookup[valueid].value
 
-    def get_concept_export_value(self, valueid, *args, **kwargs):
-        concept_export_value_type = None
-        if 'concept_export_value_type' in kwargs:
-            concept_export_value_type = kwargs.get('concept_export_value_type')
+    def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ''
-        if concept_export_value_type != None:
-            if concept_export_value_type == "label" or concept_export_value_type == "both":
-                if concept_export_value_type == "label":
-                    ret = self.get_value(valueid)
-                elif concept_export_value_type == "both":
-                    ret = valueid + '|' + self.get_value(valueid)
+
+        if concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
+            ret = self.get_value(valueid)
+        elif concept_export_value_type == 'both':
+            ret = valueid + '|' + self.get_value(valueid)
+        elif concept_export_value_type == 'id':
+            ret = valueid
         return ret
 
     def append_to_document(self, document, nodevalue):
