@@ -12,18 +12,18 @@ class BaseConceptDataType(BaseDataType):
 
     def get_value(self, valueid):
         try:
-            return self.value_lookup[valueid].value
+            return self.value_lookup[valueid]
         except:
             self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
-            return self.value_lookup[valueid].value
+            return self.value_lookup[valueid]
 
     def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ''
 
         if concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
-            ret = self.get_value(valueid)
+            ret = self.get_value(valueid).value
         elif concept_export_value_type == 'both':
-            ret = valueid + '|' + self.get_value(valueid)
+            ret = valueid + '|' + self.get_value(valueid).value
         elif concept_export_value_type == 'id':
             ret = valueid
         return ret
@@ -66,6 +66,17 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
+    def validate(self, value, source=''):
+        errors = []
+        for v in value:
+            value = v.strip()
+            try:
+                models.Value.objects.get(pk=value)
+            except ObjectDoesNotExist:
+                message = "Not a valid domain value"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+        return errors
+
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
