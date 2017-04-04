@@ -6003,6 +6003,12 @@ span.basemap-unselected {
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
+.iiif-widget {
+    position: relative;
+}
+.iiif-widget .hover-feature-info {
+    margin-left: 25px;
+}
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
