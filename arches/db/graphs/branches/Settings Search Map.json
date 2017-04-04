@@ -1,0 +1,254 @@
+{
+    "graph": [
+        {
+            "subtitle": "Configure default settings for search map",
+            "functions_x_graphs": [],
+            "mapfeaturecolor": "#FF0000",
+            "isresource": false,
+            "forms_x_cards": [],
+            "relatable_resource_model_ids": [],
+            "reports": [],
+            "iconclass": "fa fa-map-marker",
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "de2d490c-fac0-11e6-b6fb-6c4008b05c4c",
+                    "parentnodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c"
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "parentnodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c"
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " ",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "b46805d4-fac1-11e6-a956-6c4008b05c4c",
+                    "datatype": "string",
+                    "nodegroup_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Provider Key"
+                },
+                {
+                    "is_collector": true,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140_assigned_attribute_to",
+                    "name": "Geocoding Providers"
+                },
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Search Map"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "4e4c4f1c-fac1-11e6-8725-6c4008b05c4c",
+                    "datatype": "domain-value",
+                    "nodegroup_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "config": {
+                        "options": [
+                            {
+                                "text": "MapBox",
+                                "selected": false,
+                                "id": "667316ee-8b90-4f1f-b9ea-bb402303f026"
+                            },
+                            {
+                                "text": "Mapzen",
+                                "selected": false,
+                                "id": "143157ae-090f-4e7f-8688-b5fdc8dc8f87"
+                            },
+                            {
+                                "text": "Bing",
+                                "selected": false,
+                                "id": "2cf08870-18a7-41aa-85a7-bc66e89b3312"
+                            }
+                        ]
+                    },
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Provider Name"
+                },
+                {
+                    "is_collector": true,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "de2d490c-fac0-11e6-b6fb-6c4008b05c4c",
+                    "datatype": "geojson-feature-collection",
+                    "nodegroup_id": "de2d490c-fac0-11e6-b6fb-6c4008b05c4c",
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "config": {
+                        "outlineColor": "rgba(200, 200, 200, 0.7)",
+                        "layerName": "",
+                        "clusterMaxZoom": 5,
+                        "weight": 2,
+                        "pointColor": "rgba(130, 130, 130, 0.7)",
+                        "layerActivated": true, "addToMap": false, "layerIcon": "",
+                        "clusterMinPoints": 3,
+                        "clusterDistance": 20,
+                        "haloRadius": 4,
+                        "advancedStyle": "",
+                        "cacheTiles": false,
+                        "radius": 2,
+                        "fillColor": "rgba(130, 130, 130, 0.5)",
+                        "lineColor": "rgba(130, 130, 130, 0.7)",
+                        "outlineWeight": 2,
+                        "haloWeight": 4,
+                        "autoManageCache": false,
+                        "pointHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "lineHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "advancedStyling": false
+                    },
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Map"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "Initial settings for Arches map in the Search UI",
+            "resource_2_resource_constraints": [],
+            "edges": [
+                {
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "b4680797-fac1-11e6-87b7-6c4008b05c4c",
+                    "domainnode_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "rangenode_id": "b46805d4-fac1-11e6-a956-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "402bc230-fac1-11e6-bd69-6c4008b05c4c",
+                    "domainnode_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "rangenode_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "ontologyproperty": "P140_assigned_attribute_to",
+                    "description": null
+                },
+                {
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "de2d4ae1-fac0-11e6-b6a5-6c4008b05c4c",
+                    "domainnode_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "rangenode_id": "de2d490c-fac0-11e6-b6fb-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "4e4c50c0-fac1-11e6-83dd-6c4008b05c4c",
+                    "domainnode_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "rangenode_id": "4e4c4f1c-fac1-11e6-8725-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                }
+            ],
+            "maplinewidth": 1,
+            "mappointsize": 3,
+            "graphid": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+            "name": "Settings Search Map",
+            "cards_x_nodes_x_widgets": [],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "description": "Represents a single node in a graph",
+                    "visible": true,
+                    "nodegroup_id": "402bbff8-fac1-11e6-80c4-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": 1,
+                    "cardid": "4b67b263-fac1-11e6-b9a7-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": null,
+                    "active": true,
+                    "name": "Providers"
+                },
+                {
+                    "helpenabled": false,
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "description": "Represents a single node in a graph",
+                    "visible": true,
+                    "nodegroup_id": "de2d490c-fac0-11e6-b6fb-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": 0,
+                    "cardid": "3d198c45-fac1-11e6-8d1f-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": "Position the map (pan and zoom) to define the initial extent of the map when users access Arches' Search page.  Select the default basemap and any overlays that you want to show by default.  NOTE: Use the Map Layer Manager to configure basemaps and overlayes",
+                    "active": true,
+                    "name": "Map"
+                },
+                {
+                    "helpenabled": false,
+                    "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                    "description": "Initial settings for Arches map in the Search UI",
+                    "visible": true,
+                    "nodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "aadda24a-fac0-11e6-92a5-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": null,
+                    "active": true,
+                    "name": "Settings Search Map"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E13_Attribute_Assignment",
+                "nodeid": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                "datatype": "semantic",
+                "nodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c",
+                "graph_id": "aadccd7a-fac0-11e6-800a-6c4008b05c4c",
+                "config": null,
+                "name": "Search Map"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "0ffff60 2017-02-24 11:14:14 -0800",
+        "db": "PostgreSQL 9.6.1 on x86_64-apple-darwin14.5.0, compiled by Apple LLVM version 7.0.0 (clang-700.1.76), 64-bit",
+        "os version": "15.6.0",
+        "os": "Darwin"
+    }
+}

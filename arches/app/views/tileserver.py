@@ -3,159 +3,178 @@ from django.http import HttpResponse
 import os
 import shutil
 import sys
+import math
 from arches.app.models import models
-from TileStache import parseConfig
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
 from django.conf import settings
-from arches.app.models import models
-from shapely.geometry import asShape
+from arches.app.datatypes import datatypes
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
-def get_tileserver_config():
-    # TODO: the resource queries here perhaps should be moved to a separate view
-    # and url.  We may want to consider parameterizing it to support filtering
-    # on graphid and we will need to support filtering data based on user
-    # permissions, which are defined at the node level; ie only show geometries
-    # for nodes which the authenticated user has read permissions
+def get_tileserver_config(layer_id):
     database = settings.DATABASES['default']
-    return {
+    datatype_factory = DataTypeFactory()
+
+    try:
+        node = models.Node.objects.get(pk=layer_id)
+        # TODO: check user node permissions here, if  user
+        # does not have read access to this node, fire an exception
+        datatype = datatype_factory.get_instance(node.datatype)
+        layer_config = datatype.get_layer_config(node)
+    except Exception:
+        layer_model = models.TileserverLayer.objects.get(name=layer_id)
+        layer_config = layer_model.config
+
+    config_dict = {
         "cache": settings.TILE_CACHE_CONFIG,
-        "layers": {
-            "resources": {
-                "provider": {
-                    "class": "TileStache.Goodies.VecTiles:Provider",
-                    "kwargs": {
-                        "dbinfo": {
-                            "host": database["HOST"],
-                            "user": database["USER"],
-                            "password": database["PASSWORD"],
-                            "database": database["NAME"],
-                            "port": database["PORT"]
-                        },
-                        "queries": [
-                            """SELECT tileid::text,
-                                        resourceinstanceid::text,
-                                        nodeid::text,
-                                        graphid::text,
-                                        node_name,
-                                        graph_name,
-                                        false AS poly_outline,
-                                        geom AS __geometry__,
-                                        row_number() over () as __id__
-                                    FROM mv_geojson_geoms
-                                UNION
-                                SELECT tileid::text,
-                                        resourceinstanceid::text,
-                                        nodeid::text,
-                                        graphid::text,
-                                        node_name,
-                                        graph_name,
-                                        true AS poly_outline,
-                                        ST_ExteriorRing(geom) AS __geometry__,
-                                        row_number() over () as __id__
-                                    FROM mv_geojson_geoms
-                                    where ST_GeometryType(geom) = 'ST_Polygon'"""
-                        ]
-                    },
-                },
-                "allowed origin": "*",
-                "compress": True,
-                "write cache": settings.CACHE_RESOURCE_TILES
-            }
-        }
+        "layers": {}
     }
+    config_dict["layers"][str(layer_id)] = layer_config
+    return config_dict
 
 
 def handle_request(request):
-    config_dict = get_tileserver_config()
-    layer_models = models.TileserverLayers.objects.all()
-    for layer_model in layer_models:
-        config_dict['layers'][layer_model.name] = {
-            "provider": {
-                "name": "mapnik",
-                "mapfile": layer_model.path
-            }
-        }
-
-    config = TileStache.Config.buildConfiguration(config_dict)
     path_info = request.path.replace('/tileserver/', '')
-    query_string = None
-    script_name = None
-
-    status_code, headers, content = TileStache.requestHandler2(
-        config, path_info, query_string, script_name)
-
+    layer_id = path_info.split('/')[0]
+    config_dict = get_tileserver_config(layer_id)
+    config = TileStache.Config.buildConfiguration(config_dict)
+    query_string = ""
+    script_name = ""
     response = HttpResponse()
-    response.content = content
-    response.status_code = status_code
-    for header, value in headers.items():
-        response[header] = value
-    response['Content-length'] = str(len(content))
+
+    try:
+        status_code, headers, content = TileStache.requestHandler2(
+            config, path_info, query_string, script_name)
+
+        response.content = content
+        response.status_code = status_code
+        for header, value in headers.items():
+            response[header] = value
+
+        response['Content-length'] = str(len(content))
+
+    except Exception as e:
+        print 'No tile data', e, response
+
     return response
 
 
-def clean_resource_cache(tile):
-    if not settings.CACHE_RESOURCE_TILES:
-        return
+def generateCoordinates(ul, lr, zooms, padding):
+    count = 0
 
+    for zoom in zooms:
+        ul_ = ul.zoomTo(zoom).container().left(padding).up(padding)
+        lr_ = lr.zoomTo(zoom).container().right(padding).down(padding)
+
+        rows = lr_.row + 1 - ul_.row
+        cols = lr_.column + 1 - ul_.column
+
+        count += int(rows * cols)
+
+    offset = 0
+    for zoom in zooms:
+        ul_ = ul.zoomTo(zoom).container().left(padding).up(padding)
+        lr_ = lr.zoomTo(zoom).container().right(padding).down(padding)
+
+        for row in range(int(ul_.row), int(lr_.row + 1)):
+            for column in range(int(ul_.column), int(lr_.column + 1)):
+                coord = Coordinate(row, column, zoom)
+
+                yield (offset, count, coord)
+
+                offset += 1
+
+
+def clean_resource_cache(tile):
     # get the tile model's bounds
-    bounds = None
+    datatype_factory = DataTypeFactory()
     nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
     for node in nodegroup.node_set.all():
-        if node.datatype == 'geojson-feature-collection':
-            node_data = tile.data[str(node.pk)]
-            for feature in node_data['features']:
-                shape = asShape(feature['geometry'])
-                if bounds is None:
-                    bounds = shape.bounds
-                else:
-                    minx, miny, maxx, maxy = bounds
-                    if shape.bounds[0] < minx:
-                        minx = shape.bounds[0]
-                    if shape.bounds[1] < miny:
-                        miny = shape.bounds[1]
-                    if shape.bounds[2] > maxx:
-                        maxx = shape.bounds[2]
-                    if shape.bounds[3] > maxy:
-                        maxy = shape.bounds[3]
-                    bounds = (minx, miny, maxx, maxy)
-    if bounds is None:
-        return
+        datatype = datatype_factory.get_instance(node.datatype)
+        if datatype.should_cache(node) and datatype.should_manage_cache(node):
+            bounds = datatype.get_bounds(tile, node)
+            if bounds is not None:
+                zooms = range(20)
+                config = TileStache.parseConfig(
+                    get_tileserver_config(node.nodeid))
+                layer = config.layers[str(node.nodeid)]
+                mimetype, format = layer.getTypeByExtension('pbf')
 
-    zooms = range(20)
-    config = parseConfig(get_tileserver_config())
-    layer = config.layers['resources']
-    mimetype, format = layer.getTypeByExtension('pbf')
+                lon1, lat1, lon2, lat2 = bounds
+                south, west = min(lat1, lat2), min(lon1, lon2)
+                north, east = max(lat1, lat2), max(lon1, lon2)
 
-    lon1, lat1, lon2, lat2 = bounds
+                northwest = Location(north, west)
+                southeast = Location(south, east)
+
+                ul = layer.projection.locationCoordinate(northwest)
+                lr = layer.projection.locationCoordinate(southeast)
+
+                padding = 0
+                coordinates = generateCoordinates(ul, lr, zooms, padding)
+
+                for (offset, count, coord) in coordinates:
+                    config.cache.remove(layer, coord, format)
+    for key, tile_list in tile.tiles.iteritems():
+        for child_tile in tile_list:
+            clean_resource_cache(child_tile)
+
+def seed_resource_cache():
+    zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
+    extension = 'pbf'
+
+    lat1, lon1, lat2, lon2 = settings.CACHE_SEED_BOUNDS
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 
     northwest = Location(north, west)
     southeast = Location(south, east)
 
-    ul = layer.projection.locationCoordinate(northwest)
-    lr = layer.projection.locationCoordinate(southeast)
+    padding = 0
 
-    # start with a simple total of all the coordinates we will need.
-    for zoom in zooms:
-        ul_ = ul.zoomTo(zoom).container()
-        lr_ = lr.zoomTo(zoom).container()
+    datatypes = [
+        d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
+    nodes = models.Node.objects.filter(
+        graph__isresource=True, datatype__in=datatypes)
+    for node in nodes:
+        datatype = datatype_factory.get_instance(node.datatype)
+        count = models.TileModel.objects.filter(
+            data__has_key=str(node.nodeid)).count()
+        if datatype.should_cache(node) and count > 0:
+            config = TileStache.parseConfig(get_tileserver_config(node.nodeid))
+            layer = config.layers[str(node.nodeid)]
+            ul = layer.projection.locationCoordinate(northwest)
+            lr = layer.projection.locationCoordinate(southeast)
+            coordinates = generateCoordinates(ul, lr, zooms, padding)
+            for (offset, count, coord) in coordinates:
+                path = '%s/%d/%d/%d.%s' % (layer.name(), coord.zoom,
+                                           coord.column, coord.row, extension)
 
-        rows = lr_.row + 1 - ul_.row
-        cols = lr_.column + 1 - ul_.column
+                progress = {"tile": path,
+                            "offset": offset + 1,
+                            "total": count}
 
-    # now generate the actual coordinates.
-    coordinates = []
-    for zoom in zooms:
-        ul_ = ul.zoomTo(zoom).container()
-        lr_ = lr.zoomTo(zoom).container()
+                attempts = 3
+                rendered = False
 
-        for row in range(int(ul_.row), int(lr_.row + 1)):
-            for column in range(int(ul_.column), int(lr_.column + 1)):
-                coord = Coordinate(row, column, zoom)
-                coordinates.append(coord)
+                while not rendered:
+                    print '%(offset)d of %(total)d...' % progress,
 
-    for coord in coordinates:
-        config.cache.remove(layer, coord, format)
+                    try:
+                        mimetype, content = TileStache.getTile(
+                            layer, coord, extension, True)
+
+                    except:
+                        attempts -= 1
+                        print 'Failed %s, will try %s more.' % (progress['tile'], ['no', 'once', 'twice'][attempts])
+
+                        if attempts == 0:
+                            print 'Failed %(zoom)d/%(column)d/%(row)d, trying next tile.\n' % coord.__dict__
+                            break
+
+                    else:
+                        rendered = True
+                        progress['size'] = '%dKB' % (len(content) / 1024)
+
+                        print '%(tile)s (%(size)s)' % progress

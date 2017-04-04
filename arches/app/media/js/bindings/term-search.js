@@ -52,16 +52,9 @@ define([
                             text: value,
                             value: value
                         }];
-                        $.each(data.hits.hits, function() {
-                            results.push({
-                                inverted: ko.observable(false),
-                                type: this._source.options.conceptid ? 'concept' : 'term',
-                                context: this._source.context,
-                                context_label: this._source.options.context_label,
-                                id: this._source.term + this._source.context,
-                                text: this._source.term,
-                                value: this._source.options.conceptid ? this._source.options.conceptid : this._source.term
-                            });
+                        $.each(data, function() {
+                            this.inverted = ko.observable(false);
+                            results.push(this);
                         }, this);
                         return {
                             results: results

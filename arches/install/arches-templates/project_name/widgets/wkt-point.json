@@ -1,0 +1,13 @@
+{
+    "name": "wkt-point-widget",
+    "component": "views/components/widgets/wkt-point",
+    "defaultconfig": {
+        "width":"100%",
+        "x_value": null,
+        "x_placeholder":"Longitude",
+        "y_value": null,
+        "y_placeholder":"Latitude"
+    },
+    "helptext": null,
+    "datatype": "wkt-point"
+}

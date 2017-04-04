@@ -1,0 +1,23 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
+        <div class="col-xs-12">
+            <div class="pad-hor columns" data-bind="foreach: flatOptions">
+                <label class="form-checkbox form-normal form-primary form-text"
+                    data-bind="css: {
+                        'active': $parent.isOptionSelected($data)
+                    },
+                    click: $parent.toggleOptionSelection">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
+                    <span data-bind="text:text"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form %}

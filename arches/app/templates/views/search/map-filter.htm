@@ -5,6 +5,7 @@
   <!-- ko component: {
       name: 'map-widget',
       params: {
+        searchAggregations: aggregations,
         resizeOnChange: resizeOnChange,
         type: 'search-filter',
         configForm: false,
@@ -14,25 +15,25 @@
         query: query,
         state: 'form',
         config: {
-            basemap: "streets",
+            basemap: defaultBasemap.name,
             bearing: 0,
-            centerX: -122.39977301055693,
-            centerY: 37.79019437299843,
+            centerX: defaultCenter[0],
+            centerY: defaultCenter[1],
             featureColor: "rgba(55,32,196,0.85)",
             featureEditingDisabled: false,
             featureLineWidth: 2,
             featurePointSize: 6,
             geocodePlaceholder: "Locate a Place or Address",
-            geocodeProvider: "MapzenGeocoder",
+            geocodeProvider: geocoderDefault,
             geocoderVisible: true,
             geometryTypes: [{'id':'Point','text':'Point'},{'id':'Line','text':'Line'},{'id':'Polygon','text':'Polygon'}],
             mapControlsHidden: false,
-            maxZoom: 20,
-            minZoom: 0,
-            overlayConfigs: [],
+            maxZoom: maxZoom,
+            minZoom: minZoom,
+            overlayConfigs: overlays,
             overlayOpacity: 0,
             pitch: 0,
-            zoom: 10.007195441591573
+            zoom: defaultZoom
         }
     }
   } --><!-- /ko -->

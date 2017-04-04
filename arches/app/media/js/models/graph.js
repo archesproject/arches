@@ -607,10 +607,8 @@ define(['arches',
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
                     }
-                    if (status === 'success' &&  request.responseJSON) {
-                        if(eventname || eventname !== ''){
-                            self.trigger(eventname, self);
-                        }
+                    if(!!eventname){
+                        self.trigger(eventname, self, request);
                     }
                 }
             }, config));

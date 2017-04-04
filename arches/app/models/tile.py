@@ -21,9 +21,9 @@ from django.conf import settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.concept import get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
-
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 class Tile(models.TileModel):
@@ -93,6 +93,11 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
+        if self.data != {}:
+            for nodeid, value in self.data.iteritems():
+                datatype_factory = DataTypeFactory()
+                datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
+                datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
         if index:
             self.index()
@@ -104,12 +109,25 @@ class Tile(models.TileModel):
 
 
     def delete(self, *args, **kwargs):
+        se = SearchEngineFactory().create()
         request = kwargs.pop('request', None)
         for tiles in self.tiles.itervalues():
             for tile in tiles:
                 tile.delete(*args, request=request, **kwargs)
+
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.filter(Terms(field='tileid', terms=[self.tileid]))
+        query.add_query(bool_query)
+        results = query.search(index='strings', doc_type='term')['hits']['hits']
+        for result in results:
+            se.delete(index='strings', doc_type='term', id=result['_id'])
+
         self.__preDelete(request)
         super(Tile, self).delete(*args, **kwargs)
+        resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
+        resource.index()
+
 
     def index(self):
         """
@@ -117,73 +135,17 @@ class Tile(models.TileModel):
 
         """
 
-        se = SearchEngineFactory().create()
+        Resource.objects.get(pk=self.resourceinstance_id).index()
 
-        search_documents = self.prepare_documents_for_search_index()
-        for document in search_documents:
-            se.index_data('resource', self.resourceinstance.graph_id, document, id=self.resourceinstance_id)
-
-        for term in self.prepare_terms_for_search_index():
-            term_id = '%s_%s' % (str(self.tileid), str(term['nodeid']))
-            se.delete_terms(term_id)
-            se.index_term(term['term'], term_id, term['context'], term['options'])
-
-    def prepare_documents_for_search_index(self):
-        """
-        Generates a list of specialized resource based documents to support resource search
-
-        """
-
-        document = JSONSerializer().serializeToPython(Resource.objects.get(pk=self.resourceinstance_id))
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self.resourceinstance)
-        document['strings'] = []
-        document['dates'] = []
-        document['domains'] = []
-        document['geometries'] = []
-        document['numbers'] = []
-
-        for tile in document['tiles']:
-            for nodeid, nodevalue in tile.data.iteritems():
-                node = models.Node.objects.get(pk=nodeid)
-                if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
-                    if node.datatype == 'string':
-                        document['strings'].append(nodevalue)
-                    elif node.datatype == 'concept' or node.datatype == 'concept-list':
-                        if node.datatype == 'concept':
-                            nodevalue = [nodevalue]
-                        for concept_valueid in nodevalue:
-                            value = models.Value.objects.get(pk=concept_valueid)
-                            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': concept_valueid})
-                    elif node.datatype == 'date':
-                        document['dates'].append(nodevalue)
-                    elif node.datatype == 'geojson-feature-collection':
-                        document['geometries'].append(nodevalue)
-                    elif node.datatype == 'number':
-                        document['numbers'].append(nodevalue)
-
-        return [JSONSerializer().serializeToPython(document)]
-
-    def prepare_terms_for_search_index(self):
-        """
-        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM
-        long and any concept associated with a resource to support term search
-
-        """
-
-        terms = []
-        for nodeid, nodevalue in self.data.iteritems():
-            node = models.Node.objects.get(pk=nodeid)
-            if node.datatype == 'string' and nodevalue is not None:
-                if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append({'term': nodevalue, 'nodeid': nodeid, 'context': '', 'options': {}})
-        return terms
-
-    def get_node_display_values(self):
-        for nodeid, nodevalue in self.data.iteritems():
-            if models.Node.objects.get(pk=nodeid).datatype == 'concept':
-                self.data[nodeid] = get_preflabel_from_valueid(nodevalue, 'en-US')['value']
-
-        return self.data
+    def after_update_all(self):
+        nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
+        datatype_factory = DataTypeFactory()
+        for node in nodegroup.node_set.all():
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.after_update_all()
+        for key, tile_list in self.tiles.iteritems():
+            for child_tile in tile_list:
+                child_tile.after_update_all()
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
@@ -213,7 +175,7 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = ''
+            tile.data[str(node.nodeid)] = None
 
         return tile
 

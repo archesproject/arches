@@ -130,16 +130,12 @@ define([
 
         conceptSelected: function(e) {
             var data = $(e.target).data();
-            this.mode = '';
-
             this.trigger('conceptSelected', data.conceptid);
         },
 
         dropdownConceptSelected: function(e) {
             var data = $(e.target).data();
-            this.mode = 'dropdown';
-
-            this.trigger('conceptSelected', data.conceptid);
+            this.trigger('dropdownConceptSelected', data.conceptid);
         },
 
         addChildConcept: function(e){

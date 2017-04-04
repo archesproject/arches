@@ -20,13 +20,13 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Dsl(object):
     def __init__(self, dsl=None):
-        if dsl is None: 
+        if dsl is None:
             self.dsl = {}
         else:
             self.dsl = dsl
 
     def __str__(self):
-        return JSONSerializer().serialize(self.dsl, indent=4) 
+        return JSONSerializer().serialize(self.dsl, indent=4)
 
     @property
     def dsl(self):
@@ -37,7 +37,7 @@ class Dsl(object):
         try:
             self._dsl = value.dsl
         except AttributeError:
-            self._dsl = value  
+            self._dsl = value
 
 class Query(Dsl):
     """
@@ -47,8 +47,6 @@ class Query(Dsl):
 
     def __init__(self, se, **kwargs):
         self.se = se
-        self._filtered = False
-        self.filter_operator = None
         self.fields = kwargs.pop('fields', None)
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
@@ -59,44 +57,21 @@ class Query(Dsl):
             }
         }
 
-    def add_filter(self, dsl=None, operator='and'):
-        """
-        Wrap the filter in an "and" or "or" clause by specifying an operator value of "and" or "or"
-
-        """
-
-        if dsl is not None:
-            dsl = Dsl(dsl).dsl
-            if operator:
-                self.filter_operator = operator
-
-            if self._filtered:
-                self.dsl['query']['filtered']['filter'].append(dsl)
-            else:
-                self._filtered = True
-                self.dsl = {
-                    'query':{
-                        'filtered':{
-                            'query': self.dsl['query'],
-                            'filter': [dsl]
-                        }
-                    }
-                }
-
     def add_query(self, dsl=None):
         if dsl is not None:
             dsl = Dsl(dsl).dsl
 
-            if self._filtered:
-                if 'bool' in dsl and 'bool' in self.dsl['query']['filtered']['query']:
-                    self.dsl['query']['filtered']['query'] = Bool(self.dsl['query']['filtered']['query']).merge(dsl).dsl
-                else:
-                    self.dsl['query']['filtered']['query'] = dsl
-            else:
-                if 'bool' in dsl and 'bool' in self.dsl['query']:
-                    self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
-                else:
-                    self.dsl['query'] = dsl
+        if 'bool' in dsl and 'bool' in self.dsl['query']:
+            self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
+        else:
+            self.dsl['query'] = dsl
+
+    def add_aggregation(self, agg=None):
+        if agg is not None:
+            if 'aggs' not in self.dsl:
+                self.dsl['aggs'] = {}
+
+            self.dsl['aggs'][agg.name] = agg.agg[agg.name]
 
     def search(self, index='', doc_type='', **kwargs):
         self.fields = kwargs.pop('fields', self.fields)
@@ -114,12 +89,6 @@ class Query(Dsl):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
 
-        if self._filtered:
-            if not ('or' in self.dsl['query']['filtered']['filter'] or 'and' in self.dsl['query']['filtered']['filter']):
-                self.dsl['query']['filtered']['filter'] = {   
-                    self.filter_operator: self.dsl['query']['filtered']['filter']
-                }
-
         if self.fields != None:
             self.dsl['fields'] = self.fields
 
@@ -127,15 +96,16 @@ class Query(Dsl):
 class Bool(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-    
+
     """
-    
-    def __init__(self, dsl=None, **kwargs):  
+
+    def __init__(self, dsl=None, **kwargs):
         self.dsl = {
             'bool':{
                 'should':[],
                 'must':[],
-                'must_not':[]
+                'must_not':[],
+                'filter':[]
             }
         }
         if isinstance(dsl, dict):
@@ -146,6 +116,7 @@ class Bool(Dsl):
         self.should(kwargs.pop('should', None))
         self.must(kwargs.pop('must', None))
         self.must_not(kwargs.pop('must_not', None))
+        self.filter(kwargs.pop('filter', None))
         self.empty = True
 
     def must(self, dsl):
@@ -156,6 +127,9 @@ class Bool(Dsl):
 
     def must_not(self, dsl):
         return self._append('must_not', dsl)
+
+    def filter(self, dsl):
+        return self._append('filter', dsl)
 
     def _append(self, type, dsl):
         if dsl:
@@ -171,14 +145,15 @@ class Bool(Dsl):
         self.dsl['bool']['must'] = self.dsl['bool']['must'] + object.dsl['bool']['must']
         self.dsl['bool']['should'] = self.dsl['bool']['should'] + object.dsl['bool']['should']
         self.dsl['bool']['must_not'] = self.dsl['bool']['must_not'] + object.dsl['bool']['must_not']
+        self.dsl['bool']['filter'] = self.dsl['bool']['filter'] + object.dsl['bool']['filter']
 
         return self
-       
+
 
 class Match(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
-    
+
     """
 
     def __init__(self, **kwargs):
@@ -201,7 +176,7 @@ class Match(Dsl):
         }
 
         if self.fuzziness and self.type != 'phrase_prefix':
-            self.dsl['match'][self.field]['fuzziness'] = self.fuzziness   
+            self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):
     """
@@ -224,7 +199,7 @@ class Nested(Dsl):
         }
 
         if self.score_mode:
-            self.dsl['nested']['score_mode'] = self.score_mode 
+            self.dsl['nested']['score_mode'] = self.score_mode
 
         if self.query:
             self.add_query(dsl=self.query)
@@ -316,7 +291,7 @@ class Range(Dsl):
             }
         else:
             boost = {}
-            
+
         self.dsl = {
             'range' : {
                 self.field : boost
@@ -326,10 +301,10 @@ class Range(Dsl):
         if self.gte is None and self.gt is None and self.lte is None and self.lt is None:
             raise Exception('You need at least one of the following: gte, gt, lte, or lt')
         if self.gte is not None and self.gt is not None:
-            raise Exception('You can only use one of either: gte or gt') 
+            raise Exception('You can only use one of either: gte or gt')
         if self.lte is not None and self.lt is not None:
-            raise Exception('You can only use one of either: lte or lt') 
-        
+            raise Exception('You can only use one of either: lte or lt')
+
         if self.gte is not None:
             self.dsl['range'][self.field]['gte'] = self.gte
         if self.gt is not None:
@@ -368,3 +343,149 @@ class SimpleQueryString(Dsl):
         self.dsl = {
             "prefix" : { self.field : self.query }
         }
+
+class Aggregation(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.agg = {}
+        self.name = kwargs.pop('name', None)
+        self.field = kwargs.pop('field', None)
+        self.script = kwargs.pop('script', None)
+        self.type = kwargs.pop('type', None)
+        self.size = kwargs.pop('size', None)
+
+        if self.field is not None and self.script is not None:
+            raise Exception('You need to specify either a "field" or a "script"')
+        if self.field is None and self.script is None:
+            raise Exception('You need to specify either a "field" or a "script"')
+        if self.name is None:
+            raise Exception('You need to specify a name for your aggregation')
+        if self.type is None:
+            raise Exception('You need to specify an aggregation type')
+
+        self.agg = {
+            self.name: {
+                self.type: {}
+            }
+        }
+
+        if self.field is not None:
+            self.agg[self.name][self.type]['field'] = self.field
+        elif self.script is not None:
+            self.agg[self.name][self.type]['script'] = self.script
+
+        self.set_size(self.size)
+
+        for key in kwargs:
+            self.agg[self.name][self.type][key] = kwargs.get(key, None)
+
+    def add_aggregation(self, agg=None):
+        if agg is not None:
+            if 'aggs' not in self.agg[self.name]:
+                self.agg[self.name]['aggs'] = {}
+
+            self.agg[self.name]['aggs'][agg.name] = agg.agg[agg.name]
+
+    def set_size(self, size):
+        if size is not None and size > 0:
+            self.agg[self.name][self.type]['size'] = size
+
+
+class GeoHashGridAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.precision = kwargs.get('precision', 5)
+        super(GeoHashGridAgg, self).__init__(type='geohash_grid',**kwargs)
+
+        self.agg[self.name][self.type]['precision'] = self.precision
+
+
+class GeoBoundsAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.wrap_longitude = kwargs.get('wrap_longitude', False)
+        super(GeoBoundsAgg, self).__init__(type='geo_bounds',**kwargs)
+
+        self.agg[self.name][self.type]['wrap_longitude'] = self.wrap_longitude
+
+
+class CoreDateAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.get('field', '')
+        self.format = kwargs.pop('format', None)
+        super(CoreDateAgg, self).__init__(**kwargs)
+
+        if self.format:
+            self.agg[self.name][self.type]['format'] = self.format
+
+class MinAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        name = kwargs.pop('name', 'min_%s' % kwargs.get('field', ''))
+        super(MinAgg, self).__init__(name=name, type='min', **kwargs)
+
+class MaxAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        name = kwargs.pop('name', 'max_%s' % kwargs.get('field', ''))
+        super(MaxAgg, self).__init__(name=name, type='max', **kwargs)
+
+class DateRangeAgg(CoreDateAgg):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+    """
+
+    def __init__(self, **kwargs):
+        min_date = kwargs.pop('min_date', None)
+        max_date = kwargs.pop('max_date', None)
+        key = kwargs.pop('key', None)
+        super(DateRangeAgg, self).__init__(type='date_range', **kwargs)
+
+        self.add(min_date=min_date, max_date=max_date, key=key, **kwargs)
+
+    def add(self, **kwargs):
+        date_range = {}
+        min_date = kwargs.pop('min_date', None)
+        max_date = kwargs.pop('max_date', None)
+        key = kwargs.pop('key', None)
+
+        if 'ranges' not in self.agg[self.name][self.type]:
+            self.agg[self.name][self.type]['ranges'] = []
+
+        if min_date is not None:
+            date_range['from'] = min_date
+        if max_date is not None:
+            date_range['to'] = max_date
+        if key is not None:
+            date_range['key'] = key
+
+        if min_date is not None or max_date is not None:
+            self.agg[self.name][self.type]['ranges'].append(date_range)

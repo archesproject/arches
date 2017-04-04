@@ -17,12 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
-
+import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.module_loading import import_string
-import os, sys, subprocess
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
@@ -30,17 +30,15 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from arches.app.models import models
-import csv, json
-from arches.app.utils.data_management.resources.arches_file_importer import ArchesFileImporter
-from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
-from arches.app.utils.data_management.resources.csv_file_importer import CSVFileImporter
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.skos import SKOSReader
+from arches.app.views.tileserver import seed_resource_cache
 from django.db import transaction
 
 
@@ -52,8 +50,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'import_json', 'export_json', 'add_tilserver_layer', 'delete_tilserver_layer',
-            'create_mapping_file', 'import_csv', 'import_business_data', 'import_mapping_file', 'add_mapbox_layer',],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -81,11 +79,14 @@ class Command(BaseCommand):
         parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
             help='A comma separated list of the graphids of the resources you would like to import/export.')
 
-        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=False,
+        parser.add_argument('-c', '--config_file', action='store', dest='config_file', default=None,
             help='Usually an export mapping file.')
 
         parser.add_argument('-m', '--mapnik_xml_path', action='store', dest='mapnik_xml_path', default=False,
             help='A path to a mapnik xml file to generate a tileserver layer from.')
+
+        parser.add_argument('-t', '--tile_config_path', action='store', dest='tile_config_path', default=False,
+            help='A path to a tile config json file to generate a tileserver layer from.')
 
         parser.add_argument('-j', '--mapbox_json_path', action='store', dest='mapbox_json_path', default=False,
             help='A path to a mapbox json file to generate a layer from.')
@@ -93,11 +94,20 @@ class Command(BaseCommand):
         parser.add_argument('-n', '--layer_name', action='store', dest='layer_name', default=False,
             help='The name of the tileserver layer to add or delete.')
 
+        parser.add_argument('-ow', '--overwrite', action='store', dest='overwrite', default='',
+            help='Whether to overwrite existing concepts with ones being imported or not.')
+
+        parser.add_argument('-st', '--stage', action='store', dest='stage', default='keep',
+            help='Whether to stage new concepts or add them to the existing concept scheme.')
+
         parser.add_argument('-i', '--layer_icon', action='store', dest='layer_icon', default='fa fa-globe',
             help='An icon class to use for a tileserver layer.')
 
         parser.add_argument('-b', '--is_basemap', action='store_true', dest='is_basemap',
             help='Add to make the layer a basemap.')
+
+        parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
+            help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
 
     def handle(self, *args, **options):
@@ -106,36 +116,33 @@ class Command(BaseCommand):
         print 'package: '+ package_name
 
         if options['operation'] == 'setup':
-            self.setup(package_name)
+            self.setup(package_name, es_install_location=options['dest_dir'])
 
         if options['operation'] == 'install':
             self.install(package_name)
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
-            self.delete_indexes(package_name)
-            self.setup_indexes(package_name)
+            self.delete_indexes()
+            self.setup_indexes()
 
         if options['operation'] == 'setup_indexes':
-            self.setup_indexes(package_name)
+            self.setup_indexes()
 
         if options['operation'] == 'delete_indexes':
-            self.delete_indexes(package_name)
+            self.delete_indexes()
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
 
         if options['operation'] == 'setup_elasticsearch':
-            self.setup_elasticsearch(package_name)
+            self.setup_elasticsearch(install_location=options['dest_dir'])
 
         if options['operation'] == 'livereload':
             self.start_livereload()
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
-
-        if options['operation'] == 'load_resources':
-            self.load_resources(package_name, options['source'])
 
         if options['operation'] == 'remove_resources':
             self.remove_resources(options['load_id'])
@@ -147,44 +154,64 @@ class Command(BaseCommand):
             self.index_database(package_name)
 
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['resources'], options['format'], options['config_file'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
 
-        if options['operation'] == 'import_json':
-            self.import_json(options['source'], options['graphs'], options['resources'])
+        if options['operation'] == 'import_reference_data':
+            self.import_reference_data(options['source'], options['overwrite'], options['stage'])
+
+        if options['operation'] == 'import_graphs':
+            self.import_graphs(options['source'])
 
         if options['operation'] == 'import_business_data':
-            self.import_business_data(options['source'])
+            self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
+
+        if options['operation'] == 'import_business_data_relations':
+            self.import_business_data_relations(options['source'])
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
 
-        if options['operation'] == 'export_json':
-            self.export_json(options['dest_dir'], options['graphs'], options['resources'])
-
-        if options['operation'] == 'add_tilserver_layer':
-            self.add_tilserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'])
+        if options['operation'] == 'add_tileserver_layer':
+            self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'], options['tile_config_path'])
 
         if options['operation'] == 'add_mapbox_layer':
             self.add_mapbox_layer(options['layer_name'], options['mapbox_json_path'], options['layer_icon'], options['is_basemap'])
 
-        if options['operation'] == 'delete_tilserver_layer':
-            self.delete_tilserver_layer(options['layer_name'])
+        if options['operation'] == 'seed_resource_tile_cache':
+            self.seed_resource_tile_cache()
+
+        if options['operation'] == 'delete_tileserver_layer':
+            self.delete_tileserver_layer(options['layer_name'])
 
         if options['operation'] == 'create_mapping_file':
             self.create_mapping_file(options['dest_dir'], options['graphs'])
 
-        if options['operation'] == 'import_csv':
-            self.import_csv(options['source'])
+        if options['operation'] == 'update_project_templates':
+            self.update_project_templates()
 
-    def setup(self, package_name):
+    def update_project_templates(self):
+        """
+        Moves files from the arches project to the arches-templates directory to
+        ensure that they remain in sync.
+
+        """
+        files = [
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
+            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
+            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
+            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
+            ]
+        for f in files:
+            shutil.copyfile(f['src'], f['dst'])
+
+    def setup(self, package_name, es_install_location=None):
         """
         Installs Elasticsearch into the package directory and
         installs the database into postgres as "arches_<package_name>"
 
         """
-        self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)
+        self.setup_elasticsearch(install_location=es_install_location, port=settings.ELASTICSEARCH_HTTP_PORT)
         self.setup_db(package_name)
-        self.generate_procfile(package_name)
 
     def install(self, package_name):
         """
@@ -195,48 +222,8 @@ class Command(BaseCommand):
         install = import_string('%s.setup.install' % package_name)
         install()
 
-    def setup_elasticsearch(self, package_name, port=9200):
-        """
-        Installs Elasticsearch into the package directory and
-        adds default settings for running in a test environment
-
-        Change these settings in production
-
-        """
-
-        install_location = self.get_elasticsearch_install_location(package_name)
-        install_root = os.path.abspath(os.path.join(install_location, '..'))
-        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
-        file_name = url.split('/')[-1]
-
-        download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
-        unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
-
-        es_config_directory = os.path.join(install_location, 'config')
-        try:
-            os.rename(os.path.join(es_config_directory, 'elasticsearch.yml'), os.path.join(es_config_directory, 'elasticsearch.yml.orig'))
-        except: pass
-
-        with open(os.path.join(es_config_directory, 'elasticsearch.yml'), 'w') as f:
-            f.write('# ----------------- FOR TESTING ONLY -----------------')
-            f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
-            f.write('\nnode.max_local_storage_nodes: 1')
-            f.write('\nnode.local: true')
-            f.write('\nindex.number_of_shards: 1')
-            f.write('\nindex.number_of_replicas: 0')
-            f.write('\nhttp.port: %s' % port)
-            f.write('\ndiscovery.zen.ping.multicast.enabled: false')
-            f.write('\ndiscovery.zen.ping.unicast.hosts: ["localhost"]')
-            f.write('\ncluster.routing.allocation.disk.threshold_enabled: false')
-
-        # install plugin
-        if sys.platform == 'win32':
-            os.system("call %s install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
-        else:
-            os.chdir(os.path.join(install_location, 'bin'))
-            os.system("chmod u+x plugin")
-            os.system("./plugin install mobz/elasticsearch-head")
-            os.system("chmod u+x elasticsearch")
+    def setup_elasticsearch(self, install_location=None, port=9200):
+        management.call_command('es', operation='install', dest_dir=install_location, port=port)
 
     def start_elasticsearch(self, package_name):
         """
@@ -256,7 +243,6 @@ class Command(BaseCommand):
         else:
             p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
         return p
-        #os.system('honcho start')
 
     def setup_db(self, package_name):
         """
@@ -275,33 +261,14 @@ class Command(BaseCommand):
 
         management.call_command('migrate')
 
-    def setup_indexes(self, package_name):
-        prepare_term_index(create=True)
-        prepare_resource_relations_index(create=True)
+    def setup_indexes(self):
+        management.call_command('es', operation='setup_indexes')
 
-    def delete_indexes(self, package_name):
-        delete_term_index()
-        delete_search_index()
-        delete_resource_relations_index()
+    def drop_resources(self, packages_name):
+        drop_all_resources()
 
-    def generate_procfile(self, package_name):
-        """
-        Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
-
-        """
-
-        python_exe = os.path.abspath(sys.executable)
-
-        contents = []
-        contents.append('\nelasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
-        contents.append('django: %s manage.py runserver' % (python_exe))
-        contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
-
-        package_root = settings.PACKAGE_ROOT
-        if hasattr(settings, 'SUBPACKAGE_ROOT'):
-            package_root = settings.SUBPACKAGE_ROOT
-
-        utils.write_to_file(os.path.join(package_root, '..', 'Procfile'), '\n'.join(contents))
+    def delete_indexes(self):
+        management.call_command('es', operation='delete_indexes')
 
     def get_elasticsearch_install_location(self, package_name):
         """
@@ -343,32 +310,13 @@ class Command(BaseCommand):
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def load_resources(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        # data_source = None if data_source == '' else data_source
-        # load = import_string('%s.setup.load_resources' % package_name)
-        # load(data_source)
-        ArchesFileImporter(data_source).import_business_data()
-
-
     def remove_resources(self, load_id):
         """
         Runs the resource_remover command found in package_utils
 
         """
-        resource_remover.delete_resources(load_id)
-
-    def load_concept_scheme(self, package_name, data_source=None):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
-        load(data_source)
+        # resource_remover.delete_resources(load_id)
+        resource_remover.clear_resources()
 
     def index_database(self, package_name):
         """
@@ -377,41 +325,94 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-
-    def export_business_data(self, data_dest=None, resources=None, file_format=None, config_file=None):
-        """
-        Exports resources to specified format.
-        """
-
-        resource_exporter = ResourceExporter(file_format)
-        resource_exporter.export(resources=resources, configs=config_file)
-
-
-    def export_business_data(self, file_format, data_dest=None, resources=None, config_file=None):
-        if file_format in ['csv', 'json', 'shp']:
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
+        if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
-            resource_exporter.export(data_dest=data_dest, resources=resources, configs=config_file)
-        else:
-            print '{0} is not a valid export file format.'.format(file_format)
+            if file_format == 'json':
+                config_file = None
+            elif file_format == 'csv':
+                graph = None
+            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
 
-    def import_business_data(self, data_source):
+            for file in data:
+                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    f.write(file['outputfile'].getvalue())
+        else:
+            print '*'*80
+            print '{0} is not a valid export file format.'.format(file_format)
+            print '*'*80
+            sys.exit()
+
+    def import_reference_data(self, data_source, overwrite='ignore', stage='stage'):
+        if overwrite == '':
+            overwrite = 'overwrite'
+
+        skos = SKOSReader()
+        rdf = skos.read_file(data_source)
+        ret = skos.save_concepts_from_skos(rdf, overwrite, stage)
+
+    def import_business_data(self, data_source, config_file=None, overwrite=None, bulk_load=False):
         """
         Imports business data from all formats
         """
+        if overwrite == '':
+            print '*'*80
+            print 'No overwrite option indicated. Please rerun command with \'-ow\' parameter.'
+            print '*'*80
+            sys.exit()
+
         if data_source == '':
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
+            data_source = settings.BUSINESS_DATA_FILES
 
         if isinstance(data_source, basestring):
             data_source = [data_source]
 
+        if data_source != ():
+            for path in data_source:
+                if os.path.isabs(path):
+                    if os.path.isfile(os.path.join(path)):
+                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load)
+                    else:
+                        print '*'*80
+                        print 'No file found at indicated location: {0}'.format(path)
+                        print '*'*80
+                        sys.exit()
+                else:
+                    print '*'*80
+                    print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                    print '*'*80
+                    sys.exit()
+        else:
+            print '*'*80
+            print 'No BUSINESS_DATA_FILES locations specified in your settings file. Please rerun this command with BUSINESS_DATA_FILES locations specified or pass the locations in manually with the \'-s\' parameter.'
+            print '*'*80
+            sys.exit()
+
+    def import_business_data_relations(self, data_source):
+        """
+        Imports business data relations
+        """
+        if isinstance(data_source, basestring):
+            data_source = [data_source]
+
         for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                BusinessDataImporter(path).import_business_data()
+            if os.path.isabs(path):
+                if os.path.isfile(os.path.join(path)):
+                    relations = csv.DictReader(open(path, 'r'))
+                    RelationImporter().import_relations(relations)
+                else:
+                    print '*'*80
+                    print 'No file found at indicated location: {0}'.format(path)
+                    print '*'*80
+                    sys.exit()
+            else:
+                print '*'*80
+                print 'ERROR: The specified file path appears to be relative. Please rerun command with an absolute file path.'
+                print '*'*80
+                sys.exit()
 
 
-    def import_json(self, data_source='', graphs=None, resources=None):
+    def import_graphs(self, data_source=''):
         """
         Imports objects from arches.json.
 
@@ -425,34 +426,15 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                ArchesFileImporter(path).import_all()
+                with open(path, 'rU') as f:
+                    archesfile = JSONDeserializer().deserialize(f)
+                    ResourceGraphImporter(archesfile['graph'])
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
-                    ArchesFileImporter(os.path.join(path, file_path)).import_all()
-
-    def import_csv(self, data_source=''):
-        """
-        Imports objects from csv file.
-
-        """
-
-        if data_source == '':
-            # data_source = settings.RESOURCE_GRAPH_LOCATIONS
-            print '*'*80
-            print 'No data source indicated. Please rerun command with \'-s\' parameter.'
-            print '*'*80
-
-        if isinstance(data_source, basestring):
-            data_source = [data_source]
-
-        for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                CSVFileImporter(path).import_all()
-            else:
-                file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.csv')]
-                for file_path in file_paths:
-                    CSVFileImporter(os.path.join(path, file_path)).import_all()
+                    with open(os.path.join(path, file_path), 'rU') as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        ResourceGraphImporter(archesfile['graph'])
 
     def start_livereload(self):
         from livereload import Server
@@ -463,28 +445,19 @@ class Command(BaseCommand):
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
 
-    def export_json(self, data_dest=None, graphs=None, resources=None):
-        """
-        Export objects to arches.json.
-        """
-
-        if graphs != False:
-            graphs = [x.strip(' ') for x in graphs.split(",")]
-        if resources != False:
-            resources = [x.strip(' ') for x in resources.split(",")]
-
-        ArchesFileExporter().export_all(data_dest, graphs, resources)
-
-    def add_tilserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False):
-        if layer_name != False and mapnik_xml_path != False:
-            with transaction.atomic():
-                tileserver_layer = models.TileserverLayers(name=layer_name, path=os.path.abspath(mapnik_xml_path))
-                source_dict = {
-                    "type": "raster",
-                    "tiles": [
-                        ("/tileserver/%s/{z}/{x}/{y}.png") % (layer_name)
-                    ],
-                    "tileSize": 256
+    def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
+        if layer_name != False:
+            config = None
+            extension = "png"
+            layer_type = "raster"
+            tile_size = 256
+            if mapnik_xml_path != False:
+                path = os.path.abspath(mapnik_xml_path),
+                config = {
+                    "provider": {
+                        "name": "mapnik",
+                        "mapfile": os.path.abspath(mapnik_xml_path)
+                    }
                 }
                 layer_list = [{
                     "id": layer_name,
@@ -493,13 +466,41 @@ class Command(BaseCommand):
                     "minzoom": 0,
                     "maxzoom": 22
                 }]
-                map_source = models.MapSources(name=layer_name, source=source_dict)
-                map_layer = models.MapLayers(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
-                map_source.save()
-                map_layer.save()
-                tileserver_layer.map_layer = map_layer
-                tileserver_layer.map_source = map_source
-                tileserver_layer.save()
+            elif tile_config_path != False:
+                path = os.path.abspath(tile_config_path)
+                with open(path) as content:
+                    config_data = json.load(content)
+                config = config_data["config"]
+                layer_type = config_data["type"]
+                layer_list = config_data["layers"]
+                for layer in layer_list:
+                    layer["source"] = layer_name
+                    if layer_type == "vector":
+                        layer["source-layer"] = layer_name
+                if layer_type == "vector":
+                    extension = "pbf"
+                    tile_size = 512
+            if config is not None:
+                with transaction.atomic():
+                    tileserver_layer = models.TileserverLayer(
+                        name=layer_name,
+                        path=path,
+                        config=config
+                    )
+                    source_dict = {
+                        "type": layer_type,
+                        "tiles": [
+                            ("/tileserver/%s/{z}/{x}/{y}.%s") % (layer_name, extension)
+                        ],
+                        "tileSize": tile_size
+                    }
+                    map_source = models.MapSource(name=layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                    map_source.save()
+                    map_layer.save()
+                    tileserver_layer.map_layer = map_layer
+                    tileserver_layer.map_source = map_source
+                    tileserver_layer.save()
 
 
     def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):
@@ -511,15 +512,15 @@ class Command(BaseCommand):
                         if 'source' in layer:
                             layer['source'] = layer['source'] + '-' + layer_name
                     for source_name, source_dict in data['sources'].iteritems():
-                        map_source = models.MapSources.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
-                    map_layer = models.MapLayers(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
+                        map_source = models.MapSource.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
                     map_layer.save()
 
 
-    def delete_tilserver_layer(self, layer_name=False):
+    def delete_tileserver_layer(self, layer_name=False):
         if layer_name != False:
             with transaction.atomic():
-                tileserver_layer = models.TileserverLayers.objects.get(name=layer_name)
+                tileserver_layer = models.TileserverLayer.objects.get(name=layer_name)
                 tileserver_layer.map_layer.delete()
                 tileserver_layer.map_source.delete()
                 tileserver_layer.delete()
@@ -548,3 +549,6 @@ class Command(BaseCommand):
                 with open(path, 'rU') as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)
+
+    def seed_resource_tile_cache(self):
+        seed_resource_cache()

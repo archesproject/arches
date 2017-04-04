@@ -27,28 +27,52 @@ def prepare_term_index(create=False):
     """
 
     index_settings = {
-        'settings':{
+        'settings': {
             'analysis': {
                 'analyzer': {
                     'folding': {
                         'tokenizer': 'standard',
-                        'filter':  [ 'lowercase', 'asciifolding' ]
+                        'filter': [ 'lowercase', 'asciifolding' ]
                     }
                 }
             }
         },
-        'mappings':{
-            'value':{
+        'mappings': {
+            'term': {
                 'properties': {
-                    'ids':{'type': 'string', 'index' : 'not_analyzed'},
-                    'context':{'type': 'string', 'index' : 'not_analyzed'},
-                    'term': {
-                        'type': 'string',
+                    'nodegroupid': {'type': 'keyword'},
+                    'tileid': {'type': 'keyword'},
+                    'nodeid': {'type': 'keyword'},
+                    'resourceinstanceid': {'type': 'keyword'},
+                    'value': {
                         'analyzer': 'standard',
+                        'type': 'text',
                         'fields': {
+                            'raw': {'type': 'keyword'},
                             'folded': {
-                                'type': 'string',
-                                'analyzer': 'folding'
+                                'analyzer': 'folding',
+                                'type': 'text'
+                            }
+                        }
+                    }
+                }
+            },
+            'concept': {
+                'properties': {
+                    'top_concept': {'type': 'keyword'},
+                    'conceptid': {'type': 'keyword'},
+                    'language': {'type': 'keyword'},
+                    'id': {'type': 'keyword'},
+                    'category': {'type': 'keyword'},
+                    'type': {'type': 'keyword'},
+                    'value': {
+                        'analyzer': 'standard',
+                        'type': 'text',
+                        'fields': {
+                            'raw': {'type': 'keyword'},
+                            'folded': {
+                                'analyzer': 'folding',
+                                'type': 'text'
                             }
                         }
                     }
@@ -59,13 +83,13 @@ def prepare_term_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index='term', body=index_settings, ignore=400)
+        se.create_index(index='strings', body=index_settings)
 
     return index_settings
 
 def delete_term_index():
     se = SearchEngineFactory().create()
-    se.delete_index(index='term')
+    se.delete_index(index='strings')
 
 def prepare_search_index(resource_model_id, create=False):
     """
@@ -74,7 +98,7 @@ def prepare_search_index(resource_model_id, create=False):
     """
 
     index_settings = {
-        'settings':{
+        'settings': {
             'analysis': {
                 'analyzer': {
                     'folding': {
@@ -87,38 +111,40 @@ def prepare_search_index(resource_model_id, create=False):
         'mappings': {
             resource_model_id : {
                 'properties' : {
-                    'graphid': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'resourceinstanceid': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'graphid': {'type': 'keyword'},
+                    'resourceinstanceid': {'type': 'keyword'},
+                    'displayname': {'type': 'keyword'},
+                    'displaydescription': {'type': 'keyword'},
+                    'map_popup': {'type': 'keyword'},
                     'tiles' : {
                         'type' : 'nested',
                         'properties' : {
                             "tiles": {'enabled': False},
-                            'tileid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'nodegroup_id' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'parenttile_id' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'resourceinstanceid_id' : {'type' : 'string', 'index' : 'not_analyzed'}
+                            'tileid' : {'type': 'keyword'},
+                            'nodegroup_id' : {'type': 'keyword'},
+                            'parenttile_id' : {'type': 'keyword'},
+                            'resourceinstanceid_id' : {'type': 'keyword'}
                         }
                     },
                     'strings' : {
-                        'type' : 'string',
+                        'type' : 'text',
                         'index' : 'analyzed',
                         'fields' : {
-                            'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
-                            'folded': { 'type': 'string', 'analyzer': 'folding'}
+                            'raw' : {'type': 'keyword'},
+                            'folded': { 'type': 'text', 'analyzer': 'folding'}
                         }
                     },
                     'domains' : {
                         'properties' : {
                             'value' : {
-                                'type' : 'string',
+                                'type' : 'text',
                                 'index' : 'analyzed',
                                 'fields' : {
-                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                    'raw' : {'type': 'keyword'}
                                 }
                             },
-                            'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'valueid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'conceptid' : {'type': 'keyword'},
+                            'valueid' : {'type': 'keyword'},
                         }
                     },
                     'geometries' : {
@@ -126,15 +152,18 @@ def prepare_search_index(resource_model_id, create=False):
                             "features": {
                                 "properties": {
                                     "geometry": {"type": "geo_shape"},
-                                    "id": { 'type' : 'string', 'index' : 'not_analyzed'},
-                                    "type": { 'type' : 'string', 'index' : 'not_analyzed'},
+                                    "id": {'type': 'keyword'},
+                                    "type": {'type': 'keyword'},
                                     "properties": {
                                          "enabled": False
                                     }
                                 }
                             },
-                            "type": { 'type' : 'string', 'index' : 'not_analyzed'}
+                            "type": {'type': 'keyword'}
                         }
+                    },
+                    'points': {
+                        "type": "geo_point"
                     },
                     'dates' : {
                         "type" : "date"
@@ -170,14 +199,14 @@ def prepare_resource_relations_index(create=False):
     """
 
     index_settings = {
-        'mappings':{
+        'mappings': {
             'all': {
                 'properties': {
-                    'resourcexid': {'type': 'string', 'index' : 'not_analyzed'},
-                    'notes': { 'type': 'string'},
-                    'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
-                    'resourceinstanceidfrom': {'type': 'string', 'index' : 'not_analyzed'},
-                    'resourceinstanceidto': {'type': 'string', 'index' : 'not_analyzed'}
+                    'resourcexid': {'type': 'keyword'},
+                    'notes': {'type': 'text'},
+                    'relationshiptype': {'type': 'keyword'},
+                    'resourceinstanceidfrom': {'type': 'keyword'},
+                    'resourceinstanceidto': {'type': 'keyword'}
                 }
             }
         }

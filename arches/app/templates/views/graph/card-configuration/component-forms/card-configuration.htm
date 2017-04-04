@@ -3,7 +3,7 @@
 <!-- Title Block -->
 <div class="library-title-block">
     <div class="">
-        <h4 class="title-block-title" style=""> Card Manager </h4>
+        <h4 class="title-block-title" style=""> {% trans "Card Manager" %} </h4>
     </div>
 
     <!-- nav bar -->
@@ -34,14 +34,18 @@
     <div id="card-crud-settings" class="tab-pane fade in active">
 
         <!-- Card Container Property -->
+        {% if graph.isresource and graph.ontology_id %}
+        <!-- ko if: !($root.card.isContainer()) -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Relation to Resource" %}
             </div>
-            <div data-bind="with: card">
-                <select class="resources" data-bind="value: $root.ontologyproperty, options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div>
+                <select class="resources" data-bind="value: card().get('ontologyproperty'), options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
+        <!-- /ko -->
+        {% endif %}
 
         <div class="node-widget-label" style="">
             <div class="control-label">
@@ -70,16 +74,6 @@
 
         <!-- Multiple values tools -->
         <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
-
-            <!-- Cardinlity Tools: Tile Header -->
-            <div class="node-widget-label" style="">
-                <div class="control-label">
-                    {% trans "Tile Name" %}
-                </div>
-                <div class="col-sm-12 pad-no crud-widget-container">
-                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: card().get('itemtext'), valueUpdate: 'keyup'">
-                </div>
-            </div>
         </div>
 
     </div>
@@ -106,14 +100,14 @@
         <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible: card().get('helpenabled')">
             <div class="tertiary-panel-content">
                 <div class="">
-                    <h4 class="title-block-title" style=""> Card-Level Help </h4>
+                    <h4 class="title-block-title" style=""> {% trans "Card-Level Help" %} </h4>
                 </div>
 
                 <!-- Help CRUD -->
                 <div class="pad-all">
                     <div class="node-widget-label" style="">
                         <div class="control-label">
-                            Help Panel Title
+                            {% trans "Help Panel Title" %}
                         </div>
                         <div class="col-sm-12 pad-no crud-widget-container">
                             <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card().get("helptitle")'>

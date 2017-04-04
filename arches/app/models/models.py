@@ -21,6 +21,9 @@ from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from datetime import datetime
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.forms.models import model_to_dict
+
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
@@ -39,7 +42,6 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -73,10 +75,13 @@ class Concept(models.Model):
 class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
     defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True)
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
+    isgeometric = models.BooleanField()
 
     class Meta:
         managed = True
@@ -262,6 +267,7 @@ class FunctionXGraph(models.Model):
     class Meta:
         managed = True
         db_table = 'functions_x_graphs'
+        unique_together = ('function', 'graph',)
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -515,6 +521,17 @@ class ResourceXResource(models.Model):
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
 
+    def delete(self):
+        se = SearchEngineFactory().create()
+        se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
+        super(ResourceXResource, self).delete()
+
+    def save(self):
+        se = SearchEngineFactory().create()
+        document = model_to_dict(self)
+        se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
+        super(ResourceXResource, self).save()
+
     class Meta:
         managed = True
         db_table = 'resource_x_resource'
@@ -523,7 +540,8 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column='graphid')
-    resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
+    legacyid = models.TextField(blank=True, unique=True, null=True)
+    createdtime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = True
@@ -557,7 +575,7 @@ class TileModel(models.Model): #Tile
     parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    sortorder = models.IntegerField(blank=True, null=True, default=0)
 
     class Meta:
         managed = True
@@ -619,9 +637,12 @@ class Widget(models.Model):
         db_table = 'widgets'
 
 
-class MapSources(models.Model):
+class MapSource(models.Model):
     name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')
+
+    def __unicode__(self):
+        return self.name
 
     @property
     def source_json(self):
@@ -633,28 +654,37 @@ class MapSources(models.Model):
         db_table = 'map_sources'
 
 
-class MapLayers(models.Model):
+class MapLayer(models.Model):
     maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
+    activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
+    addtomap = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
         json_string = json.dumps(self.layerdefinitions)
         return json_string
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         managed = True
         db_table = 'map_layers'
 
 
-class TileserverLayers(models.Model):
+class TileserverLayer(models.Model):
     name = models.TextField(unique=True)
     path = models.TextField()
-    map_layer = models.ForeignKey('MapLayers', db_column='map_layerid')
-    map_source = models.ForeignKey('MapSources', db_column='map_sourceid')
+    config = JSONField()
+    map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')
+    map_source = models.ForeignKey('MapSource', db_column='map_sourceid')
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         managed = True
@@ -668,3 +698,15 @@ class GraphXMapping(models.Model):
     class Meta:
         managed = True
         db_table = 'graphs_x_mapping_file'
+
+
+class IIIFManifest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    url = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'iiif_manifests'

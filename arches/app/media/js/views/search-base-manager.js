@@ -37,6 +37,7 @@ define([
             this.isNewQuery = true;
             this.viewModel.resultsExpanded = ko.observable(true);
 
+            this.aggregations = ko.observable();
             this.filters = {};
             this.filters.termFilter = new TermFilter();
             this.filters.timeFilter = new TimeFilter({
@@ -45,17 +46,19 @@ define([
             this.filters.resourceTypeFilter = new ResourceTypeFilter({
                 termFilter: this.filters.termFilter
             });
-            this.filters.mapFilter = new MapFilter({
-                resizeOnChange: this.viewModel.resultsExpanded,
-                termFilter: this.filters.termFilter
-            });
             this.filters.savedSearches = new BaseFilter();
             this.filters.advancedFilter = new BaseFilter();
             this.filters.searchRelatedResources = new BaseFilter()
+            this.filters.mapFilter = new MapFilter({
+                aggregations: this.aggregations,
+                resizeOnChange: this.viewModel.resultsExpanded,
+                termFilter: this.filters.termFilter
+            });
 
             _.extend(this.viewModel, this.filters);
 
             this.viewModel.searchResults = new SearchResults({
+                aggregations: this.aggregations,
                 viewModel: this.viewModel
             });
 
@@ -69,6 +72,17 @@ define([
             })
 
             this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
+            if (this.viewModel.resourceEditorContext === true) {
+                this.viewModel.openRelatedResources.subscribe(function(val) {
+                    if (val === true) {
+                        var resize = function(){
+                            $(window).trigger("resize");
+                        }
+                        setTimeout(resize, 200);
+                    }
+                })
+            }
+
             this.filters.mapFilter.results = this.viewModel.searchResults;
 
             this.queryString = ko.computed(function() {
@@ -109,13 +123,11 @@ define([
                 if(this.viewModel.searchResults.userRequestedNewPage()){
                     this.isNewQuery = false;
                     this.viewModel.searchResults.userRequestedNewPage(false);
-                    console.log('user requested new page')
                     this.doQuery();
                 }
             }, this)
 
             this.queryString.subscribe(function() {
-                console.log('user updated a filter')
                 this.isNewQuery = true;
                 this.viewModel.searchResults.page(1);
                 this.doQuery();
@@ -125,10 +137,8 @@ define([
         },
 
         doQuery: function() {
-            console.log('in doQuery');
             var queryString = this.queryString();
             queryString.page = this.viewModel.searchResults.page();
-            queryString.include_ids = this.isNewQuery;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
@@ -142,11 +152,10 @@ define([
                 context: this,
                 success: function(response) {
                     var data = this.viewModel.searchResults.updateResults(response);
-                    //this.isNewQuery = true;
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
                     }
                 },
                 complete: function(request, status) {

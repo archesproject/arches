@@ -1,0 +1,212 @@
+{
+    "graph": [
+        {
+            "subtitle": "Saved search settings",
+            "functions_x_graphs": [],
+            "mapfeaturecolor": "#FF0000",
+            "isresource": false,
+            "forms_x_cards": [],
+            "relatable_resource_model_ids": [],
+            "reports": [],
+            "iconclass": "fa fa-save",
+            "nodegroups": [
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "author": " ",
+            "deploymentfile": null,
+            "forms": [],
+            "version": "",
+            "nodes": [
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "1c8d1766-fa14-11e6-8226-6c4008b05c4c",
+                    "datatype": "string",
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Search Description"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "e382bea6-fa13-11e6-bb8c-6c4008b05c4c",
+                    "datatype": "string",
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Search Name"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "312e4cc5-fa14-11e6-ad08-6c4008b05c4c",
+                    "datatype": "string",
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Search URL"
+                },
+                {
+                    "is_collector": true,
+                    "description": "",
+                    "istopnode": true,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "datatype": "semantic",
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "",
+                    "name": "Saved Searches"
+                },
+                {
+                    "is_collector": false,
+                    "description": "Represents a single node in a graph",
+                    "istopnode": false,
+                    "ontologyclass": "E13_Attribute_Assignment",
+                    "nodeid": "54f907ae-fa14-11e6-8b01-6c4008b05c4c",
+                    "datatype": "file-list",
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "config": null,
+                    "parentproperty": "P140i_was_attributed_by",
+                    "name": "Image"
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "description": "System configuration for saving searches",
+            "resource_2_resource_constraints": [],
+            "edges": [
+                {
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "54f9095c-fa14-11e6-aec3-6c4008b05c4c",
+                    "domainnode_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "rangenode_id": "54f907ae-fa14-11e6-8b01-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "1c8d1978-fa14-11e6-b0ef-6c4008b05c4c",
+                    "domainnode_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "rangenode_id": "1c8d1766-fa14-11e6-8226-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "e382c1c0-fa13-11e6-99d5-6c4008b05c4c",
+                    "domainnode_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "rangenode_id": "e382bea6-fa13-11e6-bb8c-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                },
+                {
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "name": null,
+                    "edgeid": "312e4e7d-fa14-11e6-8abe-6c4008b05c4c",
+                    "domainnode_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "rangenode_id": "312e4cc5-fa14-11e6-ad08-6c4008b05c4c",
+                    "ontologyproperty": "P140i_was_attributed_by",
+                    "description": null
+                }
+            ],
+            "maplinewidth": 1,
+            "mappointsize": 3,
+            "graphid": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+            "name": "Settings Saved Searches",
+            "cards_x_nodes_x_widgets": [
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000019",
+                    "card_id": "b6f1ffb5-fa13-11e6-8973-6c4008b05c4c",
+                    "label": "Image",
+                    "node_id": "54f907ae-fa14-11e6-8b01-6c4008b05c4c",
+                    "sortorder": 3,
+                    "config": "{\"maxFilesize\":\"200\",\"acceptedFiles\":\"\",\"label\":\"Image\"}",
+                    "id": "63b169ee-fa14-11e6-8c31-6c4008b05c4c"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000001",
+                    "card_id": "b6f1ffb5-fa13-11e6-8973-6c4008b05c4c",
+                    "label": "Search Name",
+                    "node_id": "e382bea6-fa13-11e6-bb8c-6c4008b05c4c",
+                    "sortorder": 0,
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Search Name\"}",
+                    "id": "63b0a1ee-fa14-11e6-8c08-6c4008b05c4c"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000001",
+                    "card_id": "b6f1ffb5-fa13-11e6-8973-6c4008b05c4c",
+                    "label": "Search URL",
+                    "node_id": "312e4cc5-fa14-11e6-ad08-6c4008b05c4c",
+                    "sortorder": 1,
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Search URL\"}",
+                    "id": "63b12ab0-fa14-11e6-b1c2-6c4008b05c4c"
+                },
+                {
+                    "widget_id": "10000000-0000-0000-0000-000000000005",
+                    "card_id": "b6f1ffb5-fa13-11e6-8973-6c4008b05c4c",
+                    "label": "Search Description",
+                    "node_id": "1c8d1766-fa14-11e6-8226-6c4008b05c4c",
+                    "sortorder": 2,
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Search Description\"}",
+                    "id": "63b0e8ca-fa14-11e6-852f-6c4008b05c4c"
+                }
+            ],
+            "cards": [
+                {
+                    "helpenabled": false,
+                    "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                    "description": "System configuration for saving searches",
+                    "visible": true,
+                    "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                    "helptext": null,
+                    "sortorder": null,
+                    "cardid": "b6f1ffb5-fa13-11e6-8973-6c4008b05c4c",
+                    "helptitle": null,
+                    "instructions": null,
+                    "active": true,
+                    "name": "Settings Saved Searches"
+                }
+            ],
+            "root": {
+                "is_collector": true,
+                "description": "",
+                "istopnode": true,
+                "ontologyclass": "E13_Attribute_Assignment",
+                "nodeid": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                "datatype": "semantic",
+                "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c",
+                "graph_id": "b6f174f5-fa13-11e6-9116-6c4008b05c4c",
+                "config": null,
+                "name": "Saved Searches"
+            },
+            "isactive": true,
+            "deploymentdate": null
+        }
+    ],
+    "metadata": {
+        "git hash": "0ffff60 2017-02-24 11:14:14 -0800",
+        "db": "PostgreSQL 9.6.1 on x86_64-apple-darwin14.5.0, compiled by Apple LLVM version 7.0.0 (clang-700.1.76), 64-bit",
+        "os version": "15.6.0",
+        "os": "Darwin"
+    }
+}

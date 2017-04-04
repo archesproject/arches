@@ -25,7 +25,6 @@ define(['jquery',
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
-                this.all_result_ids = ko.observableArray();
                 this.page = ko.observable(1);
                 this.paginator = koMapping.fromJS({});
                 this.showPaginator = ko.observable(false);
@@ -33,6 +32,7 @@ define(['jquery',
                 this.mouseoverInstanceId = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
+                this.mapLinkData = ko.observable(null);
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -84,11 +84,13 @@ define(['jquery',
                 this.total(response.results.hits.total);
                 this.results.removeAll();
                 this.userRequestedNewPage(false);
+                this.aggregations(
+                    _.extend(response.results.aggregations, {
+                        results: response.results.hits.hits
+                    })
+                );
 
-                this.all_result_ids.removeAll();
-                this.all_result_ids(response.all_result_ids);
                 response.results.hits.hits.forEach(function(result){
-                    var description = "we should probably have a 'Primary Description Function' like we do for primary name";
                     var relatable;
                     graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
@@ -96,16 +98,32 @@ define(['jquery',
                     if (this.viewModel.graph) {
                         relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, result._source.graph_id);
                     }
+                    var point = null;
+                    if (result._source.points.length > 0) {
+                        point = result._source.points[0]
+                    }
+                    var mapData = result._source.geometries.reduce(function (fc1, fc2) {
+                        fc1.features = fc1.features.concat(fc2.features);
+                        return fc1;
+                    }, {
+                      "type": "FeatureCollection",
+                      "features": []
+                    });
                     this.results.push({
-                        primaryname: result._source.primaryname,
+                        displayname: result._source.displayname,
                         resourceinstanceid: result._source.resourceinstanceid,
-                        primarydescription: description,
+                        displaydescription: result._source.displaydescription,
+                        map_popup: result._source.map_popup,
                         geometries: ko.observableArray(result._source.geometries),
                         iconclass: graphdata ? graphdata.iconclass : '',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        relatable: relatable
+                        relatable: relatable,
+                        point: point,
+                        mapLinkClicked: function () {
+                            self.mapLinkData(mapData);
+                        }
                     });
                 }, this);
 

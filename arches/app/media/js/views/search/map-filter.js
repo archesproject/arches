@@ -1,12 +1,14 @@
 define([
     'knockout',
     'views/search/base-filter',
-    'widgets/map'
+    'arches',
+    'views/components/widgets/map',
 ],
-function(ko, BaseFilter) {
+function(ko, BaseFilter, arches) {
     return BaseFilter.extend({
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
+            this.aggregations = options.aggregations;
             this.name = "Map Filter";
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);
@@ -16,6 +18,35 @@ function(ko, BaseFilter) {
               "features": []
             });
             this.filter.inverted = ko.observable(false);
+            var basemaps = _.filter(arches.mapLayers, function(layer) {
+                return !layer.isoverlay;
+            });
+
+            if (!this.defaultBasemap) {
+                this.defaultBasemap = _.find(basemaps, function (basemap) {
+                    return basemap.addtomap;
+                });
+            }
+            if (!this.defaultBasemap) {
+                this.defaultBasemap = basemaps[0];
+            }
+
+            this.geocoderDefault = arches.geocoderDefault;
+
+            this.overlays = _.filter(arches.mapLayers, function(layer) {
+                return layer.isoverlay && layer.addtomap;
+            }).map(function(layer) {
+                return {
+                    'maplayerid': layer.maplayerid,
+                    'name': layer.name,
+                    'opacity': 100
+                };
+            });
+
+            this.defaultZoom = arches.mapDefaultZoom;
+            this.minZoom = arches.mapDefaultMinZoom;
+            this.maxZoom = arches.mapDefaultMaxZoom;
+            this.defaultCenter = [arches.mapDefaultX, arches.mapDefaultY];
         },
 
         restoreState: function(query) {

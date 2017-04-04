@@ -25,6 +25,25 @@ define([
             var self = this;
             self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
+            self.layer = options.layer;
+            self.icons = options.icons || [];
+            self.mapSource = options.mapSource;
+            self.loading = options.loading;
+            self.permissions = {};
+            var canRead = function (entity) {
+                var perms = entity.perms.default.concat(entity.perms.local).map(function(perm) {
+                    return perm.name;
+                });
+                if (_.contains(perms, 'No Access')) {
+                    return false;
+                } else {
+                    return _.contains(perms, 'Read')
+                }
+            }
+            if (options.permissions) {
+                self.permissions.users = _.filter(options.permissions.users, canRead)
+                self.permissions.groups = _.filter(options.permissions.groups, canRead)
+            }
 
             self._node = ko.observable('');
             self.selected = ko.observable(false);
@@ -37,12 +56,14 @@ define([
                     return datatype();
                 },
                 write: function(value) {
-                    var datatypeRecord = self.datatypelookup[value];
-                    if (datatypeRecord) {
-                        var defaultConfig = datatypeRecord.defaultconfig;
-                        self.setupConfig(defaultConfig);
+                    if (datatype() !== value) {
+                        var datatypeRecord = self.datatypelookup[value];
+                        if (datatypeRecord) {
+                            var defaultConfig = datatypeRecord.defaultconfig;
+                            self.setupConfig(defaultConfig);
+                        }
+                        datatype(value);
                     }
-                    datatype(value);
                 },
                 owner: this
             });
@@ -180,17 +201,23 @@ define([
             self.istopnode = source.istopnode;
 
             self.set('id', self.nodeid);
+            self.set('graph_id', source.graph_id);
         },
 
         setupConfig: function(config) {
             var self = this;
-            self.configKeys.removeAll();
+            var keys = [];
             _.each(config, function(configVal, configKey) {
-                self.config[configKey] = Array.isArray(configVal) ?
-                    ko.observableArray(configVal) :
-                    ko.observable(configVal);
-                self.configKeys.push(configKey);
+                if (!ko.isObservable(self.config[configKey])) {
+                    self.config[configKey] = Array.isArray(configVal) ?
+                        ko.observableArray(configVal) :
+                        ko.observable(configVal);
+                } else {
+                    self.config[configKey](configVal);
+                }
+                keys.push(configKey);
             });
+            self.configKeys(keys);
         },
 
         /**
@@ -199,6 +226,23 @@ define([
          */
         reset: function() {
             this.parse(JSON.parse(this._node()), self);
+        },
+
+        save: function (userCallback, scope) {
+            var method = "POST";
+            var callback = function (request, status, model) {
+                if (typeof userCallback === 'function') {
+                    userCallback.call(this, request, status, model);
+                }
+                if (status==='success') {
+                    this._node(this.json());
+                };
+            };
+            this._doRequest({
+                type: method,
+                url: this._getURL(method),
+                data: JSON.stringify(this.toJSON())
+            }, callback, scope, 'save');
         },
 
         /**
@@ -242,6 +286,18 @@ define([
                     }, this);
                 }
             }, this);
-        }
+        },
+
+        _getURL: function(method){
+            var id = this.get('graph_id');
+            if(!(id)){
+                id = '';
+            }
+            if(this.url.indexOf('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') > -1){
+                return this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', id);
+            }else{
+                return this.url + id;
+            }
+        },
     });
 });

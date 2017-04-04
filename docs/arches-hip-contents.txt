@@ -13,19 +13,14 @@ Resource Models
 ======================================
 
 + Heritage Resource
-    *add description*
-+ Heritage District
-    *add description*
+    Describes heritage resources, which includes monuments, buildings, structures, etc.
++ Heritage Resource Group
+    Describes heritage resource groups which are groupings of heritage resources.
 + Historic Event
-    *add description*
+    Describes significant historical events that would be related to Heritage Resources
 + Actor
-    *add description*
+    Describes actor resources such as individual people and groups of people
 + Activity
-    *add description*
+    Describes activities relating to heritage resources and heritage resource groups
 + Information Resource
-    *add description*
-
-Branches
-=================
-
-<listy list list of branches>
+    Models information carriers such as images, reports, and publications

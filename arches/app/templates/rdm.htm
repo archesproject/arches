@@ -65,42 +65,64 @@
 
                     <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
 
-                        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{% trans "RDM" %}</h3>
 
-                            <!-- Scheme Tools for larger screens -->
-<!--                             <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-primary active" id="option1">
-                                    <input type="radio" name="options" autocomplete="off" checked>{% trans "Schemes" %}
-                                </label>
-                                <label class="btn btn-primary" id="option2" >
-                                    <input type="radio" name="options" autocomplete="off">{% trans "Dropdowns" %}
-                                </label>
-                            </div> -->
+                        <ul class="nav nav-tabs map-service-nav-tabs">
+                            <li class="active">
+                                <a class="config-title-tab mar-no" data-toggle="tab" href="#rdm-panel" aria-expanded="false"><i class="ion-android-share-alt"></i> {% trans "Thesauri" %} </a>
+                            </li>
+                            <li class="">
+                                <a class="config-title-tab mar-no" data-toggle="tab" href="#dropdown-panel" aria-expanded="false"><i class="ion-ios-browsers-outline"></i> {% trans "Collections" %} </a>
+                            </li>
+                        </ul>
+                    
+            
 
-                            <div class="btn-group pull-right hidden-xs">
-                                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">{% trans "Tools" %}
-                                    <i class="fa fa-chevron-down"></i>
-                                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
-                                    <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Scheme" %}</a></li>
-                                    <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
-                                    <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
-                                </ul>
-                            </div>
-
-                        </div>
 
                         <!-- RDM Tree Container -->
-                        <section style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                        <div class="tab-content">
+                            <section id="rdm-panel" role="tabpanel" class="tab-pane active" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
 
-                            <div class="concept_tree" id="jqtree">
-                            </div>
+                                <div class="btn-group pull-right hidden-xs" style="top: 15px; position: absolute; right: 14px;">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">{% trans "Tools" %}
+                                        <i class="fa fa-chevron-down"></i>
+                                        <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Scheme" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
+                                    </ul>
+                                </div>
 
-                        </section>
+                                <div class="concept_tree" id="jqtree">
+                                </div>
+
+                            </section>
+
+                            <section id="dropdown-panel" role="tabpanel" class="tab-pane" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+
+                                <div class="btn-group pull-right hidden-xs" style="top: 15px; position: absolute; right: 14px;">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">{% trans "Tools" %}
+                                        <i class="fa fa-chevron-down"></i>
+                                        <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="javascript:void(0);" data-toggle="#add-collection-form">{% trans "Add Collection" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#delete-collection-form">{% trans "Delete Collection" %}</a></li>
+                                        <li><a href="javascript:void(0);" data-toggle="#export-all-collections">{% trans "Export All Collections" %}</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="concept_tree" id="ddtree">
+                                </div>
+
+                            </section>
+                        </div>
                         <!-- End RDM Tree Container -->
 
                     </div>
@@ -164,5 +186,14 @@
 <div id="import-scheme-form">
     {% include "views/rdm/modals/import-scheme-form.htm" %}
 </div>
+
+<div id="add-collection-form">
+    {% include "views/rdm/modals/add-collection-form.htm" %}
+</div>
+
+<div id="delete-collection-form">
+    {% include "views/rdm/modals/delete-collection-form.htm" %}
+</div>
+
 
 {% endblock main_content %}

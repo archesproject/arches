@@ -1,11 +1,144 @@
-from django.conf import settings
+import uuid
 from arches.app.models.concept import Concept
+from arches.app.models.models import ResourceXResource
+from arches.app.models.resource import Resource
+from arches.app.models.models import Value
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.db import connection, transaction
+from django.utils.translation import ugettext as _
+
+class ResourceImportReporter:
+    def __init__(self, business_data):
+        self.resources = 0
+        self.total_tiles = 0
+        self.resources_saved = 0
+        self.tiles_saved = 0
+        self.relations_saved = 0
+        self.relations = 0
+
+        if 'resources' in business_data:
+            self.resources = len(business_data['resources'])
+
+        if 'relations' in business_data:
+            self.relations = len(business_data['relations'])
+
+    def update_resources_saved(self, count=1):
+        self.resources_saved += count
+        print _('{0} of {1} resources saved'.format(self.resources_saved, self.resources))
+
+    def update_tiles(self, count=1):
+        self.total_tiles += count
+
+    def update_tiles_saved(self, count=1):
+        self.tiles_saved += count
+
+    def update_relations_saved(self, count=1):
+        self.relations_saved += count
+        print _('{0} of {1} relations saved'.format(self.relations_saved, self.relations))
+
+    def report_results(self):
+        if self.resources > 0:
+            result = "Resources for Import: {0}, Resources Saved: {1}, Tiles for Import: {2}, Tiles Saved: {3}, Relations for Import: {4}, Relations Saved: {5}"
+            print result.format(
+                    self.resources,
+                    self.resources_saved,
+                    self.total_tiles,
+                    self.tiles_saved,
+                    self.relations,
+                    self.relations_saved
+                    )
+
+class Reader(object):
+
+    def __init__(self):
+        self.errors = []
+
+    def validate_datatypes(self, record):
+        pass
+
+    def import_business_data(self):
+        pass
+
+    def import_relations(self, relations=None):
+
+        def get_resourceid_from_legacyid(legacyid):
+            ret = Resource.objects.filter(legacyid=legacyid)
+
+            if len(ret) > 1 or len(ret) == 0:
+                return None
+            else:
+                return ret[0].resourceinstanceid
+
+        for relation_count, relation in enumerate(relations):
+            relation_count = relation_count + 2
+            if relation_count % 500 == 0:
+                print '{0} relations saved'.format(str(relation_count))
+
+
+            def validate_resourceinstanceid(resourceinstanceid, key):
+                # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
+                try:
+                    # Test if resourceinstanceid from relations file is a UUID.
+                    newresourceinstanceid = uuid.UUID(resourceinstanceid)
+                    try:
+                        # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
+                        Resource.objects.get(resourceinstanceid=resourceinstanceid)
+                    except:
+                        # If resourceinstanceid is not associated with a resource instance then set resourceinstanceid to None
+                        newresourceinstanceid = None
+                except:
+                    # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
+                    newresourceinstanceid = get_resourceid_from_legacyid(resourceinstanceid)
+
+                # If resourceinstancefrom is None then either:
+                # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
+                # 2.) a uuid was passed in and it is not associated with a resource instance
+                if newresourceinstanceid == None:
+                    errors = []
+                    # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
+                    errors.append({'type':'ERROR', 'message': 'Relation not created, either zero or multiple resources found with legacyid: {0}'.format(relation[key])})
+                    if len(errors) > 0:
+                        self.errors += errors
+
+                return newresourceinstanceid
+
+            resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
+            resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
+            if relation['datestarted'] == '':
+                relation['datestarted'] = None
+            if relation['dateended'] == '':
+                relation['dateended'] = None
+
+            if resourceinstancefrom != None and resourceinstanceto != None:
+                relation = ResourceXResource(
+                    resourceinstanceidfrom = Resource(resourceinstancefrom),
+                    resourceinstanceidto = Resource(resourceinstanceto),
+                    relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                    datestarted = relation['datestarted'],
+                    dateended = relation['dateended'],
+                    notes = relation['notes']
+                )
+                relation.save()
+
+        self.report_errors()
+
+    def report_errors(self):
+        if len(self.errors) == 0:
+            print _("No import errors")
+        else:
+            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
+            with open('arches/logs/resource_import.log', 'w') as f:
+                for error in self.errors:
+                    try:
+                        f.write(_('{0}: {1}\n'.format(error['type'], error['message'])))
+                    except TypeError as e:
+                        f.write(e + unicode(error))
 
 class Writer(object):
 
@@ -20,7 +153,7 @@ class Writer(object):
             ],
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
-        } 
+        }
 
     def create_template_record(self, schema, resource, resource_type):
         """

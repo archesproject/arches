@@ -45,7 +45,6 @@
             "reports": [],
             "iconclass": "",
             "functions": [],
-            "domain_connections": [],
             "nodegroups": [
                 {
                     "cardinality": "1",
@@ -402,7 +401,6 @@
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card container that has a cardinality of '1' and a child card with cardinality of '1'",
                     "name": "Scenario 1-1",
@@ -417,7 +415,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card that has a cardinality of '1' and no child cards",
                     "name": "Scenario 1-",
@@ -432,7 +429,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card container that has a cardinality of 'n' and a child card with cardinality of '1'",
                     "name": "Scenario n-1",
@@ -447,7 +443,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "Represents a single node in a graph",
                     "name": "Inner Card",
@@ -462,7 +457,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card container that has a cardinality of 'n' and a child card with cardinality of 'n'",
                     "name": "Scenario n-n",
@@ -477,7 +471,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "Represents a single node in a graph",
                     "name": "Inner Card",
@@ -492,7 +485,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card container that has a cardinality of '1' and a child card with cardinality of 'n'",
                     "name": "Scenario 1-n",
@@ -507,7 +499,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "Represents a single node in a graph",
                     "name": "Inner Card",
@@ -522,7 +513,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "A card that has a cardinality of 'n' and no child cards",
                     "name": "Scenario n-",
@@ -537,7 +527,6 @@
                     "instructions": null
                 },
                 {
-                    "itemtext": null,
                     "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
                     "description": "Represents a single node in a graph",
                     "name": "Inner Card",

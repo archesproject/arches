@@ -13,9 +13,10 @@ require([
     'bindings/let'
 ], function($, _, ko, arches, SearchBaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
     var self = this;
+    var loading = ko.observable(false);
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
-    })
+    });
     formList.selectItem(formList.items()[0]);
 
     var formView = new FormView({
@@ -23,20 +24,32 @@ require([
         resourceid: data.resourceid,
         tiles: data.tiles,
         blanks: data.blanks
-    })
+    });
+
+    var loadForm = function(form) {
+        loading(true);
+        formView.loadForm(form.formid, function(){
+            loading(false);
+        });
+    };
 
     formList.on('item-clicked', function(form){
-        pageView.viewModel.loading(true);
-        formView.loadForm(form.formid, function(){
-            pageView.viewModel.loading(false);
-        });
+        if (pageView.viewModel.dirty()) {
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                pageView.viewModel.showConfirmNav(false);
+            }, function() {
+                loadForm(form);
+            }));
+        } else {
+            loadForm(form);
+        }
     });
 
     formView.on('before-update', function(){
-        pageView.viewModel.loading(true);
+        loading(true);
     });
     formView.on('after-update', function(response){
-        pageView.viewModel.loading(false);
+        loading(false);
         var errorMessageTitle = arches.requestFailed.title
         var errorMessageText = arches.requestFailed.text
         pageView.viewModel.alert(null);
@@ -49,12 +62,12 @@ require([
         }
     });
 
-
     /**
     * a PageView representing the resource listing and recent edits page
     */
     var pageView = new SearchBaseManagerView({
         viewModel:{
+            loading: loading,
             resourceEditorContext: true,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
@@ -62,11 +75,20 @@ require([
             formList: formList,
             formView: formView,
             openRelatedResources: ko.observable(false),
+            dirty: ko.computed(function() {
+                var dirty = false;
+                _.each(formView.formTiles(), function (tile) {
+                    if (tile.dirty()) {
+                        dirty = true;
+                    }
+                });
+                return dirty;
+            }),
             deleteResource: function(){
                 pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
                     return;
                 }, function(){
-                    pageView.viewModel.loading(true);
+                    loading(true);
                     $.ajax({
                         type: "DELETE",
                         url: arches.urls.resource_editor + data.resourceid,
@@ -77,7 +99,7 @@ require([
 
                         },
                         complete: function (request, status) {
-                            pageView.viewModel.loading(false);
+                            loading(false);
                             if (status === 'success') {
                                 pageView.viewModel.navigate(arches.urls.resource);
                             }

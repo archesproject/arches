@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+<div class="content-panel" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
 
     <!-- Title Block -->
     <div class="ep-form-toolbar">
@@ -66,9 +66,11 @@
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
                         <div>perform complex search</div>
                     </div>
+                    <!-- ko if: selectedTab() === relatedResourcesManager -->
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, with: relatedResourcesManager">
                         {% include 'views/resource/related-resources/related-resources-manager.htm' %}
                     </div>
+                    <!-- /ko -->
                 </div>
             </div>
         </div>

@@ -72,4 +72,3 @@ class MapWidget(BaseWidget):
         ac = ActionChains(self.page.driver)
         map = self.page.driver.find_element(*locators.MAP_CANVAS)
         ac.click(map).perform()
-

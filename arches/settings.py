@@ -47,6 +47,8 @@ RESOURCE_MODEL = {
     'default': 'arches.app.models.resource.Resource'
 }
 
+SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
@@ -79,17 +81,6 @@ ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
 LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
 
-DEFAULT_MAP_X = 0
-DEFAULT_MAP_Y = 0
-DEFAULT_MAP_ZOOM = 0
-MAP_MIN_ZOOM = 0
-MAP_MAX_ZOOM = 19
-MAP_LAYER_FEATURE_LIMIT = 10000
-MAP_EXTENT = ''
-
-RESOURCE_MARKER_ICON_UNICODE = '\uf060'
-RESOURCE_MARKER_ICON_FONT = 'octicons'
-RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
@@ -330,8 +321,8 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
-        },
-    },
+        }
+    }
 }
 
 LOGIN_URL = 'auth'
@@ -348,7 +339,7 @@ RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
+    os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
@@ -361,16 +352,22 @@ CONCEPT_SCHEME_LOCATIONS = (
     # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
 )
 
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
 
-# Set to true to cache resource vector tiles; slows tile save performance, but
-# improves performance of tile layers on client. Usually, you may want to use
-# this in production, but probably not during development
-CACHE_RESOURCE_TILES = False
+# If you are manually managing your resource tile cache, you may want to "seed"
+# the cache (or prerender some tiles) for low zoom levels.  You can do this by
+# running:
+# python manage.py packages -o seed_resource_tile_cache
+#
+# The following settings control the extent and max zoom level to which tiles
+# will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
+# will take a long time
+CACHE_SEED_BOUNDS = (-89.99, 179.99, 89.99, -179.99)
+CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache
 TILE_CACHE_CONFIG = {
@@ -387,6 +384,32 @@ TILE_CACHE_CONFIG = {
 }
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
+
+# links to sprites and glyphs for use on map
+MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
+MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
+
+# Default map settings for search and map layer manager pages
+DEFAULT_MAP_X = 0
+DEFAULT_MAP_Y = 0
+DEFAULT_MAP_ZOOM = 0
+MAP_MIN_ZOOM = 0
+MAP_MAX_ZOOM = 20
+
+DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
+
+# bounds for search results hex binning fabric
+# a smaller bbox will give you less distortion in hexes and better performance
+HEX_BIN_BOUNDS = (-122, -52, 128, 69)
+# size to use for hex binning search results on map (in km)
+HEX_BIN_SIZE = 100
+# binning uses elasticsearch GeoHash grid aggregation.
+# precision for binning is set based on GeoHash precision, see this table:
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
+# high precision binning may result in performance issues.
+HEX_BIN_PRECISION = 4
+
+BULK_IMPORT_BATCH_SIZE = 2000
 
 try:
     from settings_local import *
