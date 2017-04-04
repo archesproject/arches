@@ -637,7 +637,7 @@ class IIIFDrawingDataType(BaseDataType):
         terms = []
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
-            print string_item
-            if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(string_item)
+            if string_item is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(string_item)
         return terms

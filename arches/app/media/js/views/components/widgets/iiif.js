@@ -54,17 +54,17 @@ define([
             var highlightedFeature;
             var highlightedFeatureStyle;
             var largeIcon = new L.Icon.Default();
-            largeIcon.options.iconSize = [38, 95]
-            largeIcon.options.iconAnchor = [22, 94]
+            largeIcon.options.iconSize = [33, 54]
+            largeIcon.options.iconAnchor = [16, 54]
+            largeIcon.options.shadowSize =  [54, 54];
             var highlightFeature = function(layer) {
                 highlightedFeatureStyle = _.clone(layer.options);
                 if (highlightedFeatureStyle.icon) {
                     layer.setIcon(largeIcon);
                 } else {
                     layer.setStyle({
-                        weight: 5,
-                        color: '#666',
-                        dashArray: '',
+                        weight: 7,
+                        color: '#2a3fff',
                         fillOpacity: 0.7
                     });
 
