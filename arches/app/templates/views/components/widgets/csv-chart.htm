@@ -130,6 +130,15 @@
                                                                                         <small class="text-uppercase">Sample Id</small>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div>
+                                                                                    <select type="" id="" placeholder="{% trans " Select  " %}" data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'},
+                                                                                    event: {select:
+                                                                                        function(e){
+                                                                                        console.log('doing', e)
+                                                                                        getFileData(e);
+                                                                                        indicateDataTableRowSelection(e)
+                                                                                    }"></select>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>

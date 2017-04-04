@@ -11,6 +11,7 @@ define([
     'bindings/dropzone',
     'bindings/nvd3-line',
     'bindings/datatable',
+    'bindings/chosen',
 ], function($, ko, koMapping, _, Dropzone, nvd3, uuid, moment, WidgetViewModel) {
     /**
      * registers a file-widget component for use in forms
@@ -27,7 +28,7 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
 
             WidgetViewModel.apply(this, [params]);
-            this.selectedFile = ko.observable(undefined);
+            this.selectedFile = ko.observable();
             this.viewChart = ko.observable(false);
 
             this.selection = ko.computed(function() {
@@ -128,7 +129,9 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
+            this.selectedUrl = ko.observable('')
             this.selectedFiles = ko.observableArray([]);
+
             this.indicateDataTableRowSelection = function(row) {
                 this.selectedFiles.removeAll();
                 this.selectedFiles.push(ko.unwrap(row.url))
@@ -211,6 +214,7 @@ define([
                 }, 50)
             }
 
+
             this.getFileData = function(f) {
                 var self = this;
                 var url = ko.unwrap(f.url);
@@ -241,8 +245,15 @@ define([
                     self.selectedFile(f);
                   });
               }
-
             }
+
+            this.selectedUrl.subscribe(function(val){
+                var url = val;
+                var selected = _.filter(this.uploadedFiles(), function(f){return f.url() === url})[0]
+                this.selectedFile(url);
+                this.getFileData(selected)
+                this.indicateDataTableRowSelection(selected)
+            }, this)
 
             this.unique_id = uuid.generate();
             this.uniqueidClass = ko.computed(function () {
