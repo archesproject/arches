@@ -10,7 +10,7 @@ define([
     'viewmodels/widget',
     'bindings/dropzone',
     'bindings/nvd3-line',
-    'bindings/datatable',
+    // 'bindings/datatable',
     'bindings/chosen',
 ], function($, ko, koMapping, _, Dropzone, nvd3, uuid, moment, WidgetViewModel) {
     /**
@@ -208,11 +208,14 @@ define([
 
             this.chartData = ko.observable([])
             this.resize = function(){
-                window.setTimeout(function() {
+                var self = this;
+                var reloadChart = function() {
+                    self.getFileData(self.selectedFile())
                     window.dispatchEvent(new Event('resize'))
-                    console.log('resizing')
-                }, 50)
-            }
+                    }
+                    window.setTimeout(reloadChart, 50)
+                }
+
 
 
             this.getFileData = function(f) {
@@ -249,10 +252,10 @@ define([
 
             this.selectedUrl.subscribe(function(val){
                 var url = val;
-                var selected = _.filter(this.uploadedFiles(), function(f){return f.url() === url})[0]
+                var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
                 this.selectedFile(url);
-                this.getFileData(selected)
-                this.indicateDataTableRowSelection(selected)
+                this.getFileData(selected);
+                // this.indicateDataTableRowSelection(selected) //Only needed if we keep table
             }, this)
 
             this.unique_id = uuid.generate();

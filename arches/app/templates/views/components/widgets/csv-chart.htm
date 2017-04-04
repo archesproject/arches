@@ -93,7 +93,7 @@
                                                                 <div class="row">
                                                                     <div class="col-lg-6">
                                                                         <div class="row">
-                                                                            <div class="col-xs-6">
+                                                                            <div class="col-xs-3">
 
                                                                                 <!-- Upload stat -->
                                                                                 <div class="pad-ver media">
@@ -115,7 +115,7 @@
                                                                                 </div>
 
                                                                             </div>
-                                                                            <div class="col-xs-6">
+                                                                            <div class="col-xs-3">
 
                                                                                 <!-- Label -->
                                                                                 <div class="pad-ver media">
@@ -130,15 +130,14 @@
                                                                                         <small class="text-uppercase">Sample Id</small>
                                                                                     </div>
                                                                                 </div>
+
+                                                                            </div>
+                                                                            <div class="col-xs-6">
                                                                                 <div>
-                                                                                    <select type="" id="" placeholder="{% trans " Select  " %}" data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'},
-                                                                                    event: {select:
-                                                                                        function(e){
-                                                                                        console.log('doing', e)
-                                                                                        getFileData(e);
-                                                                                        indicateDataTableRowSelection(e)
-                                                                                    }"></select>
+                                                                                    <select data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'}"></select>
                                                                                 </div>
+                                                                                <!-- Label -->
+
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -147,10 +146,10 @@
                                                             </div>
                                                         </div>
 
-                                                        <hr class="mar-lft" style="margin-right: 25px; margin-top: 0px;">
+                                                        <!-- <hr class="mar-lft" style="margin-right: 25px; margin-top: 0px;"> -->
                                                         <!-- File List -->
                                                         <!-- ko foreach: { data: [$data], as: 'self' } -->
-                                                        <div class="" style="">
+                                                        <!-- <div class="" style="">
                                                             <div class="panel-body">
 
                                                                 <table class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -187,7 +186,7 @@
                                                                 </table>
 
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                         <!-- /ko -->
                                                     </div>
                                                 </div>
