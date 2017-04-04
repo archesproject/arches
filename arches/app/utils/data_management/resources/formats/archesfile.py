@@ -33,6 +33,7 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import Value
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from copy import deepcopy
@@ -116,15 +117,17 @@ class ArchesFileReader(Reader):
                                 reporter.update_tiles_saved()
 
                 for relation in business_data['relations']:
-                    relation = ResourceXResource.objects.update_or_create(
-                        resourcexid = uuid.UUID(str(relation['resourcexid'])),
-                        resourceinstanceidfrom = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom']))),
-                        resourceinstanceidto = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto']))),
-                        notes = relation['notes'],
-                        relationshiptype = uuid.UUID(str(relation['relationshiptype'])),
+                    resource_x_resource_relation = ResourceXResource(
+                        resourcexid = str(uuid.UUID(str(relation['resourcexid']))),
+                        resourceinstanceidfrom = ResourceInstance(str(relation['resourceinstanceidfrom_id'])),
+                        resourceinstanceidto = ResourceInstance(str(relation['resourceinstanceidto_id'])),
+                        relationshiptype = Value(uuid.UUID(str(relation['relationshiptype_id']))),
                         datestarted = relation['datestarted'],
-                        dateended = relation['dateended']
+                        dateended = relation['dateended'],
+                        notes = relation['notes']
                     )
+                    resource_x_resource_relation.save()
+
                     if len(ResourceXResource.objects.filter(resourcexid=relation['resourcexid'])) == 1:
                         reporter.update_relations_saved()
             else:

@@ -50,6 +50,7 @@
             'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core',
             'turf': '{{ STATIC_URL }}bower_components/turf/index',
             'geohash': '{{ STATIC_URL }}bower_components/geohash/latlon-geohash',
+            'nvd3': '{{ STATIC_URL }}bower_components/nvd3/build/nv.d3.min',
             'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw'
@@ -103,6 +104,10 @@
             },
             'geohash': {
                 exports: 'Geohash'
+            },
+            'nvd3': {
+                deps: ['d3'],
+                exports: 'nv'
             },
             'leaflet-iiif': {
                 deps: ['leaflet']
