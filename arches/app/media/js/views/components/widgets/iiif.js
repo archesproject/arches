@@ -21,6 +21,18 @@ define([
             var ignoreFeatureClick = false;
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
+            this.clickName = ko.pureComputed({
+                read: function () {
+                    return self.clickData() ? self.clickData().name :  '';
+                },
+                write: function (val) {
+                    if (self.clickData()) {
+                        self.clickData().name = val;
+                        updateFeatures();
+                    }
+                },
+                owner: this
+            });
             this.popupData = ko.computed(function () {
                 var hoverData = self.hoverData();
                 return hoverData ? hoverData : self.clickData();
@@ -252,6 +264,7 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
+                    self.clickData(null);
                     if (!ko.unwrap(self.value)) {
                         drawnItems.clearLayers();
                         self.selectedManifest(null);
@@ -259,6 +272,7 @@ define([
                     }
                 });
                 this.form.on('tile-reset', function(tile) {
+                    self.clickData(null);
                     drawnItems.clearLayers();
                     var features = self.value.features ? koMapping.toJS(self.value.features) : [];
                     drawnItems.addData({
