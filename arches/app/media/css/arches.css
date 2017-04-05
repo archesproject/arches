@@ -4910,7 +4910,7 @@ h4.report-toolbar-title {
     font-weight: 400;
 }
 
-.csv-chart-menubar-item.active a {
+.csv-chart-menubar-item.active {
     color: #123;
     font-weight: 600;
 }

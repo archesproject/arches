@@ -32,9 +32,11 @@ define([
             this.viewChart = ko.observable(false);
 
             this.selectionDisplayValues = ko.computed(function() {
+                // console.log('computed!!')
                 if (this.selectedFile()) {
                     var f = this.selectedFile()
                     res = {
+                        file_name: ko.unwrap(f.name),
                         upload_time: moment(ko.unwrap(f.upload_time)).format('YYYY-MM-DD'),
                         size: ko.unwrap(f.size)/1024 + 'kb',
                         url: ko.unwrap(f.url),
@@ -45,7 +47,8 @@ define([
                     return {
                         upload_time: undefined,
                         size: undefined,
-                        records: undefined
+                        records: undefined,
+                        file_name: undefined
                     }
                 }
 
