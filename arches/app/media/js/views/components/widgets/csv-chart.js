@@ -209,11 +209,11 @@ define([
             this.chartData = ko.observable([])
             this.resize = function(){
                 var self = this;
-                // var reloadChart = function() {
-                //     self.getFileData(self.uploadedFiles()[0])
-                //     window.dispatchEvent(new Event('resize'))
-                //     }
-                //     window.setTimeout(reloadChart, 50)
+                var reloadChart = function() {
+                    self.getFileData(self.uploadedFiles()[0])
+                    window.dispatchEvent(new Event('resize'))
+                    }
+                    window.setTimeout(reloadChart, 50)
                 }
 
 
