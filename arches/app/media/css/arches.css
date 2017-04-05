@@ -4920,6 +4920,22 @@ h4.report-toolbar-title {
     padding: 0px 0px 10px;
 }
 
+.csv-chart-selection-detail-container {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+}
+.csv-chart-selection-detail {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.file-selector {
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
+
 .tab-content .csv-chart-panel {
     padding-top: 0px;
 }
