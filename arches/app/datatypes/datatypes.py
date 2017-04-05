@@ -53,12 +53,12 @@ class StringDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         return value.encode('utf8')
 
-    def get_search_term(self, nodevalue):
-        term = None
+    def get_search_terms(self, nodevalue):
+        terms = []
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                term = nodevalue
-        return term
+                terms.append(nodevalue)
+        return terms
 
 
 class NumberDataType(BaseDataType):
@@ -618,3 +618,26 @@ class CSVChartJsonDataType(FileListDataType):
                         file_json["status"] = 'uploaded'
         except Exception as e:
             print e
+
+
+class IIIFDrawingDataType(BaseDataType):
+    def get_strings(self, nodevalue):
+        string_list = [nodevalue['manifestLabel']]
+        for feature in nodevalue['features']:
+            if feature['properties']['name'] != '':
+                string_list.append(feature['properties']['name'])
+        return string_list
+
+    def append_to_document(self, document, nodevalue):
+        string_list = self.get_strings(nodevalue)
+        for string_item in string_list:
+            document['strings'].append(string_item)
+
+    def get_search_terms(self, nodevalue):
+        terms = []
+        string_list = self.get_strings(nodevalue)
+        for string_item in string_list:
+            if string_item is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(string_item)
+        return terms

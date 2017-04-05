@@ -705,7 +705,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
 
     def __unicode__(self):
-        return self.name
+        return self.url
 
     class Meta:
         managed = True
