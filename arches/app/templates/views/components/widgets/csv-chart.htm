@@ -62,6 +62,10 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <template id="file-widget-dz-preview"><span></span></template>
+
+
                         </div>
 
                         <!-- Visualize Dataset -->
@@ -206,7 +210,9 @@
     </div>
 </div>
 
-<template id="file-widget-dz-preview"><span></span></template> {% endblock form %} {% block config_form %}
+
+
+{% endblock form %} {% block config_form %}
 <div class="control-label">
     {% trans "Accepted Files" %}
 </div>
@@ -249,5 +255,7 @@
     </div>
 </dd>
 <!-- /ko -->
-{% endblock report %} {% block display_value %}
-<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'"></span> {% endblock display_value %}
+{% endblock report %}
+{% block display_value %}
+<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'"></span>
+{% endblock display_value %}
