@@ -528,11 +528,12 @@ class FileListDataType(BaseDataType):
             file_model = models.File()
             file_model.path = file_data
             file_model.save()
-            for file_json in current_tile.data[str(node.pk)]:
-                if file_json["name"] == file_data.name and file_json["url"] is None:
-                    file_json["file_id"] = str(file_model.pk)
-                    file_json["url"] = str(file_model.path.url)
-                    file_json["status"] = 'uploaded'
+            if current_tile.data[str(node.pk)] != None:
+                for file_json in current_tile.data[str(node.pk)]:
+                    if file_json["name"] == file_data.name and file_json["url"] is None:
+                        file_json["file_id"] = str(file_model.pk)
+                        file_json["url"] = str(file_model.path.url)
+                        file_json["status"] = 'uploaded'
 
     def transform_import_values(self, value):
         '''

@@ -4910,7 +4910,7 @@ h4.report-toolbar-title {
     font-weight: 400;
 }
 
-.csv-chart-menubar-item.active a {
+.csv-chart-menubar-item.active {
     color: #123;
     font-weight: 600;
 }
@@ -4919,6 +4919,22 @@ h4.report-toolbar-title {
     width: 100%;
     padding: 0px 0px 10px;
 }
+
+.csv-chart-selection-detail-container {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+}
+.csv-chart-selection-detail {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.file-selector {
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
 
 .tab-content .csv-chart-panel {
     padding-top: 0px;

@@ -7,16 +7,16 @@
 
             <div class="csv-chart-menubar">
                 <ul class="list-inline">
-                    <li class="csv-chart-menubar-item active"><a href="#file-upload" data-toggle="tab">{% trans "Upload Files" %}</a></li>
-                    <li class="csv-chart-menubar-item" data-bind="click: function(){resize()}"><a href="#visualize-data" data-toggle="tab" data-bind="css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
+                    <li class="csv-chart-menubar-item" data-bind="click: function(){viewChart(false)}, css: {'active': viewChart() == false}"><a data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}">{% trans "Upload Files" %}</a></li>
+                    <li class="csv-chart-menubar-item" data-bind="click: function(){if (uploadedFiles().length > 0){ resize(); viewChart(true)};}, css: {'active': viewChart() == true}"><a data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
                 </ul>
             </div>
             <div>
                 <!--CONTENT CONTAINER-->
-                <div class="tab-content csv-chart-panel" style="margin-bottom: 20px;">
-
+                <div class="csv-chart-panel" style="margin-bottom: 20px;">
                         <!-- Upload Dataset -->
-                        <div id="file-upload" class="dropzone tab-pane csv-chart-panel active" data-bind="dropzone: dropzoneOptions">
+
+                        <div class="dropzone csv-chart-panel" data-bind="dropzone: dropzoneOptions, attr: {'id': 'file-upload-' + uniqueidClass()}, visible: viewChart() == false">
                             <div class="panel">
                                 <div>
                                     <div class="pad-ver csv-chart-panel">
@@ -59,14 +59,17 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <template id="file-widget-dz-preview"><span></span></template>
+
                         </div>
 
                         <!-- Visualize Dataset -->
-                        <div id="visualize-data" class="tab-pane csv-chart-panel">
+                        <div class="csv-chart-panel" data-bind="attr: {'id': 'visualize-data-' + uniqueidClass()}, visible: viewChart() == true">
                             <div id="card-container" class="csv-chart-container">
                                 <div class="panel-heading">
                                     <div class="" style="">
-                                        <h3 id="cc-title" class="panel-title csv-chart-title">File Name Here for char title</h3>
+                                        <h3 id="cc-title" class="panel-title csv-chart-title" data-bind="text: selectionDisplayValues().file_name"></h3>
                                     </div>
                                 </div>
 
@@ -84,12 +87,13 @@
 
                                                         <!-- File Chart -->
                                                         <div style="">
-                                                            <div class="csv-chart" data-bind="nvd3Line: {data: chartData}"></div>
-                                                            
+                                                            <div class="csv-chart" data-bind="nvd3Line: {data: chartData}, css: uniqueidClass"></div>
+
                                                             <!--Chart information-->
                                                             <div class="panel-body">
                                                                 <div class="row">
-                                                                    
+
+
                                                                     <!-- Upload Date -->
                                                                     <div class="hidden-xs col-sm-6 col-lg-3">
                                                                         <!-- Upload stat -->
@@ -101,15 +105,14 @@
                                                                             </div>
 
                                                                             <div class="media-body">
-                                                                                <p class="h3 text-thin media-heading" data-bind="text: selection().upload_time"></p>
+                                                                                <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().upload_time"></p>
                                                                                 <small class="text-uppercase">{% trans "Upload date" %}</small>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    
+
                                                                     <!-- Sample ID -->
                                                                     <div class="hidden-xs col-sm-6 col-lg-3">
-
                                                                         <!-- Label -->
                                                                         <div class="pad-ver media">
                                                                             <div class="media-right">
@@ -119,19 +122,22 @@
                                                                             </div>
 
                                                                             <div class="media-body">
-                                                                                <p class="h3 text-thin media-heading">33.25 kB</p>
-                                                                                <small class="text-uppercase">File Size</small>
+                                                                                <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().records"></p>
+                                                                                <small class="text-uppercase">{% trans "Records" %}</small>
                                                                             </div>
                                                                         </div>
                                                                     </div>
 
-                                                                    <!-- File Selector -->
-                                                                    <div class="col-lg-6">
-                                                                        <div class="csv-chart-file-selector">
-                                                                            <select data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'}"></select>
+                                                                            <!-- File Selector -->
+                                                                            <div class="col-lg-6">
+                                                                                <div class="csv-chart-file-selector">
+                                                                                    <select data-bind="options: uploadedFiles, optionsText:'name', optionsValue:'url', value: selectedUrl, chosen: {width: '100%'}"></select>
+                                                                                </div>
+                                                                            </div>
+
                                                                         </div>
                                                                     </div>
-                                                                    
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -193,7 +199,9 @@
     </div>
 </div>
 
-<template id="file-widget-dz-preview"><span></span></template> {% endblock form %} {% block config_form %}
+
+
+{% endblock form %} {% block config_form %}
 <div class="control-label">
     {% trans "Accepted Files" %}
 </div>
@@ -236,5 +244,7 @@
     </div>
 </dd>
 <!-- /ko -->
-{% endblock report %} {% block display_value %}
-<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'"></span> {% endblock display_value %}
+{% endblock report %}
+{% block display_value %}
+<span data-bind="text: displayValue() + ' {% trans " files uploaded " %}'"></span>
+{% endblock display_value %}
