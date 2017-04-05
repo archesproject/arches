@@ -31,21 +31,21 @@ define([
             this.selectedFile = ko.observable();
             this.viewChart = ko.observable(false);
 
-            this.selection = ko.computed(function() {
+            this.selectionDisplayValues = ko.computed(function() {
                 if (this.selectedFile()) {
                     var f = this.selectedFile()
                     res = {
                         upload_time: moment(ko.unwrap(f.upload_time)).format('YYYY-MM-DD'),
                         size: ko.unwrap(f.size)/1024 + 'kb',
                         url: ko.unwrap(f.url),
-                        description: "This is a description"
+                        records: this.chartData().length === 0 ? undefined : this.chartData()[0].values.length
                     };
                     return res;
                 } else {
                     return {
                         upload_time: undefined,
                         size: undefined,
-                        description: undefined
+                        records: undefined
                     }
                 }
 

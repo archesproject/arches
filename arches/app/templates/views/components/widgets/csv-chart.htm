@@ -107,7 +107,7 @@
                                                                                     </div>
 
                                                                                     <div class="media-body">
-                                                                                        <p class="h3 text-thin media-heading" data-bind="text: selection().upload_time"></p>
+                                                                                        <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().upload_time"></p>
                                                                                         <small class="text-uppercase">{% trans "Upload date" %}</small>
                                                                                     </div>
                                                                                 </div>
@@ -124,13 +124,13 @@
                                                                                 <div class="pad-ver media">
                                                                                     <div class="media-right">
                                                                                         <span class="icon-wrap icon-wrap-xs">
-                                                                                            <i class="fa fa-tag fa-2x"></i>
+                                                                                            <i class="fa fa-list-ol fa-2x"></i>
                                                                                         </span>
                                                                                     </div>
 
                                                                                     <div class="media-body">
-                                                                                        <p class="h3 text-thin media-heading">Area 06</p>
-                                                                                        <small class="text-uppercase">Sample Id</small>
+                                                                                        <p class="h3 text-thin media-heading" data-bind="text: selectionDisplayValues().records"></p>
+                                                                                        <small class="text-uppercase">{% trans "Records" %}</small>
                                                                                     </div>
                                                                                 </div>
 
