@@ -57,7 +57,7 @@ define([
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
-                        var data = req.responseJSON.data[self.node.nodeid];
+                        var data = req.responseJSON.data[self.node.nodeid] || req.responseJSON.tiles[self.node.nodeid][0].data[self.node.nodeid];
                         if (Array.isArray(data.files)) {
                             self.uploadedFiles(data.files)
                         }
@@ -209,11 +209,11 @@ define([
             this.chartData = ko.observable([])
             this.resize = function(){
                 var self = this;
-                var reloadChart = function() {
-                    self.getFileData(self.selectedFile())
-                    window.dispatchEvent(new Event('resize'))
-                    }
-                    window.setTimeout(reloadChart, 50)
+                // var reloadChart = function() {
+                //     self.getFileData(self.uploadedFiles()[0])
+                //     window.dispatchEvent(new Event('resize'))
+                //     }
+                //     window.setTimeout(reloadChart, 50)
                 }
 
 
@@ -252,9 +252,12 @@ define([
 
             this.selectedUrl.subscribe(function(val){
                 var url = val;
-                var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
-                this.selectedFile(url);
-                this.getFileData(selected);
+                if (this.uploadedFiles().length > 0 && url) {
+                    var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
+                    this.selectedFile(url);
+                    this.getFileData(selected);
+                }
+
                 // this.indicateDataTableRowSelection(selected) //Only needed if we keep table
             }, this)
 
