@@ -7,19 +7,16 @@
 
             <div class="bord-top pad-ver">
                 <ul class="list-inline">
-                    <!-- <li class="active"><a href="#file-upload" data-toggle="tab">{% trans "Upload Files" %}</a></li> -->
-                    <li class="active"><a data-toggle="tab" data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}">{% trans "Upload Files" %}</a></li>
-                    <!-- <li data-bind="click: function(){resize()}"><a href="#visualize-data" data-toggle="tab" data-bind="css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li> -->
-                    <li data-bind="click: function(){resize()}"><a data-toggle="tab" data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
-
+                    <li><a data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}, click: function(){viewChart(false)}">{% trans "Upload Files" %}</a></li>
+                    <li data-bind="click: function(){if (uploadedFiles().length > 0){ resize(); viewChart(true)}; }"><a data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
                 </ul>
             </div>
             <div>
                 <!--CONTENT CONTAINER-->
-                <div class="tab-content csv-chart-panel" style="margin-bottom: 20px;">
-
+                <div class="csv-chart-panel" style="margin-bottom: 20px;">
                         <!-- Upload Dataset -->
-                        <div class="dropzone tab-pane csv-chart-panel active" data-bind="dropzone: dropzoneOptions, attr: {'id': 'file-upload-' + uniqueidClass()}">
+
+                        <div class="dropzone csv-chart-panel" data-bind="dropzone: dropzoneOptions, attr: {'id': 'file-upload-' + uniqueidClass()}, visible: viewChart() == false">
                             <div class="panel">
                                 <div>
                                     <div class="pad-ver csv-chart-panel">
@@ -65,11 +62,10 @@
 
                             <template id="file-widget-dz-preview"><span></span></template>
 
-
                         </div>
 
                         <!-- Visualize Dataset -->
-                        <div class="tab-pane csv-chart-panel" data-bind="attr: {'id': 'visualize-data-' + uniqueidClass()}" style="border: 1px solid #ddd; border-bottom-width: 0px; margin-top: 0px;">
+                        <div class="csv-chart-panel" data-bind="attr: {'id': 'visualize-data-' + uniqueidClass()}, visible: viewChart() == true" style="border: 1px solid #ddd; border-bottom-width: 0px; margin-top: 0px;">
                             <div id="card-container" class="panel card-panel">
                                 <div class="panel-heading">
                                     <div class="" style="">
