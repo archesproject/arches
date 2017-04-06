@@ -32,7 +32,6 @@ define([
             this.viewChart = ko.observable(false);
 
             this.selectionDisplayValues = ko.computed(function() {
-                // console.log('computed!!')
                 if (this.selectedFile()) {
                     var f = this.selectedFile()
                     res = {
@@ -56,7 +55,13 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
+
+                    var isParent = _.every(tile.data, function(value) { return value === null });
+                    if (isParent === true){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
+                    } else if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
@@ -193,20 +198,24 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                if (ko.isObservable(self.value)){
-                    self.value(
-                        {'files':value.filter(function(file) {
+
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    if (ko.isObservable(self.value)){
+                        self.value(
+                            {'files':value.filter(function(file) {
+                                return file.accepted;
+                            }),
+                             'name':self.datasetName(),
+                             'description':self.datasetDescription(),
+                             'device':self.datasetDevice()
+                            })
+                    } else {
+                        self.value.files(value.filter(function(file) {
                             return file.accepted;
-                        }),
-                         'name':self.datasetName(),
-                         'description':self.datasetDescription(),
-                         'device':self.datasetDevice()
-                        })
-                } else {
-                    self.value.files(value.filter(function(file) {
-                        return file.accepted;
-                    }));
+                        }));
+                    }
                 }
+
             });
 
             this.chartData = ko.observable([])
