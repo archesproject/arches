@@ -114,12 +114,12 @@
                         </div>
                     </div>
 
-                    <!--Summernote-->
+                    <!--Rich text editor-->
                     <div class="node-widget-label" style="">
                         <div class="control-label">
                             {% trans "Help Content" %}
                         </div>
-                        <div class="summernote" data-bind='summernote: {value: card().get("helptext")}'></div>
+                        <textarea rows="10" cols="80" data-bind="ckeditor: card().get('helptext'), valueUpdate: 'afterkeydown'"></textarea>
                     </div>
 
                     <!-- Preview help -->
