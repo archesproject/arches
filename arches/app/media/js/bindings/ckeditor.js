@@ -15,15 +15,21 @@ define([
     * @name ckeditor
     */
     ko.bindingHandlers.ckeditor = {
-        init: function (element, valueAccessor) {
- 
+        init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var modelValue = valueAccessor();
             var value = ko.utils.unwrapObservable(valueAccessor());
             var $element = $(element);
+            var options = {};
+
+            if (allBindings.has('ckeditorOptions')){
+                var opts = allBindings.get('ckeditorOptions');
+                options = (typeof opts === 'object') ? opts : {};
+            };
      
             // Set initial value and create the CKEditor
             $element.html(value);
-            var editor = $element.ckeditor().editor;
+            var editor = $element.ckeditor(options).editor;
+
      
             // bind to change events and link it to the observable
             var onChange = function (e) {
