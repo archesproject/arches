@@ -254,6 +254,12 @@ define([
                     });
                     self.map.on(L.Draw.Event.EDITED, updateFeatures);
                     self.map.on(L.Draw.Event.DELETED, updateFeatures);
+
+                    self.expanded.subscribe(function () {
+                        _.defer(function () {
+                            self.map.invalidateSize();
+                        }, 500);
+                    });
                 }
             };
 
