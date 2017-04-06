@@ -22,7 +22,7 @@ init_arches() {
 	if [[ "${FORCE_DB_INIT}" == "True" ]]; then
 		echo ""
 		echo "*** Warning: FORCE_DB_INIT = True ***"
-		echo "" 
+		echo ""
 		run_db_init_commands
 	elif db_exists; then
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
@@ -45,28 +45,28 @@ db_exists() {
 
 setup_arches() {
 	# Setup Postgresql and Elasticsearch (this deletes your existing database)
-	
-	echo "" && echo "" 
-	echo "*** Initializing database ***" 
-	echo "" 
-	echo "*** Any existing Arches database will be deleted ***"
-	echo "" && echo "" 
 
-	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo "" 
+	echo "" && echo ""
+	echo "*** Initializing database ***"
+	echo ""
+	echo "*** Any existing Arches database will be deleted ***"
+	echo "" && echo ""
+
+	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
 
 	echo "Running: python manage.py packages -o setup"
 	python manage.py packages -o setup
 }
 
-init_arches_projects() { 
+init_arches_projects() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
-			echo "" 
+			echo ""
 			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
-			echo "" 
-			
+			echo ""
+
 			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 
 			exit_code=$?
@@ -133,12 +133,17 @@ run_django_server() {
 	echo ""
 	echo "----- *** RUNNING DJANGO SERVER *** -----"
 	echo ""
-	exec python manage.py runserver 0.0.0.0:8000
+	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
+	    echo "Running Django with options --noreload --nothreading."
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:8000
+	else
+		exec python manage.py runserver 0.0.0.0:8000
+	fi
 }
 
 
 
-### Starting point ### 
+### Starting point ###
 
 # Run first commands from ${ARCHES_ROOT}
 cd_arches_root

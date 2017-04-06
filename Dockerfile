@@ -39,7 +39,7 @@ RUN apt-get update -y &&\
 	wget https://bootstrap.pypa.io/get-pip.py &&\
 	python get-pip.py
 
-	
+
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
 RUN pip install virtualenv==15.1.0 &&\
@@ -47,16 +47,16 @@ RUN pip install virtualenv==15.1.0 &&\
 	. ENV/bin/activate &&\
 	pip install -U pip \
 	setuptools &&\
-	pip install requests
-	
-	
+	pip install requests ptvsd
+
+
 ## Install Postgresql client
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
 	apt-get install -y postgresql-client-9.6
 
-	
+
 ## Clean up obsolete folders and packages
 RUN rm -rf /var/lib/apt/lists/*
 RUN rm -rf /tmp/*
@@ -69,15 +69,15 @@ WORKDIR ${ARCHES_ROOT}
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 	bower --allow-root install &&\
 	python setup.py install
-		
-		
+
+
 # Add Docker-related files
 COPY docker/entrypoint.sh ${DOCKER_DIR}/entrypoint.sh
 COPY docker/settings_local.py ${ARCHES_ROOT}/arches/settings_local.py
 RUN	chmod -R 700 ${DOCKER_DIR} &&\
 	dos2unix ${DOCKER_DIR}/*
 
-	
+
 # Set entrypoint
 CMD ${DOCKER_DIR}/entrypoint.sh
 

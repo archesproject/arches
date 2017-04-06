@@ -165,8 +165,11 @@ You can mount your custom scripts into the container, e.g.:
         - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
 ```
 
-Useful environment variables:
+
+
+## Useful environment variables
 	- APP_FOLDER = The folder in your custom Arches app where your manage.py file lives. `/your_project_root/<your_project_name>`
+	- DJANGO_NORELOAD = Set this to "True" if you do not want Django to reload the server each time the python code is updated. Useful when using a remote debugger.
 
 
 
@@ -210,6 +213,15 @@ For development environments, it is advisable to mount your source code into the
 
 This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
   
+
+
+## Debugging
+In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
+Point 4 is handled for you, all you need to do is set this environment variable:
+- DJANGO_NORELOAD=True
+
+For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
+
 
 
 ## See also
