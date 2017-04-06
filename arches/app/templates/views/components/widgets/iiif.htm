@@ -17,13 +17,13 @@
                     <li class="map-widget-toolbar-item text-center basemaps-map-tools" >
                         <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip"></i></a>
                     </li>
-                    <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
-                        <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
-                    </li>
                     <li class="map-widget-toolbar-item text-center">
                         <a class="map-widget-icon" href="#" data-bind="click: function () { expanded(!expanded()); }">
                             <i class="ion-android-expand add-tooltip" data-bind="tooltip: { title: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}', placement: 'bottom' }"></i>
                         </a>
+                    </li>
+                    <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
+                        <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                     </li>
                 </ul>
             </div>
@@ -102,7 +102,7 @@
                     <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
                     <!-- /ko -->
                 </div>
-                <div>
+                <div class="pad-top">
                     <label data-bind="text: typeLabel() + ':'"></label>
                     <!-- ko if: popupData() !== clickData() -->
                     <div style='display: inline;' data-bind='component: {
@@ -123,7 +123,7 @@
                     }'></div>
                     <!-- /ko -->
                     <!-- ko if: popupData() === clickData() -->
-                    <div class='' data-bind='component: {
+                    <div style="margin-top: -5px;" data-bind='component: {
                         name: "concept-select-widget",
                         params: {
                             formData: formData,

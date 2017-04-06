@@ -4898,11 +4898,11 @@ h4.report-toolbar-title {
 
 .csv-chart-menubar {
     padding-bottom: 15px;
-    margin-top: -10px;
+    margin-top: 5px;
 }
 
 .csv-chart-menubar-item {
-    padding: 3px;
+    padding: 3px 5px;
 }
 
 .csv-chart-menubar-item a {
@@ -5377,7 +5377,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 .iiif-wrapper.expanded-iiif {
     position: fixed;
-    top: 50px;
+    top: 106px;
     right: 0px;
     left: 50px;
     bottom: 0;
@@ -6869,6 +6869,7 @@ table.table.dataTable {
     }
     .dl-horizontal dd {
         margin-left: 280px;
+        padding-right: 20px;
     }
     .dl-horizontal dt {
         float: left;
