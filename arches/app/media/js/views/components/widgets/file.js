@@ -33,8 +33,17 @@ define([
                         if (Array.isArray(data)) {
                             self.uploadedFiles(data)
                         }
-                        self.dropzone.removeAllFiles(true);
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                            if (self.filesForUpload().length === 0 && self.tile != tile) {
+                                self.reset();
+                            }
+                        }
                         self.formData.delete('file-list_' + self.node.nodeid);
+                    }  else if (self.uploadedFiles().length === 0){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
                     }
                 });
                 this.form.on('tile-reset', function(tile) {
@@ -123,11 +132,15 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                self.value(
-                    value.filter(function(file) {
-                        return file.accepted;
-                    })
-                );
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    self.value(
+                        value.filter(function(file) {
+                            return file.accepted;
+                        })
+                    );
+                } else {
+                    console.log('not updating file upload')
+                }
             });
 
             this.unique_id = uuid.generate();

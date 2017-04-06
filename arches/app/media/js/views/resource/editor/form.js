@@ -303,15 +303,17 @@ define([
             var appendFormData = function() {
                 var parent = parentTile;
                 return function(tile) {
-                    var childFormData = tile()[0].formData
-                    for (var entry of childFormData.entries()) {
-                               parent.formData.append(entry[0], entry[1])
+                    if (tile().length > 0) {
+                        var childFormData = tile()[0].formData
+                        for (var entry of childFormData.entries()) {
+                            parent.formData.append(entry[0], entry[1])
                             }
                         }
+                    }
                 }
 
             _.each(parentTile.tiles, appendFormData());
-            
+
             this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){

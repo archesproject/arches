@@ -37,7 +37,7 @@ define([
                     res = {
                         file_name: ko.unwrap(f.name),
                         upload_time: moment(ko.unwrap(f.upload_time)).format('YYYY-MM-DD'),
-                        size: ko.unwrap(f.size) / 1024 + 'kb',
+                        size: ko.unwrap(f.size)/1024 + 'kb',
                         url: ko.unwrap(f.url),
                         records: this.chartData().length === 0 ? undefined : this.chartData()[0].values.length
                     };
@@ -65,6 +65,8 @@ define([
                         }
                         self.dropzone.removeAllFiles(true);
                         self.formData.delete('file-list_' + self.node.nodeid);
+                    } else if (self.uploadedFiles().length === 0){
+                        self.dropzone.removeAllFiles(true);
                     }
                 });
                 this.form.on('tile-reset', function(tile) {
@@ -111,8 +113,8 @@ define([
                 var filesForUpload = self.filesForUpload();
                 var uploadedFiles = self.uploadedFiles();
                 if (file.file_id) {
-                    file = _.find(uploadedFiles, function(uploadedFile) {
-                        return file.file_id === ko.unwrap(uploadedFile.file_id);
+                    file = _.find(uploadedFiles, function (uploadedFile) {
+                        return file.file_id ===  ko.unwrap(uploadedFile.file_id);
                     });
                     self.uploadedFiles.remove(file);
                 } else {
@@ -121,9 +123,9 @@ define([
                 }
             }
 
-            this.formatSize = function(file) {
+            this.formatSize = function (file) {
                 var bytes = ko.unwrap(file.size);
-                if (bytes == 0) return '0 Byte';
+                if(bytes == 0) return '0 Byte';
                 var k = 1024;
                 var dm = 2;
                 var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -149,16 +151,11 @@ define([
                 this.datasetDevice = ko.observable('');
             };
 
-            [this.datasetName, this.datasetDescription, this.datasetDevice].forEach(function(obs) {
+            [this.datasetName, this.datasetDescription, this.datasetDevice].forEach(function(obs){
                 var self = this;
-                obs.subscribe(function(val) {
-                    if (ko.isObservable(self.value)) {
-                        this.value({
-                            'files': this.filesJSON(),
-                            'name': this.datasetName(),
-                            'description': this.datasetDescription(),
-                            'device': this.datasetDevice()
-                        })
+                obs.subscribe(function(val){
+                    if (ko.isObservable(self.value)){
+                        this.value({'files':this.filesJSON(), 'name':this.datasetName(), 'description':this.datasetDescription(), 'device':this.datasetDevice()})
                     }
                 }, self)
             }, this);
@@ -186,9 +183,7 @@ define([
                         };
                     })
                 ));
-            }).extend({
-                throttle: 100
-            });
+            }).extend({throttle: 100});
 
             this.filesJSON.subscribe(function(value) {
                 if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
@@ -199,31 +194,37 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                if (ko.isObservable(self.value)) {
-                    self.value({
-                        'files': value.filter(function(file) {
+
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    if (ko.isObservable(self.value)){
+                        self.value(
+                            {'files':value.filter(function(file) {
+                                return file.accepted;
+                            }),
+                             'name':self.datasetName(),
+                             'description':self.datasetDescription(),
+                             'device':self.datasetDevice()
+                            })
+                    } else {
+                        self.value.files(value.filter(function(file) {
                             return file.accepted;
-                        }),
-                        'name': self.datasetName(),
-                        'description': self.datasetDescription(),
-                        'device': self.datasetDevice()
-                    })
+                        }));
+                    }
                 } else {
-                    self.value.files(value.filter(function(file) {
-                        return file.accepted;
-                    }));
+                    console.log('not updating')
                 }
+
             });
 
             this.chartData = ko.observable([])
-            this.resize = function() {
+            this.resize = function(){
                 var self = this;
                 var reloadChart = function() {
                     self.getFileData(self.uploadedFiles()[0])
                     window.dispatchEvent(new Event('resize'))
+                    }
+                    window.setTimeout(reloadChart, 50)
                 }
-                window.setTimeout(reloadChart, 50)
-            }
 
 
 
@@ -234,45 +235,35 @@ define([
                 var basename = filename.substr(0, filename.lastIndexOf('.')) || filename;
                 if (url.endsWith('.csv')) {
                     d3.csv(url, function(d) {
-                        return {
-                            x: +d.x,
-                            y: +d.y,
-                        };
+                      return {
+                        x: +d.x,
+                        y: +d.y,
+                      };
                     }, function(error, rows) {
-                        var data = _.sortBy(rows, function(a) {
-                            return a['x']
-                        });
-                        self.chartData(data)
-                    });
-                } else {
-                    d3.text(url, function(text) {
-                        var rows = d3.tsv.parseRows(text).map(function(row) {
-                            return {
-                                x: +row[0],
-                                y: +row[1]
-                            }
-                        })
-                        var data = _.sortBy(rows, function(a) {
-                            return a['x']
-                        });
-                        var series = [{
-                            values: data,
-                            key: basename,
-                            color: '#ff7f0e'
-                        }]
+                        var data = _.sortBy(rows, function(a){return a['x']});
+                      self.chartData(data)
+                  });
+              } else {
+                  d3.text(url, function(text) {
+                    var rows = d3.tsv.parseRows(text).map(function(row) {
+                      return {
+                          x: +row[0],
+                          y: +row[1]
+                          }
+                    })
+                    var data = _.sortBy(rows, function(a){return a['x']});
+                    var series = [{values: data, key: basename, color: '#ff7f0e'}]
 
-                        self.chartData(series);
-                        self.selectedFile(f);
-                    });
-                }
+                    self.chartData(series);
+                    self.selectedFile(f);
+                  });
+              }
             }
 
-            this.selectedUrl.subscribe(function(val) {
+            this.selectedUrl.subscribe(function(val){
                 var url = val;
                 if (this.uploadedFiles().length > 0 && url) {
-                    var selected = _.filter(this.uploadedFiles(), function(f) {
-                        return ko.unwrap(f.url) === url
-                    })[0]
+                    var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
                     this.selectedFile(url);
                     this.getFileData(selected);
                 }
@@ -281,7 +272,7 @@ define([
             }, this)
 
             this.unique_id = uuid.generate();
-            this.uniqueidClass = ko.computed(function() {
+            this.uniqueidClass = ko.computed(function () {
                 return "unique_id_" + self.unique_id;
             });
 
