@@ -3642,7 +3642,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .ep-card-crud-container:last-of-type {
-    margin-bottom: 100px;
+    margin-bottom: 200px;
 }
 
 .left-column-crud-container{
@@ -4886,7 +4886,33 @@ h4.report-toolbar-title {
 }
 
 .csv-chart {
-    height: 240px
+    height: 300px;
+    margin-left: -10px;
+    padding-right: 30px;
+}
+
+.csv-chart-title {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.csv-chart-menubar {
+    padding-bottom: 15px;
+    margin-top: -10px;
+}
+
+.csv-chart-menubar-item {
+    padding: 3px;
+}
+
+.csv-chart-menubar-item a {
+    color: #777;
+    font-weight: 400;
+}
+
+.csv-chart-menubar-item.active {
+    color: #123;
+    font-weight: 600;
 }
 
 .csv-chart-widget-input {
@@ -4894,12 +4920,39 @@ h4.report-toolbar-title {
     padding: 0px 0px 10px;
 }
 
+.csv-chart-selection-detail-container {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+}
+.csv-chart-selection-detail {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.file-selector {
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
+
 .tab-content .csv-chart-panel {
     padding-top: 0px;
 }
 
 .pad-ver .csv-chart-panel {
     padding-top: 0px;
+}
+
+.csv-chart-container {
+    margin-top: -15px;
+    margin-left: -30px;
+    margin-right: -45px;
+}
+
+.csv-chart-file-selector {
+    margin-top: 10px;
+    padding-right: 15px;
 }
 
 .map-widget-container {

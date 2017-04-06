@@ -31,21 +31,23 @@ define([
             this.selectedFile = ko.observable();
             this.viewChart = ko.observable(false);
 
-            this.selection = ko.computed(function() {
+            this.selectionDisplayValues = ko.computed(function() {
                 if (this.selectedFile()) {
                     var f = this.selectedFile()
                     res = {
+                        file_name: ko.unwrap(f.name),
                         upload_time: moment(ko.unwrap(f.upload_time)).format('YYYY-MM-DD'),
                         size: ko.unwrap(f.size)/1024 + 'kb',
                         url: ko.unwrap(f.url),
-                        description: "This is a description"
+                        records: this.chartData().length === 0 ? undefined : this.chartData()[0].values.length
                     };
                     return res;
                 } else {
                     return {
                         upload_time: undefined,
                         size: undefined,
-                        description: undefined
+                        records: undefined,
+                        file_name: undefined
                     }
                 }
 
@@ -53,11 +55,17 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
+
+                    var isParent = _.every(tile.data, function(value) { return value === null });
+                    if (isParent === true){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
+                    } else if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
-                        var data = req.responseJSON.data[self.node.nodeid];
+                        var data = req.responseJSON.data[self.node.nodeid] || req.responseJSON.tiles[self.node.nodeid][0].data[self.node.nodeid];
                         if (Array.isArray(data.files)) {
                             self.uploadedFiles(data.files)
                         }
@@ -190,27 +198,31 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                if (ko.isObservable(self.value)){
-                    self.value(
-                        {'files':value.filter(function(file) {
+
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    if (ko.isObservable(self.value)){
+                        self.value(
+                            {'files':value.filter(function(file) {
+                                return file.accepted;
+                            }),
+                             'name':self.datasetName(),
+                             'description':self.datasetDescription(),
+                             'device':self.datasetDevice()
+                            })
+                    } else {
+                        self.value.files(value.filter(function(file) {
                             return file.accepted;
-                        }),
-                         'name':self.datasetName(),
-                         'description':self.datasetDescription(),
-                         'device':self.datasetDevice()
-                        })
-                } else {
-                    self.value.files(value.filter(function(file) {
-                        return file.accepted;
-                    }));
+                        }));
+                    }
                 }
+
             });
 
             this.chartData = ko.observable([])
             this.resize = function(){
                 var self = this;
                 var reloadChart = function() {
-                    self.getFileData(self.selectedFile())
+                    self.getFileData(self.uploadedFiles()[0])
                     window.dispatchEvent(new Event('resize'))
                     }
                     window.setTimeout(reloadChart, 50)
@@ -252,9 +264,12 @@ define([
 
             this.selectedUrl.subscribe(function(val){
                 var url = val;
-                var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
-                this.selectedFile(url);
-                this.getFileData(selected);
+                if (this.uploadedFiles().length > 0 && url) {
+                    var selected = _.filter(this.uploadedFiles(), function(f){return ko.unwrap(f.url) === url})[0]
+                    this.selectedFile(url);
+                    this.getFileData(selected);
+                }
+
                 // this.indicateDataTableRowSelection(selected) //Only needed if we keep table
             }, this)
 
