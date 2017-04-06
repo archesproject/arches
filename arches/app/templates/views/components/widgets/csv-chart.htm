@@ -7,8 +7,8 @@
 
             <div class="csv-chart-menubar">
                 <ul class="list-inline">
-                    <li class="csv-chart-menubar-item" data-bind="click: function(){viewChart(false)}, css: {'active': viewChart() == false}"><a data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}">{% trans "Upload Files" %}</a></li>
-                    <li class="csv-chart-menubar-item" data-bind="click: function(){if (uploadedFiles().length > 0){ resize(); viewChart(true)};}, css: {'active': viewChart() == true}"><a data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0}">{% trans "Visualize Data" %}</a></li>
+                    <li data-bind="click: function(){viewChart(false)}"><a class="csv-chart-menubar-item" data-bind="attr: {'href': '#file-upload-' + uniqueidClass()}, css: {'active': viewChart() == false}">{% trans "Upload Files" %}</a></li>
+                    <li data-bind="click: function(){if (uploadedFiles().length > 0){ resize(); viewChart(true);};}"><a class="csv-chart-menubar-item" data-bind="attr: {'href': '#visualize-data-' + uniqueidClass()}, css:{'disabled-link': uploadedFiles().length === 0, 'active': viewChart() == true}">{% trans "Visualize Data" %}</a></li>
                 </ul>
             </div>
             <div>
