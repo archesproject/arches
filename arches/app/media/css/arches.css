@@ -6839,6 +6839,17 @@ table.table.dataTable {
   stroke-opacity: .5;
 }
 
+.hover-feature-body .row.widget-wrapper {
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+.hover-feature-body .row.widget-wrapper .col-xs-12 {
+    padding: 0;
+}
+.hover-feature-body .row.widget-wrapper label {
+    display: none;
+}
 
 @keyframes loader {
 	0% { background: #ddd; }

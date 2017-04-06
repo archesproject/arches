@@ -637,6 +637,11 @@ class IIIFDrawingDataType(BaseDataType):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
             document['strings'].append(string_item)
+        for feature in nodevalue['features']:
+            if feature['properties']['type'] is not None:
+                valueid = feature['properties']['type']
+                value = models.Value.objects.get(pk=valueid)
+                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
     def get_search_terms(self, nodevalue):
         terms = []
