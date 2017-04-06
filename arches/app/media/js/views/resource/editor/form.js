@@ -254,7 +254,7 @@ define([
                 model.save(function(response, status, model){
                     if(response.status === 200){
                         // if we had to save a parentTile
-                        console.log(response.responseJSON)
+                        // console.log(response.responseJSON)
                         if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){

@@ -25,7 +25,14 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
+                    var isParent = _.every(tile.data, function(value) {
+                        return ko.unwrap(value) === null
+                    });
+                    if (isParent === true){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
+                    } else if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
@@ -35,15 +42,8 @@ define([
                         }
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
-                            if (self.filesForUpload().length === 0 && self.tile != tile) {
-                                self.reset();
-                            }
                         }
                         self.formData.delete('file-list_' + self.node.nodeid);
-                    }  else if (self.uploadedFiles().length === 0){
-                        if (self.dropzone) {
-                            self.dropzone.removeAllFiles(true);
-                        }
                     }
                 });
                 this.form.on('tile-reset', function(tile) {
@@ -138,8 +138,6 @@ define([
                             return file.accepted;
                         })
                     );
-                } else {
-                    console.log('not updating file upload')
                 }
             });
 
