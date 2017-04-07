@@ -103,6 +103,18 @@ install_dev_requirements() {
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 }
 
+install_bower_components() {
+	if [[ ! -d ${ARCHES_ROOT}/arches/app/media/bower_components ]]; then
+		echo ""
+		echo ""
+		echo "----- INSTALLING BOWER COMPONENTS -----"
+		echo ""
+		echo "(The bower_components folder may have been overlaid by a Docker volume, running bower install again...)"
+		echo ""
+		bower --allow-root install
+	fi
+}
+
 run_custom_scripts() {
 	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
 		if [[ -f ${file} ]]; then
@@ -153,6 +165,7 @@ init_arches
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 	set_dev_mode
 	install_dev_requirements
+	install_bower_components
 fi
 
 run_tests
