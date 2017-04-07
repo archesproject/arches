@@ -5394,10 +5394,10 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
-    z-index: 10;
+    z-index: 1000;
     position: absolute;
-    top: 60px;
-    left: 10px;
+    top: 20px;
+    right: 270px;
     transition-duration: .3s;
 }
 
