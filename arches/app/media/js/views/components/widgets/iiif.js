@@ -18,6 +18,14 @@ define([
             params.configKeys = ['nameLabel', 'placeholder', 'typeLabel'];
             WidgetViewModel.apply(this, [params]);
 
+            this.displayValue = ko.computed(function() {
+                var val = ko.unwrap(self.value);
+                if (!val) {
+                    return val;
+                }
+                return val.manifestLabel;
+            });
+
             var features = self.value.features ? koMapping.toJS(self.value.features) : [];
             var ignoreFeatureClick = false;
             this.hoverData = ko.observable(null);
