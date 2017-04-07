@@ -15,7 +15,7 @@ define([
         viewModel: function(params) {
             var self = this;
             var canvasLayer = null;
-            params.configKeys = [];
+            params.configKeys = ['nameLabel', 'placeholder', 'typeLabel'];
             WidgetViewModel.apply(this, [params]);
 
             var features = self.value.features ? koMapping.toJS(self.value.features) : [];
@@ -45,6 +45,9 @@ define([
                     }
                 },
                 owner: this
+            });
+            this.hoverType = ko.pureComputed(function() {
+                return self.hoverData() ? self.hoverData().type : null;
             });
             this.popupData = ko.computed(function() {
                 var hoverData = self.hoverData();
@@ -254,6 +257,12 @@ define([
                     });
                     self.map.on(L.Draw.Event.EDITED, updateFeatures);
                     self.map.on(L.Draw.Event.DELETED, updateFeatures);
+
+                    self.expanded.subscribe(function () {
+                        _.defer(function () {
+                            self.map.invalidateSize();
+                        }, 500);
+                    });
                 }
             };
 

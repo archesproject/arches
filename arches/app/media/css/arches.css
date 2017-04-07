@@ -4898,11 +4898,11 @@ h4.report-toolbar-title {
 
 .csv-chart-menubar {
     padding-bottom: 15px;
-    margin-top: -10px;
+    margin-top: 5px;
 }
 
 .csv-chart-menubar-item {
-    padding: 3px;
+    padding: 3px 5px;
 }
 
 .csv-chart-menubar-item a {
@@ -5372,7 +5372,22 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     transition-duration: .3s;
 }
-
+.iiif-wrapper {
+    height: 500px;
+}
+.iiif-wrapper.expanded-iiif {
+    position: fixed;
+    top: 106px;
+    right: 0px;
+    left: 50px;
+    bottom: 0;
+    transition-duration: .3s;
+    z-index: 50000;
+    height: auto;
+}
+.leaflet-iiif {
+    height: 100%;
+}
 .expanded-resource-menu {
     margin-left: -275px;
     transition-duration: .3s;
@@ -5882,6 +5897,10 @@ span.basemap-unselected {
     font-size: 11px;
     text-align: center;
     border-radius: 2px;
+}
+
+.iiif-expand-button {
+    position: absolute;
 }
 
 /* Hide "Full Screen" button for map tools widget in card manager */
@@ -6820,6 +6839,17 @@ table.table.dataTable {
   stroke-opacity: .5;
 }
 
+.hover-feature-body .row.widget-wrapper {
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+.hover-feature-body .row.widget-wrapper .col-xs-12 {
+    padding: 0;
+}
+.hover-feature-body .row.widget-wrapper label {
+    display: none;
+}
 
 @keyframes loader {
 	0% { background: #ddd; }
@@ -6839,6 +6869,7 @@ table.table.dataTable {
     }
     .dl-horizontal dd {
         margin-left: 280px;
+        padding-right: 20px;
     }
     .dl-horizontal dt {
         float: left;
