@@ -2,25 +2,25 @@ version: 0.0
 os: linux
 hooks:
   ApplicationStop:
-    - location: arches/install/arches_stop.sh
+    - location: arches/install/ci_install/arches_stop.sh
       timeout: 300
       mode: 755
       runas: ubuntu
   BeforeInstall:
-    - location: arches/install/ubuntu_xenial_setup.sh
+    - location: arches/install/ci_install/ci_ubuntu_xenial_setup.sh
       timeout: 300
       mode: 755
       runas: ubuntu
-    - location: arches/install/install_arches.sh
+    - location: arches/install/ci_install/install_arches.sh
       timeout: 10000
       mode: 755
       runas: ubuntu
-    - location: arches/install/update_docs.sh
+    - location: arches/install/ci_install/update_docs.sh
       timeout: 300
       mode: 755
       runas: ubuntu
   ApplicationStart:
-    - location: arches/install/arches_start.sh
+    - location: arches/install/ci_install/arches_start.sh
       timeout: 300
       mode: 755
       runas: ubuntu
