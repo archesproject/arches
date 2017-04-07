@@ -5382,7 +5382,7 @@ div.row.widget-wrapper.report-header:hover {
     left: 50px;
     bottom: 0;
     transition-duration: .3s;
-    z-index: 50000;
+    z-index: 100;
     height: auto;
 }
 .leaflet-iiif {
