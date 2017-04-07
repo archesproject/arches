@@ -6118,7 +6118,7 @@ span.basemap-unselected {
 .hover-panel-dismiss {
     position: absolute;
     top: 10px;
-    right: 5px;
+    right: 10px;
 }
 .hover-feature-metadata{
     margin-bottom: -4px;
@@ -6434,6 +6434,7 @@ span.basemap-unselected {
 	color: #888;
 	background: #fff;
 	padding: 5px 10px;
+    margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -6853,6 +6854,18 @@ table.table.dataTable {
 }
 .hover-feature-body .row.widget-wrapper label {
     display: none;
+}
+.hover-feature-footer {
+    height: 50px;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    padding-top: 15px;
+}
+
+.hover-feature-footer a {
+    color: steelblue;
+    font-weight: 500;
+    padding-right: 10px;
 }
 
 @keyframes loader {
