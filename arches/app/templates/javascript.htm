@@ -2,6 +2,7 @@
 {% load i18n %}
 
 <script>
+    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}bower_components/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -27,6 +28,8 @@
             'd3': '{{ STATIC_URL }}bower_components/d3/d3.min',
             'dropzone': '{{ STATIC_URL }}bower_components/dropzone/downloads/dropzone-amd-module.min',
             'summernote': '{{ STATIC_URL }}bower_components/summernote/dist/summernote.min',
+            'ckeditor': '{{ STATIC_URL }}bower_components/ckeditor/ckeditor',
+            'ckeditor-jquery': '{{ STATIC_URL }}bower_components/ckeditor/adapters/jquery',
             'knockout': '{{ STATIC_URL }}bower_components/knockout/dist/knockout',
             'knockout-mapping': '{{ STATIC_URL }}bower_components/bower-knockout-mapping/dist/knockout.mapping.min',
             'moment': '{{ STATIC_URL }}bower_components/moment/min/moment.min',
@@ -114,6 +117,9 @@
             },
             'leaflet-draw': {
                 deps: ['leaflet']
+            },
+            'ckeditor-jquery': {
+                deps: ['ckeditor']
             }
         }
     });
