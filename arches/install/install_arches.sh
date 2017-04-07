@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-sudo rm -r /home/ubuntu/arches
-sudo rm -r /home/ubuntu/ENV
+sudo rm -r ~/arches
+sudo rm -r ~/ENV
 sudo curl -XDELETE 'http://localhost:9200/_all'
 
 sudo apt-get install -y git
@@ -28,11 +28,11 @@ python manage.py packages -o setup_db
 python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_scheme.rdf -ow overwrite -st keep
 python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_collections.rdf -ow overwrite -st keep
 python manage.py packages -o import_graphs
-python manage.py packages -o import_business_data -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.csv -ow overwrite
-python manage.py packages -o import_business_data_relations -s /home/ubuntu/arches/tests/fixtures/data/csv/heritage_resource_model.relations
+python manage.py packages -o import_business_data -s ~/arches/tests/fixtures/data/csv/heritage_resource_model.csv -ow overwrite
+python manage.py packages -o import_business_data_relations -s ~/arches/tests/fixtures/data/csv/heritage_resource_model.relations
 python manage.py packages -o add_tileserver_layer -m arches/tileserver/hillshade.xml -n hillshade
 python manage.py packages -o add_tileserver_layer -m arches/tileserver/world.xml -n world
 
 python manage.py collectstatic --noinput
-sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
+sudo chown www-data:www-data ~/arches/arches/arches.log
 sudo service apache2 restart
