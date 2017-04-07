@@ -55,9 +55,7 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-
-                    var isParent = _.every(tile.data, function(value) { return value === null });
-                    if (isParent === true){
+                    if (tile.isParent === true){
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
                         }
