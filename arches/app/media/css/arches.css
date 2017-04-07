@@ -5316,6 +5316,7 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-iiif .map-widget-panel {
     position: fixed;
     top: 150px;
+    width: 250px;
     bottom: 0;
     height: auto;
 }
@@ -5406,8 +5407,8 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-buttons {
     z-index: 1000;
     position: absolute;
-    top: -45px;
-    right: 180px;
+    top: -255px;
+    right: 195px;
     transition-duration: .3s;
 }
 
