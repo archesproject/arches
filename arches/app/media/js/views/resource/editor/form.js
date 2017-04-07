@@ -253,8 +253,8 @@ define([
                 this.trigger('before-update');
                 model.save(function(response, status, model){
                     if(response.status === 200){
-                        // if we had to save an parentTile
-                        console.log(response.responseJSON)
+                        // if we had to save a parentTile
+                        // console.log(response.responseJSON)
                         if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){
@@ -290,6 +290,7 @@ define([
             }
         },
 
+
         /**
          * saves a tile and it's child tiles back to the database
          * @memberof Form.prototype
@@ -298,6 +299,21 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
+
+            var appendFormData = function() {
+                var parent = parentTile;
+                return function(tile) {
+                    if (tile().length > 0) {
+                        var childFormData = tile()[0].formData
+                        for (var entry of childFormData.entries()) {
+                            parent.formData.append(entry[0], entry[1])
+                            }
+                        }
+                    }
+                }
+
+            _.each(parentTile.tiles, appendFormData());
+
             this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){
