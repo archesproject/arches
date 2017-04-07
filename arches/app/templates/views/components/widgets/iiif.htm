@@ -17,13 +17,13 @@
                     <li class="map-widget-toolbar-item text-center basemaps-map-tools" >
                         <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip"></i></a>
                     </li>
-                    <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
-                        <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
-                    </li>
                     <li class="map-widget-toolbar-item text-center">
                         <a class="map-widget-icon" href="#" data-bind="click: function () { expanded(!expanded()); }">
                             <i class="ion-android-expand add-tooltip" data-bind="tooltip: { title: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}', placement: 'bottom' }"></i>
                         </a>
+                    </li>
+                    <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
+                        <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                     </li>
                 </ul>
             </div>
@@ -94,12 +94,50 @@
             </div>
             <div class="hover-feature-body">
                 <div>
-                    <label>Name:</label>
+                    <label data-bind="text: nameLabel() + ':'"></label>
                     <!-- ko if: popupData() !== clickData() -->
                     <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
                     <!-- /ko -->
                     <!-- ko if: popupData() === clickData() -->
                     <input type="text" data-bind="value: clickName, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+                    <!-- /ko -->
+                </div>
+                <div class="pad-top">
+                    <label data-bind="text: typeLabel() + ':'"></label>
+                    <!-- ko if: popupData() !== clickData() -->
+                    <div style='display: inline;' data-bind='component: {
+                        name: "concept-select-widget",
+                        params: {
+                            formData: formData,
+                            tile: tile,
+                            form: form,
+                            config: config,
+                            label: typeLabel,
+                            value: hoverType,
+                            node: node,
+                            expanded: expanded,
+                            disabled: false,
+                            type: "resource-editor",
+                            state: "display_value"
+                        }
+                    }'></div>
+                    <!-- /ko -->
+                    <!-- ko if: popupData() === clickData() -->
+                    <div style="margin-top: -5px;" data-bind='component: {
+                        name: "concept-select-widget",
+                        params: {
+                            formData: formData,
+                            tile: tile,
+                            form: form,
+                            config: config,
+                            label: typeLabel,
+                            value: clickType,
+                            node: node,
+                            expanded: expanded,
+                            disabled: false,
+                            type: "resource-editor"
+                        }
+                    }'></div>
                     <!-- /ko -->
                 </div>
                 <div data-bind="if: popupData() !== clickData()">
@@ -115,7 +153,26 @@
 {% endblock form %}
 
 {% block config_form %}
-
+<div>
+    <div class="control-label">
+        {% trans "Name Label" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <input placeholder="{% trans "Name Label" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: nameLabel, valueUpdate: 'keyup'">
+    </div>
+</div>
+<div>
+    <div class="control-label">
+        {% trans "Type Label" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <input placeholder="{% trans "Type Label" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: typeLabel, valueUpdate: 'keyup'">
+    </div>
+</div>
 {% endblock config_form %}
 
 {% block report %}
@@ -137,12 +194,51 @@
         </div>
         <div class="hover-feature-body">
             <div>
-                <label>Name:</label>
+                <label data-bind="text: nameLabel() + ':'"></label>
                 <!-- ko if: popupData() !== clickData() -->
                 <span data-bind="text: popupData().name || '{% trans "Unnamed" %}'"></span>
                 <!-- /ko -->
                 <!-- ko if: popupData() === clickData() -->
                 <span data-bind="text: clickName() || '{% trans "Unnamed" %}'"></span>
+                <!-- /ko -->
+            </div>
+            <div>
+                <label data-bind="text: typeLabel() + ':'"></label>
+                <!-- ko if: popupData() !== clickData() -->
+                <div style='display: inline;' data-bind='component: {
+                    name: "concept-select-widget",
+                    params: {
+                        formData: formData,
+                        tile: tile,
+                        form: form,
+                        config: config,
+                        label: typeLabel,
+                        value: hoverType,
+                        node: node,
+                        expanded: expanded,
+                        disabled: false,
+                        type: "resource-editor",
+                        state: "display_value"
+                    }
+                }'></div>
+                <!-- /ko -->
+                <!-- ko if: popupData() === clickData() -->
+                <div style='display: inline;' data-bind='component: {
+                    name: "concept-select-widget",
+                    params: {
+                        formData: formData,
+                        tile: tile,
+                        form: form,
+                        config: config,
+                        label: typeLabel,
+                        value: clickType,
+                        node: node,
+                        expanded: expanded,
+                        disabled: false,
+                        type: "resource-editor",
+                        state: "display_value"
+                    }
+                }'></div>
                 <!-- /ko -->
             </div>
         </div>
