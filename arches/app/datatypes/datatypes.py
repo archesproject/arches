@@ -598,8 +598,6 @@ class CSVChartJsonDataType(FileListDataType):
         super(CSVChartJsonDataType, self).__init__(model=model)
 
     def manage_files(self, previously_saved_tile, current_tile, request, node):
-        print len(previously_saved_tile)
-        print previously_saved_tile.count()
         try:
             if previously_saved_tile.count() == 1:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]['files']:
