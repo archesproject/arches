@@ -6187,7 +6187,7 @@ span.basemap-unselected {
 
 .search-listing-icon {
     transform: translate(0, -2px);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .search-results-pagination {
@@ -6416,7 +6416,7 @@ span.basemap-unselected {
 }
 
 .search-listing-title {
-	font-size: 17px;
+	font-size: 15px;
 	font-weight: 500;
 	background: #fff;
 	color: #666;
