@@ -5304,10 +5304,20 @@ div.row.widget-wrapper.report-header:hover {
     overflow-y: auto;
     right: 0px;
     padding: 0px;
-    background: transparent;
     box-shadow: none;
+    background: transparent;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
+}
+.iiif-wrapper .map-widget-panel {
+    background-color: rgba(143, 143, 143, 0.2);
+    border-left: solid rgba(143, 143, 143, 0.6) 1px;
+}
+.expanded-iiif .map-widget-panel {
+    position: fixed;
+    top: 150px;
+    bottom: 0;
+    height: auto;
 }
 
 .map-search-container div .map-widget-panel {
@@ -5396,15 +5406,8 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-buttons {
     z-index: 1000;
     position: absolute;
-    top: 20px;
-    right: 270px;
-    transition-duration: .3s;
-}
-
-.expanded-buttons-shim {
-    position: absolute;
-    top: -10px;
-    left: -5px;
+    top: -45px;
+    right: 180px;
     transition-duration: .3s;
 }
 
