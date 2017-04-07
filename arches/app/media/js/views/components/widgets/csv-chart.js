@@ -73,13 +73,12 @@ define([
                 });
                 this.form.on('tile-reset', function(tile) {
                     if ((self.tile === tile || _.contains(tile.tiles, self.tile))) {
-                        if (isObservable(self.value)) {
-                            if (self.filesForUpload().length > 0) {
-                                self.filesForUpload.removeAll();
-                            }
-                            if (Array.isArray(self.value().files)) {
-                                self.uploadedFiles(self.value().files)
-                            }
+                        var value = ko.unwrap(self.value);
+                        if (self.filesForUpload().length > 0) {
+                            self.filesForUpload.removeAll();
+                        }
+                        if (Array.isArray(value.files)) {
+                            self.uploadedFiles(value.files)
                         }
                         self.dropzone.removeAllFiles(true);
                         self.formData.delete('file-list_' + self.node.nodeid);
