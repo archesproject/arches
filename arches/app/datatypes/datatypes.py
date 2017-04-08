@@ -649,3 +649,15 @@ class IIIFDrawingDataType(BaseDataType):
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append(string_item)
         return terms
+
+
+class DomainDataType(BaseDataType):
+    def append_to_document(self, document, nodevalue):
+        document['strings'].append(nodevalue)
+
+class DomainListDataType(BaseDataType):
+    def transform_import_values(self, value):
+        return [v.strip() for v in value.split(',')]
+
+    def append_to_document(self, document, nodevalue):
+        document['strings'].append(nodevalue)
