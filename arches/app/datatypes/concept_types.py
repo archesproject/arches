@@ -77,20 +77,3 @@ class ConceptListDataType(BaseConceptDataType):
             new_val = self.get_concept_export_value(val, concept_export_value_type)
             new_values.append(new_val)
         return ','.join(new_values)
-
-
-class DomainDataType(ConceptDataType):
-
-    def get_display_value(self, tile, node):
-        value = None
-        return self.get_value(uuid.UUID(tile.data[str(node.nodeid)]))
-
-
-class DomainListDataType(ConceptListDataType):
-    pass
-    def transform_export_values(self, value, concept_export_value_type):
-        new_values = []
-        for val in value:
-            new_val = self.get_concept_export_value(val, concept_export_value_type)
-            new_values.append(new_val)
-        return ','.join(new_values)
