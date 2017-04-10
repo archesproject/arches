@@ -53,6 +53,9 @@ define(['jquery',
                 var self = this;
                 return function(resourceinstanceid){
                     self.showRelationships(resourceinstanceid)
+                    if (self.viewModel.selectedTab() !== self.viewModel.relatedResourcesManager) {
+                        self.viewModel.selectedTab(self.viewModel.relatedResourcesManager)
+                    }
                 }
             },
 

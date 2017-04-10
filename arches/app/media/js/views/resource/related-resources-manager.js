@@ -20,7 +20,7 @@ define([
             this.resourceEditorContext = options.resourceEditorContext;
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
-            this.showGraph = ko.observable(false);
+            this.showGraph = ko.observable(true);
             this.graphNodeList = ko.observableArray();
             this.newResource = ko.observableArray();
             this.fdgNodeListView = new RelatedResourcesNodeList({

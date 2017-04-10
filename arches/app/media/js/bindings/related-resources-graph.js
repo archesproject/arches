@@ -37,6 +37,12 @@ define([
             var nodeList = options.nodeList
             var currentResource = options.currentResource
 
+            if (options.nodeList().length > 0) {
+                // nodeList([]);
+                // currentResource([]);
+                console.log(options.nodeList().length, options.currentResource())
+            }
+
             var selectNode = function(d){
                 vis.selectAll("circle")
                     .attr("class", function(d1){
