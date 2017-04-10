@@ -75,6 +75,17 @@ define(['jquery',
                 }
             },
 
+            isResourceRelatable: function (graphId) {
+                var relatable = false;
+                graphdata = _.find(viewdata.graphs, function(graphdata){
+                    return graphId === graphdata.graphid;
+                })
+                if (this.viewModel.graph) {
+                    relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, graphId);
+                }
+                return relatable;
+            },
+
             updateResults: function(response){
                 var self = this;
                 koMapping.fromJS(response.paginator, this.paginator);
@@ -91,8 +102,7 @@ define(['jquery',
                 );
 
                 response.results.hits.hits.forEach(function(result){
-                    var relatable;
-                    graphdata = _.find(viewdata.graphs, function(graphdata){
+                    var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
                     })
                     if (this.viewModel.graph) {
@@ -119,7 +129,7 @@ define(['jquery',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        relatable: relatable,
+                        relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {
                             self.mapLinkData(mapData);
