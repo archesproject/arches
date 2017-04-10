@@ -329,14 +329,29 @@ class Command(BaseCommand):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
             if file_format == 'json':
+                print '*'*80
+                print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
+                print '*'*80
+                sys.exit()
                 config_file = None
             elif file_format == 'csv':
                 graph = None
-            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
+                if config_file == None:
+                    print '*'*80
+                    print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
+                    print '*'*80
+                    sys.exit()
+            if data_dest != '':
+                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
 
-            for file in data:
-                with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                    f.write(file['outputfile'].getvalue())
+                for file in data:
+                    with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                        f.write(file['outputfile'].getvalue())
+            else:
+                print '*'*80
+                print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+                print '*'*80
+                sys.exit()
         else:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
