@@ -496,6 +496,17 @@ define([
                             };
                             self.map[method](options);
                         };
+                        self.zoomToPopupData = function () {
+                            var fc = {
+                                "type": "FeatureCollection",
+                                "features": []
+                            };
+                            fcs = JSON.parse(ko.unwrap(self.popupData().geometries));
+                            _.each(fcs, function (currentFC) {
+                                fc.features = fc.features.concat(currentFC.features);
+                            });
+                            zoomToGeoJSON(fc, true);
+                        }
                         var source = self.map.getSource('resource')
                         var features = [];
                         var result = {
