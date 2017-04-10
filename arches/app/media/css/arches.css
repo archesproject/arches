@@ -9,7 +9,6 @@
 @import url(../plugins/chosen.min.css);
 @import url(plugins/select2/select2.min.css);
 @import url(plugins/select2/select2-bootstrap.min.css);
-@import url(../bower_components/summernote/dist/summernote.css);
 @import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
@@ -20,15 +19,6 @@
 @import url(../bower_components/leaflet/dist/leaflet.css);
 @import url(../bower_components/leaflet-draw/dist/leaflet.draw.css);
 
-
-/*  Summernote Overrides */
-.note-editor.note-frame {
-    border: 1px solid #ddd;
-}
-
-.note-editor.note-frame:hover {
-    cursor: text;
-}
 
 .regular-link{
     color: #337ab7;
