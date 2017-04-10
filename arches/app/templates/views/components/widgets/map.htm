@@ -193,8 +193,10 @@
                     </div>
                 </div>
                 <div class="hover-feature-footer">
-                    <a class="" href=""><i class="ion-ios-refresh-empty"></i> Edit</a>
-                    <a class="" href=""><i class="fa fa-map-marker"></i> Map</a>
+                    {% if 'Resource Editor' in user.user_groups %}
+                    <a data-bind="click: function () { window.open(editURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
+                    {% endif %}
+                    <a data-bind="click: zoomToPopupData" href="javascript:void(0)"><i class="fa fa-map-marker"></i> Map</a>
                     <!-- If user is editing a resource instance, show relate link -->
                     <a class="pull-right" href=""><i class="fa fa-code-fork"></i> Relate</a>
                 </div>
