@@ -113,9 +113,8 @@ define([
                 items: self.overlayLibrary
             });
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
+            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
-                this.results = params.results;
                 this.query = params.query;
             }
 
