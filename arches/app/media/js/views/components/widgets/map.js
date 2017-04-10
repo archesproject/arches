@@ -1322,6 +1322,8 @@ define([
             }
 
             this.mapStyle.layers = this.addInitialLayers();
+
+            this.editURL = arches.urls.resource_editor;
         },
         template: {
             require: 'text!widget-templates/map'
