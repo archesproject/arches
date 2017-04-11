@@ -15,10 +15,6 @@ hooks:
       timeout: 10000
       mode: 755
       runas: ubuntu
-    - location: arches/install/ci_install/update_docs.sh
-      timeout: 300
-      mode: 755
-      runas: ubuntu
   ApplicationStart:
     - location: arches/install/ci_install/arches_start.sh
       timeout: 300
