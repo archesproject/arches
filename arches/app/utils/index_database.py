@@ -23,12 +23,11 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
     index_resources(clear_index=clear_index, batch_size=batch_size)
-    index_resource_to_resource_relations(clear_index=clear_index, batch_size=batch_size)
+    index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
-    Deletes any existing indicies from elasticsearch related to resources 
-    and then indexes all resources from the database
+    Indexes all resources from the database
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources from the index before the reindexing operation
@@ -85,7 +84,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         status = 'Passed' if result_summary['database'] == result_summary['indexed'] else 'Failed'
         print "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(status, graph_name, result_summary['database'], result_summary['indexed'], (datetime.now()-start).seconds)
 
-def index_resource_to_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
+def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
     """
     Indexes all resource to resource relation records
 

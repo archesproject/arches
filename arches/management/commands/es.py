@@ -24,6 +24,7 @@ from arches.management.commands import utils
 from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+import arches.app.utils.index_database as index_database
 
 
 class Command(BaseCommand):
@@ -33,13 +34,28 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('operation', nargs='?')
+        parser.add_argument('operation', nargs='?',
+            choices=['install', 'setup_indexes', 'delete_indexes', 'index_database', 'index_concepts', 'index_resources', 'index_resource_relations',],
+            help='Operation Type; ' +
+            '\'install\'=Install\'s Elasticsearch in the provided location with the provided port' +
+            '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
+            '\'delete_indexes\'=Deletes all indexs in Elasticsearch required by the system' +
+            '\'index_database\'=Indexes all the data (resources, concepts, and resource relations) found in the database' +
+            '\'index_concepts\'=Indxes all concepts from the database'+
+            '\'index_resources\'=Indexes all resources from the database'+
+            '\'index_resource_relations\'=Indexes all resource to resource relation records')
 
         parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
             help='Directory from where you want to run elasticsearch.')
 
         parser.add_argument('-p', '--port', action='store', dest='port', default=settings.ELASTICSEARCH_HTTP_PORT,
             help='Port to use for elasticsearch.')
+
+        parser.add_argument('-b', '--batch_size', action='store', dest='batch_size', default=settings.BULK_IMPORT_BATCH_SIZE,
+            help='The number of records to index as a group, the larger the number to more memory required')
+
+        parser.add_argument('-c', '--clear_index', action='store', dest='clear_index', default=True,
+            help='Set to True(default) to remove all the resources from the index before the reindexing operation')
 
 
     def handle(self, *args, **options):
@@ -54,6 +70,18 @@ class Command(BaseCommand):
 
         if options['operation'] == 'delete_indexes':
             self.delete_indexes()
+
+        if options['operation'] == 'index_database':
+            index_database.index_db(clear_index=options['clear_index'], batch_size=options['batch_size'])
+
+        if options['operation'] == 'index_concepts':
+            index_database.index_concepts(clear_index=options['clear_index'], batch_size=options['batch_size'])
+
+        if options['operation'] == 'index_resources':
+            index_database.index_resources(clear_index=options['clear_index'], batch_size=options['batch_size'])
+
+        if options['operation'] == 'index_resource_relations':
+            index_database.index_resource_relations(clear_index=options['clear_index'], batch_size=options['batch_size'])
 
     def install(self, install_location=None, port=None):
         """
