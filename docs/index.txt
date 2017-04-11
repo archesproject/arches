@@ -4,7 +4,6 @@ Arches v4 Documentation (draft)
 
 .. toctree::
     :caption: Introduction
-    :name: this is the name
     :maxdepth: 2
 
     overview
@@ -19,9 +18,7 @@ Arches v4 Documentation (draft)
     using-the-arches-designer
     creating-resources
     import-export
-    Arches Data *from v3* <arches-data>
-    Reference Data Manager (RDM) *from v3* <rdm>
-    Arches Web Applications *from v3* <arches-web-applications>
+    rdm
 
 .. toctree::
     :caption: Tutorials
