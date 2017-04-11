@@ -49,8 +49,11 @@ class BusinessDataImporter(object):
         self.business_data = ''
         self.file_format = ''
         self.relations = ''
-        csv.field_size_limit(sys.maxsize)
-
+        try:
+            csv.field_size_limit(sys.maxsize)
+        except TypeError: #This circumvents the 32-bit C long limit on Windows 64bit
+            csv.field_size_limit(sys.maxint)
+            
         if not file:
             file = settings.BUSINESS_DATA_FILES
         else:
