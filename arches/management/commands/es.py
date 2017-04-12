@@ -21,7 +21,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
-from arches.app.search.mappings import prepare_term_index, delete_term_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
+from arches.app.models import models
+from arches.app.search.mappings import prepare_term_index, delete_term_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 import arches.app.utils.index_database as index_database
@@ -145,6 +146,8 @@ class Command(BaseCommand):
     def setup_indexes(self):
         prepare_term_index(create=True)
         prepare_resource_relations_index(create=True)
+        for graphid in models.GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
+            prepare_search_index(str(graphid), create=True)
 
     def delete_indexes(self):
         delete_term_index()
