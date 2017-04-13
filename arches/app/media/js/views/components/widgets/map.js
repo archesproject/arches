@@ -139,8 +139,8 @@ define([
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
             this.popupData = ko.computed(function () {
-                var hoverData = self.hoverData();
-                return hoverData ? hoverData : self.clickData();
+                var clickData = self.clickData();
+                return clickData ? clickData : self.hoverData();
             });
 
             // TODO: This should be a system config rather than hard-coded here
