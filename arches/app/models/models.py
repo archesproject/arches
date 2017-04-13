@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 import os
 import json
 import uuid
+import importlib
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -258,6 +259,13 @@ class Function(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
+    def get_class_module(self):
+        mod_path = self.modulename.replace('.py', '')
+        module = importlib.import_module('arches.app.functions.%s' % mod_path)
+        func = getattr(module, self.classname)
+        return func
+
+
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     function = models.ForeignKey('Function', on_delete=models.CASCADE, db_column='functionid')
@@ -268,6 +276,7 @@ class FunctionXGraph(models.Model):
         managed = True
         db_table = 'functions_x_graphs'
         unique_together = ('function', 'graph',)
+
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.

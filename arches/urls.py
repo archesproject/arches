@@ -21,6 +21,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph, tileserver
+from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors
 from arches.app.views.concept import RDMView
@@ -40,6 +41,7 @@ urlpatterns = [
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^geocoder', search.geocode, name="geocoder"),
 
+    url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^entities/(?P<entityid>%s)$' % uuid_regex , entity.Entities),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
