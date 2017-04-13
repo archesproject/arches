@@ -3,11 +3,10 @@
 <div>
 <!-- Nav tabs -->
 <ul class="nav nav-tabs card-nav-container" role="tablist">
-  <li role="presentation" class="active"><a href="#primary-descriptors-name" aria-controls="primary-descriptors-name" role="tab" data-toggle="tab">{% trans "Display Name" %}</a></li>
-  <li role="presentation"><a href="#primary-descriptors-description" aria-controls="primary-descriptors-description" role="tab" data-toggle="tab">{% trans "Display Description" %}</a></li>
-  <li role="presentation"><a href="#primary-descriptors-map-popup" aria-controls="primary-descriptors-description" role="tab" data-toggle="tab">{% trans "Map Popup" %}</a></li>
-
-  <a class="btn btn-sm btn-primary btn-labeled fa fa-refresh" style="float: right;margin-top: 6px;margin-right: 6px;" data-bind="click: reindexdb">{% trans "Re-Index Database" %}</a>
+    <li role="presentation" class="active"><a href="#primary-descriptors-name" aria-controls="primary-descriptors-name" role="tab" data-toggle="tab">{% trans "Display Name" %}</a></li>
+    <li role="presentation"><a href="#primary-descriptors-description" aria-controls="primary-descriptors-description" role="tab" data-toggle="tab">{% trans "Display Description" %}</a></li>
+    <li role="presentation"><a href="#primary-descriptors-map-popup" aria-controls="primary-descriptors-description" role="tab" data-toggle="tab">{% trans "Map Popup" %}</a></li>
+    <li role="presentation" style="float:right; padding-right: 15px;"><a href="#reindex" aria-controls="reindex" role="tab" data-toggle="tab">{% trans "Re-Index" %}</a></li>
 </ul>
 
 <div class="tab-content">
@@ -81,6 +80,23 @@
 
                 <div class="col-xs-12">
                     <input placeholder="{% trans 'Use bracketed node names like this: <node name>' %}" class="form-control input-lg widget-input" data-bind="textInput: map_popup.string_template">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane" role="tabpanel" id="reindex">
+        <div class="row widget-container">
+            <div class="form-group">
+                <div class="relative">
+                    <i class="fa fa-exclamation-triangle" style="color: #f75d3f;"></i><span class="control-label"> {% trans "If you've made any changes to this function and there are resources already in the system, then you will need to reindex the resources to reflect your changes.  This process can take some time (potentially several minuetes or more).  Please be patient." %}</span>
+                </div>
+
+                <div class="col-xs-12">
+                    <a class="btn btn-sm btn-primary btn-labeled fa fa-refresh" style="float: right;margin-top: 6px;margin-right: 6px;" data-bind="visible: !loading(), click: reindexdb;">{% trans "Re-Index Resources Now" %}</a>
+                    <a class="btn btn-primary" href="#" style="float: right;margin-top: 6px;margin-right: 6px; padding:0px 5px 0px 0px;" data-bind="visible: loading">
+                        <i class="fa fa-spin fa-refresh" style="padding: 8px;"></i> {% trans "Re-Indexing..." %}
+                    </a>
                 </div>
             </div>
         </div>

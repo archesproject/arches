@@ -24,7 +24,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
-class ReIndexDb(View):
+class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         index_resources_by_type(data['graphids'], clear_index=False, batch_size=4000)

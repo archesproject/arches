@@ -10,6 +10,7 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
             this.cards = ko.observableArray();
+            this.loading = ko.observable(false);
 
             this.graph.cards.forEach(function(card){
                 var found = !!_.find(this.graph.nodegroups, function(nodegroup){
@@ -42,15 +43,17 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
             }, this)
 
             this.reindexdb = function(){
+                this.loading(true);
                 $.ajax({
                     type: "POST",
                     url: arches.urls.reindex,
+                    context: this,
                     data: JSON.stringify({'graphids': [this.graph.graphid]}),
-                    success: function(response) {
-                        alert('success');
-                    },
                     error: function(response) {
-                        alert('error');
+                        console.log('error');
+                    },
+                    complete: function(){
+                        this.loading(false);
                     }
                 });
             }
