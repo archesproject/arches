@@ -110,4 +110,12 @@ require([
         }
     });
 
+    pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
+        if (!pageView.viewModel.openRelatedResources()) {
+            pageView.viewModel.openRelatedResources(true);
+        }
+        if (pageView.viewModel.selectedTab() !== pageView.viewModel.relatedResourcesManager) {
+            pageView.viewModel.selectedTab(pageView.viewModel.relatedResourcesManager);
+        }
+    });
 });

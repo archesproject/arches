@@ -5,7 +5,7 @@ define([
     'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'card-configuration-data',
-    'bindings/summernote',
+    'bindings/ckeditor',
     'plugins/knockstrap'
 ], function(_, Backbone,  ko, PermissionsList, widgets, data) {
     var CardComponentForm = Backbone.View.extend({
