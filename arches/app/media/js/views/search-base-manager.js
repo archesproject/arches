@@ -69,7 +69,7 @@ define([
                 resourceEditorContext: this.viewModel.resourceEditorContext,
                 editing_instance_id: this.viewModel.editingInstanceId,
                 relationship_types: this.viewModel.relationship_types,
-                editing_model_name: this.viewModel.graph
+                graph: this.viewModel.graph
             })
 
             this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
