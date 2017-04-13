@@ -4523,6 +4523,10 @@ div.row.widget-wrapper {
     align-content: flex-end;
 }
 
+.relation-properties-model-name {
+    padding-left: 5px;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }

@@ -32,7 +32,6 @@ import arches.app.utils.data_management.resource_graphs.importer as graph_import
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
-import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -50,7 +49,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -149,9 +148,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
-
-        if options['operation'] == 'index_database':
-            self.index_database(package_name)
 
         if options['operation'] == 'export_business_data':
             self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
@@ -317,13 +313,6 @@ class Command(BaseCommand):
         """
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
-
-    def index_database(self, package_name):
-        """
-        Runs the index_database command found in package_utils
-        """
-        # self.setup_indexes(package_name)
-        index_database.index_db()
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
         if file_format in ['csv', 'json']:
