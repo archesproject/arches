@@ -41,12 +41,6 @@ function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
                 }, this);
             }, this)
 
-            _.each([this.name.string_template, this.description.string_template, this.map_popup.string_template], function(property){
-                property.subscribe(function(nodegroup_id){
-                    alert('tes')
-                }, this);
-            }, this)
-
             this.reindexdb = function(){
                 $.ajax({
                     type: "POST",
