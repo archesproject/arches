@@ -1,8 +1,10 @@
-define(['knockout',
+define(['jquery',
+        'arches',
+        'knockout',
         'knockout-mapping',
         'viewmodels/function',
         'bindings/chosen'],
-function (ko, koMapping, FunctionViewModel, chosen) {
+function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
     return ko.components.register('views/components/functions/primary-descriptors', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
@@ -38,6 +40,26 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                     property.string_template(template);
                 }, this);
             }, this)
+
+            _.each([this.name.string_template, this.description.string_template, this.map_popup.string_template], function(property){
+                property.subscribe(function(nodegroup_id){
+                    alert('tes')
+                }, this);
+            }, this)
+
+            this.reindexdb = function(){
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.reindex,
+                    data: JSON.stringify({'graphids': [this.graph.graphid]}),
+                    success: function(response) {
+                        alert('success');
+                    },
+                    error: function(response) {
+                        alert('error');
+                    }
+                });
+            }
 
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
