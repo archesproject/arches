@@ -49,10 +49,16 @@ define(['jquery',
                 }
             },
 
-            showRelatedResources: function(resourceinstanceid) {
+            showRelatedResources: function(resourceinstance) {
                 var self = this;
-                return function(resourceinstanceid){
-                    self.showRelationships(resourceinstanceid)
+                return function(resourceinstance){
+                    if (resourceinstance === undefined) {
+                        resourceinstance = self.viewModel.relatedResourcesManager.currentResource();
+                        if (self.viewModel.relatedResourcesManager.showGraph() === true) {
+                            self.viewModel.relatedResourcesManager.showGraph(false)
+                        }
+                    }
+                    self.showRelationships(resourceinstance)
                     if (self.viewModel.selectedTab() !== self.viewModel.relatedResourcesManager) {
                         self.viewModel.selectedTab(self.viewModel.relatedResourcesManager)
                     }

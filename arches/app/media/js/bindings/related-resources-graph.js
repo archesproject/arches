@@ -13,6 +13,7 @@ define([
                 return a;
             }, {});
             var options = ko.unwrap(valueAccessor());
+            var subscriptions = options.subscriptions;
             var $el = $(element);
             var width = $el.parent().width();
             var height = $el.parent().height();
@@ -36,12 +37,6 @@ define([
 
             var nodeList = options.nodeList
             var currentResource = options.currentResource
-
-            if (options.nodeList().length > 0) {
-                // nodeList([]);
-                // currentResource([]);
-                console.log(options.nodeList().length, options.currentResource())
-            }
 
             var selectNode = function(d){
                 vis.selectAll("circle")
@@ -313,7 +308,6 @@ define([
                 var start = 0;
                 var rootNode = nodeMap[resourceId];
 
-
                 if (rootNode) {
                     if (rootNode.relationCount) {
                         load = (rootNode.relationCount.total > rootNode.relationCount.loaded && !rootNode.loading);
@@ -431,7 +425,12 @@ define([
             }
 
             if (ko.isObservable(currentResource)) {
-                currentResource.subscribe(setRoot, this)
+                var subscription = currentResource.subscribe(setRoot, this);
+                if (subscriptions.length > 0) {
+                    _.each(subscriptions, function(s){s.dispose()})
+                }
+                console.log(currentResource.getSubscriptionsCount());
+                subscriptions.push(subscription)
             }
 
             $(window).on("resize", function() {

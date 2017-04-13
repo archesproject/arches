@@ -6,7 +6,8 @@
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
         nodeList: graphNodeList,
-        currentResource: newResource
+        currentResource: newResource,
+        subscriptions: currentResourceSubscriptions
     }">
 
         <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
