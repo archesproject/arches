@@ -572,6 +572,13 @@ class FunctionManagerView(GraphBaseView):
                 )
                 item['id'] = functionXgraph.pk
 
+                # run post function save hook
+                func = functionXgraph.function.get_class_module()()
+                try:
+                    func.after_function_save(functionXgraph, request)
+                except NotImplementedError:
+                    pass
+
         return JSONResponse(data)
 
     def delete(self, request, graphid):
@@ -583,3 +590,4 @@ class FunctionManagerView(GraphBaseView):
                 functionXgraph.delete()
 
         return JSONResponse(data)
+

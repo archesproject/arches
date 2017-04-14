@@ -15,3 +15,6 @@ class BaseFunction(object):
 
     def on_import(self, *args, **kwargs):
         raise NotImplementedError
+
+    def after_function_save(self, *args, **kwargs):
+        raise NotImplementedError
