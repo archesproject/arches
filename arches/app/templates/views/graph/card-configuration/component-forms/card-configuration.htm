@@ -72,9 +72,6 @@
         <!-- Card Visibility -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
-        <!-- Active -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>
-
         <!-- Set Cardinaltiy -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
