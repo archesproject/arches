@@ -81,7 +81,8 @@ class CsvWriter(Writer):
                                     concept_export_value_type = None
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                    if tile['data'][k] != None:
+                                        value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
                                     csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:

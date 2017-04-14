@@ -51,7 +51,8 @@ class StringDataType(BaseDataType):
         document['strings'].append(nodevalue)
 
     def transform_export_values(self, value, *args, **kwargs):
-        return value.encode('utf8')
+        if value != None:
+            return value.encode('utf8')
 
     def get_search_terms(self, nodevalue):
         terms = []

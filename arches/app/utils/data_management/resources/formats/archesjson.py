@@ -48,11 +48,7 @@ class JsonWriter(Writer):
                 resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
 
-        for relation in models.ResourceXResource.objects.all():
-            relations.append(relation)
-
         export['business_data']['resources'] = resources
-        export['business_data']['relations'] = relations
 
         json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name
 
