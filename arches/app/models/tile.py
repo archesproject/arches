@@ -196,11 +196,9 @@ class Tile(models.TileModel):
     def __getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
-        functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
-        for function in functions:
-            mod_path = function.function.modulename.replace('.py', '')
-            module = importlib.import_module('arches.app.functions.%s' % mod_path)
-            func = getattr(module, function.function.classname)(function.config, self.nodegroup_id)
+        functionXgraphs = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
+        for functionXgraph in functionXgraphs:
+            func = functionXgraph.function.get_class_module()(functionXgraph.config, self.nodegroup_id)
             ret.append(func)
         return ret
 

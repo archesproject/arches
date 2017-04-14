@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-# Use the yes command if you would like to include java, postgis and node by default
-# Example:
-# yes | sudo ./ubuntu_xenial_setup.sh
-
 function install_postgres {
-
     sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
@@ -42,15 +37,10 @@ function install_bower {
     sudo npm install -g bower
 }
 
-function install_java {
-    sudo apt-get install openjdk-8-jre-headless -y
-}
-
 function main {
   sudo apt-get update -y
   sudo apt-get install -y make python-software-properties
   sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
-
   sudo apt-get install -y build-essential
   sudo apt-get install -y libxml2-dev
   sudo apt-get install -y libproj-dev
@@ -60,36 +50,11 @@ function main {
   sudo apt-get install -y docbook-mathml
   sudo apt-get install -y libgdal1-dev
   sudo apt-get install -y libpq-dev
-
   sudo apt-get install python-pip -y
-  pip install virtualenv==13.1.2
+  pip install virtualenv==15.1.0
 
-  echo -n "Would you like to install openjdk-8-jre? (y/n)? "
-  read answer
-  if echo "$answer" | grep -iq "^y" ;then
-      echo Yes, installing Java 8
-      install_java
-  else
-      echo Skipping Java installation
-  fi
-
-  echo -n "Would you like to install and configure postgres/postgis? (y/n)? "
-  read answer
-  if echo "$answer" | grep -iq "^y" ;then
-      echo Yes, Installing postgis
-      install_postgres
-  else
-      echo Skipping postgres/postgis installation
-  fi
-
-  echo -n "Would you like to install and nodejs/npm/and bower (y/n)? "
-  read answer
-  if echo "$answer" | grep -iq "^y" ;then
-      echo Yes, installing Node/Bower
-      install_bower
-  else
-      echo Skipping node/npm/bower installation
-  fi
+  install_postgres
+  install_bower
 }
 
 main

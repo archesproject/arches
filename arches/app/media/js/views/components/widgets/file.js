@@ -25,7 +25,11 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
+                    if (tile.isParent === true){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
+                    } else if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
@@ -33,7 +37,9 @@ define([
                         if (Array.isArray(data)) {
                             self.uploadedFiles(data)
                         }
-                        self.dropzone.removeAllFiles(true);
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 });
@@ -123,11 +129,13 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                self.value(
-                    value.filter(function(file) {
-                        return file.accepted;
-                    })
-                );
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    self.value(
+                        value.filter(function(file) {
+                            return file.accepted;
+                        })
+                    );
+                }
             });
 
             this.unique_id = uuid.generate();

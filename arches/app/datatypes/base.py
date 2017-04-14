@@ -317,11 +317,11 @@ class BaseDataType(object):
         """
         return None
 
-    def get_search_term(self, nodevalue):
+    def get_search_terms(self, nodevalue):
         """
         Returns a nodevalue if it qualifies as a search term
         """
-        return None
+        return []
 
     def manage_files(self, previously_saved_tile, current_tile, request, node):
         """

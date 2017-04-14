@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Card Container -->
-    <div class="card-form-preview-container" data-bind="let: {'form': formView}">
+    <div class="card-form-preview-container" data-bind="let: {'form': formView}, css: {'loading-mask': cardLoading()}">
         {% include 'views/resource/editor/form.htm' %}
     </div>
 

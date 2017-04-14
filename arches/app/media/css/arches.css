@@ -9,7 +9,6 @@
 @import url(../plugins/chosen.min.css);
 @import url(plugins/select2/select2.min.css);
 @import url(plugins/select2/select2-bootstrap.min.css);
-@import url(../bower_components/summernote/dist/summernote.css);
 @import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
@@ -20,15 +19,6 @@
 @import url(../bower_components/leaflet/dist/leaflet.css);
 @import url(../bower_components/leaflet-draw/dist/leaflet.draw.css);
 
-
-/*  Summernote Overrides */
-.note-editor.note-frame {
-    border: 1px solid #ddd;
-}
-
-.note-editor.note-frame:hover {
-    cursor: text;
-}
 
 .regular-link{
     color: #337ab7;
@@ -1928,6 +1918,38 @@ div.dropdown-menu.open {
     transform: translate(0, 0);
     z-index: 100000001;
 }
+
+.card-form-preview-container.loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
+.card-form-preview-container.loading-mask::before {
+    position: fixed;
+    opacity: .5;
+    color: #000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 14vw;
+    margin-top: 42vh;
+    margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
@@ -3642,7 +3664,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .ep-card-crud-container:last-of-type {
-    margin-bottom: 100px;
+    margin-bottom: 200px;
 }
 
 .left-column-crud-container{
@@ -4533,6 +4555,10 @@ div.row.widget-wrapper {
     align-content: flex-end;
 }
 
+.relation-properties-model-name {
+    padding-left: 5px;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -4886,7 +4912,33 @@ h4.report-toolbar-title {
 }
 
 .csv-chart {
-    height: 240px
+    height: 300px;
+    margin-left: -10px;
+    padding-right: 30px;
+}
+
+.csv-chart-title {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.csv-chart-menubar {
+    padding-bottom: 15px;
+    margin-top: 5px;
+}
+
+.csv-chart-menubar-item {
+    padding: 3px 5px;
+}
+
+.csv-chart-menubar-item a {
+    color: #777;
+    font-weight: 400;
+}
+
+.csv-chart-menubar-item.active {
+    color: #123;
+    font-weight: 600;
 }
 
 .csv-chart-widget-input {
@@ -4894,12 +4946,39 @@ h4.report-toolbar-title {
     padding: 0px 0px 10px;
 }
 
+.csv-chart-selection-detail-container {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+}
+.csv-chart-selection-detail {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.file-selector {
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
+
 .tab-content .csv-chart-panel {
     padding-top: 0px;
 }
 
 .pad-ver .csv-chart-panel {
     padding-top: 0px;
+}
+
+.csv-chart-container {
+    margin-top: -15px;
+    margin-left: -30px;
+    margin-right: -45px;
+}
+
+.csv-chart-file-selector {
+    margin-top: 10px;
+    padding-right: 15px;
 }
 
 .map-widget-container {
@@ -5251,10 +5330,21 @@ div.row.widget-wrapper.report-header:hover {
     overflow-y: auto;
     right: 0px;
     padding: 0px;
-    background: transparent;
     box-shadow: none;
+    background: transparent;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
+}
+.iiif-wrapper .map-widget-panel {
+    background-color: rgba(143, 143, 143, 0.2);
+    border-left: solid rgba(143, 143, 143, 0.6) 1px;
+}
+.expanded-iiif .map-widget-panel {
+    position: fixed;
+    top: 150px;
+    width: 250px;
+    bottom: 0;
+    height: auto;
 }
 
 .map-search-container div .map-widget-panel {
@@ -5319,24 +5409,32 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     transition-duration: .3s;
 }
-
+.iiif-wrapper {
+    height: 500px;
+}
+.iiif-wrapper.expanded-iiif {
+    position: fixed;
+    top: 106px;
+    right: 0px;
+    left: 50px;
+    bottom: 0;
+    transition-duration: .3s;
+    z-index: 100;
+    height: auto;
+}
+.leaflet-iiif {
+    height: 100%;
+}
 .expanded-resource-menu {
     margin-left: -275px;
     transition-duration: .3s;
 }
 
 .expanded-buttons {
-    z-index: 10;
+    z-index: 1000;
     position: absolute;
-    top: 60px;
-    left: 10px;
-    transition-duration: .3s;
-}
-
-.expanded-buttons-shim {
-    position: absolute;
-    top: -10px;
-    left: -5px;
+    top: -255px;
+    right: 195px;
     transition-duration: .3s;
 }
 
@@ -5831,6 +5929,10 @@ span.basemap-unselected {
     border-radius: 2px;
 }
 
+.iiif-expand-button {
+    position: absolute;
+}
+
 /* Hide "Full Screen" button for map tools widget in card manager */
 .widget-preview div div div div span .toggle-map-size {
     display: none;
@@ -6003,6 +6105,12 @@ span.basemap-unselected {
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
+.iiif-widget {
+    position: relative;
+}
+.iiif-widget .hover-feature-info {
+    margin-left: 25px;
+}
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
@@ -6036,7 +6144,7 @@ span.basemap-unselected {
 .hover-panel-dismiss {
     position: absolute;
     top: 10px;
-    right: 5px;
+    right: 10px;
 }
 .hover-feature-metadata{
     margin-bottom: -4px;
@@ -6105,7 +6213,7 @@ span.basemap-unselected {
 
 .search-listing-icon {
     transform: translate(0, -2px);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .search-results-pagination {
@@ -6334,7 +6442,7 @@ span.basemap-unselected {
 }
 
 .search-listing-title {
-	font-size: 17px;
+	font-size: 15px;
 	font-weight: 500;
 	background: #fff;
 	color: #666;
@@ -6352,6 +6460,7 @@ span.basemap-unselected {
 	color: #888;
 	background: #fff;
 	padding: 5px 10px;
+    margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -6761,6 +6870,29 @@ table.table.dataTable {
   stroke-opacity: .5;
 }
 
+.hover-feature-body .row.widget-wrapper {
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+.hover-feature-body .row.widget-wrapper .col-xs-12 {
+    padding: 0;
+}
+.hover-feature-body .row.widget-wrapper label {
+    display: none;
+}
+.hover-feature-footer {
+    height: 50px;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    padding-top: 15px;
+}
+
+.hover-feature-footer a {
+    color: steelblue;
+    font-weight: 500;
+    padding-right: 10px;
+}
 
 @keyframes loader {
 	0% { background: #ddd; }
@@ -6780,6 +6912,7 @@ table.table.dataTable {
     }
     .dl-horizontal dd {
         margin-left: 280px;
+        padding-right: 20px;
     }
     .dl-horizontal dt {
         float: left;

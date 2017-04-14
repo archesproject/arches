@@ -16,23 +16,17 @@ define([
             this.propertiesDialogOpen = ko.observable(false);
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
+            this.graph = options.graph;
             this.currentResource = ko.observable();
+            this.currentResourceSubscriptions = [];
             this.resourceEditorContext = options.resourceEditorContext;
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
-            this.showGraph = ko.observable(false);
+            this.showGraph = ko.observable(this.editingInstanceId === undefined ? true : false);
             this.graphNodeList = ko.observableArray();
             this.newResource = ko.observableArray();
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
-            });
-
-            _.each(this.relatedProperties, function(prop, key) {
-                if (ko.isObservable(prop)) {
-                    prop.subscribe(function(val) {
-                        console.log(key, prop())
-                    });
-                };
             });
 
             this.searchResults.relationshipCandidates.subscribe(function(val) {

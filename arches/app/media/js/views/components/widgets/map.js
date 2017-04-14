@@ -113,9 +113,8 @@ define([
                 items: self.overlayLibrary
             });
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools'
+            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
-                this.results = params.results;
                 this.query = params.query;
             }
 
@@ -140,8 +139,8 @@ define([
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
             this.popupData = ko.computed(function () {
-                var hoverData = self.hoverData();
-                return hoverData ? hoverData : self.clickData();
+                var clickData = self.clickData();
+                return clickData ? clickData : self.hoverData();
             });
 
             // TODO: This should be a system config rather than hard-coded here
@@ -496,6 +495,17 @@ define([
                             };
                             self.map[method](options);
                         };
+                        self.zoomToPopupData = function () {
+                            var fc = {
+                                "type": "FeatureCollection",
+                                "features": []
+                            };
+                            fcs = JSON.parse(ko.unwrap(self.popupData().geometries));
+                            _.each(fcs, function (currentFC) {
+                                fc.features = fc.features.concat(currentFC.features);
+                            });
+                            zoomToGeoJSON(fc, true);
+                        }
                         var source = self.map.getSource('resource')
                         var features = [];
                         var result = {
@@ -1181,6 +1191,29 @@ define([
                     });
                     return !overlay.invisible();
                 }
+                var highlightResource = function (resourceId, layerIdSuffix) {
+                    var style = self.getMapStyle();
+                    _.each(style.layers, function (layer) {
+                        var filter = self.map.getFilter(layer.id);
+                        var filterToUpdate;
+                        if (filter && layer.id.split('-').pop() === layerIdSuffix) {
+                            if (filter[1] === 'resourceinstanceid') {
+                                filterToUpdate = filter;
+                            } else {
+                                _.each(filter, function (item) {
+                                    if (Array.isArray(item) && item[1] === 'resourceinstanceid') {
+                                        filterToUpdate = item;
+                                    }
+                                })
+                            }
+                            if (filterToUpdate) {
+                                filterToUpdate[2] = resourceId;
+                            }
+                            layer.filter = filter;
+                        }
+                    });
+                    self.map.setStyle(style);
+                };
                 self.map.on('mousemove', function(e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var hoverData = null;
@@ -1205,6 +1238,8 @@ define([
 
                     if (self.hoverData() !== hoverData) {
                         self.hoverData(hoverData);
+                        var hoverFeatureId = hoverFeature && hoverFeature.properties.resourceinstanceid ? hoverFeature.properties.resourceinstanceid : '';
+                        highlightResource(hoverFeatureId, 'hover')
                     }
                     self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                 }, this);
@@ -1244,6 +1279,8 @@ define([
 
                     if (self.clickData() !== clickData) {
                         self.clickData(clickData);
+                        var clickFeatureId = clickFeature && clickFeature.properties.resourceinstanceid ? clickFeature.properties.resourceinstanceid : '';
+                        highlightResource(clickFeatureId, 'click')
                     }
                 });
 
@@ -1322,6 +1359,8 @@ define([
             }
 
             this.mapStyle.layers = this.addInitialLayers();
+
+            this.editURL = arches.urls.resource_editor;
         },
         template: {
             require: 'text!widget-templates/map'

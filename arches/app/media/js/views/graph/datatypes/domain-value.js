@@ -19,6 +19,15 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 setupOption(option);
                 self.options.push(option);
                 self.newOptionLabel('');
+            };
+            if (ko.isObservable(this.options)) {
+                this.options.subscribe(function(opts){
+                    _.each(opts, function(opt){
+                        if (!opt.remove) {
+                            setupOption(opt);
+                        }
+                    })
+                }, this)
             }
         },
         template: { require: 'text!datatype-config-templates/domain-value' }

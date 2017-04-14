@@ -192,6 +192,20 @@
                         <span data-bind="text: popupData().graph_name"></span>
                     </div>
                 </div>
+                <div class="hover-feature-footer">
+                    {% if 'Resource Editor' in user.user_groups %}
+                    <a data-bind="click: function () { window.open(editURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
+                    {% endif %}
+                    <a data-bind="click: zoomToPopupData" href="javascript:void(0)"><i class="fa fa-map-marker"></i> {% trans "Map" %}</a>
+                    <!--ko if: $root.editingInstanceId -->
+                        <!--ko if: results.isResourceRelatable(ko.unwrap(popupData().graphid)) && $root.editingInstanceId !== ko.unwrap(popupData().resourceinstanceid) -->
+                        <a class="pull-right" href="" data-bind="click: function () { results.toggleRelationshipCandidacy(ko.unwrap(popupData().resourceinstanceid))({resourceinstanceid: ko.unwrap(popupData().resourceinstanceid)}); }"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %}</a>
+                        <!--/ko-->
+                        <!--ko if: !results.isResourceRelatable(ko.unwrap(popupData().graphid)) || $root.editingInstanceId === ko.unwrap(popupData().resourceinstanceid) -->
+                        <a class="unrelatable-search-result pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Cannot Be Related" %} </a>
+                        <!--/ko-->
+                    <!--/ko-->
+                </div>
                 <!--/ko-->
             <!--/ko-->
 
