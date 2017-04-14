@@ -597,8 +597,8 @@ define([
                                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
                                             resourceinstanceid: result._id,
                                             highlight: result._id===mouseoverInstanceId ||
-                                                clickData ? (ko.unwrap(clickData.resourceinstanceid)===result._id) : false ||
-                                                hoverData ? (ko.unwrap(hoverData.resourceinstanceid)===result._id) : false
+                                                (clickData ? (ko.unwrap(clickData.resourceinstanceid)===result._id) : false) ||
+                                                (hoverData ? (ko.unwrap(hoverData.resourceinstanceid)===result._id) : false)
                                         }));
                                         features.push(feature);
                                     });
