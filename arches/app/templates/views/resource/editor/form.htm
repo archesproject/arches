@@ -3,7 +3,7 @@
 <!-- ko foreach: { data: form.cards, as: 'outerCard' } -->
 <!-- ko let: {'isWizard': outerCard.isContainer() && outerCard.get('cardinality')() === 'n'} -->
 <!-- Card Manager Panels and Forms -->
-<div class="ep-card-crud-container">
+<div class="ep-card-crud-container" data-bind="visible: outerCard.get('visible')()">
 
     <div class="panel" style="padding-bottom: 10px; margin-bottom: 0px;">
         <div class="panel-heading">
@@ -18,7 +18,7 @@
 
                 <!--Nav Tabs-->
                 <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
-                    data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
+                    data: outerCard.isContainer() ? _.filter(outerCard.get('cards')(), function(card){return card.get('visible')()}) : [outerCard],
                     as: 'card'
                 }, click: isWizard && !forceBlank ? form.toggleGroup : null;">
                     <li id="summary-group" data-bind="css: {
@@ -37,7 +37,7 @@
 
                 <!--Tabs Content-->
                 <div class="tab-content card-content-tab" style="margin-left: 0px;" data-bind="foreach: {
-                    data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
+                    data: outerCard.isContainer() ? _.filter(outerCard.get('cards')(), function(card){return card.get('visible')()}) : [outerCard],
                     as: 'card'
                 }, visible: !(isWizard && !forceBlank)">
 
