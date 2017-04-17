@@ -500,7 +500,7 @@ define([
                                 "type": "FeatureCollection",
                                 "features": []
                             };
-                            fcs = JSON.parse(ko.unwrap(self.popupData().geometries));
+                            fcs = ko.unwrap(self.popupData().featureCollections);
                             _.each(fcs, function (currentFC) {
                                 fc.features = fc.features.concat(currentFC.features);
                             });
@@ -1176,14 +1176,17 @@ define([
                     resourceData.displayname = '';
                     resourceData.graphid = '';
                     resourceData.graph_name = '';
+                    resourceData.featureCollections = [];
                     resourceData = ko.mapping.fromJS(resourceData);
                     resourceLookup[resourceId] = resourceData;
                     $.get(arches.urls.resource_descriptors + resourceId, function (data) {
+                        console.log(data);
                         resourceLookup[resourceId].displaydescription(data.displaydescription);
                         resourceLookup[resourceId].map_popup(data.map_popup);
                         resourceLookup[resourceId].displayname(data.displayname);
                         resourceLookup[resourceId].graphid(data.graphid);
                         resourceLookup[resourceId].graph_name(data.graph_name);
+                        resourceLookup[resourceId].featureCollections(data.geometries);
                         resourceLookup[resourceId].loading(false);
                     });
                     return resourceLookup[resourceId];
