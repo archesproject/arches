@@ -538,6 +538,9 @@ define([
                             var cellWidth = arches.hexBinSize;
                             var units = 'kilometers';
                             var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
+                            _.each(hexGrid.features, function (feature, i) {
+                                feature.properties.id = i;
+                            });
                             var getSearchAggregationGeoJSON = function () {
                                 var agg = ko.unwrap(self.searchAggregations);
                                 if (!agg || !agg.grid.buckets) {
@@ -620,7 +623,17 @@ define([
                             }
                             self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
                             self.clickData.subscribe(updateSearchPointsGeoJSON);
-                            self.hoverData.subscribe(updateSearchPointsGeoJSON);
+                            self.hoverData.subscribe(function (val) {
+                                var resultsHoverLayer = self.map.getLayer('search-results-hex-outline-highlighted');
+                                var filter = ['==', 'id', ''];
+                                if (val && val.doc_count) {
+                                    filter[2] = val.id;
+                                }
+                                if (resultsHoverLayer) {
+                                    self.map.setFilter(resultsHoverLayer.id, filter);
+                                }
+                                updateSearchPointsGeoJSON();
+                            });
                             self.results.mapLinkData.subscribe(function(data) {
                                 zoomToGeoJSON(data, true);
                             });
