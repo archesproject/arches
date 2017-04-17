@@ -231,8 +231,19 @@ define([
             })
         );
     });
-
-    vm.selection = ko.observable(vm.geomNodes[0] || null);
+    var selectedList;
+    switch (window.location.hash) {
+        case "#basemaps":
+            selectedList = vm.basemaps;
+            break;
+        case "#overlays":
+            selectedList = vm.overlays;
+            break;
+        default:
+            selectedList = vm.geomNodes;
+    }
+    vm.selectedList(selectedList);
+    vm.selection = ko.observable(ko.unwrap(selectedList)[0] || null);
     vm.selectedLayerJSON = ko.computed({
         read: function () {
             if (!vm.selection() || !vm.selection().maplayerid) {
@@ -289,7 +300,6 @@ define([
     vm.selectedBasemapName.subscribe(updateMapStyle);
     vm.selection.subscribe(updateMapStyle);
     vm.selectedLayerJSON.subscribe(updateMapStyle);
-    vm.selectedList(vm.geomNodes);
     vm.selectedList.subscribe(function (selectedList) {
         var selection = null;
         var layerList = ko.unwrap(vm.selectedList());
