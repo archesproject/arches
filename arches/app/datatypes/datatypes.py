@@ -239,7 +239,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         sql_list.append("""
             SELECT resourceinstanceid::text,
                     false AS poly_outline,
-                    row_number() over () as __id__,
+                    (row_number() over ())::text as __id__,
                     1 as total,
                     geom AS __geometry__,
                     '' AS extent
@@ -248,7 +248,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             UNION
             SELECT resourceinstanceid::text,
                     true AS poly_outline,
-                    row_number() over () as __id__,
+                    (row_number() over ())::text||'-outline' as __id__,
                     1 as total,
                     ST_ExteriorRing(geom) AS __geometry__,
                     '' AS extent
@@ -338,7 +338,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "fill-color": "%(fillColor)s"
                     }
@@ -351,7 +351,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "fill-color": "%(fillColor)s"
                     }
@@ -364,7 +364,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "poly_outline", true]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1]],
                     "paint": {
                         "line-width": %(outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -378,7 +378,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -392,7 +392,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
