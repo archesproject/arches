@@ -153,7 +153,7 @@ INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
-    
+
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000007', 'member');
 
@@ -3324,6 +3324,7 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
+-- DELETE FROM map_layers where name = 'Search Results';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
         {
@@ -3343,6 +3344,21 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
             },
             "type": "line",
             "id": "search-results-hex-outline"
+        },
+        {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "==",
+                "id",
+                ""
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 1
+            },
+            "type": "line",
+            "id": "search-results-hex-outline-highlighted"
         },
         {
            "layout": {},
