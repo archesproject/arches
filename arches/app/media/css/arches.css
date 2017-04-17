@@ -2443,12 +2443,15 @@ input.cmn-toggle-yes-no:checked + label:after {
     max-height: 89px;
 }
 .library-card-body {
-    height: 106px;
+    height: 116px;
     padding: 5px 20px 25px;
     color: #888;
+    margin-top: -10px;
+    overflow-y: hidden;
 }
 .library-card-panel-title {
     font-size: 1.2em;
+    margin-bottom: -10px;
 }
 .resource-list a.chosen-single {
     background: transparent;
@@ -2884,6 +2887,20 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 .card-item-child > .drag-tool:hover {
     opacity: .9;
     color: #4682B4;
+}
+
+.primary-descriptors-card-container {
+    margin-top: -5px; 
+    margin-left: 0px; 
+    padding-left: 15px; 
+    padding-right: 15px
+}
+.primary-descriptors-container {
+    border: 1px solid #ddd;
+    min-height: 450px;
+}
+.panel-padding-bottom {
+    padding-bottom: 20px;
 }
 .widget-container {
     padding: 10px 15px 25px;
