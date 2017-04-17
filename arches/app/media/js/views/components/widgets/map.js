@@ -1180,7 +1180,6 @@ define([
                     resourceData = ko.mapping.fromJS(resourceData);
                     resourceLookup[resourceId] = resourceData;
                     $.get(arches.urls.resource_descriptors + resourceId, function (data) {
-                        console.log(data);
                         resourceLookup[resourceId].displaydescription(data.displaydescription);
                         resourceLookup[resourceId].map_popup(data.map_popup);
                         resourceLookup[resourceId].displayname(data.displayname);
