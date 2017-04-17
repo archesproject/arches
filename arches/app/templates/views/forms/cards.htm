@@ -20,7 +20,7 @@
         {% for card in cardgroup.cards %}
         
         
-        <div id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+        <div class="" id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
             <div class="panel-body card-panel-body" style="">
                 
                 <!-- Card Level Alert -->

@@ -9,7 +9,6 @@
 @import url(../plugins/chosen.min.css);
 @import url(plugins/select2/select2.min.css);
 @import url(plugins/select2/select2-bootstrap.min.css);
-@import url(../bower_components/summernote/dist/summernote.css);
 @import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../bower_components/codemirror/lib/codemirror.css);
@@ -20,15 +19,6 @@
 @import url(../bower_components/leaflet/dist/leaflet.css);
 @import url(../bower_components/leaflet-draw/dist/leaflet.draw.css);
 
-
-/*  Summernote Overrides */
-.note-editor.note-frame {
-    border: 1px solid #ddd;
-}
-
-.note-editor.note-frame:hover {
-    cursor: text;
-}
 
 .regular-link{
     color: #337ab7;
@@ -1928,6 +1918,38 @@ div.dropdown-menu.open {
     transform: translate(0, 0);
     z-index: 100000001;
 }
+
+.card-form-preview-container.loading-mask {
+    position: relative;
+    opacity: .5;
+    background-color: gray;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000000;
+}
+
+.card-form-preview-container.loading-mask::before {
+    position: fixed;
+    opacity: .5;
+    color: #000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 14vw;
+    margin-top: 42vh;
+    margin-left: 32vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index: 100000001;
+}
+
+
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
@@ -4533,6 +4555,10 @@ div.row.widget-wrapper {
     align-content: flex-end;
 }
 
+.relation-properties-model-name {
+    padding-left: 5px;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -5304,10 +5330,21 @@ div.row.widget-wrapper.report-header:hover {
     overflow-y: auto;
     right: 0px;
     padding: 0px;
-    background: transparent;
     box-shadow: none;
+    background: transparent;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
+}
+.iiif-wrapper .map-widget-panel {
+    background-color: rgba(143, 143, 143, 0.2);
+    border-left: solid rgba(143, 143, 143, 0.6) 1px;
+}
+.expanded-iiif .map-widget-panel {
+    position: fixed;
+    top: 150px;
+    width: 250px;
+    bottom: 0;
+    height: auto;
 }
 
 .map-search-container div .map-widget-panel {
@@ -5382,7 +5419,7 @@ div.row.widget-wrapper.report-header:hover {
     left: 50px;
     bottom: 0;
     transition-duration: .3s;
-    z-index: 50000;
+    z-index: 100;
     height: auto;
 }
 .leaflet-iiif {
@@ -5394,17 +5431,10 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-buttons {
-    z-index: 10;
+    z-index: 1000;
     position: absolute;
-    top: 60px;
-    left: 10px;
-    transition-duration: .3s;
-}
-
-.expanded-buttons-shim {
-    position: absolute;
-    top: -10px;
-    left: -5px;
+    top: -255px;
+    right: 195px;
     transition-duration: .3s;
 }
 
@@ -6114,7 +6144,7 @@ span.basemap-unselected {
 .hover-panel-dismiss {
     position: absolute;
     top: 10px;
-    right: 5px;
+    right: 10px;
 }
 .hover-feature-metadata{
     margin-bottom: -4px;
@@ -6183,7 +6213,7 @@ span.basemap-unselected {
 
 .search-listing-icon {
     transform: translate(0, -2px);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .search-results-pagination {
@@ -6412,7 +6442,7 @@ span.basemap-unselected {
 }
 
 .search-listing-title {
-	font-size: 17px;
+	font-size: 15px;
 	font-weight: 500;
 	background: #fff;
 	color: #666;
@@ -6430,6 +6460,7 @@ span.basemap-unselected {
 	color: #888;
 	background: #fff;
 	padding: 5px 10px;
+    margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -6849,6 +6880,18 @@ table.table.dataTable {
 }
 .hover-feature-body .row.widget-wrapper label {
     display: none;
+}
+.hover-feature-footer {
+    height: 50px;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    padding-top: 15px;
+}
+
+.hover-feature-footer a {
+    color: steelblue;
+    font-weight: 500;
+    padding-right: 10px;
 }
 
 @keyframes loader {

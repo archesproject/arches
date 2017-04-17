@@ -25,13 +25,13 @@ To begin development or make a test installation of Arches, you will need the fo
 Dependencies
 ============
 
-* **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is [Postgres.app](http://postgresapp.com). For Windows, use the [EnterpriseDB installers](https://www.postgresql.org/download/windows/), and use Stack Builder (included) to get PostGIS.
-* **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the OSgeo4W installer, and choose to install the GDAL package.
-* **Python 2.7.x** Installation instructions here: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
-* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. To be safe, you may as well upgrade pip right away. Once installed, run `python -m pip install --upgrade pip`. In Python 2.7.9 and later, pip is included by default.
+* **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is `Postgres.app <http://postgresapp.com>`_. For Windows, use the `EnterpriseDB installers <https://www.postgresql.org/download/windows/>`_, and use Stack Builder (included) to get PostGIS.
+* **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the `OSgeo4W installer <https://trac.osgeo.org/osgeo4w/>`_, and choose to install the GDAL package.
+* **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
+* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. To be safe, you may as well upgrade pip right away with this command `python -m pip install. Once installed, run `python -m pip install --upgrade pip`. In Python 2.7.9 and later, pip is included by default.
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
-* **Mapnik** Installation instructions here: http://mapnik.org/pages/downloads.html. *Windows installation of Mapnik is currently under development.*
-* **JDK** Use the installers found here: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
+* **Mapnik** Installation instructions: http://mapnik.org/pages/downloads.html. *Windows installation of Mapnik is currently under development.*
+* **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
 * **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ regarding Arches and Elasticsearch.
 
 These instructions will provide some guidance on installing the required dependencies and getting Arches up and running quickly.
@@ -43,6 +43,59 @@ These instructions will provide some guidance on installing the required depende
 Installing Arches
 ===================
 
-Once you have all of the dependencies installed, you can use the Arches installer that can be found here: ________
+Once you have all of the dependencies installed, you can use ``pip`` to install Arches. It's best to do this in a virtual environment. Using a command prompt, follow these steps.
 
-To install Arches directly from our GitHub repo, follow our dev installation guide which is located `here <https://github.com/archesproject/arches/wiki/Developer-Installation>`_ in our GitHub repo wiki.
+#. Create and enter a new directory called Projects
+
+    ``mkdir Projects && cd Projects``
+#. Create a virtual environment called ENV
+
+    ``virtualenv ENV``
+#. Activate the new virtual environment
+
+    **Linux and macOS**
+        ``source ENV/bin/activate``
+
+    **Windows**
+        ``ENV\Scripts\activate``
+
+#. Install Arches into your virtual environment
+
+    ``pip install arches==4.0b3``
+
+    Arches is now installed! The next steps will guide you through the creation of an Arches "project".
+
+#. Create a new Arches project
+
+     A project is a standalone Arches app that sits outside of your virtual environment and facilitate all of the customizations that you will need to make one installation of Arches different from the next.
+
+    **Linux and macOS**
+        ``arches-project create my_project``
+
+    **Windows**
+        ``python C:\Projects\ENV\Scripts\arches-project create my_project``
+
+#. Run the bower installation
+
+    Enter your new project directory (``cd my_project``) and run
+
+    ``bower install``
+
+#. Setup your Arches database
+
+    `You must have elasticsearch running for this step.`
+
+    ``python manage.py packages -o setup_db``
+
+#. Run the development server
+
+    ``python manage.py runserver``
+
+    You can now view Arches in a browser by navigating to ``localhost:8000``.
+
+If you want to install Arches directly from the GitHub repo (instead of from the stable pip distribution), use `this documentation <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
+
+What is an Arches Project?
+===========================
+
+To learn more about what it means to create an Arches project, please check out `this documentation <https://github.com/archesproject/arches/wiki/Creating-an-Arches-Project>`_.

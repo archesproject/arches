@@ -1,13 +1,16 @@
-define(['knockout',
+define(['jquery',
+        'arches',
+        'knockout',
         'knockout-mapping',
         'viewmodels/function',
         'bindings/chosen'],
-function (ko, koMapping, FunctionViewModel, chosen) {
+function ($, arches, ko, koMapping, FunctionViewModel, chosen) {
     return ko.components.register('views/components/functions/primary-descriptors', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
             this.cards = ko.observableArray();
+            this.loading = ko.observable(false);
 
             this.graph.cards.forEach(function(card){
                 var found = !!_.find(this.graph.nodegroups, function(nodegroup){
@@ -38,6 +41,22 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                     property.string_template(template);
                 }, this);
             }, this)
+
+            this.reindexdb = function(){
+                this.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.reindex,
+                    context: this,
+                    data: JSON.stringify({'graphids': [this.graph.graphid]}),
+                    error: function(response) {
+                        console.log('error');
+                    },
+                    complete: function(){
+                        this.loading(false);
+                    }
+                });
+            }
 
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },

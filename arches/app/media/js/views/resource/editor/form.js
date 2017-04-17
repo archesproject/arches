@@ -125,7 +125,9 @@ define([
         initTile: function(tile){
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
                 tile.dirty = ko.observable(false);
+                tile.isParent = true;
             }else{
+                tile.isParent = false;
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
                 tile.dirty = ko.computed(function(){
                     return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
@@ -134,6 +136,7 @@ define([
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+
             tile.formData = new FormData();
             this.formTiles.push(tile);
             return tile;
@@ -299,7 +302,6 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
-
             var appendFormData = function() {
                 var parent = parentTile;
                 return function(tile) {

@@ -147,7 +147,7 @@ class Resource(models.ResourceInstance):
         """
 
         document = JSONSerializer().serializeToPython(self)
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self) if fetchTiles else self.tiles
+        document['tiles'] = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []

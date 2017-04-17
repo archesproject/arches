@@ -115,21 +115,6 @@ class ArchesFileReader(Reader):
                             )
                             if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
                                 reporter.update_tiles_saved()
-
-                for relation in business_data['relations']:
-                    resource_x_resource_relation = ResourceXResource(
-                        resourcexid = str(uuid.UUID(str(relation['resourcexid']))),
-                        resourceinstanceidfrom = ResourceInstance(str(relation['resourceinstanceidfrom_id'])),
-                        resourceinstanceidto = ResourceInstance(str(relation['resourceinstanceidto_id'])),
-                        relationshiptype = Value(uuid.UUID(str(relation['relationshiptype_id']))),
-                        datestarted = relation['datestarted'],
-                        dateended = relation['dateended'],
-                        notes = relation['notes']
-                    )
-                    resource_x_resource_relation.save()
-
-                    if len(ResourceXResource.objects.filter(resourcexid=relation['resourcexid'])) == 1:
-                        reporter.update_relations_saved()
             else:
 
                 blanktilecache = {}

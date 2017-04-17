@@ -27,7 +27,6 @@
             'jquery-validate': '{{ STATIC_URL }}bower_components/jquery-validate/jquery.validate',
             'd3': '{{ STATIC_URL }}bower_components/d3/d3.min',
             'dropzone': '{{ STATIC_URL }}bower_components/dropzone/downloads/dropzone-amd-module.min',
-            'summernote': '{{ STATIC_URL }}bower_components/summernote/dist/summernote.min',
             'ckeditor': '{{ STATIC_URL }}bower_components/ckeditor/ckeditor',
             'ckeditor-jquery': '{{ STATIC_URL }}bower_components/ckeditor/adapters/jquery',
             'knockout': '{{ STATIC_URL }}bower_components/knockout/dist/knockout',
@@ -172,7 +171,8 @@
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tileserver: "{% url 'tileserver' %}",
-                time_wheel_config: "{% url 'time_wheel_config' %}"
+                time_wheel_config: "{% url 'time_wheel_config' %}",
+                reindex: "{% url 'reindex' %}"
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",

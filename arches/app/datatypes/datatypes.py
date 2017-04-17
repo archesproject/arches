@@ -51,7 +51,8 @@ class StringDataType(BaseDataType):
         document['strings'].append(nodevalue)
 
     def transform_export_values(self, value, *args, **kwargs):
-        return value.encode('utf8')
+        if value != None:
+            return value.encode('utf8')
 
     def get_search_terms(self, nodevalue):
         terms = []
@@ -209,7 +210,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
             UNION
 
-            SELECT '' as resourceinstanceid,
+            SELECT NULL as resourceinstanceid,
             		false AS poly_outline,
             		row_number() over () as __id__,
             		count(*) as total,
@@ -330,6 +331,74 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     }
                 },
                 {
+                    "id": "resources-fill-%(nodeid)s-click",
+                    "type": "fill",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "fill-color": "%(fillColor)s"
+                    }
+                },
+                {
+                    "id": "resources-fill-%(nodeid)s-hover",
+                    "type": "fill",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "fill-color": "%(fillColor)s"
+                    }
+                },
+                {
+                    "id": "resources-poly-outline-%(nodeid)s",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "poly_outline", true]],
+                    "paint": {
+                        "line-width": %(outlineWeight)s,
+                        "line-color": "%(outlineColor)s"
+                    }
+                },
+                {
+                    "id": "resources-poly-outline-%(nodeid)s-hover",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "line-width": %(expanded_outlineWeight)s,
+                        "line-color": "%(outlineColor)s"
+                    }
+                },
+                {
+                    "id": "resources-poly-outline-%(nodeid)s-click",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "line-width": %(expanded_outlineWeight)s,
+                        "line-color": "%(outlineColor)s"
+                    }
+                },
+                {
                     "id": "resources-line-halo-%(nodeid)s",
                     "type": "line",
                     "source": "%(source_name)s",
@@ -358,19 +427,91 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     }
                 },
                 {
-                    "id": "resources-poly-outline-%(nodeid)s",
+                    "id": "resources-line-halo-%(nodeid)s-hover",
                     "type": "line",
                     "source": "%(source_name)s",
                     "source-layer": "%(nodeid)s",
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1]],
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
-                        "line-width": %(outlineWeight)s,
-                        "line-color": "%(outlineColor)s"
+                        "line-width": %(expanded_haloWeight)s,
+                        "line-color": "%(lineHaloColor)s"
                     }
                 },
+                {
+                    "id": "resources-line-%(nodeid)s-hover",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "line-width": %(expanded_weight)s,
+                        "line-color": "%(lineColor)s"
+                    }
+                },
+                {
+                    "id": "resources-line-halo-%(nodeid)s-click",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "line-width": %(expanded_haloWeight)s,
+                        "line-color": "%(lineHaloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-line-%(nodeid)s-click",
+                    "type": "line",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "line-width": %(expanded_weight)s,
+                        "line-color": "%(lineColor)s"
+                    }
+                },
+
+                {
+                    "id": "resources-point-halo-%(nodeid)s-hover",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "circle-radius": %(expanded_haloRadius)s,
+                        "circle-color": "%(pointHaloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-point-%(nodeid)s-hover",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "circle-radius": %(expanded_radius)s,
+                        "circle-color": "%(pointColor)s"
+                    }
+                },
+
                 {
                     "id": "resources-point-halo-%(nodeid)s",
                     "type": "circle",
@@ -396,6 +537,35 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
                     "paint": {
                         "circle-radius": %(radius)s,
+                        "circle-color": "%(pointColor)s"
+                    }
+                },
+
+                {
+                    "id": "resources-point-halo-%(nodeid)s-click",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "circle-radius": %(expanded_haloRadius)s,
+                        "circle-color": "%(pointHaloColor)s"
+                    }
+                },
+                {
+                    "id": "resources-point-%(nodeid)s-click",
+                    "type": "circle",
+                    "source": "%(source_name)s",
+                    "source-layer": "%(nodeid)s",
+                    "layout": {
+                        "visibility": "visible"
+                    },
+                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "paint": {
+                        "circle-radius": %(expanded_radius)s,
                         "circle-color": "%(pointColor)s"
                     }
                 },
@@ -486,14 +656,19 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "pointColor": node.config["pointColor"],
                 "pointHaloColor": node.config["pointHaloColor"],
                 "radius": node.config["radius"],
+                "expanded_radius": node.config["radius"]*2,
                 "haloRadius": node.config["haloRadius"],
+                "expanded_haloRadius": node.config["haloRadius"]*2,
                 "lineColor": node.config["lineColor"],
                 "lineHaloColor": node.config["lineHaloColor"],
                 "weight": node.config["weight"],
                 "haloWeight": node.config["haloWeight"],
+                "expanded_weight": node.config["weight"]*2,
+                "expanded_haloWeight": node.config["haloWeight"]*2,
                 "fillColor": node.config["fillColor"],
                 "outlineColor": node.config["outlineColor"],
                 "outlineWeight": node.config["outlineWeight"],
+                "expanded_outlineWeight": node.config["outlineWeight"]*2,
             }
         return {
             "nodeid": node.nodeid,
@@ -598,8 +773,6 @@ class CSVChartJsonDataType(FileListDataType):
         super(CSVChartJsonDataType, self).__init__(model=model)
 
     def manage_files(self, previously_saved_tile, current_tile, request, node):
-        print len(previously_saved_tile)
-        print previously_saved_tile.count()
         try:
             if previously_saved_tile.count() == 1:
                 for previously_saved_file in previously_saved_tile[0].data[str(node.pk)]['files']:
@@ -651,3 +824,15 @@ class IIIFDrawingDataType(BaseDataType):
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(string_item.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append(string_item)
         return terms
+
+
+class DomainDataType(BaseDataType):
+    def append_to_document(self, document, nodevalue):
+        document['strings'].append(nodevalue)
+
+class DomainListDataType(BaseDataType):
+    def transform_import_values(self, value):
+        return [v.strip() for v in value.split(',')]
+
+    def append_to_document(self, document, nodevalue):
+        document['strings'].append(nodevalue)
