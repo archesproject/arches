@@ -3324,7 +3324,6 @@ CREATE MATERIALIZED VIEW mv_geojson_geoms AS
 
 CREATE INDEX mv_geojson_geoms_gix ON mv_geojson_geoms USING GIST (geom);
 
--- DELETE FROM map_layers where name = 'Search Results';
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
    VALUES (public.uuid_generate_v1mc(), 'Search Results', '[
         {
