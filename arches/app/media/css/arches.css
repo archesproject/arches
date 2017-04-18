@@ -2261,6 +2261,9 @@ ul .collapse li:last-of-type {
     width: 450px;
     z-index: 10;
 }
+.graph-list-header .find-widget {
+    z-index: 1;
+}
 .clear-find {
     position: absolute;
     right: 10px;
@@ -2890,9 +2893,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .primary-descriptors-card-container {
-    margin-top: -5px; 
-    margin-left: 0px; 
-    padding-left: 15px; 
+    margin-top: -5px;
+    margin-left: 0px;
+    padding-left: 15px;
     padding-right: 15px
 }
 .primary-descriptors-container {
