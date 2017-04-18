@@ -3797,7 +3797,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-x: hidden;
     border: 1px solid #ddd;
     border-top-width: 0;
-    margin-bottom: 0px;
+    margin-bottom: 50px;
 }
 .crud-menu-panel {
     width: 250px;
