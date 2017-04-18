@@ -91,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
-                        <!-- ko if: selection().nodeid -->
+                        <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                         </div>
@@ -104,7 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <!-- /ko -->
 
-                        <!-- ko if: !selection().nodeid -->
+                        <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
                             <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
 

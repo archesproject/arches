@@ -17,17 +17,14 @@ class BaseConceptDataType(BaseDataType):
             self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
             return self.value_lookup[valueid]
 
-    def get_concept_export_value(self, valueid, *args, **kwargs):
-        concept_export_value_type = None
-        if 'concept_export_value_type' in kwargs:
-            concept_export_value_type = kwargs.get('concept_export_value_type')
+    def get_concept_export_value(self, valueid, concept_export_value_type=None):
         ret = ''
-        if concept_export_value_type != None:
-            if concept_export_value_type == "label" or concept_export_value_type == "both":
-                if concept_export_value_type == "label":
-                    ret = self.get_value(valueid)
-                elif concept_export_value_type == "both":
-                    ret = valueid + '|' + self.get_value(valueid)
+        if concept_export_value_type == None or concept_export_value_type == '' or concept_export_value_type == 'label':
+            ret = self.get_value(valueid).value
+        elif concept_export_value_type == 'both':
+            ret = valueid + '|' + self.get_value(valueid).value
+        elif concept_export_value_type == 'id':
+            ret = valueid
         return ret
 
     def append_to_document(self, document, nodevalue):
@@ -68,6 +65,17 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
+    def validate(self, value, source=''):
+        errors = []
+        for v in value:
+            value = v.strip()
+            try:
+                models.Value.objects.get(pk=value)
+            except ObjectDoesNotExist:
+                message = "Not a valid domain value"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+        return errors
+
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 

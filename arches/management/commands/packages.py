@@ -108,6 +108,9 @@ class Command(BaseCommand):
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
+        parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
+            help='Export grouped business data attrbiutes one or multiple csv files. By setting this flag the system will export all grouped business data to one csv file.')
+
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -150,7 +153,7 @@ class Command(BaseCommand):
             self.load_concept_scheme(package_name, options['source'])
 
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'], options['single_file'])
 
         if options['operation'] == 'import_reference_data':
             self.import_reference_data(options['source'], options['overwrite'], options['stage'])
@@ -314,7 +317,7 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
             if file_format == 'json':
@@ -332,7 +335,7 @@ class Command(BaseCommand):
                     print '*'*80
                     sys.exit()
             if data_dest != '':
-                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
+                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
 
                 for file in data:
                     with open(os.path.join(data_dest, file['name']), 'wb') as f:

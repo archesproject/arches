@@ -500,7 +500,7 @@ define([
                                 "type": "FeatureCollection",
                                 "features": []
                             };
-                            fcs = JSON.parse(ko.unwrap(self.popupData().geometries));
+                            fcs = ko.unwrap(self.popupData().featureCollections);
                             _.each(fcs, function (currentFC) {
                                 fc.features = fc.features.concat(currentFC.features);
                             });
@@ -538,6 +538,9 @@ define([
                             var cellWidth = arches.hexBinSize;
                             var units = 'kilometers';
                             var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);
+                            _.each(hexGrid.features, function (feature, i) {
+                                feature.properties.id = i;
+                            });
                             var getSearchAggregationGeoJSON = function () {
                                 var agg = ko.unwrap(self.searchAggregations);
                                 if (!agg || !agg.grid.buckets) {
@@ -578,7 +581,8 @@ define([
 
                                 return aggregated;
                             }
-                            var getSearchPointsGeoJSON = function () {
+                            var updateSearchPointsGeoJSON = function () {
+                                var pointSource = self.map.getSource('search-results-points')
                                 var agg = ko.unwrap(self.searchAggregations);
                                 if (!agg || !agg.results) {
                                     return {
@@ -588,46 +592,47 @@ define([
                                 }
 
                                 var features = [];
+                                var mouseoverInstanceId = self.results.mouseoverInstanceId();
+                                var hoverData = self.hoverData();
+                                var clickData = self.clickData();
                                 _.each(agg.results, function (result) {
                                     _.each(result._source.points, function (pt) {
                                         var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
                                             resourceinstanceid: result._id,
-                                            highlight: false
+                                            highlight: result._id===mouseoverInstanceId ||
+                                                (clickData ? (ko.unwrap(clickData.resourceinstanceid)===result._id) : false) ||
+                                                (hoverData ? (ko.unwrap(hoverData.resourceinstanceid)===result._id) : false)
                                         }));
                                         features.push(feature);
                                     });
                                 });
 
-                                var mouseoverInstanceId = self.results.mouseoverInstanceId();
-                                if (mouseoverInstanceId) {
-                                    var highlightFeature = _.find(features, function(feature) {
-                                        return feature.properties.resourceinstanceid === mouseoverInstanceId;
-                                    });
-                                    if (highlightFeature) {
-                                        highlightFeature.properties.highlight = true;
-                                    }
-                                }
-
                                 var pointsFC = turf.featureCollection(features);
-                                return pointsFC;
+                                pointSource.setData(pointsFC)
                             }
                             self.overlays.unshift(self.createOverlay(self.searchQueryLayer))
                             self.updateSearchResultsLayer = function() {
                                 var aggSource = self.map.getSource('search-results-hex')
                                 var aggData = getSearchAggregationGeoJSON();
                                 aggSource.setData(aggData)
-                                var pointSource = self.map.getSource('search-results-points')
-                                var pointData = getSearchPointsGeoJSON();
-                                pointSource.setData(pointData)
+                                updateSearchPointsGeoJSON();
                             }
                             self.searchAggregations.subscribe(self.updateSearchResultsLayer);
                             if (self.searchAggregations) {
                                 self.updateSearchResultsLayer()
                             }
-                            self.results.mouseoverInstanceId.subscribe(function () {
-                                var pointSource = self.map.getSource('search-results-points')
-                                var pointData = getSearchPointsGeoJSON();
-                                pointSource.setData(pointData)
+                            self.results.mouseoverInstanceId.subscribe(updateSearchPointsGeoJSON);
+                            self.clickData.subscribe(updateSearchPointsGeoJSON);
+                            self.hoverData.subscribe(function (val) {
+                                var resultsHoverLayer = self.map.getLayer('search-results-hex-outline-highlighted');
+                                var filter = ['==', 'id', ''];
+                                if (val && val.doc_count) {
+                                    filter[2] = val.id;
+                                }
+                                if (resultsHoverLayer) {
+                                    self.map.setFilter(resultsHoverLayer.id, filter);
+                                }
+                                updateSearchPointsGeoJSON();
                             });
                             self.results.mapLinkData.subscribe(function(data) {
                                 zoomToGeoJSON(data, true);
@@ -1171,6 +1176,7 @@ define([
                     resourceData.displayname = '';
                     resourceData.graphid = '';
                     resourceData.graph_name = '';
+                    resourceData.featureCollections = [];
                     resourceData = ko.mapping.fromJS(resourceData);
                     resourceLookup[resourceId] = resourceData;
                     $.get(arches.urls.resource_descriptors + resourceId, function (data) {
@@ -1179,6 +1185,7 @@ define([
                         resourceLookup[resourceId].displayname(data.displayname);
                         resourceLookup[resourceId].graphid(data.graphid);
                         resourceLookup[resourceId].graph_name(data.graph_name);
+                        resourceLookup[resourceId].featureCollections(data.geometries);
                         resourceLookup[resourceId].loading(false);
                     });
                     return resourceLookup[resourceId];
