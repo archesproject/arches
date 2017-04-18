@@ -315,7 +315,7 @@ class BaseDataType(object):
         """
         Returns a list of concept values for a given node
         """
-        return None
+        return unicode(tile.data[str(node.nodeid)])
 
     def get_search_terms(self, nodevalue):
         """

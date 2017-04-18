@@ -60,8 +60,7 @@ class ConceptDataType(BaseConceptDataType):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
     def get_display_value(self, tile, node):
-        value = None
-        return self.get_value(uuid.UUID(tile.data[str(node.nodeid)]))
+        return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
 
 
 class ConceptListDataType(BaseConceptDataType):
@@ -84,4 +83,11 @@ class ConceptListDataType(BaseConceptDataType):
         for val in value:
             new_val = self.get_concept_export_value(val, concept_export_value_type)
             new_values.append(new_val)
+        return ','.join(new_values)
+
+    def get_display_value(self, tile, node):
+        new_values = []
+        for val in tile.data[str(node.nodeid)]:
+            new_val = self.get_value(uuid.UUID(val))
+            new_values.append(new_val.value)
         return ','.join(new_values)
