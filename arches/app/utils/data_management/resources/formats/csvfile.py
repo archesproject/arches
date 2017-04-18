@@ -50,7 +50,7 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type)
         return value
 
-    def write_resources(self, resources, resource_export_configs=None):
+    def write_resources(self, resources, resource_export_configs=None, single_file=False):
         csv_records = []
         other_group_records = []
         mapping = {}
@@ -95,23 +95,33 @@ class CsvWriter(Writer):
             if other_group_record != {}:
                 other_group_records.append(other_group_record)
 
-
         csv_name_prefix = resource_export_configs[0]['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
-        for csv_record in csv_records:
-            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name + '_groups', 'outputfile': dest})
-        for csv_record in other_group_records:
-            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+        if single_file != True:
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+            for csv_record in csv_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name.split('.')[0] + '_groups.' + csv_name.split('.')[1], 'outputfile': dest})
+            for csv_record in other_group_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+        elif single_file == True:
+            all_records = csv_records + other_group_records
+            all_records = sorted(all_records, key=lambda k: k['ResourceID'])
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+            for csv_record in all_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         return csvs_for_export
 
