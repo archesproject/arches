@@ -33,7 +33,7 @@ class JsonWriter(Writer):
         tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('-parenttile_id')
         return tiles
 
-    def write_resources(self, resourceids, resource_export_configs=None):
+    def write_resources(self, resourceids, resource_export_configs=None, single_file=True):
         json_for_export = []
         resources = []
         relations = []
