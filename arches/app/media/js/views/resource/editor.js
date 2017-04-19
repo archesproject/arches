@@ -14,6 +14,8 @@ require([
 ], function($, _, ko, arches, SearchBaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
     var self = this;
     var loading = ko.observable(false);
+    var cardLoading = ko.observable(false);
+    var displayName = ko.observable(data.displayName);
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
     });
@@ -46,10 +48,16 @@ require([
     });
 
     formView.on('before-update', function(){
-        loading(true);
+        cardLoading(true);
     });
     formView.on('after-update', function(response){
-        loading(false);
+        cardLoading(false);
+        var updateDisplayName = function(){
+            var name = displayName;
+            return function(val) {
+                name(val.displayname)
+            }
+        }
         var errorMessageTitle = arches.requestFailed.title
         var errorMessageText = arches.requestFailed.text
         pageView.viewModel.alert(null);
@@ -59,6 +67,8 @@ require([
               errorMessageText = response.responseJSON.message[1]
             }
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', errorMessageTitle, errorMessageText));
+        } else {
+            $.get(arches.urls.resource_descriptors + this.resourceid, updateDisplayName());
         }
     });
 
@@ -68,6 +78,8 @@ require([
     var pageView = new SearchBaseManagerView({
         viewModel:{
             loading: loading,
+            cardLoading: cardLoading,
+            displayName: displayName,
             resourceEditorContext: true,
             editingInstanceId: data.resourceid,
             relationship_types: data.relationship_types,
@@ -110,4 +122,12 @@ require([
         }
     });
 
+    pageView.viewModel.searchResults.relationshipCandidates.subscribe(function () {
+        if (!pageView.viewModel.openRelatedResources()) {
+            pageView.viewModel.openRelatedResources(true);
+        }
+        if (pageView.viewModel.selectedTab() !== pageView.viewModel.relatedResourcesManager) {
+            pageView.viewModel.selectedTab(pageView.viewModel.relatedResourcesManager);
+        }
+    });
 });

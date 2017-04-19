@@ -33,6 +33,11 @@ define(['jquery',
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
                 this.mapLinkData = ko.observable(null);
+                this.selectedResourceId = ko.observable(null);
+
+                this.showRelationships.subscribe(function (res) {
+                    self.selectedResourceId(res.resourceinstanceid);
+                });
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -49,10 +54,19 @@ define(['jquery',
                 }
             },
 
-            showRelatedResources: function(resourceinstanceid) {
+            showRelatedResources: function(resourceinstance) {
                 var self = this;
-                return function(resourceinstanceid){
-                    self.showRelationships(resourceinstanceid)
+                return function(resourceinstance){
+                    if (resourceinstance === undefined) {
+                        resourceinstance = self.viewModel.relatedResourcesManager.currentResource();
+                        if (self.viewModel.relatedResourcesManager.showGraph() === true) {
+                            self.viewModel.relatedResourcesManager.showGraph(false)
+                        }
+                    }
+                    self.showRelationships(resourceinstance)
+                    if (self.viewModel.selectedTab() !== self.viewModel.relatedResourcesManager) {
+                        self.viewModel.selectedTab(self.viewModel.relatedResourcesManager)
+                    }
                 }
             },
 
@@ -75,6 +89,17 @@ define(['jquery',
                 }
             },
 
+            isResourceRelatable: function (graphId) {
+                var relatable = false;
+                graphdata = _.find(viewdata.graphs, function(graphdata){
+                    return graphId === graphdata.graphid;
+                })
+                if (this.viewModel.graph) {
+                    relatable = _.contains(this.viewModel.graph.relatable_resource_model_ids, graphId);
+                }
+                return relatable;
+            },
+
             updateResults: function(response){
                 var self = this;
                 koMapping.fromJS(response.paginator, this.paginator);
@@ -89,10 +114,10 @@ define(['jquery',
                         results: response.results.hits.hits
                     })
                 );
+                this.selectedResourceId(null);
 
                 response.results.hits.hits.forEach(function(result){
-                    var relatable;
-                    graphdata = _.find(viewdata.graphs, function(graphdata){
+                    var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;
                     })
                     if (this.viewModel.graph) {
@@ -119,11 +144,18 @@ define(['jquery',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
-                        relatable: relatable,
+                        relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {
+                            self.selectedResourceId(result._source.resourceinstanceid);
+                            if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
+                                self.viewModel.selectedTab(self.viewModel.mapFilter)
+                            }
                             self.mapLinkData(mapData);
-                        }
+                        },
+                        selected: ko.computed(function () {
+                            return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
+                        })
                     });
                 }, this);
 

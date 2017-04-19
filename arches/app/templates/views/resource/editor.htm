@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 {% block graph_header_title %}
-{% trans "Resource Editor - " %}{% trans displayname %}
+{% trans "Resource Editor - " %}<span data-bind="text: displayName"></span>
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Card Container -->
-    <div class="card-form-preview-container" data-bind="let: {'form': formView}">
+    <div class="card-form-preview-container" data-bind="let: {'form': formView}, css: {'loading-mask': cardLoading()}">
         {% include 'views/resource/editor/form.htm' %}
     </div>
 
@@ -62,7 +62,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             widgets: {{ widgets_json }},
             resourceid: '{{resourceid}}',
             graph: {{graph_json}},
-            relationship_types: {{ relationship_types }}
+            relationship_types: {{ relationship_types }},
+            displayName: '{{ displayname }}'
         };
     });
     {% endautoescape %}

@@ -11,7 +11,6 @@ cache:
   - pip
 
 addons:
-  sauce_connect: false
   postgresql: 9.6
   apt:
     sources:
@@ -74,6 +73,6 @@ deploy:
   region: us-west-1
   on: *2
 before_deploy:
-- zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/*.sh
+- zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/ci_install/*.sh
 - mkdir -p dpl_cd_upload
 - mv codedeploy.zip dpl_cd_upload/arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip

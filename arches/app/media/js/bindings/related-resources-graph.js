@@ -13,6 +13,7 @@ define([
                 return a;
             }, {});
             var options = ko.unwrap(valueAccessor());
+            var subscriptions = options.subscriptions;
             var $el = $(element);
             var width = $el.parent().width();
             var height = $el.parent().height();
@@ -35,6 +36,7 @@ define([
                 .size([width, height]);
 
             var nodeList = options.nodeList
+            var currentResource = options.currentResource
 
             var selectNode = function(d){
                 vis.selectAll("circle")
@@ -403,15 +405,32 @@ define([
                 }
             };
 
-            if (options.resourceId) {
-                $el.addClass('loading');
-                getResourceData(options.resourceId, options.resourceName, options.resourceTypeId, function (newData) {
-                    $el.removeClass('loading');
-                    data = newData;
-                    data.nodes[0].x = width/2;
-                    data.nodes[0].y = height/2-160;
-                    update();
-                }, true);
+            setRoot = function(val){
+                if (val.graphid !== undefined) {
+                    nodeMap = {};
+                    linkMap = {};
+                    nodeList([]);
+                    getResourceData(val.resourceinstanceid, val.displayname, val.graphid, function(newData) {
+                        $el.removeClass('loading');
+                        data = newData;
+                        data.nodes[0].x = width/2;
+                        data.nodes[0].y = height/2-160;
+                        update();
+                    }, true);
+                    }
+            };
+
+            if (currentResource().resourceinstanceid) {
+                setRoot(currentResource())
+            }
+
+            if (ko.isObservable(currentResource)) {
+                var subscription = currentResource.subscribe(setRoot, this);
+                if (subscriptions.length > 0) {
+                    _.each(subscriptions, function(s){s.dispose()})
+                }
+                console.log(currentResource.getSubscriptionsCount());
+                subscriptions.push(subscription)
             }
 
             $(window).on("resize", function() {

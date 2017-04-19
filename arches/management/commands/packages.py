@@ -32,7 +32,6 @@ import arches.app.utils.data_management.resource_graphs.importer as graph_import
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 import arches.management.commands.package_utils.resource_graphs as resource_graphs
-import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -50,7 +49,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -109,6 +108,9 @@ class Command(BaseCommand):
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
+        parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
+            help='Export grouped business data attrbiutes one or multiple csv files. By setting this flag the system will export all grouped business data to one csv file.')
+
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -150,11 +152,8 @@ class Command(BaseCommand):
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
 
-        if options['operation'] == 'index_database':
-            self.index_database(package_name)
-
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'], options['single_file'])
 
         if options['operation'] == 'import_reference_data':
             self.import_reference_data(options['source'], options['overwrite'], options['stage'])
@@ -318,25 +317,34 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def index_database(self, package_name):
-        """
-        Runs the index_database command found in package_utils
-        """
-        # self.setup_indexes(package_name)
-        index_database.index_db()
-
-    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
             if file_format == 'json':
+                if graph == None:
+                    print '*'*80
+                    print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
+                    print '*'*80
+                    sys.exit()
                 config_file = None
             elif file_format == 'csv':
                 graph = None
-            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
+                if config_file == None:
+                    print '*'*80
+                    print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
+                    print '*'*80
+                    sys.exit()
+            if data_dest != '':
+                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
 
-            for file in data:
-                with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                    f.write(file['outputfile'].getvalue())
+                for file in data:
+                    with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                        f.write(file['outputfile'].getvalue())
+            else:
+                print '*'*80
+                print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+                print '*'*80
+                sys.exit()
         else:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)

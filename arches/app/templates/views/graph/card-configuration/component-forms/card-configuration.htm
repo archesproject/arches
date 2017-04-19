@@ -69,6 +69,9 @@
             <h4 class="title-block-title" style=""> {% trans "Settings" %} </h4>
         </div>
 
+        <!-- Card Visibility -->
+        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
+
         <!-- Set Cardinaltiy -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
@@ -114,12 +117,12 @@
                         </div>
                     </div>
 
-                    <!--Summernote-->
+                    <!--Rich text editor-->
                     <div class="node-widget-label" style="">
                         <div class="control-label">
                             {% trans "Help Content" %}
                         </div>
-                        <div class="summernote" data-bind='summernote: {value: card().get("helptext")}'></div>
+                        <textarea rows="10" cols="80" data-bind="ckeditor: card().get('helptext'), ckeditorOptions: {}, valueUpdate: 'afterkeydown'"></textarea>
                     </div>
 
                     <!-- Preview help -->
