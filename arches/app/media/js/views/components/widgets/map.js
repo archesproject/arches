@@ -1287,9 +1287,12 @@ define([
 
                     if (self.clickData() !== clickData) {
                         self.clickData(clickData);
-                        var clickFeatureId = clickFeature && clickFeature.properties.resourceinstanceid ? clickFeature.properties.resourceinstanceid : '';
-                        highlightResource(clickFeatureId, 'click')
                     }
+                });
+
+                self.clickData.subscribe(function (val) {
+                    var clickFeatureId = val && val.resourceinstanceid ? ko.unwrap(val.resourceinstanceid) : '';
+                    highlightResource(clickFeatureId, 'click');
                 });
 
                 ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
