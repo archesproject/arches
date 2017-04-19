@@ -1988,11 +1988,16 @@ ul .collapse li:last-of-type {
 .resource-grid-item {
     float: left;
     width: 100%;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ebeef0;
     border-right: 1px solid #ebeef0;
     margin: 0;
 }
+
+.resource-grid-item:first-of-type {
+    border-top: 1px solid #ddd;
+}
+
 .resource-grid-main-container {
     height: 90px;
     background: #ebeef0;
@@ -2027,7 +2032,8 @@ ul .collapse li:last-of-type {
 }
 .resource-grid-item:hover {
     cursor: pointer;
-    border: 1px solid #d5d5d5;
+    border-left: 1px solid #d5d5d5;
+    border-right: 1px solid #d5d5d5;
     opacity: 1.0;
     background: #f9f9f9;
 }
@@ -2260,6 +2266,9 @@ ul .collapse li:last-of-type {
     top: 10px;
     width: 450px;
     z-index: 10;
+}
+.graph-list-header .find-widget {
+    z-index: 1;
 }
 .clear-find {
     position: absolute;
@@ -3600,7 +3609,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .left-column-container.ep-card-tools-panel {
-    margin-bottom: 50px;
+    margin-bottom: 0px;
 }
 
 #node-listing .panel {
@@ -4368,6 +4377,9 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     z-index: 1;
     width: 100%;
     height: 100%;
+}
+.graph-base-content {
+    margin-bottom: 50px;
 }
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;

@@ -825,14 +825,30 @@ class IIIFDrawingDataType(BaseDataType):
                     terms.append(string_item)
         return terms
 
+class BaseDomainDataType(BaseDataType):
+    def get_option_text(self, node, option_id):
+        for option in node.config['options']:
+            if option['id'] == option_id:
+                return option['text']
+        return ''
 
-class DomainDataType(BaseDataType):
+class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
 
-class DomainListDataType(BaseDataType):
+    def get_display_value(self, tile, node):
+        return self.get_option_text(node, tile.data[str(node.nodeid)])
+
+class DomainListDataType(BaseDomainDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
+
+    def get_display_value(self, tile, node):
+        new_values = []
+        for val in tile.data[str(node.nodeid)]:
+            option = self.get_option_text(node, val)
+            new_values.append(option)
+        return ','.join(new_values)

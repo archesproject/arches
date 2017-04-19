@@ -28,11 +28,14 @@ class ResourceExporter(object):
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    def export(self, data_dest=None, query=None, configs=None, graph=None):
+    def export(self, data_dest=None, query=None, configs=None, graph=None, single_file=False):
+        #business data export
         #resources should be changed to query
         configs = self.read_export_configs(configs)
         business_data = self.get_resources_for_export(query, configs, graph)
-        resources = self.writer.write_resources(business_data, configs)
+        resources = self.writer.write_resources(business_data, configs, single_file)
+
+        #relation export
         if len(business_data) > 0:
             if isinstance(business_data[0], dict):
                 resourceids = []
