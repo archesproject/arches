@@ -3603,7 +3603,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .left-column-container.ep-card-tools-panel {
-    margin-bottom: 50px;
+    margin-bottom: 0px;
 }
 
 #node-listing .panel {
@@ -3797,7 +3797,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow-x: hidden;
     border: 1px solid #ddd;
     border-top-width: 0;
-    margin-bottom: 50px;
+    margin-bottom: 0px;
 }
 .crud-menu-panel {
     width: 250px;
@@ -4371,6 +4371,9 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     z-index: 1;
     width: 100%;
     height: 100%;
+}
+.graph-base-content {
+    margin-bottom: 50px;
 }
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
