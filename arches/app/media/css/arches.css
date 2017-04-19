@@ -2890,9 +2890,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .primary-descriptors-card-container {
-    margin-top: -5px; 
-    margin-left: 0px; 
-    padding-left: 15px; 
+    margin-top: -5px;
+    margin-left: 0px;
+    padding-left: 15px;
     padding-right: 15px
 }
 .primary-descriptors-container {
@@ -6455,6 +6455,10 @@ span.basemap-unselected {
 }
 
 .search-listing:active {
+    border: 1px solid steelblue;
+}
+
+.search-listing.selected {
     border: 1px solid steelblue;
 }
 
