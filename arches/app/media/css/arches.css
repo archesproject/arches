@@ -6470,6 +6470,10 @@ span.basemap-unselected {
     border: 1px solid steelblue;
 }
 
+.search-listing.selected {
+    border: 1px solid steelblue;
+}
+
 .search-listing-title {
 	font-size: 15px;
 	font-weight: 500;
