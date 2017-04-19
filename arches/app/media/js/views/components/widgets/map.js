@@ -446,7 +446,7 @@ define([
              * @return {null}
              */
             this.setupMap = function(map) {
-                var draw = Draw({
+                var draw = new Draw({
                     controls: {
                         trash: false //if true, the backspace key is inactivated in the geocoder input
                     },
@@ -1221,7 +1221,8 @@ define([
                     });
                     self.map.setStyle(style);
                 };
-                self.map.on('mousemove', function(e) {
+
+                self.map.on('mousemove', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var hoverData = null;
                     var clickable = false;
@@ -1249,7 +1250,7 @@ define([
                         highlightResource(hoverFeatureId, 'hover')
                     }
                     self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
-                }, this);
+                });
 
                 map.on('click', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
