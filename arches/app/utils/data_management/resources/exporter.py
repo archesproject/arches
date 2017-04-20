@@ -122,6 +122,8 @@ class ResourceExporter(object):
                 relation.__dict__['relationshiptype'] = relation.__dict__.pop('relationshiptype_id')
                 relation.__dict__['resourceinstanceidfrom'] = relation.__dict__.pop('resourceinstanceidfrom_id')
                 relation.__dict__['resourceinstanceidto'] = relation.__dict__.pop('resourceinstanceidto_id')
+                relation.__dict__['datestarted'] = relation.__dict__['datestarted'] if relation.__dict__['datestarted'] != None else ''
+                relation.__dict__['dateended'] = relation.__dict__['dateended'] if relation.__dict__['dateended'] != None else ''
                 relation.__dict__.pop('_state')
                 relations.append(relation)
 

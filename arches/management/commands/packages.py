@@ -321,7 +321,7 @@ class Command(BaseCommand):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
             if file_format == 'json':
-                if graph == None:
+                if graph == None or graph == False:
                     print '*'*80
                     print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
                     print '*'*80
