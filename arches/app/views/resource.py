@@ -136,13 +136,17 @@ class ResourceData(View):
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
         if resourceid is not None:
+            es = Elasticsearch()
+            se = SearchEngineFactory().create()
+            document = se.search(index='resource', doc_type='_all', id=resourceid)
             resource = Resource.objects.get(pk=resourceid)
             return JSONResponse({
-                'graphid': resource.graph.pk,
+                'graphid': document['_source']['graph_id'],
                 'graph_name': resource.graph.name,
-                'displaydescription': resource.displaydescription,
-                'map_popup': resource.map_popup,
-                'displayname': resource.displayname,
+                'displaydescription': document['_source']['displaydescription'],
+                'map_popup': document['_source']['map_popup'],
+                'displayname': document['_source']['displayname'],
+                'geometries': document['_source']['geometries'],
             })
 
         return HttpResponseNotFound()

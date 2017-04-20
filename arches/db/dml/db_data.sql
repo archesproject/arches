@@ -153,7 +153,7 @@ INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
-    
+
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000007', 'member');
 
@@ -3343,6 +3343,21 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
             },
             "type": "line",
             "id": "search-results-hex-outline"
+        },
+        {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "==",
+                "id",
+                ""
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 1
+            },
+            "type": "line",
+            "id": "search-results-hex-outline-highlighted"
         },
         {
            "layout": {},

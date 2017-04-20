@@ -1988,11 +1988,16 @@ ul .collapse li:last-of-type {
 .resource-grid-item {
     float: left;
     width: 100%;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ebeef0;
     border-right: 1px solid #ebeef0;
     margin: 0;
 }
+
+.resource-grid-item:first-of-type {
+    border-top: 1px solid #ddd;
+}
+
 .resource-grid-main-container {
     height: 90px;
     background: #ebeef0;
@@ -2027,7 +2032,8 @@ ul .collapse li:last-of-type {
 }
 .resource-grid-item:hover {
     cursor: pointer;
-    border: 1px solid #d5d5d5;
+    border-left: 1px solid #d5d5d5;
+    border-right: 1px solid #d5d5d5;
     opacity: 1.0;
     background: #f9f9f9;
 }
@@ -2261,6 +2267,9 @@ ul .collapse li:last-of-type {
     width: 450px;
     z-index: 10;
 }
+.graph-list-header .find-widget {
+    z-index: 1;
+}
 .clear-find {
     position: absolute;
     right: 10px;
@@ -2443,12 +2452,15 @@ input.cmn-toggle-yes-no:checked + label:after {
     max-height: 89px;
 }
 .library-card-body {
-    height: 106px;
+    height: 116px;
     padding: 5px 20px 25px;
     color: #888;
+    margin-top: -10px;
+    overflow-y: hidden;
 }
 .library-card-panel-title {
     font-size: 1.2em;
+    margin-bottom: -10px;
 }
 .resource-list a.chosen-single {
     background: transparent;
@@ -2884,6 +2896,20 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 .card-item-child > .drag-tool:hover {
     opacity: .9;
     color: #4682B4;
+}
+
+.primary-descriptors-card-container {
+    margin-top: -5px;
+    margin-left: 0px;
+    padding-left: 15px;
+    padding-right: 15px
+}
+.primary-descriptors-container {
+    border: 1px solid #ddd;
+    min-height: 450px;
+}
+.panel-padding-bottom {
+    padding-bottom: 20px;
 }
 .widget-container {
     padding: 10px 15px 25px;
@@ -3583,7 +3609,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .left-column-container.ep-card-tools-panel {
-    margin-bottom: 50px;
+    margin-bottom: 0px;
 }
 
 #node-listing .panel {
@@ -4351,6 +4377,9 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     z-index: 1;
     width: 100%;
     height: 100%;
+}
+.graph-base-content {
+    margin-bottom: 50px;
 }
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
@@ -6438,6 +6467,10 @@ span.basemap-unselected {
 }
 
 .search-listing:active {
+    border: 1px solid steelblue;
+}
+
+.search-listing.selected {
     border: 1px solid steelblue;
 }
 

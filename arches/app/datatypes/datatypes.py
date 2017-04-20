@@ -239,7 +239,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         sql_list.append("""
             SELECT resourceinstanceid::text,
                     false AS poly_outline,
-                    row_number() over () as __id__,
+                    (row_number() over ())::text as __id__,
                     1 as total,
                     geom AS __geometry__,
                     '' AS extent
@@ -248,7 +248,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             UNION
             SELECT resourceinstanceid::text,
                     true AS poly_outline,
-                    row_number() over () as __id__,
+                    (row_number() over ())::text||'-outline' as __id__,
                     1 as total,
                     ST_ExteriorRing(geom) AS __geometry__,
                     '' AS extent
@@ -338,7 +338,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "fill-color": "%(fillColor)s"
                     }
@@ -351,7 +351,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "fill-color": "%(fillColor)s"
                     }
@@ -364,7 +364,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "poly_outline", true]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1]],
                     "paint": {
                         "line-width": %(outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -378,7 +378,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -392,7 +392,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "layout": {
                         "visibility": "visible"
                     },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "poly_outline", true],["==", "total", 1],["==", "resourceinstanceid", ""]],
+                    "filter": ["all", ["!=", "poly_outline", false],["==", "total", 1],["==", "resourceinstanceid", ""]],
                     "paint": {
                         "line-width": %(expanded_outlineWeight)s,
                         "line-color": "%(outlineColor)s"
@@ -656,19 +656,19 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "pointColor": node.config["pointColor"],
                 "pointHaloColor": node.config["pointHaloColor"],
                 "radius": node.config["radius"],
-                "expanded_radius": node.config["radius"]*2,
+                "expanded_radius": int(node.config["radius"])*2,
                 "haloRadius": node.config["haloRadius"],
-                "expanded_haloRadius": node.config["haloRadius"]*2,
+                "expanded_haloRadius": int(node.config["haloRadius"])*2,
                 "lineColor": node.config["lineColor"],
                 "lineHaloColor": node.config["lineHaloColor"],
                 "weight": node.config["weight"],
                 "haloWeight": node.config["haloWeight"],
-                "expanded_weight": node.config["weight"]*2,
-                "expanded_haloWeight": node.config["haloWeight"]*2,
+                "expanded_weight": int(node.config["weight"])*2,
+                "expanded_haloWeight": int(node.config["haloWeight"])*2,
                 "fillColor": node.config["fillColor"],
                 "outlineColor": node.config["outlineColor"],
                 "outlineWeight": node.config["outlineWeight"],
-                "expanded_outlineWeight": node.config["outlineWeight"]*2,
+                "expanded_outlineWeight": int(node.config["outlineWeight"])*2,
             }
         return {
             "nodeid": node.nodeid,
@@ -825,14 +825,30 @@ class IIIFDrawingDataType(BaseDataType):
                     terms.append(string_item)
         return terms
 
+class BaseDomainDataType(BaseDataType):
+    def get_option_text(self, node, option_id):
+        for option in node.config['options']:
+            if option['id'] == option_id:
+                return option['text']
+        return ''
 
-class DomainDataType(BaseDataType):
+class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
 
-class DomainListDataType(BaseDataType):
+    def get_display_value(self, tile, node):
+        return self.get_option_text(node, tile.data[str(node.nodeid)])
+
+class DomainListDataType(BaseDomainDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
     def append_to_document(self, document, nodevalue):
         document['strings'].append(nodevalue)
+
+    def get_display_value(self, tile, node):
+        new_values = []
+        for val in tile.data[str(node.nodeid)]:
+            option = self.get_option_text(node, val)
+            new_values.append(option)
+        return ','.join(new_values)

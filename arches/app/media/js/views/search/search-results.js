@@ -33,6 +33,11 @@ define(['jquery',
                 this.relationshipCandidates = ko.observableArray();
                 this.userRequestedNewPage = ko.observable(false);
                 this.mapLinkData = ko.observable(null);
+                this.selectedResourceId = ko.observable(null);
+
+                this.showRelationships.subscribe(function (res) {
+                    self.selectedResourceId(res.resourceinstanceid);
+                });
             },
 
             mouseoverInstance: function(resourceinstance) {
@@ -109,6 +114,7 @@ define(['jquery',
                         results: response.results.hits.hits
                     })
                 );
+                this.selectedResourceId(null);
 
                 response.results.hits.hits.forEach(function(result){
                     var graphdata = _.find(viewdata.graphs, function(graphdata){
@@ -141,8 +147,15 @@ define(['jquery',
                         relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {
+                            self.selectedResourceId(result._source.resourceinstanceid);
+                            if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
+                                self.viewModel.selectedTab(self.viewModel.mapFilter)
+                            }
                             self.mapLinkData(mapData);
-                        }
+                        },
+                        selected: ko.computed(function () {
+                            return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
+                        })
                     });
                 }, this);
 
