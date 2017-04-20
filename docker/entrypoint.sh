@@ -2,6 +2,7 @@
 
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
+BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
 
 
 cd_arches_root() {
@@ -11,7 +12,12 @@ cd_arches_root() {
 
 cd_app_folder() {
 	cd ${APP_FOLDER}
-	echo "Current work directory: ${APP_FOLDER}/"
+	echo "Current work directory: ${APP_FOLDER}"
+}
+
+cd_bower_folder() {
+	cd ${BOWER_JSON_FOLDER}
+	echo "Current work directory: ${BOWER_JSON_FOLDER}"
 }
 
 activate_virtualenv() {
@@ -103,16 +109,14 @@ install_dev_requirements() {
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 }
 
+# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
+# Also, the bower_components folder may have been overlaid by a Docker volume in a dev environment. 
 install_bower_components() {
-	if [[ ! -d ${ARCHES_ROOT}/arches/app/media/bower_components ]]; then
-		echo ""
-		echo ""
-		echo "----- INSTALLING BOWER COMPONENTS -----"
-		echo ""
-		echo "(The bower_components folder may have been overlaid by a Docker volume, running bower install again...)"
-		echo ""
-		bower --allow-root install
-	fi
+	echo ""
+	echo ""
+	echo "----- INSTALLING BOWER COMPONENTS -----"
+	echo ""
+	bower --allow-root install
 }
 
 run_custom_scripts() {
@@ -165,10 +169,13 @@ init_arches
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 	set_dev_mode
 	install_dev_requirements
-	install_bower_components
 fi
 
 run_tests
+
+# Run from folder where user's bower.json lives
+cd_bower_folder
+install_bower_components
 
 # From here on, run from ${APP_FOLDER}
 cd_app_folder
