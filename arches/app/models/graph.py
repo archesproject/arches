@@ -180,6 +180,8 @@ class Graph(models.GraphModel):
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
+            node.nodeid = uuid.UUID(str(node.nodeid))
+
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
