@@ -76,7 +76,6 @@ require([
             graph: data.graph,
             formList: formList,
             formView: formView,
-            //openRelatedResources: ko.observable(false),
             dirty: ko.computed(function() {
                 var dirty = false;
                 _.each(formView.formTiles(), function (tile) {

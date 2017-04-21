@@ -31,6 +31,7 @@ class BaseManagerView(TemplateView):
     def get_context_data(self, **kwargs):
         datatype_factory = DataTypeFactory()
         context = super(BaseManagerView, self).get_context_data(**kwargs)
+        context['system_settings_graphid'] = SystemSettings.graph_id
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=SystemSettings.graph_id)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
         if 'Resource Editor' in self.request.user.user_groups:
