@@ -832,19 +832,40 @@ class BaseDomainDataType(BaseDataType):
                 return option['text']
         return ''
 
+
 class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue):
-        document['strings'].append(nodevalue)
+        domain_text = None
+        for tile in document['tiles']:
+            for k, v in tile.data.iteritems():
+                if v == nodevalue:
+                    node = models.Node.objects.get(nodeid=k)
+                    domain_text = self.get_option_text(node, v)
+
+        if domain_text not in document['strings'] and domain_text != None:
+            document['strings'].append(domain_text)
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
+
 
 class DomainListDataType(BaseDomainDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
     def append_to_document(self, document, nodevalue):
-        document['strings'].append(nodevalue)
+        domain_text_values = set([])
+        for tile in document['tiles']:
+            for k, v in tile.data.iteritems():
+                if v == nodevalue:
+                    node = models.Node.objects.get(nodeid=k)
+                    for value in nodevalue:
+                        text_value = self.get_option_text(node, value)
+                        domain_text_values.add(text_value)
+
+        for value in domain_text_values:
+            if value not in document['strings']:
+                document['strings'].append(value)
 
     def get_display_value(self, tile, node):
         new_values = []
