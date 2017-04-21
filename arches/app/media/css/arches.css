@@ -2093,7 +2093,7 @@ ul .collapse li:last-of-type {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 50px);
     position: relative;
 }
 .edit-panel {
@@ -4377,9 +4377,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     width: 100%;
     height: 100%;
 }
-.graph-base-content {
-    margin-bottom: 50px;
-}
+
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
 }
