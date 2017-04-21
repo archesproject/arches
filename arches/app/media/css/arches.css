@@ -3746,7 +3746,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
-    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
