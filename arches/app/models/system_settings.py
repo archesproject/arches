@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.conf import settings as core_settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
 
@@ -25,31 +26,56 @@ def singleton(cls):
 
 @singleton
 class SystemSettings(object):
+    """
+    This class can be used just like you would use settings.py 
+
+    This class is a singleton and doesn't need to be instantiated
+
+    To use, import like you would the django settings module:
+        
+        from system_settings import SystemSettings as settings
+        ....
+        settings.SEARCH_ITEMS_PER_PAGE 
+
+    """
 
     graph_id = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
     resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195'
-    settings = {}
+    settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
+        print 'init System Settings'
         self.cache_settings()
 
     @classmethod
     def get(cls, setting_name):
+        """
+        Used to retrieve any setting, even callable methods defined in settings.py
+
+        """
+
         return cls.settings[setting_name]
-        # tiles = models.TileModel.objects.filter(resourceinstance__graph_id=cls.graph_id)
-        # for tile in tiles:
-        #     for node in tile.nodegroup.node_set.all():
-        #         if node.name == setting_name:
-        #             return tile.data[str(node.nodeid)]
-        # return None
 
     @classmethod
     def cache_settings(cls):
+        """
+        Updates the current cache of settings defined in settings.py and in the Arches System Settings graph
+
+        """
+
+        # load all the settings from settings.py
+        for setting in dir(core_settings):
+            cls.settings[setting] = getattr(core_settings, setting)
+            if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
+                setattr(cls, setting, getattr(core_settings, setting))
+
+        # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=cls.graph_id):
             if node.datatype != 'semantic':
                 cls.settings[node.name] = None
                 setattr(cls, node.name, None)
 
+        # set any values saved in the instance of the Arches System Settings Graph 
         for tile in models.TileModel.objects.filter(resourceinstance__graph_id=cls.graph_id):
             for node in tile.nodegroup.node_set.all():
                 if node.datatype != 'semantic':
