@@ -34,6 +34,7 @@ from django.db import transaction
 class SystemSettings(Resource):
 
     graph_id = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+    resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195'
     settings = {}
 
     class Meta:
