@@ -4957,18 +4957,19 @@ h4.report-toolbar-title {
 }
 
 .csv-chart-menubar-item {
-    padding: 3px 8px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
 }
 
-.csv-chart-menubar-item a {
+a .csv-chart-menubar-item {
     color: #777;
     font-weight: 400;
 }
 
 .csv-chart-menubar-item.active {
-    color: #fff;
+    color: #123;
     border-radius: 1px;
-    background: steelblue;
+    background: #f2f2f2;
 }
 
 .csv-chart-widget-input {
