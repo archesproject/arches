@@ -41,6 +41,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
+from arches.app.models.system_settings import SystemSettings
 
 
 try:
@@ -138,7 +139,7 @@ def search_results(request):
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
-        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
+        paginator, pages = get_paginator(request, results, total, page, SystemSettings.SEARCH_ITEMS_PER_PAGE)
         page = paginator.page(page)
 
         ret = {}
@@ -203,7 +204,7 @@ def build_search_results_dsl(request):
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     else:
-        limit = settings.SEARCH_ITEMS_PER_PAGE
+        limit = SystemSettings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
     query.add_aggregation(GeoHashGridAgg(field='points', name='grid', precision=settings.HEX_BIN_PRECISION))
