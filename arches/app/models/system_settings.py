@@ -33,9 +33,12 @@ class SystemSettings(object):
 
     To use, import like you would the django settings module:
         
-        from system_settings import SystemSettings as settings
+        from system_settings import SystemSettings
         ....
-        settings.SEARCH_ITEMS_PER_PAGE 
+        SystemSettings.SEARCH_ITEMS_PER_PAGE 
+
+        # will list all settings
+        print SystemSettings
 
     """
 
@@ -44,8 +47,14 @@ class SystemSettings(object):
     settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
-        print 'init System Settings'
         self.cache_settings()
+        #print self
+
+    def __str__(self):
+        ret = []
+        for item in sorted(self.settings.iteritems(), key=lambda item: item[0], reverse=False):
+            ret.append("%s = %s" % (item[0], item[1]))
+        return '\n'.join(ret)
 
     @classmethod
     def get(cls, setting_name):
