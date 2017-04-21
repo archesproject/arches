@@ -844,7 +844,6 @@ class DomainDataType(BaseDomainDataType):
                             domain_text = option['text']
 
         document['strings'].append(domain_text)
-        from pprint import pprint as pp
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
