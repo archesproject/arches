@@ -53,88 +53,17 @@
                     <div class="tab-pane fade" data-bind="css: {
                         'active in': 0 === $index()
                     }">
-                        <div class="panel-body card-panel-body">
-                            <div id="" class="card-content">
 
-                                <div class="card-instructions">
-                                    <span data-bind="text: card.get('instructions')"></span>
-
-                                    <!-- Help link -->
-                                    <!-- ko if: card.get('helpenabled') -->
-                                    <span>
-                                        <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
-                                    </span>
-                                    <!-- /ko -->
-                                </div>
-
-                                <!-- Form -->
-                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
-                                    <div class="card-form-container" data-bind="let: {'tile': $data}">
-
-                                        <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
-                                                data:card.get('widgets'), as: 'widget'
-                                            }">
-                                            <div class='' data-bind='component: {
-                                                name: form.widgetLookup[widget.get("widget_id")()].name,
-                                                params: {
-                                                    formData: tile.formData,
-                                                    tile: tile,
-                                                    form: form,
-                                                    results: $root.searchResults,
-                                                    config: configJSON,
-                                                    label: widget.get("label")(),
-                                                    value: tile.data[widget.get("node_id")()],
-                                                    node: widget.node,
-                                                    expanded: widget.expanded,
-                                                    disabled: false,
-                                                    graph: form.graph,
-                                                    type: "resource-editor"
-                                                }
-                                            }'></div>
-                                        </form>
-
-
-
-                                        <!-- Save/Add Buttons -->
-                                        <!-- ko if: tile.dirty -->
-                                            <!-- ko if: forceBlank -->
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': card.expanded() }" style="display: none;">
-                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
-                                            </div>
-                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
-                                            <!-- /ko -->
-                                            <!-- /ko -->
-
-                                            <!-- ko if: !forceBlank -->
-                                            <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
-                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
-                                            </div>
-                                            <!-- /ko -->
-                                        <!-- /ko -->
-
-                                        <!-- ko if: !tile.dirty() -->
-                                        <!-- ko if: forceBlank -->
-                                        <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(false): null -->
-                                        <!-- /ko -->
-                                        <!-- /ko -->
-                                        <!-- /ko -->
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- ko if: card.get('cardinality')() === 'n' -->
 
                         <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: (parentTile.tiles[card.get('nodegroup_id')]().length > 0)">
 
-                            <div class="card-tab-title mar-btm">
+                            <div class="card-tab-title">
                                 Saved <span data-bind="text: card.get('name')"/>
                             </div>
 
-                            <div class="list-group" style="margin-top: 20px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
+                            <div class="list-group" style="margin-top: 5px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
 
                                 <div class="list-group-item crud-record-item" style="">
 
@@ -224,6 +153,84 @@
 
                         </div>
                         <!-- /ko -->
+
+
+
+
+                        <div class="panel-body card-panel-body">
+                            <div id="" class="card-content">
+
+                                <div class="card-instructions">
+                                    <span data-bind="text: card.get('instructions')"></span>
+
+                                    <!-- Help link -->
+                                    <!-- ko if: card.get('helpenabled') -->
+                                    <span>
+                                        <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                                    </span>
+                                    <!-- /ko -->
+                                </div>
+
+                                <!-- Form -->
+                                <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
+                                    <div class="card-form-container" data-bind="let: {'tile': $data}">
+
+                                        <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                data:card.get('widgets'), as: 'widget'
+                                            }">
+                                            <div class='' data-bind='component: {
+                                                name: form.widgetLookup[widget.get("widget_id")()].name,
+                                                params: {
+                                                    formData: tile.formData,
+                                                    tile: tile,
+                                                    form: form,
+                                                    results: $root.searchResults,
+                                                    config: configJSON,
+                                                    label: widget.get("label")(),
+                                                    value: tile.data[widget.get("node_id")()],
+                                                    node: widget.node,
+                                                    expanded: widget.expanded,
+                                                    disabled: false,
+                                                    graph: form.graph,
+                                                    type: "resource-editor"
+                                                }
+                                            }'></div>
+                                        </form>
+
+
+
+                                        <!-- Save/Add Buttons -->
+                                        <!-- ko if: tile.dirty -->
+                                            <!-- ko if: forceBlank -->
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': card.expanded() }" style="display: none;">
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
+                                            </div>
+                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
+                                            <!-- /ko -->
+                                            <!-- /ko -->
+
+                                            <!-- ko if: !forceBlank -->
+                                            <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
+                                            </div>
+                                            <!-- /ko -->
+                                        <!-- /ko -->
+
+                                        <!-- ko if: !tile.dirty() -->
+                                        <!-- ko if: forceBlank -->
+                                        <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(false): null -->
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
 
 
                         <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
