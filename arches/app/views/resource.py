@@ -57,7 +57,7 @@ class ResourceListView(BaseManagerView):
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
-    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', nav_menu=True):
+    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = Resource.objects.create(graph_id=graphid)
@@ -86,7 +86,7 @@ class ResourceEditorView(BaseManagerView):
                 displayname = 'Unnamed Resource'
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
-                main_script='views/resource/editor',
+                main_script=main_script,
                 resource_type=resource_instance.graph.name,
                 relationship_types=relationship_type_values,
                 iconclass=resource_instance.graph.iconclass,
