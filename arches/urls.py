@@ -27,6 +27,7 @@ from arches.app.views.resource import ResourceEditorView, ResourceListView, Reso
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
+from arches.app.models.system_settings import SystemSettings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -67,7 +68,7 @@ urlpatterns = [
     url(r'^resources/markers/(?P<entitytypeid>.*)$', resources.map_layers, {'get_centroids':True}, name="map_markers"),
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
-    url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': 'a106c400-260c-11e7-a604-14109fd34195'}, name='config'),
+    url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': SystemSettings.resourceinstanceid, 'view_template':'views/system-settings.htm', 'nav_menu':False}, name='config'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),

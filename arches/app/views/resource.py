@@ -57,7 +57,7 @@ class ResourceListView(BaseManagerView):
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
-    def get(self, request, graphid=None, resourceid=None):
+    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', nav_menu=True):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = Resource.objects.create(graph_id=graphid)
@@ -107,11 +107,11 @@ class ResourceEditorView(BaseManagerView):
             if graph.iconclass:
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
-            context['nav']['menu'] = True
+            context['nav']['menu'] = nav_menu
             context['nav']['edit_history'] = True
             context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
-            return render(request, 'views/resource/editor.htm', context)
+            return render(request, view_template, context)
 
         return HttpResponseNotFound()
 
