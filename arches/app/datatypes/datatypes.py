@@ -834,7 +834,17 @@ class BaseDomainDataType(BaseDataType):
 
 class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue):
-        document['strings'].append(nodevalue)
+        domain_text = ''
+        for tile in document['tiles']:
+            for k, v in tile.data.iteritems():
+                if v == nodevalue:
+                    node = models.Node.objects.get(nodeid=k)
+                    for option in node.config['options']:
+                        if option['id'] == v:
+                            domain_text = option['text']
+
+        document['strings'].append(domain_text)
+        from pprint import pprint as pp
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
