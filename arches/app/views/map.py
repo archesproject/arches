@@ -27,11 +27,13 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.JSONResponse import JSONResponse
-
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class MapLayerManagerView(BaseManagerView):
     def get(self, request):
+        se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -47,6 +49,13 @@ class MapLayerManagerView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
+        def get_resource_bounds(node):
+            query = Query(se, start=0, limit=0)
+            search_query = Bool()
+            query.add_query(search_query)
+            query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
+            results = query.search(index='resource', doc_type=[str(node.graph.pk)])
+            return results['aggregations']['bounds']['bounds']
 
         context['geom_nodes_json'] = JSONSerializer().serialize(context['geom_nodes'])
         resource_layers = []
@@ -56,6 +65,11 @@ class MapLayerManagerView(BaseManagerView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
             if map_layer is not None:
+                count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
+                if count > 0:
+                    map_layer['bounds'] = get_resource_bounds(node)
+                else:
+                    map_layer['bounds'] = None
                 resource_layers.append(map_layer)
             map_source = datatype.get_map_source(node=node, preview=True)
             if map_source is not None:
