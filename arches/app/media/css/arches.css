@@ -4957,7 +4957,7 @@ h4.report-toolbar-title {
 }
 
 .csv-chart-menubar-item {
-    padding: 3px 5px;
+    padding: 3px 8px;
 }
 
 .csv-chart-menubar-item a {
@@ -4966,8 +4966,9 @@ h4.report-toolbar-title {
 }
 
 .csv-chart-menubar-item.active {
-    color: #123;
-    font-weight: 600;
+    color: #fff;
+    border-radius: 1px;
+    background: steelblue;
 }
 
 .csv-chart-widget-input {
