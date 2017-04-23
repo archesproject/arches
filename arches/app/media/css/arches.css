@@ -2094,7 +2094,7 @@ ul .collapse li:last-of-type {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 50px);
     position: relative;
 }
 .edit-panel {
@@ -3747,7 +3747,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
-    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -4379,9 +4378,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     width: 100%;
     height: 100%;
 }
-.graph-base-content {
-    margin-bottom: 50px;
-}
+
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
 }
