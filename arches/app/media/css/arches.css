@@ -2093,7 +2093,7 @@ ul .collapse li:last-of-type {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 50px);
     position: relative;
 }
 .edit-panel {
@@ -3746,7 +3746,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
-    min-height: 740px;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -4378,9 +4377,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     width: 100%;
     height: 100%;
 }
-.graph-base-content {
-    margin-bottom: 50px;
-}
+
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
 }
@@ -4957,17 +4954,19 @@ h4.report-toolbar-title {
 }
 
 .csv-chart-menubar-item {
-    padding: 3px 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
 }
 
-.csv-chart-menubar-item a {
+a .csv-chart-menubar-item {
     color: #777;
     font-weight: 400;
 }
 
 .csv-chart-menubar-item.active {
     color: #123;
-    font-weight: 600;
+    border-radius: 1px;
+    background: #f2f2f2;
 }
 
 .csv-chart-widget-input {

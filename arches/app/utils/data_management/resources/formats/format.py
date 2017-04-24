@@ -110,9 +110,9 @@ class Reader(object):
 
             resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
             resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
-            if relation['datestarted'] == '':
+            if relation['datestarted'] == '' or relation['datestarted'] == 'None':
                 relation['datestarted'] = None
-            if relation['dateended'] == '':
+            if relation['dateended'] == '' or relation['dateended'] == 'None':
                 relation['dateended'] = None
 
             if resourceinstancefrom != None and resourceinstanceto != None:
