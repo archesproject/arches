@@ -671,6 +671,9 @@ class MapLayer(models.Model):
     activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
     addtomap = models.BooleanField(default=False)
+    centerx = models.FloatField(blank=True, null=True)
+    centery = models.FloatField(blank=True, null=True)
+    zoom = models.FloatField(blank=True, null=True)
 
     @property
     def layer_json(self):

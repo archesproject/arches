@@ -117,6 +117,23 @@ define([
                 this.map = null;
                 this.setupMap = function(map) {
                     this.map = map;
+                    if (this.node.layer.bounds) {
+                        var bounds = [
+                            [
+                                this.node.layer.bounds.top_left.lon,
+                                this.node.layer.bounds.bottom_right.lat
+                            ],
+                            [
+                                this.node.layer.bounds.bottom_right.lon,
+                                this.node.layer.bounds.top_left.lat
+                            ]
+                        ];
+                        _.defer(function () {
+                            map.fitBounds(bounds, {
+                                padding: 20
+                            });
+                        }, 1);
+                    }
                 }
 
                 var updateMapStyle = function () {

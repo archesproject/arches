@@ -222,7 +222,10 @@
                 'icon': '{{ map_layer.icon }}',
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
-                'is_resource_layer': false
+                'is_resource_layer': false,
+                'centerx': {{ map_layer.centerx|default_if_none:"null" }},
+                'centery': {{ map_layer.centery|default_if_none:"null" }},
+                'zoom': {{ map_layer.zoom|default_if_none:"null" }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
                 'name': '{{ resource_map_layer.name }}',
