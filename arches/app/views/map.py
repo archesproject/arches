@@ -97,6 +97,9 @@ class MapLayerManagerView(BaseManagerView):
         map_layer.activated = data['activated']
         map_layer.addtomap = data['addtomap']
         map_layer.layerdefinitions = data['layer_definitions']
+        map_layer.centerx = data['centerx']
+        map_layer.centery = data['centery']
+        map_layer.zoom = data['zoom']
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
