@@ -23,7 +23,7 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     """
 
     if not settings:
-        from django.conf import settings        
+        from arches.app.models.system_settings import SystemSettings as settings    
   
     errors = []
     graph_location = settings.RESOURCE_GRAPH_LOCATIONS

@@ -6,11 +6,11 @@ import uuid
 import codecs
 import django.contrib.gis.db.models.fields
 from django.core import management
-from django.conf import settings
-from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
-from arches.app.models.models import get_ontology_storage_system
+from django.db import migrations, models
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
+from arches.app.models.models import get_ontology_storage_system
+from arches.app.models.system_settings import SystemSettings as settings
 
 def get_sql_string_from_file(pathtofile):
     ret = []

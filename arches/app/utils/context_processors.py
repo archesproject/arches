@@ -16,8 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.conf import settings
 from arches import __version__
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def livereload(request):

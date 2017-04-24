@@ -20,6 +20,7 @@ import uuid, importlib
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -29,8 +30,6 @@ from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
-from django.conf import settings
-from arches.app.models.system_settings import SystemSettings
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class TileData(View):
@@ -104,5 +103,5 @@ def get(id):
 uuid.get_or_create = get
 
 def update_system_settings_cache(tile):
-    if tile.resourceinstance_id == SystemSettings.resourceinstanceid:
-        SystemSettings.cache_settings()
+    if tile.resourceinstance_id == settings.resourceinstanceid:
+        settings.cache_settings()

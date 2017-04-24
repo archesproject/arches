@@ -1,7 +1,6 @@
 import sys
 import os
 import json
-from django.conf import settings
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiLineString
@@ -10,6 +9,7 @@ from django.contrib.gis.geos import MultiPolygon
 from arches.app.models.models import Concept
 # from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
+from arches.app.models.system_settings import SystemSettings as settings
 from format import Writer
 import datetime
 import shapefile

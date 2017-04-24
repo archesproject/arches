@@ -17,9 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
-from django.conf import settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms

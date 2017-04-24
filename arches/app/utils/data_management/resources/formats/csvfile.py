@@ -21,12 +21,12 @@ from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.db import connection
 from django.db import transaction
 from django.db.models import Q
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from django.http import HttpRequest
 from django.core.files import File as DjangoFile

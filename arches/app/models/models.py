@@ -14,7 +14,7 @@ import os
 import json
 import uuid
 import importlib
-from django.conf import settings
+from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Q, Max
@@ -23,7 +23,7 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from datetime import datetime
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.forms.models import model_to_dict
+from arches.app.models.system_settings import SystemSettings as settings
 
 
 def get_ontology_storage_system():

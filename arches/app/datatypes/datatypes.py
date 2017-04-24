@@ -6,9 +6,9 @@ from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr

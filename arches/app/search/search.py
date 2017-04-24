@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import urllib
 import uuid
 import logging
-from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 

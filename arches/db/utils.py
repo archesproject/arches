@@ -1,5 +1,5 @@
 import subprocess
-from django.conf import settings
+from arches.app.models.system_settings import SystemSettings as settings
 
 def execute_sql_file(pathtofile, database='default'):
 	database = settings.DATABASES[database]

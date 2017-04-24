@@ -17,21 +17,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
+from django.http import HttpResponseNotFound
+from django.contrib.gis.geos import GEOSGeometry
+from django.db import transaction
+from django.db.models import Max, Min
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from arches.app.utils.decorators import group_required
-from django.conf import settings
-from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.models.concept import Concept, get_preflabel_from_valueid
-from django.http import HttpResponseNotFound
-from django.contrib.gis.geos import GEOSGeometry
-from django.db.models import Max, Min
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')

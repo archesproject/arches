@@ -16,12 +16,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from arches.app.models.entity import Entity
+from arches.app.models.system_settings import SystemSettings as settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @csrf_exempt

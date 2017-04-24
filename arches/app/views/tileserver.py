@@ -1,15 +1,15 @@
 import TileStache
-from django.http import HttpResponse
 import os
 import shutil
 import sys
 import math
-from arches.app.models import models
+from django.http import HttpResponse
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
-from django.conf import settings
 from arches.app.datatypes import datatypes
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.models import models
+from arches.app.models.system_settings import SystemSettings as settings
 
 
 def get_tileserver_config(layer_id):

@@ -20,25 +20,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 from django.utils.module_loading import import_string
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.db.install import truncate_db
-from arches.app.utils.data_management.resources.importer import ResourceLoader
+from django.db import transaction
+import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
+from arches.db.install import truncate_db
+from arches.app.models import models
+from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
-import arches.management.commands.package_utils.resource_graphs as resource_graphs
-from arches.management.commands import utils
-from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
-from django.db import transaction
+from arches.management.commands import utils
+from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 
 
 class Command(BaseCommand):
