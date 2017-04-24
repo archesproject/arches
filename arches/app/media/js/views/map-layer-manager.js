@@ -349,7 +349,7 @@ define([
             },
             write: function (val) {
                 var selection = vm.selection();
-                val = val===arches.mapDefaultX ? null : val;
+                val = val===defaultValue ? null : val;
                 if (selection && selection[key]) {
                     selection[key](val);
                 }
