@@ -22,13 +22,13 @@ from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from datetime import datetime
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.models.system_settings import SystemSettings as settings
 
+# can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
+# so make sure the only settings we use in this file are ones that are static (fixed at run time)
+from django.conf import settings
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
-
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -531,11 +531,13 @@ class ResourceXResource(models.Model):
     dateended = models.DateField(blank=True, null=True)
 
     def delete(self):
+        from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
         se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
         super(ResourceXResource, self).delete()
 
     def save(self):
+        from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
         document = model_to_dict(self)
         se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
