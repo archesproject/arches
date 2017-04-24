@@ -83,11 +83,30 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
+    def validate(self, value, source=''):
+        errors = []
+
+        try:
+            bool(distutils.util.strtobool(value))
+        except:
+            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+        return errors
+
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
 
 class DateDataType(BaseDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+
+        try:
+            int((FlexiDate.from_str(value).as_float()-1970)*31556952*1000)
+        except:
+            errors.append({'type': 'ERROR', 'message': 'Incorrect data format, should be YYYY-MM-DD'})
+        return errors
+
     def append_to_document(self, document, nodevalue):
         document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
 
@@ -109,12 +128,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
             except:
                 message = 'Not a properly formatted geometry'
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         for feature in value['features']:
-            geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+            try:
+                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+            except:
+                message = 'It was not possible to serialize some feaures in your geometry.'
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
             validate_geom(geom, coordinate_count)
 
         return errors
@@ -834,6 +858,16 @@ class BaseDomainDataType(BaseDataType):
 
 
 class DomainDataType(BaseDomainDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+
+        try:
+            models.Node.objects.get(config__options__0__id=value)
+        except:
+            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
+        return errors
+
     def append_to_document(self, document, nodevalue):
         domain_text = None
         for tile in document['tiles']:
@@ -850,6 +884,16 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
+    def validate(self, value, source=''):
+        errors = []
+
+        for v in value:
+            try:
+                models.Node.objects.get(config__options__0__id=v)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(v)})
+        return errors
+
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
