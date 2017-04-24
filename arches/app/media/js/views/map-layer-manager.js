@@ -337,7 +337,7 @@ define([
             return name.indexOf(listFilter) > -1;
         })
     });
-    var mapConfigFactory = function (key, defaultValue) {
+    var addMapConfig = function (key, defaultValue) {
         vm[key] = ko.computed({
             read: function () {
                 var val;
@@ -356,9 +356,9 @@ define([
             }
         });
     }
-    mapConfigFactory('centerX', arches.mapDefaultX);
-    mapConfigFactory('centerY', arches.mapDefaultY);
-    mapConfigFactory('zoom', arches.mapDefaultZoom);
+    addMapConfig('centerX', arches.mapDefaultX);
+    addMapConfig('centerY', arches.mapDefaultY);
+    addMapConfig('zoom', arches.mapDefaultZoom);
 
     var pageView = new BaseManagerView({
         viewModel: vm
