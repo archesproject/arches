@@ -104,21 +104,29 @@ class Migration(migrations.Migration):
             name='name',
             field=models.TextField(primary_key=True, serialize=False, unique=True),
         ),
+        migrations.RunSQL(
+                """
+                INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+                    VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{
+                            "placeholder": "",
+                            "options": [],
+                            "nameLabel": "Name",
+                            "typeLabel": "Type"
+                        }'
+                    );
+                INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
+                INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
+                INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
+                UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
+                UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
+                """,
+                """
+                DELETE FROM d_data_types WHERE datatype = 'iiif-drawing';
+                DELETE FROM d_data_types WHERE datatype = 'csv-chart-json';
+                DELETE FROM widgets WHERE widgetid = '10000000-0000-0000-0000-000000000020';
+                DELETE from widgets WHERE widgetid = '10000000-0000-0000-0000-000000000022';
+                UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
+                UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
+                """
+            )
     ]
-
-    migrations.RunSQL(
-            """
-            INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-                VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{
-                        "placeholder": "",
-                        "options": [],
-                        "nameLabel": "Name",
-                        "typeLabel": "Type"
-                    }'
-                );
-            INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-            INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
-            UPDATE d_data_types SET (modulename) = ('datatypes.py') WHERE datatype in ('domain-value', 'domain-value-list');
-            """
-            ),
