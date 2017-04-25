@@ -17,14 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import settings as core_settings
+from django.conf import LazySettings
 from arches.app.models import models
 
 
-def singleton(cls):
-    return cls()
-
-@singleton
-class SystemSettings(object):
+class SystemSettings_Base(LazySettings):
     """
     This class can be used just like you would use settings.py 
 
@@ -46,13 +43,18 @@ class SystemSettings(object):
     settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
-        self.load_settings_py()
+        super(SystemSettings_Base, self).__init__(*args, **kwargs)
+        #self.load_settings_py()
         print self
 
     def __str__(self):
         ret = []
-        for item in sorted(self.settings.iteritems(), key=lambda item: item[0], reverse=False):
-            ret.append("%s = %s" % (item[0], item[1]))
+        for setting in dir(self):
+            if setting.isupper():
+                setting_value = getattr(self, setting)
+                ret.append("%s = %s" % (setting, setting_value))
+        #for item in sorted(self.settings.iteritems(), key=lambda item: item[0], reverse=False):
+                #ret.append("%s = %s" % (item[0], item[1]))
         return '\n'.join(ret)
 
     @classmethod
@@ -72,14 +74,15 @@ class SystemSettings(object):
         """
 
         for setting in dir(core_settings):
-            cls.settings[setting] = getattr(core_settings, setting)
-            if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
+            if setting.isupper():
+                cls.settings[setting] = getattr(core_settings, setting)
+                #if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
                 setattr(cls, setting, getattr(core_settings, setting))
 
     @classmethod
     def update_settings(cls):
         """
-        Updates the current cache of settings defined in settings.py and in the Arches System Settings graph
+        Updates the settings the Arches System Settings graph
 
         """
 
@@ -148,9 +151,10 @@ class SystemSettings(object):
                 cls.settings[collector_nodename].append(obj)
                 #setattr(cls, collector_nodename, ret)
 
-        for key, setting in cls.settings.iteritems():
-            if not key.startswith('__') and not callable(cls.settings[key]):
-                setattr(cls, key, setting)
+        for setting_name, setting_value in cls.settings.iteritems():
+            if setting_name.isupper():
+            #if not setting_name.startswith('__') and not callable(cls.settings[setting_name]):
+                setattr(cls, setting_name, setting_value)
 
         print cls
 
@@ -169,3 +173,4 @@ class SystemSettings(object):
     #     for node in 
 
 
+SystemSettings = SystemSettings_Base()
