@@ -138,7 +138,7 @@ def search_results(request):
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
-        paginator, pages = get_paginator(request, results, total, page, SystemSettings.SEARCH_ITEMS_PER_PAGE)
+        paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
         page = paginator.page(page)
 
         ret = {}
@@ -203,7 +203,7 @@ def build_search_results_dsl(request):
     if export != None:
         limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     else:
-        limit = SystemSettings.SEARCH_ITEMS_PER_PAGE
+        limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
     query.add_aggregation(GeoHashGridAgg(field='points', name='grid', precision=settings.HEX_BIN_PRECISION))
