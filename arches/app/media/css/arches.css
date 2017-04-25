@@ -197,6 +197,7 @@
     box-shadow: none;
     padding: 5px 0 0;
 }
+
 .card-panel-body {
     background-color: #FFF;
     padding-top: 15px;
@@ -5461,8 +5462,8 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-buttons {
     z-index: 1000;
     position: absolute;
-    top: -255px;
-    right: 195px;
+    top: 7px;
+    right: 315px;
     transition-duration: .3s;
 }
 
