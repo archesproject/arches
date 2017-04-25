@@ -5,7 +5,6 @@ import datetime
 import json
 import glob
 import uuid
-from django.conf import settings
 from django.db.models import Q
 from formats.csvfile import CsvWriter
 from formats.kmlfile import KmlWriter

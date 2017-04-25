@@ -3,7 +3,6 @@ import inspect
 import subprocess
 from django.template import Template
 from django.template import Context
-from django.conf import settings
 from arches.management.commands import utils
 
 def create_sqlfile(database_settings, path_to_file):
