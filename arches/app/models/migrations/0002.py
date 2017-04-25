@@ -8,6 +8,7 @@ import django.db.models.deletion
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 from django.core import management
+from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import SystemSettings as settings
 
 def forwards_func(apps, schema_editor):
@@ -16,7 +17,7 @@ def forwards_func(apps, schema_editor):
     management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'graphs', 'resource_models', 'Arches System Settings.json'))
 
 def reverse_func(apps, schema_editor):
-    pass
+    GraphModel.objects.get(graphid=settings.graph_id).delete()
 
 
 class Migration(migrations.Migration):
