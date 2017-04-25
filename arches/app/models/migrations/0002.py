@@ -31,3 +31,11 @@ class Migration(migrations.Migration):
             field=models.FloatField(blank=True, null=True),
         )
     ]
+
+    migrations.RunSQL(
+            """
+            INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
+            INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
+            UPDATE d_data_types SET (modulename) = ('datatypes.py') WHERE datatype in ('domain-value', 'domain-value-list');
+            """
+            ),
