@@ -671,6 +671,9 @@ class MapLayer(models.Model):
     activated = models.BooleanField(default=True)
     icon = models.TextField(default=None)
     addtomap = models.BooleanField(default=False)
+    centerx = models.FloatField(blank=True, null=True)
+    centery = models.FloatField(blank=True, null=True)
+    zoom = models.FloatField(blank=True, null=True)
 
     @property
     def layer_json(self):
@@ -686,7 +689,7 @@ class MapLayer(models.Model):
 
 
 class TileserverLayer(models.Model):
-    name = models.TextField(unique=True)
+    name = models.TextField(primary_key=True, unique=True)
     path = models.TextField()
     config = JSONField()
     map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')
