@@ -46,8 +46,14 @@ class Migration(migrations.Migration):
         migrations.RunSQL("""
             INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
             VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
-
         """, """
             DELETE FROM public.resource_instances WHERE resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195';
+        """),
+        migrations.RunSQL("""
+            INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype)
+            VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
+        """, """
+            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' 
+            AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
         """),
     ]
