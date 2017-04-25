@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.conf import settings as core_settings
 from django.conf import LazySettings
 from arches.app.models import models
 
@@ -65,19 +64,6 @@ class SystemSettings_Base(LazySettings):
         """
 
         return cls.settings[setting_name]
-
-    @classmethod
-    def load_settings_py(cls):
-        """
-        Loads all the settings from settings.py
-
-        """
-
-        for setting in dir(core_settings):
-            if setting.isupper():
-                cls.settings[setting] = getattr(core_settings, setting)
-                #if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
-                setattr(cls, setting, getattr(core_settings, setting))
 
     @classmethod
     def update_settings(cls):
