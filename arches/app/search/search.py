@@ -21,7 +21,7 @@ import uuid
 import logging
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 

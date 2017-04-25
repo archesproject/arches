@@ -15,7 +15,7 @@ def load_graphs(break_on_error=True, settings=None):
     """
 
     if not settings:
-        from arches.app.models.system_settings import SystemSettings as settings       
+        from arches.app.models.system_settings import settings       
   
     suffix = '_nodes.csv'
     errors = []

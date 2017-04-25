@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, json
 from tests import test_settings
-from arches.app.models.system_settings import SystemSettings
+from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core import management
@@ -80,7 +80,7 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse('graph', kwargs={'graphid':''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
-        self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=SystemSettings.graph_id).count())
+        self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.graph_id).count())
 
         url = reverse('graph', kwargs={'graphid':self.GRAPH_ID})
         response = self.client.get(url)

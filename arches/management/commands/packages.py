@@ -28,7 +28,7 @@ import arches.app.utils.data_management.resource_graphs.exporter as graph_export
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 from arches.db.install import truncate_db
 from arches.app.models import models
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter

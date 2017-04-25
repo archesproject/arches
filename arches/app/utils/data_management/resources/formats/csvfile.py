@@ -21,7 +21,7 @@ from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.resource import Resource
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.db import connection

@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from django.core.exceptions import ImproperlyConfigured
 
 class SearchEngineFactory(object):

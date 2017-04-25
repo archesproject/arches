@@ -9,7 +9,7 @@ import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 from django.core import management
 from arches.app.models.models import GraphModel
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;

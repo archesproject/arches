@@ -24,7 +24,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from arches.app.models import models
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString

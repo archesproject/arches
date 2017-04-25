@@ -27,7 +27,7 @@ from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse

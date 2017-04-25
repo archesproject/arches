@@ -10,7 +10,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import migrations, models
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
 from arches.app.models.models import get_ontology_storage_system
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 
 def get_sql_string_from_file(pathtofile):
     ret = []

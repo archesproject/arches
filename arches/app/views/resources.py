@@ -26,7 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.resource import Resource
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory

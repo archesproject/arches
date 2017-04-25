@@ -20,20 +20,18 @@ from django.conf import LazySettings
 from arches.app.models import models
 
 
-class SystemSettings_Base(LazySettings):
+class SystemSettings(LazySettings):
     """
     This class can be used just like you would use settings.py 
 
-    This class is a singleton and doesn't need to be instantiated
-
     To use, import like you would the django settings module:
         
-        from system_settings import SystemSettings
+        from system_settings import settings
         ....
-        SystemSettings.SEARCH_ITEMS_PER_PAGE 
+        settings.SEARCH_ITEMS_PER_PAGE 
 
         # will list all settings
-        print SystemSettings
+        print settings
 
     """
 
@@ -42,9 +40,8 @@ class SystemSettings_Base(LazySettings):
     settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
-        super(SystemSettings_Base, self).__init__(*args, **kwargs)
-        #self.load_settings_py()
-        print self
+        super(SystemSettings, self).__init__(*args, **kwargs)
+        #print self
 
     def __str__(self):
         ret = []
@@ -52,8 +49,6 @@ class SystemSettings_Base(LazySettings):
             if setting.isupper():
                 setting_value = getattr(self, setting)
                 ret.append("%s = %s" % (setting, setting_value))
-        #for item in sorted(self.settings.iteritems(), key=lambda item: item[0], reverse=False):
-                #ret.append("%s = %s" % (item[0], item[1]))
         return '\n'.join(ret)
 
     @classmethod
@@ -152,11 +147,5 @@ class SystemSettings_Base(LazySettings):
             nodes.append(edge.rangenode)
         return nodes
 
-    # @classmethod
-    # def serialize(cls):
-    #     nodes = models.Node.objects.filter(graph_id=cls.graph_id)
-    #     edges = models.Edge.objects.filter(graph_id=cls.graph_id)
-    #     for node in 
 
-
-SystemSettings = SystemSettings_Base()
+settings = SystemSettings()

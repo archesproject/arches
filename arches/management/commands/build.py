@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 
 class Command(BaseCommand):
     """A general command used in compiling all the required static data files and js file in Arches."""

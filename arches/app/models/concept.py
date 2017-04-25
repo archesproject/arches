@@ -23,7 +23,7 @@ from operator import methodcaller
 from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer

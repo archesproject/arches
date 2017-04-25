@@ -3,7 +3,7 @@ from arches.app.models.concept import Concept
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.models import Value
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection

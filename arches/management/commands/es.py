@@ -23,7 +23,7 @@ from django.core.management.base import BaseCommand, CommandError
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.management.commands import utils
 from arches.app.models import models
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_term_index, delete_term_index, prepare_search_index, delete_search_index, prepare_resource_relations_index, delete_resource_relations_index
 import arches.app.utils.index_database as index_database
 

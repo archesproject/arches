@@ -9,7 +9,7 @@ from django.contrib.gis.geos import MultiPolygon
 from arches.app.models.models import Concept
 # from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from format import Writer
 import datetime
 import shapefile

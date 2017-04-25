@@ -26,7 +26,7 @@ from arches.app.views.resource import ResourceEditorView, ResourceListView, Reso
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin

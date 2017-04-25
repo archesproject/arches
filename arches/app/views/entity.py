@@ -21,7 +21,7 @@ from django.template import RequestContext
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from arches.app.models.entity import Entity
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @csrf_exempt

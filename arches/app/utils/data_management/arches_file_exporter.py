@@ -23,7 +23,7 @@ import json
 import subprocess
 from os.path import isfile, join
 from django.db import connection, transaction
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export as resourceGraphExporter
 from arches.app.utils.data_management.concepts.exporter import get_reference_data_for_export as referenceDataExporter

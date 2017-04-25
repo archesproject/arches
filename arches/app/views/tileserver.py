@@ -9,7 +9,7 @@ from ModestMaps.Geo import Location
 from arches.app.datatypes import datatypes
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.system_settings import SystemSettings as settings
+from arches.app.models.system_settings import settings
 
 
 def get_tileserver_config(layer_id):
