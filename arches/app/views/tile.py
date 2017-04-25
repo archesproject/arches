@@ -104,4 +104,4 @@ uuid.get_or_create = get
 
 def update_system_settings_cache(tile):
     if tile.resourceinstance_id == settings.resourceinstanceid:
-        settings.cache_settings()
+        settings.update_settings()

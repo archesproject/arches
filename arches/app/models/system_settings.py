@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings as core_settings
 from arches.app.models import models
-from arches.app.models.models import TileModel
 
 
 def singleton(cls):
@@ -47,7 +46,7 @@ class SystemSettings(object):
     settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
-        self.cache_settings()
+        self.load_settings_py()
         print self
 
     def __str__(self):
@@ -66,17 +65,23 @@ class SystemSettings(object):
         return cls.settings[setting_name]
 
     @classmethod
-    def cache_settings(cls):
+    def load_settings_py(cls):
+        """
+        Loads all the settings from settings.py
+
+        """
+
+        for setting in dir(core_settings):
+            cls.settings[setting] = getattr(core_settings, setting)
+            if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
+                setattr(cls, setting, getattr(core_settings, setting))
+
+    @classmethod
+    def update_settings(cls):
         """
         Updates the current cache of settings defined in settings.py and in the Arches System Settings graph
 
         """
-
-        # load all the settings from settings.py
-        for setting in dir(core_settings):
-            cls.settings[setting] = getattr(core_settings, setting)
-            # if not setting.startswith('__') and not callable(getattr(core_settings,setting)):
-            #     setattr(cls, setting, getattr(core_settings, setting))
 
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=cls.graph_id):
