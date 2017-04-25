@@ -3474,5 +3474,3 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
 INSERT INTO iiif_manifests(id, url)
    VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');
 
-INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
-    VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
