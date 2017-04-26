@@ -6184,6 +6184,7 @@ span.basemap-unselected {
 }
 
 .saved-search-grid {
+    height: calc(100vh - 105px);
 	width: 100%;
 	min-height: 400px;
 	overflow-y: scroll;
