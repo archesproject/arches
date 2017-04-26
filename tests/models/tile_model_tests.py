@@ -39,7 +39,7 @@ class TileTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        management.call_command('packages', operation='import_graphs', data_source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        management.call_command('packages', operation='import_graphs', source=os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)

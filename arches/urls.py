@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
@@ -27,6 +26,7 @@ from arches.app.views.resource import ResourceEditorView, ResourceListView, Reso
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
+from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -67,7 +67,7 @@ urlpatterns = [
     url(r'^resources/markers/(?P<entitytypeid>.*)$', resources.map_layers, {'get_centroids':True}, name="map_markers"),
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
-    url(r'^config/', config.manager, name='config'),
+    url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': settings.resourceinstanceid, 'view_template':'views/system-settings.htm', 'main_script':'views/system-settings', 'nav_menu':False}, name='config'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),

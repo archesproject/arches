@@ -4,7 +4,6 @@ import types
 import sys
 import uuid
 import datetime
-from django.conf import settings
 from django.db import connection
 import arches.app.models.models as archesmodels
 from arches.app.models.resource import Resource

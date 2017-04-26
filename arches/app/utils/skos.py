@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid, re
-from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils.http import urlencode
@@ -25,8 +24,9 @@ from rdflib import Literal, Namespace, RDF, URIRef
 from rdflib.namespace import SKOS, DCTERMS
 from rdflib.graph import Graph
 from time import time
-from arches.app.models.concept import Concept
 from arches.app.models import models
+from arches.app.models.concept import Concept
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # define the ARCHES namespace

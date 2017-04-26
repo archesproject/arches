@@ -150,9 +150,6 @@ INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 'hasTopConcept');
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
-    VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
-
-INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
     VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000007', 'member');
 
 
@@ -3459,3 +3456,4 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
 
 INSERT INTO iiif_manifests(id, url)
    VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');
+

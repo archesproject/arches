@@ -23,7 +23,6 @@ import uuid
 import xml.etree.ElementTree as ET
 import networkx as nx
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
