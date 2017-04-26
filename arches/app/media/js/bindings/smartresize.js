@@ -23,7 +23,7 @@ define([
                     });
 
                     if (images_per_row == 1) {
-                        console.log(images_per_row)
+                        // console.log(images_per_row)
                     }
                 }
                 $(window).smartresize(update_grid);
