@@ -62,7 +62,7 @@ class SystemSettings(LazySettings):
 
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=self.graph_id):
-            
+
             def setup_node(node, parent_node=None):
                 if node.is_collector:
                     if node.nodegroup.cardinality == '1':
@@ -111,8 +111,7 @@ class SystemSettings(LazySettings):
 
         print self
 
-    @classmethod
-    def get_direct_decendent_nodes(cls, node):
+    def get_direct_decendent_nodes(self, node):
         nodes = []
         for edge in models.Edge.objects.filter(domainnode=node):
             nodes.append(edge.rangenode)
