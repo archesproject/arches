@@ -69,7 +69,7 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
 
-        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='.',
             help='Directory where you want to save exported files.')
 
         parser.add_argument('-r', '--resources', action='store', dest='resources', default=False,
