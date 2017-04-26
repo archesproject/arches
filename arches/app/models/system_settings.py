@@ -37,7 +37,6 @@ class SystemSettings(LazySettings):
 
     graph_id = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
     resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195'
-    settings = {} # includes all settings including methods and private attributes defined in settings.py
 
     def __init__(self, *args, **kwargs):
         super(SystemSettings, self).__init__(*args, **kwargs)
@@ -55,14 +54,6 @@ class SystemSettings(LazySettings):
                 ret.append("%s = %s" % (setting, setting_value))
         return '\n'.join(ret)
 
-    def get(self, setting_name):
-        """
-        Used to retrieve any setting, even callable methods defined in settings.py
-
-        """
-
-        return self.settings[setting_name]
-
     def update_settings(self):
         """
         Updates the settings the Arches System Settings graph
@@ -71,31 +62,22 @@ class SystemSettings(LazySettings):
 
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=self.graph_id):
-            # if node.datatype != 'semantic':
-            #     self.settings[node.name] = None
-            #     setattr(self, node.name, None)
+            
             def setup_node(node, parent_node=None):
                 if node.is_collector:
                     if node.nodegroup.cardinality == '1':
                         obj = {}
                         for decendant_node in self.get_direct_decendent_nodes(node):
-                            # setup_node(decendant_node)
-                            # if decendant_node.name not in self.settings:
-                            #     self.settings[decendant_node.name] = None
-                            #     setattr(self, decendant_node.name, None)
                             obj[decendant_node.name] = setup_node(decendant_node, node)
 
-                        self.settings[node.name] = obj
-                        #setattr(self, node.name, obj)
+                        setattr(self, node.name, obj)
 
                     if node.nodegroup.cardinality == 'n':
-                        self.settings[node.name] = []
-                        #setattr(self, node.name, [])
-                    return self.settings[node.name]
+                        setattr(self, node.name, [])
+                    return getattr(self, node.name)
 
                 if parent_node is not None:
-                    self.settings[node.name] = None
-                    #setattr(self, node.name, None)
+                    setattr(self, node.name, None)
 
             setup_node(node)
 
@@ -106,8 +88,7 @@ class SystemSettings(LazySettings):
                     if node.datatype != 'semantic':
                         try:
                             val = tile.data[str(node.nodeid)]
-                            self.settings[node.name] = val
-                            #setattr(self, node.name, val)
+                            setattr(self, node.name, val)
                         except:
                             pass
 
@@ -120,27 +101,15 @@ class SystemSettings(LazySettings):
                         collector_nodename = node.name
                     if node.datatype != 'semantic':
                         obj[node.name] = tile.data[str(node.nodeid)]
-                    # try:
-                    #     #val = tile.data[str(node.nodeid)]
-                    #     obj[node.name] = tile.data[str(node.nodeid)]
-                    #     # self.settings[node.name] = val
-                    #     # setattr(self, node.name, val)
-                    # except:
-                    #     pass
 
                 # print collector_nodename
                 # print obj
 
-                self.settings[collector_nodename].append(obj)
-                #setattr(self, collector_nodename, ret)
-
-        for setting_name, setting_value in self.settings.iteritems():
-            if setting_name.isupper():
-            #if not setting_name.startswith('__') and not callable(self.settings[setting_name]):
-                setattr(self, setting_name, setting_value)
+                val = getattr(self, collector_nodename)
+                val.append(obj)
+                setattr(self, collector_nodename, val)
 
         print self
-
 
     @classmethod
     def get_direct_decendent_nodes(cls, node):
