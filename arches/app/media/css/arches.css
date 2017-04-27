@@ -7044,6 +7044,145 @@ table.table.dataTable {
     padding-right: 10px;
 }
 
+.advanced-search-title {
+	font-size: 16px;
+	font-weight: 500;
+    margin-top: 5px;
+    color: #666;
+}
+
+.facets-container {
+	position: absolute;
+	width: 250px;
+	margin-top: -20px;
+	margin-left: -20px;
+	margin-bottom: -20px;
+	right: 0px;
+	border-left: 1px solid #ddd;
+}
+
+.facets-search-container {
+	position: absolute;
+	top: 15px;
+	left: 20px;
+	width: calc(100% - 300px);
+}
+
+.search-facets {
+	height: 100vh;
+	background: #f8f8f8;
+	border-right: 1px solid #ddd;
+}
+
+.search-facet-item {
+	position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-right-width: 0px;
+    border-left-width: 0px;
+}
+
+.search-facet-item:first-of-type {
+	border-top-width: 0px;
+}
+
+a.search-facet-item:not(.active):hover {
+    cursor: pointer;
+}
+
+a.search-facet-item:hover, a.search-facet-item:focus {
+    background-color: #f8f8f8;
+}
+
+div.search-facet-item.disabled {
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 1px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.search-facet-item-heading {
+	font-weight: 400;
+}
+
+a.search-facet-item .search-facet-item-heading {
+    color: #666;
+}
+
+a.search-facet-item {
+	color: #777;
+}
+
+.search-facet-item.disabled {
+	background: #f6f6f6;
+	color: #666;
+	cursor: default;
+}
+
+a.search-facet-item.disabled {
+    cursor: default;
+}
+
+.pagination-bottom {
+	position: absolute;
+	bottom: 10px;
+	width: 400px;
+    margin-left: -20px;
+	border-top: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	background: #f8f8f8;
+}
+
+
+.faceted-search-container {
+	background: #fbfbfb;
+	border: 1px solid #ddd;
+	border-radius: 1px;
+	min-height: 50px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.facet-name {
+	font-size: 15px;
+	color: #333;
+}
+
+.facet-search-criteria {
+	position: relative;
+	padding: 10px 0px 0px 0px;
+}
+
+.facet-search-button {
+	padding: 10px;
+}
+
+.faceted-search-operator-container {
+	background: #f0a636;
+	border: 1px solid #f1aa40;
+	color: #fff;
+	border-radius: 1px;
+	height: 50px;
+	padding: 15px;
+	margin-bottom: 10px;
+}
+
+.facet-btn-group {
+	width: 100%;
+}
+
+.facet-btn {
+	width: 25%;
+}
+
+.facet-btn:focus, .facet-btn.selected {
+	background: #ee9818;
+}
+
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

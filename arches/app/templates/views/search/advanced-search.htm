@@ -1,2 +1,72 @@
 {% load i18n %}
-<div>perform complex search</div>
+<div class="search-container advanced-search-container relative">
+
+    <!-- Advanced Search Panel -->
+    <div class="facets-container" style="">
+        <div class="list-group search-facets">
+            <div class="search-facet-item disabled">
+                <h4 class="search-facet-item-heading">Search Facets</h4>
+                <div class="list-filter relative">
+                    <input type="text" class="form-control" style="" placeholder="Find ...">
+                    <!-- Clear Filter -->
+                    <span class="clear-node-search"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+            <a href="#" class="search-facet-item">
+                <h4 class="search-facet-item-heading">Address</h4>
+                <p class="list-group-item-text"></p>
+            </a>
+        </div>
+    </div>
+
+    <div class="facets-search-container" style="">
+        <h3 class="advanced-search-title"> Advanced Search</h3>
+
+        <!-- Logical Operators -->
+        <div class="btn-group btn-group-sm facet-btn-group">
+            <button class="btn btn-warning btn-active-dark facet-btn selected">Or</button>
+            <button class="btn btn-warning btn-active-dark facet-btn">And</button>
+            <button class="btn btn-warning btn-active-dark facet-btn">Or NOT</button>
+            <button class="btn btn-warning btn-active-dark facet-btn">And NOT</button>
+        </div>
+
+        <!-- Faceted search term -->
+        <div class="faceted-search-container">
+            <!-- Search Name -->
+            <div class="facet-name">
+                Address
+            </div>
+            <!-- Search criteria -->
+            <div class="row facet-search-criteria">
+                <!-- Operator -->
+                <div class="col-sm-2">
+                    <select class="resources" tabindex="-1" style="display: none;">
+                        <option>Like</option>
+                        <option>Equals</option>
+                        <option>Not</option>
+                    </select>
+                    <div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;">
+                        <a class="chosen-single" tabindex="-1">
+                            <span>Like</span>
+                            <div>
+                                <b></b>
+                            </div>
+                        </a>
+                        <div class="chosen-drop">
+                            <div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div>
+                            <ul class="chosen-results"></ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Value -->
+                <div class="col-sm-10">
+                    <input type="text" placeholder="Name" class="form-control input-lg" style="height: 36px;" value="Dalgity Street">
+                </div>
+                <!-- Action -->
+                <div class="facet-search-button pull-right">
+                    <button class="btn btn-sm btn-primary">Add to search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
