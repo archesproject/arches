@@ -170,7 +170,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Provider Key"
+                    "name": "API_KEY"
                 },
                 {
                     "is_collector": true,
@@ -183,7 +183,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Analytics"
+                    "name": "ANALYTICS"
                 },
                 {
                     "is_collector": true,
@@ -196,7 +196,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Language Codes"
+                    "name": "???Language Codes"
                 },
                 {
                     "is_collector": false,
@@ -209,7 +209,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "",
-                    "name": "Arches System Settings"
+                    "name": "ARCHES_SYSTEM_SETTINGS"
                 },
                 {
                     "is_collector": false,
@@ -222,7 +222,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "ETL Name"
+                    "name": "ETL_NAME"
                 },
                 {
                     "is_collector": false,
@@ -235,7 +235,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Search Name"
+                    "name": "SEARCH_NAME"
                 },
                 {
                     "is_collector": true,
@@ -248,7 +248,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "System Settings"
+                    "name": "SYSTEM_SETTINGS"
                 },
                 {
                     "is_collector": false,
@@ -279,7 +279,7 @@
                         ]
                     },
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Provider Name"
+                    "name": "PROVIDER_NAME"
                 },
                 {
                     "is_collector": false,
@@ -292,7 +292,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "MaxExportResults"
+                    "name": "SEARCH_EXPORT_ITEMS_PER_PAGE"
                 },
                 {
                     "is_collector": true,
@@ -305,7 +305,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Temporal Search"
+                    "name": "TEMPORAL_SEARCH"
                 },
                 {
                     "is_collector": true,
@@ -339,7 +339,7 @@
                         "advancedStyling": false
                     },
                     "parentproperty": null,
-                    "name": "Map"
+                    "name": "MAP"
                 },
                 {
                     "is_collector": true,
@@ -352,7 +352,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "AppNames"
+                    "name": "APP_NAMES"
                 },
                 {
                     "is_collector": false,
@@ -388,7 +388,7 @@
                         ]
                     },
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Color Ramp"
+                    "name": "COLOR_RAMP"
                 },
                 {
                     "is_collector": false,
@@ -401,7 +401,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Search Description"
+                    "name": "SEARCH_DESCRIPTION"
                 },
                 {
                     "is_collector": false,
@@ -414,7 +414,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "MaxResultsPerPage"
+                    "name": "SEARCH_ITEMS_PER_PAGE"
                 },
                 {
                     "is_collector": false,
@@ -427,7 +427,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Search URL"
+                    "name": "SEARCH_URL"
                 },
                 {
                     "is_collector": false,
@@ -440,7 +440,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Time Wheel Configuration"
+                    "name": "TIME_WHEEL_CONFIGURATION"
                 },
                 {
                     "is_collector": false,
@@ -453,7 +453,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Endpoint"
+                    "name": "???Endpoint"
                 },
                 {
                     "is_collector": true,
@@ -466,7 +466,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Basic Search Settings"
+                    "name": "BASIC_SEARCH_SETTINGS"
                 },
                 {
                     "is_collector": false,
@@ -479,7 +479,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "SPARQL Provider"
+                    "name": "SPARQL_ENDPOINT_PROVIDER"
                 },
                 {
                     "is_collector": true,
@@ -492,7 +492,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Saved Searches"
+                    "name": "SAVED_SEARCHES"
                 },
                 {
                     "is_collector": false,
@@ -507,7 +507,7 @@
                         "rdmCollection": null
                     },
                     "parentproperty": "P140_assigned_attribute_to",
-                    "name": "Langauges"
+                    "name": "??Langauges"
                 },
                 {
                     "is_collector": true,
@@ -520,7 +520,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "SPARQL Providers"
+                    "name": "SPARQL_ENDPOINT_PROVIDERS"
                 },
                 {
                     "is_collector": false,
@@ -533,7 +533,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "GoogleAnalyticsKey"
+                    "name": "GOOGLE_ANALYTICS_TRACKING_ID"
                 },
                 {
                     "is_collector": false,
@@ -546,7 +546,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Image"
+                    "name": "IMAGE"
                 },
                 {
                     "is_collector": true,
@@ -559,7 +559,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Geocoding Providers"
+                    "name": "GEOCODING_PROVIDERS"
                 },
                 {
                     "is_collector": false,
@@ -572,7 +572,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "MaxDropdownResults"
+                    "name": "SEARCH_DROPDOWN_LENGTH"
                 },
                 {
                     "is_collector": false,
@@ -585,7 +585,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": "P140i_was_attributed_by",
-                    "name": "Application Name"
+                    "name": "APP_NAME"
                 },
                 {
                     "is_collector": true,
@@ -598,7 +598,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
                     "config": null,
                     "parentproperty": null,
-                    "name": "Search Map"
+                    "name": "SEARCH_MAP"
                 }
             ],
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",

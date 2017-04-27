@@ -429,7 +429,6 @@ define([
                 if (subscriptions.length > 0) {
                     _.each(subscriptions, function(s){s.dispose()})
                 }
-                console.log(currentResource.getSubscriptionsCount());
                 subscriptions.push(subscription)
             }
 

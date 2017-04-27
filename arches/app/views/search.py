@@ -21,7 +21,6 @@ import csv
 import math
 from datetime import datetime
 from flexidate import FlexiDate
-from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
@@ -34,13 +33,14 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
+from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
+from arches.app.views.concept import get_preflabel_from_conceptid
 
 
 try:

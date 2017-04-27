@@ -1,7 +1,7 @@
-from django.conf import settings
 import os
 import datetime
 from arches.app.models.concept import Concept
+from arches.app.models.system_settings import settings
 import xml.etree.ElementTree as ET
 from format import Writer
 

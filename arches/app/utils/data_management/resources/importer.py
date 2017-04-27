@@ -7,26 +7,17 @@ import importlib
 import datetime
 import unicodecsv
 from time import time
+from copy import deepcopy
+from optparse import make_option
 from os.path import isfile, join
-from django.conf import settings
 from django.db import connection, transaction
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ValidationError
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
-from arches.app.models.models import Concept
-from arches.app.models.models import Value
-from arches.app.models.models import ResourceXResource
-from arches.app.models.concept import Concept
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.management.commands import utils
-from optparse import make_option
-from formats.archesjson import JsonReader
-from formats.shpfile import ShapeReader
-from formats.csvfile import CsvReader
-from formats.archesfile import ArchesFileReader
 from arches.app.models.tile import Tile
 from arches.app.models.models import DDataType
 from arches.app.models.models import ResourceInstance
@@ -34,9 +25,18 @@ from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
 from arches.app.models.models import ResourceXResource
-from django.core.exceptions import ValidationError
+from arches.app.models.models import Concept
+from arches.app.models.models import Value
+from arches.app.models.models import ResourceXResource
+from arches.app.models.concept import Concept
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from copy import deepcopy
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.management.commands import utils
+from formats.archesjson import JsonReader
+from formats.shpfile import ShapeReader
+from formats.csvfile import CsvReader
+from formats.archesfile import ArchesFileReader
 
 
 class BusinessDataImporter(object):
