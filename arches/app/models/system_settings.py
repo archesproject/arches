@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import LazySettings
+from django.utils.functional import empty
 from arches.app.models import models
 
 
@@ -40,10 +41,6 @@ class SystemSettings(LazySettings):
 
     def __init__(self, *args, **kwargs):
         super(SystemSettings, self).__init__(*args, **kwargs)
-        try: 
-            self.update_settings()
-        except:
-            pass
         #print self
 
     def __str__(self):
@@ -54,7 +51,24 @@ class SystemSettings(LazySettings):
                 ret.append("%s = %s" % (setting, setting_value))
         return '\n'.join(ret)
 
-    def update_settings(self):
+    def __getattr__(self, name):
+        """
+        By default get settings from this class which is initially populated from the settings.py filter
+        If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
+        by calling update_settings first which populates this class with any settings from the database
+
+        What this means is that update_settings will only be called once a setting is requested that isn't initially in the settings.py file 
+        Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
+        
+        """
+
+        try:
+            return super(SystemSettings, self).__getattr__(name)
+        except:
+            self.update_settings()
+            return getattr(self, name)
+
+    def update_settings(self, **kwargs):
         """
         Updates the settings the Arches System Settings graph
 
@@ -109,7 +123,7 @@ class SystemSettings(LazySettings):
                 val.append(obj)
                 setattr(self, collector_nodename, val)
 
-        print self
+        #print self
 
     def get_direct_decendent_nodes(self, node):
         nodes = []
