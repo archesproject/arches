@@ -169,9 +169,8 @@ init_arches
 if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 	set_dev_mode
 	install_dev_requirements
+	run_tests
 fi
-
-run_tests
 
 # Run from folder where user's bower.json lives
 cd_bower_folder
