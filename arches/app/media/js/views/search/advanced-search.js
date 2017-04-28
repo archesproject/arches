@@ -7,21 +7,20 @@ define([
 	return BaseFilter.extend({
 		initialize: function(options) {
             var self = this;
+            this.facets = ko.observableArray();
             this.searchableGraphs = [];
-            var searchableCards = _.filter(
-                _.each(options.cards, function (card) {
-                    card.nodes = _.filter(options.nodes, function (node) {
-                        return node.nodegroup_id === card.nodegroup_id;
-                    });
-                }),
-                function (card) {
-                    return card.nodes.length > 0;
-                }
-            );
+            _.each(options.cards, function (card) {
+                card.nodes = _.filter(options.nodes, function (node) {
+                    return node.nodegroup_id === card.nodegroup_id;
+                });
+                card.addFacet = function () {
+                    self.addFacet(card);
+                };
+            });
             _.each(options.graphs, function (graph) {
                 if (graph.isresource && graph.isactive) {
-                    graph.cards = _.filter(searchableCards, function (card) {
-                        return card.graph_id === graph.graphid;
+                    graph.cards = _.filter(options.cards, function (card) {
+                        return card.graph_id === graph.graphid && card.nodes.length > 0;
                     });
                     if (graph.cards.length > 0) {
                         self.searchableGraphs.push(graph);
@@ -34,6 +33,20 @@ define([
 
 			BaseFilter.prototype.initialize.call(this, options);
 		},
+
+        addFacet: function (card) {
+            var facet = {
+                card: card,
+                value: {
+                    op: 'and'
+                }
+            };
+            _.each(facet.card.nodes, function (node) {
+                facet.value[node.nodeid] = ko.observable();
+            });
+            this.facets.push(facet);
+            console.log(facet);
+        },
 
 		appendFilters: function(filterParams) {
 			var filtersApplied = this.filter.advanced().length > 0;

@@ -17,7 +17,7 @@
                 <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
             </div>
                 <!-- ko foreach: cards -->
-                <a href="#" class="search-facet-item">
+                <a href="#" class="search-facet-item" data-bind="click: addFacet">
                     <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
                     <p class="list-group-item-text"></p>
                 </a>
@@ -29,15 +29,17 @@
     <div class="facets-search-container" style="">
         <h3 class="advanced-search-title"> Advanced Search</h3>
 
-        <!-- Logical Operators -->
+        <!-- ko foreach: facets -->
+
+        <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
             <button class="btn btn-warning btn-active-dark facet-btn selected">Or</button>
             <button class="btn btn-warning btn-active-dark facet-btn">And</button>
             <button class="btn btn-warning btn-active-dark facet-btn">Or NOT</button>
             <button class="btn btn-warning btn-active-dark facet-btn">And NOT</button>
         </div>
+        <!-- /ko -->
 
-        <!-- Faceted search term -->
         <div class="faceted-search-container">
             <!-- Search Name -->
             <div class="facet-name">
@@ -75,5 +77,6 @@
                 </div>
             </div>
         </div>
+        <!-- /ko -->
     </div>
 </div>
