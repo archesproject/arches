@@ -8,17 +8,24 @@ define([
 		initialize: function(options) {
             var self = this;
             this.searchableGraphs = [];
-            _.each(options.cards, function (card) {
-                card.nodes = _.filter(options.nodes, function (node) {
-                    return node.nodegroup_id === card.nodegroup_id;
-                });
-            });
+            var searchableCards = _.filter(
+                _.each(options.cards, function (card) {
+                    card.nodes = _.filter(options.nodes, function (node) {
+                        return node.nodegroup_id === card.nodegroup_id;
+                    });
+                }),
+                function (card) {
+                    return card.nodes.length > 0;
+                }
+            );
             _.each(options.graphs, function (graph) {
                 if (graph.isresource && graph.isactive) {
-                    graph.cards = _.filter(options.cards, function (card) {
+                    graph.cards = _.filter(searchableCards, function (card) {
                         return card.graph_id === graph.graphid;
                     });
-                    self.searchableGraphs.push(graph);
+                    if (graph.cards.length > 0) {
+                        self.searchableGraphs.push(graph);
+                    }
                 }
             });
 			this.filter = {
