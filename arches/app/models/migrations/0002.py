@@ -116,6 +116,16 @@ class Migration(migrations.Migration):
             name='name',
             field=models.TextField(primary_key=True, serialize=False, unique=True),
         ),
+        migrations.AddField(
+            model_name='ddatatype',
+            name='issearchable',
+            field=models.NullBooleanField(default=False),
+        ),
+        migrations.RunSQL("""
+            UPDATE d_data_types SET issearchable = true WHERE datatype = 'string';
+        """, """
+            UPDATE d_data_types SET issearchable = false WHERE datatype = 'string';
+        """),
         migrations.RunPython(forwards_func, reverse_func),
         migrations.RunSQL("""
             INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
@@ -127,7 +137,7 @@ class Migration(migrations.Migration):
             INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype)
             VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
         """, """
-            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' 
+            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004'
             AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
         """),
         migrations.RunSQL("""

@@ -13,8 +13,10 @@ define([
     'views/resource/related-resources-manager',
     'views/search/search-results',
     'views/search/saved-searches',
-    'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView) {
+    'views/base-manager',
+    'view-data',
+    'search-data'
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -49,7 +51,11 @@ define([
                 termFilter: this.filters.termFilter
             });
             this.filters.savedSearches = new BaseFilter();
-            this.filters.advancedFilter = new AdvancedSearch();
+            this.filters.advancedFilter = new AdvancedSearch({
+                graphs: viewData.graphs,
+                nodes: searchData.searchable_nodes,
+                cards: searchData.resource_cards
+            });
             this.filters.searchRelatedResources = new BaseFilter();
             this.filters.mapFilter = new MapFilter({
                 aggregations: this.aggregations,

@@ -12,10 +12,17 @@
                     <span class="clear-node-search"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
-            <a href="#" class="search-facet-item">
-                <h4 class="search-facet-item-heading">Address</h4>
-                <p class="list-group-item-text"></p>
-            </a>
+            <!-- ko foreach: searchableGraphs -->
+            <div class="search-facet-item disabled">
+                <h3 class="search-facet-item-heading" data-bind="text: name"></h4>
+            </div>
+                <!-- ko foreach: cards -->
+                <a href="#" class="search-facet-item">
+                    <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                    <p class="list-group-item-text"></p>
+                </a>
+                <!-- /ko -->
+            <!-- /ko -->
         </div>
     </div>
 

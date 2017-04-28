@@ -6,6 +6,21 @@ define([
 ], function(_, ko, BaseFilter, arches) {
 	return BaseFilter.extend({
 		initialize: function(options) {
+            var self = this;
+            this.searchableGraphs = [];
+            _.each(options.cards, function (card) {
+                card.nodes = _.filter(options.nodes, function (node) {
+                    return node.nodegroup_id === card.nodegroup_id;
+                });
+            });
+            _.each(options.graphs, function (graph) {
+                if (graph.isresource && graph.isactive) {
+                    graph.cards = _.filter(options.cards, function (card) {
+                        return card.graph_id === graph.graphid;
+                    });
+                    self.searchableGraphs.push(graph);
+                }
+            });
 			this.filter = {
 				advanced: ko.observableArray()
 			};

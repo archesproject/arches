@@ -54,8 +54,13 @@ class SearchView(BaseManagerView):
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+        searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
 
         context = self.get_context_data(
+            resource_cards=JSONSerializer().serialize(resource_cards),
+            searchable_nodes=JSONSerializer().serialize(searchable_nodes),
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
