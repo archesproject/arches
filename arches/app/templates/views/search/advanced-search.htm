@@ -29,7 +29,7 @@
     <div class="facets-search-container" style="">
         <h3 class="advanced-search-title"> Advanced Search</h3>
 
-        <!-- ko foreach: facets -->
+        <!-- ko foreach: filter.facets -->
 
         <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
@@ -41,12 +41,10 @@
         <!-- /ko -->
 
         <div class="faceted-search-container">
-            <!-- Search Name -->
-            <div class="facet-name">
-                Address
-            </div>
-            <!-- Search criteria -->
+            <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
             <div class="row facet-search-criteria">
+                <!-- ko foreach: card.nodes -->
+                <div class="facet-name" data-bind="text: name"></div>
                 <!-- Operator -->
                 <div class="col-sm-2">
                     <select class="resources" tabindex="-1" style="display: none;">
@@ -71,7 +69,8 @@
                 <div class="col-sm-10">
                     <input type="text" placeholder="Name" class="form-control input-lg" style="height: 36px;" value="Dalgity Street">
                 </div>
-                <!-- Action -->
+                <!-- /ko -->
+
                 <div class="facet-search-button pull-right">
                     <button class="btn btn-sm btn-primary">Add to search</button>
                 </div>

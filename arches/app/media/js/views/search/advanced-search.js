@@ -7,14 +7,14 @@ define([
 	return BaseFilter.extend({
 		initialize: function(options) {
             var self = this;
-            this.facets = ko.observableArray();
             this.searchableGraphs = [];
+            this.cards = options.cards;
             _.each(options.cards, function (card) {
                 card.nodes = _.filter(options.nodes, function (node) {
                     return node.nodegroup_id === card.nodegroup_id;
                 });
                 card.addFacet = function () {
-                    self.addFacet(card);
+                    self.newFacet(card);
                 };
             });
             _.each(options.graphs, function (graph) {
@@ -23,18 +23,23 @@ define([
                         return card.graph_id === graph.graphid && card.nodes.length > 0;
                     });
                     if (graph.cards.length > 0) {
+                        _.each(graph.cards, function(card) {
+                            card.getGraph = function () {
+                                return graph;
+                            };
+                        });
                         self.searchableGraphs.push(graph);
                     }
                 }
             });
 			this.filter = {
-				advanced: ko.observableArray()
+				facets: ko.observableArray()
 			};
 
 			BaseFilter.prototype.initialize.call(this, options);
 		},
 
-        addFacet: function (card) {
+        newFacet: function (card) {
             var facet = {
                 card: card,
                 value: {
@@ -42,16 +47,26 @@ define([
                 }
             };
             _.each(facet.card.nodes, function (node) {
-                facet.value[node.nodeid] = ko.observable();
+                facet.value[node.nodeid] = ko.observable('');
             });
-            this.facets.push(facet);
-            console.log(facet);
+            this.filter.facets.push(facet);
         },
 
 		appendFilters: function(filterParams) {
-			var filtersApplied = this.filter.advanced().length > 0;
+			var filtersApplied = this.filter.facets().length > 0;
 			if (filtersApplied) {
-				filterParams.advanced = ko.toJSON(this.filter.advanced);
+                var facets = this.filter.facets();
+                var advanced = [];
+                _.each(facets, function (facet) {
+                    var value = {
+                        'op': facet.value.op
+                    }
+                    _.each(facet.card.nodes, function (node) {
+                        value[node.nodeid] = ko.unwrap(value[node.nodeid]) || '';
+                    });
+                    advanced.push(value);
+                });
+                filterParams.advanced = JSON.stringify(advanced);
 			}
 			return filtersApplied;
 		},
@@ -59,15 +74,17 @@ define([
         restoreState: function(query) {
             var doQuery = false;
             if ('advanced' in query) {
-                query.advanced = JSON.parse(query.advanced);
-                this.filter.advanced(query.advanced);
-                doQuery = true;
+                var query = JSON.parse(query.advanced);
+                console.log(query);
+                // TODO: Add facets from json here...
+                // this.filter.advanced(query.advanced);
+                // doQuery = true;
             }
             return doQuery;
         },
 
         clear: function() {
-            this.filter.advanced([]);
+            this.filter.facets([]);
             return;
         }
 	});

@@ -111,6 +111,7 @@ define([
                 this.filters.timeFilter.appendFilters(params);
                 this.filters.resourceTypeFilter.appendFilters(params);
                 this.filters.mapFilter.appendFilters(params);
+                this.filters.advancedFilter.appendFilters(params);
 
                 params.no_filters = !Object.keys(params).length;
                 return params;
