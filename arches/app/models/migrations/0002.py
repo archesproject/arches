@@ -18,7 +18,7 @@ def forwards_func(apps, schema_editor):
     management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite='overwrite')
 
 def reverse_func(apps, schema_editor):
-    GraphModel.objects.get(graphid=settings.graph_id).delete()
+    GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
 
 
 class Migration(migrations.Migration):

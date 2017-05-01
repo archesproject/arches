@@ -30,9 +30,9 @@ def clear_resources():
     match_all_query.delete(index='resource')
     match_all_query.delete(index='resource_relations')
 
-    print 'deleting', Resource.objects.exclude(resourceinstanceid=settings.resourceinstanceid).count(), 'resources'
-    Resource.objects.exclude(resourceinstanceid=settings.resourceinstanceid).delete()
-    print Resource.objects.exclude(resourceinstanceid=settings.resourceinstanceid).count(), 'resources remaining'
+    print 'deleting', Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources'
+    Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).delete()
+    print Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), 'resources remaining'
 
     print 'deleting', models.ResourceXResource.objects.count(), 'resource relationships'
     cursor = connection.cursor()

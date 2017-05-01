@@ -31,11 +31,11 @@ class BaseManagerView(TemplateView):
     def get_context_data(self, **kwargs):
         datatype_factory = DataTypeFactory()
         context = super(BaseManagerView, self).get_context_data(**kwargs)
-        context['system_settings_graphid'] = settings.graph_id
-        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.graph_id)
+        context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
         if 'Resource Editor' in self.request.user.user_groups:
-            context['resource_instances'] = Resource.objects.all().exclude(graph_id=settings.graph_id).order_by('-createdtime')[:100]
+            context['resource_instances'] = Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
         else:
             context['resource_instances'] = []
         context['nav'] = {
