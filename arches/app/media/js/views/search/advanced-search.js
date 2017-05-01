@@ -1,9 +1,10 @@
 define([
 	'underscore',
 	'knockout',
+    'knockout-mapping',
 	'views/search/base-filter',
 	'arches',
-], function(_, ko, BaseFilter, arches) {
+], function(_, ko, koMapping, BaseFilter, arches) {
 	return BaseFilter.extend({
 		initialize: function(options) {
             var self = this;
@@ -43,11 +44,11 @@ define([
             var facet = {
                 card: card,
                 value: {
-                    op: 'and'
+                    op: ko.observable('and')
                 }
             };
             _.each(facet.card.nodes, function (node) {
-                facet.value[node.nodeid] = ko.observable('');
+                facet.value[node.nodeid] = {};
             });
             this.filter.facets.push(facet);
         },
@@ -58,12 +59,8 @@ define([
                 var facets = this.filter.facets();
                 var advanced = [];
                 _.each(facets, function (facet) {
-                    var value = {
-                        'op': facet.value.op
-                    }
-                    _.each(facet.card.nodes, function (node) {
-                        value[node.nodeid] = ko.unwrap(value[node.nodeid]) || '';
-                    });
+                    var value = koMapping.toJS(facet.value);
+
                     advanced.push(value);
                 });
                 filterParams.advanced = JSON.stringify(advanced);
@@ -72,13 +69,28 @@ define([
 		},
 
         restoreState: function(query) {
+            var self = this;
             var doQuery = false;
             if ('advanced' in query) {
-                var query = JSON.parse(query.advanced);
-                console.log(query);
-                // TODO: Add facets from json here...
-                // this.filter.advanced(query.advanced);
-                // doQuery = true;
+                var facets = JSON.parse(query.advanced);
+                _.each(facets, function (facet) {
+                    var nodeIds = _.filter(Object.keys(facet), function (key) {
+                        return key !== 'op';
+                    });
+                    var card = _.find(self.cards, function(card) {
+                        var cardNodeIds = _.map(card.nodes, function (node) {
+                            return node.nodeid;
+                        });
+                        return _.contains(cardNodeIds, nodeIds[0]);
+                    });
+                    if (card) {
+                        self.filter.facets.push({
+                            card: card,
+                            value: koMapping.fromJS(facet)
+                        });
+                        doQuery = true;
+                    }
+                });
             }
             return doQuery;
         },
