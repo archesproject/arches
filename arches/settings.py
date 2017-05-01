@@ -112,9 +112,9 @@ def RESOURCE_TYPE_CONFIGS():
     }
 
 GEOCODING_PROVIDERS = [
-    {'name': 'MapZen', 'api_key':'', 'id':'MapzenGeocoder'},
-    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
-    ]
+    {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
+    {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
+]
 
 
 EXPORT_CONFIG = ''
