@@ -11,8 +11,9 @@ define([
     'views/search/resource-type-filter',
     'views/resource/related-resources-manager',
     'views/search/search-results',
+    'views/search/saved-searches',
     'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, BaseManagerView) {
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -56,7 +57,7 @@ define([
             });
 
             _.extend(this.viewModel, this.filters);
-
+            this.viewModel.savedSearches = new SavedSearches();
             this.viewModel.searchResults = new SearchResults({
                 aggregations: this.aggregations,
                 viewModel: this.viewModel
@@ -72,14 +73,22 @@ define([
                 graph: this.viewModel.graph
             })
 
+            var resizeFilter = function(duration){
+                var duration = duration;
+                return function(){
+                    var resize = function(){
+                        $(window).trigger("resize");
+                    }
+                    setTimeout(resize, duration);
+                }
+            }
+
             this.viewModel.selectedTab = this.viewModel.resourceEditorContext === true ? ko.observable(this.viewModel.relatedResourcesManager) : ko.observable(this.filters.mapFilter);
+            this.viewModel.selectedTab.subscribe(resizeFilter(100));
             if (this.viewModel.resourceEditorContext === true) {
                 this.viewModel.openRelatedResources.subscribe(function(val) {
                     if (val === true) {
-                        var resize = function(){
-                            $(window).trigger("resize");
-                        }
-                        setTimeout(resize, 200);
+                        resizeFilter(200)
                     }
                 })
             }
