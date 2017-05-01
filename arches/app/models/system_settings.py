@@ -55,9 +55,9 @@ class SystemSettings(LazySettings):
         """
         By default get settings from this class which is initially populated from the settings.py filter
         If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
-        by calling update_settings first which populates this class with any settings from the database
+        by calling update_from_db first which populates this class with any settings from the database
 
-        What this means is that update_settings will only be called once a setting is requested that isn't initially in the settings.py file 
+        What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file 
         Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
         
         """
@@ -65,12 +65,12 @@ class SystemSettings(LazySettings):
         try:
             return super(SystemSettings, self).__getattr__(name)
         except:
-            self.update_settings()
+            self.update_from_db()
             return getattr(self, name)
 
-    def update_settings(self, **kwargs):
+    def update_from_db(self, **kwargs):
         """
-        Updates the settings the Arches System Settings graph
+        Updates the settings the Arches System Settings graph tile instances stored in the database
 
         """
 
