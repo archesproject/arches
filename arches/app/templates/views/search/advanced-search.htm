@@ -6,9 +6,9 @@
     <div class="facets-container" style="">
         <div class="list-group search-facets">
             <div class="search-facet-item disabled">
-                <h4 class="search-facet-item-heading">Search Facets</h4>
+                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
                 <div class="list-filter relative">
-                    <input type="text" class="form-control" style="" placeholder="Find ...">
+                    <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}">
                     <!-- Clear Filter -->
                     <span class="clear-node-search"><i class="fa fa-times-circle"></i></span>
                 </div>
@@ -30,14 +30,14 @@
     </div>
 
     <div class="facets-search-container" style="">
-        <h3 class="advanced-search-title"> Advanced Search</h3>
+        <h3 class="advanced-search-title"> {% trans "Advanced Search" %}</h3>
 
         <!-- ko foreach: filter.facets -->
 
         <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
-            <button class="btn btn-warning btn-active-dark facet-btn selected">Or</button>
-            <button class="btn btn-warning btn-active-dark facet-btn">And</button>
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">{% trans "And" %}</button>
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">{% trans "Or" %}</button>
         </div>
         <!-- /ko -->
 
@@ -51,7 +51,7 @@
                     name: self.datatypelookup[datatype].configname,
                     params: {
                         search: true,
-                        searchValue: $parent.value[nodeid]
+                        filterValue: $parent.value[nodeid]
                     }
                 }">
                 </div>

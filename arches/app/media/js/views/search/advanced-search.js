@@ -90,9 +90,13 @@ define([
                         return _.contains(cardNodeIds, nodeIds[0]);
                     });
                     if (card) {
+                        _.each(card.nodes, function (node) {
+                            facet[node.nodeid] = ko.observable(facet[node.nodeid]);
+                        });
+                        facet.op = ko.observable(facet.op);
                         self.filter.facets.push({
                             card: card,
-                            value: koMapping.fromJS(facet)
+                            value: facet
                         });
                         doQuery = true;
                     }
