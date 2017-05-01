@@ -40,13 +40,6 @@ DATABASES = {
     }
 }
 
-RESOURCE_MODEL = {
-    # override this setting in your packages settings.py file
-    # to set the default model for the system to use
-    # Your model needs to inherit from 'arches.app.models.resource.Resource' to work
-    'default': 'arches.app.models.resource.Resource'
-}
-
 SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
 
 
@@ -64,18 +57,6 @@ SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 SEARCH_DROPDOWN_LENGTH = 100
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
-DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
-
-# override this setting in your packages settings.py file
-# entity type that holds the spatial coordinates of resources
-ENTITY_TYPE_FOR_MAP_DISPLAY = ''
-
-LIMIT_ENTITY_TYPES_TO_LOAD = None #(
-    # override this setting in your packages settings.py file
-#    'ARCHAEOLOGICAL HERITAGE (ARTIFACT).E18',
-#)
-
-DATA_CONCEPT_SCHEME = ''
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
@@ -87,39 +68,12 @@ GOOGLE_ANALYTICS_TRACKING_ID = None
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
-def RESOURCE_TYPE_CONFIGS():
-    return {
-        # override this setting in your packages settings.py file
-        #
-        # 'HERITAGE_RESOURCE.E18': {
-        #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
-        #     'name': _('Heritage Resource'),
-        #     'icon_class': 'fa fa-trophy',
-        #     'default_page': 'summary',
-        #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
-        #     'categories': [_('Resource')],
-        #     'has_layer': True,
-        #     'on_map': True,
-        #     'marker_color': '#3366FF',
-        #     'stroke_color': '#3366FF',
-        #     'fill_color': '#3366FF',
-        #     'primary_name_lookups': {
-        #         'entity_type': 'NAME.E41',
-        #         'lookup_value': 'Primary'
-        #     },
-        #     'sort_order': 1
-        # },
-    }
 
 GEOCODING_PROVIDERS = [
     {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
     {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
 ]
 
-
-EXPORT_CONFIG = ''
-
-DATE_SEARCH_ENTITY_TYPES = []
 
 SPARQL_ENDPOINT_PROVIDERS = (
     'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
@@ -155,8 +109,6 @@ ADMINS = (
 MANAGERS = ADMINS
 
 POSTGIS_VERSION = (2, 0, 0)
-
-SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -261,7 +213,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'arches.app.utils.context_processors.livereload',
-                'arches.app.utils.context_processors.resource_types',
                 'arches.app.utils.context_processors.map_info',
                 'arches.app.utils.context_processors.app_settings',
             ],
@@ -327,10 +278,6 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
-# Package specific validation.
-# Should be over-written in the package settings file.
-PACKAGE_VALIDATOR = 'arches.app.utils.mock_package_validator'
-
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
 DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
@@ -341,15 +288,6 @@ RESOURCE_GRAPH_LOCATIONS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(ROOT_DIR, 'db', 'graphs', 'branches'),
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
-)
-
-CONCEPT_SCHEME_LOCATIONS = (
-    # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-
-    # 'absolute/path/to/authority_files',
-    # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
 )
 
 BUSINESS_DATA_FILES = (
