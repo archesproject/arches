@@ -122,9 +122,17 @@ class Migration(migrations.Migration):
             field=models.NullBooleanField(default=False),
         ),
         migrations.RunSQL("""
-            UPDATE d_data_types SET issearchable = true WHERE datatype = 'string';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/string',
+                    configname = 'string-datatype-config'
+                WHERE datatype = 'string';
         """, """
-            UPDATE d_data_types SET issearchable = false WHERE datatype = 'string';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'string';
         """),
         migrations.RunPython(forwards_func, reverse_func),
         migrations.RunSQL("""

@@ -4,12 +4,18 @@ define([
     'knockout-mapping',
 	'views/search/base-filter',
 	'arches',
+    'datatype-config-components',
+    'bindings/let'
 ], function(_, ko, koMapping, BaseFilter, arches) {
 	return BaseFilter.extend({
 		initialize: function(options) {
             var self = this;
             this.searchableGraphs = [];
             this.cards = options.cards;
+            this.datatypelookup = {};
+            _.each(options.datatypes, function(datatype){
+                self.datatypelookup[datatype.datatype] = datatype;
+            });
             _.each(options.cards, function (card) {
                 card.nodes = _.filter(options.nodes, function (node) {
                     return node.nodegroup_id === card.nodegroup_id;
@@ -48,7 +54,7 @@ define([
                 }
             };
             _.each(facet.card.nodes, function (node) {
-                facet.value[node.nodeid] = {};
+                facet.value[node.nodeid] = ko.observable({});
             });
             this.filter.facets.push(facet);
         },

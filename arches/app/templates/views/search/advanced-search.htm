@@ -1,4 +1,5 @@
 {% load i18n %}
+<!--ko let: { self: $data }-->
 <div class="search-container advanced-search-container relative">
 
     <!-- Advanced Search Panel -->
@@ -14,7 +15,9 @@
             </div>
             <!-- ko foreach: searchableGraphs -->
             <div class="search-facet-item disabled">
-                <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                <h4 class="search-facet-item-heading">
+                    <strong data-bind="text: name"></strong>
+                </h4>
             </div>
                 <!-- ko foreach: cards -->
                 <a href="#" class="search-facet-item" data-bind="click: addFacet">
@@ -42,38 +45,24 @@
             <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
             <div class="row facet-search-criteria">
                 <!-- ko foreach: card.nodes -->
-                <div class="facet-name" data-bind="text: name"></div>
-                <!-- Operator -->
-                <div class="col-sm-2">
-                    <select class="resources" tabindex="-1" style="display: none;">
-                        <option>Like</option>
-                        <option>Equals</option>
-                        <option>Not</option>
-                    </select>
-                    <div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;">
-                        <a class="chosen-single" tabindex="-1">
-                            <span>Like</span>
-                            <div>
-                                <b></b>
-                            </div>
-                        </a>
-                        <div class="chosen-drop">
-                            <div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div>
-                            <ul class="chosen-results"></ul>
-                        </div>
-                    </div>
-                </div>
-                <!-- Value -->
-                <div class="col-sm-10">
-                    <input type="text" placeholder="Name" class="form-control input-lg" style="height: 36px;" value="Dalgity Street">
+                <div class="facet-label" data-bind="text: name"></div>
+
+                <div data-bind="component: {
+                    name: self.datatypelookup[datatype].configname,
+                    params: {
+                        search: true,
+                        searchValue: $parent.value[nodeid]
+                    }
+                }">
                 </div>
                 <!-- /ko -->
 
                 <div class="facet-search-button pull-right">
-                    <button class="btn btn-sm btn-primary">Add to search</button>
+                    <button class="btn btn-sm btn-primary">Remove</button>
                 </div>
             </div>
         </div>
         <!-- /ko -->
     </div>
 </div>
+<!-- /ko -->

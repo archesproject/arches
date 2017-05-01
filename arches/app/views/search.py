@@ -57,6 +57,7 @@ class SearchView(BaseManagerView):
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
         searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
+        datatypes = models.DDataType.objects.all()
 
         context = self.get_context_data(
             resource_cards=JSONSerializer().serialize(resource_cards),
@@ -66,6 +67,8 @@ class SearchView(BaseManagerView):
             map_sources=map_sources,
             main_script='views/search',
             resource_graphs=resource_graphs,
+            datatypes=datatypes,
+            datatypes_json=JSONSerializer().serialize(datatypes),
         )
 
         context['nav']['title'] = 'Search'

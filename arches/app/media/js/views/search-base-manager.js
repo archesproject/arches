@@ -54,7 +54,8 @@ define([
             this.filters.advancedFilter = new AdvancedSearch({
                 graphs: viewData.graphs,
                 nodes: searchData.searchable_nodes,
-                cards: searchData.resource_cards
+                cards: searchData.resource_cards,
+                datatypes: searchData.datatypes
             });
             this.filters.searchRelatedResources = new BaseFilter();
             this.filters.mapFilter = new MapFilter({
