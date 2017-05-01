@@ -1,0 +1,100 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "tiles": [
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": null,
+                        "nodegroup_id": "c5a2a914-fadd-11e6-8f8f-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {},
+                        "tileid": "a70b6016-5145-4513-a6be-5901944347b4"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": null,
+                        "nodegroup_id": "d0987880-fad8-11e6-8cce-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {
+                            "d0987880-fad8-11e6-8cce-6c4008b05c4c": null,
+                            "d0987de3-fad8-11e6-a434-6c4008b05c4c": 5.0,
+                            "d0987ec0-fad8-11e6-aad3-6c4008b05c4c": 100000.0,
+                            "d0987cc2-fad8-11e6-8581-6c4008b05c4c": 100.0
+                        },
+                        "tileid": "a4e0f0e2-9840-4ba6-acae-a6c430daf917"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": null,
+                        "nodegroup_id": "444ed2e3-fad7-11e6-8431-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {},
+                        "tileid": "71b1cdd9-692a-4639-aa0c-c18965af0cae"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": "a70b6016-5145-4513-a6be-5901944347b4",
+                        "nodegroup_id": "c5a2b1dc-fadd-11e6-a726-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {
+                            "c5a2b94a-fadd-11e6-a029-6c4008b05c4c": "Arches",
+                            "c5a2bdb3-fadd-11e6-8c96-6c4008b05c4c": null,
+                            "c5a2b1dc-fadd-11e6-a726-6c4008b05c4c": null
+                        },
+                        "tileid": "4345f530-aa90-48cf-b4b3-92d1185ca439"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": "a70b6016-5145-4513-a6be-5901944347b4",
+                        "nodegroup_id": "c5a2b530-fadd-11e6-b5f6-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {
+                            "c5a2b530-fadd-11e6-b5f6-6c4008b05c4c": null,
+                            "c5a2ba63-fadd-11e6-9306-6c4008b05c4c": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
+                        },
+                        "tileid": "c45a7069-1803-4d85-a017-61296a2ae760"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": "71b1cdd9-692a-4639-aa0c-c18965af0cae",
+                        "nodegroup_id": "444ed78a-fad7-11e6-b6f6-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {
+                            "444edfc7-fad7-11e6-9428-6c4008b05c4c": "2cf08870-18a7-41aa-85a7-bc66e89b3312",
+                            "c561d0e3-2e9d-11e7-9706-14109fd34195": "BingGeocoder",
+                            "444ed78a-fad7-11e6-b6f6-6c4008b05c4c": null,
+                            "444ede23-fad7-11e6-83bb-6c4008b05c4c": null
+                        },
+                        "tileid": "44a5f964-eb78-4a0a-add7-5436feab5d59"
+                    },
+                    {
+                        "tiles": {},
+                        "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
+                        "parenttile_id": "71b1cdd9-692a-4639-aa0c-c18965af0cae",
+                        "nodegroup_id": "444ed78a-fad7-11e6-b6f6-6c4008b05c4c",
+                        "sortorder": 0,
+                        "data": {
+                            "444edfc7-fad7-11e6-9428-6c4008b05c4c": "143157ae-090f-4e7f-8688-b5fdc8dc8f87",
+                            "c561d0e3-2e9d-11e7-9706-14109fd34195": "MapzenGeocoder",
+                            "444ed78a-fad7-11e6-b6f6-6c4008b05c4c": null,
+                            "444ede23-fad7-11e6-83bb-6c4008b05c4c": null
+                        },
+                        "tileid": "90a57b6d-9e11-4185-b86a-57630183b8aa"
+                    }
+                ],
+                "resourceinstance": {
+                    "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
+                    "resourceinstanceid": "a106c400-260c-11e7-a604-14109fd34195",
+                    "legacyid": "a106c400-260c-11e7-a604-14109fd34195"
+                }
+            }
+        ]
+    }
+}
