@@ -58,7 +58,7 @@
                 <!-- /ko -->
 
                 <div class="facet-search-button pull-right">
-                    <button class="btn btn-sm btn-primary">Remove</button>
+                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">Remove</button>
                 </div>
             </div>
         </div>

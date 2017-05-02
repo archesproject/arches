@@ -13,7 +13,7 @@ define(['knockout'], function (ko) {
                         op: self.op(),
                         val: self.searchValue()
                     }
-                });
+                }).extend({ throttle: 750 });
                 params.filterValue(this.filterValue());
                 this.filterValue.subscribe(function (val) {
                     params.filterValue(val);
