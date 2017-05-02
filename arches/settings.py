@@ -18,15 +18,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-# Django settings for Arches project.
+
+
+#########################################
+###          STATIC SETTINGS          ###
+#########################################
+
 
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
-
-#########################################
-###  START PACKAGE SPECIFIC SETTINGS  ###
-#########################################
 
 DATABASES = {
     'default': {
@@ -40,7 +41,8 @@ DATABASES = {
     }
 }
 
-SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = None
 
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
@@ -51,39 +53,6 @@ ELASTICSEARCH_HOSTS = [
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 
-
-SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
-SEARCH_DROPDOWN_LENGTH = 100
-WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
-
-
-ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
-
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
-
-
-GOOGLE_ANALYTICS_TRACKING_ID = None
-
-# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
-ANONYMOUS_USER_NAME = None
-
-
-GEOCODING_PROVIDERS = [
-    {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
-    {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
-]
-
-
-SPARQL_ENDPOINT_PROVIDERS = (
-    'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
-)
-
-APP_NAME = 'Arches'
-
-#######################################
-###  END PACKAGE SPECIFIC SETTINGS  ###
-#######################################
 
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
@@ -278,6 +247,42 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
+
+
+#######################################
+###       END STATIC SETTINGS       ###
+#######################################
+
+
+
+##########################################
+###   RUN TIME CONFIGURABLE SETTINGS   ###
+##########################################
+
+
+SEARCH_ITEMS_PER_PAGE = 5
+SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+SEARCH_DROPDOWN_LENGTH = 100
+WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
+
+ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
+
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+GOOGLE_ANALYTICS_TRACKING_ID = None
+
+GEOCODING_PROVIDERS = [
+    {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
+    {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
+]
+DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
+
+SPARQL_ENDPOINT_PROVIDERS = (
+    'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
+)
+
+APP_NAME = 'Arches'
+
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
 DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
@@ -334,8 +339,6 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
-
 # bounds for search results hex binning fabric
 # a smaller bbox will give you less distortion in hexes and better performance
 HEX_BIN_BOUNDS = (-122, -52, 128, 69)
@@ -348,6 +351,12 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
+
+
+##########################################
+### END RUN TIME CONFIGURABLE SETTINGS ###
+##########################################
+
 
 try:
     from settings_local import *
