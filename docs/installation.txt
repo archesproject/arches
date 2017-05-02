@@ -1,4 +1,4 @@
-############
+﻿############
 Installation
 ############
 
@@ -30,7 +30,7 @@ Dependencies
 * **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
 * **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. To be safe, you may as well upgrade pip right away with this command `python -m pip install. Once installed, run `python -m pip install --upgrade pip`. In Python 2.7.9 and later, pip is included by default.
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
-* **Mapnik** Installation instructions: http://mapnik.org/pages/downloads.html. *Windows installation of Mapnik is currently under development.*
+* **Mapnik** Installation instructions: http://mapnik.org/pages/downloads.html. *Mapnik is not fully supported on Windows, a few tileserver operations will not be available.*
 * **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
 * **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ regarding Arches and Elasticsearch.
 
@@ -45,57 +45,100 @@ Installing Arches
 
 Once you have all of the dependencies installed, you can use ``pip`` to install Arches. It's best to do this in a virtual environment. Using a command prompt, follow these steps.
 
-#. Create and enter a new directory called Projects
+#. Create and enter a new directory called Projects::
 
-    ``mkdir Projects && cd Projects``
-#. Create a virtual environment called ENV
+    mkdir Projects && cd Projects
 
-    ``virtualenv ENV``
+#. Create a virtual environment called ENV::
+
+    virtualenv ENV
+
 #. Activate the new virtual environment
 
-    **Linux and macOS**
-        ``source ENV/bin/activate``
+    **Linux and macOS**::
 
-    **Windows**
-        ``ENV\Scripts\activate``
+        source ENV/bin/activate
+
+    **Windows**::
+
+        ENV\Scripts\activate
+
+    .. note:: At this point (once the virtual environment is activated), Windows users need to manually install Shapely. `Follow these instructions <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#shapely>`_.
 
 #. Install Arches into your virtual environment
 
-    ``pip install arches==4.0b3``
+    You can install Arches with pip::
 
-    Arches is now installed! The next steps will guide you through the creation of an Arches "project".
+        pip install arches==4.0b3
+
+    .. note:: Windows users should use ``pip install arches==4.0b3 --no-use-wheel``. The extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
+
+    Arches is now installed! At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already), and then continue with the next steps to guide you through the creation of an Arches "project".
 
 #. Create a new Arches project
 
-     A project is a standalone Arches app that sits outside of your virtual environment and facilitate all of the customizations that you will need to make one installation of Arches different from the next.
+    A project is a standalone Arches app that sits outside of your virtual environment and facilitates all of the customizations that you will need to make one installation of Arches different from the next.
 
-    **Linux and macOS**
-        ``arches-project create my_project``
+    **Linux and macOS**::
+    
+        arches-project create my_project
 
-    **Windows**
-        ``python C:\Projects\ENV\Scripts\arches-project create my_project``
+    **Windows**::
+
+        python C:\Projects\ENV\Scripts\arches-project create my_project
 
 #. Run the bower installation
 
-    Enter your new project directory (``cd my_project``) and run
+    Enter your new project directory (``cd my_project``) and run::
 
-    ``bower install``
+        bower install
 
 #. Setup your Arches database
 
-    `You must have elasticsearch running for this step.`
+    First, make sure ElasticSearch is installed and running
 
-    ``python manage.py packages -o setup_db``
+    Then create your Arches database with::
+
+        python manage.py packages -o setup_db
 
 #. Run the development server
 
-    ``python manage.py runserver``
+    To view Arches, run::
 
-    You can now view Arches in a browser by navigating to ``localhost:8000``.
+        python manage.py runserver
+
+    You can now view Arches by navigating to ``localhost:8000`` in a browser.
 
 If you want to install Arches directly from the GitHub repo (instead of from the stable pip distribution), use `this documentation <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
 
-What is an Arches Project?
+More about Arches Projects
 ===========================
 
-To learn more about what it means to create an Arches project, please check out `this documentation <https://github.com/archesproject/arches/wiki/Creating-an-Arches-Project>`_.
+Arches Projects facilitate all of the customizations that you will need to make one installation of Arches different from the next. You can update html to modify web page branding, and add functions, datatypes, and widgets to introduce new functionality. A project sits outside of your virtual environment, and can thus be transferred to any other system where Arches is installed.
+
+The default structure of a new Arches project is (not all files shown)::
+
+	my_project/
+	└─ manage.py
+	└─ my_project/
+	      └─ settings.py
+	      └─ datatypes/
+	      └─ functions/
+	      └─ media/
+	      └─ templates/
+	      └─ widgets/
+
+settings.py
+^^^^^^^^^^^^
+
+Many project-specific settings are defined here. You will likely want to add a ``settings_local.py`` file that can separately store variables that you may want to keep out of the public eye (db passwords, API keys, etc.).
+
+templates
+^^^^^^^^^^^
+
+This directory holds HTML templates that you can modify to customize the branding and general appearance of your project.
+
+datatypes, fuctions, and widgets
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These directories will store the custom datatypes, functions, and widgets that you can create for the project. Developers interested in pursuing these customizations should start with `this documentation <https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets>`_.

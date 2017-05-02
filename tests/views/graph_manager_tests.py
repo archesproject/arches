@@ -80,7 +80,7 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse('graph', kwargs={'graphid':''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
-        self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.graph_id).count())
+        self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count())
 
         url = reverse('graph', kwargs={'graphid':self.GRAPH_ID})
         response = self.client.get(url)
