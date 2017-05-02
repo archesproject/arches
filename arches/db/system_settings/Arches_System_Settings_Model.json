@@ -475,7 +475,7 @@
                     "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c", 
                     "config": null, 
                     "parentproperty": "P140i_was_attributed_by", 
-                    "name": "ETL_NAME"
+                    "name": "ETL_USERNAME"
                 }, 
                 {
                     "is_collector": false, 
