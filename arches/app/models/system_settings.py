@@ -75,7 +75,7 @@ class SystemSettings(LazySettings):
         """
 
         # get all the possible settings defined by the Arches System Settings Graph
-        for node in models.Node.objects.filter(graph_id=self.graph_id):
+        for node in models.Node.objects.filter(graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
 
             def setup_node(node, parent_node=None):
                 if node.is_collector:
@@ -96,7 +96,7 @@ class SystemSettings(LazySettings):
             setup_node(node)
 
         # set any values saved in the instance of the Arches System Settings Graph 
-        for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.graph_id):
+        for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             if tile.nodegroup.cardinality == '1':
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != 'semantic':
