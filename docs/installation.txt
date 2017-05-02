@@ -28,9 +28,9 @@ Dependencies
 * **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is `Postgres.app <http://postgresapp.com>`_. For Windows, use the `EnterpriseDB installers <https://www.postgresql.org/download/windows/>`_, and use Stack Builder (included) to get PostGIS.
 * **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the `OSgeo4W installer <https://trac.osgeo.org/osgeo4w/>`_, and choose to install the GDAL package.
 * **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
-* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. To be safe, you may as well upgrade pip right away with this command `python -m pip install. Once installed, run `python -m pip install --upgrade pip`. In Python 2.7.9 and later, pip is included by default.
+* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. In Python 2.7.9 and later, pip is included by default. For good measure, you may as well upgrade pip right away with this command ``python -m pip install --upgrade pip``.
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
-* **Mapnik** Installation instructions: http://mapnik.org/pages/downloads.html. *Mapnik is not fully supported on Windows, a few tileserver operations will not be available.*
+* **Mapnik** Version 2.2. Installation instructions: http://mapnik.org/pages/downloads.html. If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible. Please read `this note on our Wiki <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#mapnik>`_ about how this limitation affects Arches.
 * **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
 * **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ regarding Arches and Elasticsearch.
 
@@ -71,7 +71,7 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
         pip install arches==4.0b3
 
-    .. note:: Windows users should use ``pip install arches==4.0b3 --no-use-wheel``. The extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
+    .. note:: Windows users should add ``--no-use-wheel`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
 
     Arches is now installed! At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already), and then continue with the next steps to guide you through the creation of an Arches "project".
 
@@ -87,11 +87,7 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
         python C:\Projects\ENV\Scripts\arches-project create my_project
 
-#. Run the bower installation
-
-    Enter your new project directory (``cd my_project``) and run::
-
-        bower install
+    .. note:: On Windows, with the current Arches beta release, v4.0b3, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
 #. Setup your Arches database
 
@@ -109,14 +105,14 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
     You can now view Arches by navigating to ``localhost:8000`` in a browser.
 
-If you want to install Arches directly from the GitHub repo (instead of from the stable pip distribution), use `this documentation <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
+If you want to install Arches directly from the GitHub repo (instead of from the stable pip distribution), use the `developer installation documentation <https://github.com/archesproject/arches/wiki/Developer-Installation>`_ on the Arches repo wiki.
 
 More about Arches Projects
 ===========================
 
 Arches Projects facilitate all of the customizations that you will need to make one installation of Arches different from the next. You can update html to modify web page branding, and add functions, datatypes, and widgets to introduce new functionality. A project sits outside of your virtual environment, and can thus be transferred to any other system where Arches is installed.
 
-The default structure of a new Arches project is (not all files shown)::
+The general structure of a new Arches project is:::
 
 	my_project/
 	└─ manage.py
@@ -127,6 +123,8 @@ The default structure of a new Arches project is (not all files shown)::
 	      └─ media/
 	      └─ templates/
 	      └─ widgets/
+
+*Note that not all files are shown*
 
 settings.py
 ^^^^^^^^^^^^
@@ -141,4 +139,4 @@ This directory holds HTML templates that you can modify to customize the brandin
 datatypes, fuctions, and widgets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These directories will store the custom datatypes, functions, and widgets that you can create for the project. Developers interested in pursuing these customizations should start with `this documentation <https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets>`_.
+These directories will store the custom datatypes, functions, and widgets that you can create for the project. Developers interested in pursuing these customizations should start with `this customization documentation <https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets>`_.
