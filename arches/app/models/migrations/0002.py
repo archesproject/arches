@@ -14,7 +14,7 @@ from arches.app.models.system_settings import settings
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
-    management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches System Settings.json'))
+    management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
     management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite='overwrite')
 
 def reverse_func(apps, schema_editor):
