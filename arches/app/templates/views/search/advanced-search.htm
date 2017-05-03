@@ -10,7 +10,7 @@
                 <div class="list-filter relative">
                     <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
                     <!-- Clear Filter -->
-                    <span class="clear-node-search"><i class="fa fa-times-circle"></i></span>
+                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
