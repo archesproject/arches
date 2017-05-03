@@ -1,0 +1,9 @@
+######################
+Intitial Configuration
+######################
+
+Now that you have Arches installed, this section will guide you through some of the initial settings you must provide to make your installation ready. In the Arches interface, settings are managed in the **System Settings** menu.
+
+*work on Arches system settings is still in progress*
+
+
