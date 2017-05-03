@@ -14,16 +14,18 @@
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
-            <div class="search-facet-item disabled">
-                <h4 class="search-facet-item-heading">
-                    <strong data-bind="text: name"></strong>
-                </h4>
-            </div>
-                <!-- ko foreach: cards -->
-                <a href="#" class="search-facet-item" data-bind="click: addFacet">
-                    <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
-                    <p class="list-group-item-text"></p>
-                </a>
+                <!-- ko if: cards().length > 0  -->
+                <div class="search-facet-item disabled">
+                    <h4 class="search-facet-item-heading">
+                        <strong data-bind="text: name"></strong>
+                    </h4>
+                </div>
+                    <!-- ko foreach: cards -->
+                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
+                        <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                        <p class="list-group-item-text"></p>
+                    </a>
+                    <!-- /ko -->
                 <!-- /ko -->
             <!-- /ko -->
         </div>
