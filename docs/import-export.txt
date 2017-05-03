@@ -37,7 +37,15 @@ The first column in the CSV must be named ``ResourceID``. ResourceID is a user-g
 +-------------+---------------------+--------------------+--------------------+
 | 3           | attr. 1 value       | attr. 2 value      | attr. 3 value      |
 +-------------+---------------------+--------------------+--------------------+
+
 *Simple CSV with three resources, each with three different attributes.*
+
+Or, in a raw format (if you open the file in a text editor), the CSV should look like this::
+
+    Resource ID,attribute 1,attribute 2,attribute 3
+    1,attr. 1 value,attr. 2 value,attr. 3 value
+    2,attr. 1 value,attr. 2 value,attr. 3 value
+    3,attr. 1 value,attr. 2 value,attr. 3 value
 
 Multiple lines may be used to add multiple attributes to a single resource. You must make sure these lines are contiguous, and every line must have a ResourceID. Other cells are optional.
 
@@ -52,6 +60,7 @@ Multiple lines may be used to add multiple attributes to a single resource. You 
 +-------------+---------------------+--------------------------+--------------------+
 | 3           | attr. 1 value       | attr. 2 value            | attr. 3 value      |
 +-------------+---------------------+--------------------------+--------------------+
+
 *CSV with three resources, one of which has two values for attribute 2.*
 
 Depending on your Resource Model's graph structure, some attributes will be handled as "groups". For example, ``Name`` and ``Name Type`` attributes would be a group. Attributes that are grouped must be on the same row. However, a single row can have many different groups of attributes in it, just not more than one value for any one group.
@@ -67,6 +76,7 @@ Depending on your Resource Model's graph structure, some attributes will be hand
 +-------------+--------------------------+--------------------+---------------------------+
 | 3           | Writer's Cabin           | Primary*           | housed resident authors   |
 +-------------+--------------------------+--------------------+---------------------------+
+
 *CSV with three resources, one of which has two groups of* ``name`` *and* ``name_type`` *attributes. See below for more on the 'Primary' and 'Historic' labels.*
 
 Some data types require specially formatted values:
