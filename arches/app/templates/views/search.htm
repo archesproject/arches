@@ -16,7 +16,9 @@
 {{block.super}}
     <script>
         {% autoescape off %}define('search-data', [], function() {
-            return {};
+            return {
+                saved_searches: {{ saved_searches }}
+            };
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}
