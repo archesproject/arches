@@ -1,5 +1,166 @@
-======================
+﻿======================
 Resource Import/Export
 ======================
 
-<explanation of import/export gui interface>
+*Currently, all data import and export operations happen through the Arches command line interface.*
+
+Uploading a CSV to Arches
+-------------------------
+
+To do a bulk import of resources to your Arches database, you must create a correctly formatted CSV (comma-separated values) file. We recommend MS Excel or Open Office for this task. More advanced users will likely find a custom scripting effort to be worthwhile.
+
+The CSV upload is also the best way to upload an ESRI Shapefile to Arches. Using mapping software like QGIS you will be able to save the shapefile as a CSV. Make sure that any geometry values are stored as `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and that all coordinates are stored as WGS 84 (EPSG:4326) decimal degrees.
+
+All values containing commas must be quoted so the value is not misinterpreted by the importer as multiple csv columns. This includes strings, concept-lists, and multi-geoms.
+
+The workflow for creating a CSV should be something like this:
+
+#. Identify which Resource Model you are loading data into
+#. Download the **mapping file** and **concepts file** for that resource model
+#. Modify the mapping file to reference your CSV
+#. Populate the CSV with your data
+#. Import the CSV using the `import_business_data <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_ command.
+
+CSV File Requirements
+^^^^^^^^^^^^^^^^^^^^^^
+
+Each row in the CSV can contain the attribute values of one and only one resource.
+
+The first column in the CSV must be named ``ResourceID``. ResourceID is a user-generated unique ID for each individual resource. If ResourceID is a valid UUID, Arches will adopt it internally as the new resource's ArchesID. If ResourceID is not a valid UUID Arches will create a new UUID and use that as the ArchesID. Subsequent columns can have any name.
+
++-------------+---------------------+--------------------+--------------------+
+| Resource ID | attribute 1         |  attribute 2       | attribute 3        |
++=============+=====================+====================+====================+
+| 1           | attr. 1 value       | attr. 2 value      | attr. 3 value      |
++-------------+---------------------+--------------------+--------------------+
+| 2           | attr. 1 value       | attr. 2 value      | attr. 3 value      |
++-------------+---------------------+--------------------+--------------------+
+| 3           | attr. 1 value       | attr. 2 value      | attr. 3 value      |
++-------------+---------------------+--------------------+--------------------+
+*Simple CSV with three resources, each with three different attributes.*
+
+Multiple lines may be used to add multiple attributes to a single resource. You must make sure these lines are contiguous, and every line must have a ResourceID. Other cells are optional.
+
++-------------+---------------------+--------------------------+--------------------+
+| Resource ID | attribute 1         |  attribute 2             | attribute 3        |
++=============+=====================+==========================+====================+
+| 1           | attr. 1 value       | attr. 2 value            | attr. 3 value      |
++-------------+---------------------+--------------------------+--------------------+
+| 2           | attr. 1 value       | attr. 2 value            | attr. 3 value      |
++-------------+---------------------+--------------------------+--------------------+
+| 2           |                     | attr. 2 additional value |                    |
++-------------+---------------------+--------------------------+--------------------+
+| 3           | attr. 1 value       | attr. 2 value            | attr. 3 value      |
++-------------+---------------------+--------------------------+--------------------+
+*CSV with three resources, one of which has two values for attribute 2.*
+
+Depending on your Resource Model's graph structure, some attributes will be handled as "groups". For example, ``Name`` and ``Name Type`` attributes would be a group. Attributes that are grouped must be on the same row. However, a single row can have many different groups of attributes in it, just not more than one value for any one group.
+
++-------------+--------------------------+--------------------+---------------------------+
+| Resource ID |  name                    | name_type          | description               |
++=============+==========================+====================+===========================+
+| 1           | Yucca House              | Primary*           | "this house, built in..." |
++-------------+--------------------------+--------------------+---------------------------+
+| 2           | Big House                | Primary*           | originally a small cabin  |
++-------------+--------------------------+--------------------+---------------------------+
+| 2           | Old Main Building        | Historic*          |                           |
++-------------+--------------------------+--------------------+---------------------------+
+| 3           | Writer's Cabin           | Primary*           | housed resident authors   |
++-------------+--------------------------+--------------------+---------------------------+
+*CSV with three resources, one of which has two groups of* ``name`` *and* ``name_type`` *attributes. See below for more on the 'Primary' and 'Historic' labels.*
+
+Some data types require specially formatted values:
+
+* **Dates** All dates must be formatted as YYYY-MM-DD
+* **Geometry** All geometry must be formatted in `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and that all coordinates stored as WGS 84 (EPSG:4326) decimal degrees.
+* **Concepts** See the Concepts_ section below.
+* ``concept-list`` and ``domain-value-list`` Values must be represented as quoted, comma-separated strings in the source CSV file. Each value within the concept/domain list does not need to be in quotation marks.
+
+    ``concept-list`` example::
+        
+        "3b4bddbb-0ca6-44d5-8622-ce9982412883,10ac2b9b-3425-4c3c-9b5c-983bb16f93d3,052e8714-3f19-4179-b1f9-dcbe45df673e"
+
+Mapping File Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All CSV files must be accompanied by a **mapping file**. This is a JSON-structured file that indicates which node in a Resource Model's graph each column in the CSV file should map to. The mapping file should contain the source column name populated in the ``file_field_name`` property for all nodes in a graph the user wishes to map to. The mapping file should be named exactly the same as the CSV file but with the extension '.mapping', and must be in the same directory as the CSV.
+
+To create a mapping file for a Resource Model in your database, go to the Arches Designer landing page. Find the Resource Model into which you plan to load resources, and choose Export Mapping File from the Manage menu.
+
+.. image:: images/create_mapping_file.gif
+
+Unzip the download, and you'll find a ``.mapping`` file as well as a ``...concepts.json`` file (more on the latter below). The contents of the mapping file will look something like this::
+
+    {
+        "resource_model_id": "bbc5cee8-fa16-11e6-9e3e-026d961c88e6", 
+        "resource_model_name": "HER Buildings", 
+        "nodes": [
+            {
+                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
+                "arches_node_name": "Name", 
+                "file_field_name": "", 
+                "concept_export_value": "label", 
+                "data_type": "concept", 
+                "export": false
+            }, 
+            {
+                "arches_nodeid": "d4896e3b-fa30-11e6-9e3e-026d961c88e6", 
+                "arches_node_name": "Name Type", 
+                "file_field_name": "", 
+                "concept_export_value": "label", 
+                "data_type": "concept", 
+                "export": false
+            },
+            ...
+        ]
+    }
+
+You will now need to enter the column name in your CSV into the ``file_field_name`` in appropriate node in the mapping file. For example, if your CSV has a column named "activity_type" and you want the values in this column to populate "Activity Type" nodes in Arches, you would add that name to the mapping file like so::
+
+    {   
+        ...
+            {
+                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
+                "arches_node_name": "Name", 
+                "file_field_name": "name", <-- place column name here 
+                "concept_export_value": "label", 
+                "data_type": "concept", 
+                "export": false
+            },
+       ...
+    }
+
+To map more than one column to a single node, you must copy and paste that node within the mapping file.
+
+.. _concepts:
+
+Concept Values in CSVs, and the **concepts file**
+`````````````````````````````````````````````````
+
+Values in the CSV that represent concepts in the RDM (Reference Data Manager) must not use the label of that concept, but its actual valueid that represents that concept in the RDM. Thus, in the above example, 'Primary' and 'Historic', because these are actually concepts stored in the RDM, would actually need to be replaced by the valueid (a UUID) for their respective concepts.
+
+To aid with the process, a **concepts file** is created every time you download a mapping file, which lists the concept valueids and corresponding labels for all of the Concept Collections associated with any of the Resource Model's nodes. For example::
+
+    "Name Type": {
+        "ecb20ae9-a457-4011-83bf-1c936e2d6b6a": "Historic", 
+        "81dd62d2-6701-4195-b74b-8057456bba4b": "Primary"
+    },
+
+Thus, using the concepts file, the example above should be changed to look like this:
+
++-------------+--------------------------+--------------------------------------+---------------------------+
+| Resource ID |  name                    | name_type                            | description               |
++=============+==========================+======================================+===========================+
+| 1           | Yucca House              | 81dd62d2-6701-4195-b74b-8057456bba4b | "this house, built in..." |
++-------------+--------------------------+--------------------------------------+---------------------------+
+| 2           | Big House                | 81dd62d2-6701-4195-b74b-8057456bba4b | originally a small cabin  |
++-------------+--------------------------+--------------------------------------+---------------------------+
+| 2           | Old Main Building        | ecb20ae9-a457-4011-83bf-1c936e2d6b6a |                           |
++-------------+--------------------------+--------------------------------------+---------------------------+
+| 3           | Writer's Cabin           | 81dd62d2-6701-4195-b74b-8057456bba4b | housed resident authors   |
++-------------+--------------------------+--------------------------------------+---------------------------+
+
+Exporting Arches Data
+---------------------
+
+More documentation coming soon... Currently all export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
