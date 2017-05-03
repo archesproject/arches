@@ -15,10 +15,13 @@
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('search-data', [], function() {
-            return {
+        define('search-data', [], function() {
+            return {{% autoescape off %}
+                searchable_nodes: {{ searchable_nodes }},
+                resource_cards: {{ resource_cards }},
+                datatypes: {{ datatypes_json }},
                 saved_searches: {{ saved_searches }}
-            };
-        });{% endautoescape %}
+            {% endautoescape %}};
+        });
     </script>
 {% endblock pre_require_js %}

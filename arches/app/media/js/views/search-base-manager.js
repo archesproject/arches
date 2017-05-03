@@ -8,12 +8,15 @@ define([
     'views/search/time-filter',
     'views/search/term-filter',
     'views/search/map-filter',
+    'views/search/advanced-search',
     'views/search/resource-type-filter',
     'views/resource/related-resources-manager',
     'views/search/search-results',
     'views/search/saved-searches',
-    'views/base-manager'
-], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView) {
+    'views/base-manager',
+    'view-data',
+    'search-data'
+], function($, _, ko, arches, AlertViewModel, BaseFilter, TimeFilter, TermFilter, MapFilter, AdvancedSearch, ResourceTypeFilter, RelatedResourcesManager, SearchResults, SavedSearches, BaseManagerView, viewData, searchData) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -48,8 +51,13 @@ define([
                 termFilter: this.filters.termFilter
             });
             this.filters.savedSearches = new BaseFilter();
-            this.filters.advancedFilter = new BaseFilter();
-            this.filters.searchRelatedResources = new BaseFilter()
+            this.filters.advancedFilter = new AdvancedSearch({
+                graphs: viewData.graphs,
+                nodes: searchData.searchable_nodes,
+                cards: searchData.resource_cards,
+                datatypes: searchData.datatypes
+            });
+            this.filters.searchRelatedResources = new BaseFilter();
             this.filters.mapFilter = new MapFilter({
                 aggregations: this.aggregations,
                 resizeOnChange: this.viewModel.resultsExpanded,
@@ -104,6 +112,7 @@ define([
                 this.filters.timeFilter.appendFilters(params);
                 this.filters.resourceTypeFilter.appendFilters(params);
                 this.filters.mapFilter.appendFilters(params);
+                this.filters.advancedFilter.appendFilters(params);
 
                 params.no_filters = !Object.keys(params).length;
                 return params;
