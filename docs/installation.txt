@@ -27,7 +27,7 @@ Dependencies
 
 * **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is `Postgres.app <http://postgresapp.com>`_. For Windows, use the `EnterpriseDB installers <https://www.postgresql.org/download/windows/>`_, and use Stack Builder (included) to get PostGIS.
 * **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the `OSgeo4W installer <https://trac.osgeo.org/osgeo4w/>`_, and choose to install the GDAL package.
-* **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.13, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
+* **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.12, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
 * **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. In Python 2.7.9 and later, pip is included by default. For good measure, you may as well upgrade pip right away with this command ``python -m pip install --upgrade pip``.
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
 * **Mapnik** Version 2.2. Installation instructions: http://mapnik.org/pages/downloads.html. If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible. Please read `this note on our Wiki <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#mapnik>`_ about how this limitation affects Arches.
