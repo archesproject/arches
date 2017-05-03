@@ -13,6 +13,7 @@ define([
             this.searchableGraphs = [];
             this.cards = options.cards;
             this.datatypelookup = {};
+            this.facetFilterText = ko.observable('');
             _.each(options.datatypes, function(datatype){
                 self.datatypelookup[datatype.datatype] = datatype;
             });
@@ -26,14 +27,24 @@ define([
             });
             _.each(options.graphs, function (graph) {
                 if (graph.isresource && graph.isactive) {
-                    graph.cards = _.filter(options.cards, function (card) {
+                    var graphCards = _.filter(options.cards, function (card) {
                         return card.graph_id === graph.graphid && card.nodes.length > 0;
                     });
-                    if (graph.cards.length > 0) {
-                        _.each(graph.cards, function(card) {
+                    if (graphCards.length > 0) {
+                        _.each(graphCards, function(card) {
                             card.getGraph = function () {
                                 return graph;
                             };
+                        });
+                        graph.cards = ko.computed(function () {
+                            var facetFilterText = self.facetFilterText().toLowerCase();
+                            if (facetFilterText) {
+                                return _.filter(graphCards, function (card) {
+                                    return card.name.toLowerCase().indexOf(facetFilterText)>-1;
+                                });
+                            } else {
+                                return graphCards;
+                            }
                         });
                         self.searchableGraphs.push(graph);
                     }
