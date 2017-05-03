@@ -50,12 +50,14 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
+        saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
 
         context = self.get_context_data(
+            saved_searches=saved_searches,
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
