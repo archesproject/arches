@@ -382,7 +382,11 @@ def build_search_results_dsl(request):
                     node = models.Node.objects.get(pk=key)
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.append_search_filters(val, node, tile_query, request)
-            advanced_query.must(Nested(path='tiles', query=tile_query))
+            nested_query = Nested(path='tiles', query=tile_query)
+            if advanced_filter['op'] == 'or':
+                advanced_query.should(nested_query)
+            else:
+                advanced_query.must(nested_query)
         search_query.must(advanced_query)
 
     query.add_query(search_query)
