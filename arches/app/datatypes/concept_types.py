@@ -60,7 +60,10 @@ class ConceptDataType(BaseConceptDataType):
         return get_preflabel_from_valueid(nodevalue, lang)['value']
 
     def get_display_value(self, tile, node):
-        return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
+        if tile.data[str(node.nodeid)] is None or tile.data[str(node.nodeid)].strip() == '':
+            return ''
+        else:
+            return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
 
 
 class ConceptListDataType(BaseConceptDataType):

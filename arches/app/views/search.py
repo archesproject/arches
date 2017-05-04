@@ -50,17 +50,27 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
+        saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+        searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
+        datatypes = models.DDataType.objects.all()
 
         context = self.get_context_data(
+            resource_cards=JSONSerializer().serialize(resource_cards),
+            searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+            saved_searches=saved_searches,
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',
             resource_graphs=resource_graphs,
+            datatypes=datatypes,
+            datatypes_json=JSONSerializer().serialize(datatypes),
         )
 
         context['nav']['title'] = 'Search'
@@ -399,10 +409,10 @@ def _get_child_concepts(conceptid):
 
 def geocode(request):
     geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['id'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['id'])
+    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['ID'] == geocoding_provider_id), None)
+    Geocoder = import_string('arches.app.utils.geocoders.' + provider['ID'])
     search_string = request.GET.get('q', '')
-    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['api_key']) })
+    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['API_KEY']) })
 
 def export_results(request):
     dsl = build_search_results_dsl(request)

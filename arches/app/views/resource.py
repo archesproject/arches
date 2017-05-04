@@ -85,6 +85,9 @@ class ResourceEditorView(BaseManagerView):
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+            searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+            searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+            resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
                 main_script=main_script,
                 resource_type=resource_instance.graph.name,
@@ -102,6 +105,8 @@ class ResourceEditorView(BaseManagerView):
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
                 displayname=displayname,
+                resource_cards=JSONSerializer().serialize(resource_cards),
+                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
             )
 
             if graph.iconclass:

@@ -66,6 +66,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             displayName: '{{ displayname }}'
         };
     });
+    define('search-data', [], function() {
+        return {{% autoescape off %}
+            searchable_nodes: {{ searchable_nodes }},
+            resource_cards: {{ resource_cards }},
+            datatypes: {{ datatypes_json }}
+        {% endautoescape %}};
+    });
     {% endautoescape %}
 </script>
 {% endblock pre_require_js %}

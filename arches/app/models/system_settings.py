@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import LazySettings
+from django.utils.functional import empty
 from arches.app.models import models
 
 
@@ -35,9 +36,8 @@ class SystemSettings(LazySettings):
 
     """
 
-    graph_id = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
-    resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195'
-    settings = {} # includes all settings including methods and private attributes defined in settings.py
+    SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+    RESOURCE_INSTANCE_ID = 'a106c400-260c-11e7-a604-14109fd34195'
 
     def __init__(self, *args, **kwargs):
         super(SystemSettings, self).__init__(*args, **kwargs)
@@ -51,61 +51,58 @@ class SystemSettings(LazySettings):
                 ret.append("%s = %s" % (setting, setting_value))
         return '\n'.join(ret)
 
-    @classmethod
-    def get(cls, setting_name):
+    def __getattr__(self, name):
         """
-        Used to retrieve any setting, even callable methods defined in settings.py
+        By default get settings from this class which is initially populated from the settings.py filter
+        If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
+        by calling update_from_db first which populates this class with any settings from the database
 
+        What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file 
+        Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
+        
         """
 
-        return cls.settings[setting_name]
+        try:
+            return super(SystemSettings, self).__getattr__(name)
+        except:
+            self.update_from_db()
+            return getattr(self, name)
 
-    @classmethod
-    def update_settings(cls):
+    def update_from_db(self, **kwargs):
         """
-        Updates the settings the Arches System Settings graph
+        Updates the settings the Arches System Settings graph tile instances stored in the database
 
         """
 
         # get all the possible settings defined by the Arches System Settings Graph
-        for node in models.Node.objects.filter(graph_id=cls.graph_id):
-            # if node.datatype != 'semantic':
-            #     cls.settings[node.name] = None
-            #     setattr(cls, node.name, None)
+        for node in models.Node.objects.filter(graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+
             def setup_node(node, parent_node=None):
                 if node.is_collector:
                     if node.nodegroup.cardinality == '1':
                         obj = {}
-                        for decendant_node in cls.get_direct_decendent_nodes(node):
-                            # setup_node(decendant_node)
-                            # if decendant_node.name not in cls.settings:
-                            #     cls.settings[decendant_node.name] = None
-                            #     setattr(cls, decendant_node.name, None)
+                        for decendant_node in self.get_direct_decendent_nodes(node):
                             obj[decendant_node.name] = setup_node(decendant_node, node)
 
-                        cls.settings[node.name] = obj
-                        #setattr(cls, node.name, obj)
+                        setattr(self, node.name, obj)
 
                     if node.nodegroup.cardinality == 'n':
-                        cls.settings[node.name] = []
-                        #setattr(cls, node.name, [])
-                    return cls.settings[node.name]
+                        setattr(self, node.name, [])
+                    return getattr(self, node.name)
 
                 if parent_node is not None:
-                    cls.settings[node.name] = None
-                    #setattr(cls, node.name, None)
+                    setattr(self, node.name, None)
 
             setup_node(node)
 
         # set any values saved in the instance of the Arches System Settings Graph 
-        for tile in models.TileModel.objects.filter(resourceinstance__graph_id=cls.graph_id):
+        for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             if tile.nodegroup.cardinality == '1':
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != 'semantic':
                         try:
                             val = tile.data[str(node.nodeid)]
-                            cls.settings[node.name] = val
-                            #setattr(cls, node.name, val)
+                            setattr(self, node.name, val)
                         except:
                             pass
 
@@ -113,35 +110,22 @@ class SystemSettings(LazySettings):
                 obj = {}
                 collector_nodename = ''
                 for node in tile.nodegroup.node_set.all():
-                    print "%s: %s" % (node.name,node.is_collector)
+                    # print "%s: %s" % (node.name,node.is_collector)
                     if node.is_collector:
                         collector_nodename = node.name
                     if node.datatype != 'semantic':
                         obj[node.name] = tile.data[str(node.nodeid)]
-                    # try:
-                    #     #val = tile.data[str(node.nodeid)]
-                    #     obj[node.name] = tile.data[str(node.nodeid)]
-                    #     # cls.settings[node.name] = val
-                    #     # setattr(cls, node.name, val)
-                    # except:
-                    #     pass
 
-                print collector_nodename
-                print obj
+                # print collector_nodename
+                # print obj
 
-                cls.settings[collector_nodename].append(obj)
-                #setattr(cls, collector_nodename, ret)
+                val = getattr(self, collector_nodename)
+                val.append(obj)
+                setattr(self, collector_nodename, val)
 
-        for setting_name, setting_value in cls.settings.iteritems():
-            if setting_name.isupper():
-            #if not setting_name.startswith('__') and not callable(cls.settings[setting_name]):
-                setattr(cls, setting_name, setting_value)
+        #print self
 
-        print cls
-
-
-    @classmethod
-    def get_direct_decendent_nodes(cls, node):
+    def get_direct_decendent_nodes(self, node):
         nodes = []
         for edge in models.Edge.objects.filter(domainnode=node):
             nodes.append(edge.rangenode)
