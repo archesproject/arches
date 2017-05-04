@@ -3,7 +3,7 @@
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
 BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
-
+DJANGO_PORT=${DJANGO_PORT:-8000}
 
 cd_arches_root() {
 	cd ${ARCHES_ROOT}
@@ -29,19 +29,15 @@ init_arches() {
 		echo ""
 		echo "*** Warning: FORCE_DB_INIT = True ***"
 		echo ""
-		run_db_init_commands
+		setup_arches
 	elif db_exists; then
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
 		echo ""
 	else
-		run_db_init_commands
+		setup_arches
 	fi
 
 	init_arches_projects
-}
-
-run_db_init_commands() {
-	setup_arches
 }
 
 db_exists() {
@@ -119,10 +115,21 @@ install_bower_components() {
 	bower --allow-root install
 }
 
+run_migrations() {
+	echo ""
+	echo ""
+	echo "----- RUNNING DATABASE MIGRATIONS -----"
+	echo ""
+	python manage.py migrate
+}
+
 run_custom_scripts() {
 	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
 		if [[ -f ${file} ]]; then
-			echo "Running custom script: ${file}"
+			echo ""
+			echo ""
+			echo "----- RUNNING CUSTUM SCRIPT: ${file} -----"
+			echo ""
 			${file}
 		fi
 	done
@@ -151,9 +158,9 @@ run_django_server() {
 	echo ""
 	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
 	    echo "Running Django with options --noreload --nothreading."
-		exec python manage.py runserver --noreload --nothreading 0.0.0.0:8000
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
 	else
-		exec python manage.py runserver 0.0.0.0:8000
+		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
 	fi
 }
 
@@ -172,14 +179,21 @@ if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 	run_tests
 fi
 
+
 # Run from folder where user's bower.json lives
 cd_bower_folder
 install_bower_components
 
-# From here on, run from ${APP_FOLDER}
+
+# From here on, run from the user's ${APP_FOLDER}
 cd_app_folder
-run_custom_scripts
-if [[ "${DJANGO_MODE}" == "PROD" ]]; then
+
+if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+	run_migrations
+elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 	collect_static
 fi
+
+run_custom_scripts
+
 run_django_server
