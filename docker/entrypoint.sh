@@ -42,7 +42,7 @@ init_arches() {
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	psql -lqt -h $PGHOST -U postgres | cut -d \| -f 1 | grep -qw ${PGDBNAME}
+	psql -lqt -h ${PGHOST} -U postgres | cut -d \| -f 1 | grep -qw ${PGDBNAME}
 }
 
 setup_arches() {
