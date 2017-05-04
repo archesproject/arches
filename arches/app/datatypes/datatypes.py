@@ -9,6 +9,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.search.elasticsearch_dsl_builder import Match
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -60,6 +61,14 @@ class StringDataType(BaseDataType):
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(nodevalue)
         return terms
+
+    def append_search_filters(self, value, node, query, request):
+        """
+        Updates files
+        """
+        if value['val'] != '':
+            query.should(Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix'))
+        pass
 
 
 class NumberDataType(BaseDataType):

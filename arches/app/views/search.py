@@ -41,6 +41,7 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 try:
@@ -207,6 +208,7 @@ def build_search_results_dsl(request):
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
+    advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
 
     se = SearchEngineFactory().create()
 
@@ -369,6 +371,19 @@ def build_search_results_dsl(request):
 
 
         search_query.must(temporal_query)
+
+    datatype_factory = DataTypeFactory()
+    if len(advanced_filters) > 0:
+        advanced_query = Bool()
+        for advanced_filter in advanced_filters:
+            tile_query = Bool()
+            for key, val in advanced_filter.iteritems():
+                if key != 'op':
+                    node = models.Node.objects.get(pk=key)
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    datatype.append_search_filters(val, node, tile_query, request)
+            advanced_query.must(Nested(path='tiles', query=tile_query))
+        search_query.must(advanced_query)
 
     query.add_query(search_query)
     return query
