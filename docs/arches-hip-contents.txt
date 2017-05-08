@@ -2,13 +2,15 @@
 Arches HIP Contents
 ############################
 
-By default, Arches ships with a set of cohesive Resource Models, Branches, and Concepts which form the v4 version of Arches Heritage Inventory Packes (HIP), a data schema that was originally developed for `Historic Places L.A. <http://historicplacesla.org>`_. HPLA is the Arches implementation in Los Angeles that was designed to hold data from the ongoing Survey LA project.
+By default, Arches ships with a set of cohesive Resource Models, Branches, and Concepts which form the v4 version of Arches-HIP (Heritage Inventory Package), a data schema that was originally developed for `Historic Places L.A. <http://historicplacesla.org>`_. HPLA is the Arches implementation in Los Angeles that was designed to hold data from the ongoing Survey LA project.
 
 To import this entire data schema into your Arches database, use these commands (with your virtual environment activated)::
 
     python manage.py packages -o import_graphs
-    python manage.py packages -o 
-The v4 HIP comprises 6 Resource Models and 36 Branches.
+    python manage.py packages -o python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_scheme.rdf -ow overwrite -st keep
+    python manage.py packages -o python manage.py packages -o import_reference_data -s arches/db/schemes/arches_concept_collections.rdf -ow overwrite -st keep
+
+The package comprises 6 Resource Models and 36 Branches.
 
 Resource Models
 ===============
