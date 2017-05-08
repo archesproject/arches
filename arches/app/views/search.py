@@ -21,7 +21,6 @@ import csv
 import math
 from datetime import datetime
 from flexidate import FlexiDate
-from django.conf import settings
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
@@ -34,13 +33,15 @@ from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
+from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
+from arches.app.views.concept import get_preflabel_from_conceptid
+from arches.app.datatypes.datatypes import DataTypeFactory
 
 
 try:
@@ -50,17 +51,27 @@ except ImportError:
 
 class SearchView(BaseManagerView):
     def get(self, request):
+        saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
         resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+        searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+        searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
+        datatypes = models.DDataType.objects.all()
 
         context = self.get_context_data(
+            resource_cards=JSONSerializer().serialize(resource_cards),
+            searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+            saved_searches=saved_searches,
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
             main_script='views/search',
             resource_graphs=resource_graphs,
+            datatypes=datatypes,
+            datatypes_json=JSONSerializer().serialize(datatypes),
         )
 
         context['nav']['title'] = 'Search'
@@ -197,6 +208,7 @@ def build_search_results_dsl(request):
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
+    advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
 
     se = SearchEngineFactory().create()
 
@@ -360,6 +372,27 @@ def build_search_results_dsl(request):
 
         search_query.must(temporal_query)
 
+    datatype_factory = DataTypeFactory()
+    if len(advanced_filters) > 0:
+        advanced_query = Bool()
+        grouped_query = Bool()
+        grouped_queries = [grouped_query]
+        for index, advanced_filter in enumerate(advanced_filters):
+            tile_query = Bool()
+            for key, val in advanced_filter.iteritems():
+                if key != 'op':
+                    node = models.Node.objects.get(pk=key)
+                    datatype = datatype_factory.get_instance(node.datatype)
+                    datatype.append_search_filters(val, node, tile_query, request)
+            nested_query = Nested(path='tiles', query=tile_query)
+            if advanced_filter['op'] == 'or' and index != 0:
+                grouped_query = Bool()
+                grouped_queries.append(grouped_query)
+            grouped_query.must(nested_query)
+        for grouped_query in grouped_queries:
+            advanced_query.should(grouped_query)
+        search_query.must(advanced_query)
+
     query.add_query(search_query)
     return query
 
@@ -399,10 +432,10 @@ def _get_child_concepts(conceptid):
 
 def geocode(request):
     geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['id'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['id'])
+    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['ID'] == geocoding_provider_id), None)
+    Geocoder = import_string('arches.app.utils.geocoders.' + provider['ID'])
     search_string = request.GET.get('q', '')
-    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['api_key']) })
+    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['API_KEY']) })
 
 def export_results(request):
     dsl = build_search_results_dsl(request)

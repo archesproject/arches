@@ -14,7 +14,7 @@ import os
 import json
 import uuid
 import importlib
-from django.conf import settings
+from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Q, Max
@@ -22,13 +22,13 @@ from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from datetime import datetime
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.forms.models import model_to_dict
 
+# can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
+# so make sure the only settings we use in this file are ones that are static (fixed at run time)
+from django.conf import settings
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
-
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -82,6 +82,7 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
+    issearchable = models.NullBooleanField(default=False)
     isgeometric = models.BooleanField()
 
     class Meta:
@@ -531,11 +532,13 @@ class ResourceXResource(models.Model):
     dateended = models.DateField(blank=True, null=True)
 
     def delete(self):
+        from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
         se.delete(index='resource_relations', doc_type='all', id=self.resourcexid)
         super(ResourceXResource, self).delete()
 
     def save(self):
+        from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
         document = model_to_dict(self)
         se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
@@ -689,7 +692,7 @@ class MapLayer(models.Model):
 
 
 class TileserverLayer(models.Model):
-    name = models.TextField(unique=True)
+    name = models.TextField(primary_key=True, unique=True)
     path = models.TextField()
     config = JSONField()
     map_layer = models.ForeignKey('MapLayer', db_column='map_layerid')

@@ -21,12 +21,12 @@ from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.db import connection
 from django.db import transaction
 from django.db.models import Q
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from django.http import HttpRequest
 from django.core.files import File as DjangoFile
@@ -83,7 +83,7 @@ class CsvWriter(Writer):
                                         concept_export_value_type = concept_export_value_lookup[k]
                                     if tile['data'][k] != None:
                                         value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
-                                    csv_record[mapping[k]] = value
+                                        csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
                                     value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)

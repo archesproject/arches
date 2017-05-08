@@ -6,9 +6,10 @@ from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.conf import settings
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -60,6 +61,18 @@ class StringDataType(BaseDataType):
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(nodevalue)
         return terms
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                fuzziness = 'AUTO' if '~' in value['op'] else 0
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=fuzziness)
+                if '!' in value['op']:
+                    query.must_not(match_query)
+                else:
+                    query.must(match_query)
+        except KeyError, e:
+            pass
 
 
 class NumberDataType(BaseDataType):

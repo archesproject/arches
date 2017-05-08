@@ -20,6 +20,7 @@ import uuid, importlib
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -29,7 +30,6 @@ from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
-from django.conf import settings
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class TileData(View):
@@ -53,6 +53,7 @@ class TileData(View):
 
                 tile.after_update_all()
                 clean_resource_cache(tile)
+                update_system_settings_cache(tile)
                 return JSONResponse(tile)
 
         if self.action == 'reorder_tiles':
@@ -85,6 +86,7 @@ class TileData(View):
                 clean_resource_cache(tile)
                 tile.delete(request=request)
                 tile.after_update_all()
+                update_system_settings_cache(tile)
 
             return JSONResponse(tile)
 
@@ -98,5 +100,8 @@ def get(id):
     except(ValueError, TypeError):
         return uuid.uuid4(), True
 
-
 uuid.get_or_create = get
+
+def update_system_settings_cache(tile):
+    if tile.resourceinstance_id == settings.RESOURCE_INSTANCE_ID:
+        settings.update_from_db()

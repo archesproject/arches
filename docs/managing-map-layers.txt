@@ -1,0 +1,75 @@
+###################
+Managing Map Layers
+###################
+
+Arches allows a great deal of customization for the layers on the search map. You'll be able to configure these layers in the **Map Layer Manager**.
+
+Three categories of Map Layers will appear on your map: **Resource Layers** (the contents of your database), **Basemaps** (static background layers), and **Overlays** (custom data layers from outside your database). To configure a layer, first select its category in the top bar, and then choose it from the list at left.
+
+Resource Layers
+---------------
+
+Resource Layers display the resource layers in your database. One Resource Layer is created for each node with a geospatial datatype (for example, ``geojson-feature-collection``). You are able to customize the appearance and visibility of each Resource Layer in the following ways.
+
+Service Styling
+```````````````
+
+Define the way features will look on the map. The example map has demonstration features that give you a preview of the changes you make. You can choose to use Advanced Editing to create a more nuanced style. Note that changes made in **Advanced Editing** will not be reflected if you switch back to basic editing. For styling reference, checkout the MapBox Style Specification.
+
+Settings
+`````````
+
+You can change the name of this overlay if desired; by default it will use the name of its Resource Model. You make also set the layer to be added to the search map by default, or choose a custom icon for it.
+
+Clustering
+``````````
+
+Arches uses "clustering" to better display resources at low zoom levels (zoomed out). You are able to control the clustering settings for each layer individually.
+
+* Cluster Distance - distance (in pixels) within which resources will be clustered
+* Cluster Max Zoom - zoom level after which clustering will stop being used
+* Cluster Min Points - minimum number of points needed to create a cluster
+
+Caching
+```````
+
+Caching tiles will improve the speed of map rendering. However, caching is not a simple matter, and it is disabled by default. Caching is only advisable if you know what you are doing.
+
+Permissions
+```````````
+
+This tab shows the permissions for the nodegroup whose geometry is displayed in this Resource Layer. Permissions are defined in the Graph Designer.
+
+Basemaps
+--------
+
+A Basemap will always be present in your map. Arches comes with a few default basemaps, but advanced users are able to add more. Once added, there are few ways to configure each basemap.
+
+Service Styling
+```````````````
+
+Define a style for this basemap. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the `MapBox Style Specification <https://www.mapbox.com/mapbox-gl-js/style-spec/#layers>`_.
+
+Settings
+````````
+
+* Layer name - enter a name to identify this basemap
+* Default search map - choose this layer to be the default basemap
+* Layer icon - associate an icon with this layer
+
+Overlays
+--------
+
+Overlays allow you to incorporate map layers from external sources. Note that Search Results and Search Markets are treated as overlays, and can be customize separately. New overlays can be added with a little behind-the-scenes work. Once added, there are few ways to configure each overlay.
+
+Service Styling
+```````````````
+
+Define a style for this overlay. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the `MapBox Style Specification <https://www.mapbox.com/mapbox-gl-js/style-spec/#layers>`_.
+
+Settings
+````````
+
+* Layer name - enter a name to identify this overlay
+* Default search map - choose whether this overlay should be shown in the search map by default. Note that in the search map itself you can change the order of the layers.
+* Layer icon - associate an icon with this layer

@@ -56,6 +56,4 @@ Arches is open source software, which means that with your help it will continue
 
 + **Translations** We are always hoping to bring Arches to new audiences around the world. Please get in touch from the main Arches website to express your interest in helping with translations.
 + **Bug Reports** Reporting bugs is strongly encouraged, and can be made at the official Arches GitHub repository. Please read this article before reporting issues.
-+ **Code Contributions** For developers, good guidelines on how to contribute to the Arches code-base can be found here.
-
-current repo status (insert the coverage status graphic from github here? I’d vote to leave that on github itself)
++ **Code Contributions** For developers, good guidelines on how to contribute to the Arches code-base can be found in our `GitHub repo wiki <https://github.com/archesproject/arches/wiki#contributing-to-arches>`_.

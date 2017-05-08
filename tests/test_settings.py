@@ -30,8 +30,6 @@ SEARCH_BACKEND = 'tests.base_test.TestSearchEngine'
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'resource_graphs'),)
 
-CONCEPT_SCHEME_LOCATIONS = (os.path.join(TEST_ROOT, 'fixtures', 'authority_files'),)
-
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, 'fixtures', 'ontologies')
 
 BUSISNESS_DATA_FILES = (

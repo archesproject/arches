@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
@@ -28,12 +27,13 @@ from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
-from arches.app.views.base import BaseManagerView
+from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
@@ -57,7 +57,7 @@ class ResourceListView(BaseManagerView):
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
-    def get(self, request, graphid=None, resourceid=None):
+    def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = Resource.objects.create(graph_id=graphid)
@@ -85,8 +85,11 @@ class ResourceEditorView(BaseManagerView):
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
+            searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+            searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+            resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
-                main_script='views/resource/editor',
+                main_script=main_script,
                 resource_type=resource_instance.graph.name,
                 relationship_types=relationship_type_values,
                 iconclass=resource_instance.graph.iconclass,
@@ -102,16 +105,19 @@ class ResourceEditorView(BaseManagerView):
                 resource_graphs=resource_graphs,
                 graph_json=JSONSerializer().serialize(graph),
                 displayname=displayname,
+                resource_cards=JSONSerializer().serialize(resource_cards),
+                searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
             )
 
             if graph.iconclass:
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
-            context['nav']['menu'] = True
+            context['nav']['menu'] = nav_menu
             context['nav']['edit_history'] = True
             context['nav']['help'] = (_('Creating and Editing Resources'),'')
 
-            return render(request, 'views/resource/editor.htm', context)
+            return render(request, view_template, context)
 
         return HttpResponseNotFound()
 

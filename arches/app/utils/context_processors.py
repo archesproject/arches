@@ -16,8 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.conf import settings
 from arches import __version__
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def livereload(request):
@@ -40,12 +40,6 @@ def map_info(request):
             'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS),
             'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
         }
-    }
-
-def resource_types(request):
-    sorted_resource_types = sorted(settings.RESOURCE_TYPE_CONFIGS().items(), key=lambda v: v[1]['sort_order'])
-    return {
-        'resource_types': sorted_resource_types
     }
 
 def app_settings(request):

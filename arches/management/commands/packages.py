@@ -20,25 +20,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 from django.utils.module_loading import import_string
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.db.install import truncate_db
-from arches.app.utils.data_management.resources.importer import ResourceLoader
+from django.db import transaction
+import pprint
+import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
+from arches.db.install import truncate_db
+from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
-import arches.management.commands.package_utils.resource_graphs as resource_graphs
-from arches.management.commands import utils
-from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
-from django.db import transaction
+from arches.management.commands import utils
+from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 
 
 class Command(BaseCommand):
@@ -69,7 +70,7 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
 
-        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='.',
             help='Directory where you want to save exported files.')
 
         parser.add_argument('-r', '--resources', action='store', dest='resources', default=False,
@@ -191,17 +192,70 @@ class Command(BaseCommand):
     def update_project_templates(self):
         """
         Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync.
+        ensure that they remain in sync. Adds and comments out settings that are
+        whitelisted into the settings_local.py template
 
         """
         files = [
             {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
             {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
-            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
+            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
+
+        settings_whitelist = [
+            'MODE',
+            'DATABASES',
+            'DEBUG',
+            'INTERNAL_IPS',
+            'ANONYMOUS_USER_NAME',
+            'ELASTICSEARCH_HTTP_PORT',
+            'SEARCH_BACKEND',
+            'ELASTICSEARCH_HOSTS',
+            'ELASTICSEARCH_CONNECTION_OPTIONS',
+            'ROOT_DIR',
+            'ONTOLOGY_PATH',
+            'ONTOLOGY_BASE',
+            'ONTOLOGY_BASE_VERSION',
+            'ONTOLOGY_BASE_NAME',
+            'ONTOLOGY_BASE_ID',
+            'ONTOLOGY_EXT',
+            'ADMINS',
+            'MANAGERS',
+            'POSTGIS_VERSION',
+            'USE_I18N',
+            'TIME_ZONE',
+            'USE_TZ',
+            'LANGUAGE_CODE',
+            'LOCALE_PATHS',
+            'USE_L10N',
+            'MEDIA_URL',
+            'STATIC_ROOT',
+            'STATIC_URL',
+            'ADMIN_MEDIA_PREFIX',
+            'STATICFILES_DIRS',
+            'STATICFILES_FINDERS',
+            'TEMPLATES',
+            'AUTHENTICATION_BACKENDS',
+            'INSTALLED_APPS',
+            'MIDDLEWARE_CLASSES',
+            'ROOT_URLCONF',
+            'WSGI_APPLICATION',
+            'LOGGING',
+            'LOGIN_URL'
+            ]
+
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
+            for setting_key in dir(settings):
+                if setting_key in settings_whitelist:
+                    setting_value = getattr(settings, setting_key)
+                    if type(setting_value) == dict or (type(setting_value) in (list, tuple) and len(setting_value) >= 3):
+                        val = "'''\n{0} = {1}\n'''\n\n".format(setting_key, pprint.pformat(setting_value, indent=4, width=50, depth=None))
+                    else:
+                        val = "#{0} = {1}\n\n".format(setting_key, setting_value)
+                    f.write(val)
 
     def setup(self, package_name, es_install_location=None):
         """

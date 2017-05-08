@@ -323,6 +323,13 @@ class BaseDataType(object):
         """
         return []
 
+    def append_search_filters(self, value, node, query, request):
+        """
+        Allows for modification of an elasticsearch bool query for use in
+        advanced search
+        """
+        pass
+
     def manage_files(self, previously_saved_tile, current_tile, request, node):
         """
         Updates files

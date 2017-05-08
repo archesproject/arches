@@ -14,7 +14,7 @@
 
         <script type="text/html" id="card-template">
             <!-- Card Template -->
-            <div class="tab-base outline" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
+            <div class="tab-base outline relative" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
 
                 <!--Nav Tabs-->
                 <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
@@ -57,7 +57,7 @@
 
                         <!-- ko if: card.get('cardinality')() === 'n' -->
 
-                        <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: (parentTile.tiles[card.get('nodegroup_id')]().length > 0)">
+                        <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 5px; display: block;" data-bind="visible: (parentTile.tiles[card.get('nodegroup_id')]().length > 0)">
 
                             <div class="card-tab-title">
                                 Saved <span data-bind="text: card.get('name')"/>

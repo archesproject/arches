@@ -175,7 +175,7 @@ class Match(Dsl):
             }
         }
 
-        if self.fuzziness and self.type != 'phrase_prefix':
+        if self.fuzziness:
             self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):

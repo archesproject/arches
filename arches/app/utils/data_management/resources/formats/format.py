@@ -3,8 +3,8 @@ from arches.app.models.concept import Concept
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.models import Value
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
@@ -143,7 +143,6 @@ class Reader(object):
 class Writer(object):
 
     def __init__(self):
-        self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -154,31 +153,6 @@ class Writer(object):
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
         }
-
-    def create_template_record(self, schema, resource, resource_type):
-        """
-        Creates an empty record from the export mapping schema and populates its values
-        with resource data that does not require the export field mapping - these include
-        entityid, primaryname and entitytypeid.
-        """
-        record = {}
-        for column in schema:
-            if column['source'] == 'resource_name':
-                if resource_type != None:
-                    record[column['field_name']] = self.resource_type_configs[resource_type]['name']
-                else:
-                    record[column['field_name']] = resource['_source']['entitytypeid']
-            elif column['source'] in ('primaryname', 'entitytypeid', 'entityid'):
-                record[column['field_name']] = resource['_source'][column['source']]
-            elif column['source'] == 'alternatename':
-                record[column['field_name']] = []
-                for entity in resource['_source']['child_entities']:
-                    primaryname_type = self.resource_type_configs[resource_type]['primary_name_lookup']['entity_type']
-                    if entity['entitytypeid'] == primaryname_type and entity['label'] != resource['_source']['primaryname']:
-                        record[column['field_name']].append(entity['label'])
-            else:
-                record[column['field_name']] = []
-        return record
 
     def get_field_map_values(self, resource, template_record, field_map):
         """
