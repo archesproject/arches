@@ -70,7 +70,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         return {{% autoescape off %}
             searchable_nodes: {{ searchable_nodes }},
             resource_cards: {{ resource_cards }},
-            datatypes: {{ datatypes_json }}
+            datatypes: {{ datatypes_json }},
+            saved_searches: {{ saved_searches }}
         {% endautoescape %}};
     });
     {% endautoescape %}

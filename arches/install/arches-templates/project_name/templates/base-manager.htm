@@ -416,15 +416,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         {% endif %}
 
 
-                                        <!--Menu list item-->
+                                        <!-- System Settings list item -->
                                         {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
-                                            <a href="#">
+                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="/settings" data-bind="click: navigate.bind(this, '/settings') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
-                                                    <strong>System Settings</strong>
+                                                    <strong>{% trans "Manage System Settings" %}</strong>
                                                 </span>
                                             </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/settings" data-bind="click: navigate.bind(this, '/settings')">{% trans "System Settings" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="/graph/{{system_settings_graphid}}" data-bind="click: navigate.bind(this, '/graph/{{system_settings_graphid}}')">{% trans "System Settings Graph" %}</a>
+                                                </li>
+                                            </ul>
                                         </li>
                                         {% endif %}
 
@@ -440,13 +448,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                             <ul class="collapse" aria-expanded="false">
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource" %}</a>
+                                                    <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="/graph#basemaps" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Basemaps" %}</a>
+                                                    <a class="link-submenu" href="{% url 'map_layer_manager' %}#basemaps" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#overlays')">{% trans "Overlays" %}</a>
+                                                    <a class="link-submenu" href="{% url 'map_layer_manager' %}#overlays" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
                                                 </li>
                                             </ul>
                                         </li>

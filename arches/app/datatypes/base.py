@@ -323,6 +323,12 @@ class BaseDataType(object):
         """
         return []
 
+    def append_search_filters(self, value, node, query, request):
+        """
+        Updates files
+        """
+        pass
+
     def manage_files(self, previously_saved_tile, current_tile, request, node):
         """
         Updates files

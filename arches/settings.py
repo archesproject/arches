@@ -278,7 +278,7 @@ GEOCODING_PROVIDERS = [
 DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
 
 SPARQL_ENDPOINT_PROVIDERS = (
-    'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
+    {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
 )
 
 APP_NAME = 'Arches'

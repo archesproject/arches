@@ -42,7 +42,7 @@ class BingGeocoder(Geocoder):
 
     def find_candidates(self, search_string, api_key):
         query_args = { 'q': search_string, 'key': api_key }
-        url = 'http://dev.virtualearth.net/REST/v1/Locations?'
+        url = '//dev.virtualearth.net/REST/v1/Locations?'
         response = self.get_response(query_args, url)
         results = []
         for resource_set in response['resourceSets']:
