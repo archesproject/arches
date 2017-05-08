@@ -26,7 +26,7 @@ CSV File Requirements
 
 Each row in the CSV can contain the attribute values of one and only one resource.
 
-The first column in the CSV must be named ``ResourceID``. ResourceID is a user-generated unique ID for each individual resource. If ResourceID is a valid UUID, Arches will adopt it internally as the new resource's ArchesID. If ResourceID is not a valid UUID Arches will create a new UUID and use that as the ArchesID. Subsequent columns can have any name.
+The first column in the CSV must be named ``ResourceID``. ResourceID is a user-generated unique ID for each individual resource. If ResourceID is a valid UUID, Arches will adopt it internally as the new resource's identifier. If ResourceID is not a valid UUID Arches will create a new UUID and use that as the resource's identifier. Subsequent columns can have any name.
 
 +-------------+---------------------+--------------------+--------------------+
 | Resource ID | attribute 1         |  attribute 2       | attribute 3        |
@@ -111,23 +111,23 @@ Unzip the download, and you'll find a ``.mapping`` file as well as a ``...concep
                 "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
                 "arches_node_name": "Name", 
                 "file_field_name": "", 
+                "data_type": "concept",
                 "concept_export_value": "label", 
-                "data_type": "concept", 
                 "export": false
             }, 
             {
                 "arches_nodeid": "d4896e3b-fa30-11e6-9e3e-026d961c88e6", 
                 "arches_node_name": "Name Type", 
                 "file_field_name": "", 
-                "concept_export_value": "label", 
                 "data_type": "concept", 
+                "concept_export_value": "label",
                 "export": false
             },
             ...
         ]
     }
 
-The mapping file contains cursory information about the resource model (name and resource model id) and a listing of the nodes that comprise that resource model. Each node contains attributes to help you import your business data (not all attributes are used on import, some are there simply to assist you). It is recommended that you not delete any attributes from the mapping file. If you do not need to map to a specfic node simply leave the ``file_field_name`` attribute blank.
+The mapping file contains cursory information about the resource model (name and resource model id) and a listing of the nodes that comprise that resource model. Each node contains attributes to help you import your business data (not all attributes are used on import, some are there simply to assist you). The concept_export_value attribute is only present for nodes with datatypes of `concept`, 'concept-list', 'domain', and 'domain-list' - this attribute is not used for import. It is recommended that you not delete any attributes from the mapping file. If you do not wish to map to a specfic node simply leave the ``file_field_name`` attribute blank.
 
 You will now need to enter the column name from your CSV into the ``file_field_name`` in appropriate node in the mapping file. For example, if your CSV has a column named "activity_type" and you want the values in this column to populate "Activity Type" nodes in Arches, you would add that name to the mapping file like so::
 
@@ -136,9 +136,9 @@ You will now need to enter the column name from your CSV into the ``file_field_n
             {
                 "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
                 "arches_node_name": "Activity Type", 
-                "file_field_name": "activity_type", <-- place column name here 
-                "concept_export_value": "label", 
-                "data_type": "concept", 
+                "file_field_name": "activity_type", <-- place column name here
+                "data_type": "concept",
+                "concept_export_value": "label",  
                 "export": false
             },
        ...
