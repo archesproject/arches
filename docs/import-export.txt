@@ -79,6 +79,8 @@ Depending on your Resource Model's graph structure, some attributes will be hand
 
 *CSV with three resources, one of which has two groups of* ``name`` *and* ``name_type`` *attributes. See below for more on the 'Primary' and 'Historic' labels.*
 
+The data_type attribute in the mapping file(see below) can help you determine what data type (string, number, conceptid, geometry, etc.) is valid for each column in your csv.
+
 Some data types require specially formatted values:
 
 * **Dates** All dates must be formatted as YYYY-MM-DD
@@ -125,14 +127,16 @@ Unzip the download, and you'll find a ``.mapping`` file as well as a ``...concep
         ]
     }
 
-You will now need to enter the column name in your CSV into the ``file_field_name`` in appropriate node in the mapping file. For example, if your CSV has a column named "activity_type" and you want the values in this column to populate "Activity Type" nodes in Arches, you would add that name to the mapping file like so::
+The mapping file contains cursory information about the resource model (name and resource model id) and a listing of the nodes that comprise that resource model. Each node contains attributes to help you import your business data (not all attributes are used on import, some are there simply to assist you). It is recommended that you not delete any attributes from the mapping file. If you do not need to map to a specfic node simply leave the ``file_field_name`` attribute blank.
+
+You will now need to enter the column name from your CSV into the ``file_field_name`` in appropriate node in the mapping file. For example, if your CSV has a column named "activity_type" and you want the values in this column to populate "Activity Type" nodes in Arches, you would add that name to the mapping file like so::
 
     {   
         ...
             {
                 "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
-                "arches_node_name": "Name", 
-                "file_field_name": "name", <-- place column name here 
+                "arches_node_name": "Activity Type", 
+                "file_field_name": "activity_type", <-- place column name here 
                 "concept_export_value": "label", 
                 "data_type": "concept", 
                 "export": false
@@ -140,7 +144,7 @@ You will now need to enter the column name in your CSV into the ``file_field_nam
        ...
     }
 
-To map more than one column to a single node, you must copy and paste that node within the mapping file.
+To map more than one column to a single node, simply copy and paste that node within the mapping file.
 
 .. _concepts:
 
