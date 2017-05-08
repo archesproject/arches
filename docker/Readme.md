@@ -143,6 +143,8 @@ Optional Environment Variables:
 		Runs your Django server on an alternative port. Default = 8000
 	- DJANGO_NORELOAD=<True or False> 
 		Runs Django with options --noreload --nothreading. Useful for some debugging methods.
+	- DJANGO_SECRET_KEY=<50 character string>
+		Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set).
 	- TZ=<Time Zone> 
 		Useful for logging the correct time. US Eastern = EST
 
