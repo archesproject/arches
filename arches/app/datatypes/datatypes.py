@@ -136,10 +136,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         for feature in value['features']:
             try:
                 geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+                validate_geom(geom, coordinate_count)
             except:
                 message = 'It was not possible to serialize some feaures in your geometry.'
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
-            validate_geom(geom, coordinate_count)
 
         return errors
 

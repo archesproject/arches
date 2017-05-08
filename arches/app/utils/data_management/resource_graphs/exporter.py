@@ -132,11 +132,11 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             export_node['arches_nodeid'] = str(node.nodeid)
             export_node['arches_node_name'] = node.name
             export_node['file_field_name'] = ""
+            export_node['data_type'] = node.datatype
             if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                 export_node['concept_export_value'] = "label"
             # export_node['value_type'] = ""
             # export_node['data_length'] = ""
-            export_node['data_type'] = node.datatype
             export_node['export'] = False
 
             export_json['nodes'].append(export_node)
