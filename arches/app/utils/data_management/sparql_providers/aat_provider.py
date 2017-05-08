@@ -26,7 +26,7 @@ from abstract_provider import Abstract_Provider
 class AAT_Provider(Abstract_Provider):
 
     def __init__(self, **kwargs):
-        super(AAT_Provider, self).__init__('http://vocab.getty.edu/sparql.json', **kwargs)
+        super(AAT_Provider, self).__init__('//vocab.getty.edu/sparql.json', **kwargs)
         
         self.name = _('Getty AAT')        
         self.setReturnFormat(JSON)     
