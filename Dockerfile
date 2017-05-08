@@ -67,7 +67,6 @@ COPY . ${ARCHES_ROOT}
 WORKDIR ${ARCHES_ROOT}
 
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
-	bower --allow-root install &&\
 	python setup.py install
 
 
