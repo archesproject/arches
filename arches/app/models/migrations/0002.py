@@ -117,6 +117,24 @@ class Migration(migrations.Migration):
             name='name',
             field=models.TextField(primary_key=True, serialize=False, unique=True),
         ),
+        migrations.AddField(
+            model_name='ddatatype',
+            name='issearchable',
+            field=models.NullBooleanField(default=False),
+        ),
+        migrations.RunSQL("""
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/string',
+                    configname = 'string-datatype-config'
+                WHERE datatype = 'string';
+        """, """
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'string';
+        """),
         # migrations.RunSQL("""
         #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
         #     VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
@@ -127,7 +145,7 @@ class Migration(migrations.Migration):
             INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype)
             VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
         """, """
-            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' 
+            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004'
             AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
         """),
         migrations.RunSQL("""

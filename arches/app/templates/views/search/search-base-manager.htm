@@ -64,7 +64,7 @@
                         {% include 'views/search/saved-searches.htm' %}
                     </div>
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === advancedFilter}, with: advancedFilter">
-                        <div>perform complex search</div>
+                        {% include 'views/search/advanced-search.htm' %}
                     </div>
                     <!-- ko if: selectedTab() === relatedResourcesManager -->
                     <div class="tab-pane" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, with: relatedResourcesManager">

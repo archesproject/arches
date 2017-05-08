@@ -13,7 +13,8 @@ Arches v4 Documentation (draft)
     :maxdepth: 2
 
     installation
-    general-configuration
+    initial-configuration
+    managing-map-layers
     managing-resources
     using-the-arches-designer
     creating-resources
