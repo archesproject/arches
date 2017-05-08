@@ -375,7 +375,9 @@ def build_search_results_dsl(request):
     datatype_factory = DataTypeFactory()
     if len(advanced_filters) > 0:
         advanced_query = Bool()
-        for advanced_filter in advanced_filters:
+        grouped_query = Bool()
+        grouped_queries = [grouped_query]
+        for idx, advanced_filter in enumerate(advanced_filters):
             tile_query = Bool()
             for key, val in advanced_filter.iteritems():
                 if key != 'op':
@@ -383,10 +385,12 @@ def build_search_results_dsl(request):
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.append_search_filters(val, node, tile_query, request)
             nested_query = Nested(path='tiles', query=tile_query)
-            if advanced_filter['op'] == 'or':
-                advanced_query.should(nested_query)
-            else:
-                advanced_query.must(nested_query)
+            if advanced_filter['op'] == 'or' and idx != 0:
+                grouped_query = Bool()
+                grouped_queries.append(grouped_query)
+            grouped_query.must(nested_query)
+        for grouped_query in grouped_queries:
+            advanced_query.should(grouped_query)
         search_query.must(advanced_query)
 
     query.add_query(search_query)

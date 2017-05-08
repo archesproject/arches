@@ -325,7 +325,8 @@ class BaseDataType(object):
 
     def append_search_filters(self, value, node, query, request):
         """
-        Updates files
+        Allows for modification of an elasticsearch bool query for use in
+        advanced search
         """
         pass
 
