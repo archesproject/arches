@@ -107,6 +107,7 @@ class ResourceEditorView(BaseManagerView):
                 displayname=displayname,
                 resource_cards=JSONSerializer().serialize(resource_cards),
                 searchable_nodes=JSONSerializer().serialize(searchable_nodes),
+                saved_searches=JSONSerializer().serialize(settings.SAVED_SEARCHES),
             )
 
             if graph.iconclass:

@@ -93,7 +93,7 @@ Some data types require specially formatted values:
 Mapping File Requirements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All CSV files must be accompanied by a **mapping file**. This is a JSON-structured file that indicates which node in a Resource Model's graph each column in the CSV file should map to. The mapping file should contain the source column name populated in the ``file_field_name`` property for all nodes in a graph the user wishes to map to. The mapping file should be named exactly the same as the CSV file but with the extension '.mapping', and must be in the same directory as the CSV.
+All CSV files must be accompanied by a **mapping file**. This is a JSON-structured file that indicates which node in a Resource Model's graph each column in the CSV file should map to. The mapping file should contain the source column name populated in the ``file_field_name`` property for all nodes in a graph the user wishes to map to. The mapping file should be named exactly the same as the CSV file but with the extension '.mapping', and should be in the same directory as the CSV.
 
 To create a mapping file for a Resource Model in your database, go to the Arches Designer landing page. Find the Resource Model into which you plan to load resources, and choose Export Mapping File from the Manage menu.
 
