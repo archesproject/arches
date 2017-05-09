@@ -138,6 +138,11 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/boolean',
                     configname = 'boolean-datatype-config'
                 WHERE datatype = 'boolean';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configname = 'domain-value-datatype-config'
+                WHERE datatype = 'domain-value';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -154,6 +159,11 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'boolean';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'domain-value';
         """),
         # migrations.RunSQL("""
         #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
