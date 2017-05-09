@@ -130,6 +130,11 @@ class Migration(migrations.Migration):
                 WHERE datatype = 'string';
             UPDATE d_data_types
                 SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/number',
+                    configname = 'number-datatype-config'
+                WHERE datatype = 'number';
+            UPDATE d_data_types
+                SET issearchable = true,
                     configcomponent = 'views/graph/datatypes/boolean',
                     configname = 'boolean-datatype-config'
                 WHERE datatype = 'boolean';
@@ -139,6 +144,11 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'string';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'number';
             UPDATE d_data_types
                 SET issearchable = false,
                     configcomponent = NULL,

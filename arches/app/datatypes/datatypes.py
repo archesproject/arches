@@ -9,7 +9,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -92,6 +92,19 @@ class NumberDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue):
         document['numbers'].append(nodevalue)
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                if value['op'] != 'eq':
+                    operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
+                    operators[value['op']] = value['val']
+                    search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
+                else:
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=0)
+                query.must(search_query)
+        except KeyError, e:
+            pass
 
 
 class BooleanDataType(BaseDataType):
