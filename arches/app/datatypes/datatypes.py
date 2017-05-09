@@ -884,14 +884,13 @@ class DomainDataType(BaseDomainDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                # search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], fuzziness=0)
-                search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=value['val'])
-                import ipdb
-                ipdb.set_trace()
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if '!' in value['op']:
                     query.must_not(search_query)
                 else:
                     query.must(search_query)
+
         except KeyError, e:
             pass
 
