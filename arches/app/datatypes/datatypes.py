@@ -94,7 +94,6 @@ class NumberDataType(BaseDataType):
         document['numbers'].append(nodevalue)
 
     def append_search_filters(self, value, node, query, request):
-
         try:
             if value['val'] != '':
                 if value['op'] != 'eq':
@@ -103,13 +102,9 @@ class NumberDataType(BaseDataType):
                     search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=0)
-                if '!' in value['op']:
-                    query.must_not(search_query)
-                else:
-                    query.must(search_query)
+                query.must(search_query)
         except KeyError, e:
             pass
-
 
 
 class BooleanDataType(BaseDataType):
