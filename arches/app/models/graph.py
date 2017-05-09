@@ -177,6 +177,7 @@ class Graph(models.GraphModel):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.config = nodeobj.get('config', None)
+            node.issearchable = nodeobj.get('issearchable', True)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
