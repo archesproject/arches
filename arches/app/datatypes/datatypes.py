@@ -101,8 +101,8 @@ class BooleanDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         try:
-            if value != '':
-                term = True if value == 't' else False
+            if value['val'] != '':
+                term = True if value['val'] == 't' else False
                 query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
         except KeyError, e:
             pass
