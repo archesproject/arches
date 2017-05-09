@@ -9,7 +9,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -111,6 +111,14 @@ class BooleanDataType(BaseDataType):
 
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                term = True if value['val'] == 't' else False
+                query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
+        except KeyError, e:
+            pass
 
 
 class DateDataType(BaseDataType):
