@@ -132,7 +132,7 @@ class Reader(object):
         if len(self.errors) == 0:
             print _("No import errors")
         else:
-            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
+            print _("***** Errors occured during import. For more information, check resource import error log: arches/logs/resource_import.log")
             with open('arches/logs/resource_import.log', 'w') as f:
                 for error in self.errors:
                     try:

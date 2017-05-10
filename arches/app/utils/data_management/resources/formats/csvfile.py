@@ -269,8 +269,8 @@ class CsvReader(Reader):
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
-                            if len(errors) > 0:
-                                self.errors += errors
+                        if len(errors) > 0:
+                            self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
 
