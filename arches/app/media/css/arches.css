@@ -7764,6 +7764,34 @@ table.table.dataTable {
     border-left: 1px solid #ddd;
 }
 
+a .search-type-link{
+    height: 50px;
+    width: 50px;
+}
+
+.search-type-btn {
+    height: 50px;
+    width: 60px;
+    font-size: 11px;
+    padding-top: 25px;
+}
+
+.search-type-btn.relative:hover {
+    background: #f0f0f0;
+}
+
+.search-type-btn.relative.active {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+}
+
+.search-type-btn-icon {
+    position: absolute;
+    top: 10px;
+    left: 25px;
+    font-size: 15px;
+}
+
 .facets-search-container {
     position: absolute;
     width: calc(100% - 250px);
