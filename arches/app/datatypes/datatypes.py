@@ -137,12 +137,7 @@ class DateDataType(BaseDataType):
 
     def validate(self, value, source=''):
         errors = []
-
-        # try:
-        #     print datetime.strptime(value, '%Y-%m-%d')
-        # except:
-        #     errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD'.format(value)})
-
+        
         date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
         valid = False
         for mat in date_formats:
