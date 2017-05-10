@@ -1,9 +1,11 @@
 {% load i18n %}
+<!-- ko ifnot: $data.search -->
 <div class="node-widget-label new-option-field">
     <div class="control-label">
         {% trans "Add new option" %}
     </div>
     <div>
+        <div data-bind="text: $data.search"></div>
         <input type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="value: newOptionLabel, valueUpdate: 'keyup'">
         <a href="#" data-bind="click: addNewOption">
              <i class="fa fa-plus-circle pull-right"></i>
@@ -23,3 +25,18 @@
         </div>
     </div>
 </div>
+<!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-sm-2">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">{% trans "Equals" %}</option>
+        <option value="!">{% trans "Not" %}</option>
+    </select>
+</div>
+
+<div class="col-sm-10">
+    <select  type="" placeholder="{% trans " Date Format " %}" class="form-control library-search" data-bind="options: options, optionsText: 'text', optionsValue: 'id', value: searchValue, chosen: {width: '100%', disable_search: true}"></select>
+</div>
+<!-- /ko -->
+{% load i18n %}

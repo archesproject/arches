@@ -78,7 +78,6 @@ class StringDataType(BaseDataType):
 class NumberDataType(BaseDataType):
 
     def validate(self, value, source=''):
-        'validating a number'
         errors = []
 
         try:
@@ -881,6 +880,19 @@ class DomainDataType(BaseDomainDataType):
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+                if '!' in value['op']:
+                    query.must_not(search_query)
+                else:
+                    query.must(search_query)
+
+        except KeyError, e:
+            pass
 
 
 class DomainListDataType(BaseDomainDataType):
