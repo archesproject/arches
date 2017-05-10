@@ -7,7 +7,6 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
-from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.resource import Resource
 
 
@@ -47,7 +46,7 @@ def truncate_db():
     management.call_command('packages', operation='setup_db')
 
 def load_resource_graphs():
-    resource_graphs.load_graphs(break_on_error=True)
+    # resource_graphs.load_graphs(break_on_error=True)
     pass
 
 def load_map_layers():

@@ -23,7 +23,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.db import transaction
 import pprint
-import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
