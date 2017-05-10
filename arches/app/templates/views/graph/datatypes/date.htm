@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-sm-2">
     <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
@@ -10,6 +11,6 @@
 </div>
 
 <div class="col-xs-12 pad-no crud-widget-container">
-    <!-- <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}"> -->
+    <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
 </div>
 <!-- /ko -->

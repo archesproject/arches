@@ -6,10 +6,7 @@ define(['knockout'], function (ko) {
             this.search = params.search;
             if (this.search) {
                 var filter = params.filterValue();
-                this.viewMode = ko.observable({
-                    'id': 'days',
-                    'name': 'Days'
-                });
+                this.viewMode = 'days';
                 this.op = ko.observable(filter.op || '');
                 this.searchValue = ko.observable(filter.val || '');
                 this.filterValue = ko.computed(function () {
