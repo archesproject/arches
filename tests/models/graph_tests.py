@@ -20,7 +20,6 @@ import os, json, uuid
 from django.core import management
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
