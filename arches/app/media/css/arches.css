@@ -7895,6 +7895,11 @@ a.search-facet-item.disabled {
     margin-bottom: 5px;
 }
 
+.facet-body {
+    padding-top: 5px;
+    padding-bottom: 45px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
