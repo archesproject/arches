@@ -2,6 +2,7 @@ import uuid
 from arches.app.models import models
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.concept import get_preflabel_from_valueid
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -64,6 +65,19 @@ class ConceptDataType(BaseConceptDataType):
             return ''
         else:
             return self.get_value(uuid.UUID(tile.data[str(node.nodeid)])).value
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                nested_query = Nested(path='tiles', query=match_query)
+                if '!' in value['op']:
+                    query.must_not(nested_query)
+                else:
+                    query.must(nested_query)
+
+        except KeyError, e:
+            pass
 
 
 class ConceptListDataType(BaseConceptDataType):

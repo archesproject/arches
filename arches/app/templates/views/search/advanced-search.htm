@@ -47,16 +47,19 @@
             <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
             <div class="row facet-search-criteria">
                 <!-- ko foreach: card.nodes -->
-                <div class="facet-label" data-bind="text: name"></div>
+                <div class="facet-body">
 
-                <div data-bind="component: {
-                    name: self.datatypelookup[datatype].configname,
-                    params: {
-                        search: true,
-                        filterValue: $parent.value[nodeid],
-                        config: $data.config
-                    }
-                }">
+                    <div class="facet-label" data-bind="text: name"></div>
+                    <div data-bind="component: {
+                        name: self.datatypelookup[datatype].configname,
+                        params: {
+                            search: true,
+                            filterValue: $parent.value[nodeid],
+                            node: $data
+                        }
+                    }">
+                    </div>
+
                 </div>
                 <!-- /ko -->
 

@@ -10,7 +10,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -68,10 +68,11 @@ class StringDataType(BaseDataType):
             if value['val'] != '':
                 fuzziness = 'AUTO' if '~' in value['op'] else 0
                 match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=fuzziness)
+                nested_query = Nested(path='tiles', query=match_query)
                 if '!' in value['op']:
-                    query.must_not(match_query)
+                    query.must_not(nested_query)
                 else:
-                    query.must(match_query)
+                    query.must(nested_query)
         except KeyError, e:
             pass
 
@@ -102,7 +103,8 @@ class NumberDataType(BaseDataType):
                     search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=0)
-                query.must(search_query)
+                nested_query = Nested(path='tiles', query=search_query)
+                query.must(nested_query)
         except KeyError, e:
             pass
 
@@ -125,7 +127,8 @@ class BooleanDataType(BaseDataType):
         try:
             if value['val'] != '':
                 term = True if value['val'] == 't' else False
-                query.must(Term(field='tiles.data.%s' % (str(node.pk)), term=term))
+                nested_query = Nested(path='tiles', query=Term(field='tiles.data.%s' % (str(node.pk)), term=term))
+                query.must(nested_query)
         except KeyError, e:
             pass
 
@@ -934,10 +937,11 @@ class DomainDataType(BaseDomainDataType):
             if value['val'] != '':
                 search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+                nested_query = Nested(path='tiles', query=search_query)
                 if '!' in value['op']:
-                    query.must_not(search_query)
+                    query.must_not(nested_query)
                 else:
-                    query.must(search_query)
+                    query.must(nested_query)
 
         except KeyError, e:
             pass
