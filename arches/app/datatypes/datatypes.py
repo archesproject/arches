@@ -137,7 +137,7 @@ class DateDataType(BaseDataType):
 
     def validate(self, value, source=''):
         errors = []
-        
+
         date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
         valid = False
         for mat in date_formats:
@@ -167,7 +167,6 @@ class DateDataType(BaseDataType):
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix', fuzziness=0)
                 nested_query = Nested(path='tiles', query=search_query)
                 query.must(nested_query)
-                print query.dsl
         except KeyError, e:
             pass
 
