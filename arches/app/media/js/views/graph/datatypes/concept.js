@@ -6,10 +6,10 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
             if (this.search) {
                 var self = this;
                 var filter = params.filterValue();
+                params.config = ko.observable({options:[]});
                 this.op = ko.observable(filter.op || '');
                 this.placeholder = ko.observable('Select a concept');
                 this.multiple = ko.observable(false);
-                params.config = ko.observable({options:[]});
                 this.searchValue = ko.observable(filter.val || '');
                 this.node = params.node;
                 this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
