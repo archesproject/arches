@@ -143,6 +143,11 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/domain-value',
                     configname = 'domain-value-datatype-config'
                 WHERE datatype = 'domain-value';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/concept',
+                    configname = 'concept-datatype-config'
+                WHERE datatype = 'concept';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -164,6 +169,11 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'domain-value';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'concept';
         """),
         migrations.AddField(
             model_name='node',

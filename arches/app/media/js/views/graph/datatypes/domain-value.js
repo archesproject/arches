@@ -3,8 +3,8 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
-            this.options = params.config.options;
             if (this.search) {
+                this.options = params.node.config.options;
                 var filter = params.filterValue();
                 this.op = ko.observable(filter.op || '');
                 this.searchValue = ko.observable(filter.val || '');
@@ -20,6 +20,7 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 });
 
             } else {
+                this.options = params.config.options;
                 var setupOption = function(option) {
                     option.remove = function () {
                         self.options.remove(option);
