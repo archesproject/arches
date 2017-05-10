@@ -2,6 +2,7 @@ import uuid
 import json
 import decimal
 import importlib
+from datetime import datetime
 from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -114,10 +115,23 @@ class DateDataType(BaseDataType):
     def validate(self, value, source=''):
         errors = []
 
-        try:
-            int((FlexiDate.from_str(value).as_float()-1970)*31556952*1000)
-        except:
-            errors.append({'type': 'ERROR', 'message': 'Incorrect data format, should be YYYY-MM-DD'})
+        # try:
+        #     print datetime.strptime(value, '%Y-%m-%d')
+        # except:
+        #     errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD'.format(value)})
+
+        date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+        valid = False
+        for mat in date_formats:
+            if valid == False:
+                try:
+                    if datetime.strptime(value, mat):
+                        valid = True
+                except:
+                    valid = False
+        if valid == False:
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD'.format(value)})
+
         return errors
 
     def append_to_document(self, document, nodevalue):
