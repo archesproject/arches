@@ -12,7 +12,9 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                 this.multiple = ko.observable(false);
                 this.searchValue = ko.observable(filter.val || '');
                 this.node = params.node;
-                this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
+                if (!ko.isObservable(this.node.config.rdmCollection)) {
+                    this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);                    
+                }
                 ConceptWidgetViewModel.apply(this, [params]);
                 this.filterValue = ko.computed(function () {
                     return {
