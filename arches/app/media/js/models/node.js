@@ -67,6 +67,14 @@ define([
                 },
                 owner: this
             });
+            self.datatypeIsSearchable = ko.computed(function () {
+                var searchable = false;
+                var datatype = self.datatypelookup[self.datatype()];
+                if (datatype && datatype.configname) {
+                    searchable = datatype.issearchable;
+                }
+                return searchable;
+            });
             self.datatypeConfigComponent = ko.computed(function() {
                 var component = null;
                 var datatype = self.datatypelookup[self.datatype()];
@@ -82,7 +90,7 @@ define([
             });
             self.configKeys = ko.observableArray();
             self.config = {};
-
+            self.issearchable = ko.observable(true);
 
             self.parse(options.source);
 
@@ -159,7 +167,8 @@ define([
                     nodegroup_id: self.nodeGroupId,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
-                    config: config
+                    config: config,
+                    issearchable: self.issearchable
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
@@ -192,6 +201,7 @@ define([
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
+            self.issearchable(source.issearchable);
 
             if (source.config) {
                 self.setupConfig(source.config);

@@ -128,13 +128,48 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/string',
                     configname = 'string-datatype-config'
                 WHERE datatype = 'string';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/number',
+                    configname = 'number-datatype-config'
+                WHERE datatype = 'number';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/boolean',
+                    configname = 'boolean-datatype-config'
+                WHERE datatype = 'boolean';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configname = 'domain-value-datatype-config'
+                WHERE datatype = 'domain-value';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'string';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'number';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'boolean';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'domain-value';
         """),
+        migrations.AddField(
+            model_name='node',
+            name='issearchable',
+            field=models.BooleanField(default=True),
+        ),
         # migrations.RunSQL("""
         #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
         #     VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
