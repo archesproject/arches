@@ -5,7 +5,7 @@
 <div class="row widget-wrapper iiif-widget">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
     <div class="iiif-wrapper" data-bind="css: {'expanded-iiif': expanded()}">
-        <div id="map-widget-container" class="relative" style="z-index:5000">
+        <div class="relative" style="z-index:5000">
 
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : expandControls(), 'hide-maptools': expandControls()}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: function () { expandControls(true); }"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>

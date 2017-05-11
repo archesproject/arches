@@ -59,16 +59,6 @@ define(['arches',
                 return !!self.get('cards')().length;
             });
 
-            this.expanded = ko.pureComputed(function() {
-                var expanded = false;
-                _.each(this.get('widgets')(), function(widget) {
-                    if (widget.expanded()) {
-                        expanded = true;
-                    }
-                });
-                return expanded;
-            }, this)
-
             this.parse(attributes);
 
         },
