@@ -23,7 +23,7 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
                     expanded(false);
                 }
             }
-        })
+        });
         this.value = params.value || ko.observable(null);
         this.formData = params.formData || new FormData();
         this.form = params.form || null;
