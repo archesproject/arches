@@ -14,7 +14,7 @@
 
         <script type="text/html" id="card-template">
             <!-- Card Template -->
-            <div class="tab-base outline relative" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
+            <div class="tab-base outline" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
 
                 <!--Nav Tabs-->
                 <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
@@ -44,7 +44,7 @@
                     <!-- ko let: {'cardinality': outerCard.isContainer() ? outerCard.get('cardinality')() + '-' + card.get('cardinality')() : card.get('cardinality')() + '-'} -->
 
                     <!-- ko if: isWizard && !forceBlank -->
-                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
+                    <a href="#" class="library-tools-icon card-container-trash-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
                         <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                     </a>
                     <!-- /ko -->

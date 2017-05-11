@@ -169,6 +169,18 @@
     margin-bottom: 10px;
 }
 
+.library-tools-icon.card-container-trash-icon {
+    float: right;
+    margin-top: -50px;
+}
+
+.card-container-trash-icon .record-delete {
+    position: relative;
+    top: 0;
+    right: 0;
+    color: lightcoral;
+}
+
 .card-main-title {
     font-size: 16px;
     font-weight: 500;
