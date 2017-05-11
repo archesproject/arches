@@ -137,7 +137,7 @@ class DateDataType(BaseDataType):
 
     def validate(self, value, source=''):
         errors = []
-        
+
         date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
         valid = False
         for mat in date_formats:
@@ -154,6 +154,21 @@ class DateDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue):
         document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                date_value = datetime.strptime(value['val'], '%Y-%m-%d').isoformat()
+                if value['op'] != 'eq':
+                    operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
+                    operators[value['op']] = date_value
+                    search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
+                else:
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix', fuzziness=0)
+                nested_query = Nested(path='tiles', query=search_query)
+                query.must(nested_query)
+        except KeyError, e:
+            pass
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
