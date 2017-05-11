@@ -267,7 +267,6 @@ define([
                     self.map.on(L.Draw.Event.DELETED, updateFeatures);
 
                     self.expanded.subscribe(function () {
-                        console.log(self.tile.tileid())
                         _.defer(function () {
                             self.map.invalidateSize();
                         }, 500);
