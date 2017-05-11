@@ -729,10 +729,6 @@ define([
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
                         this.updateSearchQueryLayer([]);
-                        this.value({
-                          "type": "FeatureCollection",
-                          "features": []
-                        });
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);

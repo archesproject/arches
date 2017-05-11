@@ -34,7 +34,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from formats.archesjson import JsonReader
-from formats.shpfile import ShapeReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 
@@ -173,9 +172,7 @@ class ResourceLoader(object):
     def load(self, source):
         file_name, file_format = os.path.splitext(source)
         archesjson = False
-        if file_format == '.shp':
-            reader = ShapeReader()
-        elif file_format == '.arches':
+        if file_format == '.arches':
             reader = ArchesReader()
             print '\nVALIDATING ARCHES FILE ({0})'.format(source)
             reader.validate_file(source)

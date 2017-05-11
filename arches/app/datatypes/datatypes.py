@@ -2,6 +2,7 @@ import uuid
 import json
 import decimal
 import importlib
+from datetime import datetime
 from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
@@ -110,6 +111,15 @@ class NumberDataType(BaseDataType):
 
 class BooleanDataType(BaseDataType):
 
+    def validate(self, value, source=''):
+        errors = []
+
+        try:
+            bool(distutils.util.strtobool(value))
+        except:
+            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+        return errors
+
     def transform_import_values(self, value):
         return bool(distutils.util.strtobool(value))
 
@@ -124,8 +134,41 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+
+        date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+        valid = False
+        for mat in date_formats:
+            if valid == False:
+                try:
+                    if datetime.strptime(value, mat):
+                        valid = True
+                except:
+                    valid = False
+        if valid == False:
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD'.format(value)})
+
+        return errors
+
     def append_to_document(self, document, nodevalue):
         document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                date_value = datetime.strptime(value['val'], '%Y-%m-%d').isoformat()
+                if value['op'] != 'eq':
+                    operators = {'gte': None, 'lte': None, 'lt': None, 'gt': None}
+                    operators[value['op']] = date_value
+                    search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
+                else:
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix', fuzziness=0)
+                nested_query = Nested(path='tiles', query=search_query)
+                query.must(nested_query)
+        except KeyError, e:
+            pass
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -145,13 +188,18 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
             except:
                 message = 'Not a properly formatted geometry'
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         for feature in value['features']:
-            geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
-            validate_geom(geom, coordinate_count)
+            try:
+                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+                validate_geom(geom, coordinate_count)
+            except:
+                message = 'It was not possible to serialize some feaures in your geometry.'
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
 
         return errors
 
@@ -870,6 +918,16 @@ class BaseDomainDataType(BaseDataType):
 
 
 class DomainDataType(BaseDomainDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+
+        try:
+            models.Node.objects.get(config__options__0__id=value)
+        except:
+            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
+        return errors
+
     def append_to_document(self, document, nodevalue):
         domain_text = None
         for tile in document['tiles']:
@@ -900,6 +958,16 @@ class DomainDataType(BaseDomainDataType):
 
 
 class DomainListDataType(BaseDomainDataType):
+    def validate(self, value, source=''):
+        errors = []
+
+        for v in value:
+            try:
+                models.Node.objects.get(config__options__0__id=v)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(v)})
+        return errors
+
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
