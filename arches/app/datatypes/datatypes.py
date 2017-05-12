@@ -10,7 +10,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -66,10 +66,11 @@ class StringDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                fuzziness = 'AUTO' if '~' in value['op'] else 0
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=fuzziness)
+                match_type = 'phrase_prefix' if '~' in value['op'] else 'phrase'
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type=match_type)
                 if '!' in value['op']:
                     query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(match_query)
         except KeyError, e:
@@ -945,6 +946,7 @@ class DomainDataType(BaseDomainDataType):
                 # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
                 if '!' in value['op']:
                     query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
                     query.must(search_query)
 

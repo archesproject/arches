@@ -344,6 +344,19 @@ class SimpleQueryString(Dsl):
             "prefix" : { self.field : self.query }
         }
 
+
+class Exists(Dsl):    
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "")
+        self.dsl = {
+            "exists" : { "field": self.field }
+        }
+
 class Aggregation(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
