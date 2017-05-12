@@ -162,8 +162,7 @@ class DateDataType(BaseDataType):
                     search_query = Range(field='tiles.data.%s' % (str(node.pk)), **operators)
                 else:
                     search_query = Match(field='tiles.data.%s' % (str(node.pk)), query=date_value, type='phrase_prefix', fuzziness=0)
-                nested_query = Nested(path='tiles', query=search_query)
-                query.must(nested_query)
+                query.must(search_query)
         except KeyError, e:
             pass
 
