@@ -70,11 +70,10 @@ class ConceptDataType(BaseConceptDataType):
         try:
             if value['val'] != '':
                 match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
-                nested_query = Nested(path='tiles', query=match_query)
                 if '!' in value['op']:
-                    query.must_not(nested_query)
+                    query.must_not(match_query)
                 else:
-                    query.must(nested_query)
+                    query.must(match_query)
 
         except KeyError, e:
             pass
