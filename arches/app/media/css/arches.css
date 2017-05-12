@@ -6975,15 +6975,18 @@ span.basemap-unselected {
 
 .search-query-link-captions {
     padding-left: 0;
-    color: #fff;
-    font-size: 15px;
+    color: #123;
+    font-size: 16px;
     font-weight: 400;
     letter-spacing: 1px;
     text-transform: uppercase;
     margin: 0 0 20px;
     list-style: none;
     text-align: center;
+    cursor: pointer;
 }
+
+
 
 .search-query {
     padding-top: 10px;
@@ -6991,7 +6994,7 @@ span.basemap-unselected {
     margin-top: -20px;
     margin-left: 20px;
     margin-right: 20px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 a.search-query-link-captions:hover {
@@ -7010,8 +7013,8 @@ a.search-query-link-captions:focus {
 }
 
 .search-query-desc {
-    color: #fff;
-    font-size: 11px;
+    color: #444;
+    font-size: 13px;
     text-transform: uppercase;
 }
 
@@ -7786,15 +7789,18 @@ a .search-type-link{
     width: 60px;
     font-size: 11px;
     padding-top: 25px;
+    color: #888;
 }
 
 .search-type-btn.relative:hover {
     background: #f0f0f0;
+    color: #123;
 }
 
 .search-type-btn.relative.active {
     background: #f0f0f0;
     border: 1px solid #ddd;
+    color: #123;
 }
 
 .search-type-btn-icon {
@@ -7855,6 +7861,7 @@ div.search-facet-item.disabled {
 
 .search-facet-item-heading {
     font-weight: 400;
+    font-size: 13px;
 }
 
 a.search-facet-item .search-facet-item-heading {
