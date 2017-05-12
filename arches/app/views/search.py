@@ -37,7 +37,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, Exists, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -384,6 +384,7 @@ def build_search_results_dsl(request):
                     node = models.Node.objects.get(pk=key)
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.append_search_filters(val, node, tile_query, request)
+                    tile_query.must(Exists(field="tiles.data.%s" % (str(node.pk))))
             nested_query = Nested(path='tiles', query=tile_query)
             if advanced_filter['op'] == 'or' and index != 0:
                 grouped_query = Bool()
