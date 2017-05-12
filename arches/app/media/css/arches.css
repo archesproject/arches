@@ -6101,13 +6101,13 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .expanded-edit-map {
-    position: absolute;
+    position: fixed;
     border-width: 0px;
-    top: 0px;
-    left: 0px;
+    top: 105px;
+    left: 50px;
+    bottom: 0px;
     right: 0px;
-    height: 100vh;
-    transition-duration: .3s;
+    height: auto;
 }
 
 .iiif-wrapper {
