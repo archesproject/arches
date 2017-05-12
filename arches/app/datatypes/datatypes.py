@@ -66,8 +66,8 @@ class StringDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
-                fuzziness = 'AUTO' if '~' in value['op'] else 0
-                match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type='phrase_prefix', fuzziness=fuzziness)
+                match_type = 'phrase_prefix' if '~' in value['op'] else 'phrase'
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), query=value['val'], type=match_type)
                 if '!' in value['op']:
                     query.must_not(match_query)
                 else:
