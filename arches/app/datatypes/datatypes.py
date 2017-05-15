@@ -2,6 +2,7 @@ import uuid
 import json
 import decimal
 import importlib
+import distutils
 from datetime import datetime
 from flexidate import FlexiDate
 from mimetypes import MimeTypes
