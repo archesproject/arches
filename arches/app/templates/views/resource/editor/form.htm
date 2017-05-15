@@ -14,7 +14,7 @@
 
         <script type="text/html" id="card-template">
             <!-- Card Template -->
-            <div class="tab-base outline relative" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
+            <div class="tab-base outline" style="margin-bottom: 5px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
 
                 <!--Nav Tabs-->
                 <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
@@ -44,7 +44,7 @@
                     <!-- ko let: {'cardinality': outerCard.isContainer() ? outerCard.get('cardinality')() + '-' + card.get('cardinality')() : card.get('cardinality')() + '-'} -->
 
                     <!-- ko if: isWizard && !forceBlank -->
-                    <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
+                    <a href="#" class="library-tools-icon card-container-trash-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
                         <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                     </a>
                     <!-- /ko -->
@@ -128,11 +128,13 @@
                                                         label: widget.get("label")(),
                                                         value: innerTile.data[widget.get("node_id")()],
                                                         node: widget.node,
-                                                        expanded: widget.expanded,
+                                                        expanded: innerTile.expanded,
                                                         disabled: false,
                                                         graph: form.graph,
                                                         type: "resource-editor"
                                                     }
+                                                }, css: {
+                                                    "hidden": !innerTile.expanded() && form.expanded()
                                                 }'></div>
                                             </form>
 
@@ -140,7 +142,7 @@
 
                                         <!-- Save/Add Button -->
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
-                                        <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
+                                        <div class="install-buttons" data-bind="css: { 'expanded-buttons': innerTile.expanded() }">
                                             <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                         </div>
@@ -189,11 +191,13 @@
                                                     label: widget.get("label")(),
                                                     value: tile.data[widget.get("node_id")()],
                                                     node: widget.node,
-                                                    expanded: widget.expanded,
+                                                    expanded: tile.expanded,
                                                     disabled: false,
                                                     graph: form.graph,
                                                     type: "resource-editor"
                                                 }
+                                            }, css: {
+                                                "hidden": !tile.expanded() && form.expanded()
                                             }'></div>
                                         </form>
 
@@ -202,7 +206,7 @@
                                         <!-- Save/Add Buttons -->
                                         <!-- ko if: tile.dirty -->
                                             <!-- ko if: forceBlank -->
-                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': card.expanded() }" style="display: none;">
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': tile.expanded() }" style="display: none;">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
@@ -211,7 +215,7 @@
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
-                                            <div class="install-buttons" data-bind="css: { 'expanded-buttons': card.expanded() }">
+                                            <div class="install-buttons" data-bind="css: { 'expanded-buttons': tile.expanded() }">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                             </div>
@@ -230,7 +234,7 @@
                             </div>
                         </div>
 
-                        
+
 
 
                         <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
@@ -274,7 +278,7 @@
         <!-- ko if: isWizard -->
         <div class="card-body panel-body ">
 
-            <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outerCard.get('cardinality')() === 'n' && form.tiles[outerCard.get('nodegroup_id')]().length > 0">
+            <div style="padding-bottom: 10px; display: none;" data-bind="visible: outerCard.get('cardinality')() === 'n' && form.tiles[outerCard.get('nodegroup_id')]().length > 0">
 
                 <!-- Title -->
                 <div class="card-tab-title mar-top mar-btm">
@@ -314,7 +318,7 @@
             <!-- /ko -->
             <!-- /ko -->
 
-            
+
 
         </div>
 

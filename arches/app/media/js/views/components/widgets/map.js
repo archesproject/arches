@@ -283,29 +283,33 @@ define([
             }
 
             this.restoreSearchState = function() {
-                var features = this.query.features;
-                var drawMode;
-                var geojsonToDrawMode = {
-                    'Point': {'drawMode': 'draw_point', 'name':'Point'},
-                    'LineString': {'drawMode':'draw_line_string', 'name':'Line'},
-                    'Polygon': {'drawMode': 'draw_polygon', 'name': 'Polygon'}
-                }
-                if (features.length > 0) {
-                    this.queryFeature = features[0];
-                    if (this.queryFeature.properties.extent_search === true) {
-                        var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
-                        this.toggleExtentSearch()
-                        this.map.fitBounds(bounds);
-                    } else {
-                        drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
-                        this.draw.changeMode(drawMode.drawMode)
-                        this.drawMode(drawMode.drawMode)
-                        this.geometryTypeDetails[drawMode.name].active(true);
-                        this.updateSearchQueryLayer([this.queryFeature]);
-                        if (this.queryFeature.properties.buffer) {
-                            this.buffer(this.queryFeature.properties.buffer.width)
+                if (this.query) {
+                    var features = this.query.features;
+                    var drawMode;
+                    var geojsonToDrawMode = {
+                        'Point': {'drawMode': 'draw_point', 'name':'Point'},
+                        'LineString': {'drawMode':'draw_line_string', 'name':'Line'},
+                        'Polygon': {'drawMode': 'draw_polygon', 'name': 'Polygon'}
+                    }
+                    if (features.length > 0) {
+                        this.queryFeature = features[0];
+                        if (this.queryFeature.properties.extent_search === true) {
+                            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
+                            this.toggleExtentSearch()
+                            this.map.fitBounds(bounds);
+                        } else {
+                            drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
+                            this.draw.changeMode(drawMode.drawMode)
+                            this.drawMode(drawMode.drawMode)
+                            this.geometryTypeDetails[drawMode.name].active(true);
+                            this.updateSearchQueryLayer([this.queryFeature]);
+                            if (this.queryFeature.properties.buffer) {
+                                this.buffer(this.queryFeature.properties.buffer.width)
+                            }
                         }
                     }
+                } else {
+                    this.fitToAggregationBounds();
                 }
             }
 
@@ -514,6 +518,25 @@ define([
                         };
                         var data = null;
 
+                        self.fitToAggregationBounds = function(agg){
+                            var agg = self.searchAggregations();
+                            var aggBounds;
+                            if (agg.bounds.bounds && self.map && !self.extentSearch()) {
+                                aggBounds = agg.bounds.bounds;
+                                var bounds = [
+                                    [
+                                        aggBounds.top_left.lon,
+                                        aggBounds.bottom_right.lat
+                                    ],
+                                    [
+                                        aggBounds.bottom_right.lon,
+                                        aggBounds.top_left.lat
+                                    ]
+                                ];
+                                map.fitBounds(bounds);
+                            }
+                        }
+
                         self.getMapStyle = function() {
                             var style = map.getStyle();
                             style.sources = _.defaults(self.sources, style.sources);
@@ -549,19 +572,7 @@ define([
                                         "features": []
                                     };
                                 }
-                                if (agg.bounds.bounds && self.map && !self.extentSearch()) {
-                                    var bounds = [
-                                        [
-                                            agg.bounds.bounds.top_left.lon,
-                                            agg.bounds.bounds.bottom_right.lat
-                                        ],
-                                        [
-                                            agg.bounds.bounds.bottom_right.lon,
-                                            agg.bounds.bounds.top_left.lat
-                                        ]
-                                    ];
-                                    map.fitBounds(bounds);
-                                }
+                                self.fitToAggregationBounds();
                                 var features = [];
                                 _.each(agg.grid.buckets, function (cell) {
                                     var pt = geohash.decode(cell.key);
@@ -672,9 +683,9 @@ define([
                     }
                     window.setTimeout(function() {
                         window.dispatchEvent(new Event('resize'))
-                        if (self.query !== undefined && self.context === 'search-filter') {
+                        if (self.context === 'search-filter') {
                             self.restoreSearchState();
-                        }
+                        };
                     }, 30)
                 });
 
@@ -729,10 +740,6 @@ define([
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
                         this.updateSearchQueryLayer([]);
-                        this.value({
-                          "type": "FeatureCollection",
-                          "features": []
-                        });
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);

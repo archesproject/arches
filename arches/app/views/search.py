@@ -384,10 +384,11 @@ def build_search_results_dsl(request):
                     node = models.Node.objects.get(pk=key)
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.append_search_filters(val, node, tile_query, request)
+            nested_query = Nested(path='tiles', query=tile_query)
             if advanced_filter['op'] == 'or' and index != 0:
                 grouped_query = Bool()
                 grouped_queries.append(grouped_query)
-            grouped_query.must(tile_query)
+            grouped_query.must(nested_query)
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
