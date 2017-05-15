@@ -275,7 +275,8 @@ GEOCODING_PROVIDERS = [
     {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
     {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
 ]
-DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
+
+DEFAULT_SEARCH_GEOCODER = "BingGeocoder" # currently MapzenGeocoder or BingGeocoder
 
 SPARQL_ENDPOINT_PROVIDERS = (
     {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
