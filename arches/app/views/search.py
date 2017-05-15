@@ -432,8 +432,8 @@ def _get_child_concepts(conceptid):
 
 def geocode(request):
     geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['ID'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['ID'])
+    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['NAME'] == geocoding_provider_id), None)
+    Geocoder = import_string('arches.app.utils.geocoders.' + provider['NAME'])
     search_string = request.GET.get('q', '')
     return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['API_KEY']) })
 
