@@ -115,7 +115,7 @@ class BooleanDataType(BaseDataType):
         errors = []
 
         try:
-            type(bool(distutils.util.strtobool(str(value)))) == True:
+            type(bool(distutils.util.strtobool(str(value)))) == True
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
 
