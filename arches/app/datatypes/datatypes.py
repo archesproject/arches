@@ -115,13 +115,14 @@ class BooleanDataType(BaseDataType):
         errors = []
 
         try:
-            bool(distutils.util.strtobool(value))
+            type(bool(distutils.util.strtobool(str(value)))) == True:
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+
         return errors
 
     def transform_import_values(self, value):
-        return bool(distutils.util.strtobool(value))
+        return bool(distutils.util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
         try:
