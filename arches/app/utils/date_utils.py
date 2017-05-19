@@ -1,5 +1,5 @@
 from flexidate import FlexiDate
-import ipdb
+
 class SortableDate(object):
     def __init__(self, date):
         self.orig_date = date
