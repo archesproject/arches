@@ -4,8 +4,8 @@ class SortableDate(object):
     def __init__(self, date):
         fd = FlexiDate.from_str(str(date))
         self.year = fd.year
-        self.month = fd.month
-        self.day = fd.day
+        self.month = '1' if fd.month == '0' or fd.month is '' else fd.month
+        self.day = '1' if fd.day == '0' or fd.day is '' else fd.day
 
     def as_float(self):
         year = int(self.year) * 10000

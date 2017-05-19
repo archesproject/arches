@@ -37,7 +37,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.date_utils import SortableDate
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -336,11 +336,11 @@ def build_search_results_dsl(request):
 
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.as_float(), lt=end_date.as_float())
+                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.as_float(), lte=end_date.as_float())
                 date_range_query = Nested(path='tiles', query=range)
                 temporal_query.should(date_range_query)
             else:
-                date_range_query = Range(field='dates', gte=start_date.as_float(), lt=end_date.as_float())
+                date_range_query = Range(field='dates', gte=start_date.as_float(), lte=end_date.as_float())
                 temporal_query.should(date_range_query)
 
                 select_clause = """
@@ -447,14 +447,13 @@ def export_results(request):
 def time_wheel_config(request):
     se = SearchEngineFactory().create()
     query = Query(se, limit=0)
-    query.add_aggregation(MinAgg(field='dates', format='0'))
-    query.add_aggregation(MaxAgg(field='dates', format='0'))
+    query.add_aggregation(MinAgg(field='dates'))
+    query.add_aggregation(MaxAgg(field='dates'))
     results = query.search(index='resource')
-    print results
 
     if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
-        min_date = int(results['aggregations']['min_dates']['value_as_string'])/10000
-        max_date = int(results['aggregations']['max_dates']['value_as_string'])/10000
+        min_date = int(results['aggregations']['min_dates']['value'])/10000
+        max_date = int(results['aggregations']['max_dates']['value'])/10000
 
         # round min and max date to the nearest 1000 years
         min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
@@ -464,18 +463,18 @@ def time_wheel_config(request):
         for millennium in range(int(min_date),int(max_date)+1000,1000):
             min_millenium = millennium
             max_millenium = millennium + 1000
-            millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='0', min_date=SortableDate(min_millenium).as_float(), max_date=SortableDate(max_millenium).as_float())
+            millenium_agg = RangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', min=SortableDate(min_millenium).as_float()-1, max=SortableDate(max_millenium).as_float())
 
             for century in range(min_millenium,max_millenium,100):
                 min_century = century
                 max_century = century + 100
-                century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='0', min_date=SortableDate(min_century).as_float(), max_date=SortableDate(max_century).as_float())
+                century_aggregation = RangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', min=SortableDate(min_century).as_float()-1, max=SortableDate(max_century).as_float())
                 millenium_agg.add_aggregation(century_aggregation)
 
                 for decade in range(min_century,max_century,10):
                     min_decade = decade
                     max_decade = decade + 10
-                    decade_aggregation = DateRangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', format='0', min_date=SortableDate(min_decade).as_float(), max_date=SortableDate(max_decade).as_float())
+                    decade_aggregation = RangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', min=SortableDate(min_decade).as_float()-1, max=SortableDate(max_decade).as_float())
                     century_aggregation.add_aggregation(decade_aggregation)
 
             query.add_aggregation(millenium_agg)
@@ -491,12 +490,10 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
         return d3ItemInstance
 
     for key, value in results['buckets'][0].iteritems():
-        if key == 'from' or key == 'to':
-            pass
-        elif key == 'from_as_string':
-            d3ItemInstance.start = int(int(value)/10000)
-        elif key == 'to_as_string':
-            d3ItemInstance.end = int(int(value)/10000)
+        if key == 'from':
+            d3ItemInstance.start = int(value/10000)
+        elif key == 'to':
+            d3ItemInstance.end = int(value/10000)
         elif key == 'doc_count':
             d3ItemInstance.size = value
         elif key == 'key':
