@@ -268,20 +268,10 @@ def build_search_results_dsl(request):
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
-        start_date = None
-        end_date = None
-        start_year = 'null'
-        end_year = 'null'
-
-        try:
-            start_date = SortableDate(temporal_filter['fromDate'])
-        except:
-            pass
-
-        try:
-            end_date = SortableDate(temporal_filter['toDate'])
-        except:
-            pass
+        start_date = SortableDate(temporal_filter['fromDate'])
+        end_date = SortableDate(temporal_filter['toDate'])
+        start_year = start_date.year or 'null'
+        end_year = end_date.year or 'null'
 
 
         # add filter for concepts that define min or max dates
@@ -318,11 +308,13 @@ def build_search_results_dsl(request):
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 field='tiles.data.%s' % (temporal_filter['dateNodeId'])
 
-            if start_date is not None:
-                inverted_date_filter.should(Range(field=field, lte=start_date.as_float()))
+            if start_date.is_valid():
+                start_date = start_date.as_float() if field == 'dates' else start_date.orig_date
+                inverted_date_filter.should(Range(field=field, lte=start_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
-            if end_date is not None:
-                inverted_date_filter.should(Range(field=field, gte=end_date.as_float()))
+            if end_date.is_valid():
+                end_date = end_date.as_float() if field == 'dates' else end_date.orig_date
+                inverted_date_filter.should(Range(field=field, gte=end_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
 
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
@@ -332,11 +324,11 @@ def build_search_results_dsl(request):
                 temporal_query.should(inverted_date_filter)
 
                 select_clause = " or ".join(select_clause) + " as overlap"
-                sql = basesql.format(select_clause=select_clause).format(start_year=start_date.year, end_year=end_date.year)
+                sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
 
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.as_float(), lte=end_date.as_float())
+                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date)
                 date_range_query = Nested(path='tiles', query=range)
                 temporal_query.should(date_range_query)
             else:
@@ -346,7 +338,7 @@ def build_search_results_dsl(request):
                 select_clause = """
                     numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
                 """
-                sql = basesql.format(select_clause=select_clause).format(start_year=start_date.year, end_year=end_date.year)
+                sql = basesql.format(select_clause=select_clause).format(start_year=start_year , end_year=end_year)
 
         # is a dateNodeId is not specified
         if sql is not None:
