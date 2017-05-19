@@ -165,7 +165,7 @@ class SearchTests(ArchesTestCase):
 
     def test_temporal_only_search_3(self):
         """
-        Search for resources that DON'T fall between 1940 and 1960 and date node is supplied
+        Search for resources that fall between 1940 and 1960 and date node is supplied
 
         """
 
@@ -176,7 +176,7 @@ class SearchTests(ArchesTestCase):
 
     def test_temporal_only_search_4(self):
         """
-        Search for resources that DON'T fall between 1940 and 1960
+        Search for resources that DON'T fall between 1940 and 1960 and date node is supplied
 
         """
 
