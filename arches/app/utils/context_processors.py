@@ -19,17 +19,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches import __version__
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 
 def livereload(request):
     return {
         'livereload_port': settings.LIVERELOAD_PORT
     }
 
+def get_bounds_from_geojson(geojson):
+    polygons = []
+    for feature in geojson['features']:
+        if feature['geometry']['type'] == 'Polygon':
+            polygons.append(GEOSGeometry(JSONSerializer().serialize(feature['geometry'])))
+    return GeometryCollection(polygons).extent
+
 def map_info(request):
+    # import ipdb
+    # ipdb.set_trace()
     return {
         'map_info': {
-            'x': settings.DEFAULT_MAP_X,
-            'y': settings.DEFAULT_MAP_Y,
+            'x': settings.DEFAULT_MAP_CENTER['features'][0]['geometry']['coordinates'][0],
+            'y': settings.DEFAULT_MAP_CENTER['features'][0]['geometry']['coordinates'][1],
             'zoom': settings.DEFAULT_MAP_ZOOM,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
@@ -37,7 +47,7 @@ def map_info(request):
             'hex_bin_size': settings.HEX_BIN_SIZE,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS),
+            'hex_bin_bounds': get_bounds_from_geojson(settings.HEX_BIN_BOUNDS),
             'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
         }
     }
