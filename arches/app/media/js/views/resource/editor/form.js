@@ -37,6 +37,15 @@ define([
             this.ready = ko.observable(false);
             this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
+            this.expanded = ko.computed(function () {
+                var expanded = false;
+                _.each(self.formTiles(), function(tile) {
+                    if (tile.expanded()) {
+                        expanded = true;
+                    }
+                });
+                return expanded;
+            });
         },
 
         /**
@@ -137,6 +146,7 @@ define([
                 this.initTiles(tile.tiles);
             }
 
+            tile.expanded = ko.observable(false);
             tile.formData = new FormData();
             this.formTiles.push(tile);
             return tile;

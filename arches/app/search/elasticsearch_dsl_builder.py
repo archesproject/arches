@@ -175,7 +175,7 @@ class Match(Dsl):
             }
         }
 
-        if self.fuzziness and self.type != 'phrase_prefix':
+        if self.fuzziness:
             self.dsl['match'][self.field]['fuzziness'] = self.fuzziness
 
 class Nested(Dsl):
@@ -344,6 +344,19 @@ class SimpleQueryString(Dsl):
             "prefix" : { self.field : self.query }
         }
 
+
+class Exists(Dsl):    
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "")
+        self.dsl = {
+            "exists" : { "field": self.field }
+        }
+
 class Aggregation(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
@@ -439,7 +452,7 @@ class CoreDateAgg(Aggregation):
 
 class MinAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-min-aggregation.html
 
     """
 
@@ -449,7 +462,7 @@ class MinAgg(CoreDateAgg):
 
 class MaxAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html
 
     """
 
@@ -459,7 +472,7 @@ class MaxAgg(CoreDateAgg):
 
 class DateRangeAgg(CoreDateAgg):
     """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-daterange-aggregation.html
 
     """
 
@@ -488,4 +501,37 @@ class DateRangeAgg(CoreDateAgg):
             date_range['key'] = key
 
         if min_date is not None or max_date is not None:
+            self.agg[self.name][self.type]['ranges'].append(date_range)
+
+class RangeAgg(Aggregation):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        min_val = kwargs.pop('min', None)
+        max_val = kwargs.pop('max', None)
+        key = kwargs.pop('key', None)
+        super(RangeAgg, self).__init__(type='range', **kwargs)
+
+        self.add(min=min_val, max=max_val, key=key, **kwargs)
+
+    def add(self, **kwargs):
+        date_range = {}
+        min_val = kwargs.pop('min', None)
+        max_val = kwargs.pop('max', None)
+        key = kwargs.pop('key', None)
+
+        if 'ranges' not in self.agg[self.name][self.type]:
+            self.agg[self.name][self.type]['ranges'] = []
+
+        if min_val is not None:
+            date_range['from'] = min_val
+        if max_val is not None:
+            date_range['to'] = max_val
+        if key is not None:
+            date_range['key'] = key
+
+        if min_val is not None or max_val is not None:
             self.agg[self.name][self.type]['ranges'].append(date_range)

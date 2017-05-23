@@ -365,6 +365,7 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column='config')
+    issearchable = models.BooleanField(default=True)
 
     def get_child_nodes_and_edges(self):
         """

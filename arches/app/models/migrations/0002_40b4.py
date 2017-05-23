@@ -10,10 +10,17 @@ from django.db import migrations, models
 from django.core import management
 from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
+from arches.app.search.mappings import prepare_search_index, delete_search_index
 
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
+
+    delete_search_index()
+    for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
+        prepare_search_index(str(graphid), create=True)
+
+    management.call_command('es', operation='index_resources')
     management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
     management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite='overwrite')
 
@@ -56,6 +63,17 @@ class Migration(migrations.Migration):
                 'proxy': True,
             },
             bases=('models.tilemodel',),
+        ),
+        migrations.CreateModel(
+            name='IIIFManifest',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('url', models.TextField())
+            ],
+            options={
+                'db_table': 'iiif_manifests',
+                'managed': True,
+            },
         ),
         migrations.AddField(
             model_name='maplayer',
@@ -122,55 +140,9 @@ class Migration(migrations.Migration):
             name='issearchable',
             field=models.NullBooleanField(default=False),
         ),
-        migrations.RunSQL("""
-            UPDATE d_data_types
-                SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/string',
-                    configname = 'string-datatype-config'
-                WHERE datatype = 'string';
-        """, """
-            UPDATE d_data_types
-                SET issearchable = false,
-                    configcomponent = NULL,
-                    configname = NULL
-                WHERE datatype = 'string';
-        """),
-        # migrations.RunSQL("""
-        #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
-        #     VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
-        # """, """
-        #     DELETE FROM public.resource_instances WHERE resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195';
-        # """),
-        migrations.RunSQL("""
-            INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype)
-            VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
-        """, """
-            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004'
-            AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
-        """),
-        migrations.RunSQL("""
-            INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-                VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{
-                        "placeholder": "",
-                        "options": [],
-                        "nameLabel": "Name",
-                        "typeLabel": "Type"
-                    }'
-                );
-            INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-            INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
-            UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
-            UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
-            """,
-            """
-            DELETE FROM d_data_types WHERE datatype = 'iiif-drawing';
-            DELETE FROM d_data_types WHERE datatype = 'csv-chart-json';
-            DELETE FROM widgets WHERE widgetid = '10000000-0000-0000-0000-000000000020';
-            DELETE from widgets WHERE widgetid = '10000000-0000-0000-0000-000000000022';
-            UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
-            UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
-        """),
-        ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
-        migrations.RunPython(forwards_func, reverse_func),
+        migrations.AddField(
+            model_name='node',
+            name='issearchable',
+            field=models.BooleanField(default=True),
+        ),
     ]

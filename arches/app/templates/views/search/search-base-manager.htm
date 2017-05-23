@@ -10,13 +10,13 @@
             </div>
         </div>
 
-        <div class="" style="margin-top: -5px;">
-            <div class="btn-group">
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="map filter" data-bind="css: {'active': selectedTab() === mapFilter}, click: function(){selectedTab(mapFilter)}"><i class="fa fa-map-marker"></i></a>
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="time filter" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}"><i class="fa fa-calendar"></i></a>
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="saved searches" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}"><i class="ion-ios-heart"></i></a>
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="advanced" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}"><i class="ion-plus-round"></i></a>
-                <a href="#" class="btn btn-default btn-display-toggle add-tooltip search" data-toggle="tooltip" data-placement="bottom" data-original-title="Related resources" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}"><i class="fa fa-code-fork"></i></a>
+        <div class="" style="margin-top: 0px;">
+            <div class="">
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === mapFilter}, click: function(){selectedTab(mapFilter)}"><i class="fa fa-map-marker search-type-btn-icon"></i>Map</button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}"><i class="fa fa-calendar search-type-btn-icon"></i>Time</button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}"><i class="fa fa-bookmark search-type-btn-icon"></i>Saved</button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}"><i class="fa fa-check-circle-o search-type-btn-icon"></i>Expert</button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}"><i class="fa fa-code-fork search-type-btn-icon"></i>Related</button>
             </div>
         </div>
     </div>
