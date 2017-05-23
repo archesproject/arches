@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import math
+import json
 from django.http import HttpResponse
 from ModestMaps.Core import Coordinate
 from ModestMaps.Geo import Location
@@ -26,8 +27,16 @@ def get_tileserver_config(layer_id):
         layer_model = models.TileserverLayer.objects.get(name=layer_id)
         layer_config = layer_model.config
 
+    try:
+        if settings.TILE_CACHE_CONFIG.has_key('name'):
+            tile_cache_config = settings.TILE_CACHE_CONFIG
+    except:
+        tile_cache_config = json.loads(settings.TILE_CACHE_CONFIG.decode('string_escape'))
+        if tile_cache_config.has_key('path'):
+            tile_cache_config['path'] = os.path.join(settings.ROOT_DIR, tile_cache_config['path'])
+
     config_dict = {
-        "cache": settings.TILE_CACHE_CONFIG,
+        "cache": tile_cache_config,
         "layers": {}
     }
     config_dict["layers"][str(layer_id)] = layer_config
