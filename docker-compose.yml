@@ -14,6 +14,8 @@ services:
         - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
       environment:
         - FORCE_DB_INIT=False
+        - INSTALL_DEFAULT_GRAPHS=True
+        - INSTALL_DEFAULT_CONCEPTS=True
         - PGPASSWORD=postgres
         - PGDBNAME=arches
         - PGHOST=db
