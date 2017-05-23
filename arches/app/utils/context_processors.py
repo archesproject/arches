@@ -34,8 +34,7 @@ def get_bounds_from_geojson(geojson):
     return GeometryCollection(polygons).extent
 
 def map_info(request):
-    # import ipdb
-    # ipdb.set_trace()
+
     return {
         'map_info': {
             'x': settings.DEFAULT_MAP_CENTER['features'][0]['geometry']['coordinates'][0],
