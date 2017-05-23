@@ -155,7 +155,12 @@ run_tests() {
 	echo ""
 	echo "----- RUNNING ARCHES TESTS -----"
 	echo ""
-	python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+	python manage.py test tests --pattern="*.py" --settings="tests.test_settings" --exe
+	if [ $? -ne 0 ]; then
+        echo "Error: Not all tests ran succesfully."
+				echo "Exiting..."
+        exit 1
+	fi
 }
 
 collect_static(){
