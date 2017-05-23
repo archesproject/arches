@@ -42,7 +42,22 @@ init_arches() {
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	psql -lqt -h ${PGHOST} -U postgres | cut -d \| -f 1 | grep -qw ${PGDBNAME}
+	count=`psql -h ${PGHOST} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+
+	# Check if returned value is a number and not some error message
+	re='^[0-9]+$'
+	if ! [[ ${count} =~ $re ]] ; then
+	   echo "Error: Something went wrong when checking if database "${PGDBNAME}" exists..." >&2;
+		 echo "Exiting..."
+		 exit 1
+	fi
+
+	# Return 0 (= true) if database exists
+	if [[ ${count} > 0 ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 setup_arches() {
