@@ -139,38 +139,38 @@ This will be used throughout your development process and does not need to be ch
 ## Parameter overview
 Your docker-compose.yml file expects the following Environment Variables:
 
-	- ARCHES_PROJECT=<Custom Arches project name>
-		Used to set up your own Arches app
-  - INSTALL_DEFAULT_GRAPHS=<True or False>
-    Used to fill the database with the default graphs that come with Arches
-  - INSTALL_DEFAULT_CONCEPTS=<True or False>
+- ARCHES_PROJECT=<Custom Arches project name>  
+	Used to set up your own Arches app  
+- INSTALL_DEFAULT_GRAPHS=<True or False>  
+    Used to fill the database with the default graphs that come with Arches  
+- INSTALL_DEFAULT_CONCEPTS=<True or False>  
     Used to fill the database with the default concepts that come with Arches
-	- PGPASSWORD=<Postgresql database password>
-	- PGDBNAME=<Postgresql database name>
-	- PGHOST=<Postgresql database host address>
-	- PGPORT=<Postgresql database host port>
-	- ESHOST=<Elasticsearch host address>
-	- ESPORT=<Elasticsearch port>
-	- DJANGO_MODE=<PROD or DEV>
-		Use PROD for production (= live) environments
-	- DJANGO_DEBUG=<True or False>
-		Use False for production environments
-	- DOMAIN_NAMES=<list of your domain names>
-		Space separated list of domain names used to reach Arches, use 'localhost' for development environments
-	- MAPBOX_API_KEY=<Your personal Mapbox api key>
+- PGPASSWORD=<Postgresql database password>
+- PGDBNAME=<Postgresql database name>
+- PGHOST=<Postgresql database host address>
+- PGPORT=<Postgresql database host port>
+- ESHOST=<Elasticsearch host address>
+- ESPORT=<Elasticsearch port>
+- DJANGO_MODE=<PROD or DEV>
+	Use PROD for production (= live) environments
+- DJANGO_DEBUG=<True or False>
+	Use False for production environments
+- DOMAIN_NAMES=<list of your domain names>
+	Space separated list of domain names used to reach Arches, use 'localhost' for development environments
+- MAPBOX_API_KEY=<Your personal Mapbox api key>
 
 Optional Environment Variables:  
 
-	- FORCE_DB_INIT=<True or False>
-		Force the initialization of Postgresql and Elasticsearch on startup
-	- DJANGO_PORT=<Django server port>
-		Runs your Django server on an alternative port. Default = 8000
-	- DJANGO_NORELOAD=<True or False>
-		Runs Django with options --noreload --nothreading. Useful for some debugging methods.
-	- DJANGO_SECRET_KEY=<50 character string>
-		Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set).
-	- TZ=<Time Zone>
-		Useful for logging the correct time. US Eastern = EST
+- FORCE_DB_INIT=<True or False>
+	Force the initialization of Postgresql and Elasticsearch on startup
+- DJANGO_PORT=<Django server port>
+	Runs your Django server on an alternative port. Default = 8000
+- DJANGO_NORELOAD=<True or False>
+	Runs Django with options --noreload --nothreading. Useful for some debugging methods.
+- DJANGO_SECRET_KEY=<50 character string>
+	Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set).
+- TZ=<Time Zone>
+	Useful for logging the correct time. US Eastern = EST
 
 
 ## Initialize
