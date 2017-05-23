@@ -39,7 +39,7 @@ ELASTICSEARCH_HOSTS = [
     { 'host': get_env_variable('ESHOST'), 'port': ELASTICSEARCH_HTTP_PORT }
 ]
 
-MAPBOX_API_KEY = get_env_variable('MAPBOX_API_KEY')
+MAPBOX_API_KEY = get_optional_env_variable('MAPBOX_API_KEY')
 
 
 ALLOWED_HOSTS = get_env_variable('DOMAIN_NAMES').split()

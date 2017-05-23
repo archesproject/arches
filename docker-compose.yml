@@ -3,9 +3,8 @@ services:
 
     arches:
       container_name: arches
-      restart: always
       image: arches/arches:latest
-      build: 
+      build:
         context: .
         dockerfile: ./Dockerfile
       command: bash -c  "sleep 15 && /docker/entrypoint.sh"
@@ -15,7 +14,7 @@ services:
         - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
       environment:
         - FORCE_DB_INIT=False
-        - PGPASSWORD=
+        - PGPASSWORD=postgres
         - PGDBNAME=arches
         - PGHOST=db
         - PGPORT=5432
@@ -27,14 +26,13 @@ services:
         - MAPBOX_API_KEY=
         - TZ=EST
       ports:
-        - '81:8000'
+        - '8000:8000'
       depends_on:
         - db
         - elasticsearch
-        
+
     db:
       container_name: db
-      restart: always
       image: mdillon/postgis:9.6
       volumes:
           - postgres-data:/var/lib/postgresql/data
@@ -42,15 +40,13 @@ services:
       ports:
         - '5432:5432'
       environment:
-        - POSTGRES_PASSWORD=
+        - POSTGRES_PASSWORD=postgres
         - TZ=EST
-        
+
     elasticsearch:
       container_name: elasticsearch
-      restart: always
       image: elasticsearch:5.2
       volumes:
-        - elasticsearch-config:/usr/share/elasticsearch/config
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:
         - "9200:9200"
@@ -58,7 +54,7 @@ services:
       environment:
         - TZ=EST
 
-        
+
 volumes:
     arches-log:
     arches-static:

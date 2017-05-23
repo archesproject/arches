@@ -34,6 +34,7 @@ init_arches() {
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
 		echo ""
 	else
+		echo "Database ${PGDBNAME} does not exists yet, starting setup..."
 		setup_arches
 	fi
 
