@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Node list -->
-    <div id="node-crud" class="middle-column-container" class="ep-node-card">
+    <div id="node-crud" class="middle-column-container" class="ep-node-card" data-bind="with:nodeList">
         {% include 'views/graph/permission-manager/node-list.htm' %}
     </div>
 
@@ -54,7 +54,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('permission-manager-data', [], function () {
     return {
-        "usersAndGroups":{{users_and_groups}}
+        'usersAndGroups':{{users_and_groups}},
+        'cards':{{cards}},
+        'datatypes':{{datatypes}}
     };
 });
 {% endautoescape %}</script>
