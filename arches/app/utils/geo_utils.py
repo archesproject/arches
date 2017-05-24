@@ -11,7 +11,12 @@ class GeoUtils(object):
 
         """
         polygons = []
-        for feature in geojson['features']:
-            if feature['geometry']['type'] == 'Polygon':
-                polygons.append(GEOSGeometry(JSONSerializer().serialize(feature['geometry'])))
-        return GeometryCollection(polygons).extent
+        try:
+            for feature in geojson['features']:
+                if feature['geometry']['type'] == 'Polygon':
+                    polygons.append(GEOSGeometry(JSONSerializer().serialize(feature['geometry'])))
+            bounds = GeometryCollection(polygons).extent
+        except:
+            bounds = geojson
+
+        return bounds

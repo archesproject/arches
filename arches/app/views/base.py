@@ -60,9 +60,11 @@ class BaseManagerView(TemplateView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_source = datatype.get_map_source(node)
             if map_source is not None:
+                print map_source
                 resource_sources.append(map_source)
             map_layer = datatype.get_map_layer(node)
             if map_layer is not None:
+                #print map_layer
                 resource_layers.append(map_layer)
 
         context['geom_nodes'] = geom_nodes

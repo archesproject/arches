@@ -131,6 +131,7 @@ def clean_resource_cache(tile):
             clean_resource_cache(child_tile)
 
 def seed_resource_cache():
+    datatype_factory = DataTypeFactory()
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
 

@@ -190,7 +190,7 @@
                             "properties": {}
                         }]
                     },
-                    "a4ae8b35-3cea-11e7-860b-c4b301baab9f": "{ \"name\": \"Disk\",  \"path\": os.path.join(ROOT_DIR, 'tileserver', 'cache')  # to reconfigure to use S3 (recommended for production), use the following     # template:      # \"name\": \"S3\",     # \"bucket\": \"<bucket name>\",     # \"access\": \"<access key>\",     # \"secret\": \"<secret key>\" }",
+                    "a4ae8b35-3cea-11e7-860b-c4b301baab9f": "{\"name\": \"Disk\",  \"path\": \"tileserver/cache\"}",
                     "a4ae8254-3cea-11e7-a59a-c4b301baab9f": 5
                 },
                 "tileid": "481d61e0-2cd3-4062-b785-11af997e6b60"

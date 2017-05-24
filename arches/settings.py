@@ -352,10 +352,19 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 # links to sprites and glyphs for use on map
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
-
 # Default map settings for search and map layer manager pages
-DEFAULT_MAP_X = 0
-DEFAULT_MAP_Y = 0
+DEFAULT_MAP_CENTER = {
+    "type": "FeatureCollection",
+    "features": [{
+        "geometry": {
+            "type": "Point",
+            "coordinates": [-0.0016980786644751333, 51.47783519865435]
+        },
+        "type": "Feature",
+        "properties": {}
+    }]
+}
+
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
