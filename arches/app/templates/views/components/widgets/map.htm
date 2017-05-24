@@ -212,10 +212,21 @@
             <!-- ko if: popupData().doc_count -->
             <div class="hover-panel-small">
                 <div class="hover-feature-title-bar">
-                    <div class="hover-feature-title">Search Results</div>
+                    <div class="hover-feature-title">{% trans "Search Results" %}</div>
                 </div>
                 <div class="hover-feature-body">
-                    <span>This cell contains</span><span class="text-semibold" data-bind="text: ' ' + popupData().doc_count"></span><span> result(s)</span>
+                    <span>{% trans "This cell contains" %}</span><span class="text-semibold" data-bind="text: ' ' + popupData().doc_count"></span><span> {% trans "result(s)" %}</span>
+                </div>
+            </div>
+            <!--/ko-->
+
+            <!-- ko if: popupData().geojson -->
+            <div class="hover-panel-small">
+                <div class="hover-feature-title-bar">
+                    <div class="hover-feature-title">{% trans "Add drawing?" %}</div>
+                </div>
+                <div class="hover-feature-body">
+                    {% trans "Click to add geometry to drawings." %}
                 </div>
             </div>
             <!--/ko-->
