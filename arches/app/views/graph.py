@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
+from django.contrib.auth.models import User, Group
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -602,8 +603,16 @@ class PermissionManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
+        users_and_groups = []
+        for group in Group.objects.all():
+            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
+        for user in User.objects.all():
+            users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
+
         context = self.get_context_data(
-            main_script='views/graph/permission-manager'
+            main_script='views/graph/permission-manager',
+            users_and_groups=JSONSerializer().serialize(users_and_groups),
+            #permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
         )
 
         context['nav']['title'] = self.graph.name
@@ -611,3 +620,6 @@ class PermissionManagerView(GraphBaseView):
         context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
 
         return render(request, 'views/graph/permission-manager.htm', context)
+
+
+
