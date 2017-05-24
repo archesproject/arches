@@ -1241,12 +1241,21 @@ define([
                         if (feature.layer.id === 'search-results-hex') {
                             return isFeatureVisible(feature);
                         }
-                    }) || null;
+                    }) || (
+                        self.context === 'resource-editor' && _.find(features, function(feature) {
+                            if (feature.properties.geojson) {
+                                return isFeatureVisible(feature);
+                            }
+                        })
+                    ) || null;
 
                     if (hoverFeature && hoverFeature.properties) {
                         hoverData = hoverFeature.properties;
                         if (hoverFeature.properties.resourceinstanceid) {
                             hoverData = lookupResourceData(hoverData);
+                            clickable = true;
+                        }
+                        if (hoverFeature.properties.geojson) {
                             clickable = true;
                         }
                     }
@@ -1270,7 +1279,13 @@ define([
                         if (feature.properties.total > 1) {
                             return isFeatureVisible(feature);
                         }
-                    }) || null;
+                    }) || (
+                        self.context === 'resource-editor' && _.find(features, function(feature) {
+                            if (feature.properties.geojson) {
+                                return isFeatureVisible(feature);
+                            }
+                        })
+                    ) || null;
                     if (clickFeature) {
                         if (clickFeature.properties.resourceinstanceid) {
                             clickData = lookupResourceData(clickFeature.properties);
@@ -1289,6 +1304,13 @@ define([
                             map.fitBounds(bounds, {
                                 padding: 20
                             });
+                        } else if (clickFeature.properties.geojson) {
+                            var feature = {
+                                "type": "Feature",
+                                "geometry": JSON.parse(clickFeature.properties.geojson),
+                                "properties": {}
+                            };
+                            self.draw.add(feature);
                         }
                     }
 
