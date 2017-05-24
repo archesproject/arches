@@ -43,7 +43,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        #migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE',reverse_sql=migrations.RunSQL.noop),
         migrations.CreateModel(
             name='FileValue',
             fields=[
@@ -149,110 +148,9 @@ class Migration(migrations.Migration):
             name='issearchable',
             field=models.NullBooleanField(default=False),
         ),
-        # migrations.RunSQL("""
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/string',
-        #             configname = 'string-datatype-config'
-        #         WHERE datatype = 'string';
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/number',
-        #             configname = 'number-datatype-config'
-        #         WHERE datatype = 'number';
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/boolean',
-        #             configname = 'boolean-datatype-config'
-        #         WHERE datatype = 'boolean';
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/domain-value',
-        #             configname = 'domain-value-datatype-config'
-        #         WHERE datatype = 'domain-value';
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/concept',
-        #             configname = 'concept-datatype-config'
-        #         WHERE datatype = 'concept';
-        #     UPDATE d_data_types
-        #         SET issearchable = true,
-        #             configcomponent = 'views/graph/datatypes/date',
-        #             configname = 'date-datatype-config'
-        #         WHERE datatype = 'date';
-        # """, """
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'string';
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'number';
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'boolean';
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'domain-value';
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'concept';
-        #     UPDATE d_data_types
-        #         SET issearchable = false,
-        #             configcomponent = NULL,
-        #             configname = NULL
-        #         WHERE datatype = 'date';
-        # """),
         migrations.AddField(
             model_name='node',
             name='issearchable',
             field=models.BooleanField(default=True),
         ),
-        # migrations.RunSQL("""
-        #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
-        #     VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
-        # """, """
-        #     DELETE FROM public.resource_instances WHERE resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195';
-        # """),
-        # migrations.RunSQL("""
-        #     INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower') ON CONFLICT DO NOTHING;
-        # """,
-        # """
-        #     DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
-        # """),
-        # migrations.RunSQL("""
-        #     INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-        #         VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{
-        #                 "placeholder": "",
-        #                 "options": [],
-        #                 "nameLabel": "Name",
-        #                 "typeLabel": "Type"
-        #             }'
-        #         );
-        #     INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-        #     INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-        #     INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
-        #     UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
-        #     UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
-        #     """,
-        #     """
-        #     DELETE FROM d_data_types WHERE datatype = 'iiif-drawing';
-        #     DELETE FROM d_data_types WHERE datatype = 'csv-chart-json';
-        #     DELETE FROM widgets WHERE widgetid = '10000000-0000-0000-0000-000000000020';
-        #     DELETE from widgets WHERE widgetid = '10000000-0000-0000-0000-000000000022';
-        #     UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
-        #     UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
-        # """),
-        # ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
-        # #migrations.RunSQL(migrations.RunSQL.noop, reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
-        # migrations.RunPython(forwards_func, reverse_func),
     ]

@@ -441,9 +441,11 @@ class FormView(GraphBaseView):
         form.delete()
         return JSONResponse({'succces':True})
 
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
@@ -478,6 +480,7 @@ class ReportManagerView(GraphBaseView):
         report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
         report.save()
         return JSONResponse(report)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
@@ -591,3 +594,20 @@ class FunctionManagerView(GraphBaseView):
 
         return JSONResponse(data)
 
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/permission-manager'
+        )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
+
+        return render(request, 'views/graph/permission-manager.htm', context)
