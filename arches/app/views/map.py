@@ -49,6 +49,7 @@ class MapLayerManagerView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
+        
         def get_resource_bounds(node):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
