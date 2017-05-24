@@ -3453,7 +3453,3 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            "paint": {}
        }
    ]', TRUE, 'ion-ios-location', TRUE, TRUE);
-
-INSERT INTO iiif_manifests(id, url)
-   VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');
-

@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
+from django.contrib.auth.models import User, Group
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -441,9 +442,11 @@ class FormView(GraphBaseView):
         form.delete()
         return JSONResponse({'succces':True})
 
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
@@ -478,6 +481,7 @@ class ReportManagerView(GraphBaseView):
         report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
         report.save()
         return JSONResponse(report)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
@@ -590,4 +594,32 @@ class FunctionManagerView(GraphBaseView):
                 functionXgraph.delete()
 
         return JSONResponse(data)
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        users_and_groups = []
+        for group in Group.objects.all():
+            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
+        for user in User.objects.all():
+            users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
+
+        context = self.get_context_data(
+            main_script='views/graph/permission-manager',
+            users_and_groups=JSONSerializer().serialize(users_and_groups),
+            #permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
+        )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
+
+        return render(request, 'views/graph/permission-manager.htm', context)
+
+
 

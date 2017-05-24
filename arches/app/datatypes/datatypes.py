@@ -2,14 +2,15 @@ import uuid
 import json
 import decimal
 import importlib
+import distutils
 from datetime import datetime
-from flexidate import FlexiDate
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.date_utils import SortableDate
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -114,13 +115,14 @@ class BooleanDataType(BaseDataType):
         errors = []
 
         try:
-            bool(distutils.util.strtobool(value))
+            type(bool(distutils.util.strtobool(str(value)))) == True
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+
         return errors
 
     def transform_import_values(self, value):
-        return bool(distutils.util.strtobool(value))
+        return bool(distutils.util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -151,7 +153,11 @@ class DateDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue):
-        document['dates'].append(int((FlexiDate.from_str(nodevalue).as_float()-1970)*31556952*1000))
+        # fd = FlexiDate.from_str(nodevalue)
+        # fd.month = fd.month if fd.month else '1'
+        # fd.day = fd.day if fd.day else '1'
+        #document['dates'].append(fd.as_float())
+        document['dates'].append(SortableDate(nodevalue).as_float())
 
     def append_search_filters(self, value, node, query, request):
         try:
