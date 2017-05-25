@@ -32,7 +32,6 @@ def map_info(request):
     hex_bin_bounds = geo_utils.get_bounds_from_geojson(hex_bin_bounds_setting)
     default_center = settings.DEFAULT_MAP_CENTER if settings.DEFAULT_MAP_CENTER != None else geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
 
-    print settings.DEFAULT_MAP_ZOOM
     return {
         'map_info': {
             'x': default_center['coordinates'][0],
