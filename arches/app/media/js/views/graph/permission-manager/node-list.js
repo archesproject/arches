@@ -2,41 +2,76 @@ define([
     'backbone',
     'knockout',
     'models/card',
+    'views/list',
     'bindings/sortable'
-], function(Backbone, ko, CardModel) {
-    var CardComponentsTree = Backbone.View.extend({
+], function(Backbone, ko, CardModel, ListView) {
+    var GroupedNodeList = ListView.extend({
         /**
-        * A backbone view representing a card components tree
-        * @augments Backbone.View
+        * A backbone view to manage a list of graph nodes
+        * @augments ListView
         * @constructor
-        * @name CardComponentsTree
+        * @name GroupedNodeList
         */
 
+        single_select: true,
+
         /**
-        * Initializes the view with optional parameters
-        * @memberof CardComponentsTree.prototype
+        * initializes the view with optional parameters
+        * @memberof GroupedNodeList.prototype
+        * @param {object} options
+        * @param {boolean} options.permissions - a list of allowable permissions
+        * @param {boolean} options.card - a reference to the selected {@link CardModel}
         */
         initialize: function(options) {
-            this.cards = ko.observableArray();
-            options.cards.forEach(function(card){
-                this.cards.push(new CardModel({
-                    data: card,
-                    datatypes: options.datatypes
-                }));
-            }, this);
-            this.selection = ko.observable(this.cards()[0]);
-        },
+            //this.items = options.items;
 
-        /**
-        * beforeMove - prevents dropping of tree nodes into other lists
-        * this provides for sorting within cards and card containers, but
-        * prevents moving of cards/widgets between containers/cards
-        * @memberof CardComponentsTree.prototype
-        * @param  {object} e - the ko.sortable event object
-        */
-        beforeMove: function (e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
+            var filterableitems = ko.observableArray(options.cards.children);
+            var outerCards = ko.observableArray();
+
+            var parseCard = function(card){
+                var item = {
+                    'name': card.name,
+                    'isContainer': !!card.cards.length,
+                    'children': card.nodes
+                };
+                filterableitems.push(item);
+                return item;
+            }
+
+            var parseCardContainer = function(card){
+                var item = {
+                    'name': card.name,
+                    'isContainer': !!card.cards.length,
+                    'children': []
+                };
+                filterableitems.push(item);
+                if (!!card.cards.length) {
+                    card.cards.forEach(function(card){
+                        item.children.push(parseCard(card));
+                    });
+                }
+                return item;
+            }
+            // options.cards.forEach(function(card){
+            //     card.isOuter = true;
+            //     if (!!card.cards.length) {
+            //         outerCards.push(parseCardContainer(card));
+            //     }else{
+            //         outerCards.push(parseCard(card));
+            //     }
+            // }, this);
+
+            this.items = filterableitems;
+            this.outerCards = options.cards.children;
+            this.datatypes = {};
+            options.datatypes.forEach(function(datatype){
+                this.datatypes[datatype.datatype] = datatype.iconclass;
+            }, this);
+
+            //this.selection = ko.observable(this.items()[0]);
+            ListView.prototype.initialize.apply(this, arguments);
         }
+
     });
-    return CardComponentsTree;
+    return GroupedNodeList;
 });
