@@ -27,11 +27,15 @@ def livereload(request):
     }
 
 def map_info(request):
+    geo_utils = GeoUtils()
+    hex_bin_bounds_setting = settings.HEX_BIN_BOUNDS if settings.HEX_BIN_BOUNDS != None else settings.DEFAULT_BOUNDS
+    hex_bin_bounds = geo_utils.get_bounds_from_geojson(hex_bin_bounds_setting)
+    default_center = settings.DEFAULT_MAP_CENTER if settings.DEFAULT_MAP_CENTER != None else geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
 
     return {
         'map_info': {
-            'x': settings.DEFAULT_MAP_CENTER['features'][0]['geometry']['coordinates'][0],
-            'y': settings.DEFAULT_MAP_CENTER['features'][0]['geometry']['coordinates'][1],
+            'x': default_center['coordinates'][0],
+            'y': default_center['coordinates'][1],
             'zoom': settings.DEFAULT_MAP_ZOOM,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
@@ -39,7 +43,7 @@ def map_info(request):
             'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE != None else 100,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': GeoUtils().get_bounds_from_geojson(settings.HEX_BIN_BOUNDS),
+            'hex_bin_bounds': hex_bin_bounds,
             'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
         }
     }

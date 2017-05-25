@@ -134,8 +134,12 @@ def seed_resource_cache():
     datatype_factory = DataTypeFactory()
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
+    geo_utils = GeoUtils()
+    cache_seed_bounds_setting = settings.CACHE_SEED_BOUNDS if settings.CACHE_SEED_BOUNDS != None else settings.DEFAULT_BOUNDS
+    cache_seed_bounds = geo_utils.get_bounds_from_geojson(cache_seed_bounds_setting)
 
-    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
+
+    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(cache_seed_bounds)
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 
