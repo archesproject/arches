@@ -60,6 +60,9 @@ define([
                 if (!item.filtered) {
                     item.filtered = ko.observable(false);
                 }
+                if (!('selectable' in item)){
+                    item.selectable = true;
+                }
                 if (!item.selected) {
                     item.selected = ko.observable(false);
                 }
@@ -89,12 +92,14 @@ define([
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
-            var selectedStatus = item.selected();
-            if(this.single_select){
-                this.clearSelection();
+            if(!!item.selectable){
+                var selectedStatus = item.selected();
+                if(this.single_select){
+                    this.clearSelection();
+                }
+                item.selected(!selectedStatus);
+                this.trigger('item-clicked', item, evt);
             }
-            item.selected(!selectedStatus);
-            this.trigger('item-clicked', item, evt);
         },
 
         /**
