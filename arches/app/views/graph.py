@@ -66,7 +66,7 @@ class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -620,6 +620,3 @@ class PermissionManagerView(GraphBaseView):
         context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
 
         return render(request, 'views/graph/permission-manager.htm', context)
-
-
-

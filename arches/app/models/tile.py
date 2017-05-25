@@ -99,7 +99,7 @@ class Tile(models.TileModel):
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
                 datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
-        if index:
+        if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
