@@ -16,11 +16,11 @@
     <div class="card-tree-container">
         <div data-bind="foreach: { data: $data.outerCards, as: 'card' }">
             <li class="card-tree-list"data-bind="css: {
-                    'active': card.selected() === card
+                    'active': card.selected
                 }">
                 <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-                        'active': card.selected() === card
-                    },
+                        'active': card.selected
+                    },visible: $data.filtered() == false,
                     click: self.selectItem.bind(self)">
                     <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
                         <i class="card-tree-list-icon" data-bind="css: card.isContainer ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
@@ -44,17 +44,17 @@
 
 <template id="card-tree">
     <li class="card-tree-list"data-bind="css: {
-        'active': card.isContainer && card.selected() === card
+        'active': card.selected
     }">
         <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-            'active': card.isContainer && card.selected() === card
+            'active': card.selected
         },
         click: self.selectItem.bind(self)">
             <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
-                <i class="card-tree-list-icon" data-bind="css: 'children' in card && !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
+                <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
             <span class="node-name" data-bind="text: card.name"></span>
-            <span class="node-subname" data-bind="text: 'children' in card && !!card.children.length ? '{% trans "Card" %}' : '{% trans "Node" %}'"></span>
+            <span class="node-subname" data-bind="text: !!card.children.length ? '{% trans "Card" %}' : '{% trans "Node" %}'"></span>
         </a>
 
         <ul class="card-tree-list-item node-indent" aria-expanded="true">

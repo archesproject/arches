@@ -13,7 +13,7 @@ define([
         * @name GroupedNodeList
         */
 
-        single_select: true,
+        single_select: false,
 
         /**
         * initializes the view with optional parameters
@@ -25,44 +25,20 @@ define([
         initialize: function(options) {
             //this.items = options.items;
 
-            var filterableitems = ko.observableArray(options.cards.children);
-            var outerCards = ko.observableArray();
-
-            var parseCard = function(card){
-                var item = {
-                    'name': card.name,
-                    'isContainer': !!card.cards.length,
-                    'children': card.nodes
-                };
-                filterableitems.push(item);
-                return item;
-            }
-
-            var parseCardContainer = function(card){
-                var item = {
-                    'name': card.name,
-                    'isContainer': !!card.cards.length,
-                    'children': []
-                };
-                filterableitems.push(item);
-                if (!!card.cards.length) {
-                    card.cards.forEach(function(card){
-                        item.children.push(parseCard(card));
-                    });
-                }
-                return item;
-            }
-            // options.cards.forEach(function(card){
-            //     card.isOuter = true;
-            //     if (!!card.cards.length) {
-            //         outerCards.push(parseCardContainer(card));
-            //     }else{
-            //         outerCards.push(parseCard(card));
-            //     }
-            // }, this);
-
-            this.items = filterableitems;
+            //this.items = ko.observableArray();
             this.outerCards = options.cards.children;
+
+            var parseData = function(item){
+                if ('nodegroup' in item){
+                    this.items.push(item);
+                }else{
+                    item.selectable = false;
+                }
+                item.children.forEach(parseData, this);
+            }
+
+            parseData.call(this, options.cards);
+
             this.datatypes = {};
             options.datatypes.forEach(function(datatype){
                 this.datatypes[datatype.datatype] = datatype.iconclass;
