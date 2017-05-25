@@ -36,7 +36,7 @@ def map_info(request):
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
             'mapbox_api_key': settings.MAPBOX_API_KEY,
-            'hex_bin_size': settings.HEX_BIN_SIZE,
+            'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE != None else 100,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
             'hex_bin_bounds': GeoUtils().get_bounds_from_geojson(settings.HEX_BIN_BOUNDS),
