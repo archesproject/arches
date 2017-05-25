@@ -37,8 +37,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Node list -->
-    <div id="node-crud" class="middle-column-container" class="ep-node-card" data-bind="with:nodeList">
-        {% include 'views/graph/permission-manager/node-list.htm' %}
+    <div id="node-crud" class="middle-column-container" class="ep-node-card" data-bind="with:groupedNodeList">
+        {% include 'views/graph/permission-manager/grouped-node-list.htm' %}
     </div>
 
     <!-- Persmission settings form -->

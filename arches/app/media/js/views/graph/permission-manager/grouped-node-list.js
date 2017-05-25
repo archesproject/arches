@@ -23,9 +23,7 @@ define([
         * @param {boolean} options.card - a reference to the selected {@link CardModel}
         */
         initialize: function(options) {
-            //this.items = options.items;
 
-            //this.items = ko.observableArray();
             this.outerCards = options.cards.children;
 
             var parseData = function(item){

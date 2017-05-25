@@ -5,9 +5,9 @@ require([
     'arches',
     'views/graph/graph-page-view', 
     'views/graph/permission-manager/users-and-groups-list',
-    'views/graph/permission-manager/node-list',
+    'views/graph/permission-manager/grouped-node-list',
     'permission-manager-data'
-], function($, _, ko, arches, GraphPageView, UsersAndGroupsList, NodeList, data) {
+], function($, _, ko, arches, GraphPageView, UsersAndGroupsList, GroupedNodeList, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
@@ -16,7 +16,7 @@ require([
         usersAndGroupsList: new UsersAndGroupsList({
             items: ko.observableArray(data.usersAndGroups)
         }),
-        nodeList: new NodeList({
+        groupedNodeList: new GroupedNodeList({
             cards: data.cards,
             datatypes: data.datatypes
         })
