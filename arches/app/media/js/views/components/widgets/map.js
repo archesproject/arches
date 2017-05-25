@@ -113,6 +113,15 @@ define([
                 items: self.overlayLibrary
             });
 
+            if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) { 
+                //Infering that the default widget config settings are used and switching to system_settings for map position.
+                this.centerX(arches.mapDefaultX);
+                this.centerY(arches.mapDefaultY);
+                this.zoom(arches.mapDefaultZoom);
+                this.maxZoom(arches.mapDefaultMaxZoom);
+                this.minZoom(arches.mapDefaultMinZoom);
+            }
+
             this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
                 this.query = params.query;
@@ -450,6 +459,7 @@ define([
              * @return {null}
              */
             this.setupMap = function(map) {
+
                 var draw = new Draw({
                     controls: {
                         trash: false //if true, the backspace key is inactivated in the geocoder input
