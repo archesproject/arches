@@ -63,7 +63,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </button>
 
                 <a class="navbar-brand" style="padding-top: 5px;" href="#intro">
-                    <img src="{% static 'img/landing/disco_light.png' %}" style="height: 36px; width: 36px;" alt="Logo">
+                    <img src="{% static 'img/landing/arches_logo_light.png' %}" style="height: 36px; width: 36px;" alt="Logo">
                 </a>
             </div>
 
@@ -113,7 +113,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <!-- SLIDE 1 -->
                     <li data-transition="slideright" data-slotamount="5" data-masterspeed="700" data-title="Slide 1">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/moses.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/landing1.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
                         <div class="tp-caption rs-caption-1 sft start" delay="4500" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1000" data-easing="Back.easeInOut" data-endspeed="300">
@@ -122,8 +122,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="3000" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            Data Management and Integration
-                            <br> For Cultural Heritage Conservation Scientists.
+                            A Data Management and Integration Platform
+                            <br> To Preserve and Protect Cultural Heritage.
                         </div>
 
                         <!-- LAYER -->
@@ -136,34 +136,44 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Manage Data</a></span>
                             {% endif %}
                         </div>
+
+                        <!-- Attribution -->
+                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/garyullah/ (CC BY 2.0)</span>
+                        </div>
                     </li>
 
                     <!-- SLIDE 2 -->
                     <li data-transition="slideup" data-slotamount="5" data-masterspeed="1000" data-title="Slide 2">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/vesuvius.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/landing2.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
                         <div class="tp-caption rs-caption-1 sft start" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
-                            Easy, Secure Data Management
+                            Dynamically Define Your Inventory
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            Easily Manage Laboratory Instrument Datasets
-                            <br> Link Your Data to Art Works and Iconography
+                            Arches Lets You Easily Create Inventory Databases
+                            <br> And Share Them With Others
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
                             <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
                         </div>
+
+                        <!-- Attribution -->
+                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/davidedamico/ (CC BY 2.0)</span>
+                        </div>
                     </li>
 
                     <!-- SLIDE 3 -->
                     <li data-transition="slideup" data-slotamount="5" data-masterspeed="700" data-title="Slide 3">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/caffeine.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/landing3.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
                         <div class="tp-caption rs-caption-1 sft start" data-x="center" data-hoffset="0" data-y="110" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
@@ -179,6 +189,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sfb" data-x="center" data-hoffset="0" data-y="370" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
                             <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Search Arches</a></span>
+                        </div>
+
+                        <!-- Attribution -->
+                        <div class="" style="position: absolute; top: 95%; left: 15px; color: #fff; padding: 10px; background: rgba(0,0,0,.5);">
+                            <span class="">Photo:  https://www.flickr.com/photos/e01/ (CC BY 2.0)</span>
                         </div>
                     </li>
                 </ul>
