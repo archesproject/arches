@@ -608,10 +608,33 @@ class PermissionManagerView(GraphBaseView):
             users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
         for user in User.objects.all():
             users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
+        
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+  
+        root = {'children': []}
+        def extract_card_info(cards, root):
+            for card in cards:
+                d = {
+                    'name': card.name,
+                    'isContainer': len(card.cards) > 0,
+                    'nodegroup': card.nodegroup_id,
+                    'children': []
+                }
+                if len(card.cards) > 0:
+                    extract_card_info(card.cards, d)
+                else:
+                    for node in card.nodegroup.node_set.all():
+                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': []})
+                root['children'].append(d)
+
+        extract_card_info(cards, root)
+        #return JSONResponse(root)
 
         context = self.get_context_data(
             main_script='views/graph/permission-manager',
             users_and_groups=JSONSerializer().serialize(users_and_groups),
+            cards=JSONSerializer().serialize(root),
+            datatypes=JSONSerializer().serialize(models.DDataType.objects.all())
             #permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
         )
 
