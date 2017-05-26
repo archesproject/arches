@@ -16,6 +16,10 @@ define([
         * @param {boolean} options.selection - the selected item, either a {@link CardModel} or a {@link NodeModel}
         */
         initialize: function(options) {
+
+            this.selectedUsersAndGroups = options.selectedUsersAndGroups;
+            this.selectedCards = options.selectedCards;
+
             // var self = this;
             // _.extend(this, _.pick(options, 'card'));
             // this.selection = options.selection || ko.observable(this.card);

@@ -13,21 +13,29 @@ require([
     * set up the page view model with the graph model and related sub views
     */
 
-    var viewModel = {
-        usersAndGroupsList: new UsersAndGroupsList({
-            items: ko.observableArray(data.usersAndGroups)
-        }),
-        groupedNodeList: new GroupedNodeList({
-            cards: data.cards,
-            datatypes: data.datatypes
-        })
-    };
+    var usersAndGroupsList = new UsersAndGroupsList({
+        items: ko.observableArray(data.usersAndGroups)
+    })
+
+    var groupedNodeList = new GroupedNodeList({
+        cards: data.cards,
+        datatypes: data.datatypes
+    })
+    
+    var permissionSettingsForm = new PermissionSettingsForm({
+        selectedUsersAndGroups: usersAndGroupsList.selectedItems,
+        selectedCards: groupedNodeList.selectedItems
+    })
   
     /**
     * a GraphPageView representing the graph manager page
     */
     var graphPageView = new GraphPageView({
-        viewModel: viewModel
+        viewModel: {
+            usersAndGroupsList: usersAndGroupsList,
+            groupedNodeList: groupedNodeList,
+            permissionSettingsForm: permissionSettingsForm
+        }
     });
 
 });
