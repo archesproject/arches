@@ -1,10 +1,8 @@
 define([
     'backbone',
     'knockout',
-    'models/card',
-    'views/list',
-    'bindings/sortable'
-], function(Backbone, ko, CardModel, ListView) {
+    'views/list'
+], function(Backbone, ko, ListView) {
     var GroupedNodeList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -19,8 +17,8 @@ define([
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
         * @param {object} options
-        * @param {boolean} options.permissions - a list of allowable permissions
-        * @param {boolean} options.card - a reference to the selected {@link CardModel}
+        * @param {boolean} options.cards - a list of all cards (simplified json) for a resource model
+        * @param {boolean} options.datatypes - a list of all datatypes
         */
         initialize: function(options) {
 

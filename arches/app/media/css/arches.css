@@ -4228,7 +4228,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
     background-color: #f0f0f0;
     width: 200px;
-    padding: 0px 7px 7px 7px;
+    padding: 4px 7px 7px 7px;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
     overflow-x: hidden;
@@ -4259,7 +4259,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
     background: #fbfbfb;
-    padding: 7px;
+    padding: 4px 7px 7px 7px;
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
