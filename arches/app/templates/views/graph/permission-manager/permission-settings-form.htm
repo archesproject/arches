@@ -1,1 +1,137 @@
-settings form here
+<div id="card-preview" class="pad-all" style="">
+
+    <div id="permissions-form" class="panel">
+        <div class="panel-heading">
+            <div class="">
+                <h3 id="cc-title" class="panel-title card-main-title">Permissions and Publishing</h3>
+            </div>
+        </div>
+
+        <!-- Alert Panel -->
+        <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+
+        <!-- Data Entry -->
+        <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
+            <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+
+
+                <!--Tabs Content-->
+                <div class="tab-content card-content-tab" style="margin-left: 0px;">
+
+                    <!-- Card -->
+                    <div class="tab-pane fade active in" style=""> 
+                        <div class="panel-body card-panel-body" style="">
+
+                            <!-- Selection Summary -->
+                            <div class="permissions-summary">
+
+                                <!-- Groups/Users -->
+                                <div class="col-sm-6 permissions-list permissions-list-divider">
+                                    <div class="">
+                                        Selected Group/Account 
+                                        <ul id="account-list-empty" class="permissions-selected hidden">
+                                            <li class="">
+                                                No Groups/Accounts selected
+                                            </li>
+                                        </ul>
+                                        <ul id="account-list" class="permissions-selected">
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Editor
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Nodes -->
+                                <div class="col-sm-6 permissions-list">
+                                    <div class="pad-lft">
+                                        Node List
+                                        <ul id="node-list-empty" class="permissions-selected">
+                                            <li class="">
+                                                No nodes selected
+                                            </li>
+                                        </ul>
+                                        <ul id="node-list" class="permissions-selected hidden">
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Condition Type
+                                            </li>
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Date Assessed
+                                            </li>
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Description
+                                            </li>
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Disturbance Type
+                                            </li>
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Threat Type
+                                            </li>
+                                            <li class="">
+                                                <i class="confirmation ion-ios-checkmark  hidden"></i> Images
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Permissions Selector -->
+                            <div id="" class="permission-selector" style="">
+                                <div class="row widget-container" style="">    
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="relative">
+                                                <label class="col-xs-12 control-label widget-input-label" for=""> Select the permissions you wish to grant to the selected  Groups/Accounts and nodes</label>
+                                            </div>
+                                            
+                                            <div class="col-xs-12">
+                                                <div class="pad-hor columns">
+                                                    <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> No Access</label>
+                                                    <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Read Only</label>
+                                                    <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Create Resource</label>
+                                                    <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Edit Resource</label>
+                                                    <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Delete Resource</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Index Selector -->
+                            <div id="" class="index-selector" style="">
+                                <div class="row widget-container" style="">    
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="relative">
+                                                <label class="col-xs-12 control-label widget-input-label" for=""> Allow users to search these nodes?</label>
+                                            </div>
+                                            
+                                            <div class="col-xs-12">
+                                                <div class="pad-hor columns">
+                                                    <label class="form-radio form-normal form-text active">
+                                                        <input type="radio" name="type-w-label" checked=""> Yes
+                                                    </label>
+                                                    <label class="form-radio form-normal form-text">
+                                                        <input type="radio" name="type-w-label"> No
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="permission-buttons pull-right mar-btm">
+                                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" disabled="disabled"> Revert Permissions
+                                </button>
+                                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" disabled="disabled"> Apply Permissions</button>
+                            </div>
+                        </div>  
+                    </div>    
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>  
