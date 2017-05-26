@@ -7931,6 +7931,7 @@ a.search-facet-item.disabled {
 
 .facet-btn {
     width: 50%;
+    height: 40px;
 }
 
 .facet-btn:focus, .facet-btn.selected {
@@ -7946,6 +7947,15 @@ a.search-facet-item.disabled {
     padding-top: 5px;
     padding-bottom: 45px;
 }
+
+.landing-attribution {
+    position: absolute;
+    top: 300px;
+    color: #fff;
+}
+
+
+
 
 @keyframes loader {
     0% {
