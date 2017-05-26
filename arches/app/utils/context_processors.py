@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from arches import __version__
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
@@ -43,7 +44,7 @@ def map_info(request):
             'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE != None else 100,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': hex_bin_bounds,
+            'hex_bin_bounds': json.dumps(hex_bin_bounds),
             'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
         }
     }
