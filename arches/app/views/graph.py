@@ -26,7 +26,8 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -631,12 +632,15 @@ class PermissionManagerView(GraphBaseView):
         extract_card_info(cards, root)
         #return JSONResponse(root)
 
+        content_type = ContentType.objects.get_for_model(models.NodeGroup)
+        nodegroupPermissions = Permission.objects.filter(content_type=content_type)
+
         context = self.get_context_data(
             main_script='views/graph/permission-manager',
             users_and_groups=JSONSerializer().serialize(users_and_groups),
             cards=JSONSerializer().serialize(root),
-            datatypes=JSONSerializer().serialize(models.DDataType.objects.all())
-            #permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
+            datatypes=JSONSerializer().serialize(models.DDataType.objects.all()),
+            nodegroupPermissions=JSONSerializer().serialize(nodegroupPermissions) #JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
         )
 
         context['nav']['title'] = self.graph.name

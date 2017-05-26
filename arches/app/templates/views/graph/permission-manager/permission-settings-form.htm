@@ -66,12 +66,15 @@
                                         </div>
                                         
                                         <div class="col-xs-12">
-                                            <div class="pad-hor columns">
-                                                <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> No Access</label>
-                                                <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Read Only</label>
-                                                <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Create Resource</label>
-                                                <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Edit Resource</label>
-                                                <label class="form-checkbox form-normal form-primary form-text"><input type="checkbox"> Delete Resource</label>
+                                            <div class="pad-hor columns" data-bind="foreach: nodegroupPermissions">
+                                                <label class="form-checkbox form-normal form-primary form-text"
+                                                    data-bind="css: {
+                                                        'active': $data.selected
+                                                    },
+                                                    click: $data.selected.bind($data, !$data.selected())">
+                                                    <input type="checkbox" data-bind="checked: $data.selected">
+                                                    <span data-bind="text: $data.name"></span>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>

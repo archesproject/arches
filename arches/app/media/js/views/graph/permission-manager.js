@@ -24,7 +24,8 @@ require([
     
     var permissionSettingsForm = new PermissionSettingsForm({
         selectedUsersAndGroups: usersAndGroupsList.selectedItems,
-        selectedCards: groupedNodeList.selectedItems
+        selectedCards: groupedNodeList.selectedItems,
+        nodegroupPermissions: data.nodegroupPermissions
     })
   
     /**

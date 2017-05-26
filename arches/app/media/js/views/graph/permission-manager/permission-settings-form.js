@@ -20,6 +20,13 @@ define([
             this.selectedUsersAndGroups = options.selectedUsersAndGroups;
             this.selectedCards = options.selectedCards;
 
+
+
+            options.nodegroupPermissions.forEach(function(perm){
+                perm.selected = ko.observable(false);
+            })
+            this.nodegroupPermissions = ko.observableArray(options.nodegroupPermissions);
+
             // var self = this;
             // _.extend(this, _.pick(options, 'card'));
             // this.selection = options.selection || ko.observable(this.card);
