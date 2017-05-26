@@ -49,6 +49,7 @@ class MapLayerManagerView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
+        
         def get_resource_bounds(node):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
@@ -104,7 +105,7 @@ class MapLayerManagerView(BaseManagerView):
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
                 models.MapLayer.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
-        return JSONResponse({'succces':True, 'map_layer': map_layer})
+        return JSONResponse({'success':True, 'map_layer': map_layer})
 
     def delete(self, request, maplayerid):
         map_layer = models.MapLayer.objects.get(pk=maplayerid)
