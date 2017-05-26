@@ -607,7 +607,8 @@ class PermissionManagerView(GraphBaseView):
         for group in Group.objects.all():
             users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
         for user in User.objects.all():
-            users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
+            groups = user.groups.values_list('name',flat=True)
+            users_and_groups.append({'name': user.email or user.username, 'groups': ','.join(groups), 'type': 'user', 'id': user.pk})
         
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
   
