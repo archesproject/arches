@@ -9,7 +9,7 @@
 			"visibility": "visible"
 		},
 		"paint": {
-			"line-width": 4,
+			"line-width": 2,
 			"line-color": "rgb(37, 58, 241)"
 		}
 	}],
@@ -24,6 +24,7 @@
 					"database": "arches",
 					"port": "5432"
 				},
+                "simplify" : 0.75,
 				"queries": [
 					"select gid as __id__, name, st_asgeojson(geom) as geojson, st_transform(geom, 900913) as __geometry__ from rivers"
 				]
@@ -31,6 +32,6 @@
 		},
 		"allowed origin": "*",
 		"compress": true,
-		"write cache": true
+		"write cache": false
 	}
 }
