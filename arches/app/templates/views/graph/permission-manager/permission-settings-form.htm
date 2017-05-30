@@ -4,7 +4,7 @@
     <div id="permissions-form" class="panel">
         <div class="panel-heading">
             <div class="">
-                <h3 id="cc-title" class="panel-title card-main-title">Permissions and Publishing</h3>
+                <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions and Publishing" %}</h3>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
                                 <div class="col-xs-12">
                                     <div class="form-group">
                                         <div class="relative">
-                                            <label class="col-xs-12 control-label widget-input-label" for=""> Select the permissions you wish to grant to the selected  Groups/Accounts and nodes</label>
+                                            <label class="col-xs-12 control-label widget-input-label" for=""> {% trans "Select the permissions you wish to grant to the selected  Groups/Accounts and nodes" %}</label>
                                         </div>
                                         
                                         <div class="col-xs-12">
@@ -108,9 +108,9 @@
 
                         <!-- Buttons -->
                         <div class="permission-buttons pull-right mar-btm">
-                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" disabled="disabled"> Revert Permissions
+                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt"> Revert Permissions
                             </button>
-                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" disabled="disabled"> Apply Permissions</button>
+                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: save"> Apply Permissions</button>
                         </div>
                     </div>     
                 </div>

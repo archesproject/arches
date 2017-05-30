@@ -42,7 +42,7 @@ from arches.app.utils.data_management.resource_graphs import importer as GraphIm
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
-from guardian.shortcuts import get_perms_for_model
+from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm
 
 try:
     from cStringIO import StringIO
@@ -648,3 +648,102 @@ class PermissionManagerView(GraphBaseView):
         context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
 
         return render(request, 'views/graph/permission-manager.htm', context)
+
+    def post(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+        
+        with transaction.atomic():
+
+            # for group in self.groups:
+            #     groupModel = Group.objects.get(pk=group['id'])
+            #     # first remove all the current permissions
+            #     for perm in get_perms(groupModel, self.nodegroup):
+            #         remove_perm(perm, groupModel, self.nodegroup)
+            #     # then add the new permissions
+            #     for perm in group['perms']['local']:
+            #         assign_perm(perm['codename'], groupModel, self.nodegroup)
+
+            # for user in self.users:
+            #     userModel = User.objects.get(pk=user['id'])
+            #     # first remove all the current permissions
+            #     for perm in get_perms(userModel, self.nodegroup):
+            #         remove_perm(perm, userModel, self.nodegroup)
+            #     # then add the new permissions
+            #     for perm in user['perms']['local']:
+            #         assign_perm(perm['codename'], userModel, self.nodegroup)
+
+            for userOrGroup in data['selectedUsersAndGroups']:
+                if userOrGroup['type'] == 'group':
+                    userOrGroupModel = Group.objects.get(pk=userOrGroup['id'])
+                else:
+                    userOrGroupModel = User.objects.get(pk=userOrGroup['id'])
+
+                for card in data['selectedCards']:
+                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
+                     # first remove all the current permissions
+                    for perm in get_perms(userOrGroupModel, nodegroup):
+                        remove_perm(perm, userOrGroupModel, nodegroup)
+                    # then add the new permissions
+                    for perm in data['nodegroupPermissions']:
+                        assign_perm(perm['codename'], userOrGroupModel, nodegroup)
+
+        return JSONResponse(data)
+
+
+        # {
+        #     "selectedUsersAndGroups": [
+        #         {
+        #             "type": "group",
+        #             "name": "Graph Editor",
+        #             "id": 1,
+        #             "selectable": true
+        #         }
+        #     ],
+        #     "selectedCards": [
+        #         {
+        #             "nodegroup": "bbc5cf04-fa16-11e6-9e3e-026d961c88e6",
+        #             "isContainer": false,
+        #             "children": [
+        #                 {
+        #                     "datatype": "string",
+        #                     "name": "Description",
+        #                     "children": [],
+        #                     "selectable": false
+        #                 },
+        #                 {
+        #                     "datatype": "concept",
+        #                     "name": "Description Type",
+        #                     "children": [],
+        #                     "selectable": false
+        #                 },
+        #                 {
+        #                     "datatype": "semantic",
+        #                     "name": "Description Assignment",
+        #                     "children": [],
+        #                     "selectable": false
+        #                 }
+        #             ],
+        #             "selectable": true
+        #         }
+        #     ],
+        #     "nodegroupPermissions": [
+        #         {
+        #             "codename": "delete_nodegroup",
+        #             "content_type_id": 42,
+        #             "name": "Delete",
+        #             "id": 132
+        #         },
+        #         {
+        #             "codename": "no_access_to_nodegroup",
+        #             "content_type_id": 42,
+        #             "name": "No Access",
+        #             "id": 133
+        #         },
+        #         {
+        #             "codename": "read_nodegroup",
+        #             "content_type_id": 42,
+        #             "name": "Read",
+        #             "id": 130
+        #         }
+        #     ]
+        # }
