@@ -649,28 +649,19 @@ class PermissionManagerView(GraphBaseView):
 
         return render(request, 'views/graph/permission-manager.htm', context)
 
-    def post(self, request, graphid):
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionDataView(View):
+
+    def get(self, request):
+        if self.action == 'export_graph':
+            graph = get_graphs_for_export([graphid])
+            grap
+
+    def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         
         with transaction.atomic():
-
-            # for group in self.groups:
-            #     groupModel = Group.objects.get(pk=group['id'])
-            #     # first remove all the current permissions
-            #     for perm in get_perms(groupModel, self.nodegroup):
-            #         remove_perm(perm, groupModel, self.nodegroup)
-            #     # then add the new permissions
-            #     for perm in group['perms']['local']:
-            #         assign_perm(perm['codename'], groupModel, self.nodegroup)
-
-            # for user in self.users:
-            #     userModel = User.objects.get(pk=user['id'])
-            #     # first remove all the current permissions
-            #     for perm in get_perms(userModel, self.nodegroup):
-            #         remove_perm(perm, userModel, self.nodegroup)
-            #     # then add the new permissions
-            #     for perm in user['perms']['local']:
-            #         assign_perm(perm['codename'], userModel, self.nodegroup)
 
             for userOrGroup in data['selectedUsersAndGroups']:
                 if userOrGroup['type'] == 'group':
@@ -684,12 +675,10 @@ class PermissionManagerView(GraphBaseView):
                     for perm in get_perms(userOrGroupModel, nodegroup):
                         remove_perm(perm, userOrGroupModel, nodegroup)
                     # then add the new permissions
-                    for perm in data['nodegroupPermissions']:
+                    for perm in data['selectedPermissions']:
                         assign_perm(perm['codename'], userOrGroupModel, nodegroup)
 
         return JSONResponse(data)
-
-
         # {
         #     "selectedUsersAndGroups": [
         #         {

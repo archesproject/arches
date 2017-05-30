@@ -7,9 +7,8 @@ require([
     'views/graph/permission-manager/users-and-groups-list',
     'views/graph/permission-manager/grouped-node-list',
     'views/graph/permission-manager/permission-settings-form',
-    'graph-base-data',
     'permission-manager-data'
-], function($, _, ko, arches, GraphPageView, UsersAndGroupsList, GroupedNodeList, PermissionSettingsForm, baseData, data) {
+], function($, _, ko, arches, GraphPageView, UsersAndGroupsList, GroupedNodeList, PermissionSettingsForm, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
@@ -36,8 +35,7 @@ require([
     var permissionSettingsForm = new PermissionSettingsForm({
         selectedUsersAndGroups: usersAndGroupsList.selectedItems,
         selectedCards: groupedNodeList.selectedItems,
-        nodegroupPermissions: data.nodegroupPermissions,
-        graphid: baseData.graphid
+        nodegroupPermissions: data.nodegroupPermissions
     })
   
     /**

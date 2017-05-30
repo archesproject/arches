@@ -19,7 +19,6 @@ define([
         * @param {boolean} options.selection - the selected item, either a {@link CardModel} or a {@link NodeModel}
         */
         initialize: function(options) {
-            this.graphid = options.graphid;
             this.selectedUsersAndGroups = options.selectedUsersAndGroups;
             this.selectedCards = options.selectedCards;
 
@@ -40,7 +39,7 @@ define([
 
             $.ajax({
                 type: 'POST',
-                url: arches.urls.permission_manager.replace('//', '/' + this.graphid + '/'),
+                url: arches.urls.permission_data,
                 data: JSON.stringify(postData),
                 success: function(res){
                     //self.options(res.results);
