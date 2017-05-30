@@ -5962,6 +5962,15 @@ div.row.widget-wrapper.report-header:hover {
     font-size: 21px;
 }
 
+.geometry-tools-container {
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    padding: 0px;
+}
+
+
+
 .geocode-container-shim {
     margin-right: 210px;
 }
@@ -6836,7 +6845,7 @@ span.basemap-unselected {
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
-    left: 30px;
+    left: 35px;
     margin: 10px;
     width: 400px;
     padding: 0px;
@@ -7057,7 +7066,7 @@ a.search-query-link-captions:focus {
     position: absolute;
     top: 33px;
     left: 0px;
-    width: 40px;
+    width: 43px;
     height: 40px;
     background: #fafafa;
     border: 1px solid #dddddd;
@@ -7077,7 +7086,7 @@ a.search-query-link-captions:focus {
 
 .search-results-button-icon {
     font-size: 19px;
-    margin-left: 12px;
+    margin-left: 15px;
     margin-top: 10px;
 }
 

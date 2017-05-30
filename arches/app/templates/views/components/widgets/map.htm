@@ -68,6 +68,7 @@
         </div>
         <!-- /ko -->
         <!-- /ko -->
+
         <div class="overlay-selection-container scroll-y" data-bind="css : {'selector-closed': overlaySelectorClosed}">
           <!-- ko foreach: { data: [$data], as: 'self' } -->
           <div data-bind="with: overlayLibraryList">
@@ -103,6 +104,49 @@
          </div>
          <!--/ko-->
         </div>
+
+
+        <!-- Map/Geometry Tools Panel -->
+        <div class="geometry-tools-container">
+            <div class="leaflet-control-container">
+                <div class="leaflet-top leaflet-left">
+                    <div class="leaflet-control-zoom leaflet-bar leaflet-control">
+                        <a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in">+</a>
+                        <a class="leaflet-control-zoom-out leaflet-disabled" href="#" title="Zoom out" role="button" aria-label="Zoom out">-</a>
+                    </div>
+                    <div class="leaflet-draw leaflet-control">
+
+                        <div class="leaflet-draw-section">
+                            <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
+                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle to Full Screen"><span class="sr-only">Full Screen</span><i class="fa fa-arrows-alt"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle Map Tilt"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                            </div>
+                            <ul class="leaflet-draw-actions"></ul>
+                        </div>
+
+                        <div class="leaflet-draw-section">
+                            <div class="leaflet-draw-toolbar leaflet-bar">
+                                <a class="leaflet-draw-draw-marker" href="#" title="Draw a marker"><span class="sr-only">Draw a marker</span></a>
+                                <a class="leaflet-draw-draw-polyline" href="#" title="Draw a polyline"><span class="sr-only">Draw a polyline</span></a>
+                                <a class="leaflet-draw-draw-polygon" href="#" title="Draw a polygon"><span class="sr-only">Draw a polygon</span></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
+                                
+                            </div>
+                            <ul class="leaflet-draw-actions"></ul>
+                        </div>
+                        
+                        <div class="leaflet-draw-section">
+                            <div class="leaflet-draw-toolbar leaflet-bar">
+                                <a class="leaflet-draw-edit-edit leaflet-disabled" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
+                                <a class="leaflet-draw-edit-remove leaflet-disabled" href="#" title="No drawings to delete."><span class="sr-only">Delete drawings.</span></a>
+                            </div>
+                            <ul class="leaflet-draw-actions"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
 
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {
