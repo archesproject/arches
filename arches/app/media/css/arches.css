@@ -4228,7 +4228,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
     background-color: #f0f0f0;
     width: 200px;
-    padding: 0px 7px 7px 7px;
+    padding: 4px 7px 7px 7px;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
     overflow-x: hidden;
@@ -4259,7 +4259,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
     background: #fbfbfb;
-    padding: 7px;
+    padding: 4px 7px 7px 7px;
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
@@ -7931,6 +7931,7 @@ a.search-facet-item.disabled {
 
 .facet-btn {
     width: 50%;
+    height: 40px;
 }
 
 .facet-btn:focus, .facet-btn.selected {
@@ -7946,6 +7947,15 @@ a.search-facet-item.disabled {
     padding-top: 5px;
     padding-bottom: 45px;
 }
+
+.landing-attribution {
+    position: absolute;
+    top: 300px;
+    color: #fff;
+}
+
+
+
 
 @keyframes loader {
     0% {
