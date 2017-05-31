@@ -29,9 +29,8 @@ def livereload(request):
 
 def map_info(request):
     geo_utils = GeoUtils()
-    hex_bin_bounds_setting = settings.HEX_BIN_BOUNDS if settings.HEX_BIN_BOUNDS != None else settings.DEFAULT_BOUNDS
-    hex_bin_bounds = geo_utils.get_bounds_from_geojson(hex_bin_bounds_setting)
-    default_center = settings.DEFAULT_MAP_CENTER if settings.DEFAULT_MAP_CENTER != None else geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
+    hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
+    default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
 
     return {
         'map_info': {
