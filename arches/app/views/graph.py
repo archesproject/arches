@@ -42,7 +42,7 @@ from arches.app.utils.data_management.resource_graphs import importer as GraphIm
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
-from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm
+from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
 try:
     from cStringIO import StringIO
@@ -652,11 +652,36 @@ class PermissionManagerView(GraphBaseView):
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class PermissionDataView(View):
+    perm_cache = {}
+
+    def get_perm_name(self, codename):
+        if codename not in self.perm_cache:
+            try:
+                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+                return self.perm_cache[codename]
+            except:
+                return None
+                # codename for nodegroup probably doesn't exist
+        return self.perm_cache[codename]
 
     def get(self, request):
-        if self.action == 'export_graph':
-            graph = get_graphs_for_export([graphid])
-            grap
+        nodegroup_ids = JSONDeserializer().deserialize(request.GET.get('nodegroupIds'))
+        userOrGroupId = request.GET.get('userOrGroupId')
+        userOrGroupType = request.GET.get('userOrGroupType')
+
+        ret = {'default': None, 'perms': []}
+        if userOrGroupType == 'group':
+            group = Group.objects.get(pk=userOrGroupId) 
+            ret['default'] = [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+            if len(ret['default']) > 0:
+                for nodegroup_id in nodegroup_ids:
+                    nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                    perms = {
+                        'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)]
+                    }
+                    ret['perms'].append({'perms': perms, 'nodegroup_id': nodegroup_id})
+
+        return JSONResponse(ret)
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)

@@ -25,7 +25,7 @@
                     <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
                         <i class="card-tree-list-icon" data-bind="css: card.isContainer ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
                     </span>
-                    <span class="node-name" data-bind="text: card.name"></span>
+                    <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
                     <span class="node-subname" data-bind="text: card.isContainer ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
                 </a>
 

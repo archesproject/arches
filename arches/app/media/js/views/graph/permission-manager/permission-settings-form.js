@@ -29,6 +29,7 @@ define([
         },
 
         save: function(){
+            var self = this;
             var postData = {
                 'selectedUsersAndGroups': this.selectedUsersAndGroups(),
                 'selectedCards': this.selectedCards(),
@@ -43,6 +44,7 @@ define([
                 data: JSON.stringify(postData),
                 success: function(res){
                     //self.options(res.results);
+                    self.trigger('save');
                 },
                 complete: function () {
                     //self.loading(false);

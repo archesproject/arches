@@ -16,11 +16,8 @@ require([
     var usersAndGroupsList = new UsersAndGroupsList({
         items: ko.observableArray(data.usersAndGroups)
     })
-    usersAndGroupsList.on('item-clicked', function(item){
-        console.log(item);
-        // groupedNodeList.selectedItems.forEach(function(node){
-        //     node.name = node.name + 'test';
-        // })
+    usersAndGroupsList.selectedItems.subscribe(function(item){
+        updatePermissions();
     })
 
 
@@ -29,7 +26,7 @@ require([
         datatypes: data.datatypes
     })
     groupedNodeList.items().forEach(function(item){
-        item.name = ko.observable(item.name);
+        item.perm = ko.observable();
     });
     
     var permissionSettingsForm = new PermissionSettingsForm({
@@ -37,6 +34,41 @@ require([
         selectedCards: groupedNodeList.selectedItems,
         nodegroupPermissions: data.nodegroupPermissions
     })
+
+    permissionSettingsForm.on('save', function(){
+        updatePermissions();
+    })
+
+    var updatePermissions = function(){
+        var item = usersAndGroupsList.selectedItems()[0];
+        var nodegroupIds = [];
+
+        if(item){
+            groupedNodeList.items().forEach(function(item){
+                nodegroupIds.push(item.nodegroup);
+            });
+            $.ajax({
+                type: 'GET',
+                url: arches.urls.permission_data,
+                data: {'nodegroupIds': JSON.stringify(nodegroupIds), 'userOrGroupType': item.type, 'userOrGroupId': item.id},
+                success: function(res){
+                    //self.options(res.results);
+                    console.log(res);
+                    res.perms.forEach(function(nodegroup){
+                        var card = _.find(groupedNodeList.items(), function(card){
+                            return card.nodegroup === nodegroup.nodegroup_id;
+                        });
+                        var perms = _.pluck(nodegroup.perms.local, 'name');
+                        card.perm(perms.join(', '));                        
+                    })
+                },
+                complete: function () {
+                    //self.loading(false);
+                }
+            });
+        }
+
+    }
   
     /**
     * a GraphPageView representing the graph manager page
