@@ -110,17 +110,6 @@
                 "tiles": {},
                 "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
                 "parenttile_id": "3442b7e7-9bee-4c54-8d37-eca3a236ef8f",
-                "nodegroup_id": "0e8fec61-4148-11e7-b9fd-c4b301baab9f",
-                "sortorder": 0,
-                "data": {
-                    "0e8ffd7d-4148-11e7-9396-c4b301baab9f": 5,
-                    "0e9004c0-4148-11e7-a72a-c4b301baab9f": "{\"name\": \"Disk\",  \"path\": \"tileserver/cache\"}"
-                },
-                "tileid": "9d2a9611-7d47-40f3-977e-f26794249cfe"
-            }, {
-                "tiles": {},
-                "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
-                "parenttile_id": "3442b7e7-9bee-4c54-8d37-eca3a236ef8f",
                 "nodegroup_id": "0e8fe87a-4148-11e7-aa8b-c4b301baab9f",
                 "sortorder": 0,
                 "data": {
@@ -129,18 +118,6 @@
                     "0e90017a-4148-11e7-82ce-c4b301baab9f": 0
                 },
                 "tileid": "2e49911e-6bcf-4711-bc59-2264cb71c4ab"
-            }, {
-                "tiles": {},
-                "resourceinstance_id": "a106c400-260c-11e7-a604-14109fd34195",
-                "parenttile_id": "3442b7e7-9bee-4c54-8d37-eca3a236ef8f",
-                "nodegroup_id": "0e8fefbd-4148-11e7-9e0b-c4b301baab9f",
-                "sortorder": 0,
-                "data": {
-                    "0e9003f0-4148-11e7-9487-c4b301baab9f": null,
-                    "0e8ffe4f-4148-11e7-9f25-c4b301baab9f": "2cf08870-18a7-41aa-85a7-bc66e89b3312",
-                    "0e8fffe8-4148-11e7-9ba2-c4b301baab9f": null
-                },
-                "tileid": "34cf5dd1-9fb0-4278-9e43-cfa7df9e02c7"
             }],
             "resourceinstance": {
                 "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
