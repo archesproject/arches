@@ -43,6 +43,59 @@ It also helps to read up on Docker: [docker.com/engine/getstarted](https://docs.
   `docker-compose up`
 
 
+## Commands
+The following commands can be used:
+
+- `run_arches`: Default. Run the Arches server  
+- `run_tests`: Run unit tests  
+- `setup_arches`: Delete any existing Arches database and set up a fresh one  
+- `-h` or `--help`: Display help text  
+
+These commands can be chained, e.g.:  
+`docker-compose run arches run_tests setup_db`
+
+Or in `docker-compose.yml`:  
+`command: run_tests run_server`
+
+
+## Parameter overview
+Your docker-compose.yml file expects the following Environment Variables:
+
+- `ARCHES_PROJECT` = *Custom Arches project name*  
+	-> **Used to set up your own Arches app**  
+- `INSTALL_DEFAULT_GRAPHS` = True | False   
+    -> **Used to fill the database with the default graphs that come with Arches**  
+- `INSTALL_DEFAULT_CONCEPTS` = True | False  
+    -> **Used to fill the database with the default concepts that come with Arches**
+- `PGPASSWORD` = *Postgresql database password*
+- `PGDBNAME` = *Postgresql database name*
+- `PGHOST` = *Postgresql database host address*
+- `PGPORT` = *Postgresql database host port*
+- `ESHOST` = *Elasticsearch host address*
+- `ESPORT` = *Elasticsearch port*
+- `DJANGO_MODE` = PROD | DEV  
+	-> **Use PROD for production (= live) environments**
+- `DJANGO_DEBUG` = True | False  
+	-> **Use False for production environments**  
+- `DOMAIN_NAMES` = *list of your domain names*  
+	-> **Space separated list of domain names used to reach Arches, use 'localhost' for development environments**  
+- `MAPBOX_API_KEY` = *Your personal Mapbox api key*
+
+Optional Environment Variables:  
+
+- `FORCE_DB_INIT` = True | False  
+	-> **Force the initialization of Postgresql and Elasticsearch on startup**
+- `DJANGO_PORT` = *Django server port*  
+	-> **Runs your Django server on an alternative port. Default = 8000**
+- `DJANGO_NORELOAD` = True | False  
+	-> **Runs Django with options --noreload --nothreading. Useful for some debugging methods**
+- `DJANGO_SECRET_KEY` = *50 character string*  
+	-> **Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set)**
+- `TZ` = *Time Zone*  
+	-> **Useful for logging the correct time. US Eastern = EST**
+
+
+
 ## Setting up your own Arches project
 1. Set the name of your Docker image. Edit your `docker-compose.yml`:  
 	Under the 'arches' service, change:
@@ -132,45 +185,8 @@ This will be used throughout your development process and does not need to be ch
 
 *Note 1: Point 4 will mount your Arches project from your host machine into your container. This is a way for connecting your development machine to the Docker container. It is very useful during the development process, as it allows you to edit code without having to build your Docker image after each edit. Remove this line for production environments.*
 
-*Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.*
+*Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.* 
 
-
-
-## Parameter overview
-Your docker-compose.yml file expects the following Environment Variables:
-
-- `ARCHES_PROJECT` = *Custom Arches project name*  
-	-> **Used to set up your own Arches app**  
-- `INSTALL_DEFAULT_GRAPHS` = True | False   
-    -> **Used to fill the database with the default graphs that come with Arches**  
-- `INSTALL_DEFAULT_CONCEPTS` = True | False  
-    -> **Used to fill the database with the default concepts that come with Arches**
-- `PGPASSWORD` = *Postgresql database password*
-- `PGDBNAME` = *Postgresql database name*
-- `PGHOST` = *Postgresql database host address*
-- `PGPORT` = *Postgresql database host port*
-- `ESHOST` = *Elasticsearch host address*
-- `ESPORT` = *Elasticsearch port*
-- `DJANGO_MODE` = PROD | DEV  
-	-> **Use PROD for production (= live) environments**
-- `DJANGO_DEBUG` = True | False  
-	-> **Use False for production environments**  
-- `DOMAIN_NAMES` = *list of your domain names*  
-	-> **Space separated list of domain names used to reach Arches, use 'localhost' for development environments**  
-- `MAPBOX_API_KEY` = *Your personal Mapbox api key*
-
-Optional Environment Variables:  
-
-- `FORCE_DB_INIT` = True | False  
-	-> **Force the initialization of Postgresql and Elasticsearch on startup**
-- `DJANGO_PORT` = *Django server port*  
-	-> **Runs your Django server on an alternative port. Default = 8000**
-- `DJANGO_NORELOAD` = True | False  
-	-> **Runs Django with options --noreload --nothreading. Useful for some debugging methods**
-- `DJANGO_SECRET_KEY` = *50 character string*  
-	-> **Used by Django for security. Use this environment variable only if you run Arches without custom project (i.e. the `ARCHES_PROJECT` environment variable is not set)**
-- `TZ` = *Time Zone*  
-	-> **Useful for logging the correct time. US Eastern = EST**  
 
 
 ## Initialize

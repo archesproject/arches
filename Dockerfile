@@ -78,8 +78,8 @@ RUN	chmod -R 700 ${DOCKER_DIR} &&\
 
 
 # Set entrypoint
-CMD ${DOCKER_DIR}/entrypoint.sh
-
+ENTRYPOINT ["/docker/entrypoint.sh"]
+CMD ["run_arches"]
 
 # Expose port 8000
 EXPOSE 8000

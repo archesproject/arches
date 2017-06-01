@@ -1,5 +1,20 @@
 #!/bin/bash
 
+HELP_TEXT="
+
+Arguments:  
+	run_arches: Default. Run the Arches server  
+	run_tests: Run unit tests  
+	setup_arches: Delete any existing Arches database and set up a fresh one  
+	-h or help: Display help text  
+"
+
+display_help() {
+	echo "${HELP_TEXT}"
+}
+
+
+
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
 APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
 BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
@@ -104,7 +119,6 @@ setup_arches() {
 			echo "Collections already exist in the database."
 			echo "Skipping 'import_reference_data arches_concept_collections.rdf'."
 		fi
-
 	fi
 }
 
@@ -189,7 +203,7 @@ set_dev_mode() {
 install_dev_requirements() {
 	echo ""
 	echo ""
-	echo "----- DJANGO_MODE = DEV, INSTALLING DEV REQUIREMENTS -----"
+	echo "----- INSTALLING DEV REQUIREMENTS -----"
 	echo ""
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 }
@@ -224,19 +238,6 @@ run_custom_scripts() {
 	done
 }
 
-run_tests() {
-	echo ""
-	echo ""
-	echo "----- RUNNING ARCHES TESTS -----"
-	echo ""
-	python manage.py test tests --pattern="*.py" --settings="tests.test_settings" --exe
-	if [ $? -ne 0 ]; then
-        echo "Error: Not all tests ran succesfully."
-				echo "Exiting..."
-        exit 1
-	fi
-}
-
 collect_static(){
 	echo ""
 	echo ""
@@ -260,34 +261,91 @@ run_django_server() {
 
 
 
-### Starting point ###
+run_arches() {
+	# Run first commands from ${ARCHES_ROOT}
+	cd_arches_root
+	init_arches
 
-# Run first commands from ${ARCHES_ROOT}
-cd_arches_root
-activate_virtualenv
-init_arches
+	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		set_dev_mode
+		install_dev_requirements
+	fi
 
-if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+	# Run from folder where user's bower.json lives
+	cd_bower_folder
+	install_bower_components
+
+	# From here on, run from the user's ${APP_FOLDER}
+	cd_app_folder
+
+	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		run_migrations
+	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
+		collect_static
+	fi
+
+	run_custom_scripts
+
+	run_django_server
+}
+
+run_tests() {
+	cd_arches_root
 	set_dev_mode
 	install_dev_requirements
-	run_tests
+	echo ""
+	echo ""
+	echo "----- RUNNING ARCHES TESTS -----"
+	echo ""
+	python manage.py test tests --pattern="*.py" --settings="tests.test_settings" --exe
+	if [ $? -ne 0 ]; then
+        echo "Error: Not all tests ran succesfully."
+		echo "Exiting..."
+        exit 1
+	fi
+}
+
+### Starting point ###
+
+activate_virtualenv
+
+# Use -gt 1 to consume two arguments per pass in the loop (e.g. each
+# argument has a corresponding value to go with it).
+# Use -gt 0 to consume one or more arguments per pass in the loop (e.g.
+# some arguments don't have a corresponding value to go with it, such as --help ).
+
+# If no arguments are supplied, assume the server needs to be run
+if [[ $#  -eq 0 ]]; then
+	run_arches
 fi
 
+# Else, process arguments
+echo "Full command: $@"
+while [[ $# -gt 0 ]]
+do
+	key="$1"
+	echo "Command: ${key}"
 
-# Run from folder where user's bower.json lives
-cd_bower_folder
-install_bower_components
+	case ${key} in
+		run_arches)
+			wait_for_db
+			run_arches
+		;;
+		setup_arches)
+			wait_for_db
+			setup_arches
+		;;
+		run_tests)
+			wait_for_db
+			run_tests
+		;;
+		help|-h)
+			display_help
+		;;
+		*)
+			exec "$@"
+		;;
+	esac
+	shift # next argument or value
+done
 
-
-# From here on, run from the user's ${APP_FOLDER}
-cd_app_folder
-
-if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-	run_migrations
-elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
-	collect_static
-fi
-
-run_custom_scripts
-
-run_django_server
