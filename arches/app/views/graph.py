@@ -389,8 +389,10 @@ class FormManagerView(GraphBaseView):
                 ret = data['forms']
             if self.action == 'add_form':
                 form = models.Form(title=_('New Menu'), graph=graph)
+                form.sortorder = len(graph.form_set.all())
                 form.save()
                 ret = form
+
         return JSONResponse(ret)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -608,9 +610,9 @@ class PermissionManagerView(GraphBaseView):
             users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
         for user in User.objects.all():
             users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
-        
+
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
-  
+
         root = {'children': []}
         def extract_card_info(cards, root):
             for card in cards:
