@@ -254,21 +254,23 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_bounds_from_value(self, node_data):
         bounds = None
         for feature in node_data['features']:
-            shape = asShape(feature['geometry'])
-            if bounds is None:
-                bounds = shape.bounds
-            else:
-                minx, miny, maxx, maxy = bounds
-                if shape.bounds[0] < minx:
-                    minx = shape.bounds[0]
-                if shape.bounds[1] < miny:
-                    miny = shape.bounds[1]
-                if shape.bounds[2] > maxx:
-                    maxx = shape.bounds[2]
-                if shape.bounds[3] > maxy:
-                    maxy = shape.bounds[3]
+            geom_collection = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
 
-                bounds = (minx, miny, maxx, maxy)
+            # if bounds is None:
+            bounds = geom_collection.extent
+            # else:
+            #     minx, miny, maxx, maxy = bounds
+            #     if geom_collection.bounds[0] < minx:
+            #         minx = geom_collection.bounds[0]
+            #     if geom_collection.bounds[1] < miny:
+            #         miny = geom_collection.bounds[1]
+            #     if geom_collection.bounds[2] > maxx:
+            #         maxx = geom_collection.bounds[2]
+            #     if geom_collection.bounds[3] > maxy:
+            #         maxy = geom_collection.bounds[3]
+            #
+            #     bounds = (minx, miny, maxx, maxy)
+
         return bounds
 
     def get_layer_config(self, node=None):
