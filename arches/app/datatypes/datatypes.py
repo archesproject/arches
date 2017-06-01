@@ -983,6 +983,17 @@ class DomainListDataType(BaseDomainDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        for val in nodevalue:
+            domain_text = self.get_option_text(node, val)
+            if domain_text is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(domain_text)
+
+        return terms
+
     def append_to_document(self, document, nodevalue):
         domain_text_values = set([])
         for tile in document['tiles']:
