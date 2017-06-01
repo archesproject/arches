@@ -93,7 +93,7 @@ class BusinessDataImporter(object):
         for path in file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.file_format = file[0].split('.')[1]
+                    self.file_format = file[0].split('.')[-1]
                     if self.file_format == 'json':
                         with open(file[0], 'rU') as f:
                             archesfile = JSONDeserializer().deserialize(f)

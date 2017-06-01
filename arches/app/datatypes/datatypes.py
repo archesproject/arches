@@ -57,7 +57,7 @@ class StringDataType(BaseDataType):
         if value != None:
             return value.encode('utf8')
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
@@ -254,21 +254,23 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_bounds_from_value(self, node_data):
         bounds = None
         for feature in node_data['features']:
-            shape = asShape(feature['geometry'])
-            if bounds is None:
-                bounds = shape.bounds
-            else:
-                minx, miny, maxx, maxy = bounds
-                if shape.bounds[0] < minx:
-                    minx = shape.bounds[0]
-                if shape.bounds[1] < miny:
-                    miny = shape.bounds[1]
-                if shape.bounds[2] > maxx:
-                    maxx = shape.bounds[2]
-                if shape.bounds[3] > maxy:
-                    maxy = shape.bounds[3]
+            geom_collection = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
 
-                bounds = (minx, miny, maxx, maxy)
+            # if bounds is None:
+            bounds = geom_collection.extent
+            # else:
+            #     minx, miny, maxx, maxy = bounds
+            #     if geom_collection.bounds[0] < minx:
+            #         minx = geom_collection.bounds[0]
+            #     if geom_collection.bounds[1] < miny:
+            #         miny = geom_collection.bounds[1]
+            #     if geom_collection.bounds[2] > maxx:
+            #         maxx = geom_collection.bounds[2]
+            #     if geom_collection.bounds[3] > maxy:
+            #         maxy = geom_collection.bounds[3]
+            #
+            #     bounds = (minx, miny, maxx, maxy)
+
         return bounds
 
     def get_layer_config(self, node=None):
@@ -903,7 +905,7 @@ class IIIFDrawingDataType(BaseDataType):
                 value = models.Value.objects.get(pk=valueid)
                 document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
@@ -930,6 +932,15 @@ class DomainDataType(BaseDomainDataType):
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
         return errors
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
+        if domain_text is not None:
+            if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(domain_text)
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text = None
@@ -973,6 +984,17 @@ class DomainListDataType(BaseDomainDataType):
 
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        for val in nodevalue:
+            domain_text = self.get_option_text(node, val)
+            if domain_text is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(domain_text)
+
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text_values = set([])
