@@ -9,6 +9,8 @@
 
 {% block list_wrapper %}
 
+<button class="btn btn-shim btn-primary btn-labeled btn-lg" style="width: 100%; height: 27px; margin-bottom: 10px;" data-bind="click: function(){showNodes(!showNodes());}, text: showNodes() ? '{% trans "Hide Nodes" %}' : '{% trans "Show Nodes" %}'">{% trans "Show Nodes" %}</button>
+
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div style="display: none;" data-bind="visible: self">
 
@@ -29,6 +31,11 @@
                     <span class="node-subname" data-bind="text: card.isContainer ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
                 </a>
 
+<!--                 <div class="node-selection-tools">
+                    <i id="cc-select-1" class="fa select-child-nodes fa-toggle-on"></i>
+                    <i id="cc-expand-1" class="expand-cc-child-nodes ion-arrow-down-b"></i>
+                </div> -->
+
                 <ul class="card-tree-list-item report-tree-list" aria-expanded="true">
                     <div data-bind="template: {
                         name: 'card-tree',
@@ -43,9 +50,7 @@
 <!-- /ko -->
 
 <template id="card-tree">
-    <li class="card-tree-list"data-bind="css: {
-        'active': card.selected
-    }">
+    <li class="card-tree-list" data-bind="css: {'active': card.selected}, visible: (card.children.length !== 0) || (self.showNodes() && card.children.length === 0)">
         <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
             'active': card.selected
         },
@@ -63,7 +68,7 @@
             <!-- /ko -->
         </a>
 
-        <ul class="card-tree-list-item node-indent" aria-expanded="true">
+        <ul class="card-tree-list-item node-indent" aria-expanded="true" data-bind="visible: self.showNodes">
             <div data-bind="template: {
                 name: 'card-tree',
                 foreach: card.children,

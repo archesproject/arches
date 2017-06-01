@@ -40,6 +40,8 @@ define([
                 this.datatypes[datatype.datatype] = datatype.iconclass;
             }, this);
 
+            this.showNodes = ko.observable(false);
+
             //this.selection = ko.observable(this.items()[0]);
             ListView.prototype.initialize.apply(this, arguments);
         }
