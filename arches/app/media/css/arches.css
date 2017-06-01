@@ -2153,7 +2153,7 @@ div.dropdown-menu.open {
 
 .loading-mask {
     position: fixed;
-    opacity: .5;
+    opacity: .75;
     background-color: gray;
     top: 0;
     bottom: 0;
@@ -7122,6 +7122,14 @@ a.search-query-link-captions:focus {
 
 .arches-select2 .select2-choices .select2-search-field {
     height: 34px;
+}
+
+.select2-container-multi .select2-choices {
+    height: 36px !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+    margin: 3px 10px;
 }
 
 .arches-select2 .select2-choices .select2-search-field input {
