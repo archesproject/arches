@@ -56,6 +56,17 @@ init_arches() {
 	init_arches_projects
 }
 
+wait_for_db() {
+	echo "Testing if database server is up..."
+	while [[ ! ${return_code} == 0 ]]
+	do
+		psql -h ${PGHOST} -U postgres -c "select 1" >&/dev/null
+		return_code=$?
+		sleep 1
+	done
+	echo "Database server is up"
+}
+
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
 	count=`psql -h ${PGHOST} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
@@ -87,8 +98,8 @@ setup_arches() {
 
 	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
 
-	echo "Running: python manage.py packages -o setup"
-	python manage.py packages -o setup
+	echo "Running: python manage.py packages -o setup_db"
+	python manage.py packages -o setup_db
 
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
@@ -120,6 +131,14 @@ setup_arches() {
 			echo "Skipping 'import_reference_data arches_concept_collections.rdf'."
 		fi
 	fi
+
+	setup_elasticsearch
+}
+
+setup_elasticsearch() {
+	python manage.py es delete_indexes
+	python manage.py es setup_indexes
+	python manage.py es index_database
 }
 
 
@@ -146,12 +165,6 @@ init_arches_projects() {
 			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
 		fi
 	fi
-}
-
-
-db_exists() {
-	echo "Checking if database "${PGDBNAME}" exists..."
-	psql -lqt -h $PGHOST -U postgres | cut -d \| -f 1 | grep -qw ${PGDBNAME}
 }
 
 graphs_exist() {
