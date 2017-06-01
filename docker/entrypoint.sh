@@ -39,7 +39,15 @@ activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
 }
 
+
+
+
+#### Install 
+
 init_arches() {
+
+	install_requirements
+
 	if [[ "${FORCE_DB_INIT}" == "True" ]]; then
 		echo ""
 		echo "*** Warning: FORCE_DB_INIT = True ***"
@@ -86,6 +94,197 @@ db_exists() {
 		return 1
 	fi
 }
+
+# This is also done in Dockerfile, but the ENV/lib folder may have been overlaid by a Docker volume.
+install_requirements() {
+	echo ""
+	echo ""
+	echo "----- INSTALLING REQUIREMENTS -----"
+	echo ""
+	python setup.py install
+}
+
+set_dev_mode() {
+	python ${ARCHES_ROOT}/setup.py develop
+}
+
+install_dev_requirements() {
+	echo ""
+	echo ""
+	echo "----- INSTALLING DEV REQUIREMENTS -----"
+	echo ""
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+}
+
+# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
+# Also, the bower_components folder may have been overlaid by a Docker volume.
+install_bower_components() {
+	echo ""
+	echo ""
+	echo "----- INSTALLING BOWER COMPONENTS -----"
+	echo ""
+	bower --allow-root install
+}
+
+setup_elasticsearch() {
+	python manage.py es delete_indexes
+	python manage.py es setup_indexes
+	python manage.py es index_database
+}
+
+
+
+
+#### Misc
+
+init_arches_projects() {
+	if [[ ! -z ${ARCHES_PROJECT} ]]; then
+		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
+		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
+			echo ""
+			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
+			echo "----- Creating '${ARCHES_PROJECT}'... -----"
+			echo ""
+
+			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+
+			exit_code=$?
+			if [[ ${exit_code} != 0 ]]; then
+				echo "Something went wrong when creating your Arches project: ${ARCHES_PROJECT}."
+				echo "Exiting..."
+				exit ${exit_code}
+			fi
+
+			copy_settings_local
+		else
+			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
+		fi
+	fi
+}
+
+
+graphs_exist() {
+	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.graphs")
+	if [[ ${row_count} -le 3 ]]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+concepts_exist() {
+	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Concept'")
+	if [[ ${row_count} -le 2 ]]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+collections_exist() {
+	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Collection'")
+	if [[ ${row_count} -le 1 ]]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+import_reference_data() {
+	# Import example concept schemes
+	local rdf_file="$1"
+	echo "Running: python manage.py packages -o import_reference_data -s \"${rdf_file}\""
+	python manage.py packages -o import_reference_data -s "${rdf_file}"
+}
+
+copy_settings_local() {
+	# The settings_local.py in ${ARCHES_ROOT}/arches/ gets ignored if running manage.py from a custom Arches project instead of Arches core app
+	if [[ ! -f ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py ]]; then
+		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py..."
+		cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
+	fi
+}
+
+
+run_custom_scripts() {
+	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
+		if [[ -f ${file} ]]; then
+			echo ""
+			echo ""
+			echo "----- RUNNING CUSTUM SCRIPT: ${file} -----"
+			echo ""
+			${file}
+		fi
+	done
+}
+
+
+
+
+#### Run
+
+run_migrations() {
+	echo ""
+	echo ""
+	echo "----- RUNNING DATABASE MIGRATIONS -----"
+	echo ""
+	python manage.py migrate
+}
+
+collect_static(){
+	echo ""
+	echo ""
+	echo "----- COLLECTING DJANGO STATIC FILES -----"
+	echo ""
+	python manage.py collectstatic --noinput
+}
+
+
+run_django_server() {
+	echo ""
+	echo ""
+	echo "----- *** RUNNING DJANGO SERVER *** -----"
+	echo ""
+	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
+	    echo "Running Django with options --noreload --nothreading."
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
+	else
+		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+	fi
+}
+
+
+
+
+#### Main commands 
+run_arches() {
+	# Run first commands from ${ARCHES_ROOT}
+	cd_arches_root
+	init_arches
+
+	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		set_dev_mode
+		install_dev_requirements
+	fi
+
+	# Run from folder where user's bower.json lives
+	cd_bower_folder
+	install_bower_components
+
+	# From here on, run from the user's ${APP_FOLDER}
+	cd_app_folder
+
+	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		run_migrations
+	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
+		collect_static
+	fi
+
+	run_custom_scripts
+
+	run_django_server
+}
+
 
 setup_arches() {
 	# Setup Postgresql and Elasticsearch (this deletes your existing database)
@@ -135,175 +334,10 @@ setup_arches() {
 	setup_elasticsearch
 }
 
-setup_elasticsearch() {
-	python manage.py es delete_indexes
-	python manage.py es setup_indexes
-	python manage.py es index_database
-}
-
-
-init_arches_projects() {
-	if [[ ! -z ${ARCHES_PROJECT} ]]; then
-		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
-		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
-			echo ""
-			echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
-			echo "----- Creating '${ARCHES_PROJECT}'... -----"
-			echo ""
-
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
-
-			exit_code=$?
-			if [[ ${exit_code} != 0 ]]; then
-				echo "Something went wrong when creating your Arches project: ${ARCHES_PROJECT}."
-				echo "Exiting..."
-				exit ${exit_code}
-			fi
-
-			copy_settings_local
-		else
-			echo "Custom Arches project '${ARCHES_PROJECT}' already exists."
-		fi
-	fi
-}
-
-graphs_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.graphs")
-	if [[ ${row_count} -le 3 ]]; then
-		return 1
-	else
-		return 0
-	fi
-}
-
-concepts_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Concept'")
-	if [[ ${row_count} -le 2 ]]; then
-		return 1
-	else
-		return 0
-	fi
-}
-
-collections_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Collection'")
-	if [[ ${row_count} -le 1 ]]; then
-		return 1
-	else
-		return 0
-	fi
-}
-
-import_reference_data() {
-	# Import example concept schemes
-	local rdf_file="$1"
-	echo "Running: python manage.py packages -o import_reference_data -s \"${rdf_file}\""
-	python manage.py packages -o import_reference_data -s "${rdf_file}"
-}
-
-copy_settings_local() {
-	# The settings_local.py in ${ARCHES_ROOT}/arches/ gets ignored if running manage.py from a custom Arches project instead of Arches core app
-	if [[ ! -f ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py ]]; then
-		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py..."
-		cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
-	fi
-}
-
-set_dev_mode() {
-	python ${ARCHES_ROOT}/setup.py develop
-}
-
-install_dev_requirements() {
-	echo ""
-	echo ""
-	echo "----- INSTALLING DEV REQUIREMENTS -----"
-	echo ""
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
-}
-
-# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
-# Also, the bower_components folder may have been overlaid by a Docker volume in a dev environment.
-install_bower_components() {
-	echo ""
-	echo ""
-	echo "----- INSTALLING BOWER COMPONENTS -----"
-	echo ""
-	bower --allow-root install
-}
-
-run_migrations() {
-	echo ""
-	echo ""
-	echo "----- RUNNING DATABASE MIGRATIONS -----"
-	echo ""
-	python manage.py migrate
-}
-
-run_custom_scripts() {
-	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
-		if [[ -f ${file} ]]; then
-			echo ""
-			echo ""
-			echo "----- RUNNING CUSTUM SCRIPT: ${file} -----"
-			echo ""
-			${file}
-		fi
-	done
-}
-
-collect_static(){
-	echo ""
-	echo ""
-	echo "----- COLLECTING DJANGO STATIC FILES -----"
-	echo ""
-	python manage.py collectstatic --noinput
-}
-
-run_django_server() {
-	echo ""
-	echo ""
-	echo "----- *** RUNNING DJANGO SERVER *** -----"
-	echo ""
-	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
-	    echo "Running Django with options --noreload --nothreading."
-		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
-	else
-		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
-	fi
-}
-
-
-
-run_arches() {
-	# Run first commands from ${ARCHES_ROOT}
-	cd_arches_root
-	init_arches
-
-	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-		set_dev_mode
-		install_dev_requirements
-	fi
-
-	# Run from folder where user's bower.json lives
-	cd_bower_folder
-	install_bower_components
-
-	# From here on, run from the user's ${APP_FOLDER}
-	cd_app_folder
-
-	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-		run_migrations
-	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
-		collect_static
-	fi
-
-	run_custom_scripts
-
-	run_django_server
-}
 
 run_tests() {
 	cd_arches_root
+	install_requirements
 	set_dev_mode
 	install_dev_requirements
 	echo ""
@@ -317,6 +351,9 @@ run_tests() {
         exit 1
 	fi
 }
+
+
+
 
 ### Starting point ###
 

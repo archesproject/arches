@@ -11,7 +11,8 @@ services:
       volumes:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
-        - arches-uploadedfiles:/web_root/arches/arches/uploadedfiles
+        - arches-bowercomponents:/web_root/arches/arches/app/media/bower_components
+        - arches-lib:/web_root/ENV/lib
       environment:
         - FORCE_DB_INIT=False
         - INSTALL_DEFAULT_GRAPHS=True
@@ -24,6 +25,7 @@ services:
         - ESPORT=9200
         - DJANGO_MODE=DEV
         - DJANGO_DEBUG=True
+        - DJANGO_NORELOAD=False
         - DOMAIN_NAMES=localhost
         - MAPBOX_API_KEY=
         - TZ=EST
@@ -60,7 +62,8 @@ services:
 volumes:
     arches-log:
     arches-static:
-    arches-uploadedfiles:
+    arches-bowercomponents:
+    arches-lib:
     postgres-data:
     postgres-log:
     elasticsearch-data:
