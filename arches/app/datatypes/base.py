@@ -317,7 +317,7 @@ class BaseDataType(object):
         """
         return unicode(tile.data[str(node.nodeid)])
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         """
         Returns a nodevalue if it qualifies as a search term
         """
