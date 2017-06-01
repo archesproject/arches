@@ -57,7 +57,7 @@ class StringDataType(BaseDataType):
         if value != None:
             return value.encode('utf8')
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
@@ -905,7 +905,7 @@ class IIIFDrawingDataType(BaseDataType):
                 value = models.Value.objects.get(pk=valueid)
                 document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
@@ -932,6 +932,15 @@ class DomainDataType(BaseDomainDataType):
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
         return errors
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
+        if domain_text is not None:
+            if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(domain_text)
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text = None
@@ -975,6 +984,17 @@ class DomainListDataType(BaseDomainDataType):
 
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        for val in nodevalue:
+            domain_text = self.get_option_text(node, val)
+            if domain_text is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(domain_text)
+
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text_values = set([])
