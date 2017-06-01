@@ -669,17 +669,13 @@ class PermissionDataView(View):
         userOrGroupId = request.GET.get('userOrGroupId')
         userOrGroupType = request.GET.get('userOrGroupType')
 
-        ret = {'default': None, 'perms': []}
+        ret = []
         if userOrGroupType == 'group':
-            group = Group.objects.get(pk=userOrGroupId) 
-            ret['default'] = [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
-            if len(ret['default']) > 0:
-                for nodegroup_id in nodegroup_ids:
-                    nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-                    perms = {
-                        'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)]
-                    }
-                    ret['perms'].append({'perms': perms, 'nodegroup_id': nodegroup_id})
+            group = Group.objects.get(pk=userOrGroupId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
 
         return JSONResponse(ret)
 

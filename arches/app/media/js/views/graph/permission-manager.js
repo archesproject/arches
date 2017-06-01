@@ -41,7 +41,7 @@ require([
     permissionSettingsForm.on('revert', function(){
         updatePermissions();
     })
-    
+
 
     var updatePermissions = function(){
         var item = usersAndGroupsList.selectedItems()[0];
@@ -58,11 +58,11 @@ require([
                 success: function(res){
                     //self.options(res.results);
                     console.log(res);
-                    res.perms.forEach(function(nodegroup){
+                    res.forEach(function(nodegroup){
                         var card = _.find(groupedNodeList.items(), function(card){
                             return card.nodegroup === nodegroup.nodegroup_id;
                         });
-                        var perms = _.pluck(nodegroup.perms.local, 'name');
+                        var perms = _.pluck(nodegroup.perms, 'name');
                         card.perm(perms.join(', '));                        
                     })
                 },
