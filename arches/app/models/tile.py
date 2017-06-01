@@ -148,17 +148,16 @@ class Tile(models.TileModel):
                 child_tile.after_update_all()
 
     def is_blank(self):
-        ret = True
         if self.tiles != {}:
             for tiles in self.tiles.values():
                 for tile in tiles:
                     if len([item for item in tile.data.values() if item != None]) > 0:
-                        ret = False
+                        return False
         elif self.data != {}:
             if len([item for item in self.data.values() if item != None]) > 0:
-                ret = False
+                return False
 
-        return ret
+        return True
 
 
     @staticmethod
