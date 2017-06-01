@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
+from django.contrib.auth.models import User, Group
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -65,7 +66,7 @@ class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -388,8 +389,10 @@ class FormManagerView(GraphBaseView):
                 ret = data['forms']
             if self.action == 'add_form':
                 form = models.Form(title=_('New Menu'), graph=graph)
+                form.sortorder = len(graph.form_set.all())
                 form.save()
                 ret = form
+
         return JSONResponse(ret)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -441,9 +444,11 @@ class FormView(GraphBaseView):
         form.delete()
         return JSONResponse({'succces':True})
 
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
@@ -478,6 +483,7 @@ class ReportManagerView(GraphBaseView):
         report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
         report.save()
         return JSONResponse(report)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
@@ -591,3 +597,51 @@ class FunctionManagerView(GraphBaseView):
 
         return JSONResponse(data)
 
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        users_and_groups = []
+        for group in Group.objects.all():
+            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
+        for user in User.objects.all():
+            users_and_groups.append({'name': user.email or user.username, 'email': user.email, 'type': 'user', 'id': user.pk})
+
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+
+        root = {'children': []}
+        def extract_card_info(cards, root):
+            for card in cards:
+                d = {
+                    'name': card.name,
+                    'isContainer': len(card.cards) > 0,
+                    'nodegroup': card.nodegroup_id,
+                    'children': []
+                }
+                if len(card.cards) > 0:
+                    extract_card_info(card.cards, d)
+                else:
+                    for node in card.nodegroup.node_set.all():
+                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': []})
+                root['children'].append(d)
+
+        extract_card_info(cards, root)
+        #return JSONResponse(root)
+
+        context = self.get_context_data(
+            main_script='views/graph/permission-manager',
+            users_and_groups=JSONSerializer().serialize(users_and_groups),
+            cards=JSONSerializer().serialize(root),
+            datatypes=JSONSerializer().serialize(models.DDataType.objects.all())
+            #permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
+        )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
+
+        return render(request, 'views/graph/permission-manager.htm', context)

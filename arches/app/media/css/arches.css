@@ -4228,7 +4228,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
     background-color: #f0f0f0;
     width: 200px;
-    padding: 0px 7px 7px 7px;
+    padding: 4px 7px 7px 7px;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
     overflow-x: hidden;
@@ -4259,7 +4259,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
     background: #fbfbfb;
-    padding: 7px;
+    padding: 4px 7px 7px 7px;
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
@@ -5962,6 +5962,15 @@ div.row.widget-wrapper.report-header:hover {
     font-size: 21px;
 }
 
+.geometry-tools-container {
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    padding: 0px;
+}
+
+
+
 .geocode-container-shim {
     margin-right: 210px;
 }
@@ -6836,7 +6845,7 @@ span.basemap-unselected {
 .hover-feature-info {
     position: absolute;
     z-index: 1000;
-    left: 30px;
+    left: 35px;
     margin: 10px;
     width: 400px;
     padding: 0px;
@@ -7057,7 +7066,7 @@ a.search-query-link-captions:focus {
     position: absolute;
     top: 33px;
     left: 0px;
-    width: 40px;
+    width: 43px;
     height: 40px;
     background: #fafafa;
     border: 1px solid #dddddd;
@@ -7077,7 +7086,7 @@ a.search-query-link-captions:focus {
 
 .search-results-button-icon {
     font-size: 19px;
-    margin-left: 12px;
+    margin-left: 15px;
     margin-top: 10px;
 }
 
@@ -7931,6 +7940,7 @@ a.search-facet-item.disabled {
 
 .facet-btn {
     width: 50%;
+    height: 40px;
 }
 
 .facet-btn:focus, .facet-btn.selected {
@@ -7946,6 +7956,15 @@ a.search-facet-item.disabled {
     padding-top: 5px;
     padding-bottom: 45px;
 }
+
+.landing-attribution {
+    position: absolute;
+    top: 300px;
+    color: #fff;
+}
+
+
+
 
 @keyframes loader {
     0% {

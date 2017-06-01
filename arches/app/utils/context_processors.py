@@ -16,9 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import json
 from arches import __version__
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.geo_utils import GeoUtils
+
 
 def livereload(request):
     return {
@@ -26,18 +28,22 @@ def livereload(request):
     }
 
 def map_info(request):
+    geo_utils = GeoUtils()
+    hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
+    default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
+
     return {
         'map_info': {
-            'x': settings.DEFAULT_MAP_X,
-            'y': settings.DEFAULT_MAP_Y,
+            'x': default_center['coordinates'][0],
+            'y': default_center['coordinates'][1],
             'zoom': settings.DEFAULT_MAP_ZOOM,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
             'mapbox_api_key': settings.MAPBOX_API_KEY,
-            'hex_bin_size': settings.HEX_BIN_SIZE,
+            'hex_bin_size': settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE != None else 100,
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
-            'hex_bin_bounds': JSONSerializer().serialize(settings.HEX_BIN_BOUNDS),
+            'hex_bin_bounds': json.dumps(hex_bin_bounds),
             'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
         }
     }

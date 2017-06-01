@@ -166,7 +166,7 @@ def prepare_search_index(resource_model_id, create=False):
                         "type": "geo_point"
                     },
                     'dates' : {
-                        "type" : "date"
+                        "type" : "float"
                     },
                     'numbers' : {
                         "type" : "double"

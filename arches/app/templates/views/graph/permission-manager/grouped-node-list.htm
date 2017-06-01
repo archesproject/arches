@@ -1,0 +1,72 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Cards" %}{% endblock %}
+
+{% block search_placeholder %}{% trans "Find cards or card containers" %}{% endblock %}
+
+
+{% block list_wrapper %}
+
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<div style="display: none;" data-bind="visible: self">
+
+    <!-- TOC Cards/Widgets -->
+    <div class="card-tree-container">
+        <div data-bind="foreach: { data: $data.outerCards, as: 'card' }">
+            <li class="card-tree-list"data-bind="css: {
+                    'active': card.selected
+                }">
+                <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+                        'active': card.selected
+                    },visible: $data.filtered() == false,
+                    click: self.selectItem.bind(self)">
+                    <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
+                        <i class="card-tree-list-icon" data-bind="css: card.isContainer ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
+                    </span>
+                    <span class="node-name" data-bind="text: card.name"></span>
+                    <span class="node-subname" data-bind="text: card.isContainer ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
+                </a>
+
+                <ul class="card-tree-list-item report-tree-list" aria-expanded="true">
+                    <div data-bind="template: {
+                        name: 'card-tree',
+                        foreach: card.children,
+                        as: 'card'
+                    }"></div>
+                </ul>
+            </li>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
+
+<template id="card-tree">
+    <li class="card-tree-list"data-bind="css: {
+        'active': card.selected
+    }">
+        <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+            'active': card.selected
+        },
+        click: self.selectItem.bind(self)">
+            <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
+                <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
+            </span>
+            <span class="node-name" data-bind="text: card.name"></span>
+            <span class="node-subname" data-bind="text: !!card.children.length ? '{% trans "Card" %}' : '{% trans "Node" %}'"></span>
+        </a>
+
+        <ul class="card-tree-list-item node-indent" aria-expanded="true">
+            <div data-bind="template: {
+                name: 'card-tree',
+                foreach: card.children,
+                as: 'card'
+            }"></div>
+        </ul>
+    </li>
+</template>
+
+
+
+{% endblock %}
