@@ -53,8 +53,14 @@
             <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
                 <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
+            <!-- ko if: card.children.length !== 0 -->
+            <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
+            <span class="node-subname" data-bind="text: '{% trans "Card" %}'"></span>
+            <!-- /ko -->
+            <!-- ko if: card.children.length === 0 -->
             <span class="node-name" data-bind="text: card.name"></span>
-            <span class="node-subname" data-bind="text: !!card.children.length ? '{% trans "Card" %}' : '{% trans "Node" %}'"></span>
+            <span class="node-subname" data-bind="text: '{% trans "Node" %}'"></span>
+            <!-- /ko -->
         </a>
 
         <ul class="card-tree-list-item node-indent" aria-expanded="true">

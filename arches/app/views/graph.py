@@ -608,8 +608,12 @@ class PermissionManagerView(GraphBaseView):
         for group in Group.objects.all():
             users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all(), 'default_permissions_list': ", ".join([item.name for item in group.permissions.all()])})
         for user in User.objects.all():
-            groups = user.groups.values_list('name',flat=True)
-            users_and_groups.append({'name': user.email or user.username, 'groups': ','.join(groups), 'type': 'user', 'id': user.pk})
+            groups = []
+            perms = []
+            for group in user.groups.all():
+                groups.append(group.name)
+                perms = perms + [item.name for item in group.permissions.all()]
+            users_and_groups.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions_list': ", ".join(set(perms))})
         
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
   
@@ -676,6 +680,18 @@ class PermissionDataView(View):
                 nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
                 perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)]
                 ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+
+
+        if userOrGroupType == 'user':
+            user = User.objects.get(pk=userOrGroupId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+
+        #     if len(perms['default']) > 0:
+        #         ret.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
+        # return ret
 
         return JSONResponse(ret)
 
