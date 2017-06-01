@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Persmission settings form -->
-    <div class="ep-card-crud-panel" style="width:100%">
+    <div style="width:100%" data-bind="with:permissionSettingsForm">
         {% include 'views/graph/permission-manager/permission-settings-form.htm' %}
     </div>
 
@@ -56,7 +56,8 @@ define('permission-manager-data', [], function () {
     return {
         'usersAndGroups':{{users_and_groups}},
         'cards':{{cards}},
-        'datatypes':{{datatypes}}
+        'datatypes':{{datatypes}},
+        'nodegroupPermissions':{{nodegroupPermissions}}
     };
 });
 {% endautoescape %}</script>
