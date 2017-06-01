@@ -63,7 +63,11 @@ require([
                             return card.nodegroup === nodegroup.nodegroup_id;
                         });
                         var perms = _.pluck(nodegroup.perms, 'name');
-                        card.perm(perms.join(', '));                        
+                        if (perms.length > 0){
+                            card.perm(perms.join(', '));                        
+                        }else{
+                            card.perm('Default (' + usersAndGroupsList.selectedItems()[0].default_permissions_list + ')');
+                        }
                     })
                 },
                 complete: function () {
