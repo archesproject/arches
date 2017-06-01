@@ -606,7 +606,7 @@ class PermissionManagerView(GraphBaseView):
 
         users_and_groups = []
         for group in Group.objects.all():
-            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk})
+            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all(), 'default_permissions_list': ", ".join([item.name for item in group.permissions.all()])})
         for user in User.objects.all():
             groups = user.groups.values_list('name',flat=True)
             users_and_groups.append({'name': user.email or user.username, 'groups': ','.join(groups), 'type': 'user', 'id': user.pk})
@@ -685,7 +685,15 @@ class PermissionDataView(View):
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        
+        self.apply_permissions(data)
+        return JSONResponse(data)
+
+    def delete(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data, revert=True)
+        return JSONResponse(data)
+
+    def apply_permissions(self, data, revert=False):
         with transaction.atomic():
 
             for userOrGroup in data['selectedUsersAndGroups']:
@@ -696,14 +704,18 @@ class PermissionDataView(View):
 
                 for card in data['selectedCards']:
                     nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
-                     # first remove all the current permissions
+                    
+                    # first remove all the current permissions
                     for perm in get_perms(userOrGroupModel, nodegroup):
                         remove_perm(perm, userOrGroupModel, nodegroup)
-                    # then add the new permissions
-                    for perm in data['selectedPermissions']:
-                        assign_perm(perm['codename'], userOrGroupModel, nodegroup)
 
-        return JSONResponse(data)
+                    if not revert:
+                        # then add the new permissions
+                        for perm in data['selectedPermissions']:
+                            assign_perm(perm['codename'], userOrGroupModel, nodegroup)
+        
+
+
         # {
         #     "selectedUsersAndGroups": [
         #         {

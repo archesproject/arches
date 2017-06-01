@@ -33,6 +33,7 @@
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedUsersAndGroups, visible: selectedUsersAndGroups().length !== 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name"></span>
+                                            <div>{% trans "Default Permissions - " %}<span data-bind="text: $data.default_permissions_list"></span></div>
                                         </li>
                                     </ul>
                                 </div>
@@ -84,7 +85,7 @@
 
                         <!-- Buttons -->
                         <div class="permission-buttons pull-right mar-btm">
-                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt"> Revert Permissions
+                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: revert"> Revert Permissions
                             </button>
                             <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: save"> Apply Permissions</button>
                         </div>
