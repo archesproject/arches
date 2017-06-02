@@ -606,16 +606,16 @@ class PermissionManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
-        users_and_groups = []
+        identities = []
         for group in Group.objects.all():
-            users_and_groups.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all(), 'default_permissions_list': ", ".join([item.name for item in group.permissions.all()])})
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all(), 'default_permissions_list': ", ".join([item.name for item in group.permissions.all()])})
         for user in User.objects.all():
             groups = []
             perms = []
             for group in user.groups.all():
                 groups.append(group.name)
                 perms = perms + [item.name for item in group.permissions.all()]
-            users_and_groups.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions_list': ", ".join(set(perms))})
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions_list': ", ".join(set(perms))})
         
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
@@ -643,7 +643,7 @@ class PermissionManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/permission-manager',
-            users_and_groups=JSONSerializer().serialize(users_and_groups),
+            identities=JSONSerializer().serialize(identities),
             cards=JSONSerializer().serialize(root),
             datatypes=JSONSerializer().serialize(models.DDataType.objects.all()),
             nodegroupPermissions=JSONSerializer().serialize(nodegroupPermissions) #JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
@@ -710,7 +710,7 @@ class PermissionDataView(View):
     def apply_permissions(self, data, revert=False):
         with transaction.atomic():
 
-            for userOrGroup in data['selectedUsersAndGroups']:
+            for userOrGroup in data['selectedIdentities']:
                 if userOrGroup['type'] == 'group':
                     userOrGroupModel = Group.objects.get(pk=userOrGroup['id'])
                 else:

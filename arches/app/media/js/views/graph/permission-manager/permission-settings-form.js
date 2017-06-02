@@ -19,7 +19,7 @@ define([
         * @param {boolean} options.selection - the selected item, either a {@link CardModel} or a {@link NodeModel}
         */
         initialize: function(options) {
-            this.selectedUsersAndGroups = options.selectedUsersAndGroups;
+            this.selectedIdentities = options.selectedIdentities;
             this.selectedCards = options.selectedCards;
             this.noAccessPerm = undefined;
             this.whiteListPerms = [];
@@ -50,7 +50,7 @@ define([
         save: function(){
             var self = this;
             var postData = {
-                'selectedUsersAndGroups': this.selectedUsersAndGroups(),
+                'selectedIdentities': this.selectedIdentities(),
                 'selectedCards': this.selectedCards(),
                 'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm){
                     return perm.selected();
@@ -70,7 +70,7 @@ define([
         revert: function(){
             var self = this;
             var postData = {
-                'selectedUsersAndGroups': this.selectedUsersAndGroups(),
+                'selectedIdentities': this.selectedIdentities(),
                 'selectedCards': this.selectedCards()
             }
 

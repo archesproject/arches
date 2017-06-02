@@ -2,19 +2,19 @@ define([
     'knockout',
     'views/list'
 ], function(ko, ListView) {
-    var UsersAndGroupsList = ListView.extend({
+    var IdentityList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
         * @augments ListView
         * @constructor
-        * @name UsersAndGroupsList
+        * @name IdentityList
         */
 
         single_select: true,
 
         /**
         * initializes the view with optional parameters
-        * @memberof UsersAndGroupsList.prototype
+        * @memberof IdentityList.prototype
         * @param {object} options
         * @param {boolean} options.permissions - a list of allowable permissions
         * @param {boolean} options.card - a reference to the selected {@link CardModel}
@@ -25,5 +25,5 @@ define([
         }
 
     });
-    return UsersAndGroupsList;
+    return IdentityList;
 });
