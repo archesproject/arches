@@ -113,7 +113,7 @@ define([
                 items: self.overlayLibrary
             });
 
-            if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) { 
+            if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
                 //Infering that the default widget config settings are used and switching to system_settings for map position.
                 this.centerX(arches.mapDefaultX);
                 this.centerY(arches.mapDefaultY);
@@ -1289,13 +1289,7 @@ define([
                         if (feature.properties.total > 1) {
                             return isFeatureVisible(feature);
                         }
-                    }) || (
-                        self.context === 'resource-editor' && _.find(features, function(feature) {
-                            if (feature.properties.geojson) {
-                                return isFeatureVisible(feature);
-                            }
-                        })
-                    ) || null;
+                    }) || null;
                     if (clickFeature) {
                         if (clickFeature.properties.resourceinstanceid) {
                             clickData = lookupResourceData(clickFeature.properties);
@@ -1314,18 +1308,30 @@ define([
                             map.fitBounds(bounds, {
                                 padding: 20
                             });
-                        } else if (clickFeature.properties.geojson) {
-                            var feature = {
-                                "type": "Feature",
-                                "geometry": JSON.parse(clickFeature.properties.geojson),
-                                "properties": {}
-                            };
-                            self.draw.add(feature);
                         }
                     }
 
                     if (self.clickData() !== clickData) {
                         self.clickData(clickData);
+                    }
+                });
+
+                map.on('dblclick', function (e) {
+                    var features = self.map.queryRenderedFeatures(e.point);
+                    var clickFeature = (
+                        self.context === 'resource-editor' && _.find(features, function(feature) {
+                            if (feature.properties.geojson) {
+                                return isFeatureVisible(feature);
+                            }
+                        })
+                    ) || null;
+                    if (clickFeature) {
+                        var feature = {
+                            "type": "Feature",
+                            "geometry": JSON.parse(clickFeature.properties.geojson),
+                            "properties": {}
+                        };
+                        self.draw.add(feature);
                     }
                 });
 
