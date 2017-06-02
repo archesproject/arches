@@ -20,7 +20,7 @@ define([
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
         * @param {object} options
-        * @param {boolean} options.cards - a list of all cards (simplified json) for a resource model
+        * @param {boolean} options.cards - a hierarchical list of all cards (simplified json) for a resource model
         * @param {boolean} options.datatypes - a list of all datatypes
         */
         initialize: function(options) {

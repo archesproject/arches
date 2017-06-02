@@ -626,13 +626,14 @@ class PermissionManagerView(GraphBaseView):
                     'name': card.name,
                     'isContainer': len(card.cards) > 0,
                     'nodegroup': card.nodegroup_id,
-                    'children': []
+                    'children': [],
+                    'type': _('Card Container') if len(card.cards) > 0 else _('Card')
                 }
                 if len(card.cards) > 0:
                     extract_card_info(card.cards, d)
                 else:
                     for node in card.nodegroup.node_set.all():
-                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': []})
+                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type': _('Node')})
                 root['children'].append(d)
 
         extract_card_info(cards, root)
