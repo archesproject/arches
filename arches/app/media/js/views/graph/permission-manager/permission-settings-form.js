@@ -21,10 +21,29 @@ define([
         initialize: function(options) {
             this.selectedUsersAndGroups = options.selectedUsersAndGroups;
             this.selectedCards = options.selectedCards;
+            this.noAccessPerm = undefined;
+            this.whiteListPerms = [];
 
             options.nodegroupPermissions.forEach(function(perm){
                 perm.selected = ko.observable(false);
-            })
+                if(perm.codename === 'no_access_to_nodegroup'){
+                    this.noAccessPerm = perm;
+                    perm.selected.subscribe(function(selected){
+                        if (selected){
+                            this.whiteListPerms.forEach(function(perm){
+                                perm.selected(false);
+                            }, this);
+                        }
+                    }, this);
+                }else{
+                    this.whiteListPerms.push(perm)
+                    perm.selected.subscribe(function(selected){
+                        if (selected){
+                            this.noAccessPerm.selected(false);
+                        }
+                    }, this);
+                }
+            }, this)
             this.nodegroupPermissions = ko.observableArray(options.nodegroupPermissions);
         },
 
