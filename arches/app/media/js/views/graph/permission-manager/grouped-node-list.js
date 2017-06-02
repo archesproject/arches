@@ -13,6 +13,9 @@ define([
 
         single_select: false,
 
+
+        select_children: true,
+
         /**
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
@@ -29,6 +32,7 @@ define([
                     this.items.push(item);
                 }else{
                     item.selectable = false;
+                    item.active = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
             }
@@ -44,7 +48,32 @@ define([
 
             //this.selection = ko.observable(this.items()[0]);
             ListView.prototype.initialize.apply(this, arguments);
-        }
+        },
+
+        /**
+        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
+        *   true clear the selected status of all other list items
+        * @memberof ListView.prototype
+        * @param {object} item - the item to be selected or unselected
+        * @param {object} evt - click event object
+        */
+        selectItem: function(item, evt, parentItem){
+            var self = this;
+            if(!!item.selectable){
+                var selectedStatus = item.selected();
+                if(this.single_select){
+                    this.clearSelection();
+                }
+                item.selected(!selectedStatus);
+                this.trigger('item-clicked', item, evt);
+                item.children.forEach(function(childItem){
+                    self.selectItem(childItem, evt, item);
+                })
+            }else{
+                item.active(parentItem.selected());
+            }
+        },
+
 
     });
     return GroupedNodeList;

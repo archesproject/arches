@@ -18,7 +18,7 @@
     <div class="card-tree-container">
         <div data-bind="foreach: { data: $data.outerCards, as: 'card' }">
             <li class="card-tree-list"data-bind="css: {
-                    'active': card.selected
+                    'active': card.selected || card.active
                 }">
                 <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
                         'active': card.selected
@@ -47,7 +47,7 @@
 <template id="card-tree">
     <li class="card-tree-list" data-bind="css: {'active': card.selected}, visible: (card.children.length !== 0) || (self.showNodes() && card.children.length === 0)">
         <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-            'active': card.selected
+            'active': card.selected || card.active
         },
         click: self.selectItem.bind(self)">
             <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
