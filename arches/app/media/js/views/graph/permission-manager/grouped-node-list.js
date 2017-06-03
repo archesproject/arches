@@ -64,13 +64,15 @@ define([
                 if(this.single_select){
                     this.clearSelection();
                 }
-                item.selected(!selectedStatus);
+                item.selected(parentItem ? parentItem.selected() : !selectedStatus);
                 this.trigger('item-clicked', item, evt);
                 item.children.forEach(function(childItem){
                     self.selectItem(childItem, evt, item);
                 })
             }else{
-                item.active(parentItem.selected());
+                if (parentItem){
+                   item.active(parentItem.selected()); 
+                }
             }
         },
 
