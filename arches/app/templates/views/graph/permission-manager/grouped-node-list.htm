@@ -17,24 +17,14 @@
     <!-- TOC Cards/Widgets -->
     <div class="card-tree-container">
         <div data-bind="foreach: { data: $data.outerCards, as: 'card' }">
-            <li class="card-tree-list"data-bind="css: {
-                    'active': card.selected
-                }">
-                <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-                        'active': card.selected
-                    },visible: $data.filtered() == false,
-                    click: self.selectItem.bind(self)">
+            <li class="card-tree-list">
+                <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {'active': card.selected || card.active}, visible: $data.filtered() == false, click: self.selectItem.bind(self)">
                     <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
                         <i class="card-tree-list-icon" data-bind="css: card.isContainer ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
                     </span>
-                    <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
-                    <span class="node-subname" data-bind="text: card.isContainer ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
+                    <span class="node-name" data-bind="text: card.name"></span>
+                    <span class="node-subname" data-bind="text: card.type"></span><!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
                 </a>
-
-<!--                 <div class="node-selection-tools">
-                    <i id="cc-select-1" class="fa select-child-nodes fa-toggle-on"></i>
-                    <i id="cc-expand-1" class="expand-cc-child-nodes ion-arrow-down-b"></i>
-                </div> -->
 
                 <ul class="card-tree-list-item report-tree-list" aria-expanded="true">
                     <div data-bind="template: {
@@ -50,22 +40,13 @@
 <!-- /ko -->
 
 <template id="card-tree">
-    <li class="card-tree-list" data-bind="css: {'active': card.selected}, visible: (card.children.length !== 0) || (self.showNodes() && card.children.length === 0)">
-        <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-            'active': card.selected
-        },
-        click: self.selectItem.bind(self)">
+    <li class="card-tree-list" data-bind="visible: (card.children.length !== 0) || (self.showNodes() && card.children.length === 0)">
+        <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {'active': card.selected || card.active}, click: self.selectItem.bind(self)">
             <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
                 <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
-            <!-- ko if: card.children.length !== 0 -->
-            <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
-            <span class="node-subname" data-bind="text: '{% trans "Card" %}'"></span>
-            <!-- /ko -->
-            <!-- ko if: card.children.length === 0 -->
             <span class="node-name" data-bind="text: card.name"></span>
-            <span class="node-subname" data-bind="text: '{% trans "Node" %}'"></span>
-            <!-- /ko -->
+            <span class="node-subname" data-bind="text: card.type"></span><!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
         </a>
 
         <ul class="card-tree-list-item node-indent" aria-expanded="true" data-bind="visible: self.showNodes">
