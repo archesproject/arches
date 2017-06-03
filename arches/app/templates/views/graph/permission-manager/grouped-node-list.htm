@@ -22,8 +22,8 @@
                     <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
                         <i class="card-tree-list-icon" data-bind="css: card.isContainer ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
                     </span>
-                    <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
-                    <span class="node-subname" data-bind="text: card.type"></span>
+                    <span class="node-name" data-bind="text: card.name"></span>
+                    <span class="node-subname" data-bind="text: card.type"></span> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko -->
                 </a>
 
                 <ul class="card-tree-list-item report-tree-list" aria-expanded="true">
@@ -46,8 +46,8 @@
                 <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
             <!-- ko if: card.children.length !== 0 -->
-            <span class="node-name" data-bind="text: card.name + ' - ' + card.perm()"></span>
-            <span class="node-subname" data-bind="text: card.type"></span>
+            <span class="node-name" data-bind="text: card.name"></span>
+            <span class="node-subname" data-bind="text: card.type"></span> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: card.children.length === 0 -->
             <span class="node-name" data-bind="text: card.name"></span>

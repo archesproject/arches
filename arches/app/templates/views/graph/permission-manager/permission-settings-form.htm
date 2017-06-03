@@ -50,7 +50,7 @@
                                     </ul>
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
                                         <li class="">
-                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name + ' - ' + $data.perm()"></span>
+                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name + $data.permsLiteral()"></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -74,7 +74,7 @@
                                                     },
                                                     click: $data.selected.bind($data, !$data.selected())">
                                                     <input type="checkbox" data-bind="checked: $data.selected">
-                                                    <span data-bind="text: $data.name"></span>
+                                                    <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
                                                 </label>
                                             </div>
                                         </div>
