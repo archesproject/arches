@@ -21,6 +21,9 @@ require([
         'delete_nodegroup': 'ion-android-delete'
     }
 
+    data.identities.forEach(function(identity){
+        identity.permsLiteral = ' - ' + _.pluck(identity.default_permissions, 'name').join(', ');
+    });
     var identityList = new IdentityList({
         items: ko.observableArray(data.identities)
     })
@@ -34,9 +37,7 @@ require([
         datatypes: data.datatypes
     })
     groupedNodeList.items().forEach(function(item){
-        item.perm = ko.observable();
         item.perms = ko.observableArray();
-        item.perm_icons = ko.observableArray();
         item.permsLiteral = ko.observable();
     });
     

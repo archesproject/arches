@@ -608,14 +608,14 @@ class PermissionManagerView(GraphBaseView):
 
         identities = []
         for group in Group.objects.all():
-            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all(), 'default_permissions_list': ", ".join([item.name for item in group.permissions.all()])})
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
         for user in User.objects.all():
             groups = []
-            perms = []
+            default_perms = []
             for group in user.groups.all():
                 groups.append(group.name)
-                perms = perms + [item.name for item in group.permissions.all()]
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions_list': ", ".join(set(perms))})
+                default_perms = default_perms + list(group.permissions.all())
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms)})
         
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 

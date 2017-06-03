@@ -33,7 +33,7 @@
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name"></span>
-                                            <div>{% trans "Default Permissions - " %}<span data-bind="text: $data.default_permissions_list"></span></div>
+                                            <div>{% trans "Default Permissions" %}<span data-bind="text: $data.permsLiteral"></span></div>
                                         </li>
                                     </ul>
                                 </div>
