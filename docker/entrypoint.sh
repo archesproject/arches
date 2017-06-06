@@ -46,7 +46,7 @@ activate_virtualenv() {
 
 init_arches() {
 
-	install_requirements
+	# install_requirements
 
 	if [[ "${FORCE_DB_INIT}" == "True" ]]; then
 		echo ""
@@ -264,18 +264,19 @@ run_arches() {
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
-		install_dev_requirements
+		# install_dev_requirements
 	fi
 
 	# Run from folder where user's bower.json lives
-	cd_bower_folder
-	install_bower_components
+	# cd_bower_folder
+	# install_bower_components
 
 	# From here on, run from the user's ${APP_FOLDER}
 	cd_app_folder
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-		run_migrations
+		echo "Not running migrations."
+		# run_migrations
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 		collect_static
 	fi
@@ -337,9 +338,9 @@ setup_arches() {
 
 run_tests() {
 	cd_arches_root
-	install_requirements
+	# install_requirements
 	set_dev_mode
-	install_dev_requirements
+	# install_dev_requirements
 	echo ""
 	echo ""
 	echo "----- RUNNING ARCHES TESTS -----"
