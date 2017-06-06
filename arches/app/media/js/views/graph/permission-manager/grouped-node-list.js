@@ -13,9 +13,6 @@ define([
 
         single_select: false,
 
-
-        select_children: true,
-
         /**
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
@@ -28,8 +25,9 @@ define([
             this.outerCards = options.cards.children;
 
             var parseData = function(item){
-                if ('nodegroup' in item){
+                if (item.type === 'card' || item.type === 'card_container'){
                     this.items.push(item);
+                    item.visible = ko.observable(item.type === 'card_container');
                 }else{
                     item.selectable = false;
                     item.active = ko.observable(false);
@@ -45,6 +43,13 @@ define([
             }, this);
 
             this.showNodes = ko.observable(false);
+            this.showNodes.subscribe(function(show){
+                this.items().forEach(function(item){
+                    if(item.type === 'card'){
+                        item.visible(show);
+                    }
+                });
+            }, this);
 
             //this.selection = ko.observable(this.items()[0]);
             ListView.prototype.initialize.apply(this, arguments);
@@ -76,6 +81,15 @@ define([
             }
         },
 
+        /**
+        * Toggles hidden nodes in the list
+        * @memberof ListView.prototype
+        * @param {object} item - the item to be hidden or shown
+        * @param {object} evt - click event object
+        */
+        toggleNodes: function(item, evt){
+            item.visible(!item.visible());
+        }
 
     });
     return GroupedNodeList;
