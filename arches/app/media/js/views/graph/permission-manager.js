@@ -38,7 +38,7 @@ require([
     })
     groupedNodeList.items().forEach(function(item){
         item.perms = ko.observableArray();
-        item.permsLiteral = ko.observable();
+        item.permsLiteral = ko.observable('');
     });
     
     data.nodegroupPermissions.forEach(function(perm){

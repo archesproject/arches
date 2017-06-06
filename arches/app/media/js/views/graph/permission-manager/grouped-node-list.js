@@ -89,6 +89,7 @@ define([
         */
         toggleNodes: function(item, evt){
             item.visible(!item.visible());
+            evt.stopPropagation();
         }
 
     });
