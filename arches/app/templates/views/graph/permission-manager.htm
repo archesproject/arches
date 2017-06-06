@@ -32,8 +32,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block content %}
 <div class="flex">
     <!--Users and Groups listing -->
-    <div class="left-column-container" data-bind="with:usersAndGroupsList">
-        {% include 'views/graph/permission-manager/users-and-groups-list.htm' %}
+    <div class="left-column-container" data-bind="with:identityList">
+        {% include 'views/graph/permission-manager/identity-list.htm' %}
     </div>
 
     <!-- Node list -->
@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('permission-manager-data', [], function () {
     return {
-        'usersAndGroups':{{users_and_groups}},
+        'identities':{{identities}},
         'cards':{{cards}},
         'datatypes':{{datatypes}},
         'nodegroupPermissions':{{nodegroupPermissions}}

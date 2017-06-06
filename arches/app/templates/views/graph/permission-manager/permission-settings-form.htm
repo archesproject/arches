@@ -25,15 +25,15 @@
                             <div class="col-sm-6 permissions-list permissions-list-divider">
                                 <div class="">
                                     <span>{% trans "Selected Group/Account " %}</span>
-                                    <ul class="permissions-selected" data-bind="visible: selectedUsersAndGroups().length === 0">
+                                    <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span>{% trans "No Groups/Accounts selected" %}</span>
                                         </li>
                                     </ul>
-                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedUsersAndGroups, visible: selectedUsersAndGroups().length !== 0">
+                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name"></span>
-                                            <div>{% trans "Default Permissions - " %}<span data-bind="text: $data.default_permissions_list"></span></div>
+                                            <div>{% trans "Default Permissions" %}<span data-bind="text: $data.permsLiteral"></span></div>
                                         </li>
                                     </ul>
                                 </div>
@@ -50,7 +50,7 @@
                                     </ul>
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
                                         <li class="">
-                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name + ' - ' + $data.perm()"></span>
+                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name + $data.permsLiteral()"></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -74,7 +74,7 @@
                                                     },
                                                     click: $data.selected.bind($data, !$data.selected())">
                                                     <input type="checkbox" data-bind="checked: $data.selected">
-                                                    <span data-bind="text: $data.name"></span>
+                                                    <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
                                                 </label>
                                             </div>
                                         </div>
@@ -85,9 +85,9 @@
 
                         <!-- Buttons -->
                         <div class="permission-buttons pull-right mar-btm">
-                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedUsersAndGroups().length === 0}"> Revert Permissions
+                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Revert Permissions
                             </button>
-                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedUsersAndGroups().length === 0}"> Apply Permissions</button>
+                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Apply Permissions</button>
                         </div>
                     </div>     
                 </div>

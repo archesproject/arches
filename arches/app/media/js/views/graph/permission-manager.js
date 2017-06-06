@@ -2,21 +2,32 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'knockout-mapping',
     'arches',
     'views/graph/graph-page-view', 
-    'views/graph/permission-manager/users-and-groups-list',
+    'views/graph/permission-manager/identity-list',
     'views/graph/permission-manager/grouped-node-list',
     'views/graph/permission-manager/permission-settings-form',
     'permission-manager-data'
-], function($, _, ko, arches, GraphPageView, UsersAndGroupsList, GroupedNodeList, PermissionSettingsForm, data) {
+], function($, _, ko, koMapping, arches, GraphPageView, IdentityList, GroupedNodeList, PermissionSettingsForm, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
 
-    var usersAndGroupsList = new UsersAndGroupsList({
-        items: ko.observableArray(data.usersAndGroups)
+    var perm_icons = {
+        'no_access_to_nodegroup': 'ion-close',
+        'read_nodegroup': 'ion-ios-book',
+        'write_nodegroup': 'ion-edit',
+        'delete_nodegroup': 'ion-android-delete'
+    }
+
+    data.identities.forEach(function(identity){
+        identity.permsLiteral = ' - ' + _.pluck(identity.default_permissions, 'name').join(', ');
+    });
+    var identityList = new IdentityList({
+        items: ko.observableArray(data.identities)
     })
-    usersAndGroupsList.selectedItems.subscribe(function(item){
+    identityList.selectedItems.subscribe(function(item){
         updatePermissions();
     })
 
@@ -26,12 +37,16 @@ require([
         datatypes: data.datatypes
     })
     groupedNodeList.items().forEach(function(item){
-        item.perm = ko.observable();
+        item.perms = ko.observableArray();
+        item.permsLiteral = ko.observable('');
     });
     
+    data.nodegroupPermissions.forEach(function(perm){
+        perm.icon = perm_icons[perm.codename];
+    });
 
     var permissionSettingsForm = new PermissionSettingsForm({
-        selectedUsersAndGroups: usersAndGroupsList.selectedItems,
+        selectedIdentities: identityList.selectedItems,
         selectedCards: groupedNodeList.selectedItems,
         nodegroupPermissions: data.nodegroupPermissions
     })
@@ -44,7 +59,7 @@ require([
 
 
     var updatePermissions = function(){
-        var item = usersAndGroupsList.selectedItems()[0];
+        var item = identityList.selectedItems()[0];
         var nodegroupIds = [];
 
         if(item){
@@ -62,12 +77,15 @@ require([
                         var card = _.find(groupedNodeList.items(), function(card){
                             return card.nodegroup === nodegroup.nodegroup_id;
                         });
-                        var perms = _.pluck(nodegroup.perms, 'name');
-                        if (perms.length > 0){
-                            card.perm(perms.join(', '));                        
-                        }else{
-                            card.perm('Default (' + usersAndGroupsList.selectedItems()[0].default_permissions_list + ')');
+
+                        if (nodegroup.perms.length === 0){
+                            nodegroup.perms = identityList.selectedItems()[0].default_permissions;
                         }
+                        nodegroup.perms.forEach(function(perm){
+                            perm.icon = perm_icons[perm.codename];
+                        });
+                        card.perms(nodegroup.perms);
+                        card.permsLiteral(' - ' + _.pluck(nodegroup.perms, 'name').join(', '));
                     })
                 },
                 complete: function () {
@@ -83,7 +101,7 @@ require([
     */
     var graphPageView = new GraphPageView({
         viewModel: {
-            usersAndGroupsList: usersAndGroupsList,
+            identityList: identityList,
             groupedNodeList: groupedNodeList,
             permissionSettingsForm: permissionSettingsForm
         }
