@@ -25,7 +25,12 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if (tile.isParent === true){
+                    var hasdata = _.filter(tile.data, function(val, key) {
+                        if (val()) {
+                            return val()
+                        }
+                    })
+                    if (tile.isParent === true || hasdata.length === 0){
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
                         }

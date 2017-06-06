@@ -177,38 +177,32 @@ define([
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(1)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(2)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
                 // this is a "wizard"
                 if(outerCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(3)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(4)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
             }else{
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
-                    //console.log(5)
                     return tile;
                 }else{
-                    //console.log(6)
                     return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                 }
             }
