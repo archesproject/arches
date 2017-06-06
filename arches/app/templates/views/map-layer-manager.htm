@@ -171,21 +171,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs">
                                             <li class="active">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
                                             </li>
                                             <li class="">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
                                             </li>
                                         </ul>
 
                                         <div class="tab-content">
-                                            <div id="styling-panel" class="tab-pane fade active in">
-                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
-                                                </div>
-                                            </div>
 
-                                            <div id="settings-panel" class="tab-pane fade">
+                                            <div id="settings-panel" class="tab-pane fade active in">
                                                 <div class="row service-widget-container">
                                                     <div class="form-horizontal">
                                                         <div class="panel-body" style="padding-top: 10px;">
@@ -246,6 +241,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div id="styling-panel" class="tab-pane fade">
+                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
+                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>

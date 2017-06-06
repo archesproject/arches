@@ -1,1 +1,97 @@
-settings form here
+{% load i18n %}
+<div id="card-preview" class="pad-all" style="">
+
+    <div id="permissions-form" class="panel">
+        <div class="panel-heading">
+            <div class="">
+                <h3 id="cc-title" class="panel-title card-main-title">{% trans "Permissions and Publishing" %}</h3>
+            </div>
+        </div>
+
+        <!-- Alert Panel -->
+        <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+
+        <!-- Data Entry -->
+        <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
+            <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+                <div class="" style="margin-left: 0px;">
+                    <!-- Card -->
+                    <div class="panel-body " style="">
+
+                        <!-- Selection Summary -->
+                        <div>
+
+                            <!-- Groups/Users -->
+                            <div class="col-sm-6 permissions-list permissions-list-divider">
+                                <div class="">
+                                    <span>{% trans "Selected Group/Account " %}</span>
+                                    <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
+                                        <li class="">
+                                            <i class="confirmation ion-ios-checkmark"></i> <span>{% trans "No Groups/Accounts selected" %}</span>
+                                        </li>
+                                    </ul>
+                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
+                                        <li class="">
+                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name"></span>
+                                            <div>{% trans "Default Permissions" %}<span data-bind="text: $data.permsLiteral"></span></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Nodes -->
+                            <div class="col-sm-6 permissions-list">
+                                <div class="pad-lft">
+                                    <span>{% trans "Node List" %}</span>
+                                    <ul class="permissions-selected" data-bind="visible: selectedCards().length === 0">
+                                        <li class="">
+                                            <i class="confirmation ion-ios-checkmark"></i> <span>{% trans "No nodes selected" %}</span>
+                                        </li>
+                                    </ul>
+                                    <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
+                                        <li class="">
+                                            <i class="confirmation ion-ios-checkmark"></i> <span data-bind="text: $data.name + $data.permsLiteral()"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Permissions Selector -->
+                        <div id="" class="permission-selector" style="">
+                            <div class="row widget-container" style="">    
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="relative">
+                                            <label class="col-xs-12 control-label widget-input-label" for=""> {% trans "Select the permissions you wish to grant to the selected  Groups/Accounts and nodes" %}</label>
+                                        </div>
+                                        
+                                        <div class="col-xs-12">
+                                            <div class="pad-hor columns" data-bind="foreach: nodegroupPermissions">
+                                                <label class="form-checkbox form-normal form-primary form-text"
+                                                    data-bind="css: {
+                                                        'active': $data.selected
+                                                    },
+                                                    click: $data.selected.bind($data, !$data.selected())">
+                                                    <input type="checkbox" data-bind="checked: $data.selected">
+                                                    <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="permission-buttons pull-right mar-btm">
+                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Revert Permissions
+                            </button>
+                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Apply Permissions</button>
+                        </div>
+                    </div>     
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>  

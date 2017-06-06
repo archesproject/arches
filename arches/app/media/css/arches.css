@@ -1051,6 +1051,56 @@ a.select2-search-choice-close {
     margin-top: -5px;
 }
 
+.permissions {
+    background: rgb(240, 240, 240);
+}
+
+.permissions:hover {
+    background: #fff;
+}
+
+.permissions.selected {
+    background: #fff;
+}
+
+.permission-selector {
+    padding-top: 0px;
+    margin: -50px 0px 10px -20px;
+}
+
+.permissions-summary {
+    margin-top: -40px;
+    margin-left: -10px;
+    margin-right: -20px;
+}
+
+.index-selector {
+    padding-top: 0px;
+    margin: -20px 0px 10px -20px;
+}
+
+.permissions-list {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    background: #fbfbfb;
+}
+
+.permissions-list-divider {
+    border-right: 1px solid #ddd;
+}
+
+.permissions-selected {
+    list-style: none;
+    color: #888;
+    line-height: 1.2;
+    padding-left: 20px;
+    max-height: 100px;
+    min-height: 100px;
+    font-size: 12px;
+    overflow-y: scroll;
+}
+
 .library-search {
     font-size: 11px;
     height: 32px;
@@ -2153,7 +2203,7 @@ div.dropdown-menu.open {
 
 .loading-mask {
     position: fixed;
-    opacity: .5;
+    opacity: .75;
     background-color: gray;
     top: 0;
     bottom: 0;
@@ -4172,6 +4222,19 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-indent a {
     padding-left: 30px;
+}
+
+.expando {
+    position: absolute;
+    font-size: 14px;
+    cursor: pointer;
+    display: none; 
+    right: 13px;
+    top: 10px;
+}
+
+.card-tree-list a:hover .expando{
+    display: block;
 }
 
 .bg-card {
@@ -7122,6 +7185,14 @@ a.search-query-link-captions:focus {
 
 .arches-select2 .select2-choices .select2-search-field {
     height: 34px;
+}
+
+.select2-container-multi .select2-choices {
+    min-height: 36px !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+    margin: 3px 10px;
 }
 
 .arches-select2 .select2-choices .select2-search-field input {

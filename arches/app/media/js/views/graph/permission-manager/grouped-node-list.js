@@ -14,10 +14,30 @@ define([
         single_select: false,
 
         /**
+        * Callback function called every time a user types into the filter input box
+        * @memberof ListView.prototype
+        */
+        filter_function: function(newValue){
+            // first run the standard filter
+            ListView.prototype.filter_function.apply(this, arguments);
+
+            // next bring back and any card containers that were filtered that have children that were not
+            this.items().forEach(function(item){
+                if (item.type === 'card_container'){
+                    var filtered = false;
+                    item.children.forEach(function(childItem){
+                        if (!childItem.filtered()){
+                            item.filtered(false);
+                        }
+                    })                }
+            }, this);
+        },
+
+        /**
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
         * @param {object} options
-        * @param {boolean} options.cards - a list of all cards (simplified json) for a resource model
+        * @param {boolean} options.cards - a hierarchical list of all cards (simplified json) for a resource model
         * @param {boolean} options.datatypes - a list of all datatypes
         */
         initialize: function(options) {
@@ -25,10 +45,13 @@ define([
             this.outerCards = options.cards.children;
 
             var parseData = function(item){
-                if ('nodegroup' in item){
+                if (item.type === 'card' || item.type === 'card_container'){
                     this.items.push(item);
+                    item.visible = ko.observable(item.type === 'card_container');
                 }else{
                     item.selectable = false;
+                    item.active = ko.observable(false);
+                    item.filtered = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
             }
@@ -40,8 +63,53 @@ define([
                 this.datatypes[datatype.datatype] = datatype.iconclass;
             }, this);
 
-            //this.selection = ko.observable(this.items()[0]);
+            this.showNodes = ko.observable(false);
+            this.showNodes.subscribe(function(show){
+                this.items().forEach(function(item){
+                    if(item.type === 'card'){
+                        item.visible(show);
+                    }
+                });
+            }, this);
+
             ListView.prototype.initialize.apply(this, arguments);
+        },
+
+        /**
+        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
+        *   true clear the selected status of all other list items
+        * @memberof ListView.prototype
+        * @param {object} item - the item to be selected or unselected
+        * @param {object} evt - click event object
+        */
+        selectItem: function(item, evt, parentItem){
+            var self = this;
+            if(!!item.selectable){
+                var selectedStatus = item.selected();
+                if(this.single_select){
+                    this.clearSelection();
+                }
+                item.selected(parentItem ? parentItem.selected() : !selectedStatus);
+                this.trigger('item-clicked', item, evt);
+                item.children.forEach(function(childItem){
+                    self.selectItem(childItem, evt, item);
+                })
+            }else{
+                if (parentItem){
+                   item.active(parentItem.selected()); 
+                }
+            }
+        },
+
+        /**
+        * Toggles hidden nodes in the list
+        * @memberof ListView.prototype
+        * @param {object} item - the item to be hidden or shown
+        * @param {object} evt - click event object
+        */
+        toggleNodes: function(item, evt){
+            item.visible(!item.visible());
+            evt.stopPropagation();
         }
 
     });
