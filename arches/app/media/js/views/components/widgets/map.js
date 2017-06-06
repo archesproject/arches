@@ -1316,6 +1316,15 @@ define([
                     }
                 });
 
+                var addDrawingFromGeojsonGeom = function(geojsonGeom) {
+                    var feature = {
+                        "type": "Feature",
+                        "geometry": geojsonGeom,
+                        "properties": {}
+                    };
+                    self.draw.add(feature);
+                };
+
                 map.on('dblclick', function (e) {
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickFeature = (
@@ -1326,12 +1335,14 @@ define([
                         })
                     ) || null;
                     if (clickFeature) {
-                        var feature = {
-                            "type": "Feature",
-                            "geometry": JSON.parse(clickFeature.properties.geojson),
-                            "properties": {}
-                        };
-                        self.draw.add(feature);
+                        try{
+                            var geojsonGeom = JSON.parse(clickFeature.properties.geojson);
+                            addDrawingFromGeojsonGeom(geojsonGeom);
+                        } catch(e) {
+                            $.getJSON(clickFeature.properties.geojson, function (geojsonGeom) {
+                                addDrawingFromGeojsonGeom(geojsonGeom);
+                            });
+                        }
                     }
                 });
 
