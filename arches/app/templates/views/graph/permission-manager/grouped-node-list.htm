@@ -18,14 +18,15 @@
     <div class="card-tree-container">
         <div data-bind="foreach: { data: $data.outerCards, as: 'card' }">
             <li class="card-tree-list">
-                <a href="#" class="cc-link" aria-expanded="true" style="position: relative;" data-bind="css: {'active': card.selected || card.active}, visible: $data.filtered() == false, click: self.selectItem.bind(self)">
-                    <span class="col-xs-2 icon-wrap icon-wrap-sm icon-circle bg-card">
+                <a href="#" class="cc-link" aria-expanded="true" style="position: relative;" data-bind="css: {'active': card.selected || card.active}, visible: card.filtered() == false, click: self.selectItem.bind(self)">
+                    <span class="icon-wrap icon-wrap-sm icon-circle bg-card">
                         <i class="card-tree-list-icon" data-bind="css: card.type === 'card_container' ? 'ion-ios-briefcase-outline' : 'ion-ios-folder'"></i>
                     </span>
-                    <span class="col-xs-8" style="margin-left: 0px;">
-                        <div data-bind="text: card.name"></div>
-                        <div><span data-bind="text: card.type_label"></span><!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko --></div>
-                    </span>
+
+                    <span class="node-name" data-bind="text: card.name"></span>
+                    <span class="node-subname" data-bind="text: card.type_label"></span>
+                    <!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
+                    
                     <!-- ko if: card.type === 'card' -->
                     <span class="expando">
                         <i id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>
@@ -48,14 +49,15 @@
 
 <template id="card-tree">
     <li class="card-tree-list">
-        <a href="#" class="cc-link" aria-expanded="true" style="position: relative;" data-bind="css: {'active': card.selected || card.active}, click: self.selectItem.bind(self)">
-            <span class="col-xs-2 icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
-                <i class="card-tree-list-icon" data-bind="css: !!card.children.length ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
+        <a href="#" class="cc-link" aria-expanded="true" style="position: relative;" data-bind="css: {'active': card.selected || card.active}, visible: card.filtered() == false, click: self.selectItem.bind(self)">
+            <span class="icon-wrap icon-wrap-sm branch-icon icon-circle bg-report-card">
+                <i class="card-tree-list-icon" data-bind="css: card.type === 'card' ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
-            <span class="col-xs-8" style="margin-left: 0px;">
-                <div data-bind="text: card.name"></div>
-                <div><span data-bind="text: card.type_label" style="margin-left: 0px;"></span><!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko --></div>
-            </span>
+
+            <span class="node-name" data-bind="text: card.name"></span>
+            <span class="node-subname" data-bind="text: card.type_label"></span>
+            <!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
+            
             <!-- ko if: card.type === 'card' -->
             <span class="expando">
                 <i id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>

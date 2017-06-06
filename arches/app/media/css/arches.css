@@ -4230,6 +4230,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     cursor: pointer;
     display: none; 
     right: 13px;
+    top: 10px;
 }
 
 .card-tree-list a:hover .expando{
