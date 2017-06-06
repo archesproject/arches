@@ -14,6 +14,26 @@ define([
         single_select: false,
 
         /**
+        * Callback function called every time a user types into the filter input box
+        * @memberof ListView.prototype
+        */
+        filter_function: function(newValue){
+            // first run the standard filter
+            ListView.prototype.filter_function.apply(this, arguments);
+
+            // next bring back and any card containers that were filtered that have children that were not
+            this.items().forEach(function(item){
+                if (item.type === 'card_container'){
+                    var filtered = false;
+                    item.children.forEach(function(childItem){
+                        if (!childItem.filtered()){
+                            item.filtered(false);
+                        }
+                    })                }
+            }, this);
+        },
+
+        /**
         * initializes the view with optional parameters
         * @memberof GroupedNodeList.prototype
         * @param {object} options
@@ -31,6 +51,7 @@ define([
                 }else{
                     item.selectable = false;
                     item.active = ko.observable(false);
+                    item.filtered = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
             }
@@ -51,7 +72,6 @@ define([
                 });
             }, this);
 
-            //this.selection = ko.observable(this.items()[0]);
             ListView.prototype.initialize.apply(this, arguments);
         },
 
