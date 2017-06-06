@@ -138,7 +138,7 @@ class DateDataType(BaseDataType):
     def validate(self, value, source=''):
         errors = []
 
-        date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+        date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
         valid = False
         for mat in date_formats:
             if valid == False:
@@ -256,20 +256,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         for feature in node_data['features']:
             geom_collection = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
 
-            # if bounds is None:
-            bounds = geom_collection.extent
-            # else:
-            #     minx, miny, maxx, maxy = bounds
-            #     if geom_collection.bounds[0] < minx:
-            #         minx = geom_collection.bounds[0]
-            #     if geom_collection.bounds[1] < miny:
-            #         miny = geom_collection.bounds[1]
-            #     if geom_collection.bounds[2] > maxx:
-            #         maxx = geom_collection.bounds[2]
-            #     if geom_collection.bounds[3] > maxy:
-            #         maxy = geom_collection.bounds[3]
-            #
-            #     bounds = (minx, miny, maxx, maxy)
+            if bounds is None:
+                bounds = geom_collection.extent
+            else:
+                minx, miny, maxx, maxy = bounds
+                if geom_collection.extent[0] < minx:
+                    minx = geom_collection.extent[0]
+                if geom_collection.extent[1] < miny:
+                    miny = geom_collection.extent[1]
+                if geom_collection.extent[2] > maxx:
+                    maxx = geom_collection.extent[2]
+                if geom_collection.extent[3] > maxy:
+                    maxy = geom_collection.extent[3]
+
+                bounds = (minx, miny, maxx, maxy)
 
         return bounds
 
