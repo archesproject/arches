@@ -50,7 +50,7 @@ class ResourceListView(BaseManagerView):
         context['nav']['title'] = "Resource Manager"
         context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating and Editing Resources'),'')
+        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
         return render(request, 'views/resource.htm', context)
 
@@ -115,7 +115,7 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
             context['nav']['edit_history'] = True
-            context['nav']['help'] = (_('Creating and Editing Resources'),'')
+            context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
 
