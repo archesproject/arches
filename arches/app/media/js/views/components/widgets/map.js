@@ -327,7 +327,7 @@ define([
                         var data = JSON.parse(val)
                         try {
                             self.draw.add(data)
-                            self.saveGeometries()()
+                            self.saveGeometries()
                         } catch(err) {
                             console.log(err)
                             console.log('invalid geometry')
@@ -974,88 +974,73 @@ define([
                 };
 
                 this.updateConfigs = function() {
-                    var self = this;
                     if (this.form === null && this.context !== 'report-header') {
-                        return function() {
-                            var mapCenter = this.getCenter()
-                            var zoom = self.map.getZoom()
-                            if (self.zoom() !== zoom) {
-                                self.zoom(zoom);
-                            };
-                            self.centerX(mapCenter.lng);
-                            self.centerY(mapCenter.lat);
-                            self.bearing(this.getBearing());
-                            self.pitch(this.getPitch());
-                        }
-                    } else {
-                        return function() {}
+                        var mapCenter = this.getCenter()
+                        var zoom = self.map.getZoom()
+                        if (self.zoom() !== zoom) {
+                            self.zoom(zoom);
+                        };
+                        self.centerX(mapCenter.lng);
+                        self.centerY(mapCenter.lat);
+                        self.bearing(this.getBearing());
+                        self.pitch(this.getPitch());
                     }
-                }
+                };
 
                 this.saveGeometries = function() {
-                    var self = this;
-                    return function() {
-                        var currentDrawing = self.draw.getAll()
-                        if (self.value.features !== undefined) {
-                            _.each(self.value.features(), function(feature) {
-                                self.value.features.pop()
-                            });
-                            currentDrawing.features.forEach(function(feature) {
-                                self.value.features.push(feature)
-                            })
-                        } else {
-                            self.value(currentDrawing)
-                        }
-                        self.queryFeature = currentDrawing.features[currentDrawing.features.length - 1];
-                        if (self.context === 'search-filter') {
-                            self.updateSearchQueryLayer([self.queryFeature])
-                        }
+                    var currentDrawing = self.draw.getAll()
+                    if (self.value.features !== undefined) {
+                        _.each(self.value.features(), function(feature) {
+                            self.value.features.pop()
+                        });
+                        currentDrawing.features.forEach(function(feature) {
+                            self.value.features.push(feature)
+                        })
+                    } else {
+                        self.value(currentDrawing)
                     }
-                }
+                    self.queryFeature = currentDrawing.features[currentDrawing.features.length - 1];
+                    if (self.context === 'search-filter') {
+                        self.updateSearchQueryLayer([self.queryFeature])
+                    }
+                };
 
                 this.updateDrawMode = function(e) {
-                    var self = this;
-                    var context = this.context
-                    return function(e) {
-                        var selectedFeatureType;
-                        var featureCount = self.draw.getAll().features.length;
-                        if (context === 'search-filter' && featureCount > 1) {
-                            _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature) {
-                                self.draw.delete(feature.id)
-                            }, self)
-                        }
-                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
-                            self.draw.changeMode(self.drawMode())
-                            if (context === 'search-filter') {
-                                if (self.buffer() > 0) {
-                                    self.applySearchBuffer(self.buffer())
-                                }
+                    var selectedFeatureType;
+                    var featureCount = self.draw.getAll().features.length;
+                    if (self.context === 'search-filter' && featureCount > 1) {
+                        _.each(self.draw.getAll().features.slice(0, featureCount - 1), function(feature) {
+                            self.draw.delete(feature.id)
+                        }, self)
+                    }
+                    if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
+                        self.draw.changeMode(self.drawMode())
+                        if (self.context === 'search-filter') {
+                            if (self.buffer() > 0) {
+                                self.applySearchBuffer(self.buffer())
                             }
-                        } else {
-                            self.drawMode(self.draw.getMode());
-                            if (context !== 'search-filter') {
-                                if (self.draw.getSelectedIds().length > 0) {
-                                    selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
-                                    self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
-                                } else {
-                                    if (self.draw.getMode().endsWith("select")) {
-                                        self.drawMode(undefined);
-                                    };
-                                }
+                        }
+                    } else {
+                        self.drawMode(self.draw.getMode());
+                        if (self.context !== 'search-filter') {
+                            if (self.draw.getSelectedIds().length > 0) {
+                                selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                            } else {
+                                if (self.draw.getMode().endsWith("select")) {
+                                    self.drawMode(undefined);
+                                };
                             }
                         }
                     }
-                }
+                };
 
                 this.updateFeatureStyles = function() {
-                    var self = this;
-                    return function() {
-                        if (self.form) {
-                            self.featureColor() === self.featureColorCache || self.featureColor(self.featureColorCache);
-                            self.featurePointSize() === self.featurePointSizeCache || self.featurePointSize(self.featurePointSizeCache);
-                            self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
-                        }
-                    };
+                    if (self.form) {
+                        self.featureColor() === self.featureColorCache || self.featureColor(self.featureColorCache);
+                        self.featurePointSize() === self.featurePointSizeCache || self.featurePointSize(self.featurePointSizeCache);
+                        self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
+                    }
                 };
 
                 this.overlays.subscribe(function(overlays) {
@@ -1316,32 +1301,46 @@ define([
                     }
                 });
 
+                self.drawingAdded = ko.observable(null);
                 var addDrawingFromGeojsonGeom = function(geojsonGeom) {
                     var feature = {
                         "type": "Feature",
                         "geometry": geojsonGeom,
                         "properties": {}
                     };
+                    _.delay(function () {
+                        self.map.doubleClickZoom.enable();
+                        self.drawingAdded(null);
+                    }, 1500);
                     self.draw.add(feature);
+                    self.saveGeometries();
+                    self.drawingAdded(true);
                 };
-
-                map.on('dblclick', function (e) {
-                    var features = self.map.queryRenderedFeatures(e.point);
-                    var clickFeature = (
+                var findDrawableFeature = function (point) {
+                    var features = self.map.queryRenderedFeatures(point);
+                    return (
                         self.context === 'resource-editor' && _.find(features, function(feature) {
                             if (feature.properties.geojson) {
                                 return isFeatureVisible(feature);
                             }
                         })
                     ) || null;
+                };
+                map.on('mousedown', function (e) {
+                    var clickFeature = findDrawableFeature(e.point);
                     if (clickFeature) {
+                        self.map.doubleClickZoom.disable();
+                    }
+                });
+                map.on('dblclick', function (e) {
+                    var clickFeature = findDrawableFeature(e.point);
+                    if (clickFeature) {
+                        self.drawingAdded(false);
                         try{
                             var geojsonGeom = JSON.parse(clickFeature.properties.geojson);
                             addDrawingFromGeojsonGeom(geojsonGeom);
                         } catch(e) {
-                            $.getJSON(clickFeature.properties.geojson, function (geojsonGeom) {
-                                addDrawingFromGeojsonGeom(geojsonGeom);
-                            });
+                            $.getJSON(clickFeature.properties.geojson, addDrawingFromGeojsonGeom);
                         }
                     }
                 });
@@ -1352,10 +1351,10 @@ define([
                 });
 
                 ['draw.create', 'draw.update', 'draw.delete'].forEach(function(event) {
-                    self.map.on(event, self.saveGeometries())
+                    self.map.on(event, self.saveGeometries)
                 });
-                self.map.on('click', this.updateDrawMode())
-                self.map.on('draw.selectionchange', self.updateFeatureStyles());
+                self.map.on('click', this.updateDrawMode)
+                self.map.on('draw.selectionchange', self.updateFeatureStyles);
 
                 if (this.context === 'search-filter') {
                     self.map.on('dragend', this.searchByExtent);
@@ -1367,7 +1366,7 @@ define([
                     }, self);
                     $(window).on("resize", this.searchByExtent);
                 } else {
-                    self.map.on('moveend', this.updateConfigs());
+                    self.map.on('moveend', self.updateConfigs);
                 }
 
             }; //end setup map
