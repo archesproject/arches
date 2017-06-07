@@ -175,11 +175,31 @@ class ResourceReportView(BaseManagerView):
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        print request.user
+        print len(cards)
+        filtered_cards = []
+        for card in cards:
+            card.filter_by_perm(request.user, 'read_nodegroup')
+            print card.cards
+            filtered_cards.append(card.filter_by_perm(request.user, 'read_nodegroup'))
+        print filtered_cards
+        # import ipdb
+        # ipdb.set_trace()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
+
+            # for formxcard in formxcards:
+            #     card = Card.objects.get(cardid=formxcard.card_id)
+            #     if user:
+            #         card.filter_by_perm(user, 'read_nodegroup')
+            #     card_obj = JSONSerializer().serializeToPython(card)
+            #     form_obj['cardgroups'].append(card_obj)
+            # self.forms = [form_obj]
+
+
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
