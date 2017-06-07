@@ -1316,32 +1316,45 @@ define([
                     }
                 });
 
+                self.drawingAdded = ko.observable(null);
                 var addDrawingFromGeojsonGeom = function(geojsonGeom) {
                     var feature = {
                         "type": "Feature",
                         "geometry": geojsonGeom,
                         "properties": {}
                     };
+                    _.delay(function () {
+                        self.map.doubleClickZoom.enable();
+                        self.drawingAdded(null);
+                    }, 1500);
                     self.draw.add(feature);
+                    self.drawingAdded(true);
                 };
-
-                map.on('dblclick', function (e) {
-                    var features = self.map.queryRenderedFeatures(e.point);
-                    var clickFeature = (
+                var findDrawableFeature = function (point) {
+                    var features = self.map.queryRenderedFeatures(point);
+                    return (
                         self.context === 'resource-editor' && _.find(features, function(feature) {
                             if (feature.properties.geojson) {
                                 return isFeatureVisible(feature);
                             }
                         })
                     ) || null;
+                };
+                map.on('mousedown', function (e) {
+                    var clickFeature = findDrawableFeature(e.point);
                     if (clickFeature) {
+                        self.map.doubleClickZoom.disable();
+                    }
+                });
+                map.on('dblclick', function (e) {
+                    var clickFeature = findDrawableFeature(e.point);
+                    if (clickFeature) {
+                        self.drawingAdded(false);
                         try{
                             var geojsonGeom = JSON.parse(clickFeature.properties.geojson);
                             addDrawingFromGeojsonGeom(geojsonGeom);
                         } catch(e) {
-                            $.getJSON(clickFeature.properties.geojson, function (geojsonGeom) {
-                                addDrawingFromGeojsonGeom(geojsonGeom);
-                            });
+                            $.getJSON(clickFeature.properties.geojson, addDrawingFromGeojsonGeom);
                         }
                     }
                 });
