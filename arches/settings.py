@@ -248,7 +248,7 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
-
+PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 
 #######################################
 ###       END STATIC SETTINGS       ###
@@ -369,7 +369,6 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
