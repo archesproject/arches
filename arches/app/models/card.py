@@ -252,6 +252,15 @@ class Card(models.CardModel):
                 return edge
 
     def filter_by_perm(self, user, perm):
+        """
+        Filters out any cards that don't have the permission for the user
+
+        Arguments:
+        user -- the user object to check permsission against
+        perm -- the permission string to check (eg: 'read_nodegroup')
+
+        """
+
         if not user.has_perm(perm, self.nodegroup):
             return None
         
