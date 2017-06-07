@@ -1328,6 +1328,7 @@ define([
                         self.drawingAdded(null);
                     }, 1500);
                     self.draw.add(feature);
+                    self.saveGeometries()();
                     self.drawingAdded(true);
                 };
                 var findDrawableFeature = function (point) {
