@@ -24,16 +24,20 @@ from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Form(object):
-    def __init__(self, resourceid=None, formid=None):
+    def __init__(self, resourceid=None, formid=None, user=None):
         self.forms = []
         self.tiles = {}
         self.blanks = {}
 
         if resourceid or formid:
-            self.load(resourceid, formid=formid)
+            self.load(resourceid, formid=formid, user=user)
 
-    def load(self, resourceid, formid=None):
+    def load(self, resourceid, formid=None, user=None):
         tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
+        # for tile in Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder'):
+        #     if tile.filter(user):
+        #         tiles.append(tile)
+        print JSONSerializer().serializeToPython(tiles)
 
         # get the form and card data
         if formid is not None:
@@ -46,7 +50,10 @@ class Form(object):
             }
             form_obj['cardgroups'] = []
             for formxcard in formxcards:
-                card_obj = JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id))
+                card = Card.objects.get(cardid=formxcard.card_id)
+                if user:
+                    card.filter_by_perm(user, 'read_nodegroup')
+                card_obj = JSONSerializer().serializeToPython(card)
                 form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
 
@@ -62,7 +69,10 @@ class Form(object):
                         for card in cardgroup['cards']:
                             parentTile['tiles'][card['nodegroup_id']] = []
                         for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
-                            parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
+                            try:
+                                parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
+                            except:
+                                pass
 
 
         # get the blank tile data
@@ -101,3 +111,8 @@ class Form(object):
 
                     # add a blank tile for each card
                     self.blanks[tile['nodegroup_id']] = [tile]
+
+    # def filter(self, user):
+    #     for tiles in self.tiles.itervalues:
+    #         for parentTile in tiles:
+    #             if user.has_perm('read_nodegroup', parentTile.nodegroup_id)

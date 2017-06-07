@@ -251,6 +251,16 @@ class Card(models.CardModel):
             if str(edge.rangenode_id) == str(self.nodegroup_id):
                 return edge
 
+    def filter_by_perm(self, user, perm):
+        if not user.has_perm(perm, self.nodegroup):
+            return None
+        
+        cards = []
+        for card in self.cards:
+            if user.has_perm(perm, card.nodegroup):
+                cards.append(card)
+        self.cards = cards
+
     def serialize(self):
         """
         serialize to a different form then used by the internal class structure
