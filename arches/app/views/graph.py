@@ -673,28 +673,19 @@ class PermissionDataView(View):
 
     def get(self, request):
         nodegroup_ids = JSONDeserializer().deserialize(request.GET.get('nodegroupIds'))
-        userOrGroupId = request.GET.get('userOrGroupId')
-        userOrGroupType = request.GET.get('userOrGroupType')
+        identityId = request.GET.get('identityId')
+        identityType = request.GET.get('identityType')
 
         ret = []
-        if userOrGroupType == 'group':
-            group = Group.objects.get(pk=userOrGroupId)
-            for nodegroup_id in nodegroup_ids:
-                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)]
-                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
-
-
-        if userOrGroupType == 'user':
-            user = User.objects.get(pk=userOrGroupId)
-            for nodegroup_id in nodegroup_ids:
-                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)]
-                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
-
-        #     if len(perms['default']) > 0:
-        #         ret.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
-        # return ret
+        if identityType == 'group':
+            identity = Group.objects.get(pk=identityId)
+        else:
+            identity = User.objects.get(pk=identityId)
+            
+        for nodegroup_id in nodegroup_ids:
+            nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+            perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_perms(identity, nodegroup)]
+            ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
 
         return JSONResponse(ret)
 
@@ -710,81 +701,20 @@ class PermissionDataView(View):
 
     def apply_permissions(self, data, revert=False):
         with transaction.atomic():
-
-            for userOrGroup in data['selectedIdentities']:
-                if userOrGroup['type'] == 'group':
-                    userOrGroupModel = Group.objects.get(pk=userOrGroup['id'])
+            for identity in data['selectedIdentities']:
+                if identity['type'] == 'group':
+                    identityModel = Group.objects.get(pk=identity['id'])
                 else:
-                    userOrGroupModel = User.objects.get(pk=userOrGroup['id'])
+                    identityModel = User.objects.get(pk=identity['id'])
 
                 for card in data['selectedCards']:
                     nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
                     
                     # first remove all the current permissions
-                    for perm in get_perms(userOrGroupModel, nodegroup):
-                        remove_perm(perm, userOrGroupModel, nodegroup)
+                    for perm in get_perms(identityModel, nodegroup):
+                        remove_perm(perm, identityModel, nodegroup)
 
                     if not revert:
                         # then add the new permissions
                         for perm in data['selectedPermissions']:
-                            assign_perm(perm['codename'], userOrGroupModel, nodegroup)
-        
-
-
-        # {
-        #     "selectedUsersAndGroups": [
-        #         {
-        #             "type": "group",
-        #             "name": "Graph Editor",
-        #             "id": 1,
-        #             "selectable": true
-        #         }
-        #     ],
-        #     "selectedCards": [
-        #         {
-        #             "nodegroup": "bbc5cf04-fa16-11e6-9e3e-026d961c88e6",
-        #             "isContainer": false,
-        #             "children": [
-        #                 {
-        #                     "datatype": "string",
-        #                     "name": "Description",
-        #                     "children": [],
-        #                     "selectable": false
-        #                 },
-        #                 {
-        #                     "datatype": "concept",
-        #                     "name": "Description Type",
-        #                     "children": [],
-        #                     "selectable": false
-        #                 },
-        #                 {
-        #                     "datatype": "semantic",
-        #                     "name": "Description Assignment",
-        #                     "children": [],
-        #                     "selectable": false
-        #                 }
-        #             ],
-        #             "selectable": true
-        #         }
-        #     ],
-        #     "nodegroupPermissions": [
-        #         {
-        #             "codename": "delete_nodegroup",
-        #             "content_type_id": 42,
-        #             "name": "Delete",
-        #             "id": 132
-        #         },
-        #         {
-        #             "codename": "no_access_to_nodegroup",
-        #             "content_type_id": 42,
-        #             "name": "No Access",
-        #             "id": 133
-        #         },
-        #         {
-        #             "codename": "read_nodegroup",
-        #             "content_type_id": 42,
-        #             "name": "Read",
-        #             "id": 130
-        #         }
-        #     ]
-        # }
+                            assign_perm(perm['codename'], identityModel, nodegroup)
