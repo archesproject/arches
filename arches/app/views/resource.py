@@ -80,7 +80,11 @@ class ResourceEditorView(BaseManagerView):
             map_sources = models.MapSource.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
-            forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+            forms_w_cards = []
+            for form_x_card in forms_x_cards:
+                cm = models.CardModel.objects.get(pk=form_x_card.card_id)
+                if request.user.has_perm('read_nodegroup', cm.nodegroup):
+                    forms_w_cards.append(form_x_card.form)
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
@@ -133,7 +137,7 @@ class ResourceEditorView(BaseManagerView):
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
-            form = Form(resourceid=resourceid, formid=formid)
+            form = Form(resourceid=resourceid, formid=formid, user=request.user)
             return JSONResponse(form)
 
         return HttpResponseNotFound()
