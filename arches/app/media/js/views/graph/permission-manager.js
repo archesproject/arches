@@ -69,7 +69,7 @@ require([
             $.ajax({
                 type: 'GET',
                 url: arches.urls.permission_data,
-                data: {'nodegroupIds': JSON.stringify(nodegroupIds), 'userOrGroupType': item.type, 'userOrGroupId': item.id},
+                data: {'nodegroupIds': JSON.stringify(nodegroupIds), 'identityType': item.type, 'identityId': item.id},
                 success: function(res){
                     //self.options(res.results);
                     console.log(res);
