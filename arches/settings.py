@@ -193,6 +193,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'arches.app.utils.permission_backend.PermissionBackend',
 )
 
 INSTALLED_APPS = (
