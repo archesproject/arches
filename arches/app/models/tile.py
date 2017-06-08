@@ -217,15 +217,16 @@ class Tile(models.TileModel):
 
     def filter_by_perm(self, user, perm):
         if user:
-            if not user.has_perm(perm, self.nodegroup):
+            if user.has_perm(perm, self.nodegroup):
+                filtered_tiles = {}
+                for key, tiles in self.tiles.iteritems():
+                    filtered_tiles[key] = []
+                    for tile in tiles:
+                        if user.has_perm(perm, tile.nodegroup):
+                            filtered_tiles[key].append(tile)
+                self.tiles = filtered_tiles
+            else:
                 return None
-            filtered_tiles = {}
-            for key, tiles in self.tiles.iteritems():
-                filtered_tiles[key] = []
-                for tile in tiles:
-                    if user.has_perm(perm, tile.nodegroup):
-                        filtered_tiles[key].append(tile)
-            self.tiles = filtered_tiles
         return self
 
     def serialize(self):

@@ -256,14 +256,16 @@ class Card(models.CardModel):
 
         """
 
-        if not user.has_perm(perm, self.nodegroup):
-            return None
-
-        cards = []
-        for card in self.cards:
-            if user.has_perm(perm, card.nodegroup):
-                cards.append(card)
-        self.cards = cards
+        if user:
+            if user.has_perm(perm, self.nodegroup):
+                cards = []
+                for card in self.cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        cards.append(card)
+                self.cards = cards
+            else:
+                return None
+        return self
 
     def serialize(self):
         """
@@ -282,7 +284,7 @@ class Card(models.CardModel):
         ret['users'] = self.users
         ret['ontologyproperty'] = self.ontologyproperty
 
-        if self.graph.ontology and self.graph.isresource:
+        if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret['ontologyproperty'] = edge.ontologyproperty
 

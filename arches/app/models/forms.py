@@ -34,13 +34,6 @@ class Form(object):
 
     def load(self, resourceid, formid=None, user=None):
         tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
-        # print JSONSerializer().serializeToPython(len(tiles))
-        # tiles2 = []
-        # tiles3 = Tile.objects.filter(resourceinstance_id=resourceid).filter_by_perm(user=user, perm='read_nodegroup').order_by('sortorder')
-        # # for tile in Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder'):
-        # #     if tile.filter_by_perm(user, 'read_nodegroup'):
-        # #         tiles2.append(tile)
-        # print JSONSerializer().serializeToPython(len(tiles3))
 
         # get the form and card data
         if formid is not None:
@@ -54,12 +47,10 @@ class Form(object):
             form_obj['cardgroups'] = []
             for formxcard in formxcards:
                 card = Card.objects.get(cardid=formxcard.card_id)
-                if user:
-                    card.filter_by_perm(user, 'read_nodegroup')
-                card_obj = JSONSerializer().serializeToPython(card)
-                form_obj['cardgroups'].append(card_obj)
+                if card.filter_by_perm(user, 'read_nodegroup'):
+                    card_obj = JSONSerializer().serializeToPython(card)
+                    form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
-
 
         # get the actual tile data
         for form in self.forms:
@@ -75,7 +66,6 @@ class Form(object):
                             # only append tiles that havn't been filtered out by user permissions
                             if str(tile['nodegroup_id']) in parentTile['tiles']:
                                 parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
-
 
         # get the blank tile data
         for form in self.forms:
@@ -113,8 +103,3 @@ class Form(object):
 
                     # add a blank tile for each card
                     self.blanks[tile['nodegroup_id']] = [tile]
-
-    # def filter(self, user):
-    #     for tiles in self.tiles.itervalues:
-    #         for parentTile in tiles:
-    #             if user.has_perm('read_nodegroup', parentTile.nodegroup_id)
