@@ -34,10 +34,13 @@ class Form(object):
 
     def load(self, resourceid, formid=None, user=None):
         tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
-        # for tile in Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder'):
-        #     if tile.filter(user):
-        #         tiles.append(tile)
-        print JSONSerializer().serializeToPython(tiles)
+        # print JSONSerializer().serializeToPython(len(tiles))
+        # tiles2 = []
+        # tiles3 = Tile.objects.filter(resourceinstance_id=resourceid).filter_by_perm(user=user, perm='read_nodegroup').order_by('sortorder')
+        # # for tile in Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder'):
+        # #     if tile.filter_by_perm(user, 'read_nodegroup'):
+        # #         tiles2.append(tile)
+        # print JSONSerializer().serializeToPython(len(tiles3))
 
         # get the form and card data
         if formid is not None:
@@ -69,10 +72,9 @@ class Form(object):
                         for card in cardgroup['cards']:
                             parentTile['tiles'][card['nodegroup_id']] = []
                         for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
-                            try:
+                            # only append tiles that havn't been filtered out by user permissions
+                            if str(tile['nodegroup_id']) in parentTile['tiles']:
                                 parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
-                            except:
-                                pass
 
 
         # get the blank tile data
