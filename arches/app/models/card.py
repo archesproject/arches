@@ -123,8 +123,6 @@ class Card(models.CardModel):
                 self.groups = self.get_group_permissions(self.nodegroup)
                 self.users = self.get_user_permissions(self.nodegroup)
 
-        self.graph = Graph.objects.get(graphid=self.graph_id)
-
     def get_group_permissions(self, nodegroup=None):
         """
         get's a list of object level permissions allowed for a all groups
@@ -246,10 +244,7 @@ class Card(models.CardModel):
         Finds the edge model that relates this card to it's parent node
 
         """
-
-        for edge in self.graph.edges.itervalues():
-            if str(edge.rangenode_id) == str(self.nodegroup_id):
-                return edge
+        return models.Edge.objects.get(rangenode_id=self.nodegroup_id)
 
     def filter_by_perm(self, user, perm):
         """
@@ -263,7 +258,7 @@ class Card(models.CardModel):
 
         if not user.has_perm(perm, self.nodegroup):
             return None
-        
+
         cards = []
         for card in self.cards:
             if user.has_perm(perm, card.nodegroup):

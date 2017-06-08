@@ -50,7 +50,7 @@ class ResourceListView(BaseManagerView):
         context['nav']['title'] = "Resource Manager"
         context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating and Editing Resources'),'')
+        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
         return render(request, 'views/resource.htm', context)
 
@@ -119,7 +119,7 @@ class ResourceEditorView(BaseManagerView):
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
             context['nav']['edit_history'] = True
-            context['nav']['help'] = (_('Creating and Editing Resources'),'')
+            context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
 
@@ -175,20 +175,40 @@ class ResourceReportView(BaseManagerView):
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        permitted_cards = []
+        permitted_forms_x_cards = []
+        permitted_forms = []
+
+        for card in cards:
+            perm = 'read_nodegroup'
+            if request.user.has_perm(perm, card.nodegroup):
+                matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id == forms_x_card.card.nodegroup_id, forms_x_cards)
+
+                if len(matching_forms_x_card) > 0:
+                    form_x_card = matching_forms_x_card[0]
+                    if form_x_card not in permitted_forms_x_cards:
+                        permitted_forms_x_cards.append(form_x_card)
+                    if form_x_card.form not in permitted_forms:
+                        permitted_forms.append(form_x_card.form)
+
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
+
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
-            forms=JSONSerializer().serialize(forms),
+            forms=JSONSerializer().serialize(permitted_forms),
             tiles=JSONSerializer().serialize(tiles),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(cards),
+            forms_x_cards=JSONSerializer().serialize(permitted_forms_x_cards),
+            cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             map_layers=map_layers,

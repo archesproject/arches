@@ -24,7 +24,7 @@
 					"database": "arches",
 					"port": "5432"
 				},
-				"simplify" : 0.75,
+				"simplify": 0.5,
 				"queries": [
 					"select gid as __id__, name, st_asgeojson(geom) as geojson, st_transform(geom, 900913) as __geometry__ from rivers"
 				]

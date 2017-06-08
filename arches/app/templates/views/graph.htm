@@ -122,6 +122,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                              <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/function_manager') }, attr: { href: graphid + '/function_manager' }"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
                             </li>
+                            </li>
+                             <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/permissions') }, attr: { href: graphid + '/permissions' }"><i class="fa fa-lock"></i> {% trans "Manage Permissions" %}</a>
+                            </li>
                           </li>
                            <li><a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
                           </li>
@@ -146,7 +149,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-    
+
 {% endblock main_content %}
 
 {% block pre_require_js %}
