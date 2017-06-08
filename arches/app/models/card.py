@@ -247,8 +247,6 @@ class Card(models.CardModel):
         return models.Edge.objects.get(rangenode_id=self.nodegroup_id)
 
     def filter_by_perm(self, user, perm):
-        print user.username, perm, self.nodegroup
-        print user.has_perm(perm, self.nodegroup)
         if not user.has_perm(perm, self.nodegroup):
             return None
 
