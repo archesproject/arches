@@ -249,7 +249,7 @@ class Card(models.CardModel):
     def filter_by_perm(self, user, perm):
         if not user.has_perm(perm, self.nodegroup):
             return None
-        
+
         cards = []
         for card in self.cards:
             if user.has_perm(perm, card.nodegroup):
