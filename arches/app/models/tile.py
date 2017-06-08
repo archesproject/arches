@@ -215,6 +215,19 @@ class Tile(models.TileModel):
             ret.append(func)
         return ret
 
+    def filter_by_perm(self, user, perm):
+        if user:
+            if not user.has_perm(perm, self.nodegroup):
+                return None
+            filtered_tiles = {}
+            for key, tiles in self.tiles.iteritems():
+                filtered_tiles[key] = []
+                for tile in tiles:
+                    if user.has_perm(perm, tile.nodegroup):
+                        filtered_tiles[key].append(tile)
+            self.tiles = filtered_tiles
+        return self
+
     def serialize(self):
         """
         serialize to a different form then used by the internal class structure
