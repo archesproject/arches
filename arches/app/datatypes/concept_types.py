@@ -28,6 +28,17 @@ class BaseConceptDataType(BaseDataType):
             ret = valueid
         return ret
 
+    def get_concept_dates(self, concept):
+        result = None
+        date_range = {}
+        values = models.Value.objects.filter(concept=concept)
+        for value in values:
+            if value.valuetype.valuetype in ('min_year' 'max_year'):
+                date_range[value.valuetype.valuetype] = value.value
+        if 'min_year' in date_range and 'max_year' in date_range:
+            result = date_range
+        return result
+
     def append_to_document(self, document, nodevalue):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
@@ -35,6 +46,9 @@ class BaseConceptDataType(BaseDataType):
             nodevalue = [nodevalue]
         for valueid in nodevalue:
             value = self.get_value(valueid)
+            date_range = self.get_concept_dates(value.concept)
+            if date_range is not None:
+                document['date_ranges'].append({'gte':date_range['min_year'], 'lte':date_range['max_year']})
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
 

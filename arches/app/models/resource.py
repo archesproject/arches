@@ -154,6 +154,7 @@ class Resource(models.ResourceInstance):
         document['geometries'] = []
         document['points'] = []
         document['numbers'] = []
+        document['date_ranges'] = []
 
         terms = []
 
