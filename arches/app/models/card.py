@@ -247,14 +247,25 @@ class Card(models.CardModel):
         return models.Edge.objects.get(rangenode_id=self.nodegroup_id)
 
     def filter_by_perm(self, user, perm):
-        if not user.has_perm(perm, self.nodegroup):
-            return None
+        """
+        Filters out any cards that don't have the permission for the user
 
-        cards = []
-        for card in self.cards:
-            if user.has_perm(perm, card.nodegroup):
-                cards.append(card)
-        self.cards = cards
+        Arguments:
+        user -- the user object to check permsission against
+        perm -- the permission string to check (eg: 'read_nodegroup')
+
+        """
+
+        if user:
+            if user.has_perm(perm, self.nodegroup):
+                cards = []
+                for card in self.cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        cards.append(card)
+                self.cards = cards
+            else:
+                return None
+        return self
 
     def serialize(self):
         """
@@ -273,7 +284,7 @@ class Card(models.CardModel):
         ret['users'] = self.users
         ret['ontologyproperty'] = self.ontologyproperty
 
-        if self.graph.ontology and self.graph.isresource:
+        if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret['ontologyproperty'] = edge.ontologyproperty
 

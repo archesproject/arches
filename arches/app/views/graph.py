@@ -679,13 +679,20 @@ class PermissionDataView(View):
         ret = []
         if identityType == 'group':
             identity = Group.objects.get(pk=identityId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(identity, nodegroup)]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
         else:
             identity = User.objects.get(pk=identityId)
-            
-        for nodegroup_id in nodegroup_ids:
-            nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
-            perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_perms(identity, nodegroup)]
-            ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(identity, nodegroup)]
+                
+                # only get the group perms ("defaults") if no user defined object settings have been saved
+                if len(perms) == 0:
+                    perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in set(get_group_perms(identity, nodegroup))]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
 
         return JSONResponse(ret)
 
