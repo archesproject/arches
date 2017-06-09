@@ -1,29 +1,14 @@
 {% load i18n %}
 
 <!-- Title Block -->
-<div class="library-title-block">
+<div>
     <div class="">
         <h4 class="title-block-title" style=""> {% trans "Card Manager" %} </h4>
     </div>
-
-    <!-- nav bar -->
-    <ul class="nav nav-tabs library-tools">
-        <li class="active">
-            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-settings add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Settings" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-help add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Help Text" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-    </ul>
-
 </div>
 
 <!-- Tabs Content -->
-<div class="tab-content listing-container">
+<div class="tab-content listing-container form-divider">
 
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
@@ -74,13 +59,8 @@
         <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
         </div>
 
-    </div>
-
-    <!-- Card CRUD HELP Form -->
-    <div id="card-crud-help" class="tab-pane fade">
-
         <!-- Enable help -->
-        <div style="margin-top: 20px;" data-bind="component: { name: 'switch-widget', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
         <!-- Tertiary Panel For Card Help Text-->
         <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible: card().get('helpenabled')">
