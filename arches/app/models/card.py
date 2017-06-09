@@ -17,11 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import uuid
 from django.db import transaction
-from django.contrib.auth.models import User, Group,Permission
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from django.forms import ModelForm
 
 class Card(models.CardModel):
@@ -79,9 +76,6 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
-        self.groups = []
-        self.users = []
-        self.perm_cache = {}
 
         if args:
             if isinstance(args[0], dict):
@@ -120,77 +114,6 @@ class Card(models.CardModel):
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
 
                 self.cardinality = self.nodegroup.cardinality
-                self.groups = self.get_group_permissions(self.nodegroup)
-                self.users = self.get_user_permissions(self.nodegroup)
-
-    def get_group_permissions(self, nodegroup=None):
-        """
-        get's a list of object level permissions allowed for a all groups
-
-        returns an object of the form:
-        .. code-block:: python
-            {
-                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
-                'default': {'codename': permssion codename, 'name': permission name} # A list of model level permissions
-            }
-
-        Keyword Arguments:
-        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
-
-        """
-
-        ret = []
-        for group in Group.objects.all():
-            perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)],
-                'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
-            }
-            if len(perms['default']) > 0:
-                ret.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
-        return ret
-
-    def get_user_permissions(self, nodegroup=None):
-        """
-        get's a list of object level permissions allowed for a all users
-
-        returns an object of the form:
-        .. code-block:: python
-            {
-                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
-                'default': {'codename': permssion codename, 'name': permission name} # A list of group based object level permissions or model level permissions
-            }
-
-        Keyword Arguments:
-        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
-
-        """
-
-        ret = []
-        for user in User.objects.all():
-            perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],
-                'default': set()
-            }
-            for group in user.groups.all():
-                codenames = set(get_group_perms(group, nodegroup))
-                if len(codenames) == 0:
-                    codenames = set([item.codename for item in group.permissions.all()])
-                perms['default'].update(codenames)
-            perms['default'] = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in perms['default']]
-
-            if len(perms['default']) > 0:
-                ret.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
-        return ret
-
-    def get_perm_name(self, codename):
-        if codename not in self.perm_cache:
-            try:
-                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
-                return self.perm_cache[codename]
-            except:
-                return None
-                # codename for nodegroup probably doesn't exist
-        return self.perm_cache[codename]
 
     def save(self):
         """
@@ -215,28 +138,6 @@ class Card(models.CardModel):
             for card in self.cards:
                 card.save()
 
-            for group in self.groups:
-                groupModel = Group.objects.get(pk=group['id'])
-                # first remove all the current permissions
-                for perm in get_perms(groupModel, self.nodegroup):
-                    remove_perm(perm, groupModel, self.nodegroup)
-                # then add the new permissions
-                for perm in group['perms']['local']:
-                    assign_perm(perm['codename'], groupModel, self.nodegroup)
-
-            for user in self.users:
-                userModel = User.objects.get(pk=user['id'])
-                # first remove all the current permissions
-                for perm in get_perms(userModel, self.nodegroup):
-                    remove_perm(perm, userModel, self.nodegroup)
-                # then add the new permissions
-                for perm in user['perms']['local']:
-                    assign_perm(perm['codename'], userModel, self.nodegroup)
-
-            # permissions for a user can vary based on the groups the user belongs to without
-            # ever having changed the users permissions directly, which is why the users
-            # permissions status needs to be updated after groups are updated
-            self.users = self.get_user_permissions(self.nodegroup)
         return self
 
     def get_edge_to_parent(self):
@@ -280,8 +181,6 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
-        ret['groups'] = self.groups
-        ret['users'] = self.users
         ret['ontologyproperty'] = self.ontologyproperty
 
         if self.graph and self.graph.ontology and self.graph.isresource:
