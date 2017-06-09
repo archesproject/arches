@@ -13,11 +13,6 @@
                 <i class="ion-settings add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Settings" %}', placement: 'bottom' }"></i>
             </a>
         </li>
-        <li>
-            <a href="#cc-permissions" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-people add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Permissions" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
     </ul>
 </div>
 
@@ -57,18 +52,6 @@
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
-    </div>
-
-    <!-- Card CRUD Permissions Form -->
-    <div id="cc-permissions" class="tab-pane fade" data-bind="with: permissionsList">
-
-        {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
-
-        <!-- Tertiary Panel For Permissions -->
-        <div id="permissions-crud" class="tertiary-panel" data-bind="with: permissionsForm">
-            {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}
-        </div>
-
     </div>
 
 </div>

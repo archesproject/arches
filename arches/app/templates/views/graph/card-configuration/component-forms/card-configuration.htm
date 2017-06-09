@@ -14,11 +14,6 @@
             </a>
         </li>
         <li>
-            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-people add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Permissions" %}', placement: 'bottom' }"></i>
-            </a>
-        </li>
-        <li>
             <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-ios-help add-tooltip library-tools-icon" data-bind="tooltip: { title: '{% trans "Help Text" %}', placement: 'bottom' }"></i>
             </a>
@@ -77,18 +72,6 @@
 
         <!-- Multiple values tools -->
         <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
-        </div>
-
-    </div>
-
-    <!-- Card CRUD Permissions Form -->
-    <div id="card-crud-permissions" class="tab-pane fade" data-bind="with: permissionsList">
-
-        {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
-
-        <!-- Tertiary Panel For Permissions -->
-        <div id="permissions-crud" class="tertiary-panel" data-bind="with: permissionsForm">
-            {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}
         </div>
 
     </div>
