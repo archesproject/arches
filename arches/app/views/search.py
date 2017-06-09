@@ -472,7 +472,9 @@ def time_wheel_config(request):
             query.add_aggregation(millenium_agg)
 
         root = d3Item(name='root')
-        transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
+        results = {'buckets':[query.search(index='resource')['aggregations']]}
+        results_with_range_search = appendDateRangeCountsToTimeWheel(results, se)
+        transformESAggToD3Hierarchy(results_with_range_search, root)
         return JSONResponse(root, indent=4)
     else:
         return HttpResponseNotFound(_('Error retrieving the time wheel config'))
@@ -498,6 +500,27 @@ def transformESAggToD3Hierarchy(results, d3ItemInstance):
 
     return d3ItemInstance
 
+def appendDateRangeCountsToTimeWheel(results, se):
+    query = Query(se, limit=0)
+    search_query = Bool()
+
+    if 'buckets' in results:
+        bucket = results['buckets'][0]
+        query_vals = {'to': None, 'from': None,'doc_count': None}
+        for key, value in bucket.iteritems():
+            if key not in ('from', 'to', 'doc_count', 'key'):
+                appendDateRangeCountsToTimeWheel(value, se)
+            else:
+                query_vals[key] = value
+
+        if 'from' in bucket and 'to' in bucket and 'doc_count' in bucket:
+            range_query = Range(field='date_ranges', gte=query_vals['from'], lte=query_vals['to'], relation='intersects')
+            search_query.must(range_query)
+            query.add_query(search_query)
+            res = query.search(index='resource')
+            bucket['doc_count'] += res['hits']['total']
+
+    return results
 
 class d3Item(object):
     name = ''
