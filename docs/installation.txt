@@ -73,8 +73,6 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
     .. note:: Windows users should add ``--no-use-wheel`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
 
-    Arches is now installed! At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already), and then continue with the next steps to guide you through the creation of an Arches "project".
-
 #. Create a new Arches project
 
     A project is a standalone Arches app that sits outside of your virtual environment and facilitates all of the customizations that you will need to make one installation of Arches different from the next.
@@ -88,6 +86,8 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
         python C:\Projects\ENV\Scripts\arches-project create my_project
 
     .. note:: On Windows, with the current Arches beta release, v4.0b3, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
+
+    At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already) before continuing.
 
 #. Setup your Arches database
 
