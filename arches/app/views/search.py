@@ -514,7 +514,7 @@ def appendDateRangeCountsToTimeWheel(results, se):
                 query_vals[key] = value
 
         if 'from' in bucket and 'to' in bucket and 'doc_count' in bucket:
-            range_query = Range(field='date_ranges', gte=query_vals['from'], lte=query_vals['to'], relation='intersects')
+            range_query = Range(field='date_ranges', gte=query_vals['from'], lte=query_vals['to'], relation='within')
             search_query.must(range_query)
             query.add_query(search_query)
             res = query.search(index='resource')
