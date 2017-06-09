@@ -27,7 +27,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.utils.permission_backend import PermissionChecker
+from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
 
@@ -76,11 +76,9 @@ class MapLayerManagerView(BaseManagerView):
             map_source = datatype.get_map_source(node=node, preview=True)
             if map_source is not None:
                 resource_sources.append(map_source)
-            #card = Card.objects.get(nodegroup_id=node.nodegroup_id)
-            perm_checker = PermissionChecker()
             permissions[str(node.pk)] = {
-                "users": perm_checker.get_users_for_object('read_nodegroup', node.nodegroup),
-                "groups": perm_checker.get_groups_for_object('read_nodegroup', node.nodegroup),
+                "users": sorted([user.email or user.username for user in get_users_for_object('read_nodegroup', node.nodegroup)]),
+                "groups": sorted([group.name for group in get_groups_for_object('read_nodegroup', node.nodegroup)])
             }
         context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
