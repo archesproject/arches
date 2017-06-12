@@ -154,7 +154,7 @@ define([
             });
 
             this.dropzoneOptions = {
-                url: "/",
+                url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 previewTemplate: $("template#file-widget-dz-preview").html(),

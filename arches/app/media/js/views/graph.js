@@ -38,7 +38,7 @@ require([
                     url: url,
                     data: JSON.stringify(data),
                     success: function(response) {
-                        window.location = response.graphid + '/settings';
+                        window.location = arches.urls.graph_settings(response.graphid);
                     },
                     error: function(response) {
                         self.viewModel.loading(false);
@@ -65,13 +65,13 @@ require([
 
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
-                    newGraph(graph.graphid + '/clone');
+                    newGraph(arches.urls.clone_graph(graph.graphid));
                 };
                 graph.exportGraph = function(model) {
-                    window.open(graph.graphid + '/export', '_blank');
+                    window.open(arches.urls.export_graph(graph.graphid), '_blank');
                 };
                 graph.exportMappingFile = function(model) {
-                    window.open(graph.graphid + '/export_mapping_file', '_blank');
+                    window.open(arches.urls.export_mapping_file(graph.graphid), '_blank');
                 };
                 graph.deleteGraph = function () {
                     self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
@@ -153,7 +153,7 @@ require([
 
             this.viewModel.graphId.subscribe(function (graphid) {
                 if(graphid && graphid !== ""){
-                    self.viewModel.navigate(arches.urls.graph + graphid + '/settings');
+                    self.viewModel.navigate(arches.urls.graph_settings(graphid));
                 }
             });
 

@@ -35,7 +35,7 @@ admin.autodiscover()
 uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
 urlpatterns = [
-    url(r'^$', main.index),
+    url(r'^$', main.index, name='root'),
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
