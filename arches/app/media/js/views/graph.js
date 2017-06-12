@@ -23,7 +23,6 @@ require([
         */
         initialize: function (options) {
             var self = this;
-
             /**
             * creates a request to add a new graph; redirects to the graph settings
             * page for the new graph on success
@@ -46,6 +45,7 @@ require([
                     }
                 });
             };
+
 
             this.viewModel.leaveDropdown = function(e){
               $('.dropdown').dropdown('toggle')
@@ -95,6 +95,7 @@ require([
             this.viewModel.showResources = ko.observable(window.location.hash!=='#branches');
 
             _.defaults(this.viewModel, {
+                arches: arches,
                 groupedGraphs: ko.observable({
                     groups: [
                         { name: 'Resource Models', items: self.viewModel.resources() },
