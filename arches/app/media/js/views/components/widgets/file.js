@@ -26,8 +26,9 @@ define([
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
                     var hasdata = _.filter(tile.data, function(val, key) {
-                        if (val()) {
-                            return val()
+                        val = ko.unwrap(val);
+                        if (val) {
+                            return val
                         }
                     })
                     if (tile.isParent === true || hasdata.length === 0){
