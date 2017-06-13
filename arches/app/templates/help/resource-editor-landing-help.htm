@@ -22,7 +22,7 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Define Required Nodes</h4></a>
         <div class="ep-help-topic-content">
             <p>By defining required nodes within your Resource Model, you can enforce that specific nodes within the same nodegroup are collected concurrently. For example, you may want to disallow users from saving an Appellation without adding an Appellation Type at the same time. To do this, you would add the Define Required Nodes fuction, and configure it by selecting the Appellation and Appellation Type nodes.</p>
-            <p><a href="/media/img/help/required-nodes-function.gif" target="_blank"><img class="reloadable-img ep-help-topic-content" src="/media/img/help/required-nodes-function.gif"></img></a></p>
+            <p><a href="{{ STATIC_URL }}img/help/required-nodes-function.gif" target="_blank"><img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/required-nodes-function.gif"></img></a></p>
             <p>You can add more than one enforcement rule to this function. Just go down the list of node groups and select any nodes that should be collected together. Remember, these rules are only enforced within nodegroups, not across the entire graph of the Resource Model.</p>
         </div>
     </div>
