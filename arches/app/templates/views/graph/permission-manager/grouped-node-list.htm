@@ -25,7 +25,13 @@
 
                     <span class="node-name" data-bind="text: card.name"></span>
                     <span class="node-subname" data-bind="text: card.type_label"></span>
-                    <!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
+                    <!-- ko if: card.perms && card.perms().length > 0 --> 
+                    <span class="node-permissions"> 
+                        <!-- ko foreach: card.perms -->
+                        <i class="node-permission-icon" data-bind="css: $data.icon"></i> 
+                        <!-- /ko -->
+                    </span>
+                    <!-- /ko -->
                     
                     <!-- ko if: card.type === 'card' -->
                     <span class="expando">
@@ -56,11 +62,17 @@
 
             <span class="node-name" data-bind="text: card.name"></span>
             <span class="node-subname" data-bind="text: card.type_label"></span>
-            <!-- ko if: card.perms && card.perms().length > 0 --> - <!-- ko foreach: card.perms --> <i data-bind="css: $data.icon"></i> <!-- /ko --><!-- /ko -->
+            <!-- ko if: card.perms && card.perms().length > 0 --> 
+            <span class="node-permissions"> 
+                <!-- ko foreach: card.perms -->
+                <i class="node-permission-icon" data-bind="css: $data.icon"></i> 
+                <!-- /ko -->
+            </span>
+            <!-- /ko -->
             
             <!-- ko if: card.type === 'card' -->
             <span class="expando">
-                <i id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>
+                <i class="expand-icon" id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>
             </span>
             <!-- /ko -->
         </a>
