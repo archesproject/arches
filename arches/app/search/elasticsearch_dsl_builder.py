@@ -541,69 +541,23 @@ class RangeAgg(Aggregation):
             self.agg[self.name][self.type]['ranges'].append(date_range)
 
 
-class RangeTypeAgg(Dsl):
+class RangeFilterAgg(Aggregation):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
 
     """
 
     def __init__(self, **kwargs):
-        self.field = kwargs.pop('field', '_all')
-        self.gte = kwargs.pop('gte', None)
-        self.lte = kwargs.pop('lte', None)
-        self.key = kwargs.pop('key', None)
+        self.name = kwargs.pop('name', None)
 
-        self.dsl = {
-            'ranges' : {
-                "filters": {
-                    "filters": {
-                        "range_docs": {
-                            "range": {
-
-                            }
-                        }
-                    }
+        self.agg = {
+                self.name: {
+                  "filters": {
+                    "filters": []
+                  }
                 }
-            }
-        }
-
-        if self.gte is not None:
-            self.dsl['range'][self.field]['gte'] = self.gte
-        if self.lte is not None:
-            self.dsl['range'][self.field]['lte'] = self.lte
-
-"""
-{
-  "query": {
-    "match_all": {}
-  },
-  "aggs": {
-    "Decade (1960-1970)": {
-      "range": {
-        "ranges": [
-          {
-            "to": 19700101,
-            "from": 19690100
-          }
-        ],
-        "field": "dates"
-      }
-    },
-    "ranges": {
-      "filters": {
-        "filters": {
-          "range_docs": {
-            "range": {
-              "date_ranges": {
-                "gte": 19690100,
-                "lte": 19700101,
-                "relation": "contains"
               }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"""
+
+    def add_filter(self, filter=None):
+        if filter is not None:
+            self.agg[self.name]['filters']['filters'].append(filter.dsl)
