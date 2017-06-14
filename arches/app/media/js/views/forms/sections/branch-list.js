@@ -13,8 +13,7 @@ define(['jquery',
         initialize: function(options) {
             var self = this;
             this.singleEdit = false;
-            this.originalItem = null;
-            
+
             _.extend(this, options);
 
             this.defaults = [];
