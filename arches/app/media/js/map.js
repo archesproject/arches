@@ -23,7 +23,8 @@ require([
             'click .visibility-toggle': 'visibilityToggle',
             'click .on-map-toggle': 'onMapToggle',
             'click .layer-zoom': 'layerZoom',
-            'click .cluster-item-link': 'clusterItemClick'
+            'click .cluster-item-link': 'clusterItemClick',
+            'change:resolution': 'ZoomChange'
         },
         initialize: function(options) {
             var self = this;
@@ -67,7 +68,10 @@ require([
                 overlays: mapLayers.reverse()
             });
 
-            var selectFeatureOverlay = new ol.FeatureOverlay({
+            var selectFeatureOverlay = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: new ol.Collection()
+                }),
                 style: function(feature, resolution) {
                     var isSelectFeature = _.contains(feature.getKeys(), 'select_feature');
                     var fillOpacity = isSelectFeature ? 0.3 : 0;
@@ -116,9 +120,9 @@ require([
                 if (feature) {
                     var geom = geoJSON.readGeometry(feature.get('geometry_collection'));
                     geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                    map.map.getView().fitExtent(geom.getExtent(), map.map.getSize());
-                    selectFeatureOverlay.getFeatures().clear();
-                    selectFeatureOverlay.getFeatures().push(feature);
+                    map.map.getView().fit(geom.getExtent(), map.map.getSize());
+                    selectFeatureOverlay.getSource().clear();
+                    selectFeatureOverlay.getSource().addFeature(feature);
                     selectedResourceId = null;
                 }
             };
@@ -187,6 +191,11 @@ require([
             });
 
             map.on('viewChanged', function (zoom, extent) {
+                
+                _.each(map.overlays, function (layer) {
+                    layer.setExtent(extent); //On zoom and panning, filter overlays by map extent.
+                    
+                });
                 self.viewModel.zoom(zoom);
             });
 
@@ -221,7 +230,8 @@ require([
                     mouseoverFeatureTooltip.show();
                 }
             };
-
+            
+            
             map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
                 var cursorStyle = "";
                 currentMousePx = pixels;
@@ -260,7 +270,7 @@ require([
 
             $('.resource-info-closer').click(function() {
                 $('#resource-info').hide();
-                selectFeatureOverlay.getFeatures().clear();
+                selectFeatureOverlay.getSource().clear();
                 $('.resource-info-closer')[0].blur();
             });
 
@@ -284,8 +294,8 @@ require([
                     resourceData[key] = feature.get(key);
                 });
                 
-                selectFeatureOverlay.getFeatures().clear();
-                selectFeatureOverlay.getFeatures().push(feature);
+                selectFeatureOverlay.getSource().clear();
+                selectFeatureOverlay.getSource().addFeature(feature);
                 self.viewModel.selectedResource(resourceData);
                 $('#resource-info').show();
             };
@@ -318,7 +328,7 @@ require([
             };
 
             map.on('mapClicked', function(e, clickFeature) {
-                selectFeatureOverlay.getFeatures().clear();
+                selectFeatureOverlay.getSource().clear();
                 $('#resource-info').hide();
                 if (clickFeature) {
                     var keys = clickFeature.getKeys();
@@ -335,7 +345,7 @@ require([
                                 }
                                 extent = ol.extent.extend(extent, featureExtent);
                             });
-                            map.map.getView().fitExtent(extent, (map.map.getSize()));
+                            map.map.getView().fit(extent, (map.map.getSize()));
                         } else {
                             showClusterPopup(clickFeature);
                         }
@@ -527,7 +537,7 @@ require([
             $('.geocodewidget').on("select2-selecting", function(e) {
                 var geom = geoJSON.readGeometry(e.object.geometry);
                 geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
+                self.map.map.getView().fit(geom.getExtent(), self.map.map.getSize());
                 self.viewModel.selectedAddress(e.object.text);
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
                 overlay.setPositioning('center-center');
@@ -565,7 +575,7 @@ require([
                 layer = layer.getLayers().getArray()[0];
             }
             if (layer.getSource) {
-                this.map.map.getView().fitExtent(layer.getSource().getExtent(), this.map.map.getSize());
+                this.map.map.getView().fit(layer.getSource().getExtent(), this.map.map.getSize());
             }
         },
         clusterItemClick: function (e) {

@@ -65,14 +65,14 @@ define([
             };
 
             var layerConfig = {
-                projection: 'EPSG:3857'
+                format: new ol.format.GeoJSON()
             };
 
             if (config.entitytypeid !== null) {
                 layerConfig.url = arches.urls.map_markers + config.entitytypeid;
             }
 
-            var source = new ol.source.GeoJSON(layerConfig);
+            var source = new ol.source.Vector(layerConfig);
 
             $('.map-loading').show();
             var loadListener = source.on('change', function(e) {
