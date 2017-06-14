@@ -330,7 +330,6 @@ class CardView(GraphBaseView):
             main_script='views/graph/card-configuration-manager',
             graph_id=self.graph.pk,
             card=JSONSerializer().serialize(card),
-            permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
             widgets=widgets,

@@ -47,7 +47,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -86,7 +86,7 @@ class NumberDataType(BaseDataType):
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number', 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value):
@@ -117,7 +117,7 @@ class BooleanDataType(BaseDataType):
         try:
             type(bool(distutils.util.strtobool(str(value)))) == True
         except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean. This data was not imported.'.format(value)})
 
         return errors
 
@@ -148,7 +148,7 @@ class DateDataType(BaseDataType):
                 except:
                     valid = False
         if valid == False:
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD. This data was not imported.'.format(value)})
 
         return errors
 
@@ -187,14 +187,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
                     message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
-                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
-                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
             except:
                 message = 'Not a properly formatted geometry'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}.'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         for feature in value['features']:
             try:
@@ -202,7 +202,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 validate_geom(geom, coordinate_count)
             except:
                 message = 'It was not possible to serialize some feaures in your geometry.'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         return errors
 
@@ -930,7 +930,7 @@ class DomainDataType(BaseDomainDataType):
         try:
             models.Node.objects.get(config__options__0__id=value)
         except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -979,7 +979,7 @@ class DomainListDataType(BaseDomainDataType):
             try:
                 models.Node.objects.get(config__options__0__id=v)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(v)})
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
 
     def transform_import_values(self, value):

@@ -388,13 +388,13 @@
                                     <dt>{% trans "Users" %}</dt>
                                     <dd>
                                         <!-- ko foreach: permissions.users -->
-                                        <div data-bind="text: username"></div>
+                                        <div data-bind="text: $data"></div>
                                         <!-- /ko -->
                                     </dd>
                                     <dt>{% trans "Groups" %}</dt>
                                     <dd>
                                         <!-- ko foreach: permissions.groups -->
-                                        <div data-bind="text: name"></div>
+                                        <div data-bind="text: $data"></div>
                                         <!-- /ko -->
                                     </dd>
                                 </dl>

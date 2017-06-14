@@ -26,6 +26,7 @@ from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
+from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import group_required
@@ -178,21 +179,21 @@ class ResourceReportView(BaseManagerView):
         permitted_cards = []
         permitted_forms_x_cards = []
         permitted_forms = []
+        permitted_tiles = []
+
+        perm = 'read_nodegroup'
 
         for card in cards:
-            perm = 'read_nodegroup'
             if request.user.has_perm(perm, card.nodegroup):
                 matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id == forms_x_card.card.nodegroup_id, forms_x_cards)
-
-                if len(matching_forms_x_card) > 0:
-                    form_x_card = matching_forms_x_card[0]
-                    if form_x_card not in permitted_forms_x_cards:
-                        permitted_forms_x_cards.append(form_x_card)
-                    if form_x_card.form not in permitted_forms:
-                        permitted_forms.append(form_x_card.form)
-
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
+
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile = Tile.objects.get(pk=tile.tileid)
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -205,9 +206,9 @@ class ResourceReportView(BaseManagerView):
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
-            forms=JSONSerializer().serialize(permitted_forms),
-            tiles=JSONSerializer().serialize(tiles),
-            forms_x_cards=JSONSerializer().serialize(permitted_forms_x_cards),
+            forms=JSONSerializer().serialize(forms),
+            tiles=JSONSerializer().serialize(permitted_tiles),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,

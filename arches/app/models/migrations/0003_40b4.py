@@ -33,6 +33,27 @@ def forwards_func(apps, schema_editor):
 def reverse_func(apps, schema_editor):
     GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
 
+def add_permissions(apps, schema_editor, with_create_permissions=True):
+    db_alias = schema_editor.connection.alias
+    Group = apps.get_model("auth", "Group")
+    Permission = apps.get_model("auth", "Permission")
+
+    read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+
+    resource_editor_group = Group.objects.using(db_alias).get(name='Resource Editor')
+    resource_editor_group.permissions.add(read_nodegroup)
+    rdm_admin_group = Group.objects.using(db_alias).get(name='RDM Administrator')
+    rdm_admin_group.permissions.add(read_nodegroup)
+    app_admin_group = Group.objects.using(db_alias).get(name='Application Administrator')
+    app_admin_group.permissions.add(read_nodegroup)
+    sys_admin_group = Group.objects.using(db_alias).get(name='System Administrator')
+    sys_admin_group.permissions.add(read_nodegroup)
+    mobile_project_admin_group = Group.objects.using(db_alias).get(name='Mobile Project Administrator')
+    mobile_project_admin_group.permissions.add(read_nodegroup)
+    crowdsource_editor_group = Group.objects.using(db_alias).get(name='Crowdsource Editor')
+    crowdsource_editor_group.permissions.add(read_nodegroup)
+    guest_group = Group.objects.using(db_alias).get(name='Guest')
+    guest_group.permissions.add(read_nodegroup)
 
 class Migration(migrations.Migration):
 
@@ -141,4 +162,5 @@ class Migration(migrations.Migration):
         """),
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
         migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
     ]
