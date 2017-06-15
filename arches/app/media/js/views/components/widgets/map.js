@@ -132,7 +132,8 @@ define([
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
             this.geojsonInput = ko.observable(false);
-            
+            this.pitchAndZoomEnabled = ko.observable(true);
+
             this.geojsonInput.subscribe(function(val){
                 if (!val) {
                     this.geojsonString('');
@@ -1073,6 +1074,16 @@ define([
                         this.addMaplayer(overlays[i])
                     }
                     this.geocoder.redrawLayer();
+                }, this)
+
+                this.pitchAndZoomEnabled.subscribe(function(val){
+                    if (!val) {
+                        this.map.setPitch(0)
+                        this.map.setBearing(0)
+                        this.map.dragRotate.disable();
+                    } else {
+                        this.map.dragRotate.enable();
+                    }
                 }, this)
 
                 this.applySearchBuffer = function(val) {
