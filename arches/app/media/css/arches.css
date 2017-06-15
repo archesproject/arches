@@ -964,11 +964,16 @@ a.select2-search-choice-close {
     width: 30px;
     position: absolute;
     left: 10px;
-    top: 10px;
+    top: 9px;
+}
+
+.user-groups {
+    font-size: 11px;
+    color: #999;
 }
 
 .library-card-main {
-    width: 135px;
+    width: 175px;
     position: absolute;
     left: 55px;
     top: 12px;
@@ -1063,9 +1068,14 @@ a.select2-search-choice-close {
     background: #fff;
 }
 
+.confirmation-permissions {
+    font-size: 12px;
+    color: #888;
+}
+
 .permission-selector {
     padding-top: 0px;
-    margin: -50px 0px 10px -20px;
+    margin: 0px 0px 10px -20px;
 }
 
 .permissions-summary {
@@ -1074,15 +1084,50 @@ a.select2-search-choice-close {
     margin-right: -20px;
 }
 
+.permissions-readout {
+    float: right;
+    padding-right: 10px;
+    font-size: 11px;
+    color: #777;
+}
+
+.permissions-node {
+    font-size: 13px;
+    color: #777;
+}
+
+.permissions-node-row {
+    background: #fff;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 10px;
+    margin-left: -20px;
+    margin-right: 10px;
+    border-left: 1px solid #f4f4f4;
+    border-right: 1px solid #f4f4f4;
+}
+
+.permissions-node-row:nth-child(even) {
+    background: #fbfbfb;
+}
+
+.permissions-node-row:first-child {
+    border-top: 1px solid #f4f4f4;
+}
+
+.permissions-node-row:last-child {
+    border-bottom: 1px solid #f4f4f4;
+}
+
 .index-selector {
     padding-top: 0px;
     margin: -20px 0px 10px -20px;
 }
 
 .permissions-list {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
     background: #fbfbfb;
 }
 
@@ -1092,13 +1137,10 @@ a.select2-search-choice-close {
 
 .permissions-selected {
     list-style: none;
-    color: #888;
+    color: #666;
     line-height: 1.2;
-    padding-left: 20px;
-    max-height: 100px;
-    min-height: 100px;
-    font-size: 12px;
-    overflow-y: scroll;
+    padding-left: 15px;
+    font-size: 15px;
 }
 
 .library-search {
@@ -1198,6 +1240,10 @@ a.select2-search-choice-close {
 
 .clear-selection-link:hover {
     color: #333;
+}
+
+.clear-selection a.clear-selection-link {
+    font-size: 11px;
 }
 
 .node circle {
@@ -4185,6 +4231,7 @@ ul.jqtree_common li.jqtree-folder {
     font-size: 12px;
     color: #888;
     padding-top: 0px;
+    margin-top: 1px;
 }
 
 ul.card-tree-list-item {
@@ -4291,7 +4338,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
     background-color: #f0f0f0;
     width: 200px;
-    padding: 4px 7px 7px 7px;
+    padding: 0px 7px 7px 7px;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
     overflow-x: hidden;
@@ -4322,7 +4369,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
     background: #fbfbfb;
-    padding: 4px 7px 7px 7px;
+    padding: 4px 7px 44px 7px;
     color: #666;
     border-right: solid 1px #dddddd;
     overflow-y: auto;
@@ -4352,6 +4399,30 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.title-block-fixed {
+    position: absolute;
+    top: 55px;
+    margin-left: -7px;
+    width: 249px;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    z-index: 10;
+}
+
+.display-nodes-toggle {
+    z-index: 11;
+    position: absolute;
+    top: 63px;
+    left: 390px;
+}
+
+.title-block-fixed + .grid {
+    margin-top: 73px;
 }
 
 .library-crud-container {
@@ -4499,6 +4570,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     width: 200px;
 }
 
+.perm-nodes-list {
+    margin-top: 72px;
+}
+
 .library-card-wide {
     width: 249px;
 }
@@ -4602,6 +4677,21 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .node-subname {
     font-size: 11px;
     color: #999;
+}
+
+.node-permissions {
+    float: right;
+    padding-right: 10px;
+    margin-top: 2px;
+}
+
+.node-permission-icon {
+    padding-right: 3px;
+}
+
+.expand-icon {
+    padding: 5px;
+    margin-right: -5px;
 }
 
 .card-tree-list a .node-name {
