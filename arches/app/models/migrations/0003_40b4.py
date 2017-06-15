@@ -10,118 +10,58 @@ from django.db import migrations, models
 from django.core import management
 from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
+from arches.app.search.mappings import prepare_search_index, delete_search_index
 
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
+
+    delete_search_index()
+    for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
+        prepare_search_index(str(graphid), create=True)
+
+    settings_data_file = 'Arches_System_Settings.json'
+    local_settings_available = os.path.isfile(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json'))
+
+    if local_settings_available == True:
+        settings_data_file = 'Arches_System_Settings_Local.json'
+
+    management.call_command('es', operation='index_resources')
     management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
-    management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite='overwrite')
+    management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', settings_data_file), overwrite='overwrite')
 
 def reverse_func(apps, schema_editor):
     GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
 
+def add_permissions(apps, schema_editor, with_create_permissions=True):
+    db_alias = schema_editor.connection.alias
+    Group = apps.get_model("auth", "Group")
+    Permission = apps.get_model("auth", "Permission")
+
+    read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+
+    resource_editor_group = Group.objects.using(db_alias).get(name='Resource Editor')
+    resource_editor_group.permissions.add(read_nodegroup)
+    rdm_admin_group = Group.objects.using(db_alias).get(name='RDM Administrator')
+    rdm_admin_group.permissions.add(read_nodegroup)
+    app_admin_group = Group.objects.using(db_alias).get(name='Application Administrator')
+    app_admin_group.permissions.add(read_nodegroup)
+    sys_admin_group = Group.objects.using(db_alias).get(name='System Administrator')
+    sys_admin_group.permissions.add(read_nodegroup)
+    mobile_project_admin_group = Group.objects.using(db_alias).get(name='Mobile Project Administrator')
+    mobile_project_admin_group.permissions.add(read_nodegroup)
+    crowdsource_editor_group = Group.objects.using(db_alias).get(name='Crowdsource Editor')
+    crowdsource_editor_group.permissions.add(read_nodegroup)
+    guest_group = Group.objects.using(db_alias).get(name='Guest')
+    guest_group.permissions.add(read_nodegroup)
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '0001_initial'),
+        ('models', '0002_40b4'),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='FileValue',
-            fields=[
-                ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('value', models.FileField(upload_to='concepts')),
-            ],
-            options={
-                'db_table': 'values',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Resource',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-            },
-            bases=('models.resourceinstance',),
-        ),
-        migrations.CreateModel(
-            name='Tile',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-            },
-            bases=('models.tilemodel',),
-        ),
-        migrations.AddField(
-            model_name='maplayer',
-            name='centerx',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='maplayer',
-            name='centery',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='maplayer',
-            name='zoom',
-            field=models.FloatField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='ddatatype',
-            name='isgeometric',
-            field=models.BooleanField(),
-        ),
-        migrations.AlterField(
-            model_name='edge',
-            name='graph',
-            field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        ),
-        migrations.AlterField(
-            model_name='form',
-            name='graph',
-            field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        ),
-        migrations.AlterField(
-            model_name='function',
-            name='defaultconfig',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='functionxgraph',
-            name='config',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='graphxmapping',
-            name='mapping',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True),
-        ),
-        migrations.AlterField(
-            model_name='node',
-            name='graph',
-            field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        ),
-        migrations.AlterField(
-            model_name='tileserverlayer',
-            name='config',
-            field=django.contrib.postgres.fields.jsonb.JSONField(),
-        ),
-        migrations.AlterField(
-            model_name='tileserverlayer',
-            name='name',
-            field=models.TextField(primary_key=True, serialize=False, unique=True),
-        ),
-        migrations.AddField(
-            model_name='ddatatype',
-            name='issearchable',
-            field=models.NullBooleanField(default=False),
-        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
@@ -148,6 +88,11 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/concept',
                     configname = 'concept-datatype-config'
                 WHERE datatype = 'concept';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/date',
+                    configname = 'date-datatype-config'
+                WHERE datatype = 'date';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -174,24 +119,23 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'concept';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'date';
         """),
-        migrations.AddField(
-            model_name='node',
-            name='issearchable',
-            field=models.BooleanField(default=True),
-        ),
-        # migrations.RunSQL("""
-        #     INSERT INTO public.resource_instances(resourceinstanceid, graphid, createdtime)
-        #     VALUES ('a106c400-260c-11e7-a604-14109fd34195','ff623370-fa12-11e6-b98b-6c4008b05c4c','2012-03-15 15:29:31.211-07');
-        # """, """
-        #     DELETE FROM public.resource_instances WHERE resourceinstanceid = 'a106c400-260c-11e7-a604-14109fd34195';
-        # """),
+
         migrations.RunSQL("""
-            INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype)
-            VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower');
+            INSERT INTO iiif_manifests(id, url) VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');
         """, """
-            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004'
-            AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
+            DELETE FROM public.iiif_manifests WHERE url = 'https://data.getty.edu/museum/api/iiif/249995/manifest.json';
+        """),
+        migrations.RunSQL("""
+            INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower') ON CONFLICT DO NOTHING;
+        """,
+        """
+            DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
         """),
         migrations.RunSQL("""
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
@@ -218,4 +162,5 @@ class Migration(migrations.Migration):
         """),
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
         migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
     ]

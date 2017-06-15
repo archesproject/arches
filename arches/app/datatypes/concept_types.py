@@ -2,7 +2,8 @@ import uuid
 from arches.app.models import models
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.concept import get_preflabel_from_valueid
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
+from arches.app.utils.date_utils import SortableDate
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -28,6 +29,17 @@ class BaseConceptDataType(BaseDataType):
             ret = valueid
         return ret
 
+    def get_concept_dates(self, concept):
+        result = None
+        date_range = {}
+        values = models.Value.objects.filter(concept=concept)
+        for value in values:
+            if value.valuetype.valuetype in ('min_year' 'max_year'):
+                date_range[value.valuetype.valuetype] = value.value
+        if 'min_year' in date_range and 'max_year' in date_range:
+            result = date_range
+        return result
+
     def append_to_document(self, document, nodevalue):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
@@ -35,6 +47,12 @@ class BaseConceptDataType(BaseDataType):
             nodevalue = [nodevalue]
         for valueid in nodevalue:
             value = self.get_value(valueid)
+            date_range = self.get_concept_dates(value.concept)
+            if date_range is not None:
+                min_date = SortableDate(date_range['min_year']).as_float()
+                max_date = SortableDate(date_range['max_year']).as_float()
+                if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
+                    document['date_ranges'].append({'gte': min_date, 'lte': max_date})
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
 
@@ -46,7 +64,7 @@ class ConceptDataType(BaseConceptDataType):
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
             message = "Not a valid domain value"
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value):
@@ -70,11 +88,11 @@ class ConceptDataType(BaseConceptDataType):
         try:
             if value['val'] != '':
                 match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
-                nested_query = Nested(path='tiles', query=match_query)
                 if '!' in value['op']:
-                    query.must_not(nested_query)
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    query.must(nested_query)
+                    query.must(match_query)
 
         except KeyError, e:
             pass
@@ -89,7 +107,7 @@ class ConceptListDataType(BaseConceptDataType):
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
                 message = "Not a valid domain value"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value):

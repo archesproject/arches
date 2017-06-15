@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import csv
 import math
 from datetime import datetime
-from flexidate import FlexiDate
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.apps import apps
@@ -36,8 +35,9 @@ from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.date_utils import SortableDate
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, DateRangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, RangeFilterAgg
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
@@ -268,31 +268,10 @@ def build_search_results_dsl(request):
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
-        start_date = None
-        end_date = None
-        start_year = 'null'
-        end_year = 'null'
-        try:
-            # start_date = parser.parse(temporal_filter['fromDate'])
-            # start_date = start_date.isoformat()
-            sd = FlexiDate.from_str(temporal_filter['fromDate'])
-            start_date = int((sd.as_float()-1970)*31556952*1000)
-
-            #start_year = parser.parse(start_date).year
-            start_year = sd.year
-        except:
-            pass
-
-        try:
-            # end_date = parser.parse(temporal_filter['toDate'])
-            # end_date = end_date.isoformat()
-            ed = FlexiDate.from_str(temporal_filter['toDate'])
-            end_date = int((ed.as_float()-1970)*31556952*1000)
-
-            #end_year = parser.parse(end_date).year
-            end_year = ed.year
-        except:
-            pass
+        start_date = SortableDate(temporal_filter['fromDate'])
+        end_date = SortableDate(temporal_filter['toDate'])
+        start_year = start_date.year or 'null'
+        end_year = end_date.year or 'null'
 
 
         # add filter for concepts that define min or max dates
@@ -329,10 +308,12 @@ def build_search_results_dsl(request):
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 field='tiles.data.%s' % (temporal_filter['dateNodeId'])
 
-            if start_date is not None:
+            if start_date.is_valid():
+                start_date = start_date.as_float() if field == 'dates' else start_date.orig_date
                 inverted_date_filter.should(Range(field=field, lte=start_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
-            if end_date is not None:
+            if end_date.is_valid():
+                end_date = end_date.as_float() if field == 'dates' else end_date.orig_date
                 inverted_date_filter.should(Range(field=field, gte=end_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
 
@@ -347,17 +328,17 @@ def build_search_results_dsl(request):
 
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date, lte=end_date)
+                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date)
                 date_range_query = Nested(path='tiles', query=range)
                 temporal_query.should(date_range_query)
             else:
-                date_range_query = Range(field='dates', gte=start_date, lte=end_date)
+                date_range_query = Range(field='dates', gte=start_date.as_float(), lte=end_date.as_float())
                 temporal_query.should(date_range_query)
 
                 select_clause = """
                     numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
                 """
-                sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
+                sql = basesql.format(select_clause=select_clause).format(start_year=start_year , end_year=end_year)
 
         # is a dateNodeId is not specified
         if sql is not None:
@@ -368,7 +349,6 @@ def build_search_results_dsl(request):
             if len(ret) > 0:
                 conceptid_filter = Terms(field='domains.conceptid', terms=ret)
                 temporal_query.should(conceptid_filter)
-
 
         search_query.must(temporal_query)
 
@@ -384,10 +364,11 @@ def build_search_results_dsl(request):
                     node = models.Node.objects.get(pk=key)
                     datatype = datatype_factory.get_instance(node.datatype)
                     datatype.append_search_filters(val, node, tile_query, request)
+            nested_query = Nested(path='tiles', query=tile_query)
             if advanced_filter['op'] == 'or' and index != 0:
                 grouped_query = Bool()
                 grouped_queries.append(grouped_query)
-            grouped_query.must(tile_query)
+            grouped_query.must(nested_query)
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
@@ -431,8 +412,8 @@ def _get_child_concepts(conceptid):
 
 def geocode(request):
     geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['ID'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['ID'])
+    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['NAME'] == geocoding_provider_id), None)
+    Geocoder = import_string('arches.app.utils.geocoders.' + provider['NAME'])
     search_string = request.GET.get('q', '')
     return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['API_KEY']) })
 
@@ -458,68 +439,95 @@ def export_results(request):
 def time_wheel_config(request):
     se = SearchEngineFactory().create()
     query = Query(se, limit=0)
-    query.add_aggregation(MinAgg(field='dates', format='y'))
-    query.add_aggregation(MaxAgg(field='dates', format='y'))
+    query.add_aggregation(MinAgg(field='dates'))
+    query.add_aggregation(MaxAgg(field='dates'))
     results = query.search(index='resource')
-    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
-        min_date = int(results['aggregations']['min_dates']['value_as_string'])
-        max_date = int(results['aggregations']['max_dates']['value_as_string'])
 
+    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
+        min_date = int(results['aggregations']['min_dates']['value'])/10000
+        max_date = int(results['aggregations']['max_dates']['value'])/10000
         # round min and max date to the nearest 1000 years
         min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
         max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
-
         query = Query(se, limit=0)
+        range_lookup = {}
+
         for millennium in range(int(min_date),int(max_date)+1000,1000):
             min_millenium = millennium
             max_millenium = millennium + 1000
-            millenium_agg = DateRangeAgg(name="Millennium (%s-%s)"%(min_millenium, max_millenium), field='dates', format='y', min_date=str(min_millenium), max_date=str(max_millenium))
+            millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
+            mill_boolquery = Bool()
+            mill_boolquery.should(Range(field='dates', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
+            mill_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float(), relation='intersects'))
+            millenium_agg = RangeFilterAgg(name=millenium_name)
+            millenium_agg.add_filter(mill_boolquery)
+            range_lookup[millenium_name] = [min_millenium, max_millenium]
 
             for century in range(min_millenium,max_millenium,100):
                 min_century = century
                 max_century = century + 100
-                century_aggregation = DateRangeAgg(name="Century (%s-%s)"%(min_century, max_century), field='dates', format='y', min_date=str(min_century), max_date=str(max_century))
-                millenium_agg.add_aggregation(century_aggregation)
+                century_name="Century (%s - %s)"%(min_century, max_century)
+                cent_boolquery = Bool()
+                cent_boolquery.should(Range(field='dates', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float()))
+                cent_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float(), relation='intersects'))
+                century_agg = RangeFilterAgg(name=century_name)
+                century_agg.add_filter(cent_boolquery)
+                millenium_agg.add_aggregation(century_agg)
+                range_lookup[century_name] = [min_century, max_century]
 
                 for decade in range(min_century,max_century,10):
                     min_decade = decade
                     max_decade = decade + 10
-                    decade_aggregation = DateRangeAgg(name="Decade (%s-%s)"%(min_decade, max_decade), field='dates', format='y', min_date=str(min_decade), max_date=str(max_decade))
-                    century_aggregation.add_aggregation(decade_aggregation)
+                    decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
+
+                    dec_boolquery = Bool()
+                    dec_boolquery.should(Range(field='dates', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float()))
+                    dec_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float(), relation='intersects'))
+                    decade_agg = RangeFilterAgg(name=decade_name)
+                    decade_agg.add_filter(dec_boolquery)
+                    century_agg.add_aggregation(decade_agg)
+                    range_lookup[decade_name] = [min_decade, max_decade]
 
             query.add_aggregation(millenium_agg)
 
         root = d3Item(name='root')
-        transformESAggToD3Hierarchy({'buckets':[query.search(index='resource')['aggregations']]}, root)
+        results = {'buckets':[query.search(index='resource')['aggregations']]}
+        results_with_ranges = appendDateRanges(results, range_lookup)
+        transformESAggToD3Hierarchy(results_with_ranges, root)
         return JSONResponse(root, indent=4)
     else:
         return HttpResponseNotFound(_('Error retrieving the time wheel config'))
-    #return JSONResponse(query.search(index='resource'), indent=4)
-    #return JSONResponse(query.dsl, indent=4)
 
 def transformESAggToD3Hierarchy(results, d3ItemInstance):
     if 'buckets' not in results:
         return d3ItemInstance
 
     for key, value in results['buckets'][0].iteritems():
-        if key == 'from' or key == 'to':
-            pass
-        elif key == 'from_as_string':
+        if key == 'from':
             d3ItemInstance.start = int(value)
-        elif key == 'to_as_string':
+        elif key == 'to':
             d3ItemInstance.end = int(value)
         elif key == 'doc_count':
             d3ItemInstance.size = value
         elif key == 'key':
             pass
-            #d3ItemInstance.name = value
         else:
-            d3ItemInstance.children.append(transformESAggToD3Hierarchy(value,d3Item(name=key)))
+            d3ItemInstance.children.append(transformESAggToD3Hierarchy(value, d3Item(name=key)))
 
     d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
 
     return d3ItemInstance
 
+def appendDateRanges(results, range_lookup):
+    if 'buckets' in results:
+        bucket = results['buckets'][0]
+        for key, value in bucket.iteritems():
+            if key in range_lookup:
+                bucket[key]['buckets'][0]['from'] = range_lookup[key][0]
+                bucket[key]['buckets'][0]['to'] = range_lookup[key][1]
+                appendDateRanges(value, range_lookup)
+
+    return results
 
 class d3Item(object):
     name = ''
