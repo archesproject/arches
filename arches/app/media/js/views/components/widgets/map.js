@@ -132,7 +132,13 @@ define([
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
             this.geojsonInput = ko.observable(false);
-            this.geojsonInput.subscribe(function(val){console.log(val)});
+            
+            this.geojsonInput.subscribe(function(val){
+                if (!val) {
+                    this.geojsonString('');
+                }
+            }, this);
+
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []

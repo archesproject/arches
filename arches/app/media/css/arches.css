@@ -6623,7 +6623,7 @@ span.basemap-unselected {
     height: 120px;
     font-size: 14px;
     white-space: nowrap;
-    /*overflow: hidden;*/
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 

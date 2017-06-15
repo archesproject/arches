@@ -130,7 +130,7 @@
                                 </a>
                                 <!-- /ko -->
                                 <!--ko if: context !== 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
                                 <div class="map-json-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
                                 </div>
@@ -141,8 +141,8 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-                                <a class="leaflet-draw-edit-edit leaflet-disabled" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
-                                <a class="leaflet-draw-edit-remove leaflet-disabled" href="#" title="No drawings to delete."><span class="sr-only">Delete drawings.</span></a>
+                                <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
+                                <a class="leaflet-draw-edit-remove" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to delete."><span class="sr-only">Delete drawings.</span></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
