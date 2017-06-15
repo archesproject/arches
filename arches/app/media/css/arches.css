@@ -967,6 +967,11 @@ a.select2-search-choice-close {
     top: 9px;
 }
 
+.user-groups {
+    font-size: 11px;
+    color: #999;
+}
+
 .library-card-main {
     width: 175px;
     position: absolute;
@@ -1235,6 +1240,10 @@ a.select2-search-choice-close {
 
 .clear-selection-link:hover {
     color: #333;
+}
+
+.clear-selection a.clear-selection-link {
+    font-size: 11px;
 }
 
 .node circle {
