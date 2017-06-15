@@ -125,12 +125,16 @@
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
                                 <!-- ko foreach: geometryTypes -->
-                                <a class="" href="#" title="Draw a marker" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
                                 </a>
                                 <!-- /ko -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
-
+                                <!--ko if: context !== 'search-filter' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
+                                <div class="map-json-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
+                                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                                </div>
+                                <!-- /ko -->
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -421,15 +425,6 @@
             <!-- /ko -->
 
             <!--ko if: context !== 'search-filter' -->
-            <div class="map-json-tool-item relative editing-tool">
-                <div class="map-json-tool-item-icon text-center">
-                    <i class='ion-code-working'></i>
-                </div>
-                <div class="map-overlay-name map-json-tool">
-                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
-                </div>
-            </div>
-
             <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-draw-tools-item-icon text-center">
                     <i class='ion-trash-a'></i>

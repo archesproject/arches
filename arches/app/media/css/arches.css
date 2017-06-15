@@ -6587,13 +6587,21 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
+.map-json-tool-container {
+    position: absolute;
+    top: 0px;
+    left: 40px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .map-json-tool-item {
-    width: 249px;
-    height: 100px;
-    padding: 7px;
-    background: #fbfbfb;
+    padding: 1px;
+    background: #aaa;
     color: #aaa;
-    border-bottom: 1px solid #ddd;
+    /*border-bottom: 1px solid #ddd;*/
 }
 
 .map-json-tool-item-icon {
@@ -6611,8 +6619,8 @@ span.basemap-unselected {
 }
 
 .form-control.map-json-tool-input {
-    width: 180px;
-    height: 80px;
+    width: 220px;
+    height: 120px;
     font-size: 14px;
     white-space: nowrap;
     /*overflow: hidden;*/
