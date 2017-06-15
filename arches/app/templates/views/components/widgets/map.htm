@@ -123,6 +123,7 @@
                         </div>
 
 
+                        <!--ko ifnot: featureEditingDisabled -->
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
@@ -141,6 +142,7 @@
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
 
+
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
                                 <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
@@ -148,6 +150,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                     </div>
                 </div>
             </div>
