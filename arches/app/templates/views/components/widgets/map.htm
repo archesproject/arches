@@ -47,20 +47,6 @@
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                     </div>
-                    <div class="geometry-edit-button-group" data-bind= "visible: !mapControls.mapControlsExpanded()">
-
-                        <div class="btn-group">
-                            <!-- ko foreach: geometryTypes -->
-                            <button class="btn btn-sm btn-default" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'active': self.geometryTypeDetails[$data.id].active}">
-                                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
-                            </button>
-                            <!-- /ko -->
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'delete')}">{% trans "Delete" %}</button>
-                            <button class="btn btn-sm btn-default" data-bind="click: function(){selectEditingTool(undefined, 'end')}">{% trans "Close" %}</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
