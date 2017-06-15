@@ -170,6 +170,9 @@ def prepare_search_index(resource_model_id, create=False):
                     },
                     'numbers' : {
                         "type" : "double"
+                    },
+                    "date_ranges": {
+                      "type": "float_range"
                     }
                 }
             }
