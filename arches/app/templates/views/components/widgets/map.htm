@@ -120,11 +120,15 @@
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
 
+
+
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-                                <a class="leaflet-draw-draw-marker" href="#" title="Draw a marker"><span class="sr-only">Draw a marker</span></a>
-                                <a class="leaflet-draw-draw-polyline" href="#" title="Draw a polyline"><span class="sr-only">Draw a polyline</span></a>
-                                <a class="leaflet-draw-draw-polygon" href="#" title="Draw a polygon"><span class="sr-only">Draw a polygon</span></a>
+                                <!-- ko foreach: geometryTypes -->
+                                <a class="" href="#" title="Draw a marker" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                        <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
+                                </a>
+                                <!-- /ko -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
 
                             </div>

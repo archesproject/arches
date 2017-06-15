@@ -418,19 +418,25 @@ define([
             this.geometryTypeDetails = {
                 Point: {
                     name: 'Point',
+                    title: 'Draw a Marker',
+                    class: 'leaflet-draw-draw-marker',
                     icon: 'ion-location',
                     drawMode: 'draw_point',
                     active: ko.observable(false)
                 },
                 Line: {
                     name: 'Line',
+                    title: 'Draw a Polyline',
                     icon: 'ion-steam',
+                    class: 'leaflet-draw-draw-polyline',
                     drawMode: 'draw_line_string',
                     active: ko.observable(false)
                 },
                 Polygon: {
                     name: 'Polygon',
+                    title: 'Draw a Polygon',
                     icon: 'fa fa-pencil-square-o',
+                    class: 'leaflet-draw-draw-polygon',
                     drawMode: 'draw_polygon',
                     active: ko.observable(false)
                 }

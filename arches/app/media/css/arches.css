@@ -4228,7 +4228,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     position: absolute;
     font-size: 14px;
     cursor: pointer;
-    display: none; 
+    display: none;
     right: 13px;
     top: 10px;
 }
@@ -6434,6 +6434,10 @@ span.basemap-unselected {
 
 .map-draw-tools-item i {
     color: inherit;
+}
+
+.leaflet-draw-toolbar .active {
+    background-color: #efefef;
 }
 
 .map-draw-tools-item.map-draw-tools-active {
