@@ -174,20 +174,39 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
             geojson_collection['features'].append(se.search(index='maplayers', id=entityid)['_source'])
         return JSONResponse(geojson_collection)
 
-    data = query.search(**args)
+    if get_centroids:
+        # If we are just fetching the centroids, we can do a slightly optimised query by having elasticsearch pull out relevant fields
+        args['fields'] = [
+            'properties.centroid.coordinates',
+            'type',
+            '_source.id'
+        ]
+        data = query.search(**args)
+        geojson_collection['features'] = [ 
+            {
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": item['fields']['properties.centroid.coordinates']
+                },
+                "type":"Feature",
+                "id": item['_id']
+            }
+            for item in data['hits']['hits']
+        ]
 
-    for item in data['hits']['hits']:
-        if get_centroids:
-            item['_source']['geometry'] = item['_source']['properties']['centroid']
-            item['_source'].pop('properties', None)
-        elif geom_param != None:
-            item['_source']['geometry'] = item['_source']['properties'][geom_param]
-            item['_source']['properties'].pop('extent', None)
-            item['_source']['properties'].pop(geom_param, None)
-        else:
-            item['_source']['properties'].pop('extent', None)
-            item['_source']['properties'].pop('centroid', None)
-        geojson_collection['features'].append(item['_source'])
+    else:
+        # We need the full data for each record
+        data = query.search(**args)
+        for item in data['hits']['hits']:
+            if geom_param != None:
+                item['_source']['geometry'] = item['_source']['properties'][geom_param]
+                item['_source']['properties'].pop('extent', None)
+                item['_source']['properties'].pop(geom_param, None)
+            else:
+                item['_source']['properties'].pop('extent', None)
+                item['_source']['properties'].pop('centroid', None)
+            geojson_collection['features'].append(item['_source'])
+
 
     return JSONResponse(geojson_collection)
 
