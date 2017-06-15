@@ -63,6 +63,9 @@ define([
             });
 
             this.map = new ol.Map({
+                controls: ol.control.defaults().extend([
+                    new ol.control.FullScreen()
+                ]),
                 layers: layers,
                 interactions: ol.interaction.defaults({
                     altShiftDragRotate: false,
