@@ -87,7 +87,6 @@
          </div>
         </div>
 
-
         <!-- Map/Geometry Tools Panel -->
         <div class="geometry-tools-container">
             <div class="leaflet-control-container">
@@ -299,14 +298,18 @@
                 <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('overlays')}, css : { 'active': !mapControls.mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                 </li>
-                <!-- ko ifnot: featureEditingDisabled -->
+                <!--ko if: context === 'search-filter' -->
                 <li class="map-widget-toolbar-item text-center drawing-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('maptools')}, css : {'active': !mapControls.mapControlPanels.maptools() }">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans toolType %}', placement: 'bottom' }"></i></a>
                 </li>
                 <!-- /ko -->
-                <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
+
+                <!-- TODO Uncomment this block once legend available -->
+                <!-- <li class="map-widget-toolbar-item text-center legend-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('legend')}, css : {'active': !mapControls.mapControlPanels.legend()}">
                     <a id="l" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
-                </li>
+                </li> -->
+
+
                 <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapControls.mapControlsExpanded}">
                     <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                 </li>
@@ -402,31 +405,7 @@
                     <a id="" class="" href=""><span>{% trans "Search Map Extent" %}<span></a>
                 </div>
             </div>
-            <!-- /ko -->
 
-            <!-- ko foreach: geometryTypes -->
-            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
-                <div class="map-draw-tools-item-icon text-center">
-                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
-                </div>
-                <div class="map-overlay-name">
-                    <a id="" class="" href=""><span data-bind='text: self.geometryTypeDetails[$data.id].name'><span></a>
-                </div>
-            </div>
-            <!-- /ko -->
-
-            <!--ko if: context !== 'search-filter' -->
-            <div class="map-draw-tools-item relative editing-tool" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
-                <div class="map-draw-tools-item-icon text-center">
-                    <i class='ion-trash-a'></i>
-                </div>
-                <div class="map-overlay-name">
-                    <a id="" class="" href=""><span>{% trans "Delete" %}<span></a>
-                </div>
-            </div>
-            <!-- /ko -->
-
-            <!--ko if: context === 'search-filter' -->
             <div class="map-draw-tools-item relative query-tool">
                 <div class="map-query-tool">
                     <div class="map-query-tool-name">
