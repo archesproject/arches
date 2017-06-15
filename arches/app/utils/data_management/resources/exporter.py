@@ -7,7 +7,6 @@ import glob
 import uuid
 from django.db.models import Q
 from formats.csvfile import CsvWriter
-from formats.kmlfile import KmlWriter
 from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
 from arches.app.models import models
@@ -22,7 +21,7 @@ except ImportError:
 class ResourceExporter(object):
 
     def __init__(self, file_format):
-        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'json': JsonWriter}
+        self.filetypes = {'csv': CsvWriter, 'json': JsonWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
