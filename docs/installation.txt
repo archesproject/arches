@@ -87,6 +87,8 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
     .. note:: On Windows, with the current Arches beta release, v4.0b3, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
+    .. warning:: On Windows, you must specify the path to your GDAL library. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
+
     At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already) before continuing.
 
 #. Setup your Arches database

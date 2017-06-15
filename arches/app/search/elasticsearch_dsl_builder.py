@@ -284,6 +284,7 @@ class Range(Dsl):
         self.lte = kwargs.pop('lte', None)
         self.lt = kwargs.pop('lt', None)
         self.boost = kwargs.pop('boost', None)
+        self.relation = kwargs.pop('relation', None)
 
         if self.boost:
             boost = {
@@ -313,6 +314,9 @@ class Range(Dsl):
             self.dsl['range'][self.field]['lte'] = self.lte
         if self.lt is not None:
             self.dsl['range'][self.field]['lt'] = self.lt
+        if self.relation is not None:
+            self.dsl['range'][self.field]['relation'] = self.relation
+
 
 class SimpleQueryString(Dsl):
     """
@@ -345,7 +349,7 @@ class SimpleQueryString(Dsl):
         }
 
 
-class Exists(Dsl):    
+class Exists(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
 
@@ -535,3 +539,25 @@ class RangeAgg(Aggregation):
 
         if min_val is not None or max_val is not None:
             self.agg[self.name][self.type]['ranges'].append(date_range)
+
+
+class RangeFilterAgg(Aggregation):
+    """
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.name = kwargs.pop('name', None)
+
+        self.agg = {
+                self.name: {
+                  "filters": {
+                    "filters": []
+                  }
+                }
+              }
+
+    def add_filter(self, filter=None):
+        if filter is not None:
+            self.agg[self.name]['filters']['filters'].append(filter.dsl)
