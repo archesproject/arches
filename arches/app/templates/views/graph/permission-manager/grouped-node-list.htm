@@ -8,11 +8,12 @@
 
 
 {% block list_wrapper %}
-
-<button class="btn btn-shim btn-primary btn-labeled btn-lg" style="width: 100%; height: 27px; margin-bottom: 10px;" data-bind="click: function(){showNodes(!showNodes());}, text: showNodes() ? '{% trans "Hide Nodes" %}' : '{% trans "Show Nodes" %}'">{% trans "Show Nodes" %}</button>
+<span class="display-nodes-toggle">
+    <button class="btn btn-shim btn-primary btn-labeled btn-lg" style="width: 100%; height: 22px; margin-bottom: 10px; font-size: 11px; padding-bottom: 3px;" data-bind="click: function(){showNodes(!showNodes());}, text: showNodes() ? '{% trans "Hide Nodes" %}' : '{% trans "Show Nodes" %}'">{% trans "Show Nodes" %}</button>
+</span>
 
 <!-- ko foreach: { data: [$data], as: 'self' } -->
-<div style="display: none;" data-bind="visible: self">
+<div class="perm-nodes-list" style="display: none;" data-bind="visible: self">
 
     <!-- TOC Cards/Widgets -->
     <div class="card-tree-container">
