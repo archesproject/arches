@@ -133,6 +133,8 @@ define([
             this.geojsonString = ko.observable();
             this.geojsonInput = ko.observable(false);
             this.pitchAndZoomEnabled = ko.observable(true);
+            this.atMaxZoom = ko.observable(false);
+            this.atMinZoom = ko.observable(true);
 
             this.geojsonInput.subscribe(function(val){
                 if (!val) {
@@ -1084,7 +1086,7 @@ define([
                     } else {
                         this.map.dragRotate.enable();
                     }
-                }, this)
+                }, this);
 
                 this.applySearchBuffer = function(val) {
                     var buffer;
@@ -1380,6 +1382,11 @@ define([
                 });
                 self.map.on('click', this.updateDrawMode)
                 self.map.on('draw.selectionchange', self.updateFeatureStyles);
+
+                self.map.on('zoom', function(e){
+                    self.map.getMaxZoom() <= self.map.getZoom() ? self.atMaxZoom(true) : self.atMaxZoom(false)
+                    self.map.getMinZoom() >= self.map.getZoom() ? self.atMinZoom(true) : self.atMinZoom(false)
+                })
 
                 if (this.context === 'search-filter') {
                     self.map.on('dragend', this.searchByExtent);

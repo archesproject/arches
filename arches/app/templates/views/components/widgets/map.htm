@@ -107,8 +107,8 @@
             <div class="leaflet-control-container">
                 <div class="leaflet-top leaflet-left">
                     <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-                        <a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in">+</a>
-                        <a class="leaflet-control-zoom-out leaflet-disabled" href="#" title="Zoom out" role="button" aria-label="Zoom out">-</a>
+                        <a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" data-bind="click: function(){map.zoomIn()}, css:{'leaflet-disabled': atMaxZoom}">+</a>
+                        <a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" data-bind="click: function(){map.zoomOut()}, css:{'leaflet-disabled': atMinZoom}">-</a>
                     </div>
                     <div class="leaflet-draw leaflet-control">
 
