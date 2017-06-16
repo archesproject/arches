@@ -38,19 +38,17 @@ class MapLayerManagerView(BaseManagerView):
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by('name')
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
-            map_layers=map_layers,
             map_sources=map_sources,
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
-        
+
         def get_resource_bounds(node):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
@@ -80,7 +78,6 @@ class MapLayerManagerView(BaseManagerView):
                 "users": sorted([user.email or user.username for user in get_users_for_object('read_nodegroup', node.nodegroup)]),
                 "groups": sorted([group.name for group in get_groups_for_object('read_nodegroup', node.nodegroup)])
             }
-        context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
         context['node_permissions'] = JSONSerializer().serialize(permissions)
 

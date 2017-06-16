@@ -92,8 +92,6 @@ class Migration(migrations.Migration):
     operations = [
         CreateExtension(name='uuid-ossp'),
 
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
-
         CreateFunction(
            name='insert_relation',
            arguments=[
