@@ -606,7 +606,7 @@ class PermissionManagerView(GraphBaseView):
         identities = []
         for group in Group.objects.all():
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
-        for user in User.objects.all():
+        for user in User.objects.filter(is_superuser=False):
             groups = []
             default_perms = []
             for group in user.groups.all():
