@@ -6575,6 +6575,10 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
+.map-query-tool-input.buffer {
+    height: 40px;
+}
+
 .map-json-tool {
     position: absolute;
     height: 120px;
@@ -6587,21 +6591,30 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
-.map-json-tool-container {
+.map-tool-container {
     position: absolute;
-    top: 0px;
-    left: 40px;
+    top: 75px;
+    left: 30px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.form-control .buffer {
+    width: 55%;
+}
+
+.map-tool-container.buffer {
+    position: absolute;
+    top: 0px;
+    width: 150px;
+}
+
 .map-json-tool-item {
     padding: 1px;
     background: #aaa;
     color: #aaa;
-    /*border-bottom: 1px solid #ddd;*/
 }
 
 .map-json-tool-item-icon {
