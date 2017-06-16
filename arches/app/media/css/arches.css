@@ -6122,6 +6122,9 @@ div.row.widget-wrapper.report-header:hover {
     padding: 0px;
 }
 
+.map-search-container div.geometry-tools-container {
+    top: 0px;
+}
 
 
 .geocode-container-shim {
@@ -6247,6 +6250,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     background: #fbfbfb;
 }
+
 
 .map-report-header-container {
     height: 500px;
@@ -7240,33 +7244,12 @@ a.search-query-link-captions:focus {
     transition: all .5s;
 }
 
-.search-results-button {
-    position: absolute;
-    top: 33px;
-    left: 0px;
-    width: 43px;
-    height: 40px;
-    background: #fafafa;
-    border: 1px solid #dddddd;
-    border-left-width: 0px;
-    padding-left: 6px;
-    padding-top: 6px;
-    z-index: 100;
-}
+
 
 .search-results-panel-closed {
     left: 10px;
 }
 
-.map-filter-panel div #map-widget-container .search-results-button {
-    display: block;
-}
-
-.search-results-button-icon {
-    font-size: 19px;
-    margin-left: 15px;
-    margin-top: 10px;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
