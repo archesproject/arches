@@ -97,8 +97,6 @@ class GraphSettingsView(GraphBaseView):
         context['nav']['menu'] = True
         context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
 
-        print request
-
         return render(request, 'views/graph/graph-settings.htm', context)
 
     def post(self, request, graphid):
@@ -315,6 +313,7 @@ class CardView(GraphBaseView):
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -335,6 +334,7 @@ class CardView(GraphBaseView):
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
+            map_layers=map_layers,
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             concept_collections=concept_collections,

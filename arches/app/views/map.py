@@ -78,6 +78,7 @@ class MapLayerManagerView(BaseManagerView):
                 "users": sorted([user.email or user.username for user in get_users_for_object('read_nodegroup', node.nodegroup)]),
                 "groups": sorted([group.name for group in get_groups_for_object('read_nodegroup', node.nodegroup)])
             }
+        context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
         context['node_permissions'] = JSONSerializer().serialize(permissions)
 
