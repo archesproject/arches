@@ -49,7 +49,6 @@ class ResourceListView(BaseManagerView):
 
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = "Resource Manager"
-        context['nav']['edit_history'] = True
         context['nav']['login'] = True
         context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
@@ -77,7 +76,6 @@ class ResourceEditorView(BaseManagerView):
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
-            map_layers = models.MapLayer.objects.all()
             map_sources = models.MapSource.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
@@ -103,7 +101,6 @@ class ResourceEditorView(BaseManagerView):
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
                 date_nodes=date_nodes,
-                map_layers=map_layers,
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
@@ -119,7 +116,6 @@ class ResourceEditorView(BaseManagerView):
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
-            context['nav']['edit_history'] = True
             context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
@@ -197,7 +193,6 @@ class ResourceReportView(BaseManagerView):
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
 
@@ -212,7 +207,6 @@ class ResourceReportView(BaseManagerView):
             cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
-            map_layers=map_layers,
             map_sources=map_sources,
             resource_graphs=resource_graphs,
             graph_id=resource_instance.graph.pk,
