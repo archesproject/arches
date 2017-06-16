@@ -131,6 +131,17 @@ define([
             this.queryFeature;
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
+            this.geojsonInput = ko.observable(false);
+            this.pitchAndZoomEnabled = ko.observable(true);
+            this.atMaxZoom = ko.observable(false);
+            this.atMinZoom = ko.observable(true);
+
+            this.geojsonInput.subscribe(function(val){
+                if (!val) {
+                    this.geojsonString('');
+                }
+            }, this);
+
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
@@ -418,19 +429,25 @@ define([
             this.geometryTypeDetails = {
                 Point: {
                     name: 'Point',
+                    title: 'Draw a Marker',
+                    class: 'leaflet-draw-draw-marker',
                     icon: 'ion-location',
                     drawMode: 'draw_point',
                     active: ko.observable(false)
                 },
                 Line: {
                     name: 'Line',
+                    title: 'Draw a Polyline',
                     icon: 'ion-steam',
+                    class: 'leaflet-draw-draw-polyline',
                     drawMode: 'draw_line_string',
                     active: ko.observable(false)
                 },
                 Polygon: {
                     name: 'Polygon',
+                    title: 'Draw a Polygon',
                     icon: 'fa fa-pencil-square-o',
+                    class: 'leaflet-draw-draw-polygon',
                     drawMode: 'draw_polygon',
                     active: ko.observable(false)
                 }
@@ -1061,6 +1078,16 @@ define([
                     this.geocoder.redrawLayer();
                 }, this)
 
+                this.pitchAndZoomEnabled.subscribe(function(val){
+                    if (!val) {
+                        this.map.setPitch(0)
+                        this.map.setBearing(0)
+                        this.map.dragRotate.disable();
+                    } else {
+                        this.map.dragRotate.enable();
+                    }
+                }, this);
+
                 this.applySearchBuffer = function(val) {
                     var buffer;
                     var coords3857;
@@ -1355,6 +1382,11 @@ define([
                 });
                 self.map.on('click', this.updateDrawMode)
                 self.map.on('draw.selectionchange', self.updateFeatureStyles);
+
+                self.map.on('zoom', function(e){
+                    self.map.getMaxZoom() <= self.map.getZoom() ? self.atMaxZoom(true) : self.atMaxZoom(false)
+                    self.map.getMinZoom() >= self.map.getZoom() ? self.atMinZoom(true) : self.atMinZoom(false)
+                })
 
                 if (this.context === 'search-filter') {
                     self.map.on('dragend', this.searchByExtent);
