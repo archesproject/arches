@@ -163,10 +163,16 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'points': {
-                        "type": "geo_point"
+                        'properties' : {
+                            'point' : {'type': 'geo_point'},
+                            'nodegroup_id' : {'type': 'keyword'},
+                        }
                     },
                     'dates' : {
-                        "type" : "float"
+                        'properties' : {
+                            'date' : {'type': 'float'},
+                            'nodegroup_id' : {'type': 'keyword'},
+                        }
                     },
                     'numbers' : {
                         "type" : "double"

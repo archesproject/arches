@@ -218,8 +218,8 @@ def build_search_results_dsl(request):
         limit = settings.SEARCH_ITEMS_PER_PAGE
 
     query = Query(se, start=limit*int(page-1), limit=limit)
-    query.add_aggregation(GeoHashGridAgg(field='points', name='grid', precision=settings.HEX_BIN_PRECISION))
-    query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
+    query.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
+    query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     search_query = Bool()
 
 
@@ -304,7 +304,7 @@ def build_search_results_dsl(request):
             select_clause = []
             inverted_date_filter = Bool()
 
-            field = 'dates'
+            field = 'dates.date'
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 field='tiles.data.%s' % (temporal_filter['dateNodeId'])
 
@@ -332,7 +332,7 @@ def build_search_results_dsl(request):
                 date_range_query = Nested(path='tiles', query=range)
                 temporal_query.should(date_range_query)
             else:
-                date_range_query = Range(field='dates', gte=start_date.as_float(), lte=end_date.as_float())
+                date_range_query = Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float())
                 temporal_query.should(date_range_query)
 
                 select_clause = """
@@ -439,13 +439,13 @@ def export_results(request):
 def time_wheel_config(request):
     se = SearchEngineFactory().create()
     query = Query(se, limit=0)
-    query.add_aggregation(MinAgg(field='dates'))
-    query.add_aggregation(MaxAgg(field='dates'))
+    query.add_aggregation(MinAgg(field='dates.date'))
+    query.add_aggregation(MaxAgg(field='dates.date'))
     results = query.search(index='resource')
 
-    if results is not None and results['aggregations']['min_dates']['value'] is not None and results['aggregations']['max_dates']['value'] is not None:
-        min_date = int(results['aggregations']['min_dates']['value'])/10000
-        max_date = int(results['aggregations']['max_dates']['value'])/10000
+    if results is not None and results['aggregations']['min_dates.date']['value'] is not None and results['aggregations']['max_dates.date']['value'] is not None:
+        min_date = int(results['aggregations']['min_dates.date']['value'])/10000
+        max_date = int(results['aggregations']['max_dates.date']['value'])/10000
         # round min and max date to the nearest 1000 years
         min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
         max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
@@ -457,7 +457,7 @@ def time_wheel_config(request):
             max_millenium = millennium + 1000
             millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
             mill_boolquery = Bool()
-            mill_boolquery.should(Range(field='dates', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
+            mill_boolquery.should(Range(field='dates.date', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
             mill_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float(), relation='intersects'))
             millenium_agg = RangeFilterAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)
@@ -468,7 +468,7 @@ def time_wheel_config(request):
                 max_century = century + 100
                 century_name="Century (%s - %s)"%(min_century, max_century)
                 cent_boolquery = Bool()
-                cent_boolquery.should(Range(field='dates', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float()))
+                cent_boolquery.should(Range(field='dates.date', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float()))
                 cent_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float(), relation='intersects'))
                 century_agg = RangeFilterAgg(name=century_name)
                 century_agg.add_filter(cent_boolquery)
@@ -481,7 +481,7 @@ def time_wheel_config(request):
                     decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
 
                     dec_boolquery = Bool()
-                    dec_boolquery.should(Range(field='dates', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float()))
+                    dec_boolquery.should(Range(field='dates.date', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float()))
                     dec_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float(), relation='intersects'))
                     decade_agg = RangeFilterAgg(name=decade_name)
                     decade_agg.add_filter(dec_boolquery)
