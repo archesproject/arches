@@ -341,11 +341,8 @@
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
             <div class="map-widget-panel-title">
                 <h4 class="" data-bind="click: toggleOverlaySelector">{% trans "Overlays" %}
-                  <i class="ion-ios-plus pull-right add-tooltip"
-                    data-placement="left"
-                    data-toggle="tooltip"
-                    data-original-title="add overlay"
-                    ></i></h4>
+                  <button style="margin-top: -7px;" class="btn btn-primary pull-right btn-labeled ion-ios-plus">Add</button>
+                </h4>
             </div>
           <!--ko let: { self: $data }-->
             <div data-bind="sortable: overlays">

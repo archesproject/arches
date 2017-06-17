@@ -5898,7 +5898,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     border: 1px solid #eee;
     border-right-width: 0px;
-    z-index: 10;
+    z-index: 1100;
 }
 
 #overlay-grid {
@@ -5936,7 +5936,7 @@ div.row.widget-wrapper.report-header:hover {
 .overlay-list-container {
     padding-top: 0px;
     padding-left: 0px;
-    height: 375px;
+    padding-bottom: 5px;
     overflow-y: auto;
 }
 
@@ -6124,6 +6124,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-search-container div.geometry-tools-container {
     top: 0px;
+    left: 0px;
 }
 
 
