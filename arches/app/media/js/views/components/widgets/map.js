@@ -294,12 +294,14 @@ define([
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
-                var style = self.getMapStyle();
-                style.sources['search-query'].data = {
-                    "type": "FeatureCollection",
-                    "features": geojson_features
-                };
-                self.map.setStyle(style);
+                if ('getMapStyle' in self){
+                    var style = self.getMapStyle();
+                    style.sources['search-query'].data = {
+                        "type": "FeatureCollection",
+                        "features": geojson_features
+                    };
+                    self.map.setStyle(style);
+                }
             }
 
             this.restoreSearchState = function() {
