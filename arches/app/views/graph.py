@@ -28,6 +28,7 @@ from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -618,6 +619,7 @@ class PermissionManagerView(GraphBaseView):
 
         root = {'children': []}
         def extract_card_info(cards, root):
+            datatype_factory = DataTypeFactory()
             for card in cards:
                 d = {
                     'name': card.name,
@@ -630,7 +632,8 @@ class PermissionManagerView(GraphBaseView):
                     extract_card_info(card.cards, d)
                 else:
                     for node in card.nodegroup.node_set.all():
-                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': 'node', 'type': _('Node')})
+                        if datatype_factory.get_instance(node.datatype).datatype_model.defaultwidget is not None:
+                            d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': 'node', 'type': _('Node')})
                 root['children'].append(d)
 
         extract_card_info(cards, root)
