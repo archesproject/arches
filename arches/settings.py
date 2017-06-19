@@ -193,6 +193,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'arches.app.utils.permission_backend.PermissionBackend',
 )
 
 INSTALLED_APPS = (
@@ -247,7 +248,7 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
-
+PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 
 #######################################
 ###       END STATIC SETTINGS       ###
@@ -310,29 +311,7 @@ BUSINESS_DATA_FILES = (
 # The following settings control the extent and max zoom level to which tiles
 # will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
 # will take a long time
-# The CACHE_SEED_BOUNDS the DEFAULT_BOUNDS will be used if the CACHE_SEED_BOUNDS == None
-CACHE_SEED_BOUNDS = None
-# CACHE_SEED_BOUNDS = {
-#                 "type": "FeatureCollection",
-#                 "features": [{
-#                     "geometry": {
-#                         "type": "Polygon",
-#                         "coordinates": [
-#                             [
-#                                 [-179.99, -60],
-#                                 [179.99, -60],
-#                                 [179.99, 77],
-#                                 [-179.99, 77],
-#                                 [-179.99, -60]
-#                             ]
-#                         ]
-#                     },
-#                     "type": "Feature",
-#                     "id": "2f9f403cde3510eb87973313213cb8c9",
-#                     "properties": {}
-#                 }]
-#             }
-
+CACHE_SEED_BOUNDS = (-122.0, -52.0, 128.0, 69.0)
 CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache
@@ -355,19 +334,12 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
-# Default map settings for search and map layer manager pages
-# The DEFAULT_BOUNDS will be used if the DEFAULT_MAP_CENTER = None
-DEFAULT_MAP_CENTER = None
-# DEFAULT_MAP_CENTER = {
-    # "geometry": {
-    #     "type": "Point",
-    #     "coordinates": [-0.0016980786644751333, 51.47783519865435]
-    # }
-
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+# bounds for search results hex binning fabric (search grid).
+# a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
     "features": [{
@@ -388,29 +360,6 @@ DEFAULT_BOUNDS = {
     }]
 }
 
-# bounds for search results hex binning fabric (search grid).
-# a smaller bbox will give you less distortion in hexes and better performance
-# The DEFAULT_BOUNDS will be used if the HEX_BIN_BOUNDS == None
-HEX_BIN_BOUNDS = None
-# HEX_BIN_BOUNDS = {
-#     "type": "FeatureCollection",
-#     "features": [{
-#         "geometry": {
-#             "type": "Polygon",
-#             "coordinates": [
-#                 [
-#                     [-122, -52],
-#                     [128, -52],
-#                     [128, 69],
-#                     [-122, 69],
-#                     [-122, -52]
-#                 ]
-#             ]
-#         },
-#         "type": "Feature",
-#         "properties": {}
-#     }]
-# }
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.
@@ -420,7 +369,6 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

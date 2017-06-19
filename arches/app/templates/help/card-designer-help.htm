@@ -6,7 +6,7 @@
         <div class="ep-help-topic-content">
             <p>{% if not graph.isresource %}Use the Card Designer to edit this Branch's Card.{% else %}Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click "Return to Cards" to go back and choose a new Card to edit.{% endif %}</p>
             <p>The Card Designer interface is split into three sections, as shown in the image below.</p>
-            <p><a href="/media/img/help/card-designer-panes.png" target="_blank"><img src="/media/img/help/card-designer-panes.png"></img></a></p>
+            <p><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank"><img src="{{ STATIC_URL }}img/help/card-designer-panes.png"></img></a></p>
             <p>The <strong>Contents</strong> panel show all Widgets within this Card. In some cases, a third, over-arching tier is added to this heirarchy, called a "Card Container". This happens when multiple Cards are used to organize complex Branches.</p>
             <p>The <strong>Manager</strong> panel is where you will make changes to a Card Container, Card, or Widget. Select an item in the contents panel, or in the preview, and you will see the manager panel update based on your selection.</p>
             <p>The <strong>Preview</strong> allows you to see the Card just as a user would encounter it while creating a new resource. As you make changes in the contents or manager panels, you'll see the the preview update accordingly.</p>
@@ -24,7 +24,7 @@
                 <p>Note that different icons are used for different types of Widgets.</p>
             </div>
             <div class="col-xs-6">
-                <p><a href="/media/img/help/reorganize-contents-card.gif" target="_blank"><img class="reloadable-img"src="/media/img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></a></p>
+                <p><a href="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" target="_blank"><img class="reloadable-img"src="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></a></p>
             </div>
             <div class="col-xs-12">
                 <h5>Example 2: Card Container with Cards</h5>
@@ -34,7 +34,7 @@
                 <p>Note that different icons are used for different types of Widgets.</p>
             </div>
             <div class="col-xs-6">
-                <p><a href="/media/img/help/reorganize-contents-card-container.gif" target="_blank"><img class="reloadable-img"src="/media/img/help/reorganize-contents-card-container.gif" style="border: 2px solid #eee"></img></a></p>
+                <p><a href="{{ STATIC_URL }}img/help/reorganize-contents-card-container.gif" target="_blank"><img class="reloadable-img"src="{{ STATIC_URL }}img/help/reorganize-contents-card-container.gif" style="border: 2px solid #eee"></img></a></p>
             </div>
         </div>
     </div>
@@ -47,8 +47,6 @@
                 <strong>Make Card Visible</strong> - allows designers to define when a card may be accessed and used for editing<br>
                 <strong>Allow multiple values</strong> - define whether multiple instances of this card may be saved in the database. Note that this setting is available for descendant Cards as well.<br>
             </p>
-            <h4>Permissions (Card Containers and Cards)</h4>
-            <p><em>This functionality coming soon.</em></p>
             <h4>Help Text (Cards only)</h4>
             <p>To aid data entry users when using the Widgets in this Card, you may want to add some extra guidance. Use the <strong>Enable Card-Level Help</strong> setting to do so, and design the content of this guidance with the Card-Level Help menu.</p>
         </div>
@@ -87,4 +85,3 @@
         </div>
     </div>
 </div>
-

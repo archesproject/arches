@@ -28,13 +28,7 @@ def get_tileserver_config(layer_id):
         layer_model = models.TileserverLayer.objects.get(name=layer_id)
         layer_config = layer_model.config
 
-    try:
-        if settings.TILE_CACHE_CONFIG.has_key('name'):
-            tile_cache_config = settings.TILE_CACHE_CONFIG
-    except:
-        tile_cache_config = json.loads(settings.TILE_CACHE_CONFIG.decode('string_escape'))
-        if tile_cache_config.has_key('path'):
-            tile_cache_config['path'] = os.path.join(settings.ROOT_DIR, tile_cache_config['path'])
+    tile_cache_config = settings.TILE_CACHE_CONFIG
 
     config_dict = {
         "cache": tile_cache_config,
@@ -134,12 +128,8 @@ def seed_resource_cache():
     datatype_factory = DataTypeFactory()
     zooms = range(settings.CACHE_SEED_MAX_ZOOM + 1)
     extension = 'pbf'
-    geo_utils = GeoUtils()
-    cache_seed_bounds_setting = settings.CACHE_SEED_BOUNDS if settings.CACHE_SEED_BOUNDS != None else settings.DEFAULT_BOUNDS
-    cache_seed_bounds = geo_utils.get_bounds_from_geojson(cache_seed_bounds_setting)
 
-
-    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(cache_seed_bounds)
+    lat1, lon1, lat2, lon2 = GeoUtils().get_bounds_from_geojson(settings.CACHE_SEED_BOUNDS)
     south, west = min(lat1, lat2), min(lon1, lon2)
     north, east = max(lat1, lat2), max(lon1, lon2)
 

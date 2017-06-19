@@ -25,7 +25,13 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if (tile.isParent === true){
+                    var hasdata = _.filter(tile.data, function(val, key) {
+                        val = ko.unwrap(val);
+                        if (val) {
+                            return val
+                        }
+                    })
+                    if (tile.isParent === true || hasdata.length === 0){
                         if (self.dropzone) {
                             self.dropzone.removeAllFiles(true);
                         }
@@ -49,10 +55,15 @@ define([
                             self.filesForUpload.removeAll();
                         }
                         if (Array.isArray(self.value())) {
-                            self.uploadedFiles(self.value())
+                            var uploaded = _.filter(self.value(), function(val) {
+                                return val.status === 'uploaded';
+                            });
+                            self.uploadedFiles(uploaded)
                         }
-                        self.dropzone.removeAllFiles(true);
-                        self.formData.delete('file-list_' + self.node.nodeid);
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                            self.formData.delete('file-list_' + self.node.nodeid);
+                        }
                     }
                 });
             }
@@ -144,7 +155,7 @@ define([
             });
 
             this.dropzoneOptions = {
-                url: "/",
+                url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 previewTemplate: $("template#file-widget-dz-preview").html(),

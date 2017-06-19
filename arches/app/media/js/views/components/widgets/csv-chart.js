@@ -8,11 +8,12 @@ define([
     'uuid',
     'moment',
     'viewmodels/widget',
+    'arches',
     'bindings/dropzone',
     'bindings/nvd3-line',
     // 'bindings/datatable',
     'bindings/chosen',
-], function($, ko, koMapping, _, Dropzone, nvd3, uuid, moment, WidgetViewModel) {
+], function($, ko, koMapping, _, Dropzone, nvd3, uuid, moment, WidgetViewModel, arches) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -276,7 +277,7 @@ define([
             });
 
             this.dropzoneOptions = {
-                url: "/",
+                url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 previewTemplate: $("template#file-widget-dz-preview").html(),

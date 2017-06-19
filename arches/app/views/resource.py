@@ -26,6 +26,7 @@ from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
+from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import group_required
@@ -48,9 +49,8 @@ class ResourceListView(BaseManagerView):
 
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = "Resource Manager"
-        context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating and Editing Resources'),'')
+        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
         return render(request, 'views/resource.htm', context)
 
@@ -80,7 +80,11 @@ class ResourceEditorView(BaseManagerView):
             map_sources = models.MapSource.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
-            forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+            forms_w_cards = []
+            for form_x_card in forms_x_cards:
+                cm = models.CardModel.objects.get(pk=form_x_card.card_id)
+                if request.user.has_perm('read_nodegroup', cm.nodegroup):
+                    forms_w_cards.append(form_x_card.form)
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
@@ -114,8 +118,7 @@ class ResourceEditorView(BaseManagerView):
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
-            context['nav']['edit_history'] = True
-            context['nav']['help'] = (_('Creating and Editing Resources'),'')
+            context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
 
@@ -133,7 +136,7 @@ class ResourceEditorView(BaseManagerView):
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
-            form = Form(resourceid=resourceid, formid=formid)
+            form = Form(resourceid=resourceid, formid=formid, user=request.user)
             return JSONResponse(form)
 
         return HttpResponseNotFound()
@@ -171,20 +174,40 @@ class ResourceReportView(BaseManagerView):
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        permitted_cards = []
+        permitted_forms_x_cards = []
+        permitted_forms = []
+        permitted_tiles = []
+
+        perm = 'read_nodegroup'
+
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id == forms_x_card.card.nodegroup_id, forms_x_cards)
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile = Tile.objects.get(pk=tile.tileid)
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         templates = models.ReportTemplate.objects.all()
+
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
             forms=JSONSerializer().serialize(forms),
-            tiles=JSONSerializer().serialize(tiles),
+            tiles=JSONSerializer().serialize(permitted_tiles),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(cards),
+            cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             map_layers=map_layers,

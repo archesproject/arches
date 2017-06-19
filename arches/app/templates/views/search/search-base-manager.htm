@@ -49,10 +49,6 @@
             <div class="card-form-preview-container">
                 <div class="tab-content relative">
                     <div class="tab-pane map-filter-panel" data-bind="css: {'active': selectedTab() === mapFilter}">
-
-                        <div class="search-results-button" data-bind="click: function () { resultsExpanded(!resultsExpanded()); }">
-                            <a class="" href="#"><i class="search-results-button-icon" data-bind="css: resultsExpanded() ? 'ion-arrow-left-b': 'ion-arrow-right-b'"></i></a>
-                        </div>
                         <!-- ko with: mapFilter -->
                         {% include 'views/search/map-filter.htm' %}
                         <!-- /ko -->

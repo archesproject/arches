@@ -24,4 +24,5 @@ arches/app/media/bower_components
 arches/tileserver/cache
 docs/_build
 arches/logs/*.log
+arches/logs/*.prof
 arches/db/system_settings/Arches_System_Settings_Local.json

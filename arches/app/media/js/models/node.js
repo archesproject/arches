@@ -29,22 +29,8 @@ define([
             self.icons = options.icons || [];
             self.mapSource = options.mapSource;
             self.loading = options.loading;
-            self.permissions = {};
-            var canRead = function (entity) {
-                var perms = entity.perms.default.concat(entity.perms.local).map(function(perm) {
-                    return perm.name;
-                });
-                if (_.contains(perms, 'No Access')) {
-                    return false;
-                } else {
-                    return _.contains(perms, 'Read')
-                }
-            }
-            if (options.permissions) {
-                self.permissions.users = _.filter(options.permissions.users, canRead)
-                self.permissions.groups = _.filter(options.permissions.groups, canRead)
-            }
-
+            self.permissions = options.permissions;
+            
             self._node = ko.observable('');
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);

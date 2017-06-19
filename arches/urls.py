@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
-from arches.app.views import concept, entity, main, map, resources, search, config, graph, tileserver
+from arches.app.views import concept, main, map, search, graph, tileserver
 from arches.app.views.admin import ReIndexResources
-from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView
+from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
@@ -35,14 +35,12 @@ admin.autodiscover()
 uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
 urlpatterns = [
-    url(r'^$', main.index),
+    url(r'^$', main.index, name='root'),
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^geocoder', search.geocode, name="geocoder"),
-
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
-    url(r'^entities/(?P<entityid>%s)$' % uuid_regex , entity.Entities),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
     url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , concept.concept, name="concept"),
@@ -61,12 +59,6 @@ urlpatterns = [
     url(r'^search/export$', search.export_results, name="search_results_export"),
     url(r'^search/time_wheel_config$', search.time_wheel_config, name="time_wheel_config"),
     url(r'^buffer/$', search.buffer, name="buffer"),
-    url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, resources.resource_manager, name="resource_manager"),
-    url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, resources.edit_history, name="edit_history"),
-    url(r'^resources/layers/(?P<entitytypeid>.*)$', resources.map_layers, name="map_layers"),
-    url(r'^resources/markers/(?P<entitytypeid>.*)$', resources.map_layers, {'get_centroids':True}, name="map_markers"),
-    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
-    url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^settings/', ResourceEditorView.as_view(), { 'resourceid': settings.RESOURCE_INSTANCE_ID, 'view_template':'views/system-settings.htm', 'main_script':'views/system-settings', 'nav_menu':False}, name='config'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
@@ -93,6 +85,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/apply_functions$' % uuid_regex, FunctionManagerView.as_view(), name='apply_functions'),
     url(r'^graph/(?P<graphid>%s)/remove_functions$' % uuid_regex, FunctionManagerView.as_view(), name='remove_functions'),
     url(r'^graph/(?P<graphid>%s)/permissions$' % uuid_regex, PermissionManagerView.as_view(), name='permission_manager'),
+    url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),

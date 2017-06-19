@@ -47,7 +47,7 @@ class StringDataType(BaseDataType):
         try:
             value.upper()
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
     def append_to_document(self, document, nodevalue):
@@ -57,7 +57,7 @@ class StringDataType(BaseDataType):
         if value != None:
             return value.encode('utf8')
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
@@ -86,7 +86,7 @@ class NumberDataType(BaseDataType):
         try:
             decimal.Decimal(value)
         except:
-            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number')})
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number', 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value):
@@ -117,7 +117,7 @@ class BooleanDataType(BaseDataType):
         try:
             type(bool(distutils.util.strtobool(str(value)))) == True
         except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not of type boolean. This data was not imported.'.format(value)})
 
         return errors
 
@@ -138,7 +138,7 @@ class DateDataType(BaseDataType):
     def validate(self, value, source=''):
         errors = []
 
-        date_formats = ['%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
+        date_formats = ['-%Y','%Y','%Y-%m-%d','%B-%m-%d','%Y-%m-%d %H:%M:%S']
         valid = False
         for mat in date_formats:
             if valid == False:
@@ -148,7 +148,7 @@ class DateDataType(BaseDataType):
                 except:
                     valid = False
         if valid == False:
-            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD. This data was not imported.'.format(value)})
 
         return errors
 
@@ -187,14 +187,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
                     message = 'Geometry has too many coordinates for Elasticsearch ({0}), Please limit to less then {1} coordinates of 5 digits of precision or less.'.format(coordinate_count, coord_limit)
-                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
                 if bbox.contains(geom) == False:
                     message = 'Geometry does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'
-                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                    errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
             except:
                 message = 'Not a properly formatted geometry'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}.'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         for feature in value['features']:
             try:
@@ -202,7 +202,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 validate_geom(geom, coordinate_count)
             except:
                 message = 'It was not possible to serialize some feaures in your geometry.'
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, message)})
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         return errors
 
@@ -254,21 +254,23 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_bounds_from_value(self, node_data):
         bounds = None
         for feature in node_data['features']:
-            shape = asShape(feature['geometry'])
+            geom_collection = GEOSGeometry(JSONSerializer().serialize(feature['geometry']))
+
             if bounds is None:
-                bounds = shape.bounds
+                bounds = geom_collection.extent
             else:
                 minx, miny, maxx, maxy = bounds
-                if shape.bounds[0] < minx:
-                    minx = shape.bounds[0]
-                if shape.bounds[1] < miny:
-                    miny = shape.bounds[1]
-                if shape.bounds[2] > maxx:
-                    maxx = shape.bounds[2]
-                if shape.bounds[3] > maxy:
-                    maxy = shape.bounds[3]
+                if geom_collection.extent[0] < minx:
+                    minx = geom_collection.extent[0]
+                if geom_collection.extent[1] < miny:
+                    miny = geom_collection.extent[1]
+                if geom_collection.extent[2] > maxx:
+                    maxx = geom_collection.extent[2]
+                if geom_collection.extent[3] > maxy:
+                    maxy = geom_collection.extent[3]
 
                 bounds = (minx, miny, maxx, maxy)
+
         return bounds
 
     def get_layer_config(self, node=None):
@@ -903,7 +905,7 @@ class IIIFDrawingDataType(BaseDataType):
                 value = models.Value.objects.get(pk=valueid)
                 document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
@@ -928,8 +930,17 @@ class DomainDataType(BaseDomainDataType):
         try:
             models.Node.objects.get(config__options__0__id=value)
         except:
-            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(value)})
+            errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
         return errors
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
+        if domain_text is not None:
+            if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(domain_text)
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text = None
@@ -968,11 +979,22 @@ class DomainListDataType(BaseDomainDataType):
             try:
                 models.Node.objects.get(config__options__0__id=v)
             except:
-                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids.'.format(v)})
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
 
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        node = models.Node.objects.get(nodeid=nodeid)
+        for val in nodevalue:
+            domain_text = self.get_option_text(node, val)
+            if domain_text is not None:
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(domain_text.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(domain_text)
+
+        return terms
 
     def append_to_document(self, document, nodevalue):
         domain_text_values = set([])

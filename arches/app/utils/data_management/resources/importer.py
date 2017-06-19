@@ -16,7 +16,6 @@ from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ValidationError
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import DDataType
@@ -93,7 +92,7 @@ class BusinessDataImporter(object):
         for path in file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.file_format = file[0].split('.')[1]
+                    self.file_format = file[0].split('.')[-1]
                     if self.file_format == 'json':
                         with open(file[0], 'rU') as f:
                             archesfile = JSONDeserializer().deserialize(f)
