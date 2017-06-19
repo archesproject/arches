@@ -74,8 +74,6 @@ Your docker-compose.yml file expects the following Environment Variables:
 
 Optional Environment Variables:  
 
-- `FORCE_DB_INIT` = True | False  
-	-> **Force the initialization of Postgresql and Elasticsearch on startup**
 - `DJANGO_PORT` = *Django server port*  
 	-> **Runs your Django server on an alternative port. Default = 8000**
 - `DJANGO_NORELOAD` = True | False  
@@ -184,9 +182,8 @@ This will be used throughout your development process and does not need to be ch
 For your convenience, this initialization is done when you first run Arches.
 (See [docker/entrypoint.sh](/docker/entrypoint.sh) in the official Arches source code)
 
-The initialization can be forced by setting the environment variable FORCE_DB_INIT before starting the Arches container.
-
-**Be aware that this script deletes any existing database with the name set in the PGDBNAME environment variable.**
+The initialization can be forced using the `setup_arches` command.  
+**Be aware that this command deletes any existing database with the name set in the PGDBNAME environment variable.**
 
 
 

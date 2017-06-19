@@ -13,7 +13,6 @@ services:
         - arches-static:/static_root
         - arches-bowercomponents:/web_root/arches/arches/app/media/bower_components
       environment:
-        - FORCE_DB_INIT=False
         - INSTALL_DEFAULT_GRAPHS=True
         - INSTALL_DEFAULT_CONCEPTS=True
         - PGPASSWORD=postgres

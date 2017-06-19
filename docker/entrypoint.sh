@@ -46,12 +46,7 @@ activate_virtualenv() {
 
 init_arches() {
 
-	if [[ "${FORCE_DB_INIT}" == "True" ]]; then
-		echo ""
-		echo "*** Warning: FORCE_DB_INIT = True ***"
-		echo ""
-		setup_arches
-	elif db_exists; then
+	if db_exists; then
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
 		echo ""
 	else
