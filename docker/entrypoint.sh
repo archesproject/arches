@@ -30,6 +30,11 @@ cd_app_folder() {
 	echo "Current work directory: ${APP_FOLDER}"
 }
 
+cd_bower_folder() {
+	cd ${BOWER_JSON_FOLDER}
+	echo "Current work directory: ${BOWER_JSON_FOLDER}"
+}
+
 activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
 }
@@ -56,6 +61,56 @@ init_arches() {
 
 	init_arches_projects
 }
+
+
+setup_arches() {
+	# Setup Postgresql and Elasticsearch (this deletes your existing database)
+
+	echo "" && echo ""
+	echo "*** Initializing database ***"
+	echo ""
+	echo "*** Any existing Arches database will be deleted ***"
+	echo "" && echo ""
+
+	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
+
+	echo "Running: python manage.py packages -o setup_db"
+	python manage.py packages -o setup_db
+
+
+	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
+		# Import graphs
+		if ! graphs_exist; then
+			echo "Running: python manage.py packages -o import_graphs"
+			python manage.py packages -o import_graphs
+		else
+			echo "Graphs already exist in the database. Skipping 'import_graphs'."
+		fi
+	fi
+
+
+	if [[ "${INSTALL_DEFAULT_CONCEPTS}" == "True" ]]; then
+		# Import concepts
+		if ! concepts_exist; then
+			import_reference_data arches/db/schemes/arches_concept_scheme.rdf
+		else
+			echo "Concepts already exist in the database."
+			echo "Skipping 'arches_concept_scheme.rdf'."
+			echo "Skipping 'cvast_concept_scheme.rdf'."
+		fi
+
+		# Import collections
+		if ! collections_exist; then
+			import_reference_data arches/db/schemes/arches_concept_collections.rdf
+		else
+			echo "Collections already exist in the database."
+			echo "Skipping 'import_reference_data arches_concept_collections.rdf'."
+		fi
+	fi
+
+	setup_elasticsearch
+}
+
 
 wait_for_db() {
 	echo "Testing if database server is up..."
@@ -90,6 +145,16 @@ db_exists() {
 
 set_dev_mode() {
 	python ${ARCHES_ROOT}/setup.py develop
+}
+
+# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
+# Also, the bower_components folder may have been overlaid by a Docker volume.
+install_bower_components() {
+	echo ""
+	echo ""
+	echo "----- INSTALLING BOWER COMPONENTS -----"
+	echo ""
+	bower --allow-root install
 }
 
 setup_elasticsearch() {
@@ -232,6 +297,10 @@ run_arches() {
 		set_dev_mode
 	fi
 
+	# Run from folder where user's bower.json lives
+	cd_bower_folder
+	install_bower_components
+
 	# From here on, run from the user's ${APP_FOLDER}
 	cd_app_folder
 
@@ -245,55 +314,6 @@ run_arches() {
 	run_custom_scripts
 
 	run_django_server
-}
-
-
-setup_arches() {
-	# Setup Postgresql and Elasticsearch (this deletes your existing database)
-
-	echo "" && echo ""
-	echo "*** Initializing database ***"
-	echo ""
-	echo "*** Any existing Arches database will be deleted ***"
-	echo "" && echo ""
-
-	echo "5" && sleep 1 && echo "4" && sleep 1 && echo "3" && sleep 1 && echo "2" && sleep 1 &&	echo "1" &&	sleep 1 && echo "0" && echo ""
-
-	echo "Running: python manage.py packages -o setup_db"
-	python manage.py packages -o setup_db
-
-
-	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
-		# Import graphs
-		if ! graphs_exist; then
-			echo "Running: python manage.py packages -o import_graphs"
-			python manage.py packages -o import_graphs
-		else
-			echo "Graphs already exist in the database. Skipping 'import_graphs'."
-		fi
-	fi
-
-
-	if [[ "${INSTALL_DEFAULT_CONCEPTS}" == "True" ]]; then
-		# Import concepts
-		if ! concepts_exist; then
-			import_reference_data arches/db/schemes/arches_concept_scheme.rdf
-		else
-			echo "Concepts already exist in the database."
-			echo "Skipping 'arches_concept_scheme.rdf'."
-			echo "Skipping 'cvast_concept_scheme.rdf'."
-		fi
-
-		# Import collections
-		if ! collections_exist; then
-			import_reference_data arches/db/schemes/arches_concept_collections.rdf
-		else
-			echo "Collections already exist in the database."
-			echo "Skipping 'import_reference_data arches_concept_collections.rdf'."
-		fi
-	fi
-
-	setup_elasticsearch
 }
 
 
