@@ -153,11 +153,7 @@ class DateDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue, tile):
-        # fd = FlexiDate.from_str(nodevalue)
-        # fd.month = fd.month if fd.month else '1'
-        # fd.day = fd.day if fd.day else '1'
-        #document['dates'].append(fd.as_float())
-        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup': tile.nodegroup_id})
+        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id})
 
     def append_search_filters(self, value, node, query, request):
         try:
