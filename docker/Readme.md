@@ -31,15 +31,7 @@ It also helps to read up on Docker: [docker.com/engine/getstarted](https://docs.
 
 2. Copy [docker-compose.yml](../docker-compose.yml) from the root of the official Arches repository to the root of your project folder.
 
-3. Set your Mapbox API key. Edit your `docker-compose-local.yml`:  
-  Fill out the `MAPBOX_API_KEY` environment variables under the `arches` service:
-	```
-		environment:
-			- MAPBOX_API_KEY=<your Mapbox API key>
-	```
-	Get your Mapbox API key here: [mapbox.com](https://www.mapbox.com/)
-
-4. Run Arches. Navigate to the folder you placed `docker-compose.yml` in and type:  
+3. Run Arches. Navigate to the folder you placed `docker-compose.yml` in and type:  
   `docker-compose up`
 
 
@@ -79,7 +71,6 @@ Your docker-compose.yml file expects the following Environment Variables:
 	-> **Use False for production environments**  
 - `DOMAIN_NAMES` = *list of your domain names*  
 	-> **Space separated list of domain names used to reach Arches, use 'localhost' for development environments**  
-- `MAPBOX_API_KEY` = *Your personal Mapbox api key*
 
 Optional Environment Variables:  
 
@@ -129,13 +120,11 @@ This will be used throughout your development process and does not need to be ch
 	*Note: Must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
 
 5. Set a couple of important Arches variables. Edit your `docker-compose-local.yml`:  
-  Fill out the `PGPASSWORD` and `MAPBOX_API_KEY` environment variables under the `arches` service:
+  Fill out the `PGPASSWORD` environment variables under the `arches` service:
 	```
 		environment:
 			- PGPASSWORD=<your chosen Postgres password>
-			- MAPBOX_API_KEY=<your Mapbox API key>
 	```
-	Get your Mapbox API key here: [mapbox.com](https://www.mapbox.com/)
 
 6. Set the Postgresql password. Edit your `docker-compose-local.yml`:  
 
@@ -253,9 +242,10 @@ This can be run on any OS and removes old Docker containers, unused images, etc.
 For development environments, it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
 1. Create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
-2. Add this line to `docker-compose-local.yml` under `volumes`:
+2. Add this line to `docker-compose-local.yml` under `volumes`:  
 ```
 	- ./:/web_root/arches/
+    - ./docker/settings_local.py:/web_root/arches/arches/settings_local.py	
 ```
 3. Build your Docker containers using:
 ```
@@ -267,6 +257,8 @@ For development environments, it is advisable to mount your source code into the
 ```
 
 This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
+
+The volume commands at *point 2* also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables. **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
 
 
 

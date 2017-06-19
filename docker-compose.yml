@@ -27,7 +27,6 @@ services:
         - DJANGO_DEBUG=True
         - DJANGO_NORELOAD=False
         - DOMAIN_NAMES=localhost
-        - MAPBOX_API_KEY=
         - TZ=EST
       ports:
         - '8000:8000'

@@ -39,28 +39,7 @@ ELASTICSEARCH_HOSTS = [
     { 'host': get_env_variable('ESHOST'), 'port': ELASTICSEARCH_HTTP_PORT }
 ]
 
-MAPBOX_API_KEY = get_optional_env_variable('MAPBOX_API_KEY')
-
-
 ALLOWED_HOSTS = get_env_variable('DOMAIN_NAMES').split()
-
-# Fix for AWS ELB returning false bad health: ELB contacts EC2 instances through their private ip.
-# An AWS service is called to get this private IP of the current EC2 node. Then the IP is added to ALLOWS_HOSTS so that Django answers to it.
-EC2_PRIVATE_IP = None
-try:
-    EC2_PRIVATE_IP = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
-except requests.exceptions.RequestException:
-    pass
-if EC2_PRIVATE_IP:
-    ALLOWED_HOSTS.append(EC2_PRIVATE_IP)
-EC2_PUBLIC_HOSTNAME = None
-try:
-    EC2_PUBLIC_HOSTNAME = requests.get('http://169.254.169.254/latest/meta-data/public-hostname', timeout=0.01).text
-except requests.exceptions.RequestException:
-    pass
-if EC2_PUBLIC_HOSTNAME:
-    ALLOWED_HOSTS.append(EC2_PUBLIC_HOSTNAME)
-
 
 USER_SECRET_KEY = get_optional_env_variable('DJANGO_SECRET_KEY')
 if USER_SECRET_KEY:
