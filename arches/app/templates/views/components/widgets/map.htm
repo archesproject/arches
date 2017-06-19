@@ -241,6 +241,7 @@
                     </div>
                 </div>
                 <div class="hover-feature-footer">
+                    <a data-bind="click: function () { window.open(reportURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>
                     {% if 'Resource Editor' in user.user_groups %}
                     <a data-bind="click: function () { window.open(editURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
                     {% endif %}

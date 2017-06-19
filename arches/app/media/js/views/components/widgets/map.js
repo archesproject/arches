@@ -1458,7 +1458,10 @@ define([
 
             this.mapStyle.layers = this.addInitialLayers();
 
+            this.reportURL = arches.urls.resource_report;
+
             this.editURL = arches.urls.resource_editor;
+
         },
         template: {
             require: 'text!widget-templates/map'
