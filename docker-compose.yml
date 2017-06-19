@@ -12,7 +12,6 @@ services:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
         - arches-bowercomponents:/web_root/arches/arches/app/media/bower_components
-        - arches-lib:/web_root/ENV/lib
       environment:
         - FORCE_DB_INIT=False
         - INSTALL_DEFAULT_GRAPHS=True
@@ -63,7 +62,6 @@ volumes:
     arches-log:
     arches-static:
     arches-bowercomponents:
-    arches-lib:
     postgres-data:
     postgres-log:
     elasticsearch-data:
