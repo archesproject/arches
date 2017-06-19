@@ -7034,6 +7034,7 @@ span.basemap-unselected {
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
