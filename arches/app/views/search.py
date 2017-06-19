@@ -309,11 +309,11 @@ def build_search_results_dsl(request):
                 field='tiles.data.%s' % (temporal_filter['dateNodeId'])
 
             if start_date.is_valid():
-                start_date = start_date.as_float() if field == 'dates' else start_date.orig_date
+                start_date = start_date.as_float() if field == 'dates.date' else start_date.orig_date
                 inverted_date_filter.should(Range(field=field, lte=start_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
             if end_date.is_valid():
-                end_date = end_date.as_float() if field == 'dates' else end_date.orig_date
+                end_date = end_date.as_float() if field == 'dates.date' else end_date.orig_date
                 inverted_date_filter.should(Range(field=field, gte=end_date))
                 select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
 
@@ -350,7 +350,17 @@ def build_search_results_dsl(request):
                 conceptid_filter = Terms(field='domains.conceptid', terms=ret)
                 temporal_query.should(conceptid_filter)
 
+        # apply permissions for nodegroups that contain date datatypes
+        date_nodes = []
+        for date_node in models.Node.objects.filter(datatype='date'):
+            if request.user.has_perm('read_nodegroup', date_node.nodegroup): 
+                date_nodes.append(str(date_node.nodegroup_id))
+        date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+        search_query.must(date_perms_filter)
+
+
         search_query.must(temporal_query)
+        #print search_query.dsl
 
     datatype_factory = DataTypeFactory()
     if len(advanced_filters) > 0:
