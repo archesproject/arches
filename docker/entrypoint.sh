@@ -30,11 +30,6 @@ cd_app_folder() {
 	echo "Current work directory: ${APP_FOLDER}"
 }
 
-cd_bower_folder() {
-	cd ${BOWER_JSON_FOLDER}
-	echo "Current work directory: ${BOWER_JSON_FOLDER}"
-}
-
 activate_virtualenv() {
 	. ${WEB_ROOT}/ENV/bin/activate
 }
@@ -45,8 +40,6 @@ activate_virtualenv() {
 #### Install 
 
 init_arches() {
-
-	install_requirements
 
 	if [[ "${FORCE_DB_INIT}" == "True" ]]; then
 		echo ""
@@ -95,35 +88,8 @@ db_exists() {
 	fi
 }
 
-# This is also done in Dockerfile, but the ENV/lib folder may have been overlaid by a Docker volume.
-install_requirements() {
-	echo ""
-	echo ""
-	echo "----- INSTALLING REQUIREMENTS -----"
-	echo ""
-	python setup.py install
-}
-
 set_dev_mode() {
 	python ${ARCHES_ROOT}/setup.py develop
-}
-
-install_dev_requirements() {
-	echo ""
-	echo ""
-	echo "----- INSTALLING DEV REQUIREMENTS -----"
-	echo ""
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
-}
-
-# This is also done in Dockerfile, but that does not include user's custom Arches app bower.json
-# Also, the bower_components folder may have been overlaid by a Docker volume.
-install_bower_components() {
-	echo ""
-	echo ""
-	echo "----- INSTALLING BOWER COMPONENTS -----"
-	echo ""
-	bower --allow-root install
 }
 
 setup_elasticsearch() {
@@ -205,7 +171,7 @@ copy_settings_local() {
 	fi
 }
 
-
+# Alllows users to add scripts that are run on startup (after this entrypoint)
 run_custom_scripts() {
 	for file in ${CUSTOM_SCRIPT_FOLDER}/*; do
 		if [[ -f ${file} ]]; then
@@ -264,17 +230,13 @@ run_arches() {
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
-		install_dev_requirements
 	fi
-
-	# Run from folder where user's bower.json lives
-	cd_bower_folder
-	install_bower_components
 
 	# From here on, run from the user's ${APP_FOLDER}
 	cd_app_folder
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
+		echo "Running database migrations..."
 		run_migrations
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 		collect_static
@@ -337,9 +299,7 @@ setup_arches() {
 
 run_tests() {
 	cd_arches_root
-	install_requirements
 	set_dev_mode
-	install_dev_requirements
 	echo ""
 	echo ""
 	echo "----- RUNNING ARCHES TESTS -----"
