@@ -351,14 +351,10 @@ def build_search_results_dsl(request):
                 temporal_query.should(conceptid_filter)
 
         # apply permissions for nodegroups that contain date datatypes
-        date_nodes = []
-        for date_node in models.Node.objects.filter(datatype='date'):
-            if request.user.has_perm('read_nodegroup', date_node.nodegroup): 
-                date_nodes.append(str(date_node.nodegroup_id))
+        date_nodes = get_nodes_of_type_with_perm('date', 'read_nodegroup')
         date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+        
         search_query.must(date_perms_filter)
-
-
         search_query.must(temporal_query)
         #print search_query.dsl
 
@@ -385,6 +381,13 @@ def build_search_results_dsl(request):
 
     query.add_query(search_query)
     return query
+
+def get_nodes_of_type_with_perm(datatype, permission):
+    nodes = []
+    for date_node in models.Node.objects.filter(datatype=datatype):
+        if request.user.has_perm(permission, date_node.nodegroup): 
+            nodes.append(str(date_node.nodegroup_id)) 
+    return nodes
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))
@@ -462,6 +465,10 @@ def time_wheel_config(request):
         query = Query(se, limit=0)
         range_lookup = {}
 
+        # apply permissions for nodegroups that contain date datatypes
+        date_nodes = get_nodes_of_type_with_perm('date', 'read_nodegroup')
+        date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+
         for millennium in range(int(min_date),int(max_date)+1000,1000):
             min_millenium = millennium
             max_millenium = millennium + 1000
@@ -469,6 +476,7 @@ def time_wheel_config(request):
             mill_boolquery = Bool()
             mill_boolquery.should(Range(field='dates.date', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
             mill_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float(), relation='intersects'))
+            mill_boolquery.must(date_perms_filter)
             millenium_agg = FiltersAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)
             range_lookup[millenium_name] = [min_millenium, max_millenium]
@@ -499,6 +507,7 @@ def time_wheel_config(request):
                     range_lookup[decade_name] = [min_decade, max_decade]
 
             query.add_aggregation(millenium_agg)
+
 
         root = d3Item(name='root')
         results = {'buckets':[query.search(index='resource')['aggregations']]}
