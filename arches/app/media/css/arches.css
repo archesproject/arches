@@ -5374,6 +5374,12 @@ div.row.widget-wrapper {
     padding-left: 5px;
 }
 
+a.mega-dropdown-toggle.disabled {
+   pointer-events: none;
+   cursor: default;
+   color: #aaa;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -5424,6 +5430,18 @@ div.row.widget-wrapper {
 
 .settings-config-panel {
     padding: 5px;
+}
+
+.data-table-selected {
+    text-align: center;
+}
+
+.data-table-selected.sorting_asc::after {
+    visibility: hidden;
+}
+
+.center-header {
+    text-align: center;
 }
 
 .shim {
