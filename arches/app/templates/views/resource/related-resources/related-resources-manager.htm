@@ -223,13 +223,20 @@
                                               paging: true,
                                               dom: 'rtip',
                                               columns:[
-                                                  {width: '10px', orderable:false, className: 'data-table-selected'},
+                                                  {width: '30px', orderable:false, className: 'data-table-selected'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width:'100px'}
-                                              ]
+                                              ],
+                                              fnInitComplete: function() {
+                                                var self = this;
+                                                setTimeout(function(){
+                                                    self.fnAdjustColumnSizing(true);
+                                                    self.fnSort(0);
+                                                }, 1000);
+                                                }
                                           }
                                       }">
                             <tr class="rr-table-row" data-bind="click: function () {

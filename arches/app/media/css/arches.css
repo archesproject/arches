@@ -5436,12 +5436,12 @@ a.mega-dropdown-toggle.disabled {
     text-align: center;
 }
 
-.sorting_asc::after {
+.data-table-selected.sorting_asc::after {
     visibility: hidden;
 }
 
 .center-header {
-    margin-right: -20px;
+    text-align: center;
 }
 
 .shim {
