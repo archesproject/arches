@@ -1084,6 +1084,7 @@ define([
                         this.map.setBearing(0)
                         this.map.dragRotate.disable();
                     } else {
+                        this.map.setPitch(this.pitch() > 0 ? this.pitch() : 50)
                         this.map.dragRotate.enable();
                     }
                 }, this);
