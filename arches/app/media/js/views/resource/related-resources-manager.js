@@ -174,6 +174,11 @@ define([
             this.propertiesDialogOpen.subscribe(function(val){
                 if (val === true) {
                     setTimeout(this.resize, 1000);
+                } else {
+                    this.relatedProperties.notes('')
+                    this.relatedProperties.dateto('')
+                    this.relatedProperties.datefrom('')
+                    this.relatedProperties.relationship_type(this.defaultRelationshipType)
                 }
             }, this)
 
