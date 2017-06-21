@@ -76,10 +76,12 @@ function(ko, BaseFilter, arches) {
 
         clear: function(reset_features) {
             if (reset_features !== false){
-                this.filter.feature_collection({
-                  "type": "FeatureCollection",
-                  "features": []
-                });
+                if (this.filter.feature_collection().features.length > 0) {
+                    this.filter.feature_collection({
+                      "type": "FeatureCollection",
+                      "features": []
+                    });
+                }
             }
             this.termFilter.removeTag('Map Filter Enabled');
         },

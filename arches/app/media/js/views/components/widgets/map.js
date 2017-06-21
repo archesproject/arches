@@ -186,10 +186,8 @@ define([
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.extentSearch(false)
                         self.updateSearchQueryLayer([]);
-                        if (self.extentSearch() === true) {
-                            self.toggleExtentSearch();
-                        }
                     }
                 };
 
@@ -301,16 +299,18 @@ define([
                 };
                 self.map.setStyle(style);
                 if (geojson_features.length === 0) {
-                    self.draw.deleteAll();
                     self.clearSearch(true);
                     self.clearSearch(false);
-                        // this.drawMode(undefined)
-                        // this.draw.changeMode('simple_select')
-                        // _.each(self.geometryTypeDetails, function(type){
-                        //     if (type.active() === true) {
-                        //         type.active(false);
-                        //     }
-                        // })
+                    if (self.draw.getAll().features.length > 0){
+                        _.each(self.geometryTypeDetails, function(type){
+                            if (type.active() === true) {
+                                type.active(false);
+                            }
+                        })
+                        self.drawMode(undefined)
+                        self.draw.changeMode('simple_select')
+                        self.draw.deleteAll();
+                    }
                 }
             }
 
@@ -464,6 +464,8 @@ define([
                     active: ko.observable(false)
                 }
             }
+
+            this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode')
 
             this.geomTypeSelectSetup = {
                 minimumInputLength: 0,
@@ -1167,7 +1169,9 @@ define([
                 this.searchByExtent = function() {
                     if (self.extentSearch() === true) {
                         self.queryFeature = undefined;
-                        self.updateSearchQueryLayer([])
+                        if (_.contains(self.drawModes, self.drawMode())) {
+                            self.updateSearchQueryLayer([])
+                        }
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -1193,7 +1197,7 @@ define([
                     }
                 }
 
-                this.extentSearch.subscribe(function() {
+                this.extentSearch.subscribe(function(val) {
                     self.searchByExtent();
                 })
 
