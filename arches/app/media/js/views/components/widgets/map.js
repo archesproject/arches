@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'jsts',
     'proj4',
     'turf',
     'geohash',
@@ -22,7 +21,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -316,7 +315,6 @@ define([
 
             this.restoreSearchState = function() {
                 if (this.query) {
-                    console.log(this.query)
                     var features = this.query.features;
                     var drawMode;
                     var geojsonToDrawMode = {
@@ -1117,24 +1115,7 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var transformer = proj4('EPSG:4326','EPSG:3857');
-                            coords = self.queryFeature.geometry.coordinates;
-                            switch (self.queryFeature.geometry.type) {
-                                case 'Point': coords3857 = transformer.forward(coords); break;
-                                case 'LineString': coords3857 = _.map(coords, function(coord){ return transformer.forward(coord);}); break;
-                                case 'Polygon': coords3857 = [_.map(coords[0], function(coord){ return transformer.forward(coord);})];
-                            }
-
-                            var prebufferFeature = $.extend(true, {}, self.queryFeature);
-                            prebufferFeature.geometry.coordinates = coords3857;
-                            var reader = new jsts.io.GeoJSONReader();
-                            var writer = new jsts.io.GeoJSONWriter();
-                            var jstsFeature = reader.read(prebufferFeature)
-                            var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
-                            var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature = turf.polygon(coords4326);
-
-
+                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
