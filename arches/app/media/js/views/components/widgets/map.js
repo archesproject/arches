@@ -316,6 +316,7 @@ define([
 
             this.restoreSearchState = function() {
                 if (this.query) {
+                    console.log(this.query)
                     var features = this.query.features;
                     var drawMode;
                     var geojsonToDrawMode = {
@@ -336,7 +337,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                this.buffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                } else {
+                                    this.buffer(this.queryFeature.properties.buffer.width)
+                                }
                             }
                         }
                     }
@@ -1201,7 +1206,7 @@ define([
                     self.searchByExtent();
                 })
 
-                this.buffer.subscribe(function(val) {
+                this.updateBuffer = function(val) {
                     var maxBuffer = 100000;
                     if(val < 0){
                         this.buffer(0)
@@ -1210,7 +1215,9 @@ define([
                     }else{
                         this.applySearchBuffer(val)
                     }
-                }, this);
+                }
+
+                this.buffer.subscribe(this.updateBuffer, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
