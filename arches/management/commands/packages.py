@@ -501,7 +501,7 @@ class Command(BaseCommand):
                         ResourceGraphImporter(archesfile['graph'])
 
 
-    def export_system_settings(self, data_dest=None, file_format='json', config_file=None, graph='ff623370-fa12-11e6-b98b-6c4008b05c4c', single_file=False):
+    def export_system_settings(self, data_dest=None, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
         resource_exporter = ResourceExporter(file_format)
 
         if data_dest != '':
