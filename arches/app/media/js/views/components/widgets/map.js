@@ -301,8 +301,16 @@ define([
                 };
                 self.map.setStyle(style);
                 if (geojson_features.length === 0) {
+                    self.draw.deleteAll();
                     self.clearSearch(true);
                     self.clearSearch(false);
+                        // this.drawMode(undefined)
+                        // this.draw.changeMode('simple_select')
+                        // _.each(self.geometryTypeDetails, function(type){
+                        //     if (type.active() === true) {
+                        //         type.active(false);
+                        //     }
+                        // })
                 }
             }
 
