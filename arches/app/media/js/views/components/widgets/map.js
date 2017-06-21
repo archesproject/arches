@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'jsts',
     'proj4',
     'turf',
     'geohash',
@@ -22,7 +21,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -122,9 +121,9 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
                 this.query = params.query;
+                this.clearSearch = params.clearSearch;
             }
 
             this.buffer = ko.observable(100.0);
@@ -186,10 +185,8 @@ define([
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.extentSearch(false)
                         self.updateSearchQueryLayer([]);
-                        if (self.extentSearch() === true) {
-                            self.toggleExtentSearch();
-                        }
                     }
                 };
 
@@ -300,6 +297,20 @@ define([
                     "features": geojson_features
                 };
                 self.map.setStyle(style);
+                if (geojson_features.length === 0) {
+                    self.clearSearch(true);
+                    self.clearSearch(false);
+                    if (self.draw.getAll().features.length > 0){
+                        _.each(self.geometryTypeDetails, function(type){
+                            if (type.active() === true) {
+                                type.active(false);
+                            }
+                        })
+                        self.drawMode(undefined)
+                        self.draw.changeMode('simple_select')
+                        self.draw.deleteAll();
+                    }
+                }
             }
 
             this.restoreSearchState = function() {
@@ -324,7 +335,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                this.buffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                } else {
+                                    this.buffer(this.queryFeature.properties.buffer.width)
+                                }
                             }
                         }
                     }
@@ -452,6 +467,8 @@ define([
                     active: ko.observable(false)
                 }
             }
+
+            this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode')
 
             this.geomTypeSelectSetup = {
                 minimumInputLength: 0,
@@ -766,7 +783,9 @@ define([
                         this.extentSearch(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
-                        this.updateSearchQueryLayer([]);
+                        if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()){
+                            this.updateSearchQueryLayer([]);
+                        }
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -1084,6 +1103,7 @@ define([
                         this.map.setBearing(0)
                         this.map.dragRotate.disable();
                     } else {
+                        this.map.setPitch(this.pitch() > 0 ? this.pitch() : 50)
                         this.map.dragRotate.enable();
                     }
                 }, this);
@@ -1095,24 +1115,7 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var transformer = proj4('EPSG:4326','EPSG:3857');
-                            coords = self.queryFeature.geometry.coordinates;
-                            switch (self.queryFeature.geometry.type) {
-                                case 'Point': coords3857 = transformer.forward(coords); break;
-                                case 'LineString': coords3857 = _.map(coords, function(coord){ return transformer.forward(coord);}); break;
-                                case 'Polygon': coords3857 = [_.map(coords[0], function(coord){ return transformer.forward(coord);})];
-                            }
-
-                            var prebufferFeature = $.extend(true, {}, self.queryFeature);
-                            prebufferFeature.geometry.coordinates = coords3857;
-                            var reader = new jsts.io.GeoJSONReader();
-                            var writer = new jsts.io.GeoJSONWriter();
-                            var jstsFeature = reader.read(prebufferFeature)
-                            var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
-                            var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature = turf.polygon(coords4326);
-
-
+                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
@@ -1152,7 +1155,9 @@ define([
                 this.searchByExtent = function() {
                     if (self.extentSearch() === true) {
                         self.queryFeature = undefined;
-                        self.updateSearchQueryLayer([])
+                        if (_.contains(self.drawModes, self.drawMode())) {
+                            self.updateSearchQueryLayer([])
+                        }
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -1178,11 +1183,11 @@ define([
                     }
                 }
 
-                this.extentSearch.subscribe(function() {
+                this.extentSearch.subscribe(function(val) {
                     self.searchByExtent();
                 })
 
-                this.buffer.subscribe(function(val) {
+                this.updateBuffer = function(val) {
                     var maxBuffer = 100000;
                     if(val < 0){
                         this.buffer(0)
@@ -1191,7 +1196,9 @@ define([
                     }else{
                         this.applySearchBuffer(val)
                     }
-                }, this);
+                }
+
+                this.buffer.subscribe(this.updateBuffer, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {

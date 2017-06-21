@@ -99,9 +99,9 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle to Full Screen" data-bind="click: function(){
-                                    expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">Full Screen</span><i class="fa fa-arrows-alt"></i></a>
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle Map Tilt and Rotate" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': !pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
+                                    expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': !pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -125,7 +125,7 @@
 
                                 <!--ko if: context === 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title="Search Map Extent" data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">Search Map Extent</span><i class="fa fa-search"></i></a>
-                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: drawMode()!== undefined">
+                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode())">
                                     <div class="form-group form-inline">
                                       <label for="buffer-input">{% trans "Buffer(ft)" %}</label>
                                       <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
