@@ -40,10 +40,11 @@ class ResourceExporter(object):
                     resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
             elif isinstance(business_data[0], str):
                 resourceids = [uuid.UUID(r) for r in business_data]
-        relations = self.get_relations_for_export(resourceids)
-        relations_file_name = resources[0]['name'].split('.')[0]
-        relations_file = self.write_relations(relations, relations_file_name)
-        resources.extend(relations_file)
+        if graph != 'ff623370-fa12-11e6-b98b-6c4008b05c4c':
+            relations = self.get_relations_for_export(resourceids)
+            relations_file_name = resources[0]['name'].split('.')[0]
+            relations_file = self.write_relations(relations, relations_file_name)
+            resources.extend(relations_file)
 
         return resources
 

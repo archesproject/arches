@@ -50,7 +50,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'export_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -169,6 +169,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
+
+        if options['operation'] == 'export_system_settings':
+            self.export_system_settings(options['dest_dir'])
 
         if options['operation'] == 'add_tileserver_layer':
             self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'], options['tile_config_path'])
@@ -496,6 +499,22 @@ class Command(BaseCommand):
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'])
+
+
+    def export_system_settings(self, data_dest=None, file_format='json', config_file=None, graph='ff623370-fa12-11e6-b98b-6c4008b05c4c', single_file=False):
+        resource_exporter = ResourceExporter(file_format)
+
+        if data_dest != '':
+            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
+
+            for file in data:
+                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    f.write(file['outputfile'].getvalue())
+        else:
+            print '*'*80
+            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+            print '*'*80
+            sys.exit()
 
     def start_livereload(self):
         from livereload import Server

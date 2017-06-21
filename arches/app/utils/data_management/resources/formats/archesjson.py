@@ -55,7 +55,7 @@ class JsonWriter(Writer):
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
         dest = StringIO()
-        json.dump(export, dest)
+        json.dump(export, dest, indent=4)
         json_for_export.append({'name':json_name, 'outputfile': dest})
 
         return json_for_export
