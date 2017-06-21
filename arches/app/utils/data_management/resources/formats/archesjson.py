@@ -49,7 +49,7 @@ class JsonWriter(Writer):
 
         export['business_data']['resources'] = resources
 
-        json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name
+        json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name.replace(' ', '_')
 
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
