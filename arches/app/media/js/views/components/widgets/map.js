@@ -122,9 +122,9 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
                 this.query = params.query;
+                this.clearSearch = params.clearSearch;
             }
 
             this.buffer = ko.observable(100.0);
@@ -300,6 +300,10 @@ define([
                     "features": geojson_features
                 };
                 self.map.setStyle(style);
+                if (geojson_features.length === 0) {
+                    self.clearSearch(true);
+                    self.clearSearch(false);
+                }
             }
 
             this.restoreSearchState = function() {
@@ -766,7 +770,9 @@ define([
                         this.extentSearch(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
-                        this.updateSearchQueryLayer([]);
+                        if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()){
+                            this.updateSearchQueryLayer([]);
+                        }
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
