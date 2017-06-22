@@ -87,11 +87,23 @@
         </div>
         <!-- /ko -->
     </template>
+
+
     {% endblock body %}
+    <!-- ko foreach: { data: report.get('related_resources'), as: 'rr' } -->
+    <div class="rp-card-section">
+        <div data-bind="text:rr.name"></div>
+        <!-- ko foreach: { data: rr.resources } -->
+        <div data-bind="text: $data.displayname"></div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
 </div>
+
 
 {% endblock report %}
 <!-- /ko -->
+
 
 <!-- ko if: configForm && (configType === 'header') -->
 {% block header_form %}
