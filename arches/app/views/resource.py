@@ -54,6 +54,14 @@ class ResourceListView(BaseManagerView):
 
         return render(request, 'views/resource.htm', context)
 
+def get_resource_relationship_types():
+    resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+    default_relationshiptype_valueid = None
+    for relationship_type in resource_relationship_types:
+        if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[5]
+    relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+    return relationship_type_values
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
@@ -67,12 +75,7 @@ class ResourceEditorView(BaseManagerView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-            resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
-            default_relationshiptype_valueid = None
-            for relationship_type in resource_relationship_types:
-                if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
-                    default_relationshiptype_valueid = relationship_type[5]
-            relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+            relationship_type_values = get_resource_relationship_types()
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
@@ -163,7 +166,25 @@ class ResourceDescriptors(View):
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        resource = Resource.objects.get(pk=resourceid)
+        resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=15)
+        related_resources = related_resources_search_results['related_resources']
+        relationships = related_resources_search_results['resource_relationships']
+        resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
+
+        for rr in related_resources:
+            for summary in related_resource_summary:
+                if rr['graph_id'] == summary['graphid']:
+                    relationship_summary = []
+                    for relationship in relationships:
+                        if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
+                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
+                    summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
+
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
         try:
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
@@ -209,6 +230,7 @@ class ResourceReportView(BaseManagerView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            related_resources=JSONSerializer().serialize(related_resource_summary),
             widgets=widgets,
             map_layers=map_layers,
             map_sources=map_sources,
@@ -231,13 +253,14 @@ class ResourceReportView(BaseManagerView):
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
-        # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         resource = Resource.objects.get(pk=resourceid)
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
         return JSONResponse(related_resources, indent=4)
 
     def delete(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         es = Elasticsearch()
         se = SearchEngineFactory().create()
         req = dict(request.GET)
@@ -251,10 +274,11 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
         return JSONResponse(related_resources, indent=4)
 
     def post(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         es = Elasticsearch()
         se = SearchEngineFactory().create()
         res = dict(request.POST)
@@ -316,5 +340,5 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
         return JSONResponse(related_resources, indent=4)
