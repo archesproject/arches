@@ -135,12 +135,6 @@ define([
             this.atMaxZoom = ko.observable(false);
             this.atMinZoom = ko.observable(true);
 
-            this.geojsonInput.subscribe(function(val){
-                if (!val) {
-                    this.geojsonString('');
-                }
-            }, this);
-
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
@@ -786,6 +780,10 @@ define([
                         if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()){
                             this.updateSearchQueryLayer([]);
                         }
+                    } else if (this.context === 'resource-editor') {
+                        if (this.geojsonInput()) {
+                            this.geojsonInput(false);
+                        }
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -1078,6 +1076,21 @@ define([
                         self.featureLineWidth() === self.featureLineWidthCache || self.featureLineWidth(self.featureLineWidthCache);
                     }
                 };
+
+                this.geojsonInput.subscribe(function(val){
+                    if (!val) {
+                        this.geojsonString('');
+                    } else {
+                        _.each(self.geometryTypeDetails, function(geomtype) {
+                            if (geomtype.active()) {
+                                geomtype.active(false);
+                                self.drawMode(undefined);
+                                self.draw.changeMode('simple_select');
+                            }
+
+                        })
+                    }
+                }, this);
 
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
