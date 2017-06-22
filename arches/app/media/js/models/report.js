@@ -14,7 +14,7 @@ define(['arches',
          * @name ReportModel
          */
 
-        url: arches.urls.report_editor,
+         url: arches.urls.report_editor,
 
         initialize: function(options) {
             var self = this;
@@ -159,6 +159,28 @@ define(['arches',
             this.forms.sort(function(f1, f2) {
                 return f1.sortorder > f2.sortorder;
             });
+
+            this.related_resources = []
+
+            this.sort_related = function(anArray, property) {
+                anArray.sort(function(a, b){
+                    if (a[property] > b[property]) return 1;
+                    if (b[property] > a[property]) return -1;
+                    return 0;
+                })
+            }
+            _.each(this.get('related_resources'), function(rr){
+                var res = {'graph_name': rr.name, 'related':[]}
+                _.each(rr.resources, function(resource) {
+                    _.each(resource.relationships, function(relationship){
+                        res.related.push({'displayname':resource.displayname,'link': arches.urls.resource_report + resource.instance_id, 'relationship': relationship})
+                    })
+                })
+                this.sort_related(res.related, 'displayname')
+                this.related_resources.push(res);
+            }, this)
+
+            this.sort_related(this.related_resources, 'graph_name');
 
             this._data(JSON.stringify(this.toJSON()));
         },
