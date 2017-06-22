@@ -370,6 +370,8 @@ HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
 
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
