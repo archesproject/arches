@@ -7301,6 +7301,10 @@ a.search-query-link-captions:focus {
     background-color: transparent;
 }
 
+ul.pagination {
+    font-size: 12px;
+}
+
 .map-filter-panel {
     /*margin-left: 10px;*/
     position: absolute;
