@@ -90,14 +90,28 @@
 
 
     {% endblock body %}
-    <!-- ko foreach: { data: report.get('related_resources'), as: 'rr' } -->
-    <div class="rp-card-section">
-        <div data-bind="text:rr.name"></div>
-        <!-- ko foreach: { data: rr.resources } -->
-        <div data-bind="text: $data.displayname"></div>
+    <div class="rp-report-section relative">
+    <div class="rp-report-section-title">
+        <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+    </div>
+    <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+    <div class="rp-card-section relative">
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
+        </h5>
+        <!--ko if: rr.related.length > 0 -->
+            <!-- ko foreach: { data: rr.related } -->
+            <div class="row rp-report-tile related">
+                <a data-bind="text: $data.displayname, attr: {href: $data.link}"></a><span class='reported-relationship' data-bind="text: '( ' + $data.relationship + ' )'"></span>
+            </div>
+            <!-- /ko -->
         <!-- /ko -->
+        <!--ko if: rr.related.length === 0 -->
+            <div class="row rp-report-tile related">None</div>
+        <!--/ko-->
     </div>
     <!-- /ko -->
+    </div>
 </div>
 
 

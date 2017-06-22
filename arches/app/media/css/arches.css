@@ -5645,6 +5645,15 @@ a.mega-dropdown-toggle.disabled {
     margin-top: 5px;
 }
 
+.rp-report-tile.related {
+    padding-bottom: 0px;
+}
+
+.rp-report-tile .reported-relationship {
+    padding-left: 5px;
+    color: #888;
+}
+
 .rp-no-data {
     color: #888;
     margin-top: 10px;

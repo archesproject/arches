@@ -170,8 +170,7 @@ class ResourceReportView(BaseManagerView):
         resource = Resource.objects.get(pk=resourceid)
         resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
-        start = request.GET.get('start', 0)
-        related_resources_search_results = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources_search_results = resource.get_related_resources(lang="en-US", start=0, limit=15)
         related_resources = related_resources_search_results['related_resources']
         relationships = related_resources_search_results['resource_relationships']
         resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
@@ -182,7 +181,7 @@ class ResourceReportView(BaseManagerView):
                     relationship_summary = []
                     for relationship in relationships:
                         if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
-                            relationship_summary.append(relationship['relationshiptype'])
+                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
                     summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
 
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
