@@ -8202,6 +8202,9 @@ a.search-facet-item.disabled {
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+    .dl-horizontal dt a {
+        font-weight: 600;
+    }
     .rp-no-data {
         margin-left: 280px;
     }
