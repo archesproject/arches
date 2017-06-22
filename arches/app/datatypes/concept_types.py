@@ -126,3 +126,17 @@ class ConceptListDataType(BaseConceptDataType):
             new_val = self.get_value(uuid.UUID(val))
             new_values.append(new_val.value)
         return ','.join(new_values)
+
+    def append_search_filters(self, value, node, query, request):
+        for val in value:
+            try:
+                if val['val'] != '':
+                    match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=val['val'], fuzziness=0)
+                    if '!' in val['op']:
+                        query.must_not(match_query)
+                        query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    else:
+                        query.must(match_query)
+
+            except KeyError, e:
+                pass

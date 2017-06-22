@@ -1016,3 +1016,18 @@ class DomainListDataType(BaseDomainDataType):
             option = self.get_option_text(node, val)
             new_values.append(option)
         return ','.join(new_values)
+
+    def append_search_filters(self, value, node, query, request):
+        for val in value:
+            try:
+                if val['val'] != '':
+                    search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=val['val'], fuzziness=0)
+                    # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(val['val']))
+                    if '!' in val['op']:
+                        query.must_not(search_query)
+                        query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    else:
+                        query.must(search_query)
+
+            except KeyError, e:
+                pass

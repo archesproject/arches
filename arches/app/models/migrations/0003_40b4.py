@@ -93,6 +93,16 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/date',
                     configname = 'date-datatype-config'
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/concept',
+                    configname = 'concept-datatype-config'
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configname = 'domain-value-datatype-config'
+                WHERE datatype = 'domain-value-list';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -124,6 +134,17 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'domain-value-list';
+
         """),
 
         migrations.RunSQL("""
