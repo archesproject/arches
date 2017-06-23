@@ -177,7 +177,7 @@ class Resource(models.ResourceInstance):
         """
 
         se = SearchEngineFactory().create()
-        related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
+        related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000)
         for rr in related_resources['resource_relationships']:
             models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
         query = Query(se)
