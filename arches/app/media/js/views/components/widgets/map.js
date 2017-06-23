@@ -343,18 +343,29 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val){
-                    try {
-                        var data = JSON.parse(val)
+                    if (val !== '') {
                         try {
-                            self.draw.add(data)
-                            self.saveGeometries()
+                            var data = JSON.parse(val)
+                            try {
+                                self.draw.add(data)
+                                self.saveGeometries()
+                                if (data['type'] === 'Point') {
+                                    data = turf.buffer(data, 500, 'meters')
+                                }
+                                var bbox = turf.bbox(data);
+                                var ll = new mapboxgl.LngLat(bbox[0],bbox[1])
+                                var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
+                                var bounds = new mapboxgl.LngLatBounds(ll, ur)
+                                self.map.fitBounds(bounds, {padding: 200});
+                                setTimeout(function(){self.geojsonString('')}, 3500)
+                            } catch(err) {
+                                console.log(err)
+                                console.log('invalid geometry')
+                            }
                         } catch(err) {
                             console.log(err)
-                            console.log('invalid geometry')
+                            console.log('invalid json')
                         }
-                    } catch(err) {
-                        console.log(err)
-                        console.log('invalid json')
                     }
             }
 
