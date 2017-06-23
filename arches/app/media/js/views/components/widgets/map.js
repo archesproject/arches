@@ -300,8 +300,7 @@ define([
                                 type.active(false);
                             }
                         })
-                        self.drawMode(undefined)
-                        self.draw.changeMode('simple_select')
+                        self.switchToEditMode()
                         self.draw.deleteAll();
                     }
                 }
@@ -357,7 +356,7 @@ define([
                                 var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
                                 var bounds = new mapboxgl.LngLatBounds(ll, ur)
                                 self.map.fitBounds(bounds, {padding: 200});
-                                setTimeout(function(){self.geojsonString('')}, 3500)
+                                setTimeout(function(){self.geojsonString('')}, 2500)
                             } catch(err) {
                                 console.log(err)
                                 console.log('invalid geometry')
@@ -811,8 +810,7 @@ define([
                         self.drawMode('simple_select');
                     }
                     else if (selectedDrawTool === 'end') {
-                        self.draw.changeMode('simple_select')
-                        self.drawMode(undefined);
+                        self.switchToEditMode()
                     }
                     else {
                         if (!self.drawMode()) {
@@ -1095,8 +1093,7 @@ define([
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             if (geomtype.active()) {
                                 geomtype.active(false);
-                                self.drawMode(undefined);
-                                self.draw.changeMode('simple_select');
+                                self.switchToEditMode()
                             }
 
                         })
@@ -1163,8 +1160,7 @@ define([
                     this.extentSearch(!this.extentSearch())
                     if (this.extentSearch() === true) {
                         self.draw.deleteAll();
-                        self.draw.changeMode('simple_select');
-                        self.drawMode(undefined);
+                        self.switchToEditMode();
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             geomtype.active(false);
                         })
