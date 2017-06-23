@@ -108,6 +108,7 @@ define([
             this.selectedFeatureType = ko.observable();
             this.overlays = ko.observableArray();
             this.overlayLibrary = ko.observableArray();
+            this.geoJsonStringValid = ko.observable(true);
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
@@ -356,14 +357,13 @@ define([
                                 var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
                                 var bounds = new mapboxgl.LngLatBounds(ll, ur)
                                 self.map.fitBounds(bounds, {padding: 200});
-                                setTimeout(function(){self.geojsonString('')}, 2500)
+                                setTimeout(function(){self.geojsonString('')}, 500)
+                                self.geoJsonStringValid(true);
                             } catch(err) {
-                                console.log(err)
-                                console.log('invalid geometry')
+                                self.geoJsonStringValid(false);
                             }
                         } catch(err) {
-                            console.log(err)
-                            console.log('invalid json')
+                            self.geoJsonStringValid(false);
                         }
                     }
             }
@@ -776,6 +776,14 @@ define([
                     self.drawMode(undefined);
                 }
 
+                if (this.context === 'resource-editor') {
+                    self.drawMode.subscribe(function(val){
+                        if (val !== undefined) {
+                            self.geojsonInput(false);
+                        }
+                    })
+                }
+
                 /**
                  * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
                  * @param  {string} selectedDrawTool the draw tool name selected in the map controls
@@ -1088,15 +1096,16 @@ define([
 
                 this.geojsonInput.subscribe(function(val){
                     if (!val) {
+                        this.geoJsonStringValid(true);
                         this.geojsonString('');
+
                     } else {
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             if (geomtype.active()) {
                                 geomtype.active(false);
-                                self.switchToEditMode()
                             }
-
                         })
+                        self.switchToEditMode()
                     }
                 }, this);
 
