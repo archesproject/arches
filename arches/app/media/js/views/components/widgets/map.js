@@ -321,7 +321,7 @@ define([
                         if (this.queryFeature.properties.extent_search === true) {
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
                             this.toggleExtentSearch()
-                            this.map.fitBounds(bounds);
+                            this.map.fitBounds(bounds, {padding: 100});
                         } else {
                             drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
                             this.draw.changeMode(drawMode.drawMode)
@@ -620,7 +620,13 @@ define([
                                         "features": []
                                     };
                                 }
-                                self.fitToAggregationBounds();
+
+                                if (self.value() && self.value()['features'].length > 0) {
+                                    var bounds = new mapboxgl.LngLatBounds(geojsonExtent(turf.buffer(self.value(), self.buffer()/3.28084, 'meters')));
+                                    self.map.fitBounds(bounds,{padding: 200});
+                                } else {
+                                    self.fitToAggregationBounds();
+                                }
                                 var features = [];
                                 _.each(agg.grid.buckets, function (cell) {
                                     var pt = geohash.decode(cell.key);
