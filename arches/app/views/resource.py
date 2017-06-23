@@ -171,7 +171,7 @@ class ResourceReportView(BaseManagerView):
         resource = Resource.objects.get(pk=resourceid)
         resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=15)
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
         related_resources = related_resources_search_results['related_resources']
         relationships = related_resources_search_results['resource_relationships']
         resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
@@ -256,7 +256,7 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         resource = Resource.objects.get(pk=resourceid)
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)
 
     def delete(self, request, resourceid=None):
@@ -274,7 +274,7 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)
 
     def post(self, request, resourceid=None):
@@ -340,5 +340,5 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)
