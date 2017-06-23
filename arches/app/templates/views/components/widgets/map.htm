@@ -19,7 +19,7 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode -->
+        <!--ko if: drawMode() || geoJsonStringValid() === false -->
         <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
@@ -45,6 +45,9 @@
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
+                        <!-- /ko -->
+                        <!-- ko ifnot: geoJsonStringValid -->
+                        <strong>{% trans "Invalid GeoJSON" %}</strong>
                         <!-- /ko -->
                     </div>
                 </div>
@@ -101,7 +104,7 @@
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
                                     expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
-                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': !pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
