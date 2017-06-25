@@ -13,15 +13,15 @@ define([
     'geojson-extent',
     'views/list',
     'views/components/widgets/map/map-styles',
-    'viewmodels/geocoder',
     'viewmodels/map-controls',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
-    'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+    'bindings/color-picker',
+    'geocoder-templates'
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -143,12 +143,6 @@ define([
             if (ko.unwrap(this.value) !== null) {
                 this.summaryDetails = koMapping.toJS(this.value).features || [];
             }
-
-            this.geocoder = new GeocoderViewModel({
-                provider: this.geocodeProvider,
-                placeholder: this.geocodePlaceholder,
-                anchorLayerId: this.anchorLayerId
-            });
 
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
@@ -441,7 +435,7 @@ define([
                     }
                 }, this);
 
-                initialLayers.push(this.geocoder.pointstyle);
+                // initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
             }
 
@@ -525,7 +519,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-                this.geocoder.setMap(map);
+                // this.geocoder.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -1130,7 +1124,7 @@ define([
                         }
                         this.addMaplayer(overlays[i])
                     }
-                    this.geocoder.redrawLayer();
+                    // this.geocoder.redrawLayer();
                 }, this)
 
                 this.pitchAndZoomEnabled.subscribe(function(val){
