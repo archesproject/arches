@@ -7,14 +7,19 @@ define(['knockout', 'viewmodels/report', 'views/components/widgets/map'], functi
 
             var tiles = this.report.get('tiles')
             this.feature_count = 0
-            tiles.forEach(function(tile) {
-                _.each(tile.data, function(val, key) {
-                    if (_.contains(val, 'FeatureCollection')) {
-                        this.feature_count += 1
-                    }
-                }, this);
-            }, this)
+            this.forReportManager = false
 
+            if (tiles) {
+                tiles.forEach(function(tile) {
+                    _.each(tile.data, function(val, key) {
+                        if (_.contains(val, 'FeatureCollection')) {
+                            this.feature_count += 1
+                        }
+                    }, this);
+                }, this)
+            } else {
+                this.forReportManager = true;
+            }
             // this.configObservable = ko.observable()
         },
         template: { require: 'text!report-templates/map' }

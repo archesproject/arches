@@ -5374,6 +5374,12 @@ div.row.widget-wrapper {
     padding-left: 5px;
 }
 
+a.mega-dropdown-toggle.disabled {
+   pointer-events: none;
+   cursor: default;
+   color: #aaa;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -5424,6 +5430,18 @@ div.row.widget-wrapper {
 
 .settings-config-panel {
     padding: 5px;
+}
+
+.data-table-selected {
+    text-align: center;
+}
+
+.data-table-selected.sorting_asc::after {
+    visibility: hidden;
+}
+
+.center-header {
+    text-align: center;
 }
 
 .shim {
@@ -5625,6 +5643,15 @@ div.row.widget-wrapper {
     padding-bottom: 15px;
     padding-left: 70px;
     margin-top: 5px;
+}
+
+.rp-report-tile.related {
+    padding-bottom: 0px;
+}
+
+.rp-report-tile .reported-relationship {
+    padding-left: 5px;
+    color: #888;
 }
 
 .rp-no-data {
@@ -5898,7 +5925,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     border: 1px solid #eee;
     border-right-width: 0px;
-    z-index: 10;
+    z-index: 1100;
 }
 
 #overlay-grid {
@@ -5936,7 +5963,7 @@ div.row.widget-wrapper.report-header:hover {
 .overlay-list-container {
     padding-top: 0px;
     padding-left: 0px;
-    height: 375px;
+    padding-bottom: 5px;
     overflow-y: auto;
 }
 
@@ -6122,6 +6149,10 @@ div.row.widget-wrapper.report-header:hover {
     padding: 0px;
 }
 
+.map-search-container div.geometry-tools-container {
+    top: 0px;
+    left: 0px;
+}
 
 
 .geocode-container-shim {
@@ -6247,6 +6278,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 100vh;
     background: #fbfbfb;
 }
+
 
 .map-report-header-container {
     height: 500px;
@@ -6575,6 +6607,10 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
+.map-query-tool-input.buffer {
+    height: 40px;
+}
+
 .map-json-tool {
     position: absolute;
     height: 120px;
@@ -6587,21 +6623,30 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
-.map-json-tool-container {
+.map-tool-container {
     position: absolute;
-    top: 0px;
-    left: 40px;
+    top: 75px;
+    left: 30px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.form-control .buffer {
+    width: 55%;
+}
+
+.map-tool-container.buffer {
+    position: absolute;
+    top: 0px;
+    width: 150px;
+}
+
 .map-json-tool-item {
     padding: 1px;
     background: #aaa;
     color: #aaa;
-    /*border-bottom: 1px solid #ddd;*/
 }
 
 .map-json-tool-item-icon {
@@ -7016,6 +7061,7 @@ span.basemap-unselected {
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
@@ -7227,33 +7273,12 @@ a.search-query-link-captions:focus {
     transition: all .5s;
 }
 
-.search-results-button {
-    position: absolute;
-    top: 33px;
-    left: 0px;
-    width: 43px;
-    height: 40px;
-    background: #fafafa;
-    border: 1px solid #dddddd;
-    border-left-width: 0px;
-    padding-left: 6px;
-    padding-top: 6px;
-    z-index: 100;
-}
+
 
 .search-results-panel-closed {
     left: 10px;
 }
 
-.map-filter-panel div #map-widget-container .search-results-button {
-    display: block;
-}
-
-.search-results-button-icon {
-    font-size: 19px;
-    margin-left: 15px;
-    margin-top: 10px;
-}
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -7274,6 +7299,10 @@ a.search-query-link-captions:focus {
     border-color: #dcdcdc;
     box-shadow: none;
     background-color: transparent;
+}
+
+ul.pagination {
+    font-size: 12px;
 }
 
 .map-filter-panel {
@@ -8176,6 +8205,9 @@ a.search-facet-item.disabled {
         text-align: right;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    .dl-horizontal dt a {
+        font-weight: 600;
     }
     .rp-no-data {
         margin-left: 280px;

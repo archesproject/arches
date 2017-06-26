@@ -493,11 +493,12 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
 
         context = self.get_context_data(
@@ -510,11 +511,11 @@ class ReportEditorView(GraphBaseView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            map_layers=map_layers,
+            map_sources=map_sources,
             resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,
-            map_layers=map_layers,
-            map_sources=map_sources,
          )
 
         context['nav']['title'] = self.graph.name
@@ -608,14 +609,14 @@ class PermissionManagerView(GraphBaseView):
         identities = []
         for group in Group.objects.all():
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
-        for user in User.objects.all():
+        for user in User.objects.filter(is_superuser=False):
             groups = []
             default_perms = []
             for group in user.groups.all():
                 groups.append(group.name)
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms)})
-        
+
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
         root = {'children': []}
@@ -687,7 +688,7 @@ class PermissionDataView(View):
             for nodegroup_id in nodegroup_ids:
                 nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
                 perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(identity, nodegroup)]
-                
+
                 # only get the group perms ("defaults") if no user defined object settings have been saved
                 if len(perms) == 0:
                     perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in set(get_group_perms(identity, nodegroup))]
@@ -715,7 +716,7 @@ class PermissionDataView(View):
 
                 for card in data['selectedCards']:
                     nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
-                    
+
                     # first remove all the current permissions
                     for perm in get_perms(identityModel, nodegroup):
                         remove_perm(perm, identityModel, nodegroup)

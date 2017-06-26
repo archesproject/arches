@@ -26,10 +26,6 @@ def install():
             os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
         shutil.rmtree(tmpinstalldir, True)
 
-        #INSTALLING CUSTOM DJANGO EDITS/PATCHES
-        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(django_install_location, 'contrib', 'auth'))
-        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(django_install_location, 'contrib', 'admin', 'static', 'admin', 'css'))
-
 def site_packages_dir():
     if sys.platform == 'win32':
         return os.path.join(sys.prefix, 'Lib', 'site-packages')

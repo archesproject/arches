@@ -20,15 +20,15 @@ def forwards_func(apps, schema_editor):
     for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
         prepare_search_index(str(graphid), create=True)
 
-    settings_data_file = 'Arches_System_Settings.json'
-    local_settings_available = os.path.isfile(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json'))
+    settings_data_file = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json')
+    local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
 
     if local_settings_available == True:
-        settings_data_file = 'Arches_System_Settings_Local.json'
+        settings_data_file = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
     management.call_command('es', operation='index_resources')
     management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
-    management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', settings_data_file), overwrite='overwrite')
+    management.call_command('packages', operation='import_business_data', source=settings_data_file, overwrite='overwrite')
 
 def reverse_func(apps, schema_editor):
     GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
@@ -93,6 +93,16 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/date',
                     configname = 'date-datatype-config'
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/concept',
+                    configname = 'concept-datatype-config'
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configname = 'domain-value-datatype-config'
+                WHERE datatype = 'domain-value-list';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -124,6 +134,17 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'domain-value-list';
+
         """),
 
         migrations.RunSQL("""

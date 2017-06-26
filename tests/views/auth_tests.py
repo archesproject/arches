@@ -143,56 +143,6 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
 
-    def test_nonauth_user_access_to_resource_manager(self):
-        """
-        Test to check that a non-authenticated user can't perform CRUD on resources
-
-        """
-
-        response = self.client.get(reverse('resource_manager', kwargs={'resourcetypeid':'HERITAGE_RESOURCE.E18', 'form_id': 'summary', 'resourceid': ''}))
-
-        self.assertTrue(response.status_code == 302)
-        self.assertTrue(strip_response_location(response) == reverse('auth'))
-
-
-        postbody = {
-            "RESOURCE_TYPE_CLASSIFICATION.E55":[],
-            "NAME.E41":[{
-                "nodes":[{
-                    "property":"",
-                    "entitytypeid":"NAME.E41",
-                    "entityid":"",
-                    "value":"ANP TEST",
-                    "label":"",
-                    "businesstablename":"",
-                    "child_entities":[]
-                },{
-                    "property":"",
-                    "entitytypeid":"NAME_TYPE.E55",
-                    "entityid":"",
-                    "value":"527d4bcf-d95a-487a-9849-c523a838ae92",
-                    "label":"Primary",
-                    "businesstablename":"",
-                    "child_entities":[]
-                }]
-            }],
-            "important_dates":[],
-            "KEYWORD.E55":[]
-        }
-
-        response = self.client.post(reverse('resource_manager', kwargs={'resourcetypeid':'HERITAGE_RESOURCE.E18', 'form_id': 'summary', 'resourceid': ''}), data={'formdata':postbody})
-
-        self.assertTrue(response.status_code == 302)
-        self.assertTrue(strip_response_location(response) == reverse('auth'))
-
-
-        response = self.client.delete(reverse('resource_manager', kwargs={'resourcetypeid':'HERITAGE_RESOURCE.E18', 'form_id': 'summary', 'resourceid': ''}), data={'formdata':postbody})
-
-        self.assertTrue(response.status_code == 302)
-        self.assertTrue(strip_response_location(response) == reverse('auth'))
-
-
-
     def tearDown(self):
         self.user.delete()
 

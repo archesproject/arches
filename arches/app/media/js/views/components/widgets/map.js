@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'jsts',
     'proj4',
     'turf',
     'geohash',
@@ -22,7 +21,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -109,6 +108,7 @@ define([
             this.selectedFeatureType = ko.observable();
             this.overlays = ko.observableArray();
             this.overlayLibrary = ko.observableArray();
+            this.geoJsonStringValid = ko.observable(true);
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
@@ -122,9 +122,9 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
                 this.query = params.query;
+                this.clearSearch = params.clearSearch;
             }
 
             this.buffer = ko.observable(100.0);
@@ -135,12 +135,6 @@ define([
             this.pitchAndZoomEnabled = ko.observable(true);
             this.atMaxZoom = ko.observable(false);
             this.atMinZoom = ko.observable(true);
-
-            this.geojsonInput.subscribe(function(val){
-                if (!val) {
-                    this.geojsonString('');
-                }
-            }, this);
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
@@ -186,10 +180,8 @@ define([
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.extentSearch(false)
                         self.updateSearchQueryLayer([]);
-                        if (self.extentSearch() === true) {
-                            self.toggleExtentSearch();
-                        }
                     }
                 };
 
@@ -290,7 +282,7 @@ define([
                     isoverlay: false,
                     icon: 'ion-map'
                 }
-                return searchQueryLayer
+                return searchQueryLayer;
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
@@ -301,6 +293,19 @@ define([
                         "features": geojson_features
                     };
                     self.map.setStyle(style);
+                    if (geojson_features.length === 0) {
+                        self.clearSearch(true);
+                        self.clearSearch(false);
+                        if (self.draw.getAll().features.length > 0){
+                            _.each(self.geometryTypeDetails, function(type){
+                                if (type.active() === true) {
+                                    type.active(false);
+                                }
+                            })
+                            self.switchToEditMode()
+                            self.draw.deleteAll();
+                        }
+                    }
                 }
             }
 
@@ -318,7 +323,7 @@ define([
                         if (this.queryFeature.properties.extent_search === true) {
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
                             this.toggleExtentSearch()
-                            this.map.fitBounds(bounds);
+                            this.map.fitBounds(bounds, {padding: 100});
                         } else {
                             drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
                             this.draw.changeMode(drawMode.drawMode)
@@ -326,7 +331,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                this.buffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                } else {
+                                    this.buffer(this.queryFeature.properties.buffer.width)
+                                }
                             }
                         }
                     }
@@ -336,19 +345,29 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val){
+                if (val !== '') {
                     try {
                         var data = JSON.parse(val)
                         try {
                             self.draw.add(data)
                             self.saveGeometries()
+                            if (data['type'] === 'Point') {
+                                data = turf.buffer(data, 500, 'meters')
+                            }
+                            var bbox = turf.bbox(data);
+                            var ll = new mapboxgl.LngLat(bbox[0],bbox[1])
+                            var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
+                            var bounds = new mapboxgl.LngLatBounds(ll, ur)
+                            self.map.fitBounds(bounds, {padding: 200});
+                            setTimeout(function(){self.geojsonString('')}, 500)
+                            self.geoJsonStringValid(true);
                         } catch(err) {
-                            console.log(err)
-                            console.log('invalid geometry')
+                            self.geoJsonStringValid(false);
                         }
                     } catch(err) {
-                        console.log(err)
-                        console.log('invalid json')
+                        self.geoJsonStringValid(false);
                     }
+                }
             }
 
 
@@ -454,6 +473,8 @@ define([
                     active: ko.observable(false)
                 }
             }
+
+            this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode')
 
             this.geomTypeSelectSetup = {
                 minimumInputLength: 0,
@@ -601,7 +622,13 @@ define([
                                         "features": []
                                     };
                                 }
-                                self.fitToAggregationBounds();
+
+                                if (self.value() && self.value()['features'].length > 0) {
+                                    var bounds = new mapboxgl.LngLatBounds(geojsonExtent(turf.buffer(self.value(), self.buffer()/3.28084, 'meters')));
+                                    self.map.fitBounds(bounds,{padding: 200});
+                                } else {
+                                    self.fitToAggregationBounds();
+                                }
                                 var features = [];
                                 _.each(agg.grid.buckets, function (cell) {
                                     var pt = geohash.decode(cell.key);
@@ -757,6 +784,14 @@ define([
                     self.drawMode(undefined);
                 }
 
+                if (this.context === 'resource-editor') {
+                    self.drawMode.subscribe(function(val){
+                        if (val !== undefined) {
+                            self.geojsonInput(false);
+                        }
+                    })
+                }
+
                 /**
                  * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
                  * @param  {string} selectedDrawTool the draw tool name selected in the map controls
@@ -768,7 +803,13 @@ define([
                         this.extentSearch(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
-                        this.updateSearchQueryLayer([]);
+                        if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()){
+                            this.updateSearchQueryLayer([]);
+                        }
+                    } else if (this.context === 'resource-editor') {
+                        if (this.geojsonInput()) {
+                            this.geojsonInput(false);
+                        }
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -785,8 +826,7 @@ define([
                         self.drawMode('simple_select');
                     }
                     else if (selectedDrawTool === 'end') {
-                        self.draw.changeMode('simple_select')
-                        self.drawMode(undefined);
+                        self.switchToEditMode()
                     }
                     else {
                         if (!self.drawMode()) {
@@ -1062,6 +1102,21 @@ define([
                     }
                 };
 
+                this.geojsonInput.subscribe(function(val){
+                    if (!val) {
+                        this.geoJsonStringValid(true);
+                        this.geojsonString('');
+
+                    } else {
+                        _.each(self.geometryTypeDetails, function(geomtype) {
+                            if (geomtype.active()) {
+                                geomtype.active(false);
+                            }
+                        })
+                        self.switchToEditMode()
+                    }
+                }, this);
+
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
                     for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
@@ -1086,6 +1141,7 @@ define([
                         this.map.setBearing(0)
                         this.map.dragRotate.disable();
                     } else {
+                        this.map.setPitch(this.pitch() > 0 ? this.pitch() : 50)
                         this.map.dragRotate.enable();
                     }
                 }, this);
@@ -1097,24 +1153,7 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var transformer = proj4('EPSG:4326','EPSG:3857');
-                            coords = self.queryFeature.geometry.coordinates;
-                            switch (self.queryFeature.geometry.type) {
-                                case 'Point': coords3857 = transformer.forward(coords); break;
-                                case 'LineString': coords3857 = _.map(coords, function(coord){ return transformer.forward(coord);}); break;
-                                case 'Polygon': coords3857 = [_.map(coords[0], function(coord){ return transformer.forward(coord);})];
-                            }
-
-                            var prebufferFeature = $.extend(true, {}, self.queryFeature);
-                            prebufferFeature.geometry.coordinates = coords3857;
-                            var reader = new jsts.io.GeoJSONReader();
-                            var writer = new jsts.io.GeoJSONWriter();
-                            var jstsFeature = reader.read(prebufferFeature)
-                            var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
-                            var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature = turf.polygon(coords4326);
-
-
+                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
@@ -1138,8 +1177,7 @@ define([
                     this.extentSearch(!this.extentSearch())
                     if (this.extentSearch() === true) {
                         self.draw.deleteAll();
-                        self.draw.changeMode('simple_select');
-                        self.drawMode(undefined);
+                        self.switchToEditMode();
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             geomtype.active(false);
                         })
@@ -1154,7 +1192,9 @@ define([
                 this.searchByExtent = function() {
                     if (self.extentSearch() === true) {
                         self.queryFeature = undefined;
-                        self.updateSearchQueryLayer([])
+                        if (_.contains(self.drawModes, self.drawMode())) {
+                            self.updateSearchQueryLayer([])
+                        }
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -1180,11 +1220,11 @@ define([
                     }
                 }
 
-                this.extentSearch.subscribe(function() {
+                this.extentSearch.subscribe(function(val) {
                     self.searchByExtent();
                 })
 
-                this.buffer.subscribe(function(val) {
+                this.updateBuffer = function(val) {
                     var maxBuffer = 100000;
                     if(val < 0){
                         this.buffer(0)
@@ -1193,7 +1233,9 @@ define([
                     }else{
                         this.applySearchBuffer(val)
                     }
-                }, this);
+                }
+
+                this.buffer.subscribe(this.updateBuffer, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
@@ -1460,7 +1502,10 @@ define([
 
             this.mapStyle.layers = this.addInitialLayers();
 
+            this.reportURL = arches.urls.resource_report;
+
             this.editURL = arches.urls.resource_editor;
+
         },
         template: {
             require: 'text!widget-templates/map'

@@ -87,11 +87,45 @@
         </div>
         <!-- /ko -->
     </template>
+
+
     {% endblock body %}
+
+    <div class="rp-report-section relative">
+    <div class="rp-report-section-title">
+        <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+    </div>
+    <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+    <div class="rp-card-section">
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
+        </h5>
+        <!--ko if: rr.related.length > 0 -->
+        <div class="rp-report-container-tile">
+        <div class="row rp-report-tile">
+            <!-- ko foreach: { data: rr.related } -->
+                <dl class="dl-horizontal">
+                    <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
+                    <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
+                </dl>
+            <!-- /ko -->
+        </div>
+        </div>
+        <!-- /ko -->
+        <!--ko if: rr.related.length === 0 -->
+        <div class="rp-report-container-tile">
+            <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
+        </div>
+        <!--/ko-->
+    </div>
+    <!-- /ko -->
+    </div>
 </div>
+
 
 {% endblock report %}
 <!-- /ko -->
+
 
 <!-- ko if: configForm && (configType === 'header') -->
 {% block header_form %}
