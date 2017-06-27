@@ -410,13 +410,6 @@ def _get_child_concepts(conceptid):
         ret.add(row[1])
     return list(ret)
 
-def geocode(request):
-    geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['id'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['id'])
-    search_string = request.GET.get('q', '')
-    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['api_key']) })
-
 def export_results(request):
     dsl = build_search_results_dsl(request)
     search_results = dsl.search(index='entity', doc_type='')
