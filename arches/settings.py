@@ -220,7 +220,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
-    # 'arches.app.utils.bing_geocoder'
 )
 
 ROOT_URLCONF = 'arches.urls'
