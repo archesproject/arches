@@ -200,6 +200,93 @@ class Migration(migrations.Migration):
         """
             DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
         """),
+        migrations.RunSQL("""
+            UPDATE report_templates SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "10000000-0000-0000-0000-010000000000",
+                "zoom": 10,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": -122.3979693,
+                "centerY": 37.79,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null,
+                "featureEditingDisabled": true,
+                "mapControlsHidden": false
+            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+
+            UPDATE widgets SET (defaultconfig) = ('{
+                    "basemap": "streets",
+                    "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                    "overlayConfigs": [],
+                    "overlayOpacity": 0.0,
+                    "geocodeProvider": "10000000-0000-0000-0000-010000000000",
+                    "zoom": 0,
+                    "maxZoom": 20,
+                    "minZoom": 0,
+                    "centerX": 0,
+                    "centerY": 0,
+                    "pitch": 0.0,
+                    "bearing": 0.0,
+                    "geocodePlaceholder": "Search",
+                    "geocoderVisible": true,
+                    "featureColor": null,
+                    "featureLineWidth": null,
+                    "featurePointSize": null
+                }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+        """,
+        """
+            UPDATE report_templates SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "MapzenGeocoder",
+                "zoom": 10,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": -122.3979693,
+                "centerY": 37.79,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null,
+                "featureEditingDisabled": true,
+                "mapControlsHidden": false
+            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            UPDATE widgets SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "MapzenGeocoder",
+                "zoom": 0,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": 0,
+                "centerY": 0,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null
+            }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+        """),
+
+
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
         migrations.RunPython(forwards_func, reverse_func),
         migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
