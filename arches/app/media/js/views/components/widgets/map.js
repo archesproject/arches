@@ -156,9 +156,6 @@ define([
                 this.geocodeProvider(arches.geocoderDefault);
             }
 
-            console.log(this.geocodingProviders)
-            console.log(this.geocodeProvider())
-
             this.geocodeProviderDetails = _.findWhere(this.geocodingProviders, {'geocoderid':this.geocodeProvider()})
 
             this.loadGeometriesIntoDrawLayer = function() {
@@ -435,8 +432,6 @@ define([
                         });
                     }
                 }, this);
-
-                // initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
             }
 
