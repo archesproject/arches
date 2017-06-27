@@ -38,7 +38,7 @@ from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
-
+# print system_settings
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -118,7 +118,10 @@ class ResourceEditorView(BaseManagerView):
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
-            context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
+            if resourceid == settings.RESOURCE_INSTANCE_ID:
+                context['nav']['help'] = (_('Managing System Settings'),'help/system-settings-help.htm')
+            else:
+                context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
 
