@@ -2,6 +2,11 @@
 Overview
 ########
 
+Documentation Overview
+======================
+
+This is the general User Manual for Arches. It should provide you with background information on Arches, how to install it, and a good overview of its capabilities. While you are using Arches, be aware that much of the content here is also available by clicking the "?" symbol in the top-right corner of any page. If you are a developer interested in customizing or contributing to Arches, you should also visit our `GitHub wiki <https://github.com/archesproject/arches/wiki>`_ for more information about how Arches works underneath.
+
 What is Arches?
 ===============
 
