@@ -62,6 +62,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='Geocoder',
+            fields=[
+                ('geocoderid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField()),
+                ('component', models.TextField()),
+                ('api_key', models.TextField()),
+            ],
+            options={
+                'db_table': 'geocoders',
+                'managed': True,
+            },
+        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
@@ -180,6 +193,12 @@ class Migration(migrations.Migration):
             DELETE from widgets WHERE widgetid = '10000000-0000-0000-0000-000000000022';
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
+        """),
+        migrations.RunSQL("""
+            INSERT INTO public.geocoders(geocoderid, name, component, api_key) VALUES ('10000000-0000-0000-0000-010000000000', 'Mapbox', 'views/components/geocoders/mapbox', '');
+        """,
+        """
+            DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
         """),
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
         migrations.RunPython(forwards_func, reverse_func),

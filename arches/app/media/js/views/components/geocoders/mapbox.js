@@ -1,11 +1,11 @@
 define(['knockout', 'mapbox-gl', 'arches', 'geocoder-templates'],
 function (ko, mapboxgl, arches) {
-    return ko.components.register('views/components/geocoder', {
+    return ko.components.register('views/components/geocoders/mapbox', {
         viewModel: function(params) {
             var self = this;
-            this.provider = params.provider || ko.observable('MapboxGeocoder');
             this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
             this.anchorLayerId = params.anchorLayerId;
+            this.apiKey = params.api_key || arches.mapboxApiKey
             this.map = params.map;
             this.pointstyle = {
                 "id": "geocode-point",
@@ -32,6 +32,8 @@ function (ko, mapboxgl, arches) {
                 self.focusItem(null);
             });
             this.query = ko.observable();
+
+
             this.query.subscribe(function (data) {
                 self.options([]);
                 if (data.length > 3) {
@@ -125,7 +127,7 @@ function (ko, mapboxgl, arches) {
             });
         },
         template: {
-            require: 'text!templates/views/components/geocoder.htm'
+            require: 'text!templates/views/components/geocoders/mapbox.htm'
         }
     });
 })

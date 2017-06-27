@@ -203,7 +203,6 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            geocodingProviders: {{ map_info.geocoding_providers|safe }},
             hexBinSize: {{ map_info.hex_bin_size }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
@@ -249,6 +248,12 @@
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',
                 'id': '{{ concept_collection.id }}',
+            },{% endfor %}{% endautoescape %}],
+            geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
+                'name': '{{ provider.name }}',
+                'geocoderid': '{{ provider.geocoderid }}',
+                'api_key': '{{ provider.api_key }}',
+                'component': '{{ provider.component }}'
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
@@ -311,11 +316,11 @@
          return;
     });
 
-    define('component-templates', ['views/components/nodegroup-selector', 'views/components/geocoder'], function () {
+    define('component-templates', ['views/components/nodegroup-selector'], function () {
          return;
     });
 
-    define('geocoder-templates', ['views/components/geocoder'], function () {
+    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
          return;
     });
 

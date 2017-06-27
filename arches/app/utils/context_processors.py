@@ -44,8 +44,7 @@ def map_info(request):
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
             'hex_bin_bounds': json.dumps(hex_bin_bounds),
-            'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER,
-            'geocoding_providers': json.dumps(settings.GEOCODING_PROVIDERS)
+            'geocoder_default': settings.DEFAULT_GEOCODER
         }
     }
 

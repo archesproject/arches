@@ -313,12 +313,12 @@ class CardView(GraphBaseView):
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-
         ontology_properties = []
         card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
         for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
@@ -331,6 +331,7 @@ class CardView(GraphBaseView):
             graph_id=self.graph.pk,
             card=JSONSerializer().serialize(card),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            geocoding_providers=geocoding_providers,
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
@@ -498,6 +499,7 @@ class ReportEditorView(GraphBaseView):
         resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        geocoders = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
         map_sources = models.MapSource.objects.all()
 
@@ -513,6 +515,7 @@ class ReportEditorView(GraphBaseView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             map_layers=map_layers,
             map_sources=map_sources,
+            geocoders=geocoders,
             resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,

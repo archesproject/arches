@@ -160,12 +160,12 @@
             'hide-geocoder': geocoderVisible
         }">
         <!-- ko component: {
-            name: 'views/components/geocoder',
+            name: geocodeProviderDetails.component,
             params: {
                 placeholder: geocodePlaceholder,
-                provider: geocodeProvider,
                 map: map,
-                anchorLayerId: anchorLayerId
+                anchorLayerId: anchorLayerId,
+                api_key: geocodeProviderDetails.api_key
             }
         } -->
         <!-- /ko -->
@@ -499,7 +499,7 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'geocoderid', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}

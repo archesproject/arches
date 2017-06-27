@@ -271,12 +271,7 @@ LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
-GEOCODING_PROVIDERS = [
-    {'name': 'Mapbox', 'api_key':'', 'id':'MapboxGeocoder'},
-    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
-]
-
-DEFAULT_SEARCH_GEOCODER = "MapboxGeocoder"
+DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
 SPARQL_ENDPOINT_PROVIDERS = (
     {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},

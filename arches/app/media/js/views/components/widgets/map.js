@@ -37,7 +37,7 @@ define([
      * @param {number} params.config.zoom - map zoom level
      * @param {number} params.config.centerX - map center longitude
      * @param {number} params.config.centerY - map center latitude
-     * @param {string} params.config.geocodeProvider - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
+     * @param {string} params.config.geocodeProvider - the geocoderid of the selected geocoder.
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {object} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {number} params.config.pitch - the pitch of the map in degrees
@@ -152,6 +152,14 @@ define([
             });
 
             this.geocodingProviders = arches.geocodingProviders;
+            if (!this.geocodeProvider()) {
+                this.geocodeProvider(arches.geocoderDefault);
+            }
+
+            console.log(this.geocodingProviders)
+            console.log(this.geocodeProvider())
+
+            this.geocodeProviderDetails = _.findWhere(this.geocodingProviders, {'geocoderid':this.geocodeProvider()})
 
             this.loadGeometriesIntoDrawLayer = function() {
                 if (self.draw) {
@@ -512,7 +520,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-                // this.geocoder.setMap(map);
+
                 this.draw = draw;
                 this.map.addControl(draw);
 
