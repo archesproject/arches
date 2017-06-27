@@ -1,9 +1,5 @@
 {% load i18n %}
 <!-- Geocode Panel -->
-<div class="geocode-container" data-bind="css : {
-    'geocode-container-shim': mapControls.mapControlsExpanded,
-    'hide-geocoder': geocoderVisible
-}, with: geocoder">
     <!-- ko if: options().length > 0 -->
     <a href="#" data-bind="click: function () {
         query('');
@@ -51,4 +47,3 @@
         </div>
         <!--/ko-->
     <!--/ko-->
-</div>

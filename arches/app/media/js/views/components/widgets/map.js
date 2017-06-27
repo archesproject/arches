@@ -151,14 +151,7 @@ define([
                 return clickData ? clickData : self.hoverData();
             });
 
-            // TODO: This should be a system config rather than hard-coded here
-            this.geocoderProviders = ko.observableArray([{
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }, {
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }]);
+            this.geocodingProviders = arches.geocodingProviders;
 
             this.loadGeometriesIntoDrawLayer = function() {
                 if (self.draw) {

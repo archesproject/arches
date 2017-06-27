@@ -154,6 +154,11 @@
             </div>
         </div>
 
+
+        <div class="geocode-container" data-bind="css : {
+            'geocode-container-shim': mapControls.mapControlsExpanded,
+            'hide-geocoder': true
+        }">
         <!-- ko component: {
             name: 'views/components/geocoder',
             params: {
@@ -164,6 +169,7 @@
             }
         } -->
         <!-- /ko -->
+        </div>
 
         <!-- ko if: popupData() !== null -->
         <div class="hover-feature-info">
@@ -493,7 +499,7 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoderProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}

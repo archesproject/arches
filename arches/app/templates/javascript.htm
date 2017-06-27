@@ -204,6 +204,7 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            geocodingProviders: {{ map_info.geocoding_providers|safe }},
             hexBinSize: {{ map_info.hex_bin_size }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',

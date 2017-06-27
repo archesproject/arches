@@ -20,6 +20,7 @@ import json
 from arches import __version__
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 def livereload(request):
@@ -31,7 +32,6 @@ def map_info(request):
     geo_utils = GeoUtils()
     hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
     default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
-
     return {
         'map_info': {
             'x': default_center['coordinates'][0],
@@ -44,7 +44,8 @@ def map_info(request):
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
             'hex_bin_bounds': json.dumps(hex_bin_bounds),
-            'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER
+            'geocoder_default': settings.DEFAULT_SEARCH_GEOCODER,
+            'geocoding_providers': json.dumps(settings.GEOCODING_PROVIDERS)
         }
     }
 
