@@ -196,9 +196,11 @@ class Migration(migrations.Migration):
         """),
         migrations.RunSQL("""
             INSERT INTO public.geocoders(geocoderid, name, component, api_key) VALUES ('10000000-0000-0000-0000-010000000000', 'Mapbox', 'views/components/geocoders/mapbox', '');
+            INSERT INTO public.geocoders(name, component) VALUES ('Mapzen', 'views/components/geocoders/mapzen');
         """,
         """
             DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
+            DELETE FROM public.geocoders WHERE name = 'Mapzen';
         """),
         migrations.RunSQL("""
             UPDATE report_templates SET (defaultconfig) = ('{
