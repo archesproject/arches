@@ -83,7 +83,12 @@
 
         <!-- ko if: tiles.length === 0 -->
         <div class="row rp-report-tile rp-no-data">
+        <!-- ko ifnot: card.get('cardid') -->
+            {% trans "Sorry, you don't have access to this information" %}
+        <!-- /ko -->
+        <!-- ko if: card.get('cardid') -->
             {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+        <!-- /ko -->
         </div>
         <!-- /ko -->
     </template>
