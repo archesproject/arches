@@ -499,7 +499,7 @@ class ReportEditorView(GraphBaseView):
         resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        geocoders = models.Geocoder.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
         map_sources = models.MapSource.objects.all()
 
@@ -515,7 +515,7 @@ class ReportEditorView(GraphBaseView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             map_layers=map_layers,
             map_sources=map_sources,
-            geocoders=geocoders,
+            geocoding_providers=geocoding_providers,
             resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,

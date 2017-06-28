@@ -158,6 +158,9 @@ define([
 
             this.geocodeProviderDetails = _.findWhere(this.geocodingProviders, {'geocoderid':this.geocodeProvider()})
 
+            console.log(this.geocodeProviderDetails)
+            console.log(this.geocodeProvider())
+
             this.loadGeometriesIntoDrawLayer = function() {
                 if (self.draw) {
                     var val = koMapping.toJS(self.value);
