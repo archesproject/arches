@@ -166,7 +166,7 @@ class ResourceDescriptors(View):
 
         return HttpResponseNotFound()
 
-@method_decorator(group_required('Guest'), name='dispatch')
+@method_decorator(group_required('Resource Editor', 'Guest'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
