@@ -15,7 +15,7 @@ To begin development or make a test installation of Arches, you will need the fo
 
 + **4gb memory (RAM)**
 	+ This recommendation is calculated by the fact that ElasticSearch requires 2gb to run, and as per `ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
-	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch#running-elasticsearch>`_.
+	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
 	+ In production, you may want to increase your memory, and allow ElasticSearch to use more than its default.
 
 ----------------
