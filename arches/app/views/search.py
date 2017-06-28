@@ -60,6 +60,7 @@ class SearchView(BaseManagerView):
         searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
         datatypes = models.DDataType.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
 
         context = self.get_context_data(
             resource_cards=JSONSerializer().serialize(resource_cards),
@@ -68,6 +69,7 @@ class SearchView(BaseManagerView):
             date_nodes=date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
+            geocoding_providers=geocoding_providers,
             main_script='views/search',
             resource_graphs=resource_graphs,
             datatypes=datatypes,
@@ -409,13 +411,6 @@ def _get_child_concepts(conceptid):
         ret.add(row[0])
         ret.add(row[1])
     return list(ret)
-
-def geocode(request):
-    geocoding_provider_id = request.GET.get('geocoder', '')
-    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['NAME'] == geocoding_provider_id), None)
-    Geocoder = import_string('arches.app.utils.geocoders.' + provider['NAME'])
-    search_string = request.GET.get('q', '')
-    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['API_KEY']) })
 
 def export_results(request):
     dsl = build_search_results_dsl(request)

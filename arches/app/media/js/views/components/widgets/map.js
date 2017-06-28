@@ -13,15 +13,15 @@ define([
     'geojson-extent',
     'views/list',
     'views/components/widgets/map/map-styles',
-    'viewmodels/geocoder',
     'viewmodels/map-controls',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
-    'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+    'bindings/color-picker',
+    'geocoder-templates'
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -37,7 +37,7 @@ define([
      * @param {number} params.config.zoom - map zoom level
      * @param {number} params.config.centerX - map center longitude
      * @param {number} params.config.centerY - map center latitude
-     * @param {string} params.config.geocodeProvider - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
+     * @param {string} params.config.geocodeProvider - the geocoderid of the selected geocoder.
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {object} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {number} params.config.pitch - the pitch of the map in degrees
@@ -144,12 +144,6 @@ define([
                 this.summaryDetails = koMapping.toJS(this.value).features || [];
             }
 
-            this.geocoder = new GeocoderViewModel({
-                provider: this.geocodeProvider,
-                placeholder: this.geocodePlaceholder,
-                anchorLayerId: this.anchorLayerId
-            });
-
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
             this.popupData = ko.computed(function () {
@@ -157,14 +151,12 @@ define([
                 return clickData ? clickData : self.hoverData();
             });
 
-            // TODO: This should be a system config rather than hard-coded here
-            this.geocoderProviders = ko.observableArray([{
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }, {
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }]);
+            this.geocodingProviders = arches.geocodingProviders;
+            if (!this.geocodeProvider()) {
+                this.geocodeProvider(arches.geocoderDefault);
+            }
+
+            this.geocodeProviderDetails = _.findWhere(this.geocodingProviders, {'geocoderid':this.geocodeProvider()})
 
             this.loadGeometriesIntoDrawLayer = function() {
                 if (self.draw) {
@@ -440,8 +432,6 @@ define([
                         });
                     }
                 }, this);
-
-                initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
             }
 
@@ -525,7 +515,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-                this.geocoder.setMap(map);
+
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -1130,7 +1120,7 @@ define([
                         }
                         this.addMaplayer(overlays[i])
                     }
-                    this.geocoder.redrawLayer();
+                    // this.geocoder.redrawLayer();
                 }, this)
 
                 this.pitchAndZoomEnabled.subscribe(function(val){

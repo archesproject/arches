@@ -1,16 +1,18 @@
-define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
+define(['knockout', 'mapbox-gl', 'arches', 'geocoder-templates'],
+function (ko, mapboxgl, arches) {
     /**
-     * A viewmodel used for a generic geocoder
+     * A viewmodel used for geocoders
      *
      * @constructor
-     * @name GeocoderViewModel
+     * @name BaseGeocoderViewModel
      *
+     * @param  {string} params - a configuration object
      */
-    var GeocoderViewModel = function(params) {
+    var BaseGeocoderViewModel = function(params) {
         var self = this;
-        this.provider = params.provider || ko.observable('MapzenGeocoder');
         this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
         this.anchorLayerId = params.anchorLayerId;
+        this.apiKey = params.api_key || arches.mapboxApiKey
         this.map = params.map;
         this.pointstyle = {
             "id": "geocode-point",
@@ -37,34 +39,40 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             self.focusItem(null);
         });
         this.query = ko.observable();
-        this.queryData = ko.computed(function () {
-            return {
-                q: self.query(),
-                geocoder: self.provider()
-            }
-        }).extend({
-            rateLimit: {
-                timeout: 500,
-                method: "notifyWhenChangesStop"
-            }
-        });
-        this.queryData.subscribe(function (data) {
-            self.options([]);
-            if (data.q.length > 3) {
-                self.loading(true);
-                $.ajax({
-                    type: 'GET',
-                    url: arches.urls.geocoder,
-                    data: data,
-                    success: function(res){
-                        self.options(res.results);
-                    },
-                    complete: function () {
-                        self.loading(false);
-                    }
-                });
-            }
-        });
+
+        this.updateResults = function(data) {
+                self.options([]);
+                if (data.length > 3) {
+                    self.loading(true);
+                    $.ajax({
+                        type: 'GET',
+                        url: 'https://api.mapbox.com/geocoding/v5/mapbox.places/'+ self.query() + '.json',
+                        data: {
+                            access_token: arches.mapboxApiKey
+                        },
+                        success: function(res){
+                            var results = _.map(res.features, function(feature){
+                                return {
+                                    'id':feature['id'],
+                                    'text':feature['place_name'],
+                                    'geometry': {
+                                        "type": "Point",
+                                        "coordinates": [
+                                          feature['geometry']['coordinates'][0],
+                                          feature['geometry']['coordinates'][1]
+                                        ]
+                                    }
+                            }})
+                            self.options(results);
+                        },
+                        complete: function () {
+                            self.loading(false);
+                        }
+                    });
+                }
+            };
+
+        this.query.subscribe(this.updateResults);
 
         this.handleKeys = function (vm, e) {
             var down = 40;
@@ -105,12 +113,14 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
         this.redrawLayer = function() {
             if (self.map) {
                 var cacheLayer = self.map.getLayer('geocode-point');
-                self.map.removeLayer('geocode-point');
+                if (cacheLayer) {
+                    self.map.removeLayer('geocode-point');
+                }
                 self.map.addLayer(self.pointstyle, self.anchorLayerId);
             }
         };
 
-        this.selection.subscribe(function(item) {
+        this.updateSelection = function(item) {
             if (self.map && item) {
                 var coords = item.geometry.coordinates;
                 self.map.getSource('geocode-point').setData(item.geometry);
@@ -122,11 +132,11 @@ define(['knockout', 'mapbox-gl', 'arches'], function(ko, mapboxgl, arches) {
             } else {
                 self.map.removeLayer('geocode-point');
             }
-        });
+        }
 
-        this.setMap = function (map) {
-            self.map = map;
-        };
-    };
-    return GeocoderViewModel;
-});
+        this.selection.subscribe(this.updateSelection);
+    }
+
+    return BaseGeocoderViewModel
+
+})

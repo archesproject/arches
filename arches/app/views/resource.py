@@ -81,6 +81,7 @@ class ResourceEditorView(BaseManagerView):
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayer.objects.all()
             map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
             forms_w_cards = []
@@ -107,6 +108,7 @@ class ResourceEditorView(BaseManagerView):
                 date_nodes=date_nodes,
                 map_layers=map_layers,
                 map_sources=map_sources,
+                geocoding_providers = geocoding_providers,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
@@ -221,6 +223,7 @@ class ResourceReportView(BaseManagerView):
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
 
         context = self.get_context_data(
@@ -233,6 +236,7 @@ class ResourceReportView(BaseManagerView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            geocoding_providers = geocoding_providers,
             related_resources=JSONSerializer().serialize(related_resource_summary),
             widgets=widgets,
             map_layers=map_layers,

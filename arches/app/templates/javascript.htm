@@ -160,7 +160,6 @@
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tile: "{% url 'tile' %}",
-                geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}",
                 reorder_tiles: "{% url 'reorder_tiles' %}",
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
@@ -250,6 +249,12 @@
                 'label': '{{ concept_collection.label }}',
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
+            geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
+                'name': '{{ provider.name }}',
+                'geocoderid': '{{ provider.geocoderid }}',
+                'api_key': '{{ provider.api_key }}',
+                'component': '{{ provider.component }}'
+            },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
               'graphid': '{{resource.graphid}}',
@@ -312,6 +317,10 @@
     });
 
     define('component-templates', ['views/components/nodegroup-selector'], function () {
+         return;
+    });
+
+    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
          return;
     });
 
