@@ -40,40 +40,6 @@ function (ko, mapboxgl, arches) {
         });
         this.query = ko.observable();
 
-        this.updateResults = function(data) {
-                self.options([]);
-                if (data.length > 3) {
-                    self.loading(true);
-                    $.ajax({
-                        type: 'GET',
-                        url: 'https://api.mapbox.com/geocoding/v5/mapbox.places/'+ self.query() + '.json',
-                        data: {
-                            access_token: arches.mapboxApiKey
-                        },
-                        success: function(res){
-                            var results = _.map(res.features, function(feature){
-                                return {
-                                    'id':feature['id'],
-                                    'text':feature['place_name'],
-                                    'geometry': {
-                                        "type": "Point",
-                                        "coordinates": [
-                                          feature['geometry']['coordinates'][0],
-                                          feature['geometry']['coordinates'][1]
-                                        ]
-                                    }
-                            }})
-                            self.options(results);
-                        },
-                        complete: function () {
-                            self.loading(false);
-                        }
-                    });
-                }
-            };
-
-        this.query.subscribe(this.updateResults);
-
         this.handleKeys = function (vm, e) {
             var down = 40;
             var up = 38;
