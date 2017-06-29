@@ -38,8 +38,8 @@ function install_bower {
 }
 
 function main {
-  # sudo apt-get update -y
-  # sudo apt-get install -y make python-software-properties
+  sudo apt-get update -y
+  sudo apt-get install -y make python-software-properties
   sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
   sudo apt-get install -y build-essential
   sudo apt-get install -y libxml2-dev

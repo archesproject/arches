@@ -16,7 +16,7 @@ addons:
     sources:
       - elasticsearch-5.x
     packages:
-      - elasticsearch
+      # - elasticsearch
       - libxml2-dev
       - libpq-dev
       - openjdk-7-jdk
