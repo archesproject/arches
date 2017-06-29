@@ -6,7 +6,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
             var self = this;
             this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
             this.anchorLayerId = params.anchorLayerId;
-            this.apiKey = params.api_key || arches.mapboxApiKey
+            this.apiKey = params.api_key() || arches.mapboxApiKey
             this.map = params.map;
 
             this.options.subscribe(function () {
@@ -21,7 +21,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
                             type: 'GET',
                             url: 'https://api.mapbox.com/geocoding/v5/mapbox.places/'+ self.query() + '.json',
                             data: {
-                                access_token: arches.mapboxApiKey
+                                access_token: ko.unwrap(self.apiKey)
                             },
                             success: function(res){
                                 var results = _.map(res.features, function(feature){

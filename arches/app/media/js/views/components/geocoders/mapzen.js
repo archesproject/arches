@@ -6,7 +6,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
             var self = this;
             this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
             this.anchorLayerId = params.anchorLayerId;
-            this.apiKey = params.api_key || arches.mapboxApiKey
+            this.apiKey = params.api_key() || arches.mapzenApiKey
             this.map = params.map;
 
             this.pointstyle = {
@@ -28,7 +28,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
                         type: 'GET',
                         url: 'http://search.mapzen.com/v1/search',
                         data: {
-                            api_key: self.apiKey(),
+                            api_key: ko.unwrap(self.apiKey),
                             text: self.query()
                         },
                         success: function(res){
