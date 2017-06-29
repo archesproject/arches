@@ -654,7 +654,7 @@ class Geocoder(models.Model):
     geocoderid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     component = models.TextField()
-    api_key = models.TextField()
+    api_key = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name

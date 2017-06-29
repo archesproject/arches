@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 ('geocoderid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('component', models.TextField()),
-                ('api_key', models.TextField()),
+                ('api_key', models.TextField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'geocoders',
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
         """),
         migrations.RunSQL("""
             INSERT INTO public.geocoders(geocoderid, name, component, api_key) VALUES ('10000000-0000-0000-0000-010000000000', 'Mapbox', 'views/components/geocoders/mapbox', '');
-            INSERT INTO public.geocoders(name, component) VALUES ('Mapzen', 'views/components/geocoders/mapzen');
+            INSERT INTO public.geocoders(geocoderid, name, component) VALUES ('10000000-0000-0000-0000-010000000001', 'Mapzen', 'views/components/geocoders/mapzen');
         """,
         """
             DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
