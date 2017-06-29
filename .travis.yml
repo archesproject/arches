@@ -7,7 +7,6 @@ python:
 sudo: false
 
 cache:
-  - apt
   - pip
 
 addons:
