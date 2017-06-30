@@ -115,6 +115,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 
+handler404 = 'app.views.main.custom_404'
+handler500 = 'app.views.main.custom_500'
+
 urlpatterns += staticfiles_urlpatterns()
 
 if settings.DEBUG:
