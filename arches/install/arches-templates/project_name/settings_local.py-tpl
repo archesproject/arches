@@ -4,7 +4,11 @@
 
 #ANONYMOUS_USER_NAME = None
 
-#AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 'guardian.backends.ObjectPermissionBackend')
+'''
+AUTHENTICATION_BACKENDS = (   'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+    'arches.app.utils.permission_backend.PermissionBackend')
+'''
 
 '''
 DATABASES = {   'default': {   'ATOMIC_REQUESTS': False,
@@ -117,7 +121,7 @@ POSTGIS_VERSION = (2, 0, 0)
 
 #STATICFILES_FINDERS = ('django.contrib.staticfiles.finders.FileSystemFinder', 'django.contrib.staticfiles.finders.AppDirectoriesFinder')
 
-#STATIC_ROOT =
+#STATIC_ROOT = 
 
 #STATIC_URL = /media/
 
@@ -132,3 +136,4 @@ POSTGIS_VERSION = (2, 0, 0)
 #USE_TZ = False
 
 #WSGI_APPLICATION = arches.wsgi.application
+
