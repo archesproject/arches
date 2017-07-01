@@ -351,7 +351,7 @@ def build_search_results_dsl(request):
                 temporal_query.should(conceptid_filter)
 
         # apply permissions for nodegroups that contain date datatypes
-        date_nodes = get_nodes_of_type_with_perm('date', 'read_nodegroup')
+        date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
         date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
         
         search_query.must(date_perms_filter)
@@ -382,7 +382,7 @@ def build_search_results_dsl(request):
     query.add_query(search_query)
     return query
 
-def get_nodes_of_type_with_perm(datatype, permission):
+def get_nodes_of_type_with_perm(request, datatype, permission):
     nodes = []
     for date_node in models.Node.objects.filter(datatype=datatype):
         if request.user.has_perm(permission, date_node.nodegroup): 
@@ -466,7 +466,7 @@ def time_wheel_config(request):
         range_lookup = {}
 
         # apply permissions for nodegroups that contain date datatypes
-        date_nodes = get_nodes_of_type_with_perm('date', 'read_nodegroup')
+        date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
         date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
 
         for millennium in range(int(min_date),int(max_date)+1000,1000):
