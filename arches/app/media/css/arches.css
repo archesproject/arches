@@ -5374,6 +5374,12 @@ div.row.widget-wrapper {
     padding-left: 5px;
 }
 
+a.mega-dropdown-toggle.disabled {
+   pointer-events: none;
+   cursor: default;
+   color: #aaa;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -5424,6 +5430,18 @@ div.row.widget-wrapper {
 
 .settings-config-panel {
     padding: 5px;
+}
+
+.data-table-selected {
+    text-align: center;
+}
+
+.data-table-selected.sorting_asc::after {
+    visibility: hidden;
+}
+
+.center-header {
+    text-align: center;
 }
 
 .shim {
@@ -5625,6 +5643,15 @@ div.row.widget-wrapper {
     padding-bottom: 15px;
     padding-left: 70px;
     margin-top: 5px;
+}
+
+.rp-report-tile.related {
+    padding-bottom: 0px;
+}
+
+.rp-report-tile .reported-relationship {
+    padding-left: 5px;
+    color: #888;
 }
 
 .rp-no-data {
@@ -7034,6 +7061,7 @@ span.basemap-unselected {
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
@@ -7271,6 +7299,10 @@ a.search-query-link-captions:focus {
     border-color: #dcdcdc;
     box-shadow: none;
     background-color: transparent;
+}
+
+ul.pagination {
+    font-size: 12px;
 }
 
 .map-filter-panel {
@@ -8173,6 +8205,9 @@ a.search-facet-item.disabled {
         text-align: right;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    .dl-horizontal dt a {
+        font-weight: 600;
     }
     .rp-no-data {
         margin-left: 280px;

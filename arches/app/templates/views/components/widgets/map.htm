@@ -19,7 +19,7 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode -->
+        <!--ko if: drawMode() || geoJsonStringValid() === false -->
         <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
@@ -45,6 +45,9 @@
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
+                        <!-- /ko -->
+                        <!-- ko ifnot: geoJsonStringValid -->
+                        <strong>{% trans "Invalid GeoJSON" %}</strong>
                         <!-- /ko -->
                     </div>
                 </div>
@@ -99,9 +102,9 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle to Full Screen" data-bind="click: function(){
-                                    expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">Full Screen</span><i class="fa fa-arrows-alt"></i></a>
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Toggle Map Tilt and Rotate" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': !pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
+                                    expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -125,7 +128,7 @@
 
                                 <!--ko if: context === 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title="Search Map Extent" data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">Search Map Extent</span><i class="fa fa-search"></i></a>
-                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: drawMode()!== undefined">
+                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode())">
                                     <div class="form-group form-inline">
                                       <label for="buffer-input">{% trans "Buffer(ft)" %}</label>
                                       <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
@@ -152,58 +155,21 @@
         </div>
 
 
-        <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {
             'geocode-container-shim': mapControls.mapControlsExpanded,
             'hide-geocoder': geocoderVisible
-        }, with: geocoder">
-            <!-- ko if: options().length > 0 -->
-            <a href="#" data-bind="click: function () {
-                query('');
-            }">
-                <i class="fa fa-close geocode-clear"></i>
-            </a>
-            <!--/ko-->
-
-            <input type="text" class="form-control input-md widget-input" data-bind="
-                attr: {
-                    placeholder: placeholder
-                },
-                value: query,
-                valueUpdate: 'keyup',
-                hasFocus: isFocused,
-                event: {
-                    'keydown': handleKeys
-                }
-            ">
-
-            <!-- ko if: isFocused -->
-                <!-- ko if: loading -->
-                <div class="geocoder-results panel">
-                    <div class="geocoder-result-item">
-                        <i class="fa fa-spinner fa-spin"></i>
-                        {% trans "searching...." %}
-                    </div>
-                </div>
-                <!--/ko-->
-
-                <!-- ko if: options().length > 0 -->
-                <div class="geocoder-results panel" data-bind="foreach: options">
-                    <div class="geocoder-result-item" data-bind="
-                        click:$parent.selection,
-                        event: {
-                            'mouseover': $parent.focusItem
-                        },
-                        css: {
-                            'selected-geocoder-result': $data === $parent.selection(),
-                            'focused-geocoder-result': $data === $parent.focusItem()
-                        }
-                    ">
-                        <span data-bind="text: text"></span>
-                    </div>
-                </div>
-                <!--/ko-->
-            <!--/ko-->
+        }">
+        <!-- ko component: {
+            name: geocodeProviderDetails.component,
+            params: {
+                placeholder: geocodePlaceholder,
+                map: map,
+                anchorLayerId: anchorLayerId,
+                api_key: geocodeProviderDetails.api_key,
+                geocodeProvider: geocodeProvider
+            }
+        } -->
+        <!-- /ko -->
         </div>
 
         <!-- ko if: popupData() !== null -->
@@ -241,6 +207,7 @@
                     </div>
                 </div>
                 <div class="hover-feature-footer">
+                    <a data-bind="click: function () { window.open(reportURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>
                     {% if 'Resource Editor' in user.user_groups %}
                     <a data-bind="click: function () { window.open(editURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
                     {% endif %}
@@ -533,7 +500,7 @@
                     {% trans "Default Geocoder" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocoderProviders, optionsText:'name', optionsValue:'id', value: geocodeProvider, chosen: {width: '100%'}"></select>
+                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options: geocodingProviders, optionsText:'name', optionsValue:'geocoderid', value: geocodeProvider, chosen: {width: '100%'}"></select>
                 </div>
                 <div class="control-label">
                     {% trans "Geocoder Placehoder" %}

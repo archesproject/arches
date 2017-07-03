@@ -43,7 +43,6 @@ define([
                 filterParams.termFilter = ko.toJSON(terms);
             }
 
-            console.log(terms.length);
             return terms.length > 0;
         },
 

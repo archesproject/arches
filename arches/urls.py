@@ -39,7 +39,6 @@ urlpatterns = [
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
-    url(r'^geocoder', search.geocode, name="geocoder"),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
@@ -115,6 +114,9 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
 ]
+
+handler404 = 'app.views.main.custom_404'
+handler500 = 'app.views.main.custom_500'
 
 urlpatterns += staticfiles_urlpatterns()
 
