@@ -5871,7 +5871,7 @@ a .csv-chart-menubar-item {
     height: 36px;
     border-radius: 2px;
     border: 1px solid #123;
-    transition: all .4s ease;
+    transition: all .2s ease;
     z-index: 1;
     line-height: 1.5;
 }
@@ -5892,14 +5892,14 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-container-expanded {
-    top: 0px;
-    right: 0px;
-    bottom: 10px;
+    top: 10px;
+    right: 10px;
     background: rgba(17, 17, 17, 0.21);
     opacity: .9;
-    width: 250px;
-    height: 100vh;
-    border: 0px solid #999;
+    width: 300px;
+    height: calc(100vh - 35px);
+    border: 1px solid #999;
+    transition: all .2s ease;
 }
 
 .map-widget-container.hide-maptools {
@@ -5920,7 +5920,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 0px;
     left: 0px;
     padding: 10px 25px;
-    width: calc(100% - 250px);
+    width: calc(100% - 310px);
     background: #fcfcfc;
     height: 100vh;
     border: 1px solid #eee;
@@ -6156,7 +6156,7 @@ div.row.widget-wrapper.report-header:hover {
 
 
 .geocode-container-shim {
-    margin-right: 210px;
+    margin-right: 260px;
 }
 
 .geocode-container {
@@ -6214,14 +6214,15 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel {
     position: absolute;
-    top: 50px;
-    width: 249px;
+    top: 60px;
+    width: 299px;
     height: 450px;
     overflow-y: auto;
-    right: 0px;
+    right: 10px;
     padding: 0px;
     box-shadow: none;
     background: transparent;
+    border-top: 1px solid #ddd;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
 }
@@ -6249,7 +6250,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel-title {
     height: 50px;
-    width: 249px;
+    width: 298px;
     padding: 8px;
     background: #fff;
     border-bottom: 1px solid #ddd;
@@ -6354,14 +6355,14 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-toolbar {
     position: absolute;
-    background: #123;
-    width: 250px;
+    background: #fff;
+    width: 298px;
     height: 50px;
-    right: 0px;
-    top: 0px;
+    right: 11px;
+    top: 10px;
     display: table-cell;
+    border-top: 1px solid #999;
     z-index: 5;
-    color: #fff;
 }
 
 
@@ -6389,40 +6390,46 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-toolbar-item {
-    padding-top: 5px;
-    font-size: 17px;
+    padding: 5px 10px 5px 10px;
+    font-size: 15px;
     height: 50px;
-    width: 50px;
-    color: #fff;
+    color: #777;
     vertical-align: middle;
-    text-align: center;
+    text-align: left;
     display: table-cell;
-    border-right: 1px solid rgba(0, 0, 0, 1);
 }
 
 .map-widget-toolbar-item:hover {
-    background: steelblue;
     cursor: pointer;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active {
-    background: steelblue;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active:focus {
-    color: #fff;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active:active {
-    color: #fff;
+    color: #444;
 }
 
 .map-widget-icon {
-    color: #fff;
+    color: #888;
 }
 
-a.map-widget-icon:hover {
-    color: #fff;
+li.active .map-widget-icon {
+    color: #444;
+}
+
+a#close-map-tools.map-widget-icon {
+    position: absolute;
+    right: 10px;
+    top: 17px;
+    font-size: 13px;
+    color: steelblue;
 }
 
 .basemap-unselected {
@@ -6434,11 +6441,15 @@ span.basemap-unselected {
 }
 
 .map-widget-overlay-item {
-    width: 249px;
+    width: 298px;
     height: 50px;
     padding: 7px;
     background: #fafafa;
     border-bottom: 1px solid #ddd;
+}
+
+a#close-map-tools.map-widget-icon:hover {
+    color: #311557;
 }
 
 .map-widget-overlay-item.selected {
@@ -6672,9 +6683,6 @@ span.basemap-unselected {
     text-overflow: ellipsis;
 }
 
-.map-widget-icon:hover {
-    color: rgba(255, 255, 255, 1);
-}
 
 .map-widget-tool:nth-child(1) {
     padding-left: 0px;
