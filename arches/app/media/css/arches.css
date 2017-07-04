@@ -6235,8 +6235,8 @@ div.row.widget-wrapper.report-header:hover {
 
 .expanded-iiif .map-widget-panel {
     position: fixed;
-    top: 150px;
-    width: 250px;
+    top: 160px;
+    width: 298px;
     bottom: 0;
     height: auto;
 }
@@ -6365,6 +6365,7 @@ div.row.widget-wrapper.report-header:hover {
     border-top: 1px solid #999;
     z-index: 5;
 }
+
 
 
 /*.map-widget-tool {
@@ -6880,6 +6881,22 @@ a#close-map-tools.map-widget-icon:hover {
     position: absolute;
 }
 
+.iiif-toolbar {
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+}
+
+.iiif-widget-panel {
+    height: 430px;
+    width: 298px;
+    right: 11px;
+    border-bottom: 1px solid #999;
+    border-right: 1px solid #999;
+}
+
+.iiif-widget-panel-title {
+    width: 297px;
+}
 
 /* Hide "Full Screen" button for map tools widget in card manager */
 

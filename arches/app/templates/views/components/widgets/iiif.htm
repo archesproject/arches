@@ -12,33 +12,29 @@
             </div>
 
 
-            <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+            <div id="map-widget-toolbar" class="map-widget-toolbar iiif-toolbar relative" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
                 <ul class="map-widget-toolbar-list" style="">
                     <li class="map-widget-toolbar-item text-center basemaps-map-tools" >
-                        <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip"></i></a>
+                        <a id="" href="" class="map-widget-icon">{% trans "Select an image" %}</a>
                     </li>
                     <li class="map-widget-toolbar-item text-center">
                         <a class="map-widget-icon" href="#" data-bind="click: function () { expanded(!expanded()); }">
-                            <i class="ion-android-expand add-tooltip" data-bind="tooltip: { title: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}', placement: 'bottom' }"></i>
+                            <i class="ion-arrow-expand add-tooltip" data-bind="tooltip: { title: expanded() ? '{% trans "Small Screen" %}' : '{% trans "Full Screen" %}', placement: 'bottom' }"></i>
                         </a>
                     </li>
                     <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function () { expandControls(false); }, css : {'map-widget-tool-expanded' : expandControls()}">
-                        <a id="close-map-tools" href="#" class="map-widget-icon"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                        <a id="close-map-tools" href="#" class="map-widget-icon">{%trans "Hide" %}</a>
                     </li>
                 </ul>
             </div>
 
-            <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
+            <div id="map-widget-basemaps" class="panel map-widget-panel iiif-widget-panel" data-bind="fadeVisible: expandControls(), delay:200, fade:400">
                 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
                     <!-- ko if: !selectedManifest() -->
-                        <div class="map-widget-panel-title">
-                            <h4 class="">{% trans "Select an object:" %}</h4>
-                        </div>
                         <!-- ko foreach: { data: manifests, as: 'manifest' } -->
-
                             <!-- ko if: manifest.data() -->
-                            <div class="map-widget-overlay-item relative" data-bind="click: self.selectedManifest, css:{'selected': manifest === self.selectedManifest()}">
+                            <div class="map-widget-overlay-item iiif-widget-panel-title relative" data-bind="click: self.selectedManifest, css:{'selected': manifest === self.selectedManifest()}">
                                 <div class="map-overlay-vis-toogle text-center">
                                     <img data-bind="attr: {'src': manifest.data().thumbnail }" style="max-height: 30px; max-width: 30px;">
                                 </div>
@@ -47,7 +43,6 @@
                                 </div>
                             </div>
                             <!-- /ko -->
-
                         <!-- /ko -->
                     <!-- /ko -->
 
