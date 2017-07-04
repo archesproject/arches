@@ -153,8 +153,6 @@ install_bower_components() {
 }
 
 setup_elasticsearch() {
-	python manage.py es delete_indexes
-	python manage.py es setup_indexes
 	python manage.py es index_database
 }
 
