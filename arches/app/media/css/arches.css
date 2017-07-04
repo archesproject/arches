@@ -5927,6 +5927,8 @@ div.row.widget-wrapper.report-header:hover {
     z-index: 1100;
 }
 
+
+
 #overlay-grid {
     margin-left: 10px;
     margin-right: 0px;
@@ -6155,7 +6157,7 @@ div.row.widget-wrapper.report-header:hover {
 
 
 .geocode-container-shim {
-    margin-right: 260px;
+    margin-right: 265px;
 }
 
 .geocode-container {
@@ -6729,7 +6731,9 @@ a#close-map-tools.map-widget-icon:hover {
 
 .widget-wrapper .mapboxgl-map {
     z-index: 10;
+    margin-bottom: -10px;
 }
+
 
 .map-overlay-item-tools-panel .noUi-base {
     background: #489EED;
