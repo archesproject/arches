@@ -280,27 +280,29 @@ define([
                     isoverlay: false,
                     icon: 'ion-map'
                 }
-                return searchQueryLayer
+                return searchQueryLayer;
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
-                var style = self.getMapStyle();
-                style.sources['search-query'].data = {
-                    "type": "FeatureCollection",
-                    "features": geojson_features
-                };
-                self.map.setStyle(style);
-                if (geojson_features.length === 0) {
-                    self.clearSearch(true);
-                    self.clearSearch(false);
-                    if (self.draw.getAll().features.length > 0){
-                        _.each(self.geometryTypeDetails, function(type){
-                            if (type.active() === true) {
-                                type.active(false);
-                            }
-                        })
-                        self.switchToEditMode()
-                        self.draw.deleteAll();
+                if ('getMapStyle' in self){
+                    var style = self.getMapStyle();
+                    style.sources['search-query'].data = {
+                        "type": "FeatureCollection",
+                        "features": geojson_features
+                    };
+                    self.map.setStyle(style);
+                    if (geojson_features.length === 0) {
+                        self.clearSearch(true);
+                        self.clearSearch(false);
+                        if (self.draw.getAll().features.length > 0){
+                            _.each(self.geometryTypeDetails, function(type){
+                                if (type.active() === true) {
+                                    type.active(false);
+                                }
+                            })
+                            self.switchToEditMode()
+                            self.draw.deleteAll();
+                        }
                     }
                 }
             }
@@ -341,29 +343,29 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val){
-                    if (val !== '') {
+                if (val !== '') {
+                    try {
+                        var data = JSON.parse(val)
                         try {
-                            var data = JSON.parse(val)
-                            try {
-                                self.draw.add(data)
-                                self.saveGeometries()
-                                if (data['type'] === 'Point') {
-                                    data = turf.buffer(data, 500, 'meters')
-                                }
-                                var bbox = turf.bbox(data);
-                                var ll = new mapboxgl.LngLat(bbox[0],bbox[1])
-                                var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
-                                var bounds = new mapboxgl.LngLatBounds(ll, ur)
-                                self.map.fitBounds(bounds, {padding: 200});
-                                setTimeout(function(){self.geojsonString('')}, 500)
-                                self.geoJsonStringValid(true);
-                            } catch(err) {
-                                self.geoJsonStringValid(false);
+                            self.draw.add(data)
+                            self.saveGeometries()
+                            if (data['type'] === 'Point') {
+                                data = turf.buffer(data, 500, 'meters')
                             }
+                            var bbox = turf.bbox(data);
+                            var ll = new mapboxgl.LngLat(bbox[0],bbox[1])
+                            var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
+                            var bounds = new mapboxgl.LngLatBounds(ll, ur)
+                            self.map.fitBounds(bounds, {padding: 200});
+                            setTimeout(function(){self.geojsonString('')}, 500)
+                            self.geoJsonStringValid(true);
                         } catch(err) {
                             self.geoJsonStringValid(false);
                         }
+                    } catch(err) {
+                        self.geoJsonStringValid(false);
                     }
+                }
             }
 
 

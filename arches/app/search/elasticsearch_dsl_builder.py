@@ -541,7 +541,7 @@ class RangeAgg(Aggregation):
             self.agg[self.name][self.type]['ranges'].append(date_range)
 
 
-class RangeFilterAgg(Aggregation):
+class FiltersAgg(Aggregation):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
 
@@ -551,12 +551,12 @@ class RangeFilterAgg(Aggregation):
         self.name = kwargs.pop('name', None)
 
         self.agg = {
-                self.name: {
-                  "filters": {
+            self.name: {
+                "filters": {
                     "filters": []
-                  }
                 }
-              }
+            }
+        }
 
     def add_filter(self, filter=None):
         if filter is not None:
