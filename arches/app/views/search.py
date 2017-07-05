@@ -478,9 +478,10 @@ def time_wheel_config(request):
             max_millenium = millennium + 1000
             millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
             mill_boolquery = Bool()
-            mill_boolquery.should(Range(field='dates.date', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
+            mill_boolquery.filter(Range(field='dates.date', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
+            mill_boolquery.filter(date_perms_filter)
+            mill_boolquery = Bool(should=mill_boolquery)
             mill_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float(), relation='intersects'))
-            mill_boolquery.must(date_perms_filter)
             millenium_agg = FiltersAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)
             range_lookup[millenium_name] = [min_millenium, max_millenium]
