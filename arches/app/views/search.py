@@ -297,6 +297,10 @@ def build_search_results_dsl(request):
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
+        
+        # apply permissions for nodegroups that contain date datatypes
+        date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
+        date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
 
         if temporal_filter['inverted']:
             # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
@@ -321,7 +325,8 @@ def build_search_results_dsl(request):
                 date_range_query = Nested(path='tiles', query=inverted_date_filter)
                 temporal_query.should(date_range_query)
             else:
-                temporal_query.should(inverted_date_filter)
+                temporal_query.filter(inverted_date_filter)
+                temporal_query.filter(date_perms_filter)
 
                 select_clause = " or ".join(select_clause) + " as overlap"
                 sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
@@ -333,7 +338,8 @@ def build_search_results_dsl(request):
                 temporal_query.should(date_range_query)
             else:
                 date_range_query = Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float())
-                temporal_query.should(date_range_query)
+                temporal_query.filter(date_range_query)
+                temporal_query.filter(date_perms_filter)
 
                 select_clause = """
                     numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
@@ -348,13 +354,11 @@ def build_search_results_dsl(request):
 
             if len(ret) > 0:
                 conceptid_filter = Terms(field='domains.conceptid', terms=ret)
+                # if we get here then we need to wrap the temporal_query into another bool query
+                # because we need to search on either dates or concpets
+                temporal_query = Bool(should=temporal_query)
                 temporal_query.should(conceptid_filter)
 
-        # apply permissions for nodegroups that contain date datatypes
-        date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
-        date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
-        
-        search_query.must(date_perms_filter)
         search_query.must(temporal_query)
         #print search_query.dsl
 
