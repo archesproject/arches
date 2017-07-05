@@ -5865,12 +5865,12 @@ a .csv-chart-menubar-item {
     padding-top: 5px;
     font-size: 17px;
     color: #fff;
-    background: #123;
+    background: #706BE2;
     opacity: 0.75;
     width: 36px;
     height: 36px;
     border-radius: 2px;
-    border: 1px solid #123;
+    border: 1px solid #332DC1;
     transition: all .2s ease;
     z-index: 1;
     line-height: 1.5;
@@ -7119,6 +7119,8 @@ a#close-map-tools.map-widget-icon:hover {
 
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
+    height: 150px;
+    overflow-y: scroll;
 }
 
 .hover-feature {
