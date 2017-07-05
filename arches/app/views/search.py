@@ -273,26 +273,6 @@ def build_search_results_dsl(request):
         start_year = start_date.year or 'null'
         end_year = end_date.year or 'null'
 
-
-        # add filter for concepts that define min or max dates
-        sql = None
-        basesql = """
-            SELECT value.conceptid
-            FROM (
-                SELECT
-                    {select_clause},
-                    v.conceptid
-                FROM
-                    public."values" v,
-                    public."values" v2
-                WHERE
-                    v.conceptid = v2.conceptid and
-                    v.valuetype = 'min_year' and
-                    v2.valuetype = 'max_year'
-            ) as value
-            WHERE overlap = true;
-        """
-
         temporal_query = Bool()
 
         if 'inverted' not in temporal_filter:
@@ -305,8 +285,8 @@ def build_search_results_dsl(request):
         if temporal_filter['inverted']:
             # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
             # eg: less than START_DATE OR greater than END_DATE
-            select_clause = []
             inverted_date_filter = Bool()
+            inverted_date_ranges_filter = Bool()
 
             field = 'dates.date'
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
@@ -315,49 +295,39 @@ def build_search_results_dsl(request):
             if start_date.is_valid():
                 start_date = start_date.as_float() if field == 'dates.date' else start_date.orig_date
                 inverted_date_filter.should(Range(field=field, lte=start_date))
-                select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange(null,{start_year},'[]'))")
+                inverted_date_ranges_filter.should(Range(field='date_ranges', lte=start_date))
             if end_date.is_valid():
                 end_date = end_date.as_float() if field == 'dates.date' else end_date.orig_date
                 inverted_date_filter.should(Range(field=field, gte=end_date))
-                select_clause.append("(numrange(v.value::int, v2.value::int, '[]') && numrange({end_year},null,'[]'))")
+                inverted_date_ranges_filter.should(Range(field='date_ranges', gte=end_date))
 
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
                 date_range_query = Nested(path='tiles', query=inverted_date_filter)
-                temporal_query.should(date_range_query)
+                temporal_query.filter(date_range_query)
             else:
                 temporal_query.filter(inverted_date_filter)
                 temporal_query.filter(date_perms_filter)
 
-                select_clause = " or ".join(select_clause) + " as overlap"
-                sql = basesql.format(select_clause=select_clause).format(start_year=start_year, end_year=end_year)
+                # wrap the temporal_query into another bool query
+                # because we need to search on either dates OR date ranges
+                temporal_query = Bool(should=temporal_query)
+                temporal_query.should(inverted_date_ranges_filter)
 
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                range = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date)
-                date_range_query = Nested(path='tiles', query=range)
-                temporal_query.should(date_range_query)
+                range_query = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date)
+                date_range_query = Nested(path='tiles', query=range_query)
+                temporal_query.filter(date_range_query)
             else:
                 date_range_query = Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float())
                 temporal_query.filter(date_range_query)
                 temporal_query.filter(date_perms_filter)
 
-                select_clause = """
-                    numrange(v.value::int, v2.value::int, '[]') && numrange({start_year},{end_year},'[]') as overlap
-                """
-                sql = basesql.format(select_clause=select_clause).format(start_year=start_year , end_year=end_year)
-
-        # is a dateNodeId is not specified
-        if sql is not None:
-            cursor = connection.cursor()
-            cursor.execute(sql)
-            ret =  [str(row[0]) for row in cursor.fetchall()]
-
-            if len(ret) > 0:
-                conceptid_filter = Terms(field='domains.conceptid', terms=ret)
-                # if we get here then we need to wrap the temporal_query into another bool query
-                # because we need to search on either dates or concpets
+                # wrap the temporal_query into another bool query
+                # because we need to search on either dates OR date ranges
                 temporal_query = Bool(should=temporal_query)
-                temporal_query.should(conceptid_filter)
+                range_query = Range(field='date_ranges', gte=start_date.as_float(), lte=end_date.as_float(), relation='intersects')
+                temporal_query.should(range_query)
 
         search_query.must(temporal_query)
         #print search_query.dsl
