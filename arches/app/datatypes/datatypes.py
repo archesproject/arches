@@ -34,7 +34,12 @@ class DataTypeFactory(object):
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
             mod_path = d_datatype.modulename.replace('.py', '')
-            module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
+            module = None
+            for datatype_dir in settings.DATATYPE_LOCATIONS:
+                try:
+                    module = importlib.import_module(datatype_dir + '.%s' % mod_path)
+                except ImportError:
+                    print "MODULE NOT FOUND", datatype_dir + '.%s' % mod_path
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
