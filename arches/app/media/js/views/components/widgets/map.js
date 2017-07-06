@@ -165,6 +165,7 @@ define([
             }, this)
 
             this.loadGeometriesIntoDrawLayer = function() {
+                self.geojsonInput(false)
                 if (self.draw) {
                     var val = koMapping.toJS(self.value);
                     self.draw.deleteAll()
