@@ -27,7 +27,6 @@
     text-decoration: underline;
 }
 
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -205,6 +204,11 @@
 .outline {
     border: 1px solid #eee;
 }
+
+.outline.open-container {
+    border: 1px solid #3b8dd5;
+}
+
 
 .card-nav-container {
     background: #f4f4f4;
