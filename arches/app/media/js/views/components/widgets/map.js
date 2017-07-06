@@ -659,8 +659,8 @@ define([
                                 var hoverData = self.hoverData();
                                 var clickData = self.clickData();
                                 _.each(agg.results, function (result) {
-                                    _.each(result._source.points, function (pt) {
-                                        var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                                    _.each(result._source.points, function (point) {
+                                        var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
                                             resourceinstanceid: result._id,
                                             highlight: result._id===mouseoverInstanceId ||
                                                 (clickData ? (ko.unwrap(clickData.resourceinstanceid)===result._id) : false) ||
