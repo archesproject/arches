@@ -6685,7 +6685,7 @@ a#close-map-tools.map-widget-icon:hover {
     height: 120px;
     font-size: 14px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: scroll;
     text-overflow: ellipsis;
 }
 
