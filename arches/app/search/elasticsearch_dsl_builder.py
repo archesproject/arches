@@ -73,6 +73,22 @@ class Query(Dsl):
 
             self.dsl['aggs'][agg.name] = agg.agg[agg.name]
 
+    def include(self, include):
+        if '_source' not in self.dsl:
+            self.dsl['_source'] = {
+                'includes': [],
+                'excludes': []
+            }
+        self.dsl['_source']['includes'].append(include)
+
+    def exclude(self, exclude):
+        if '_source' not in self.dsl:
+            self.dsl['_source'] = {
+                'includes': [],
+                'excludes': []
+            }
+        self.dsl['_source']['excludes'].append(exclude)
+
     def search(self, index='', doc_type='', **kwargs):
         self.fields = kwargs.pop('fields', self.fields)
         self.start = kwargs.pop('start', self.start)
