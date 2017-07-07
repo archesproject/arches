@@ -362,11 +362,9 @@ define([
                             self.geoJsonStringValid(true);
                         } catch(err) {
                             self.geoJsonStringValid(false);
-                            setTimeout(function(){self.geojsonString('')}, 500)
                         }
                     } catch(err) {
                         self.geoJsonStringValid(false);
-                        setTimeout(function(){self.geojsonString('')}, 500)
                     }
                 }
             }
