@@ -62,8 +62,14 @@ class SearchView(BaseManagerView):
         datatypes = models.DDataType.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
 
+        # only allow cards that the user has permission to read
+        searchable_cards = []
+        for card in resource_cards:
+            if request.user.has_perm('read_nodegroup', card.nodegroup): 
+                searchable_cards.append(card)
+
         context = self.get_context_data(
-            resource_cards=JSONSerializer().serialize(resource_cards),
+            resource_cards=JSONSerializer().serialize(searchable_cards),
             searchable_nodes=JSONSerializer().serialize(searchable_nodes),
             saved_searches=saved_searches,
             date_nodes=date_nodes,
@@ -245,13 +251,6 @@ def build_search_results_dsl(request):
     query.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
     
-    # geojson_nodes = get_nodes_of_type_with_perm(request, 'geojson-feature-collection', 'read_nodegroup')
-    # point_perm_filter = Bool(must=Terms(field='points.nodegroup_id', terms=geojson_nodes))
-
-    # point_perm_agg = FiltersAgg(name='testing123')
-    # point_perm_agg.add_filter(point_perm_filter)
-    # query.add_aggregation(point_perm_agg)
-
     search_query = Bool()
 
     if term_filter != '':
@@ -377,8 +376,9 @@ def build_search_results_dsl(request):
             for key, val in advanced_filter.iteritems():
                 if key != 'op':
                     node = models.Node.objects.get(pk=key)
-                    datatype = datatype_factory.get_instance(node.datatype)
-                    datatype.append_search_filters(val, node, tile_query, request)
+                    if request.user.has_perm('read_nodegroup', node.nodegroup): 
+                        datatype = datatype_factory.get_instance(node.datatype)
+                        datatype.append_search_filters(val, node, tile_query, request)
             nested_query = Nested(path='tiles', query=tile_query)
             if advanced_filter['op'] == 'or' and index != 0:
                 grouped_query = Bool()
