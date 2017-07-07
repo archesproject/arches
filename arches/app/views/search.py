@@ -146,6 +146,14 @@ def search_terms(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
+    dsl.include('graph_id')
+    dsl.include('resourceinstanceid')
+    dsl.include('points')
+    dsl.include('geometries')
+    dsl.include('displayname')
+    dsl.include('displaydescription')
+    dsl.include('map_popup')
+    
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     if results is not None:
         total = results['hits']['total']
@@ -153,6 +161,20 @@ def search_results(request):
 
         paginator, pages = get_paginator(request, results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
         page = paginator.page(page)
+
+        geojson_nodes = get_nodes_of_type_with_perm(request, 'geojson-feature-collection', 'read_nodegroup')
+        for result in results['hits']['hits']:
+            points = []
+            for point in result['_source']['points']:
+                if point['nodegroup_id'] in geojson_nodes:
+                    points.append(point)
+            result['_source']['points'] = points
+
+            geoms = []
+            for geom in result['_source']['geometries']:
+                if geom['nodegroup_id'] in geojson_nodes:
+                    geoms.append(geom)
+            result['_source']['geometries'] = geoms
 
         ret = {}
         ret['results'] = results
@@ -222,8 +244,15 @@ def build_search_results_dsl(request):
     query = Query(se, start=limit*int(page-1), limit=limit)
     query.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-    search_query = Bool()
+    
+    # geojson_nodes = get_nodes_of_type_with_perm(request, 'geojson-feature-collection', 'read_nodegroup')
+    # point_perm_filter = Bool(must=Terms(field='points.nodegroup_id', terms=geojson_nodes))
 
+    # point_perm_agg = FiltersAgg(name='testing123')
+    # point_perm_agg.add_filter(point_perm_filter)
+    # query.add_aggregation(point_perm_agg)
+
+    search_query = Bool()
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
@@ -257,7 +286,7 @@ def build_search_results_dsl(request):
             if 'buffer' in feature_properties:
                 buffer = feature_properties['buffer']
             feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
-            geoshape = GeoShape(field='geometries.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
+            geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
             invert_spatial_search = False
             if 'inverted' in feature_properties:
@@ -266,7 +295,11 @@ def build_search_results_dsl(request):
             if invert_spatial_search == True:
                 search_query.must_not(geoshape)
             else:
-                search_query.must(geoshape)
+                search_query.filter(geoshape)
+
+            # apply permissions for nodegroups that contain geojson-feature-collection datatypes
+            geojson_nodes = get_nodes_of_type_with_perm(request, 'geojson-feature-collection', 'read_nodegroup')
+            search_query.filter(Terms(field='geometries.nodegroup_id', terms=geojson_nodes))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
