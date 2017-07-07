@@ -1286,10 +1286,9 @@ define([
                             if (filterToUpdate) {
                                 filterToUpdate[2] = resourceId;
                             }
-                            layer.filter = filter;
+                            map.setFilter(layer.id, filter);
                         }
                     });
-                    self.map.setStyle(style);
                 };
 
                 self.map.on('mousemove', function (e) {
