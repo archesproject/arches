@@ -232,7 +232,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return GeometryCollection(wkt_geoms)
 
     def append_to_document(self, document, nodevalue, tile):
-        document['geometries'].append(nodevalue)
+        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds

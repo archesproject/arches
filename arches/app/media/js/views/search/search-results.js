@@ -125,14 +125,16 @@ define(['jquery',
                     }
                     var point = null;
                     if (result._source.points.length > 0) {
-                        point = result._source.points[0]
+                        point = result._source.points[0].point
                     }
                     var mapData = result._source.geometries.reduce(function (fc1, fc2) {
-                        fc1.features = fc1.features.concat(fc2.features);
+                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
                         return fc1;
                     }, {
-                      "type": "FeatureCollection",
-                      "features": []
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": []
+                        }
                     });
                     this.results.push({
                         displayname: result._source.displayname,
@@ -151,7 +153,7 @@ define(['jquery',
                             if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
                                 self.viewModel.selectedTab(self.viewModel.mapFilter)
                             }
-                            self.mapLinkData(mapData);
+                            self.mapLinkData(mapData.geom);
                         },
                         selected: ko.computed(function () {
                             return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);

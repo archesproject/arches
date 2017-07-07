@@ -552,7 +552,7 @@ define([
                             };
                             fcs = ko.unwrap(self.popupData().featureCollections);
                             _.each(fcs, function (currentFC) {
-                                fc.features = fc.features.concat(currentFC.features);
+                                fc.features = fc.features.concat(currentFC.geom.features);
                             });
                             zoomToGeoJSON(fc, true);
                         }
