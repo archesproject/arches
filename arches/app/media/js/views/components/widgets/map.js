@@ -361,10 +361,10 @@ define([
                             setTimeout(function(){self.geojsonString('')}, 500)
                             self.geoJsonStringValid(true);
                         } catch(err) {
-                            setTimeout(function(){self.geojsonString('')}, 500)
+                            self.geoJsonStringValid(false);
                         }
                     } catch(err) {
-                        setTimeout(function(){self.geojsonString('')}, 500)
+                        self.geoJsonStringValid(false);
                     }
                 }
             }
