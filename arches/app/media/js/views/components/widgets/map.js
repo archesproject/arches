@@ -931,6 +931,7 @@ define([
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
                             var style = self.getMapStyle();
+                            var setStyle = false;
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
@@ -945,8 +946,9 @@ define([
 
                                         if (startVal) {
                                             if (parseFloat(startVal)) {
-                                                layer.paint[opacityType + '-opacity'] = startVal * opacityVal;
+                                                this.map.setPaintProperty(layer.id, opacityType + '-opacity', startVal * opacityVal);
                                             } else {
+                                                setStyle = true;
                                                 layer.paint[opacityType + '-opacity'] = JSON.parse(JSON.stringify(startVal));
                                                 if (startVal.base) {
                                                     layer.paint[opacityType + '-opacity'].base = startVal.base * opacityVal;
@@ -957,13 +959,14 @@ define([
                                             }
                                         } else if (layer.type === opacityType ||
                                             (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
-                                            layer.paint[opacityType + '-opacity'] = opacityVal;
+                                            this.map.setPaintProperty(layer.id, opacityType + '-opacity', opacityVal);
                                         }
-                                    });
+                                    }, self);
                                 }
                             }, this)
-
-                            map.setStyle(style);
+                            if (setStyle) {
+                                map.setStyle(style);
+                            }
                         }
                     });
                     configMaplayer = _.findWhere(this.overlayConfigs(), {
@@ -1286,10 +1289,9 @@ define([
                             if (filterToUpdate) {
                                 filterToUpdate[2] = resourceId;
                             }
-                            layer.filter = filter;
+                            map.setFilter(layer.id, filter);
                         }
                     });
-                    self.map.setStyle(style);
                 };
 
                 self.map.on('mousemove', function (e) {
