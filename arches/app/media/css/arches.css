@@ -4415,7 +4415,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 10px;
     background: #f0f0f0;
     border-bottom: 1px solid #ddd;
-    z-index: 10;
+    z-index: 3;
 }
 
 .display-nodes-toggle {
