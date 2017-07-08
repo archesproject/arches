@@ -123,6 +123,7 @@
                                 <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
                                 <div class="map-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
                                 </div>
                                 <!-- /ko -->
 
@@ -288,7 +289,7 @@
             </div>
 
             <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControls.mapControlPanels.basemaps}">
-                
+
                 <!-- ko foreach: basemaps -->
                 <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap, css:{'selected': name === self.basemap()}">
                     <div class="map-overlay-vis-toogle text-center">
