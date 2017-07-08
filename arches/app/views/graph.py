@@ -655,7 +655,7 @@ class PermissionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
+        context['nav']['help'] = ('Managing Permissions','help/permissions-manager-help.htm')
 
         return render(request, 'views/graph/permission-manager.htm', context)
 

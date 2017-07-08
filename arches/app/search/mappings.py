@@ -148,18 +148,23 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'geometries' : {
-                        "properties": {
-                            "features": {
-                                "properties": {
-                                    "geometry": {"type": "geo_shape"},
-                                    "id": {'type': 'keyword'},
-                                    "type": {'type': 'keyword'},
-                                    "properties": {
-                                         "enabled": False
-                                    }
+                        'properties': {
+                            'geom': {
+                                'properties': {
+                                    'features': {
+                                        'properties': {
+                                            'geometry': {'type': 'geo_shape'},
+                                            'id': {'type': 'keyword'},
+                                            'type': {'type': 'keyword'},
+                                            'properties': {
+                                                 'enabled': False
+                                            }
+                                        }
+                                    },
+                                    'type': {'type': 'keyword'}
                                 }
                             },
-                            "type": {'type': 'keyword'}
+                            'nodegroup_id' : {'type': 'keyword'},
                         }
                     },
                     'points': {

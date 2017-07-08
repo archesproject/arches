@@ -6666,6 +6666,24 @@ a#close-map-tools.map-widget-icon:hover {
     color: #aaa;
 }
 
+a.clear-geojson-button {
+    background-image: none;
+    position:absolute;
+    top:5px;
+    right:5px;
+    color: #ddd;
+}
+
+a.clear-geojson-button.enabled {
+    color: #555;
+}
+
+a.clear-geojson-button:hover {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+
 .map-json-tool-item-icon {
     position: absolute;
     top: 0px;
@@ -6685,7 +6703,7 @@ a#close-map-tools.map-widget-icon:hover {
     height: 120px;
     font-size: 14px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: scroll;
     text-overflow: ellipsis;
 }
 
