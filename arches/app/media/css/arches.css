@@ -7122,6 +7122,7 @@ a.clear-geojson-button:hover {
 
 .iiif-widget .hover-feature-info {
     margin-left: 25px;
+    height: 220px;
 }
 
 .hover-feature-title-bar {
@@ -7167,6 +7168,7 @@ a.clear-geojson-button:hover {
     position: absolute;
     top: 10px;
     right: 10px;
+    font-size: 19px;
 }
 
 .hover-feature-metadata {
