@@ -18,8 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import importlib
+import datetime
 from django.db.models import Q
 from arches.app.models import models
+from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
@@ -65,16 +67,30 @@ class Resource(models.ResourceInstance):
     def displayname(self):
         return self.get_descriptor('name')
 
+    def save_edit(self, user={}, note='', edit_type=''):
+        timestamp = datetime.datetime.now()
+        edit = EditLog()
+        edit.resourceclassid = self.graph_id
+        edit.resourceinstanceid = self.resourceinstanceid
+        edit.userid = getattr(user, 'id', '')
+        edit.user_email = getattr(user, 'email', '')
+        edit.user_firstname = getattr(user, 'first_name', '')
+        edit.user_lastname = getattr(user, 'last_name', '')
+        edit.note = note
+        edit.timestamp = timestamp
+        edit.edittype = edit_type
+        edit.save()
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
 
         """
-
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
+        self.save_edit(edit_type='create')
         self.index()
 
     @staticmethod
@@ -170,7 +186,7 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    def delete(self):
+    def delete(self, user={}, note=''):
         """
         Deletes a single resource and any related indexed data
 
@@ -188,6 +204,7 @@ class Resource(models.ResourceInstance):
         for result in results:
             se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+        self.save_edit(edit_type='delete')
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=1000, start=0):
