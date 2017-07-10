@@ -4203,6 +4203,11 @@ ul.jqtree_common li.jqtree-folder {
     border: 2px solid #eee;
 }
 
+.ep-help-img-link {
+    float:right;
+    font-weight:600;
+}
+
 .ep-card-preview {
     position: absolute;
     top: 100px;
