@@ -4317,8 +4317,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin: 10px;
 }
 
+.ep-card-crud-container div.panel {
+    border: 1px solid #ddd;
+}
+
 .ep-card-crud-container:last-of-type {
     margin-bottom: 200px;
+}
+
+.flex.relative {
+    max-width: calc(100% - 1px);
 }
 
 .left-column-crud-container {
