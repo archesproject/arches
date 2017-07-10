@@ -273,77 +273,80 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return bounds
 
     def get_layer_config(self, node=None):
-        if node is None:
-            return None
-        elif node.config is None:
-            return None
-        database = settings.DATABASES['default']
-        config = node.config
-
-        cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
-                SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-            	FROM mv_geojson_geoms m
-                WHERE nodeid = '%s'
-            )
-
-            SELECT resourceinstanceid::text,
-                    false AS poly_outline,
-            		row_number() over () as __id__,
-            		1 as total,
-            		ST_Centroid(geom) AS __geometry__,
-                    '' AS extent
-            	FROM clusters
-            	WHERE cid is NULL
-
-            UNION
-
-            SELECT NULL as resourceinstanceid,
-            		false AS poly_outline,
-            		row_number() over () as __id__,
-            		count(*) as total,
-            		ST_Centroid(
-                        ST_Collect(geom)
-                    ) AS __geometry__,
-                    ST_AsGeoJSON(
-                        ST_Transform(
-                            ST_SetSRID(
-                                ST_Extent(geom), 900913
-                            ), 4326
-                        )
-                    ) AS extent
-            	FROM clusters
-            	WHERE cid IS NOT NULL
-            	GROUP BY cid
-        """
-
         sql_list = []
-        for i in range(int(config['clusterMaxZoom']) + 1):
-            arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-            distance = arc * int(config['clusterDistance'])
-            sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
-            sql_list.append(sql_string)
+        database = settings.DATABASES['default']
+        if node is not None and node.config is not None:
+            config = node.config
 
-        sql_list.append("""
-            SELECT resourceinstanceid::text,
-                    false AS poly_outline,
-                    (row_number() over ())::text as __id__,
-                    1 as total,
-                    geom AS __geometry__,
-                    '' AS extent
-                FROM mv_geojson_geoms
-                WHERE nodeid = '%s'
-            UNION
-            SELECT resourceinstanceid::text,
-                    true AS poly_outline,
-                    (row_number() over ())::text||'-outline' as __id__,
-                    1 as total,
-                    ST_ExteriorRing(geom) AS __geometry__,
-                    '' AS extent
-                FROM mv_geojson_geoms
-                WHERE ST_GeometryType(geom) = 'ST_Polygon'
-                AND nodeid = '%s'
-        """ % (node.pk, node.pk))
+            cluster_sql = """
+                WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
+                    SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                	FROM mv_geojson_geoms m
+                    WHERE nodeid = '%s'
+                )
+
+                SELECT resourceinstanceid::text,
+                        false AS poly_outline,
+                		row_number() over () as __id__,
+                		1 as total,
+                		ST_Centroid(geom) AS __geometry__,
+                        '' AS extent
+                	FROM clusters
+                	WHERE cid is NULL
+
+                UNION
+
+                SELECT NULL as resourceinstanceid,
+                		false AS poly_outline,
+                		row_number() over () as __id__,
+                		count(*) as total,
+                		ST_Centroid(
+                            ST_Collect(geom)
+                        ) AS __geometry__,
+                        ST_AsGeoJSON(
+                            ST_Transform(
+                                ST_SetSRID(
+                                    ST_Extent(geom), 900913
+                                ), 4326
+                            )
+                        ) AS extent
+                	FROM clusters
+                	WHERE cid IS NOT NULL
+                	GROUP BY cid
+            """
+            
+            for i in range(int(config['clusterMaxZoom']) + 1):
+                arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
+                distance = arc * int(config['clusterDistance'])
+                sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
+                sql_list.append(sql_string)
+
+            sql_list.append("""
+                SELECT resourceinstanceid::text,
+                        false AS poly_outline,
+                        (row_number() over ())::text as __id__,
+                        1 as total,
+                        geom AS __geometry__,
+                        '' AS extent
+                    FROM mv_geojson_geoms
+                    WHERE nodeid = '%s'
+                UNION
+                SELECT resourceinstanceid::text,
+                        true AS poly_outline,
+                        (row_number() over ())::text||'-outline' as __id__,
+                        1 as total,
+                        ST_ExteriorRing(geom) AS __geometry__,
+                        '' AS extent
+                    FROM mv_geojson_geoms
+                    WHERE ST_GeometryType(geom) = 'ST_Polygon'
+                    AND nodeid = '%s'
+            """ % (node.pk, node.pk))
+
+        else:
+            config = {"cacheTiles": False}
+            for i in range(23):
+                sql_list.append(None)
+
 
         return {
             "provider": {
