@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'jsts',
     'proj4',
     'turf',
     'geohash',
@@ -14,15 +13,15 @@ define([
     'geojson-extent',
     'views/list',
     'views/components/widgets/map/map-styles',
-    'viewmodels/geocoder',
     'viewmodels/map-controls',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
-    'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, jsts, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, GeocoderViewModel, MapControlsViewModel) {
+    'bindings/color-picker',
+    'geocoder-templates'
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -38,7 +37,7 @@ define([
      * @param {number} params.config.zoom - map zoom level
      * @param {number} params.config.centerX - map center longitude
      * @param {number} params.config.centerY - map center latitude
-     * @param {string} params.config.geocodeProvider - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
+     * @param {string} params.config.geocodeProvider - the geocoderid of the selected geocoder.
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {object} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {number} params.config.pitch - the pitch of the map in degrees
@@ -109,6 +108,7 @@ define([
             this.selectedFeatureType = ko.observable();
             this.overlays = ko.observableArray();
             this.overlayLibrary = ko.observableArray();
+            this.geoJsonStringValid = ko.observable(true);
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
@@ -122,9 +122,9 @@ define([
                 this.minZoom(arches.mapDefaultMinZoom);
             }
 
-            this.toolType = this.context === 'search-filter' ? 'Query Tools' : 'Map Tools';
             if (this.context === 'search-filter') {
                 this.query = params.query;
+                this.clearSearch = params.clearSearch;
             }
 
             this.buffer = ko.observable(100.0);
@@ -136,12 +136,6 @@ define([
             this.atMaxZoom = ko.observable(false);
             this.atMinZoom = ko.observable(true);
 
-            this.geojsonInput.subscribe(function(val){
-                if (!val) {
-                    this.geojsonString('');
-                }
-            }, this);
-
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
 
             this.summaryDetails = []
@@ -150,12 +144,6 @@ define([
                 this.summaryDetails = koMapping.toJS(this.value).features || [];
             }
 
-            this.geocoder = new GeocoderViewModel({
-                provider: this.geocodeProvider,
-                placeholder: this.geocodePlaceholder,
-                anchorLayerId: this.anchorLayerId
-            });
-
             this.hoverData = ko.observable(null);
             this.clickData = ko.observable(null);
             this.popupData = ko.computed(function () {
@@ -163,16 +151,21 @@ define([
                 return clickData ? clickData : self.hoverData();
             });
 
-            // TODO: This should be a system config rather than hard-coded here
-            this.geocoderProviders = ko.observableArray([{
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }, {
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }]);
+            this.geocodingProviders = arches.geocodingProviders;
+            if (!this.geocodeProvider()) {
+                this.geocodeProvider(arches.geocoderDefault);
+            }
+
+            this.geocodeProviderDetails = ko.mapping.fromJS(_.findWhere(this.geocodingProviders, {'geocoderid':this.geocodeProvider()}));
+
+            this.geocodeProvider.subscribe(function(geocoderid){
+                var provider = _.findWhere(this.geocodingProviders, {'geocoderid':geocoderid})
+                this.geocodeProviderDetails.api_key(provider.api_key);
+                this.geocodeProviderDetails.component(provider.component);
+            }, this)
 
             this.loadGeometriesIntoDrawLayer = function() {
+                self.geojsonInput(false)
                 if (self.draw) {
                     var val = koMapping.toJS(self.value);
                     self.draw.deleteAll()
@@ -186,10 +179,8 @@ define([
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.extentSearch(false)
                         self.updateSearchQueryLayer([]);
-                        if (self.extentSearch() === true) {
-                            self.toggleExtentSearch();
-                        }
                     }
                 };
 
@@ -290,16 +281,31 @@ define([
                     isoverlay: false,
                     icon: 'ion-map'
                 }
-                return searchQueryLayer
+                return searchQueryLayer;
             }
 
             this.updateSearchQueryLayer = function(geojson_features) {
-                var style = self.getMapStyle();
-                style.sources['search-query'].data = {
-                    "type": "FeatureCollection",
-                    "features": geojson_features
-                };
-                self.map.setStyle(style);
+                if ('getMapStyle' in self){
+                    var style = self.getMapStyle();
+                    style.sources['search-query'].data = {
+                        "type": "FeatureCollection",
+                        "features": geojson_features
+                    };
+                    self.map.setStyle(style);
+                    if (geojson_features.length === 0) {
+                        self.clearSearch(true);
+                        self.clearSearch(false);
+                        if (self.draw.getAll().features.length > 0){
+                            _.each(self.geometryTypeDetails, function(type){
+                                if (type.active() === true) {
+                                    type.active(false);
+                                }
+                            })
+                            self.switchToEditMode()
+                            self.draw.deleteAll();
+                        }
+                    }
+                }
             }
 
             this.restoreSearchState = function() {
@@ -316,7 +322,7 @@ define([
                         if (this.queryFeature.properties.extent_search === true) {
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
                             this.toggleExtentSearch()
-                            this.map.fitBounds(bounds);
+                            this.map.fitBounds(bounds, {padding: 100});
                         } else {
                             drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
                             this.draw.changeMode(drawMode.drawMode)
@@ -324,7 +330,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                this.buffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                } else {
+                                    this.buffer(this.queryFeature.properties.buffer.width)
+                                }
                             }
                         }
                     }
@@ -334,19 +344,29 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val){
+                if (val !== '') {
                     try {
                         var data = JSON.parse(val)
                         try {
                             self.draw.add(data)
                             self.saveGeometries()
+                            if (data['type'] === 'Point') {
+                                data = turf.buffer(data, 500, 'meters')
+                            }
+                            var bbox = turf.bbox(data);
+                            var ll = new mapboxgl.LngLat(bbox[0],bbox[1])
+                            var ur = new mapboxgl.LngLat(bbox[2],bbox[3])
+                            var bounds = new mapboxgl.LngLatBounds(ll, ur)
+                            self.map.fitBounds(bounds, {padding: 200});
+                            setTimeout(function(){self.geojsonString('')}, 500)
+                            self.geoJsonStringValid(true);
                         } catch(err) {
-                            console.log(err)
-                            console.log('invalid geometry')
+                            self.geoJsonStringValid(false);
                         }
                     } catch(err) {
-                        console.log(err)
-                        console.log('invalid json')
+                        self.geoJsonStringValid(false);
                     }
+                }
             }
 
 
@@ -421,8 +441,6 @@ define([
                         });
                     }
                 }, this);
-
-                initialLayers.push(this.geocoder.pointstyle);
                 return initialLayers;
             }
 
@@ -452,6 +470,8 @@ define([
                     active: ko.observable(false)
                 }
             }
+
+            this.drawModes = _.pluck(this.geometryTypeDetails, 'drawMode')
 
             this.geomTypeSelectSetup = {
                 minimumInputLength: 0,
@@ -504,7 +524,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-                this.geocoder.setMap(map);
+
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -533,7 +553,7 @@ define([
                             };
                             fcs = ko.unwrap(self.popupData().featureCollections);
                             _.each(fcs, function (currentFC) {
-                                fc.features = fc.features.concat(currentFC.features);
+                                fc.features = fc.features.concat(currentFC.geom.features);
                             });
                             zoomToGeoJSON(fc, true);
                         }
@@ -599,7 +619,13 @@ define([
                                         "features": []
                                     };
                                 }
-                                self.fitToAggregationBounds();
+
+                                if (self.value() && self.value()['features'].length > 0) {
+                                    var bounds = new mapboxgl.LngLatBounds(geojsonExtent(turf.buffer(self.value(), self.buffer()/3.28084, 'meters')));
+                                    self.map.fitBounds(bounds,{padding: 200});
+                                } else {
+                                    self.fitToAggregationBounds();
+                                }
                                 var features = [];
                                 _.each(agg.grid.buckets, function (cell) {
                                     var pt = geohash.decode(cell.key);
@@ -634,8 +660,8 @@ define([
                                 var hoverData = self.hoverData();
                                 var clickData = self.clickData();
                                 _.each(agg.results, function (result) {
-                                    _.each(result._source.points, function (pt) {
-                                        var feature = turf.point([pt.lon, pt.lat], _.extend(result._source, {
+                                    _.each(result._source.points, function (point) {
+                                        var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
                                             resourceinstanceid: result._id,
                                             highlight: result._id===mouseoverInstanceId ||
                                                 (clickData ? (ko.unwrap(clickData.resourceinstanceid)===result._id) : false) ||
@@ -755,6 +781,14 @@ define([
                     self.drawMode(undefined);
                 }
 
+                if (this.context === 'resource-editor') {
+                    self.drawMode.subscribe(function(val){
+                        if (val !== undefined) {
+                            self.geojsonInput(false);
+                        }
+                    })
+                }
+
                 /**
                  * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
                  * @param  {string} selectedDrawTool the draw tool name selected in the map controls
@@ -766,7 +800,13 @@ define([
                         this.extentSearch(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
-                        this.updateSearchQueryLayer([]);
+                        if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode()){
+                            this.updateSearchQueryLayer([]);
+                        }
+                    } else if (this.context === 'resource-editor') {
+                        if (this.geojsonInput()) {
+                            this.geojsonInput(false);
+                        }
                     }
                     if (this.form) {
                         this.featureColor(this.featureColorCache);
@@ -783,8 +823,7 @@ define([
                         self.drawMode('simple_select');
                     }
                     else if (selectedDrawTool === 'end') {
-                        self.draw.changeMode('simple_select')
-                        self.drawMode(undefined);
+                        self.switchToEditMode()
                     }
                     else {
                         if (!self.drawMode()) {
@@ -892,6 +931,7 @@ define([
                             val > 0.0 ? this.invisible(false) : this.invisible(true);
                             var opacityVal = Number(val) / 100.0;
                             var style = self.getMapStyle();
+                            var setStyle = false;
                             this.layer_definitions.forEach(function(def) {
                                 var layer = _.find(style.layers, function(layer) {
                                     return layer.id === def.id;
@@ -906,8 +946,9 @@ define([
 
                                         if (startVal) {
                                             if (parseFloat(startVal)) {
-                                                layer.paint[opacityType + '-opacity'] = startVal * opacityVal;
+                                                this.map.setPaintProperty(layer.id, opacityType + '-opacity', startVal * opacityVal);
                                             } else {
+                                                setStyle = true;
                                                 layer.paint[opacityType + '-opacity'] = JSON.parse(JSON.stringify(startVal));
                                                 if (startVal.base) {
                                                     layer.paint[opacityType + '-opacity'].base = startVal.base * opacityVal;
@@ -918,13 +959,14 @@ define([
                                             }
                                         } else if (layer.type === opacityType ||
                                             (layer.type === 'symbol' && (opacityType === 'text' || opacityType === 'icon'))) {
-                                            layer.paint[opacityType + '-opacity'] = opacityVal;
+                                            this.map.setPaintProperty(layer.id, opacityType + '-opacity', opacityVal);
                                         }
-                                    });
+                                    }, self);
                                 }
                             }, this)
-
-                            map.setStyle(style);
+                            if (setStyle) {
+                                map.setStyle(style);
+                            }
                         }
                     });
                     configMaplayer = _.findWhere(this.overlayConfigs(), {
@@ -1060,6 +1102,21 @@ define([
                     }
                 };
 
+                this.geojsonInput.subscribe(function(val){
+                    if (!val) {
+                        this.geoJsonStringValid(true);
+                        this.geojsonString('');
+
+                    } else {
+                        _.each(self.geometryTypeDetails, function(geomtype) {
+                            if (geomtype.active()) {
+                                geomtype.active(false);
+                            }
+                        })
+                        self.switchToEditMode()
+                    }
+                }, this);
+
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
                     for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
@@ -1075,7 +1132,7 @@ define([
                         }
                         this.addMaplayer(overlays[i])
                     }
-                    this.geocoder.redrawLayer();
+                    // this.geocoder.redrawLayer();
                 }, this)
 
                 this.pitchAndZoomEnabled.subscribe(function(val){
@@ -1084,6 +1141,7 @@ define([
                         this.map.setBearing(0)
                         this.map.dragRotate.disable();
                     } else {
+                        this.map.setPitch(this.pitch() > 0 ? this.pitch() : 50)
                         this.map.dragRotate.enable();
                     }
                 }, this);
@@ -1095,24 +1153,7 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var transformer = proj4('EPSG:4326','EPSG:3857');
-                            coords = self.queryFeature.geometry.coordinates;
-                            switch (self.queryFeature.geometry.type) {
-                                case 'Point': coords3857 = transformer.forward(coords); break;
-                                case 'LineString': coords3857 = _.map(coords, function(coord){ return transformer.forward(coord);}); break;
-                                case 'Polygon': coords3857 = [_.map(coords[0], function(coord){ return transformer.forward(coord);})];
-                            }
-
-                            var prebufferFeature = $.extend(true, {}, self.queryFeature);
-                            prebufferFeature.geometry.coordinates = coords3857;
-                            var reader = new jsts.io.GeoJSONReader();
-                            var writer = new jsts.io.GeoJSONWriter();
-                            var jstsFeature = reader.read(prebufferFeature)
-                            var buffer = writer.write(jstsFeature.geometry.buffer(val/3.28084));
-                            var coords4326 = [_.map(buffer.coordinates[0], function(coords){ return transformer.inverse(coords);})];
-                            var bufferFeature = turf.polygon(coords4326);
-
-
+                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
                                 width: val,
@@ -1136,8 +1177,7 @@ define([
                     this.extentSearch(!this.extentSearch())
                     if (this.extentSearch() === true) {
                         self.draw.deleteAll();
-                        self.draw.changeMode('simple_select');
-                        self.drawMode(undefined);
+                        self.switchToEditMode();
                         _.each(self.geometryTypeDetails, function(geomtype) {
                             geomtype.active(false);
                         })
@@ -1152,7 +1192,9 @@ define([
                 this.searchByExtent = function() {
                     if (self.extentSearch() === true) {
                         self.queryFeature = undefined;
-                        self.updateSearchQueryLayer([])
+                        if (_.contains(self.drawModes, self.drawMode())) {
+                            self.updateSearchQueryLayer([])
+                        }
                         var bounds = self.map.getBounds();
                         var ll = bounds.getSouthWest().toArray();
                         var ul = bounds.getNorthWest().toArray();
@@ -1178,11 +1220,11 @@ define([
                     }
                 }
 
-                this.extentSearch.subscribe(function() {
+                this.extentSearch.subscribe(function(val) {
                     self.searchByExtent();
                 })
 
-                this.buffer.subscribe(function(val) {
+                this.updateBuffer = function(val) {
                     var maxBuffer = 100000;
                     if(val < 0){
                         this.buffer(0)
@@ -1191,7 +1233,9 @@ define([
                     }else{
                         this.applySearchBuffer(val)
                     }
-                }, this);
+                }
+
+                this.buffer.subscribe(this.updateBuffer, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
@@ -1245,10 +1289,9 @@ define([
                             if (filterToUpdate) {
                                 filterToUpdate[2] = resourceId;
                             }
-                            layer.filter = filter;
+                            map.setFilter(layer.id, filter);
                         }
                     });
-                    self.map.setStyle(style);
                 };
 
                 self.map.on('mousemove', function (e) {

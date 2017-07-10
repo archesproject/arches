@@ -40,7 +40,7 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, tile):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
         except AssertionError:
@@ -126,3 +126,16 @@ class ConceptListDataType(BaseConceptDataType):
             new_val = self.get_value(uuid.UUID(val))
             new_values.append(new_val.value)
         return ','.join(new_values)
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                match_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                if '!' in value['op']:
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(match_query)
+
+        except KeyError, e:
+            pass

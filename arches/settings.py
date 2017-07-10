@@ -220,7 +220,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
-    # 'arches.app.utils.bing_geocoder'
 )
 
 ROOT_URLCONF = 'arches.urls'
@@ -272,12 +271,9 @@ LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
-GEOCODING_PROVIDERS = [
-    {'NAME': 'MapZen', 'API_KEY':'', 'ID':'MapzenGeocoder'},
-    {'NAME': 'Bing', 'API_KEY':'', 'ID':'BingGeocoder'},
-]
+DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
-DEFAULT_SEARCH_GEOCODER = "BingGeocoder" # currently MapzenGeocoder or BingGeocoder
+MAPZEN_API_KEY = ""
 
 SPARQL_ENDPOINT_PROVIDERS = (
     {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
@@ -303,6 +299,7 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -369,6 +366,8 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

@@ -73,6 +73,22 @@ class Query(Dsl):
 
             self.dsl['aggs'][agg.name] = agg.agg[agg.name]
 
+    def include(self, include):
+        if '_source' not in self.dsl:
+            self.dsl['_source'] = {
+                'includes': [],
+                'excludes': []
+            }
+        self.dsl['_source']['includes'].append(include)
+
+    def exclude(self, exclude):
+        if '_source' not in self.dsl:
+            self.dsl['_source'] = {
+                'includes': [],
+                'excludes': []
+            }
+        self.dsl['_source']['excludes'].append(exclude)
+
     def search(self, index='', doc_type='', **kwargs):
         self.fields = kwargs.pop('fields', self.fields)
         self.start = kwargs.pop('start', self.start)
@@ -541,7 +557,7 @@ class RangeAgg(Aggregation):
             self.agg[self.name][self.type]['ranges'].append(date_range)
 
 
-class RangeFilterAgg(Aggregation):
+class FiltersAgg(Aggregation):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
 
@@ -551,12 +567,12 @@ class RangeFilterAgg(Aggregation):
         self.name = kwargs.pop('name', None)
 
         self.agg = {
-                self.name: {
-                  "filters": {
+            self.name: {
+                "filters": {
                     "filters": []
-                  }
                 }
-              }
+            }
+        }
 
     def add_filter(self, filter=None):
         if filter is not None:

@@ -38,12 +38,14 @@ class MapLayerManagerView(BaseManagerView):
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by('name')
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
+            map_layers=map_layers,
             map_sources=map_sources,
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
@@ -53,7 +55,7 @@ class MapLayerManagerView(BaseManagerView):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
             query.add_query(search_query)
-            query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
+            query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
             results = query.search(index='resource', doc_type=[str(node.graph.pk)])
             return results['aggregations']['bounds']['bounds']
 

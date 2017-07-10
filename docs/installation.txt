@@ -15,7 +15,7 @@ To begin development or make a test installation of Arches, you will need the fo
 
 + **4gb memory (RAM)**
 	+ This recommendation is calculated by the fact that ElasticSearch requires 2gb to run, and as per `ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
-	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch#running-elasticsearch>`_.
+	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
 	+ In production, you may want to increase your memory, and allow ElasticSearch to use more than its default.
 
 ----------------
@@ -32,7 +32,7 @@ Dependencies
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
 * **Mapnik** Version 2.2. Installation instructions: http://mapnik.org/pages/downloads.html. If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible. Please read `this note on our Wiki <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#mapnik>`_ about how this limitation affects Arches.
 * **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
-* **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ regarding Arches and Elasticsearch.
+* **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ regarding Arches and Elasticsearch.
 
 These instructions will provide some guidance on installing the required dependencies and getting Arches up and running quickly.
 
@@ -71,7 +71,7 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
         pip install arches==4.0b3
 
-    .. note:: Windows users should add ``--no-use-wheel`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
+    .. note:: Windows users should add ``--no-binary :all:`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
 
 #. Create a new Arches project
 
@@ -89,7 +89,7 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
     .. warning:: On Windows, you must specify the path to your GDAL library. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
 
-    At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-Elasticsearch>`_ (unless you have done so already) before continuing.
+    At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ (unless you have done so already) before continuing.
 
 #. Setup your Arches database
 

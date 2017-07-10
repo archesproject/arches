@@ -10,6 +10,7 @@ from formats.csvfile import CsvWriter
 from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
@@ -40,10 +41,11 @@ class ResourceExporter(object):
                     resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
             elif isinstance(business_data[0], str):
                 resourceids = [uuid.UUID(r) for r in business_data]
-        relations = self.get_relations_for_export(resourceids)
-        relations_file_name = resources[0]['name'].split('.')[0]
-        relations_file = self.write_relations(relations, relations_file_name)
-        resources.extend(relations_file)
+        if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            relations = self.get_relations_for_export(resourceids)
+            relations_file_name = resources[0]['name'].split('.')[0]
+            relations_file = self.write_relations(relations, relations_file_name)
+            resources.extend(relations_file)
 
         return resources
 

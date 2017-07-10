@@ -29,7 +29,7 @@ class WKTPointDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(self.datatype_model.datatype, value, source, 'this is not a string')})
         return errors
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, tile):
         """
         Appends a value to a given elastic search document property
 

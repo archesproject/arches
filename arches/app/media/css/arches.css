@@ -27,7 +27,6 @@
     text-decoration: underline;
 }
 
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -205,6 +204,11 @@
 .outline {
     border: 1px solid #eee;
 }
+
+.outline.open-container {
+    border: 1px solid #3b8dd5;
+}
+
 
 .card-nav-container {
     background: #f4f4f4;
@@ -4313,8 +4317,16 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin: 10px;
 }
 
+.ep-card-crud-container div.panel {
+    border: 1px solid #ddd;
+}
+
 .ep-card-crud-container:last-of-type {
     margin-bottom: 200px;
+}
+
+.flex.relative {
+    max-width: calc(100% - 1px);
 }
 
 .left-column-crud-container {
@@ -4411,7 +4423,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 10px;
     background: #f0f0f0;
     border-bottom: 1px solid #ddd;
-    z-index: 10;
+    z-index: 3;
 }
 
 .display-nodes-toggle {
@@ -5374,6 +5386,12 @@ div.row.widget-wrapper {
     padding-left: 5px;
 }
 
+a.mega-dropdown-toggle.disabled {
+   pointer-events: none;
+   cursor: default;
+   color: #aaa;
+}
+
 .relation-properties-button {
     padding-left: 5px
 }
@@ -5424,6 +5442,18 @@ div.row.widget-wrapper {
 
 .settings-config-panel {
     padding: 5px;
+}
+
+.data-table-selected {
+    text-align: center;
+}
+
+.data-table-selected.sorting_asc::after {
+    visibility: hidden;
+}
+
+.center-header {
+    text-align: center;
 }
 
 .shim {
@@ -5625,6 +5655,15 @@ div.row.widget-wrapper {
     padding-bottom: 15px;
     padding-left: 70px;
     margin-top: 5px;
+}
+
+.rp-report-tile.related {
+    padding-bottom: 0px;
+}
+
+.rp-report-tile .reported-relationship {
+    padding-left: 5px;
+    color: #888;
 }
 
 .rp-no-data {
@@ -5838,13 +5877,13 @@ a .csv-chart-menubar-item {
     padding-top: 5px;
     font-size: 17px;
     color: #fff;
-    background: #123;
-    opacity: 1.0;
+    background: #706BE2;
+    opacity: 0.75;
     width: 36px;
     height: 36px;
     border-radius: 2px;
-    border: 1px solid #123;
-    transition: all .4s ease;
+    border: 1px solid #332DC1;
+    transition: all .2s ease;
     z-index: 1;
     line-height: 1.5;
 }
@@ -5865,14 +5904,14 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-container-expanded {
-    top: 0px;
-    right: 0px;
-    bottom: 10px;
+    top: 10px;
+    right: 10px;
     background: rgba(17, 17, 17, 0.21);
     opacity: .9;
-    width: 250px;
-    height: 100vh;
-    border: 0px solid #999;
+    width: 300px;
+    height: calc(100vh - 35px);
+    border: 1px solid #999;
+    transition: all .2s ease;
 }
 
 .map-widget-container.hide-maptools {
@@ -5890,16 +5929,17 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-selection-container {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 10px;
+    left: 10px;
     padding: 10px 25px;
-    width: calc(100% - 250px);
+    width: calc(100% - 325px);
     background: #fcfcfc;
-    height: 100vh;
-    border: 1px solid #eee;
-    border-right-width: 0px;
+    height: calc(100vh - 35px);
+    border: 1px solid #bbb;
     z-index: 1100;
 }
+
+
 
 #overlay-grid {
     margin-left: 10px;
@@ -6129,7 +6169,7 @@ div.row.widget-wrapper.report-header:hover {
 
 
 .geocode-container-shim {
-    margin-right: 210px;
+    margin-right: 265px;
 }
 
 .geocode-container {
@@ -6187,14 +6227,15 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel {
     position: absolute;
-    top: 50px;
-    width: 249px;
+    top: 60px;
+    width: 299px;
     height: 450px;
     overflow-y: auto;
-    right: 0px;
+    right: 10px;
     padding: 0px;
     box-shadow: none;
     background: transparent;
+    border-top: 1px solid #ddd;
     /*transition: all .40s .15s ease;*/
     z-index: 1;
 }
@@ -6206,8 +6247,8 @@ div.row.widget-wrapper.report-header:hover {
 
 .expanded-iiif .map-widget-panel {
     position: fixed;
-    top: 150px;
-    width: 250px;
+    top: 160px;
+    width: 298px;
     bottom: 0;
     height: auto;
 }
@@ -6222,7 +6263,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel-title {
     height: 50px;
-    width: 249px;
+    width: 298px;
     padding: 8px;
     background: #fff;
     border-bottom: 1px solid #ddd;
@@ -6327,15 +6368,16 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-toolbar {
     position: absolute;
-    background: #123;
-    width: 250px;
+    background: #fff;
+    width: 298px;
     height: 50px;
-    right: 0px;
-    top: 0px;
+    right: 11px;
+    top: 10px;
     display: table-cell;
+    border-top: 1px solid #999;
     z-index: 5;
-    color: #fff;
 }
+
 
 
 /*.map-widget-tool {
@@ -6362,40 +6404,46 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-toolbar-item {
-    padding-top: 5px;
-    font-size: 17px;
+    padding: 5px 10px 5px 10px;
+    font-size: 15px;
     height: 50px;
-    width: 50px;
-    color: #fff;
+    color: #777;
     vertical-align: middle;
-    text-align: center;
+    text-align: left;
     display: table-cell;
-    border-right: 1px solid rgba(0, 0, 0, 1);
 }
 
 .map-widget-toolbar-item:hover {
-    background: steelblue;
     cursor: pointer;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active {
-    background: steelblue;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active:focus {
-    color: #fff;
+    color: #444;
 }
 
 .map-widget-toolbar-item.active:active {
-    color: #fff;
+    color: #444;
 }
 
 .map-widget-icon {
-    color: #fff;
+    color: #888;
 }
 
-a.map-widget-icon:hover {
-    color: #fff;
+li.active .map-widget-icon {
+    color: #444;
+}
+
+a#close-map-tools.map-widget-icon {
+    position: absolute;
+    right: 10px;
+    top: 17px;
+    font-size: 13px;
+    color: steelblue;
 }
 
 .basemap-unselected {
@@ -6407,11 +6455,15 @@ span.basemap-unselected {
 }
 
 .map-widget-overlay-item {
-    width: 249px;
+    width: 298px;
     height: 50px;
     padding: 7px;
     background: #fafafa;
     border-bottom: 1px solid #ddd;
+}
+
+a#close-map-tools.map-widget-icon:hover {
+    color: #311557;
 }
 
 .map-widget-overlay-item.selected {
@@ -6493,7 +6545,7 @@ span.basemap-unselected {
     position: absolute;
     top: 14px;
     left: 60px;
-    width: 180px;
+    width: 220px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -6622,6 +6674,24 @@ span.basemap-unselected {
     color: #aaa;
 }
 
+a.clear-geojson-button {
+    background-image: none;
+    position:absolute;
+    top:5px;
+    right:5px;
+    color: #ddd;
+}
+
+a.clear-geojson-button.enabled {
+    color: #555;
+}
+
+a.clear-geojson-button:hover {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+
 .map-json-tool-item-icon {
     position: absolute;
     top: 0px;
@@ -6641,13 +6711,10 @@ span.basemap-unselected {
     height: 120px;
     font-size: 14px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: scroll;
     text-overflow: ellipsis;
 }
 
-.map-widget-icon:hover {
-    color: rgba(255, 255, 255, 1);
-}
 
 .map-widget-tool:nth-child(1) {
     padding-left: 0px;
@@ -6695,7 +6762,9 @@ span.basemap-unselected {
 
 .widget-wrapper .mapboxgl-map {
     z-index: 10;
+    margin-bottom: -10px;
 }
+
 
 .map-overlay-item-tools-panel .noUi-base {
     background: #489EED;
@@ -6842,6 +6911,22 @@ span.basemap-unselected {
     position: absolute;
 }
 
+.iiif-toolbar {
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+}
+
+.iiif-widget-panel {
+    height: 430px;
+    width: 298px;
+    right: 11px;
+    border-bottom: 1px solid #999;
+    border-right: 1px solid #999;
+}
+
+.iiif-widget-panel-title {
+    width: 297px;
+}
 
 /* Hide "Full Screen" button for map tools widget in card manager */
 
@@ -7045,6 +7130,7 @@ span.basemap-unselected {
 
 .iiif-widget .hover-feature-info {
     margin-left: 25px;
+    height: 220px;
 }
 
 .hover-feature-title-bar {
@@ -7064,6 +7150,8 @@ span.basemap-unselected {
 
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
+    height: 150px;
+    overflow-y: scroll;
 }
 
 .hover-feature {
@@ -7088,6 +7176,7 @@ span.basemap-unselected {
     position: absolute;
     top: 10px;
     right: 10px;
+    font-size: 19px;
 }
 
 .hover-feature-metadata {
@@ -7272,6 +7361,10 @@ a.search-query-link-captions:focus {
     border-color: #dcdcdc;
     box-shadow: none;
     background-color: transparent;
+}
+
+ul.pagination {
+    font-size: 12px;
 }
 
 .map-filter-panel {
@@ -8174,6 +8267,9 @@ a.search-facet-item.disabled {
         text-align: right;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    .dl-horizontal dt a {
+        font-weight: 600;
     }
     .rp-no-data {
         margin-left: 280px;

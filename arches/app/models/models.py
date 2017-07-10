@@ -650,6 +650,20 @@ class Widget(models.Model):
         db_table = 'widgets'
 
 
+class Geocoder(models.Model):
+    geocoderid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    component = models.TextField()
+    api_key = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'geocoders'
+
+
 class MapSource(models.Model):
     name = models.TextField(unique=True)
     source = JSONField(blank=True, null=True, db_column='source')

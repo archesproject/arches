@@ -20,15 +20,15 @@ def forwards_func(apps, schema_editor):
     for graphid in GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True):
         prepare_search_index(str(graphid), create=True)
 
-    settings_data_file = 'Arches_System_Settings.json'
-    local_settings_available = os.path.isfile(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json'))
+    settings_data_file = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json')
+    local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
 
     if local_settings_available == True:
-        settings_data_file = 'Arches_System_Settings_Local.json'
+        settings_data_file = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
     management.call_command('es', operation='index_resources')
     management.call_command('packages', operation='import_graphs', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'))
-    management.call_command('packages', operation='import_business_data', source=os.path.join(settings.ROOT_DIR, 'db', 'system_settings', settings_data_file), overwrite='overwrite')
+    management.call_command('packages', operation='import_business_data', source=settings_data_file, overwrite='overwrite')
 
 def reverse_func(apps, schema_editor):
     GraphModel.objects.get(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).delete()
@@ -62,6 +62,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='Geocoder',
+            fields=[
+                ('geocoderid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField()),
+                ('component', models.TextField()),
+                ('api_key', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'geocoders',
+                'managed': True,
+            },
+        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
@@ -93,6 +106,16 @@ class Migration(migrations.Migration):
                     configcomponent = 'views/graph/datatypes/date',
                     configname = 'date-datatype-config'
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/concept',
+                    configname = 'concept-datatype-config'
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = true,
+                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configname = 'domain-value-datatype-config'
+                WHERE datatype = 'domain-value-list';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -124,6 +147,17 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'date';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'concept-list';
+            UPDATE d_data_types
+                SET issearchable = false,
+                    configcomponent = NULL,
+                    configname = NULL
+                WHERE datatype = 'domain-value-list';
+
         """),
 
         migrations.RunSQL("""
@@ -160,6 +194,101 @@ class Migration(migrations.Migration):
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
         """),
+        migrations.RunSQL("""
+            INSERT INTO public.geocoders(geocoderid, name, component, api_key) VALUES ('10000000-0000-0000-0000-010000000000', 'Mapbox', 'views/components/geocoders/mapbox', '');
+            INSERT INTO public.geocoders(geocoderid, name, component) VALUES ('10000000-0000-0000-0000-010000000001', 'Mapzen', 'views/components/geocoders/mapzen');
+        """,
+        """
+            DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
+            DELETE FROM public.geocoders WHERE name = 'Mapzen';
+        """),
+        migrations.RunSQL("""
+            UPDATE report_templates SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "10000000-0000-0000-0000-010000000000",
+                "zoom": 10,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": -122.3979693,
+                "centerY": 37.79,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null,
+                "featureEditingDisabled": true,
+                "mapControlsHidden": false
+            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+
+            UPDATE widgets SET (defaultconfig) = ('{
+                    "basemap": "streets",
+                    "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                    "overlayConfigs": [],
+                    "overlayOpacity": 0.0,
+                    "geocodeProvider": "10000000-0000-0000-0000-010000000000",
+                    "zoom": 0,
+                    "maxZoom": 20,
+                    "minZoom": 0,
+                    "centerX": 0,
+                    "centerY": 0,
+                    "pitch": 0.0,
+                    "bearing": 0.0,
+                    "geocodePlaceholder": "Search",
+                    "geocoderVisible": true,
+                    "featureColor": null,
+                    "featureLineWidth": null,
+                    "featurePointSize": null
+                }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+        """,
+        """
+            UPDATE report_templates SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "MapzenGeocoder",
+                "zoom": 10,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": -122.3979693,
+                "centerY": 37.79,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null,
+                "featureEditingDisabled": true,
+                "mapControlsHidden": false
+            }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
+            UPDATE widgets SET (defaultconfig) = ('{
+                "basemap": "streets",
+                "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+                "overlayConfigs": [],
+                "overlayOpacity": 0.0,
+                "geocodeProvider": "MapzenGeocoder",
+                "zoom": 0,
+                "maxZoom": 20,
+                "minZoom": 0,
+                "centerX": 0,
+                "centerY": 0,
+                "pitch": 0.0,
+                "bearing": 0.0,
+                "geocodePlaceholder": "Search",
+                "geocoderVisible": true,
+                "featureColor": null,
+                "featureLineWidth": null,
+                "featurePointSize": null
+            }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
+        """),
+
+
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
         migrations.RunPython(forwards_func, reverse_func),
         migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),

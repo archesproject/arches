@@ -227,6 +227,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Tools -->
                                         <li class="list-header">Tools</li>
 
+                                        <!-- System Settings list item -->
+                                        {% if request.user|has_group:"System Administrator" %}
+                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Manage System Settings" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endif %}
+
                                         <!--Menu list item-->
                                         <li>
                                             <a href="#">
@@ -283,28 +303,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-
-                                        <!-- System Settings list item -->
-                                        {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
-                                                <i class="ti-alarm-clock"></i>
-                                                <span class="menu-title">
-                                                    <strong>{% trans "Manage System Settings" %}</strong>
-                                                </span>
-                                            </a>
-                                            <ul class="collapse" aria-expanded="false">
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
-                                                </li>
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        {% endif %}
-
-
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
                                         <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
@@ -328,36 +326,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-globe"></i>
-                                                <span class="menu-title">
-                                                    <strong>Field Project Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-cloud-upload"></i>
-                                                <span class="menu-title">
-                                                    <strong>Import/Export Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-user-md"></i>
-                                                <span class="menu-title">
-                                                    <strong>Profile Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
