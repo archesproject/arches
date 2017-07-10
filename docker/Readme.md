@@ -26,14 +26,18 @@ It also helps to read up on Docker: [docker.com/engine/getstarted](https://docs.
 
 
 
-## Getting Started
-1. Create your new project folder, preferably one managed by a version control system such as Git.
+## Quick start
+1. Create a new folder for your custom Arches code, preferably one managed by a version control system such as Git.
 
 2. Copy [docker-compose.yml](../docker-compose.yml) from the root of the official Arches repository to the root of your project folder.
 
-3. Run Arches. Navigate to the folder you placed `docker-compose.yml` in and type:  
+3. Download the latest Docker image of Arches. Navigate to the folder you placed `docker-compose.yml` in and type:
+  `docker-compose pull`
+
+4. Run Arches:  
   `docker-compose up`
 
+Your Arches app can now be reached by going to `localhost:8000` in your browser. 
 
 ## Commands
 The following commands can be used:
@@ -95,7 +99,7 @@ Optional Environment Variables:
 	```
 		image: <docker hub user>/<your project name>:latest
 	```
-	*Optional: You can leave `<docker hub user>/` out for now. Click [here](https://docs.docker.com/docker-hub/repos/) For more information on Docker Hub.*  
+	*Optional: You can leave the `<docker hub user>/` part out for now. Click [here](https://docs.docker.com/docker-hub/repos/) For more information on Docker Hub.*  
 
 2. Set the name of your Arches project. Edit your `docker-compose.yml`:  
 	Add `ARCHES_PROJECT` to the '`environment:`' node under the `arches` service:

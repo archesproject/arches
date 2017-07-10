@@ -139,6 +139,10 @@ db_exists() {
 }
 
 set_dev_mode() {
+	echo ""
+	echo ""
+	echo "----- SETTING DEV MODE -----"
+	echo ""
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
