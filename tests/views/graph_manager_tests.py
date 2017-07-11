@@ -23,7 +23,6 @@ from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core import management
 from django.core.urlresolvers import reverse
-from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -59,7 +58,7 @@ class GraphManagerViewTests(ArchesTestCase):
         self.appended_branch_2 = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
-        self.ROOT_ID = graph.root.nodeid 
+        self.ROOT_ID = graph.root.nodeid
         self.GRAPH_ID = str(graph.pk)
         self.NODE_COUNT = 5
 
@@ -156,7 +155,7 @@ class GraphManagerViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize({'nodeid':node.nodeid})
         response = self.client.delete(url, post_data)
         self.assertEqual(response.status_code, 200)
-        
+
         graph = Graph.objects.get(graphid=self.GRAPH_ID).serialize()
         self.assertEqual(len(graph['nodes']), 3)
         self.assertEqual(len(graph['edges']), 2)

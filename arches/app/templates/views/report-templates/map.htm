@@ -3,6 +3,7 @@
 
 {% block header %}
 <div>
+  <!-- ko if: feature_count > 0 || forReportManager === true -->
   <!-- ko component: {
       name: 'map-widget',
       params: {
@@ -13,6 +14,7 @@
           graph: report.graph
       }
   } --><!-- /ko -->
+  <!--/ko-->
 </div>
 {% endblock header %}
 

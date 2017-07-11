@@ -99,7 +99,7 @@ class Tile(models.TileModel):
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
                 datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
-        if index:
+        if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
@@ -146,6 +146,19 @@ class Tile(models.TileModel):
         for key, tile_list in self.tiles.iteritems():
             for child_tile in tile_list:
                 child_tile.after_update_all()
+
+    def is_blank(self):
+        if self.tiles != {}:
+            for tiles in self.tiles.values():
+                for tile in tiles:
+                    if len([item for item in tile.data.values() if item != None]) > 0:
+                        return False
+        elif self.data != {}:
+            if len([item for item in self.data.values() if item != None]) > 0:
+                return False
+
+        return True
+
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
@@ -201,6 +214,20 @@ class Tile(models.TileModel):
             func = functionXgraph.function.get_class_module()(functionXgraph.config, self.nodegroup_id)
             ret.append(func)
         return ret
+
+    def filter_by_perm(self, user, perm):
+        if user:
+            if user.has_perm(perm, self.nodegroup):
+                filtered_tiles = {}
+                for key, tiles in self.tiles.iteritems():
+                    filtered_tiles[key] = []
+                    for tile in tiles:
+                        if user.has_perm(perm, tile.nodegroup):
+                            filtered_tiles[key].append(tile)
+                self.tiles = filtered_tiles
+            else:
+                return None
+        return self
 
     def serialize(self):
         """

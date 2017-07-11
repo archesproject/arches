@@ -96,7 +96,7 @@
                     var allBindings = allBindingsAccessor();
 
                     if ("value" in allBindings) {
-                        if (allBindings.select2.multiple && allBindings.value().constructor != Array) {                
+                        if (allBindings.select2.multiple && allBindings.value().constructor != Array) {
                             $(el).select2("val", allBindings.value().split(","));
                         }
                         else {
@@ -147,13 +147,13 @@
                                 type: 'strings',
                                 crm_class: 'E32'
                             })
-                            json.crm_class = 'E55' 
+                            json.crm_class = 'E55'
                         } else {
                             json.crm_class = 'E1'
                         }
                     }
                     this.crm_class = ko.observable(json.crm_class);
-                    
+
                     this.name = ko.observable(json.name);
                     this.type = ko.observable(json.type);
 
@@ -164,7 +164,7 @@
                         }
                         return entities.length > 0;
                     });
-                    
+
                     this.entity_id = ko.computed(function() {
                         if (self.type() === 'primary key' || (self.type() === 'foreign key' && !self.has_children())) {
                           return self.name().split(' ').join('_').toUpperCase()
@@ -231,7 +231,7 @@
 
                     this.deleteNode = function() {
                         if (parent) {
-                            parent.entities.remove(self);    
+                            parent.entities.remove(self);
                         } else {
                             viewModel.resources.remove(self);
                         }
@@ -342,7 +342,7 @@
                         resources: viewModel.resources
                     });
                 });
-                    
+
                 ko.applyBindings(viewModel);
 
                 var updateResources = function(full_json) {

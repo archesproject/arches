@@ -27,6 +27,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.views.tileserver import clean_resource_cache
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
@@ -45,16 +46,18 @@ class TileData(View):
                     old_tile = Tile.objects.get(pk=tile_id)
                     clean_resource_cache(old_tile)
                 tile = Tile(data)
-                with transaction.atomic():
-                    try:
-                        tile.save(request=request)
-                    except ValidationError as e:
-                        return JSONResponse({'status':'false','message':e.args}, status=500)
-
-                tile.after_update_all()
-                clean_resource_cache(tile)
-                update_system_settings_cache(tile)
-                return JSONResponse(tile)
+                if tile.filter_by_perm(request.user, 'write_nodegroup'):
+                    with transaction.atomic():
+                        try:
+                            tile.save(request=request)
+                        except ValidationError as e:
+                            return JSONResponse({'status':'false','message':e.args}, status=500)
+                        tile.after_update_all()
+                        clean_resource_cache(tile)
+                        update_system_settings_cache(tile)
+                    return JSONResponse(tile)
+                else:
+                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
 
         if self.action == 'reorder_tiles':
             json = request.body
@@ -66,9 +69,10 @@ class TileData(View):
                     with transaction.atomic():
                         for tile in data['tiles']:
                             t = Tile(tile)
-                            t.sortorder = sortorder
-                            t.save(update_fields=['sortorder'], request=request)
-                            sortorder = sortorder + 1
+                            if t.filter_by_perm(request.user, 'write_nodegroup'):
+                                t.sortorder = sortorder
+                                t.save(update_fields=['sortorder'], request=request)
+                                sortorder = sortorder + 1
 
                     return JSONResponse(data)
 
@@ -82,13 +86,15 @@ class TileData(View):
 
             with transaction.atomic():
                 tile = Tile.objects.get(tileid = data['tileid'])
-                nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
-                clean_resource_cache(tile)
-                tile.delete(request=request)
-                tile.after_update_all()
-                update_system_settings_cache(tile)
-
-            return JSONResponse(tile)
+                if tile.filter_by_perm(request.user, 'delete_nodegroup'):
+                    nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
+                    clean_resource_cache(tile)
+                    tile.delete(request=request)
+                    tile.after_update_all()
+                    update_system_settings_cache(tile)
+                    return JSONResponse(tile)
+                else:
+                    return JSONResponse({'status':'false','message': [_('Request Failed'), _('Permission Denied')]}, status=500)
 
         return HttpResponseNotFound()
 

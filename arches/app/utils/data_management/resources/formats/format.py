@@ -1,4 +1,7 @@
+import os
 import uuid
+import shutil
+import datetime
 from arches.app.models.concept import Concept
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
@@ -132,13 +135,30 @@ class Reader(object):
         if len(self.errors) == 0:
             print _("No import errors")
         else:
-            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
-            with open('arches/logs/resource_import.log', 'w') as f:
-                for error in self.errors:
-                    try:
-                        f.write(_('{0}: {1}\n'.format(error['type'], error['message'])))
-                    except TypeError as e:
-                        f.write(e + unicode(error))
+            print _("***** Errors occured during import. Some data may not have been imported. For more information, check resource import error log: arches/logs/resource_import.log")
+            log_nums = [0]
+            if os.path.isfile('arches/logs/resource_import.log'):
+                if os.path.getsize('arches/logs/resource_import.log')/1000000 > 5:
+                    for file in os.listdir('arches/logs',):
+                        try:
+                            log_nums.append(int(file.split('.')[-1]))
+                        except:
+                            pass
+
+                    archive_log_num = str(max(log_nums) + 1)
+                    shutil.copy2('arches/logs/resource_import.log', 'arches/logs/resource_import.log' + '.' + archive_log_num)
+                    f = open('arches/logs/resource_import.log', 'w')
+                else:
+                    f = open('arches/logs/resource_import.log', 'a')
+            else:
+                f = open('arches/logs/resource_import.log', 'w')
+
+            for error in self.errors:
+                timestamp = (datetime.datetime.now() - datetime.timedelta(hours=2)).strftime('%a %b %d %H:%M:%S %Y')
+                try:
+                    f.write(_(timestamp + ' ' + '{0}: {1}\n'.format(error['type'], error['message'])))
+                except TypeError as e:
+                    f.write(timestamp + ' ' + e + unicode(error))
 
 class Writer(object):
 

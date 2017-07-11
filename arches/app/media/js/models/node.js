@@ -29,22 +29,8 @@ define([
             self.icons = options.icons || [];
             self.mapSource = options.mapSource;
             self.loading = options.loading;
-            self.permissions = {};
-            var canRead = function (entity) {
-                var perms = entity.perms.default.concat(entity.perms.local).map(function(perm) {
-                    return perm.name;
-                });
-                if (_.contains(perms, 'No Access')) {
-                    return false;
-                } else {
-                    return _.contains(perms, 'Read')
-                }
-            }
-            if (options.permissions) {
-                self.permissions.users = _.filter(options.permissions.users, canRead)
-                self.permissions.groups = _.filter(options.permissions.groups, canRead)
-            }
-
+            self.permissions = options.permissions;
+            
             self._node = ko.observable('');
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
@@ -67,6 +53,14 @@ define([
                 },
                 owner: this
             });
+            self.datatypeIsSearchable = ko.computed(function () {
+                var searchable = false;
+                var datatype = self.datatypelookup[self.datatype()];
+                if (datatype && datatype.configname) {
+                    searchable = datatype.issearchable;
+                }
+                return searchable;
+            });
             self.datatypeConfigComponent = ko.computed(function() {
                 var component = null;
                 var datatype = self.datatypelookup[self.datatype()];
@@ -82,7 +76,7 @@ define([
             });
             self.configKeys = ko.observableArray();
             self.config = {};
-
+            self.issearchable = ko.observable(true);
 
             self.parse(options.source);
 
@@ -159,7 +153,8 @@ define([
                     nodegroup_id: self.nodeGroupId,
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
-                    config: config
+                    config: config,
+                    issearchable: self.issearchable
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
@@ -192,6 +187,7 @@ define([
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
+            self.issearchable(source.issearchable);
 
             if (source.config) {
                 self.setupConfig(source.config);

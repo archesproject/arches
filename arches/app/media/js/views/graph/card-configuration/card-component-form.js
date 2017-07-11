@@ -2,12 +2,11 @@ define([
     'underscore',
     'backbone',
     'knockout',
-    'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'card-configuration-data',
     'bindings/ckeditor',
     'plugins/knockstrap'
-], function(_, Backbone,  ko, PermissionsList, widgets, data) {
+], function(_, Backbone,  ko, widgets, data) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -60,11 +59,6 @@ define([
             }, this);
 
             this.updateSelection(this.selection());
-
-            this.permissionsList = new PermissionsList({
-                card: this.card,
-                permissions: options.permissions
-            });
         }
     });
     return CardComponentForm;

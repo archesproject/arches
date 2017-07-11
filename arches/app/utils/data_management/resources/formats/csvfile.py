@@ -269,8 +269,9 @@ class CsvReader(Reader):
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
-                            if len(errors) > 0:
-                                self.errors += errors
+                        if len(errors) > 0:
+                            value = None
+                            self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
 
@@ -399,7 +400,8 @@ class CsvReader(Reader):
 
                                         populate_child_tiles(source_data)
 
-                                populated_tiles.append(target_tile)
+                                if not target_tile.is_blank():
+                                    populated_tiles.append(target_tile)
 
                                 if len(source_data)>0:
                                     need_new_tile = True

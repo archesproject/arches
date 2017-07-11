@@ -71,138 +71,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <!-- /ko -->
 
-                    {% block login_header %}
-                    <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
-                        <ul class="nav navbar-top-links pull-left">
-                            <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
-                                <a class="mainnav-toggle" href="#">
-                                    <i class="fa fa-navicon fa-lg"></i>
-                                </a>
-                            </li>
-                            <li class="hidden-xs" data-bind="if: showTabs()">
-                                <a id="toggle-aside" href="#">
-                                    <i id="toggle-aside-icon" class="fa fa-lg" data-bind="css: { 'fa-toggle-on': tabsActive(), 'fa-toggle-off': !tabsActive() }, click: function () { tabsActive(!tabsActive()) }"></i>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-top-links pull-right">
-                            <li class="">
-                                <a href="#" class="main-navbar-item" data-bind="click:function () { navigate('{% url 'search_home' %}') }, attr: { href: '{% url 'search_home' %}' }">
-                                    <div class="text-center" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
-                                      <i class="ion-search main-navbar-icon"></i>
-                                    </div>
-                                </a>
-                            </li>
-
-                            <li class="dropdown">
-                                <a id="demo-lang-switch" class="lang-selector dropdown-toggle" href="#" data-toggle="dropdown">
-                                    <span class="lang-selected">
-                                        <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
-                                        <span class="lang-id">EN</span>
-                                        <span class="lang-name">English</span>
-                                    </span>
-                                </a>
-
-                                <ul class="head-list dropdown-menu with-arrow">
-                                    <li>
-                                        <a href="#" class="active">
-                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
-                                            <span class="lang-id">EN</span>
-                                            <span class="lang-name">English</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/france.png" alt="France">
-                                            <span class="lang-id">FR</span>
-                                            <span class="lang-name">Fran&ccedil;ais</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/germany.png" alt="Germany">
-                                            <span class="lang-id">DE</span>
-                                            <span class="lang-name">Deutsch</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/italy.png" alt="Italy">
-                                            <span class="lang-id">IT</span>
-                                            <span class="lang-name">Italiano</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/spain.png" alt="Spain">
-                                            <span class="lang-id">ES</span>
-                                            <span class="lang-name">Espa&ntilde;ol</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <a class="" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right" style="background-color: transparent;">
-                                <span class="pull-right">
-                                    <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
-                                </span>
-                                <div class="username hidden-xs">
-                                {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
-                            </a>
-                            <li id="dropdown-user" class="dropdown">
-
-                                <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
-
-                                    <div class="pad-all bord-btm">
-                                        <p class="text-lg text-muted text-thin mar-btm">750Gb of 1,000Gb Used</p>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar" style="width: 70%;">
-                                                <span class="sr-only">70%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <ul class="head-list">
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-user fa-fw fa-lg"></i> Profile
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <span class="badge badge-danger pull-right">9</span>
-                                                <i class="fa fa-envelope fa-fw fa-lg"></i> Messages
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <span class="label label-success pull-right">New</span>
-                                                <i class="fa fa-gear fa-fw fa-lg"></i> Settings
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-question-circle fa-fw fa-lg"></i> Help
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-lock fa-fw fa-lg"></i> Lock screen
-                                            </a>
-                                        </li>
-                                    </ul>
-
-                                    <div class="pad-all text-right">
-                                        <a href="pages-login.html" class="btn btn-primary">
-                                            <i class="fa fa-sign-out fa-fw"></i> Logout
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    {% endblock login_header %}
-
                     {% block header %}
                     <div class="ep-toolbar">
 
@@ -338,7 +206,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% include nav.help.1 %}
                             {% endif %}
                             <hr>
-                            <h5>for more documentation, visit <a href="https://arches4.readthedocs.io/en/latest/">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                            <h5>for more documentation, visit <a href="https://arches4.readthedocs.io/en/latest/" target="_blank">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
                         </div>
                     </div>
                     {% endblock header %}
@@ -359,6 +227,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Tools -->
                                         <li class="list-header">Tools</li>
 
+                                        <!-- System Settings list item -->
+                                        {% if request.user|has_group:"System Administrator" %}
+                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Manage System Settings" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endif %}
+
                                         <!--Menu list item-->
                                         <li>
                                             <a href="#">
@@ -372,7 +260,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Resource Editor" %}
                                         <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="/resource" data-bind="click: navigate.bind(this, '/resource') ">
+                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
@@ -382,10 +270,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- ko foreach: allGraphs -->
                                                 <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource'),
+                                                    <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
                                                         attr: {
-                                                            href: disable_instance_creation ? '#' : ('/graph/' + graphid + '/add_resource')
+                                                            href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
                                                         }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
@@ -406,36 +294,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                             <ul class="collapse" aria-expanded="false">
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu"  href="/graph" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}</a>
+                                                    <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                                 </li>
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="/graph#branches" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}</a>
+                                                    <a class="link-submenu" href="{% url 'graph' '' %}#branches" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
                                                 </li>
                                             </ul>
                                         </li>
                                         {% endif %}
-
-
-                                        <!-- System Settings list item -->
-                                        {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="/settings" data-bind="click: navigate.bind(this, '/settings') ">
-                                                <i class="ti-alarm-clock"></i>
-                                                <span class="menu-title">
-                                                    <strong>{% trans "Manage System Settings" %}</strong>
-                                                </span>
-                                            </a>
-                                            <ul class="collapse" aria-expanded="false">
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="/settings" data-bind="click: navigate.bind(this, '/settings')">{% trans "System Settings" %}</a>
-                                                </li>
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="/graph/{{system_settings_graphid}}" data-bind="click: navigate.bind(this, '/graph/{{system_settings_graphid}}')">{% trans "System Settings Graph" %}</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        {% endif %}
-
 
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
@@ -460,36 +326,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-globe"></i>
-                                                <span class="menu-title">
-                                                    <strong>Field Project Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-cloud-upload"></i>
-                                                <span class="menu-title">
-                                                    <strong>Import/Export Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-user-md"></i>
-                                                <span class="menu-title">
-                                                    <strong>Profile Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
