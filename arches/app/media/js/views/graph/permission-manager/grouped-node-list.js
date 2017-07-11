@@ -55,6 +55,9 @@ define([
                     item.filtered = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
+                item.children.sort(function (a, b) {
+                    return ko.unwrap(a.name).localeCompare(ko.unwrap(b.name));
+                });
             }
 
             parseData.call(this, options.cards);
