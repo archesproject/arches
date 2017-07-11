@@ -26,13 +26,12 @@
 
                     <span class="node-name" data-bind="text: card.name"></span>
                     <span class="node-subname" data-bind="text: card.type_label"></span>
-                    <!-- ko if: card.perms && card.perms().length > 0 -->
+
                     <span class="node-permissions">
                         <!-- ko foreach: card.perms -->
                         <i class="node-permission-icon" data-bind="css: $data.icon"></i>
                         <!-- /ko -->
                     </span>
-                    <!-- /ko -->
 
                     <!-- ko if: card.type === 'card' -->
                     <span class="expando">
@@ -62,26 +61,15 @@
                 <i class="card-tree-list-icon" data-bind="css: card.type === 'card' ? 'ion-ios-folder' : self.datatypes[card.datatype]"></i>
             </span>
 
-            </div>
             <span class="node-name" data-bind="text: card.name"></span>
             <span class="node-subname" data-bind="text: card.type_label"></span>
 
-            <!-- ko if: card.perms && card.perms().length > 0-->
             <span class="node-permissions">
-                <!-- ko foreach: card.perms -->
+                <!-- ko foreach: $data.perms -->
                 <i class="node-permission-icon" data-bind="css: $data.icon"></i>
                 <!-- /ko -->
             </span>
-            <!-- /ko -->
-            <!-- This is actually a node now. -->
-            <!-- ko if: card.type_label == 'node'-->
-            <span class="node-permissions">
-                <!-- ko foreach: card.card_perms -->
-                <i class="node-permission-icon" data-bind="css: $data.icon"></i>
-                <!-- /ko -->
-            </span>
-            <!-- /ko -->
-
+            
             <!-- ko if: card.type === 'card' -->
             <span class="expando">
                 <i class="expand-icon" id="cc-expand-1" class="expand-cc-child-nodes" data-bind="click: self.toggleNodes, css: {'ion-arrow-down-b': card.visible(), 'ion-arrow-left-b': !card.visible()}"></i>

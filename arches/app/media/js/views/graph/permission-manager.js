@@ -39,6 +39,10 @@ require([
     groupedNodeList.items().forEach(function(item){
         item.perms = ko.observableArray();
         item.permsLiteral = ko.observable('');
+        item.children.forEach(function(child){
+            child.perms = ko.observableArray();
+            child.permsLiteral = ko.observable('');
+        });
     });
 
     data.nodegroupPermissions.forEach(function(perm){
@@ -71,8 +75,6 @@ require([
                 url: arches.urls.permission_data,
                 data: {'nodegroupIds': JSON.stringify(nodegroupIds), 'identityType': item.type, 'identityId': item.id},
                 success: function(res){
-                    //self.options(res.results);
-                    console.log(res);
                     res.forEach(function(nodegroup){
                         var card = _.find(groupedNodeList.items(), function(card){
                             return card.nodegroup === nodegroup.nodegroup_id;
@@ -88,15 +90,14 @@ require([
                         card.permsLiteral(' - ' + _.pluck(nodegroup.perms, 'name').join(', '));
 
                         if (card.type === 'card') {
-                          if (card.children.length > 0) {
-                            card.children.forEach(function(child){
-                              if (child.type === 'Node') {
-                                child.card_perms = card.perms
-                              }
-                            })
-                          }
+                            if (card.children.length > 0) {
+                                card.children.forEach(function(child){
+                                    if (child.type === 'node') {
+                                        child.perms(nodegroup.perms);
+                                    }
+                                })
+                            }
                         }
-                        console.log(card)
                     })
                 },
                 complete: function () {
