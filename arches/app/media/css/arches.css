@@ -6664,13 +6664,18 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .form-control .buffer {
-    width: 55%;
+    width: 75px;
 }
 
 .map-tool-container.buffer {
     position: absolute;
     top: 0px;
-    width: 150px;
+    width: 220px;
+}
+
+.map-tool-container.buffer select {
+    height: 28px;
+    width: 75px;
 }
 
 .map-json-tool-item {
