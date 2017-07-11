@@ -636,7 +636,8 @@ class PermissionManagerView(GraphBaseView):
                     extract_card_info(card.cards, d)
                 else:
                     for node in card.nodegroup.node_set.all():
-                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': 'node', 'type': _('Node')})
+                        if node.datatype != 'semantic':
+                            d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': _('Node'), 'type': 'node'})
                 root['children'].append(d)
 
         extract_card_info(cards, root)
