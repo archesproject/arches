@@ -141,6 +141,36 @@ class ResourceEditorView(BaseManagerView):
 
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
+class ResourceEditLogView(BaseManagerView):
+    def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
+        if resourceid is not None:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
+            graph = Graph.objects.get(graphid=resource_instance.graph.pk)
+            displayname = Resource.objects.get(pk=resourceid).displayname
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
+            if displayname == 'undefined':
+                displayname = 'Unnamed Resource'
+            context = self.get_context_data(
+                main_script='views/resource/edit-log',
+                graph_json=JSONSerializer().serialize(graph),
+                cards=JSONSerializer().serialize(cards),
+                resource_type=resource_instance.graph.name,
+                iconclass=resource_instance.graph.iconclass,
+                edits=JSONSerializer().serialize(edits),
+                resourceid=resourceid,
+                displayname=displayname,
+            )
+            if graph.iconclass:
+                context['nav']['icon'] = graph.iconclass
+            context['nav']['title'] = graph.name
+
+            return render(request, view_template, context)
+
+        return HttpResponseNotFound()
+
+
+@method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:

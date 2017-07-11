@@ -1,0 +1,223 @@
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resource History" %}
+{% endblock title %}
+
+
+{% block main_content %}
+<div id="" class="relative" style="display: block;">
+
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title" data-bind="text: 'Edit History'"></h4>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date"><span data-bind="text: currentDate"></span></p>
+        </div>
+    </div>
+</div>
+<div class="panel-body eh-timeline-panel">
+    <!-- Timeline -->
+    <!--===================================================-->
+    <div class="timeline timeline-panel eh-timeline eh-timeline-panel panel">
+
+        <!-- Timeline header -->
+        <div class="timeline-header eh-timeline-header">
+            <div class="timeline-header-title bg-info">
+                Now
+            </div>
+            <span class="pull-right">
+                <select id="" class="resources" style="display: none;" data-placeholder="Find a Resource..." tabindex="-1">
+                    <option>Most recent</option>
+                    <option>Oldest</option>
+                    <option>By editor</option>
+                    <option>By edit type</option>
+                </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Most recent</span>
+            <div><b></b></div>
+            </a>
+            <div class="chosen-drop">
+                <div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div>
+                <ul class="chosen-results">
+                    <li class="active-result result-selected" data-option-array-index="0">Most recent</li>
+                    <li class="active-result" data-option-array-index="1">Oldest</li>
+                    <li class="active-result" data-option-array-index="2">By editor</li>
+                    <li class="active-result" data-option-array-index="3">By edit type</li>
+                </ul>
+            </div>
+        </div>
+        </span>
+    </div>
+
+<div data-bind="foreach: edits">
+    <div class="timeline-entry">
+        <div class="timeline-stat eh-timeline-stat">
+            <div class="timeline-icon" data-bind="css: edit_type_icon.color"><i class="fa fa-plus fa-lg" data-bind="css: edit_type_icon.icon"></i></div>
+            <div class="timeline-time eh-timeline-time"><span data-bind="text: time"></span> <br> <span data-bind="text: day"></span> </div>
+        </div>
+        <div class="timeline-label eh-timeline-label">
+            <!--ko if: edittype == 'create' -->
+                <h4 class="mar-no pad-btm">{% trans 'Resource Record Created' %}</h4>
+                <div class="eh-node-group">
+                    <p>{% trans 'Record created by Arches with unique identifer' %}<span class="text-bold" data-bind="text: resourceinstanceid"></span></p>
+                </div>
+            <!--/ko-->
+            <!--ko if: edittype == 'tile create'-->
+            <h4 class="mar-no pad-btm">{% trans 'Tile Created' %}</h4>
+            <div class="eh-node-group">
+                <div class="eh-edit-title">
+                    {% trans 'Data Tile' %}
+                </div>
+
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <div data-bind="foreach: card.nodes">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name" data-bind="text: name"></span><span class="tile-node-value"> Value of Node</span>
+                        </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+            <!--/ko-->
+            <!--ko if: edittype == 'tile edit'-->
+            <h4 class="mar-no pad-btm">Tile Edited</h4>
+            <!--/ko-->
+            <!--ko if: edittype == 'tile delete'-->
+            <h4 class="mar-no pad-btm">Tile Deleted</h4>
+            <!--/ko-->
+
+            <div class="eh-footer">
+                {% trans 'edited by' %}: <span data-bind="text: user_email"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+    <div class="timeline-entry">
+        <div class="timeline-stat eh-timeline-stat">
+            <div class="timeline-icon bg-danger"><i class="fa fa-minus fa-lg"></i></div>
+            <div class="timeline-time eh-timeline-time">11:19 <br> 3 October, 2016</div>
+        </div>
+        <div class="timeline-label eh-timeline-label">
+            <h4 class="mar-no pad-btm">Name Deleted</h4>
+
+            <div class="eh-node-group">
+                <div class="eh-edit-title">
+                    Data Tile
+                </div>
+
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Name</span><span class="tile-node-value"> King Arthur's Castle</span>
+                        </li>
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Name Type</span><span class="tile-node-value"> Primary</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="eh-footer">
+                edited by: randerson@fargeo.com
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-entry">
+        <div class="timeline-stat eh-timeline-stat">
+            <div class="timeline-icon bg-purple"><i class="fa fa-repeat fa-lg"></i></div>
+            <div class="timeline-time eh-timeline-time">13:22 <br> 29 September, 2016</div>
+        </div>
+        <div class="timeline-label eh-timeline-label">
+            <h4 class="mar-no pad-btm">Condition Assessment Edit</h4>
+
+            <div class="eh-node-group">
+                <div class="eh-edit-title">
+                    New Data Tile
+                </div>
+
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Condition</span><span class="tile-node-value"> Poor</span>
+                        </li>
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Date Assessed</span><span class="tile-node-value"> 12 June, 2016</span>
+                        </li>
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Description</span><span class="tile-node-value">Etiam porta sem malesuada magna mollis euismod. Another Etiam porta sem malesuada magna mollis euismod. Porta sem Etiam porta sem malesuada magna</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="eh-node-group">
+                <div class="eh-edit-title">
+                    Previous Data Tile
+                </div>
+
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Condition</span><span class="tile-node-value"> Fair</span>
+                        </li>
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Date Assessed</span><span class="tile-node-value"> 11 June, 2016</span>
+                        </li>
+                        <li class="tile-data-item">
+                            <span class="tile-node-name">Description</span><span class="tile-node-value"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="eh-footer">
+                edited by: apeters@fargeo.com
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-entry">
+        <div class="timeline-stat eh-timeline-stat">
+            <div class="timeline-icon bg-mint"><i class="fa fa-chevron-circle-right fa-lg"></i></div>
+            <div class="timeline-time eh-timeline-time">10:18 <br> 3 January, 2016</div>
+        </div>
+        <div class="timeline-label eh-timeline-label">
+            <h4 class="mar-no pad-btm">Resource Record Created</h4>
+            <p>Record created by Arches with unique identifer <span class="text-bold">c619613f-1273-4d59-b6f0-48c17bf5fb74</span></p>
+            <div class="eh-footer">
+                edited by: apeters@fargeo.com
+            </div>
+        </div>
+    </div> -->
+
+</div>
+<!--===================================================-->
+<!-- End Timeline -->
+</div>
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('resource-edit-history-data', [], function () {
+    return {
+        edits: {{edits}},
+        cards: {{cards}},
+        graph: {{graph_json}},
+        resource_type: '{{resource_type}}',
+        iconclass: '{{iconclass}}',
+        resourceid: '{{resourceid}}',
+        displayname: '{{displayname}}'
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
