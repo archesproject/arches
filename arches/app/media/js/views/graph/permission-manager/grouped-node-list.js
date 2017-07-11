@@ -106,6 +106,21 @@ define([
         },
 
         /**
+        * Unselect all items in the list
+        * @memberof ListView.prototype
+        */
+        clearSelection: function(){
+            this.items().forEach(function(item){
+                item.selected(false);
+                item.children.forEach(function(child) {
+                  if (child.type === 'Node') {
+                    child.active(false);
+                  }
+                })
+            }, this);
+        },
+
+        /**
         * Toggles hidden nodes in the list
         * @memberof ListView.prototype
         * @param {object} item - the item to be hidden or shown
