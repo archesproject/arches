@@ -1,6 +1,9 @@
-######################
-Intitial Configuration
-######################
+#####################
+Initial Configuration
+#####################
+
+Quick Start
+===========
 
 Now that you have Arches installed, there are a few extra settings you must configure to make it fully operational. In the Arches interface, head to the **System Settings** menu.
 
@@ -15,7 +18,8 @@ The most important settings to begin with are related to the map on the Search p
 
 After getting the Map Settings figured out, you will probably want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
 
-A full summary of Arches System Settings follows.
+All Settings
+============
 
 System Settings
 ----------------
