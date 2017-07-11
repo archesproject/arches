@@ -14,6 +14,7 @@ define([
     'views/list',
     'views/components/widgets/map/map-styles',
     'viewmodels/map-controls',
+    'mathjs',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
@@ -21,7 +22,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -127,7 +128,7 @@ define([
                 this.clearSearch = params.clearSearch;
             }
 
-            this.buffer = ko.observable(100.0);
+            this.buffer = ko.observable('100m');
             this.queryFeature;
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
@@ -1153,19 +1154,13 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
+                            var bufferFeature = turf.buffer(self.queryFeature, val, 'meters')
                             bufferFeature.id = 'buffer-layer';
-                            self.queryFeature.properties.buffer = {
-                                width: val,
-                                unit: 'ft'
-                            }
+                            self.queryFeature.properties.buffer = val;
                             self.value().features[0] = self.queryFeature
                             self.updateSearchQueryLayer([bufferFeature, self.queryFeature])
                         } else {
-                            self.queryFeature.properties.buffer = {
-                                width: 0,
-                                unit: 'ft'
-                            }
+                            self.queryFeature.properties.buffer = 0
                             self.value().features = [self.queryFeature]
                         }
                         self.value(self.value())
@@ -1204,10 +1199,7 @@ define([
                         var boundsFeature = {
                             "type": "Feature",
                             "properties": {
-                                "buffer": {
-                                    "width": 0,
-                                    "unit": "ft"
-                                },
+                                "buffer": 0,
                                 "extent_search": true
                             },
                             "geometry": {
@@ -1225,14 +1217,28 @@ define([
                 })
 
                 this.updateBuffer = function(val) {
-                    var maxBuffer = 100000;
-                    if(val < 0){
-                        this.buffer(0)
-                    }else if(val > maxBuffer){
-                        this.buffer(maxBuffer)
+                  try {
+                    var unit = mathjs.unit(val);
+                    var maxBuffer = mathjs.unit(100000, 'm');
+                    if (unit.equalBase(maxBuffer)) {
+                      if(unit.value < 0){
+                          this.buffer('0m')
+                      }else if(unit.value > maxBuffer.value){
+                          this.buffer(maxBuffer.toString())
+                      }else{
+                          this.applySearchBuffer(unit.value)
+                      }
                     }else{
-                        this.applySearchBuffer(val)
+                      // Exceptions handling to be completed
+                      this.error('Invalid buffer');
                     }
+                  }
+                  catch(err) {
+                    // Exceptions handling to be completed
+                    if (String(val).match(/[\u0000-\u007F\u0080-\u00FF\u0600-\u06FF]/)) {
+                      console.log(err)
+                    }
+                  }
                 }
 
                 this.buffer.subscribe(this.updateBuffer, this);
