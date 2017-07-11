@@ -29,7 +29,8 @@ define([
                         if (!childItem.filtered()){
                             item.filtered(false);
                         }
-                    })                }
+                    })
+                  }
             }, this);
         },
 
@@ -96,7 +97,7 @@ define([
                 })
             }else{
                 if (parentItem){
-                   item.active(parentItem.selected()); 
+                   item.active(parentItem.selected());
                 }
             }
         },

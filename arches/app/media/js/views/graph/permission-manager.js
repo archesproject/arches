@@ -4,7 +4,7 @@ require([
     'knockout',
     'knockout-mapping',
     'arches',
-    'views/graph/graph-page-view', 
+    'views/graph/graph-page-view',
     'views/graph/permission-manager/identity-list',
     'views/graph/permission-manager/grouped-node-list',
     'views/graph/permission-manager/permission-settings-form',
@@ -40,7 +40,7 @@ require([
         item.perms = ko.observableArray();
         item.permsLiteral = ko.observable('');
     });
-    
+
     data.nodegroupPermissions.forEach(function(perm){
         perm.icon = perm_icons[perm.codename];
     });
@@ -86,6 +86,17 @@ require([
                         });
                         card.perms(nodegroup.perms);
                         card.permsLiteral(' - ' + _.pluck(nodegroup.perms, 'name').join(', '));
+
+                        if (card.type === 'card') {
+                          if (card.children.length > 0) {
+                            card.children.forEach(function(child){
+                              if (child.type === 'Node') {
+                                child.card_perms = card.perms
+                              }
+                            })
+                          }
+                        }
+                        console.log(card)
                     })
                 },
                 complete: function () {
@@ -95,7 +106,7 @@ require([
         }
 
     }
-  
+
     /**
     * a GraphPageView representing the graph manager page
     */
