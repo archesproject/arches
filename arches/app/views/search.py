@@ -65,13 +65,13 @@ class SearchView(BaseManagerView):
         # only allow cards that the user has permission to read
         searchable_cards = []
         for card in resource_cards:
-            if request.user.has_perm('read_nodegroup', card.nodegroup): 
+            if request.user.has_perm('read_nodegroup', card.nodegroup):
                 searchable_cards.append(card)
 
         # only allow date nodes that the user has permission to read
         searchable_date_nodes = []
         for node in date_nodes:
-            if request.user.has_perm('read_nodegroup', node.nodegroup): 
+            if request.user.has_perm('read_nodegroup', node.nodegroup):
                 searchable_date_nodes.append(node)
 
         context = self.get_context_data(
@@ -165,7 +165,7 @@ def search_results(request):
     dsl.include('displayname')
     dsl.include('displaydescription')
     dsl.include('map_popup')
-    
+
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
     if results is not None:
         total = results['hits']['total']
@@ -256,7 +256,7 @@ def build_search_results_dsl(request):
     query = Query(se, start=limit*int(page-1), limit=limit)
     query.add_aggregation(GeoHashGridAgg(field='points.point', name='grid', precision=settings.HEX_BIN_PRECISION))
     query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
-    
+
     search_query = Bool()
 
     if term_filter != '':
@@ -287,10 +287,10 @@ def build_search_results_dsl(request):
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
             feature_properties = spatial_filter['features'][0]['properties']
-            buffer = 0
+            buffer = {'width':0,'unit':'ft'}
             if 'buffer' in feature_properties:
                 buffer = feature_properties['buffer']
-            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer).json)
+            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
             geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
             invert_spatial_search = False
@@ -315,7 +315,7 @@ def build_search_results_dsl(request):
 
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
-        
+
         # apply permissions for nodegroups that contain date datatypes
         date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
         date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
@@ -379,7 +379,7 @@ def build_search_results_dsl(request):
             for key, val in advanced_filter.iteritems():
                 if key != 'op':
                     node = models.Node.objects.get(pk=key)
-                    if request.user.has_perm('read_nodegroup', node.nodegroup): 
+                    if request.user.has_perm('read_nodegroup', node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
                         datatype.append_search_filters(val, node, tile_query, request)
             nested_query = Nested(path='tiles', query=tile_query)
@@ -397,15 +397,15 @@ def build_search_results_dsl(request):
 def get_nodes_of_type_with_perm(request, datatype, permission):
     nodes = []
     for node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, node.nodegroup): 
-            nodes.append(str(node.nodegroup_id)) 
+        if request.user.has_perm(permission, node.nodegroup):
+            nodes.append(str(node.nodegroup_id))
     return nodes
 
 def buffer(request):
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':'0'}))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))
 
     if spatial_filter['geometry']['coordinates'] != '' and spatial_filter['geometry']['type'] != '':
-        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']), geom_format='json')
+        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
 
     return JSONResponse()
 
@@ -419,6 +419,9 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
+        if unit == 'ft':
+            width = width/3.28084
+
         geom.transform(3857)
         geom = geom.buffer(width)
         geom.transform(4326)

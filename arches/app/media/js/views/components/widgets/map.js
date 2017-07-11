@@ -128,7 +128,18 @@ define([
                 this.clearSearch = params.clearSearch;
             }
 
-            this.buffer = ko.observable('100m');
+            this.bufferUnits = [
+                {
+                    name: 'meters',
+                    val: 'm'
+                },
+                {
+                    name: 'feet',
+                    val: 'ft'
+                }
+            ];
+            this.buffer = ko.observable('100');
+            this.bufferUnit = ko.observable('m');
             this.queryFeature;
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
@@ -331,10 +342,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
-                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width && this.bufferUnit() === this.queryFeature.properties.buffer.unit) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width, this.queryFeature.properties.buffer.unit)
                                 } else {
                                     this.buffer(this.queryFeature.properties.buffer.width)
+                                    this.bufferUnit(this.queryFeature.properties.buffer.unit)
                                 }
                             }
                         }
@@ -622,7 +634,9 @@ define([
                                 }
 
                                 if (self.value() && self.value()['features'].length > 0) {
-                                    var bounds = new mapboxgl.LngLatBounds(geojsonExtent(turf.buffer(self.value(), self.buffer()/3.28084, 'meters')));
+                                    var geojsonFC = self.buffer() ? turf.buffer(self.value(), self.buffer()/3.28084, 'meters') : self.value();
+                                    var extent = geojsonExtent(geojsonFC);
+                                    var bounds = new mapboxgl.LngLatBounds(extent);
                                     self.map.fitBounds(bounds,{padding: 200});
                                 } else {
                                     self.fitToAggregationBounds();
@@ -1156,11 +1170,17 @@ define([
                         if (val >= 0) {
                             var bufferFeature = turf.buffer(self.queryFeature, val, 'meters')
                             bufferFeature.id = 'buffer-layer';
-                            self.queryFeature.properties.buffer = val;
+                            self.queryFeature.properties.buffer = {
+                                width: self.buffer(),
+                                unit: self.bufferUnit()
+                            };
                             self.value().features[0] = self.queryFeature
                             self.updateSearchQueryLayer([bufferFeature, self.queryFeature])
                         } else {
-                            self.queryFeature.properties.buffer = 0
+                            self.queryFeature.properties.buffer = {
+                                width: 0,
+                                unit: self.bufferUnit()
+                            }
                             self.value().features = [self.queryFeature]
                         }
                         self.value(self.value())
@@ -1216,32 +1236,28 @@ define([
                     self.searchByExtent();
                 })
 
-                this.updateBuffer = function(val) {
-                  try {
-                    var unit = mathjs.unit(val);
-                    var maxBuffer = mathjs.unit(100000, 'm');
-                    if (unit.equalBase(maxBuffer)) {
-                      if(unit.value < 0){
-                          this.buffer('0m')
-                      }else if(unit.value > maxBuffer.value){
-                          this.buffer(maxBuffer.toString())
-                      }else{
-                          this.applySearchBuffer(unit.value)
-                      }
-                    }else{
-                      // Exceptions handling to be completed
-                      this.error('Invalid buffer');
+                this.updateBuffer = function(val, units) {
+                    var maxBuffer = 100000;
+                    var maxBufferUnits = 'm';
+                    var maxBufferUnit = mathjs.unit(maxBuffer, maxBufferUnits);
+                    var unit = mathjs.unit(val + units);
+                    unit.equalBase(maxBufferUnit);
+                    if (val < 0){
+                        this.buffer(0)
+                    } else if(unit.value > maxBufferUnit.value){
+                        this.buffer(maxBuffer);
+                        this.bufferUnit(maxBufferUnits);
+                    } else {
+                        this.applySearchBuffer(unit.value);
                     }
-                  }
-                  catch(err) {
-                    // Exceptions handling to be completed
-                    if (String(val).match(/[\u0000-\u007F\u0080-\u00FF\u0600-\u06FF]/)) {
-                      console.log(err)
-                    }
-                  }
-                }
+                };
 
-                this.buffer.subscribe(this.updateBuffer, this);
+                this.buffer.subscribe(function (val) {
+                    this.updateBuffer(val, this.bufferUnit());
+                }, this);
+                this.bufferUnit.subscribe(function (val) {
+                    this.updateBuffer(this.buffer(), val);
+                }, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
