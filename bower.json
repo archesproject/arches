@@ -53,7 +53,8 @@
     "leaflet": "^1.0.3",
     "leaflet-iiif": "^1.1.1",
     "leaflet-draw": "^0.4.9",
-    "ckeditor": "~4.6.2"
+    "ckeditor": "~4.6.2",
+    "mathjs": "^3.11.4"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

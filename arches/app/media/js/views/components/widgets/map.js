@@ -14,6 +14,7 @@ define([
     'views/list',
     'views/components/widgets/map/map-styles',
     'viewmodels/map-controls',
+    'mathjs',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
@@ -21,7 +22,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -127,7 +128,18 @@ define([
                 this.clearSearch = params.clearSearch;
             }
 
-            this.buffer = ko.observable(100.0);
+            this.bufferUnits = [
+                {
+                    name: 'meters',
+                    val: 'm'
+                },
+                {
+                    name: 'feet',
+                    val: 'ft'
+                }
+            ];
+            this.buffer = ko.observable('100');
+            this.bufferUnit = ko.observable('m');
             this.queryFeature;
             this.extentSearch = ko.observable(false);
             this.geojsonString = ko.observable();
@@ -330,10 +342,11 @@ define([
                             this.geometryTypeDetails[drawMode.name].active(true);
                             this.updateSearchQueryLayer([this.queryFeature]);
                             if (this.queryFeature.properties.buffer) {
-                                if (this.buffer() === this.queryFeature.properties.buffer.width) {
-                                    this.updateBuffer(this.queryFeature.properties.buffer.width)
+                                if (this.buffer() === this.queryFeature.properties.buffer.width && this.bufferUnit() === this.queryFeature.properties.buffer.unit) {
+                                    this.updateBuffer(this.queryFeature.properties.buffer.width, this.queryFeature.properties.buffer.unit)
                                 } else {
                                     this.buffer(this.queryFeature.properties.buffer.width)
+                                    this.bufferUnit(this.queryFeature.properties.buffer.unit)
                                 }
                             }
                         }
@@ -621,7 +634,9 @@ define([
                                 }
 
                                 if (self.value() && self.value()['features'].length > 0) {
-                                    var bounds = new mapboxgl.LngLatBounds(geojsonExtent(turf.buffer(self.value(), self.buffer()/3.28084, 'meters')));
+                                    var geojsonFC = self.buffer() ? turf.buffer(self.value(), self.buffer()/3.28084, 'meters') : self.value();
+                                    var extent = geojsonExtent(geojsonFC);
+                                    var bounds = new mapboxgl.LngLatBounds(extent);
                                     self.map.fitBounds(bounds,{padding: 200});
                                 } else {
                                     self.fitToAggregationBounds();
@@ -1153,18 +1168,18 @@ define([
                     var coords;
                     if (self.value().features.length > 0 && self.queryFeature !== undefined) {
                         if (val >= 0) {
-                            var bufferFeature = turf.buffer(self.queryFeature, val/3.28084, 'meters')
+                            var bufferFeature = turf.buffer(self.queryFeature, val, 'meters')
                             bufferFeature.id = 'buffer-layer';
                             self.queryFeature.properties.buffer = {
-                                width: val,
-                                unit: 'ft'
-                            }
+                                width: self.buffer(),
+                                unit: self.bufferUnit()
+                            };
                             self.value().features[0] = self.queryFeature
                             self.updateSearchQueryLayer([bufferFeature, self.queryFeature])
                         } else {
                             self.queryFeature.properties.buffer = {
                                 width: 0,
-                                unit: 'ft'
+                                unit: self.bufferUnit()
                             }
                             self.value().features = [self.queryFeature]
                         }
@@ -1204,10 +1219,7 @@ define([
                         var boundsFeature = {
                             "type": "Feature",
                             "properties": {
-                                "buffer": {
-                                    "width": 0,
-                                    "unit": "ft"
-                                },
+                                "buffer": 0,
                                 "extent_search": true
                             },
                             "geometry": {
@@ -1224,18 +1236,28 @@ define([
                     self.searchByExtent();
                 })
 
-                this.updateBuffer = function(val) {
+                this.updateBuffer = function(val, units) {
                     var maxBuffer = 100000;
-                    if(val < 0){
+                    var maxBufferUnits = 'm';
+                    var maxBufferUnit = mathjs.unit(maxBuffer, maxBufferUnits);
+                    var unit = mathjs.unit(val + units);
+                    unit.equalBase(maxBufferUnit);
+                    if (val < 0){
                         this.buffer(0)
-                    }else if(val > maxBuffer){
-                        this.buffer(maxBuffer)
-                    }else{
-                        this.applySearchBuffer(val)
+                    } else if(unit.value > maxBufferUnit.value){
+                        this.buffer(maxBuffer);
+                        this.bufferUnit(maxBufferUnits);
+                    } else {
+                        this.applySearchBuffer(unit.value);
                     }
-                }
+                };
 
-                this.buffer.subscribe(this.updateBuffer, this);
+                this.buffer.subscribe(function (val) {
+                    this.updateBuffer(val, this.bufferUnit());
+                }, this);
+                this.bufferUnit.subscribe(function (val) {
+                    this.updateBuffer(this.buffer(), val);
+                }, this);
 
                 var resourceLookup = {};
                 var lookupResourceData = function (resourceData) {
