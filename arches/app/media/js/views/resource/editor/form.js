@@ -37,6 +37,15 @@ define([
             this.ready = ko.observable(false);
             this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
+            this.expanded = ko.computed(function () {
+                var expanded = false;
+                _.each(self.formTiles(), function(tile) {
+                    if (tile.expanded()) {
+                        expanded = true;
+                    }
+                });
+                return expanded;
+            });
         },
 
         /**
@@ -137,6 +146,7 @@ define([
                 this.initTiles(tile.tiles);
             }
 
+            tile.expanded = ko.observable(false);
             tile.formData = new FormData();
             this.formTiles.push(tile);
             return tile;
@@ -167,38 +177,32 @@ define([
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(1)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(2)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
                 // this is a "wizard"
                 if(outerCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(3)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(4)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
             }else{
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
-                    //console.log(5)
                     return tile;
                 }else{
-                    //console.log(6)
                     return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                 }
             }
@@ -466,6 +470,7 @@ define([
         toggleGroup: function(data, e){
             var contentPane = $(e.currentTarget.nextElementSibling);
             contentPane.toggle('fast');
+            $(contentPane.closest('.tab-base.outline')).toggleClass('open-container');
             $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
             window.setTimeout(function(){window.dispatchEvent(new Event('resize'))},200) //ensures the map expands to the extent of its container element
         },

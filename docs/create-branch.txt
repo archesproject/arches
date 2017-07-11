@@ -9,31 +9,31 @@ Configure the Branch Settings
 
 Just as you created the Resource Model by defining a few settings, this will be your first step toward creating a Branch.
 
-1. From the Arches Designer home page, choose  > New Branch
-2. You are now presented with the Settings menu for your new Branch. You will notice only small differences between these settings and those available for the Resource Model, but if you choose Manage… in the top left of the view, you will see that a Branch has fewer menus than a Resource Model.
+1. From the Arches Designer home page, choose |add-btn| > New Branch
+2. You are now presented with the Settings menu for your new Branch. You will notice only small differences between these settings and those available for the Resource Model, but if you click |manage-btn|, you will see that a Branch has fewer designer tools than a Resource Model.
 3. In the Identifiers tab, add "Name" as the Name, and choose "CIDOC CRM v6.2" for the ontology. Now, type "41" in the Root Class dropdown, and choose "E41_Appellation". 
-4. In the Icon tab, type "tag" to choose the tag icon.
+4. In the Icon tab, type "tag" and choose the tag icon.
 5. Again, you can skip the Appearance and Description tabs, unless you want to add extra information.
-6. Finally in the Status tab, set your Branch to Active.
-7. Click to save your branch.
+6. Finally, in the Status tab, set your Branch to Active.
+7. Click |save-edits-btn|.
 
-Create a Basic Graph
-====================
+Create a Basic Branch Graph
+===========================
 
 Now that you've defined the Branch settings, you need to create its graph. A graph is a collection of nodes, where each node defines a piece of information that will be collected to describe your resource. In this Branch we will make a very simple graph, with a node to collect the name of the building. See About the Graph Designer for more information. 
 
-1. From the Manage… menu, choose Graph/Semantics to enter the Graph Manager.  
-2. First, change the Node Name of your Top Node from "Top Node" to "Name."
+1. From |manage-btn| choose Graph/Semantics to enter the Graph Manager.  
+2. First, change the Node Name of your Top Node from "Top Node" to "Name".
 3. Now, notice that the CRM Class is "E41_Appelation". This is because we defined that class as our Branch's root class in the settings.
-4. Next, under Data Type, change the selection to "string", and click 
-5. Now that our top node looks good, we can add a second node to the graph. Click to begin this process.
-6. You now see a list of the nodes you can add. Select the one called Node and click 
+4. Next, under Data Type, change the selection to "string", and click |save-edits-btn|
+5. Now that our top node looks good, we can add a second node to the graph. Click |plus-btn| to begin this process.
+6. You now see a list of the nodes you can add. Select the one called Node and click |add-node-confirm-btn|
 7. In your new node, change the Node Name to "Name Type".
 8. In CRM Class, type "55" to find "E55 Type".
 9. In Relationship to Name choose "P2_has_type".
 10. Under Data Type, select "concept".
 11. In Concept Collection, choose "Name Type".
-12. Click to save your edits.
+12. Click |save-edits-btn|.
 
 You have now completed your first graph, and it should look like this:
 
@@ -44,28 +44,23 @@ Configure the Branch's Card
 
 By creating the graph, you defined what information will be contained in this Branch. In our example so far, the branch will store a Name value, linked to a Name Type value. However, you still need to define how the user will enter that information. This is done through Widgets, which are likewise stored in Cards.  
 
-1. From the Manage… menu, choose Data Widgets and Cards to enter the Card Designer.
+1. From |manage-btn| choose Cards.
 2. Once in the Card Manager, you are presented with a default configuration, based on the contents of the graph. Because we have a very simple graph, the card is very simple also.
 3. Change the Card Tab Title to "Identification", and add instructions if desired.
-4. You may find that the Name Type dropdown widget is positioned above the Name text input widget. You can change the order of these widgets by dragging Name Type below Name in either the Card Contents pane on the left, or the card mockup itself on the right.
-5. Click |done-btn|
+4. You may find that the Name Type dropdown widget is positioned above the Name text input widget. You can change the order of these widgets by dragging Name Type below Name in either the Card contents pane on the left, or in the Card mockup itself on the right.
+5. Click |done-btn|.
 
-You have now finished creating a new Branch, albeit, a very simple one. First, you updated the settings--name, ontology, etc.--of the Branch. Then, you created the graph that models what information will be collected through this Branch, and, finally, you configured the Card that will be used to collect this information. Now, we have to add this Branch to the Resource Model we created earlier. Click to return to the Arches Designer main page.
-
--------- OLD TEXT MAY BE USEFUL SOMEWHERE ---------
-Just like a Resource Model, a Branch also has a name, description, ontology, and a status that can be set to ‘Inactive' while the creation of a branch is in progress. Once you are satisfied with the settings you have chosen, your next step will be to enter the Graph Designer.
-
-The core of a Branch is its graph. In this collection of nodes, which you will build one-by-one, you are defining each piece of information that will be collected.  If you are making a Name branch, for example, you may want to collect a name type, along with the name itself. Each of these pieces of information would be recorded in a separate node.
+You have now finished creating a new Branch, albeit, a very simple one. First, you updated the settings--name, ontology, etc.--of the Branch. Then, you created the graph that models what information will be collected through this Branch, and, finally, you configured the Card that will be used to collect this information. Now, we have to add this Branch to the Resource Model we created earlier. Return to the Arches Designer main page and head to :doc:`add-branch-to-resource-model`.
 
 .. |add-btn| image:: images/add-btn.png
   :align: middle
-  :height: 20
 .. |save-edits-btn| image:: images/save-edits-btn.png
   :align: middle
-  :height: 20
 .. |done-btn| image:: images/done-btn.png
   :align: middle
-  :height: 20
 .. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
   :align: middle
-  :height: 20
+.. |manage-btn| image:: images/manage-btn.png
+  :align: middle
+.. |plus-btn| image:: images/plus-btn.png
+  :align: middle

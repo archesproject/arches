@@ -10,7 +10,6 @@ define([
         viewModel: function(params) {
             var self = this;
             params.configKeys = ['nodes'];
-
             ReportViewModel.apply(this, [params]);
             self.imgs = ko.observableArray([{
                 src: arches.urls.media + 'img/photo_missing.png',

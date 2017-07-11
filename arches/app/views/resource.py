@@ -26,6 +26,7 @@ from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
+from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import group_required
@@ -37,7 +38,7 @@ from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import Concept
 from elasticsearch import Elasticsearch
 
-
+# print system_settings
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceListView(BaseManagerView):
@@ -48,12 +49,19 @@ class ResourceListView(BaseManagerView):
 
         context['nav']['icon'] = "fa fa-bookmark"
         context['nav']['title'] = "Resource Manager"
-        context['nav']['edit_history'] = True
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating and Editing Resources'),'')
+        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
         return render(request, 'views/resource.htm', context)
 
+def get_resource_relationship_types():
+    resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+    default_relationshiptype_valueid = None
+    for relationship_type in resource_relationship_types:
+        if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[5]
+    relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+    return relationship_type_values
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditorView(BaseManagerView):
@@ -67,26 +75,26 @@ class ResourceEditorView(BaseManagerView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-            resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
-            default_relationshiptype_valueid = None
-            for relationship_type in resource_relationship_types:
-                if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
-                    default_relationshiptype_valueid = relationship_type[5]
-            relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+            relationship_type_values = get_resource_relationship_types()
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
             map_layers = models.MapLayer.objects.all()
             map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
             forms = resource_instance.graph.form_set.filter(visible=True)
             forms_x_cards = models.FormXCard.objects.filter(form__in=forms)
-            forms_w_cards = [form_x_card.form for form_x_card in forms_x_cards]
+            forms_w_cards = []
+            for form_x_card in forms_x_cards:
+                cm = models.CardModel.objects.get(pk=form_x_card.card_id)
+                if request.user.has_perm('read_nodegroup', cm.nodegroup):
+                    forms_w_cards.append(form_x_card.form)
             displayname = Resource.objects.get(pk=resourceid).displayname
             if displayname == 'undefined':
                 displayname = 'Unnamed Resource'
             date_nodes = models.Node.objects.filter(datatype='date', graph__isresource=True, graph__isactive=True)
             searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
-            searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes)
+            searchable_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True)
             resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True)
             context = self.get_context_data(
                 main_script=main_script,
@@ -100,6 +108,7 @@ class ResourceEditorView(BaseManagerView):
                 date_nodes=date_nodes,
                 map_layers=map_layers,
                 map_sources=map_sources,
+                geocoding_providers = geocoding_providers,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
                 resource_graphs=resource_graphs,
@@ -114,8 +123,10 @@ class ResourceEditorView(BaseManagerView):
                 context['nav']['icon'] = graph.iconclass
             context['nav']['title'] = graph.name
             context['nav']['menu'] = nav_menu
-            context['nav']['edit_history'] = True
-            context['nav']['help'] = (_('Creating and Editing Resources'),'')
+            if resourceid == settings.RESOURCE_INSTANCE_ID:
+                context['nav']['help'] = (_('Managing System Settings'),'help/system-settings-help.htm')
+            else:
+                context['nav']['help'] = (_('Using the Resource Editor'),'help/resource-editor-help.htm')
 
             return render(request, view_template, context)
 
@@ -133,7 +144,7 @@ class ResourceEditorView(BaseManagerView):
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
-            form = Form(resourceid=resourceid, formid=formid)
+            form = Form(resourceid=resourceid, formid=formid, user=request.user)
             return JSONResponse(form)
 
         return HttpResponseNotFound()
@@ -157,10 +168,28 @@ class ResourceDescriptors(View):
 
         return HttpResponseNotFound()
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(group_required('Resource Editor', 'Guest'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        resource = Resource.objects.get(pk=resourceid)
+        resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources = related_resources_search_results['related_resources']
+        relationships = related_resources_search_results['resource_relationships']
+        resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
+
+        for rr in related_resources:
+            for summary in related_resource_summary:
+                if rr['graph_id'] == summary['graphid']:
+                    relationship_summary = []
+                    for relationship in relationships:
+                        if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
+                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
+                    summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
+
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
         try:
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
@@ -171,21 +200,44 @@ class ResourceReportView(BaseManagerView):
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        permitted_cards = []
+        permitted_forms_x_cards = []
+        permitted_forms = []
+        permitted_tiles = []
+
+        perm = 'read_nodegroup'
+
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                matching_forms_x_card = filter(lambda forms_x_card: card.nodegroup_id == forms_x_card.card.nodegroup_id, forms_x_cards)
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile = Tile.objects.get(pk=tile.tileid)
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
+
         context = self.get_context_data(
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
             forms=JSONSerializer().serialize(forms),
-            tiles=JSONSerializer().serialize(tiles),
+            tiles=JSONSerializer().serialize(permitted_tiles),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(cards),
+            cards=JSONSerializer().serialize(permitted_cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            geocoding_providers = geocoding_providers,
+            related_resources=JSONSerializer().serialize(related_resource_summary),
             widgets=widgets,
             map_layers=map_layers,
             map_sources=map_sources,
@@ -208,13 +260,14 @@ class ResourceReportView(BaseManagerView):
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
-        # lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         resource = Resource.objects.get(pk=resourceid)
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)
 
     def delete(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         es = Elasticsearch()
         se = SearchEngineFactory().create()
         req = dict(request.GET)
@@ -228,10 +281,11 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)
 
     def post(self, request, resourceid=None):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         es = Elasticsearch()
         se = SearchEngineFactory().create()
         res = dict(request.POST)
@@ -293,5 +347,5 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang="en-US", start=start, limit=15)
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
         return JSONResponse(related_resources, indent=4)

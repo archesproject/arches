@@ -45,25 +45,22 @@ class BaseManagerView(TemplateView):
             'menu':False,
             'search':True,
             'res_edit':False,
-            'edit_history':True,
             'login':True,
             'print':False,
         }
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes)
+        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
-            # TODO: check user node level permissions here, if user does not
-            # have read permissions on this node, then do not create map layer
-            # or source
-            datatype = datatype_factory.get_instance(node.datatype)
-            map_source = datatype.get_map_source(node)
-            if map_source is not None:
-                resource_sources.append(map_source)
-            map_layer = datatype.get_map_layer(node)
-            if map_layer is not None:
-                resource_layers.append(map_layer)
+            if self.request.user.has_perm('read_nodegroup', node.nodegroup): 
+                datatype = datatype_factory.get_instance(node.datatype)
+                map_source = datatype.get_map_source(node)
+                if map_source is not None:
+                    resource_sources.append(map_source)
+                map_layer = datatype.get_map_layer(node)
+                if map_layer is not None:
+                    resource_layers.append(map_layer)
 
         context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers

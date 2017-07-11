@@ -1,22 +1,24 @@
-define(['jquery', 'knockout', 'arches', 'search-data', 'bindings/smartresize'], function ($, ko, arches, data) {
+define(['jquery', 'knockout', 'arches', 'search-data', 'bindings/smartresize'], function($, ko, arches, data) {
     /**
-    * A base viewmodel for functions
-    *
-    * @constructor
-    * @name SavedSearchesViewModel
-    *
-    * @param  {string} params - a configuration object
-    */
+     * A base viewmodel for functions
+     *
+     * @constructor
+     * @name SavedSearchesViewModel
+     *
+     * @param  {string} params - a configuration object
+     */
     var SavedSearchesViewModel = function(params) {
         var self = this;
         var mediaUrl = arches.urls.uploadedfiles;
         self.items = ko.observableArray([]);
         data.saved_searches.forEach(
-            function(search){self.items.push({
-                image: search.IMAGE[0].url,
-                title: search.SEARCH_NAME,
-                subtitle: search.SEARCH_DESCRIPTION,
-                searchUrl: search.SEARCH_URL
+            function(search) {
+                var searchImageUrl = (search.IMAGE.length > 0) ? search.IMAGE[0].url : '';
+                self.items.push({
+                    image: searchImageUrl,
+                    title: search.SEARCH_NAME,
+                    subtitle: search.SEARCH_DESCRIPTION,
+                    searchUrl: search.SEARCH_URL
                 })
             })
 

@@ -9,7 +9,7 @@ class BaseDataType(object):
     def validate(self, value, source=None):
         return []
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, tile):
         """
         Assigns a given node value to the corresponding key in a document in
         in preparation to index the document
@@ -317,7 +317,7 @@ class BaseDataType(object):
         """
         return unicode(tile.data[str(node.nodeid)])
 
-    def get_search_terms(self, nodevalue):
+    def get_search_terms(self, nodevalue, nodeid=None):
         """
         Returns a nodevalue if it qualifies as a search term
         """
@@ -325,7 +325,8 @@ class BaseDataType(object):
 
     def append_search_filters(self, value, node, query, request):
         """
-        Updates files
+        Allows for modification of an elasticsearch bool query for use in
+        advanced search
         """
         pass
 

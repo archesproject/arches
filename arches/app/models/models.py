@@ -365,6 +365,7 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column='config')
+    issearchable = models.BooleanField(default=True)
 
     def get_child_nodes_and_edges(self):
         """
@@ -647,6 +648,20 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class Geocoder(models.Model):
+    geocoderid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    component = models.TextField()
+    api_key = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = 'geocoders'
 
 
 class MapSource(models.Model):

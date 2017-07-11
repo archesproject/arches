@@ -104,7 +104,7 @@ class Command(BaseCommand):
 
     def list(self):
         """
-        Lists registered functions
+        Lists registered widgets
 
         """
         try:

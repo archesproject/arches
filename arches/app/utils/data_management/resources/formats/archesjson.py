@@ -6,6 +6,7 @@ import uuid
 import datetime
 from django.db import connection
 import arches.app.models.models as archesmodels
+from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
@@ -49,13 +50,17 @@ class JsonWriter(Writer):
 
         export['business_data']['resources'] = resources
 
-        json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name
+        graph_id = export['business_data']['resources'][0]['resourceinstance'].graph_id
+        json_name_prefix = Graph.objects.get(graphid=graph_id).name.replace(' ', '_')
 
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
+        if str(graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
+        else:
+            json_name = os.path.join('{0}'.format(os.path.basename(settings.SYSTEM_SETTINGS_LOCAL_PATH)))
         dest = StringIO()
-        json.dump(export, dest)
+        json.dump(export, dest, indent=4)
         json_for_export.append({'name':json_name, 'outputfile': dest})
 
         return json_for_export

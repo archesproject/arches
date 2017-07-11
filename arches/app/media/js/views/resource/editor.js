@@ -29,9 +29,9 @@ require([
     });
 
     var loadForm = function(form) {
-        loading(true);
+        cardLoading(true);
         formView.loadForm(form.formid, function(){
-            loading(false);
+            cardLoading(false);
         });
     };
 

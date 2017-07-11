@@ -19,7 +19,7 @@ from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from guardian.shortcuts import get_users_with_perms
+from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView
@@ -27,6 +27,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg
 
@@ -49,11 +50,12 @@ class MapLayerManagerView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script='views/map-layer-manager',
         )
+
         def get_resource_bounds(node):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
             query.add_query(search_query)
-            query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
+            query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
             results = query.search(index='resource', doc_type=[str(node.graph.pk)])
             return results['aggregations']['bounds']['bounds']
 
@@ -74,10 +76,9 @@ class MapLayerManagerView(BaseManagerView):
             map_source = datatype.get_map_source(node=node, preview=True)
             if map_source is not None:
                 resource_sources.append(map_source)
-            card = Card.objects.get(nodegroup_id=node.nodegroup_id)
             permissions[str(node.pk)] = {
-                "users": card.users,
-                "groups": card.groups,
+                "users": sorted([user.email or user.username for user in get_users_for_object('read_nodegroup', node.nodegroup)]),
+                "groups": sorted([group.name for group in get_groups_for_object('read_nodegroup', node.nodegroup)])
             }
         context['resource_map_layers_json'] = JSONSerializer().serialize(resource_layers)
         context['resource_map_sources_json'] = JSONSerializer().serialize(resource_sources)
@@ -104,7 +105,7 @@ class MapLayerManagerView(BaseManagerView):
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
                 models.MapLayer.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
-        return JSONResponse({'succces':True, 'map_layer': map_layer})
+        return JSONResponse({'success':True, 'map_layer': map_layer})
 
     def delete(self, request, maplayerid):
         map_layer = models.MapLayer.objects.get(pk=maplayerid)
