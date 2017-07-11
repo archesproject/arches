@@ -55,7 +55,8 @@
             'nvd3': '{{ STATIC_URL }}bower_components/nvd3/build/nv.d3.min',
             'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
-            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw'
+            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw',
+            'mathjs': '{{ STATIC_URL }}bower_components/mathjs/dist/math.min'
         },
         packages: [{
             name: "codemirror",
@@ -201,6 +202,10 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            bufferError: {
+                title: "{% trans 'Buffer error...' %}",
+                text: "{% trans 'Sorry! Your map buffer uses an unknown unit. Try m,km,ft, yd etc.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             mapzenApiKey: '{{ map_info.mapzen_api_key }}',

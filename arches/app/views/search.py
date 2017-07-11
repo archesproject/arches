@@ -287,10 +287,10 @@ def build_search_results_dsl(request):
         if len(spatial_filter['features']) > 0:
             feature_geom = spatial_filter['features'][0]['geometry']
             feature_properties = spatial_filter['features'][0]['properties']
-            buffer = {'width':0,'unit':'ft'}
+            buffer = 0
             if 'buffer' in feature_properties:
                 buffer = feature_properties['buffer']
-            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
+            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer).json)
             geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
             invert_spatial_search = False
@@ -402,10 +402,10 @@ def get_nodes_of_type_with_perm(request, datatype, permission):
     return nodes
 
 def buffer(request):
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':'0'}))
 
     if spatial_filter['geometry']['coordinates'] != '' and spatial_filter['geometry']['type'] != '':
-        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
+        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']), geom_format='json')
 
     return JSONResponse()
 
@@ -419,9 +419,6 @@ def _buffer(geojson, width=0, unit='ft'):
         width = 0
 
     if width > 0:
-        if unit == 'ft':
-            width = width/3.28084
-
         geom.transform(3857)
         geom = geom.buffer(width)
         geom.transform(4326)
