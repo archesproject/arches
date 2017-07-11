@@ -19,6 +19,7 @@ Arches v4 Documentation (draft)
     using-the-arches-designer
     creating-resources
     import-export
+    ontologies-in-arches
     rdm
 
 .. toctree::
@@ -28,9 +29,9 @@ Arches v4 Documentation (draft)
     create-resource-model
     create-branch
     add-branch-to-resource-model
-    create-form
-    create-report
+    create-menu
     add-function
+    create-report
 
 .. toctree::
     :caption: Reference

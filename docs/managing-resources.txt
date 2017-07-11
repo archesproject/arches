@@ -19,14 +19,3 @@ Consider the following example: You need to create a Building Resource Model and
 .. image:: images/models-and-branches-draft.png
 
 Managing Resource Models and Branches happens in the Arches Designer, and to enter this part of the system you must have the appropriate permissions. Once you have logged in, choose MANAGE DATA from the Arches home page, and find the Arches Designer in the left side-bar menu. You are now ready to create, modify, and remove Resource Models and Branches.
-
-Ontologies in Arches
-====================
-
-Arches data is modeled with graphs. A graph is a collection of nodes, structured like branches, all emanating from the root node, which represents the resource itself. If you are modeling a building resource, you may have a root node called "Building" with a node attached to it called "Name". You can imagine that complex and thoroughly documented resources will have many, many nodes.
-
-An ontology is a set of rules that categorizes these nodes into classes, and dictates which classes can be connected to each other. It's a "rulebook" for graph construction. Generally, this is known as a CRM (Conceptual Reference Model), and Arches comes preloaded with the CIDOC CRM v6.2, an ontology created by ICOM specifically to describe cultural heritage data. You can read more about the CIDOC CRM `here <http://www.cidoc-crm.org/>`_, or view a full list of classes and properties `here <http://www.cidoc-crm.org/Version/version-6.2>`_.
-
-In Arches v4, a user may choose to enforce an ontology for any Resource Model or Branch. In this case, the Graph Designer will enforce all of the applicable node class (CRM Entities) and edge (CRM Properties) rules during use of the Graph Designer. Likewise, if a Resource Model has an ontology set you can only add Branches to it that have been made with the same ontology.
-
-If ontologies are not relevant to a user, there is the option of forgoing them altogether, and creating graphs without any specific modeling rules.
