@@ -37,6 +37,15 @@ define([
             this.ready = ko.observable(false);
             this.formTiles = ko.observableArray();
             this.loadForm(this.formid);
+            this.expanded = ko.computed(function () {
+                var expanded = false;
+                _.each(self.formTiles(), function(tile) {
+                    if (tile.expanded()) {
+                        expanded = true;
+                    }
+                });
+                return expanded;
+            });
         },
 
         /**
@@ -125,7 +134,9 @@ define([
         initTile: function(tile){
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
                 tile.dirty = ko.observable(false);
+                tile.isParent = true;
             }else{
+                tile.isParent = false;
                 tile._data = ko.observable(koMapping.toJSON(tile.data));
                 tile.dirty = ko.computed(function(){
                     return !_.isEqual(JSON.parse(tile._data()), JSON.parse(koMapping.toJSON(tile.data)));
@@ -134,6 +145,8 @@ define([
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+
+            tile.expanded = ko.observable(false);
             tile.formData = new FormData();
             this.formTiles.push(tile);
             return tile;
@@ -164,38 +177,32 @@ define([
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(1)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(2)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
                 // this is a "wizard"
                 if(outerCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
-                        //console.log(3)
                         if(tile.tiles[card.get('nodegroup_id')]().length === 0){
                             return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                         }else{
                             return tile.tiles[card.get('nodegroup_id')]()[0];
                         }
                     }else{
-                        //console.log(4)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 }
             }else{
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
-                    //console.log(5)
                     return tile;
                 }else{
-                    //console.log(6)
                     return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                 }
             }
@@ -253,8 +260,8 @@ define([
                 this.trigger('before-update');
                 model.save(function(response, status, model){
                     if(response.status === 200){
-                        // if we had to save an parentTile
-                        console.log(response.responseJSON)
+                        // if we had to save a parentTile
+                        // console.log(response.responseJSON)
                         if(updatingTile){
                             var updatedTileData;
                             if(savingParentTile){
@@ -290,6 +297,7 @@ define([
             }
         },
 
+
         /**
          * saves a tile and it's child tiles back to the database
          * @memberof Form.prototype
@@ -298,6 +306,20 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
+            var appendFormData = function() {
+                var parent = parentTile;
+                return function(tile) {
+                    if (tile().length > 0) {
+                        var childFormData = tile()[0].formData
+                        for (var entry of childFormData.entries()) {
+                            parent.formData.append(entry[0], entry[1])
+                            }
+                        }
+                    }
+                }
+
+            _.each(parentTile.tiles, appendFormData());
+
             this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){
@@ -448,6 +470,7 @@ define([
         toggleGroup: function(data, e){
             var contentPane = $(e.currentTarget.nextElementSibling);
             contentPane.toggle('fast');
+            $(contentPane.closest('.tab-base.outline')).toggleClass('open-container');
             $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
             window.setTimeout(function(){window.dispatchEvent(new Event('resize'))},200) //ensures the map expands to the extent of its container element
         },

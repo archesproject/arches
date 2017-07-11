@@ -6,7 +6,8 @@
     <!--ko if: showGraph() -->
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
         nodeList: graphNodeList,
-        currentResource: newResource
+        currentResource: newResource,
+        subscriptions: currentResourceSubscriptions
     }">
 
         <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
@@ -93,7 +94,8 @@
                             <div class="mega-dropdown related-reources-crud-link" data-bind="visible: showGraph() == false">
 
                                 <!--ko if: !showGraph() -->
-                                <a href="#" class="mega-dropdown-toggle" data-bind="click: function(){propertiesDialogOpen(!propertiesDialogOpen())}">
+
+                                <a href="#" class="mega-dropdown-toggle" data-bind="css: {'disabled':selected().length === 0}, click: function(){propertiesDialogOpen(!propertiesDialogOpen());}">
                                     <i class="ion-wrench icon-lg"></i> {% trans "relation properties" %}
                                 </a>
 
@@ -102,13 +104,13 @@
                                         <div class="settings-config-panel relative">
 
                                             <div class="related-resources-title-container">
-                                                <h3 class="search-title">Relationship details</h3>
+                                                <h3 class="search-title">{% trans "Relationship details" %}</h3>
                                                 <div class="relation-properties-buttons">
                                                     <div class="relation-properties-button">
-                                                        <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">Save</button>
+                                                        <button class="btn btn-mint" data-bind="click: function(){saveRelationships()}, visible: selected().length > 0">{% trans "Save" %}</button>
                                                     </div>
                                                     <div class="relation-properties-button">
-                                                        <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">Close</button>
+                                                        <button type="button" class="btn btn-default" data-bind="click: function(){propertiesDialogOpen(false)}">{% trans "Close" %}</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -116,7 +118,7 @@
 
                                                 <div class="resource-relation-description">
                                                     <div class="target-resource">
-                                                        <i class="fa fa-university"></i> New Archaeological Resource <span class="resource-conjunction"> relationship with</span>
+                                                        <i data-bind="css: graph.iconclass"></i><span class="relation-properties-model-name" data-bind="text: graph.name"></span><span class="resource-conjunction"> {% trans "relationship with" %}</span>
                                                     </div>
                                                     <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
                                                         <div class="selected-resource">
@@ -132,7 +134,7 @@
                                                             <div class="form-group">
                                                                 <div class="row widget-wrapper">
                                                                     <div class="form-group">
-                                                                        <label class="col-xs-12 control-label widget-input-label" for=""> Relationship <i class="ion-ios-checkmark-outline"></i></label>
+                                                                        <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Relationship" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                                         <div class="col-xs-12">
                                                                             <input style="width:30%; display:inline-block;"
                                                                                 data-bind="select2: {
@@ -154,9 +156,9 @@
                                                         <div class="row widget-container shim">
                                                             <div class="form-group">
                                                                 <div class="relative" style="">
-                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    From Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                    <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i class="ion-ios-checkmark-outline"></i>
                                                                                             </label>
-                                                                    <label class="col-xs-6 control-label widget-input-label" for="">    To Date  <i class="ion-ios-checkmark-outline"></i>
+                                                                    <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i class="ion-ios-checkmark-outline"></i>
                                                                                             </label>
                                                                 </div>
 
@@ -174,7 +176,7 @@
                                                         <div class="row widget-container">
                                                             <div class="form-group">
                                                                 <div class="relative">
-                                                                    <label class="col-xs-12 control-label widget-input-label" for=""> Description <i class="ion-ios-checkmark-outline"></i></label>
+                                                                    <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                                 </div>
 
                                                                 <div class="col-xs-12">
@@ -207,6 +209,7 @@
                     <table class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
+                                <th class="rr-tab-field"><i class="center-header" data-bind="css: {'ion-checkmark-circled': selected}"></i></th>
                                 <th class="rr-tab-field">{% trans "Resource ID" %}</th>
                                 <th class="rr-tab-field">{% trans "Relationship" %}</th>
                                 <th class="rr-tab-field">{% trans "From" %}</th>
@@ -216,16 +219,23 @@
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
                                               jQueryUI: true,
-                                              scrollY: 350,
                                               paging: true,
                                               dom: 'rtip',
                                               columns:[
+                                                  {width: '20px', orderable:true, className: 'data-table-selected'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width: '100px'},
                                                   {width:'100px'}
-                                              ]
+                                              ],
+                                              fnInitComplete: function() {
+                                                var self = this;
+                                                setTimeout(function(){
+                                                    self.fnAdjustColumnSizing(true);
+                                                    self.fnSort(0);
+                                                }, 1000);
+                                                }
                                           }
                                       }">
                             <tr class="rr-table-row" data-bind="click: function () {
@@ -233,6 +243,9 @@
                             }">
                                 <td>
                                     <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
+                                    <span data-bind="text: resource.selected"></span>
+                                </td>
+                                <td>
                                     <span data-bind="text: resource.displayname"></span>
                                 </td>
                                 <td>

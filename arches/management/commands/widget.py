@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from arches.management.commands import utils
 from arches.app.models import models
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -105,7 +104,7 @@ class Command(BaseCommand):
 
     def list(self):
         """
-        Lists registered functions
+        Lists registered widgets
 
         """
         try:

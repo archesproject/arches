@@ -21,9 +21,9 @@ import json
 from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.search.mappings import prepare_search_index, delete_search_index
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 
@@ -177,6 +177,7 @@ class Graph(models.GraphModel):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.config = nodeobj.get('config', None)
+            node.issearchable = nodeobj.get('issearchable', True)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 

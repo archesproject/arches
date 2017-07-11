@@ -4,9 +4,9 @@ import json
 import uuid
 import csv
 import zipfile
-from django.conf import settings
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
+from arches.app.models.system_settings import settings
 from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report, Node, Resource2ResourceConstraint, FunctionXGraph, Value
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from pprint import pprint as pp
@@ -132,11 +132,11 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             export_node['arches_nodeid'] = str(node.nodeid)
             export_node['arches_node_name'] = node.name
             export_node['file_field_name'] = ""
+            export_node['data_type'] = node.datatype
             if node.datatype in ['concept', 'concept-list', 'domain-value', 'domain-value-list']:
                 export_node['concept_export_value'] = "label"
             # export_node['value_type'] = ""
             # export_node['data_length'] = ""
-            export_node['data_type'] = node.datatype
             export_node['export'] = False
 
             export_json['nodes'].append(export_node)
@@ -169,6 +169,12 @@ def create_mapping_configuration_file(graphid, data_dir=None):
                                 concepts[concept['id']] = concept['text']
 
                         values[node.name] = OrderedDict(sorted(concepts.items(), key=itemgetter(1)))
+
+        try:
+            relation_concepts = OrderedDict(sorted(get_values(Concept().get('00000000-0000-0000-0000-000000000005', include_subconcepts=True, semantic=False), {}).items(), key=itemgetter(1)))
+        except:
+            relations_concepts = 'You do not appear to have values for resource to resource relationships in your rdm.'
+        values['Resource to Resource Relationship Types'] = relation_concepts
 
     file_name_prefix = export_json['resource_model_name']
 

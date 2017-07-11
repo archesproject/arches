@@ -53,7 +53,12 @@ define([
                     _.without(val ? val : [], opt.id)
                 );
             } else if (selected) {
-                self.value(opt.id);
+              if (self.value() === opt.id) {
+                  self.value(null)
+                }
+              else {
+                  self.value(opt.id);
+              }
             }
         };
 

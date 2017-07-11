@@ -70,3 +70,11 @@ def function_templates(request, template):
 
 def templates(request, template):
     return render(request, template)
+
+def custom_404(request):
+    request = None
+    return render(request, 'errors/404.htm')
+
+def custom_500(request):
+    request = None
+    return render(request, 'errors/500.htm')

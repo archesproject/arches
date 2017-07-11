@@ -17,9 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
-from django.conf import settings
 from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
@@ -99,7 +99,7 @@ class Tile(models.TileModel):
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
                 datatype.convert_value(self, nodeid)
         super(Tile, self).save(*args, **kwargs)
-        if index:
+        if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
         for tiles in self.tiles.itervalues():
             for tile in tiles:
@@ -146,6 +146,19 @@ class Tile(models.TileModel):
         for key, tile_list in self.tiles.iteritems():
             for child_tile in tile_list:
                 child_tile.after_update_all()
+
+    def is_blank(self):
+        if self.tiles != {}:
+            for tiles in self.tiles.values():
+                for tile in tiles:
+                    if len([item for item in tile.data.values() if item != None]) > 0:
+                        return False
+        elif self.data != {}:
+            if len([item for item in self.data.values() if item != None]) > 0:
+                return False
+
+        return True
+
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
@@ -196,13 +209,25 @@ class Tile(models.TileModel):
     def __getFunctionClassInstances(self):
         ret = []
         resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
-        functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
-        for function in functions:
-            mod_path = function.function.modulename.replace('.py', '')
-            module = importlib.import_module('arches.app.functions.%s' % mod_path)
-            func = getattr(module, function.function.classname)(function.config, self.nodegroup_id)
+        functionXgraphs = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[str(self.nodegroup_id)])
+        for functionXgraph in functionXgraphs:
+            func = functionXgraph.function.get_class_module()(functionXgraph.config, self.nodegroup_id)
             ret.append(func)
         return ret
+
+    def filter_by_perm(self, user, perm):
+        if user:
+            if user.has_perm(perm, self.nodegroup):
+                filtered_tiles = {}
+                for key, tiles in self.tiles.iteritems():
+                    filtered_tiles[key] = []
+                    for tile in tiles:
+                        if user.has_perm(perm, tile.nodegroup):
+                            filtered_tiles[key].append(tile)
+                self.tiles = filtered_tiles
+            else:
+                return None
+        return self
 
     def serialize(self):
         """

@@ -214,7 +214,7 @@
             "pitch": 0,
             "overlayOpacity": 0,
             "geocoderVisible": true,
-            "geocodeProvider": "MapzenGeocoder",
+            "geocodeProvider": "10000000-0000-0000-0000-010000000000",
             "zoom": 10,
             "featureLineWidth": 1,
             "geocodePlaceholder": "Search",

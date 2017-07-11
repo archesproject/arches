@@ -24,7 +24,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Resource Report" %}
 {% endblock title %}
 
-{% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
 <div class='scroll-y'>
@@ -65,7 +64,8 @@ define('resource-report-data', [], function () {
         forms_x_cards: {{forms_x_cards}},
         cards: {{cards}},
         tiles: {{tiles}},
-        graph: {{graph_json}}
+        graph: {{graph_json}},
+        related_resources: {{related_resources}}
     };
 });
 {% endautoescape %}</script>

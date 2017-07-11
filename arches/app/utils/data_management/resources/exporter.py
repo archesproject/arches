@@ -5,13 +5,12 @@ import datetime
 import json
 import glob
 import uuid
-from django.conf import settings
+from django.db.models import Q
 from formats.csvfile import CsvWriter
-from formats.kmlfile import KmlWriter
-from formats.shpfile import ShpWriter
 from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
@@ -23,15 +22,30 @@ except ImportError:
 class ResourceExporter(object):
 
     def __init__(self, file_format):
-        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'shp': ShpWriter, 'json': JsonWriter}
+        self.filetypes = {'csv': CsvWriter, 'json': JsonWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    def export(self, data_dest=None, query=None, configs=None, graph=None):
+    def export(self, data_dest=None, query=None, configs=None, graph=None, single_file=False):
+        #business data export
         #resources should be changed to query
         configs = self.read_export_configs(configs)
         business_data = self.get_resources_for_export(query, configs, graph)
-        resources = self.writer.write_resources(business_data, configs)
+        resources = self.writer.write_resources(business_data, configs, single_file)
+
+        #relation export
+        if len(business_data) > 0:
+            if isinstance(business_data[0], dict):
+                resourceids = []
+                for resource in business_data:
+                    resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
+            elif isinstance(business_data[0], str):
+                resourceids = [uuid.UUID(r) for r in business_data]
+        if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            relations = self.get_relations_for_export(resourceids)
+            relations_file_name = resources[0]['name'].split('.')[0]
+            relations_file = self.write_relations(relations, relations_file_name)
+            resources.extend(relations_file)
 
         return resources
 
@@ -75,33 +89,6 @@ class ResourceExporter(object):
         response.write(zip_stream)
         return response
 
-    # def old_get_resources_for_export(self, resourceids):
-    #     resources = []
-    #     relations = []
-    #     business_data_dict = {}
-    #     business_data_dict['business_data'] = {}
-    #
-    #     if resourceids == None or resourceids == [] or resourceids == ['']:
-    #         resourceids = []
-    #         for resourceinstance in models.ResourceInstance.objects.all():
-    #             resourceids.append(resourceinstance.resourceinstanceid)
-    #
-    #     for resourceid in resourceids:
-    #         if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
-    #             resourceid = uuid.UUID(str(resourceid))
-    #             resource = {}
-    #             resource['tiles'] = models.TileModel.objects.filter(resourceinstance_id=resourceid)
-    #             resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
-    #             resources.append(resource)
-    #
-    #     for relation in models.ResourceXResource.objects.all():
-    #         relations.append(relation)
-    #
-    #     business_data_dict['business_data']['resources'] = resources
-    #     business_data_dict['business_data']['relations'] = relations
-    #
-    #     return business_data_dict
-
     def get_resources_for_export(self, query=None, configs=None, graph=None):
         if query == None and graph == None and configs != []:
             results = {}
@@ -125,3 +112,32 @@ class ResourceExporter(object):
             resources = results['hits']['hits']
 
         return resources
+
+    def get_relations_for_export(self, resourceids):
+        relations = []
+
+        for relation in models.ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)):
+            if any(r.resourcexid == relation.resourcexid for r in relations) == False:
+                relation.__dict__['relationshiptype'] = relation.__dict__.pop('relationshiptype_id')
+                relation.__dict__['resourceinstanceidfrom'] = relation.__dict__.pop('resourceinstanceidfrom_id')
+                relation.__dict__['resourceinstanceidto'] = relation.__dict__.pop('resourceinstanceidto_id')
+                relation.__dict__['datestarted'] = relation.__dict__['datestarted'] if relation.__dict__['datestarted'] != None else ''
+                relation.__dict__['dateended'] = relation.__dict__['dateended'] if relation.__dict__['dateended'] != None else ''
+                relation.__dict__.pop('_state')
+                relations.append(relation)
+
+        return relations
+
+    def write_relations(self, relations, file_name):
+        relations_for_export = []
+        csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
+        csv_name_prefix = file_name
+        csv_name = os.path.join('{0}.{1}'.format(csv_name_prefix, 'relations'))
+        dest = StringIO()
+        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+        csvwriter.writeheader()
+        relations_for_export.append({'name':csv_name, 'outputfile': dest})
+        for relation in relations:
+            csvwriter.writerow({k:str(v) for k,v in relation.__dict__.items()})
+
+        return relations_for_export

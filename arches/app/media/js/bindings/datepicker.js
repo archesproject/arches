@@ -63,6 +63,9 @@ define([
                     if (event.date) {
                         value(event.date.format(picker.format()));
                     }
+                    else if (value() === "") {
+                      value(null);
+                    }
                 }
             });
 

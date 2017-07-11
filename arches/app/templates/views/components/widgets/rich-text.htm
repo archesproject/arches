@@ -6,7 +6,7 @@
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <div class="summernote" data-bind='summernote: {value: value, disable: disabled}'></div>
+            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
         </div>
     </div>
 </div>

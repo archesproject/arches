@@ -25,7 +25,17 @@ define([
 
             if (this.form) {
                 this.form.on('after-update', function(req, tile) {
-                    if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
+                    var hasdata = _.filter(tile.data, function(val, key) {
+                        val = ko.unwrap(val);
+                        if (val) {
+                            return val
+                        }
+                    })
+                    if (tile.isParent === true || hasdata.length === 0){
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
+                    } else if ((self.tile === tile || _.contains(tile.tiles, self.tile)) && req.status === 200) {
                         if (self.filesForUpload().length > 0) {
                             self.filesForUpload.removeAll();
                         }
@@ -33,7 +43,9 @@ define([
                         if (Array.isArray(data)) {
                             self.uploadedFiles(data)
                         }
-                        self.dropzone.removeAllFiles(true);
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                        }
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 });
@@ -43,10 +55,15 @@ define([
                             self.filesForUpload.removeAll();
                         }
                         if (Array.isArray(self.value())) {
-                            self.uploadedFiles(self.value())
+                            var uploaded = _.filter(self.value(), function(val) {
+                                return val.status === 'uploaded';
+                            });
+                            self.uploadedFiles(uploaded)
                         }
-                        self.dropzone.removeAllFiles(true);
-                        self.formData.delete('file-list_' + self.node.nodeid);
+                        if (self.dropzone) {
+                            self.dropzone.removeAllFiles(true);
+                            self.formData.delete('file-list_' + self.node.nodeid);
+                        }
                     }
                 });
             }
@@ -123,11 +140,13 @@ define([
                         self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                     }
                 });
-                self.value(
-                    value.filter(function(file) {
-                        return file.accepted;
-                    })
-                );
+                if (ko.unwrap(self.value) !== null || self.filesForUpload().length !== 0 || self.uploadedFiles().length !== 0) {
+                    self.value(
+                        value.filter(function(file) {
+                            return file.accepted;
+                        })
+                    );
+                }
             });
 
             this.unique_id = uuid.generate();
@@ -136,7 +155,7 @@ define([
             });
 
             this.dropzoneOptions = {
-                url: "/",
+                url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 previewTemplate: $("template#file-widget-dz-preview").html(),

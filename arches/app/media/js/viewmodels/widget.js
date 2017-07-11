@@ -1,4 +1,4 @@
-define(['knockout', 'underscore'], function (ko, _) {
+define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -10,14 +10,27 @@ define(['knockout', 'underscore'], function (ko, _) {
     var WidgetViewModel = function(params) {
         var self = this;
         this.state = params.state || 'form';
-        this.expanded = params.expanded || ko.observable(false);
+        var expanded = params.expanded || ko.observable(false);
+        var nodeid = params.node ? params.node.nodeid : uuid.generate();
+        this.expanded = ko.computed({
+            read: function() {
+                return nodeid === expanded();
+            },
+            write: function(val) {
+                if (val) {
+                    expanded(nodeid);
+                } else {
+                    expanded(false);
+                }
+            }
+        });
         this.value = params.value || ko.observable(null);
         this.formData = params.formData || new FormData();
         this.form = params.form || null;
         this.tile = params.tile || null;
+        this.results = params.results || null;
         this.displayValue = ko.computed(function() {
-            var val = ko.isObservable() ? self.value() : self.value;
-            return val;
+            return ko.unwrap(self.value);
         });
         this.disabled = params.disabled || ko.observable(false);
         this.node = params.node || null;

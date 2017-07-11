@@ -20,26 +20,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os, sys, subprocess, shutil, csv, json
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 from django.utils.module_loading import import_string
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.db.install import truncate_db
-from arches.app.utils.data_management.resources.importer import ResourceLoader
+from django.db import transaction
+import pprint
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
+from arches.db.install import truncate_db
+from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
-import arches.management.commands.package_utils.resource_graphs as resource_graphs
-import arches.app.utils.index_database as index_database
-from arches.management.commands import utils
-from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
-from django.db import transaction
+from arches.management.commands import utils
+from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 
 
 class Command(BaseCommand):
@@ -50,8 +49,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'index_database','export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -70,7 +69,7 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
 
-        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='.',
             help='Directory where you want to save exported files.')
 
         parser.add_argument('-r', '--resources', action='store', dest='resources', default=False,
@@ -108,6 +107,9 @@ class Command(BaseCommand):
 
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
+
+        parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
+            help='Export grouped business data attrbiutes one or multiple csv files. By setting this flag the system will export all grouped business data to one csv file.')
 
 
     def handle(self, *args, **options):
@@ -150,11 +152,8 @@ class Command(BaseCommand):
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
 
-        if options['operation'] == 'index_database':
-            self.index_database(package_name)
-
         if options['operation'] == 'export_business_data':
-            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'])
+            self.export_business_data(options['dest_dir'], options['format'], options['config_file'], options['graphs'], options['single_file'])
 
         if options['operation'] == 'import_reference_data':
             self.import_reference_data(options['source'], options['overwrite'], options['stage'])
@@ -170,6 +169,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_mapping_file':
             self.import_mapping_file(options['source'])
+
+        if options['operation'] == 'save_system_settings':
+            self.save_system_settings(options['dest_dir'])
 
         if options['operation'] == 'add_tileserver_layer':
             self.add_tileserver_layer(options['layer_name'], options['mapnik_xml_path'], options['layer_icon'], options['is_basemap'], options['tile_config_path'])
@@ -192,17 +194,70 @@ class Command(BaseCommand):
     def update_project_templates(self):
         """
         Moves files from the arches project to the arches-templates directory to
-        ensure that they remain in sync.
+        ensure that they remain in sync. Adds and comments out settings that are
+        whitelisted into the settings_local.py template
 
         """
         files = [
             {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
             {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
-            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'},
+            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
+
+        settings_whitelist = [
+            'MODE',
+            'DATABASES',
+            'DEBUG',
+            'INTERNAL_IPS',
+            'ANONYMOUS_USER_NAME',
+            'ELASTICSEARCH_HTTP_PORT',
+            'SEARCH_BACKEND',
+            'ELASTICSEARCH_HOSTS',
+            'ELASTICSEARCH_CONNECTION_OPTIONS',
+            'ROOT_DIR',
+            'ONTOLOGY_PATH',
+            'ONTOLOGY_BASE',
+            'ONTOLOGY_BASE_VERSION',
+            'ONTOLOGY_BASE_NAME',
+            'ONTOLOGY_BASE_ID',
+            'ONTOLOGY_EXT',
+            'ADMINS',
+            'MANAGERS',
+            'POSTGIS_VERSION',
+            'USE_I18N',
+            'TIME_ZONE',
+            'USE_TZ',
+            'LANGUAGE_CODE',
+            'LOCALE_PATHS',
+            'USE_L10N',
+            'MEDIA_URL',
+            'STATIC_ROOT',
+            'STATIC_URL',
+            'ADMIN_MEDIA_PREFIX',
+            'STATICFILES_DIRS',
+            'STATICFILES_FINDERS',
+            'TEMPLATES',
+            'AUTHENTICATION_BACKENDS',
+            'INSTALLED_APPS',
+            'MIDDLEWARE_CLASSES',
+            'ROOT_URLCONF',
+            'WSGI_APPLICATION',
+            'LOGGING',
+            'LOGIN_URL'
+            ]
+
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
+            for setting_key in dir(settings):
+                if setting_key in settings_whitelist:
+                    setting_value = getattr(settings, setting_key)
+                    if type(setting_value) == dict or (type(setting_value) in (list, tuple) and len(setting_value) >= 3):
+                        val = "'''\n{0} = {1}\n'''\n\n".format(setting_key, pprint.pformat(setting_value, indent=4, width=50, depth=None))
+                    else:
+                        val = "#{0} = {1}\n\n".format(setting_key, setting_value)
+                    f.write(val)
 
     def setup(self, package_name, es_install_location=None):
         """
@@ -318,25 +373,34 @@ class Command(BaseCommand):
         # resource_remover.delete_resources(load_id)
         resource_remover.clear_resources()
 
-    def index_database(self, package_name):
-        """
-        Runs the index_database command found in package_utils
-        """
-        # self.setup_indexes(package_name)
-        index_database.index_db()
-
-    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None):
+    def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         if file_format in ['csv', 'json']:
             resource_exporter = ResourceExporter(file_format)
             if file_format == 'json':
+                if graph == None or graph == False:
+                    print '*'*80
+                    print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
+                    print '*'*80
+                    sys.exit()
                 config_file = None
             elif file_format == 'csv':
                 graph = None
-            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph)
+                if config_file == None:
+                    print '*'*80
+                    print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
+                    print '*'*80
+                    sys.exit()
+            if data_dest != '':
+                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
 
-            for file in data:
-                with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                    f.write(file['outputfile'].getvalue())
+                for file in data:
+                    with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                        f.write(file['outputfile'].getvalue())
+            else:
+                print '*'*80
+                print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+                print '*'*80
+                sys.exit()
         else:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
@@ -435,6 +499,22 @@ class Command(BaseCommand):
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'])
+
+
+    def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
+        resource_exporter = ResourceExporter(file_format)
+        if data_dest == '.':
+            data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
+        if data_dest != '':
+            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
+            for file in data:
+                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    f.write(file['outputfile'].getvalue())
+        else:
+            print '*'*80
+            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+            print '*'*80
+            sys.exit()
 
     def start_livereload(self):
         from livereload import Server

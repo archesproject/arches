@@ -1,0 +1,10 @@
+{% load i18n %}
+<!-- ko if: $data.search -->
+<div class="col-sm-12">
+    <select class="resources" data-bind="value: searchValue, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">&nbsp;</option>
+        <option value="t">{% trans "True" %}</option>
+        <option value="f">{% trans "False" %}</option>
+    </select>
+</div>
+<!-- /ko -->

@@ -1,7 +1,9 @@
+
 {% load staticfiles %}
 {% load i18n %}
 
 <script>
+    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}bower_components/ckeditor/';
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -26,7 +28,8 @@
             'jquery-validate': '{{ STATIC_URL }}bower_components/jquery-validate/jquery.validate',
             'd3': '{{ STATIC_URL }}bower_components/d3/d3.min',
             'dropzone': '{{ STATIC_URL }}bower_components/dropzone/downloads/dropzone-amd-module.min',
-            'summernote': '{{ STATIC_URL }}bower_components/summernote/dist/summernote.min',
+            'ckeditor': '{{ STATIC_URL }}bower_components/ckeditor/ckeditor',
+            'ckeditor-jquery': '{{ STATIC_URL }}bower_components/ckeditor/adapters/jquery',
             'knockout': '{{ STATIC_URL }}bower_components/knockout/dist/knockout',
             'knockout-mapping': '{{ STATIC_URL }}bower_components/bower-knockout-mapping/dist/knockout.mapping.min',
             'moment': '{{ STATIC_URL }}bower_components/moment/min/moment.min',
@@ -41,8 +44,7 @@
             'datatables.net-responsive-bs': '{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/js/responsive.bootstrap',
             'chosen': '{{ STATIC_URL }}bower_components/chosen/chosen.jquery.min',
             'mapbox-gl': '{{ STATIC_URL }}bower_components/mapbox-gl/mapbox-gl',
-            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-plugins/plugins/src/mapbox-gl-draw/v0.14.0/mapbox-gl-draw',
-            'jsts': '{{ STATIC_URL }}bower_components/jsts.min/index',
+            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-draw/index',
             'proj4': '{{ STATIC_URL }}bower_components/proj4/dist/proj4',
             'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}bower_components/geojson-extent/geojson-extent',
@@ -90,8 +92,7 @@
                 exports : '$'
             },
             'mapbox-gl-draw': {
-                deps: ['mapbox-gl'],
-                exports: 'mapboxgl.Draw'
+                deps: ['mapbox-gl']
             },
             'select2': {
                 deps: ['jquery'],
@@ -114,6 +115,9 @@
             },
             'leaflet-draw': {
                 deps: ['leaflet']
+            },
+            'ckeditor-jquery': {
+                deps: ['ckeditor']
             }
         }
     });
@@ -124,6 +128,7 @@
     define('arches', [], function () {
         return {
             urls: {
+                root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
                 media: "{{ STATIC_URL }}",
                 uploadedfiles: "{{ MEDIA_URL }}",
@@ -139,16 +144,11 @@
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 search_results_export: "{% url 'search_results_export' %}",
-                map_layers: "{% url 'map_layers' '' %}",
-                map_markers: "{% url 'map_markers' '' %}",
-                reports: "{% url 'report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 buffer: "{% url 'buffer'%}",
-                get_admin_areas: "{% url 'get_admin_areas'%}",
-                config: "{% url 'config'%}",
+                config: "{% url 'config' %}",
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
@@ -160,13 +160,24 @@
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tile: "{% url 'tile' %}",
-                geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}",
                 reorder_tiles: "{% url 'reorder_tiles' %}",
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 tileserver: "{% url 'tileserver' %}",
-                time_wheel_config: "{% url 'time_wheel_config' %}"
+                time_wheel_config: "{% url 'time_wheel_config' %}",
+                reindex: "{% url 'reindex' %}",
+                permission_data: "{% url 'permission_data' %}",
+                clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                card_manager: function(graphid){return "{% url 'card_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)}
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
@@ -192,10 +203,10 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            mapzenApiKey: '{{ map_info.mapzen_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
-            hexBinBounds: {{ map_info.hex_bin_bounds }},
             hexBinBounds: {{ map_info.hex_bin_bounds }},
             mapDefaultX: {{ map_info.x }},
             mapDefaultY: {{ map_info.y }},
@@ -216,7 +227,10 @@
                 'icon': '{{ map_layer.icon }}',
                 'activated': {{ map_layer.activated|lower }},
                 'addtomap': {{ map_layer.addtomap|lower }},
-                'is_resource_layer': false
+                'is_resource_layer': false,
+                'centerx': {{ map_layer.centerx|default_if_none:"null" }},
+                'centery': {{ map_layer.centery|default_if_none:"null" }},
+                'zoom': {{ map_layer.zoom|default_if_none:"null" }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
                 'name': '{{ resource_map_layer.name }}',
@@ -235,6 +249,12 @@
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',
                 'id': '{{ concept_collection.id }}',
+            },{% endfor %}{% endautoescape %}],
+            geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
+                'name': '{{ provider.name }}',
+                'geocoderid': '{{ provider.geocoderid }}',
+                'api_key': '{{ provider.api_key }}',
+                'component': '{{ provider.component }}'
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
@@ -298,6 +318,10 @@
     });
 
     define('component-templates', ['views/components/nodegroup-selector'], function () {
+         return;
+    });
+
+    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
          return;
     });
 

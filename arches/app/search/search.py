@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import urllib
 import uuid
 import logging
-from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -168,8 +168,8 @@ class SearchEngine(object):
                 raise detail
 
 
-    def bulk_index(self, data):
-        return helpers.bulk(self.es, data, chunk_size=500, raise_on_error=True)
+    def bulk_index(self, data, **kwargs):
+        return helpers.bulk(self.es, data, **kwargs)
 
     def create_bulk_item(self, op_type='index', index=None, doc_type=None, id=None, data=None):
         return {
@@ -186,3 +186,36 @@ class SearchEngine(object):
             return count['count']
         else:
             return None
+
+    def BulkIndexer(outer_self, batch_size=500, **kwargs):
+
+        class _BulkIndexer(object):
+            def __init__(self, **kwargs):
+                self.queue = []
+                self.batch_size = kwargs.pop('batch_size', 500)
+                self.kwargs = kwargs
+
+            def add(self, op_type='index', index=None, doc_type=None, id=None, data=None):
+                doc = {
+                    '_op_type': op_type,
+                    '_index': index,
+                    '_type': doc_type,
+                    '_id': id,
+                    '_source': data
+                }
+                self.queue.append(doc)
+
+                if len(self.queue) >= self.batch_size:
+                    outer_self.bulk_index(self.queue, **self.kwargs)
+                    del self.queue[:]  #clear out the array
+            
+            def close(self):
+                outer_self.bulk_index(self.queue, **self.kwargs)
+
+            def __enter__(self, **kwargs):
+                return self
+
+            def __exit__(self, type, value, traceback):
+                return self.close()
+
+        return _BulkIndexer(batch_size=batch_size, **kwargs)

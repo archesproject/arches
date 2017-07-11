@@ -18,15 +18,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import inspect
-# Django settings for Arches project.
+
+
+#########################################
+###          STATIC SETTINGS          ###
+#########################################
+
 
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
-
-#########################################
-###  START PACKAGE SPECIFIC SETTINGS  ###
-#########################################
 
 DATABASES = {
     'default': {
@@ -40,14 +41,8 @@ DATABASES = {
     }
 }
 
-RESOURCE_MODEL = {
-    # override this setting in your packages settings.py file
-    # to set the default model for the system to use
-    # Your model needs to inherit from 'arches.app.models.resource.Resource' to work
-    'default': 'arches.app.models.resource.Resource'
-}
-
-SYSTEM_SETTINGS_RESOURCE_MODEL_ID = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = None
 
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
@@ -58,78 +53,6 @@ ELASTICSEARCH_HOSTS = [
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 
-
-SEARCH_ITEMS_PER_PAGE = 5
-SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
-SEARCH_DROPDOWN_LENGTH = 100
-WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
-
-DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
-
-# override this setting in your packages settings.py file
-# entity type that holds the spatial coordinates of resources
-ENTITY_TYPE_FOR_MAP_DISPLAY = ''
-
-LIMIT_ENTITY_TYPES_TO_LOAD = None #(
-    # override this setting in your packages settings.py file
-#    'ARCHAEOLOGICAL HERITAGE (ARTIFACT).E18',
-#)
-
-DATA_CONCEPT_SCHEME = ''
-
-ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
-
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
-
-
-GOOGLE_ANALYTICS_TRACKING_ID = None
-
-# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
-ANONYMOUS_USER_NAME = None
-
-def RESOURCE_TYPE_CONFIGS():
-    return {
-        # override this setting in your packages settings.py file
-        #
-        # 'HERITAGE_RESOURCE.E18': {
-        #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
-        #     'name': _('Heritage Resource'),
-        #     'icon_class': 'fa fa-trophy',
-        #     'default_page': 'summary',
-        #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
-        #     'categories': [_('Resource')],
-        #     'has_layer': True,
-        #     'on_map': True,
-        #     'marker_color': '#3366FF',
-        #     'stroke_color': '#3366FF',
-        #     'fill_color': '#3366FF',
-        #     'primary_name_lookups': {
-        #         'entity_type': 'NAME.E41',
-        #         'lookup_value': 'Primary'
-        #     },
-        #     'sort_order': 1
-        # },
-    }
-
-GEOCODING_PROVIDERS = [
-    {'name': 'MapZen', 'api_key':'', 'id':'MapzenGeocoder'},
-    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
-    ]
-
-
-EXPORT_CONFIG = ''
-
-DATE_SEARCH_ENTITY_TYPES = []
-
-SPARQL_ENDPOINT_PROVIDERS = (
-    'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
-)
-
-APP_NAME = 'Arches'
-
-#######################################
-###  END PACKAGE SPECIFIC SETTINGS  ###
-#######################################
 
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
@@ -155,8 +78,6 @@ ADMINS = (
 MANAGERS = ADMINS
 
 POSTGIS_VERSION = (2, 0, 0)
-
-SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -261,7 +182,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'arches.app.utils.context_processors.livereload',
-                'arches.app.utils.context_processors.resource_types',
                 'arches.app.utils.context_processors.map_info',
                 'arches.app.utils.context_processors.app_settings',
             ],
@@ -273,6 +193,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'arches.app.utils.permission_backend.PermissionBackend',
 )
 
 INSTALLED_APPS = (
@@ -299,7 +220,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
-    # 'arches.app.utils.bing_geocoder'
 )
 
 ROOT_URLCONF = 'arches.urls'
@@ -327,9 +247,39 @@ LOGGING = {
 
 LOGIN_URL = 'auth'
 
-# Package specific validation.
-# Should be over-written in the package settings file.
-PACKAGE_VALIDATOR = 'arches.app.utils.mock_package_validator'
+PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
+
+#######################################
+###       END STATIC SETTINGS       ###
+#######################################
+
+
+
+##########################################
+###   RUN TIME CONFIGURABLE SETTINGS   ###
+##########################################
+
+
+SEARCH_ITEMS_PER_PAGE = 5
+SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+SEARCH_DROPDOWN_LENGTH = 100
+WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
+
+ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
+
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+GOOGLE_ANALYTICS_TRACKING_ID = None
+
+DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
+
+MAPZEN_API_KEY = ""
+
+SPARQL_ENDPOINT_PROVIDERS = (
+    {'SPARQL_ENDPOINT_PROVIDER':'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider'},
+)
+
+APP_NAME = 'Arches'
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
@@ -343,21 +293,13 @@ RESOURCE_GRAPH_LOCATIONS = (
     os.path.join(ROOT_DIR, 'db', 'graphs', 'resource_models'),
 )
 
-CONCEPT_SCHEME_LOCATIONS = (
-    # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-
-    # 'absolute/path/to/authority_files',
-    # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
-)
-
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
 
+DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -366,7 +308,7 @@ BUSINESS_DATA_FILES = (
 # The following settings control the extent and max zoom level to which tiles
 # will be seeded.  Be aware, seeding tiles at high zoom levels (more zoomed in)
 # will take a long time
-CACHE_SEED_BOUNDS = (-89.99, 179.99, 89.99, -179.99)
+CACHE_SEED_BOUNDS = (-122.0, -52.0, 128.0, 69.0)
 CACHE_SEED_MAX_ZOOM = 5
 
 # configure where the tileserver should store its cache
@@ -389,18 +331,32 @@ MAPBOX_API_KEY = '' # Put your Mapbox key here!
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
 MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 
-# Default map settings for search and map layer manager pages
-DEFAULT_MAP_X = 0
-DEFAULT_MAP_Y = 0
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-DEFAULT_SEARCH_GEOCODER = "MapzenGeocoder" # currently MapzenGeocoder or BingGeocoder
-
-# bounds for search results hex binning fabric
+# bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
-HEX_BIN_BOUNDS = (-122, -52, 128, 69)
+DEFAULT_BOUNDS = {
+    "type": "FeatureCollection",
+    "features": [{
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-122, -52],
+                    [128, -52],
+                    [128, 69],
+                    [-122, 69],
+                    [-122, -52]
+                ]
+            ]
+        },
+        "type": "Feature",
+        "properties": {}
+    }]
+}
+
 # size to use for hex binning search results on map (in km)
 HEX_BIN_SIZE = 100
 # binning uses elasticsearch GeoHash grid aggregation.
@@ -410,6 +366,13 @@ HEX_BIN_SIZE = 100
 HEX_BIN_PRECISION = 4
 
 BULK_IMPORT_BATCH_SIZE = 2000
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+
+##########################################
+### END RUN TIME CONFIGURABLE SETTINGS ###
+##########################################
+
 
 try:
     from settings_local import *

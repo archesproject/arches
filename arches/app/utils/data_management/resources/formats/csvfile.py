@@ -21,12 +21,12 @@ from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.db import connection
 from django.db import transaction
 from django.db.models import Q
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
 from django.http import HttpRequest
 from django.core.files import File as DjangoFile
@@ -50,7 +50,7 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type)
         return value
 
-    def write_resources(self, resources, resource_export_configs=None):
+    def write_resources(self, resources, resource_export_configs=None, single_file=False):
         csv_records = []
         other_group_records = []
         mapping = {}
@@ -81,8 +81,9 @@ class CsvWriter(Writer):
                                     concept_export_value_type = None
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
-                                    csv_record[mapping[k]] = value
+                                    if tile['data'][k] != None:
+                                        value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                        csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
                                     value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
@@ -94,23 +95,33 @@ class CsvWriter(Writer):
             if other_group_record != {}:
                 other_group_records.append(other_group_record)
 
-
         csv_name_prefix = resource_export_configs[0]['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
-        for csv_record in csv_records:
-            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        csvs_for_export.append({'name':csv_name + '_groups', 'outputfile': dest})
-        for csv_record in other_group_records:
-            csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+        if single_file != True:
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+            for csv_record in csv_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name.split('.')[0] + '_groups.' + csv_name.split('.')[1], 'outputfile': dest})
+            for csv_record in other_group_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
+        elif single_file == True:
+            all_records = csv_records + other_group_records
+            all_records = sorted(all_records, key=lambda k: k['ResourceID'])
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+            for csv_record in all_records:
+                csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         return csvs_for_export
 
@@ -131,7 +142,7 @@ class CsvReader(Reader):
             # if bulk saving then append the resources to a list otherwise just save the resource
             if bulk:
                 resources.append(newresourceinstance)
-                if len(resources) == settings.BULK_IMPORT_BATCH_SIZE:
+                if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources)
                     del resources[:]  #clear out the array
             else:
@@ -258,8 +269,9 @@ class CsvReader(Reader):
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
-                            if len(errors) > 0:
-                                self.errors += errors
+                        if len(errors) > 0:
+                            value = None
+                            self.errors += errors
                     else:
                         print _('No datatype detected for {0}'.format(value))
 
@@ -388,7 +400,8 @@ class CsvReader(Reader):
 
                                         populate_child_tiles(source_data)
 
-                                populated_tiles.append(target_tile)
+                                if not target_tile.is_blank():
+                                    populated_tiles.append(target_tile)
 
                                 if len(source_data)>0:
                                     need_new_tile = True

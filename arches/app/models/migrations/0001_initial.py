@@ -6,11 +6,11 @@ import uuid
 import codecs
 import django.contrib.gis.db.models.fields
 from django.core import management
-from django.conf import settings
-from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
-from arches.app.models.models import get_ontology_storage_system
+from django.db import migrations, models
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
+from arches.app.models.models import get_ontology_storage_system
+from arches.app.models.system_settings import settings
 
 def get_sql_string_from_file(pathtofile):
     ret = []
@@ -58,7 +58,6 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
         else:
             raise
 
-
     graph_editor_group = Group.objects.using(db_alias).create(name='Graph Editor')
     graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
 
@@ -92,8 +91,6 @@ class Migration(migrations.Migration):
 
     operations = [
         CreateExtension(name='uuid-ossp'),
-
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
 
         CreateFunction(
            name='insert_relation',
@@ -697,32 +694,6 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
-        migrations.CreateModel(
-            name='IIIFManifest',
-            fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('url', models.TextField())
-            ],
-            options={
-                'db_table': 'iiif_manifests',
-                'managed': True,
-            },
-        ),
-        # migrations.AlterField(
-        #     model_name='edge',
-        #     name='graph',
-        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
-        # migrations.AlterField(
-        #     model_name='form',
-        #     name='graph',
-        #     field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
-        # migrations.AlterField(
-        #     model_name='node',
-        #     name='graph',
-        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
-        # ),
         migrations.AddField(
             model_name='ddatatype',
             name='defaultwidget',

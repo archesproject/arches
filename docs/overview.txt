@@ -2,6 +2,11 @@
 Overview
 ########
 
+Documentation Overview
+======================
+
+This is the general User Manual for Arches. It should provide you with background information on Arches, how to install it, and a good overview of its capabilities. While you are using Arches, be aware that much of the content here is also available by clicking the "?" symbol in the top-right corner of any page. If you are a developer interested in customizing or contributing to Arches, you should also visit our `GitHub wiki <https://github.com/archesproject/arches/wiki>`_ for more information about how Arches works underneath.
+
 What is Arches?
 ===============
 
@@ -56,6 +61,4 @@ Arches is open source software, which means that with your help it will continue
 
 + **Translations** We are always hoping to bring Arches to new audiences around the world. Please get in touch from the main Arches website to express your interest in helping with translations.
 + **Bug Reports** Reporting bugs is strongly encouraged, and can be made at the official Arches GitHub repository. Please read this article before reporting issues.
-+ **Code Contributions** For developers, good guidelines on how to contribute to the Arches code-base can be found here.
-
-current repo status (insert the coverage status graphic from github here? I’d vote to leave that on github itself)
++ **Code Contributions** For developers, good guidelines on how to contribute to the Arches code-base can be found in our `GitHub repo wiki <https://github.com/archesproject/arches/wiki#contributing-to-arches>`_.

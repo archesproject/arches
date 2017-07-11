@@ -20,11 +20,6 @@
             <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
         </a>
     </li>
-     <li>
-        <a href="#" class="nav-library-tab-link" data-toggle="tab">
-            <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
-        </a>
-    </li>
     <li data-bind="visible: node() && !node().istopnode">
        <a href="#" class="nav-library-tab-link" data-bind="click:deleteNode">
            <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>
@@ -77,7 +72,7 @@
                     <div class="">
                         (<strong data-bind="text: graphModel.getParentNode(node()).name"></strong>
                     </div>
-                    <div class="">    
+                    <div class="">
                         <em data-bind="text: node().parentproperty"></em>
                     </DIV>
                     <div class="">
@@ -96,6 +91,20 @@
                         <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+
+                <!-- ko if: node().datatypeIsSearchable() -->
+                <div class="node-widget-label">
+                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+
+                    <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
+                        {% trans "Searchable" %}
+                    </p>
+                    <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                        {% trans "Activate to allow searches on values stored for this node." %}
+                    </span>
+                </div>
+                <!-- /ko -->
+
 
                 <!-- ko if: node().datatypeConfigComponent -->
                 <div data-bind='component: {

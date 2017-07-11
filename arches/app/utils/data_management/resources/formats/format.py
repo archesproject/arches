@@ -1,10 +1,13 @@
+import os
 import uuid
+import shutil
+import datetime
 from arches.app.models.concept import Concept
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.models import Value
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
@@ -110,9 +113,9 @@ class Reader(object):
 
             resourceinstancefrom = validate_resourceinstanceid(relation['resourceinstanceidfrom'], 'resourceinstanceidfrom')
             resourceinstanceto = validate_resourceinstanceid(relation['resourceinstanceidto'], 'resourceinstanceidto')
-            if relation['datestarted'] == '':
+            if relation['datestarted'] == '' or relation['datestarted'] == 'None':
                 relation['datestarted'] = None
-            if relation['dateended'] == '':
+            if relation['dateended'] == '' or relation['dateended'] == 'None':
                 relation['dateended'] = None
 
             if resourceinstancefrom != None and resourceinstanceto != None:
@@ -132,18 +135,34 @@ class Reader(object):
         if len(self.errors) == 0:
             print _("No import errors")
         else:
-            print _("***** Errors occured during import. For more information, check resource import error log: arches/arches/logs/resource_import.log")
-            with open('arches/logs/resource_import.log', 'w') as f:
-                for error in self.errors:
-                    try:
-                        f.write(_('{0}: {1}\n'.format(error['type'], error['message'])))
-                    except TypeError as e:
-                        f.write(e + unicode(error))
+            print _("***** Errors occured during import. Some data may not have been imported. For more information, check resource import error log: arches/logs/resource_import.log")
+            log_nums = [0]
+            if os.path.isfile('arches/logs/resource_import.log'):
+                if os.path.getsize('arches/logs/resource_import.log')/1000000 > 5:
+                    for file in os.listdir('arches/logs',):
+                        try:
+                            log_nums.append(int(file.split('.')[-1]))
+                        except:
+                            pass
+
+                    archive_log_num = str(max(log_nums) + 1)
+                    shutil.copy2('arches/logs/resource_import.log', 'arches/logs/resource_import.log' + '.' + archive_log_num)
+                    f = open('arches/logs/resource_import.log', 'w')
+                else:
+                    f = open('arches/logs/resource_import.log', 'a')
+            else:
+                f = open('arches/logs/resource_import.log', 'w')
+
+            for error in self.errors:
+                timestamp = (datetime.datetime.now() - datetime.timedelta(hours=2)).strftime('%a %b %d %H:%M:%S %Y')
+                try:
+                    f.write(_(timestamp + ' ' + '{0}: {1}\n'.format(error['type'], error['message'])))
+                except TypeError as e:
+                    f.write(timestamp + ' ' + e + unicode(error))
 
 class Writer(object):
 
     def __init__(self):
-        self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -154,31 +173,6 @@ class Writer(object):
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
         }
-
-    def create_template_record(self, schema, resource, resource_type):
-        """
-        Creates an empty record from the export mapping schema and populates its values
-        with resource data that does not require the export field mapping - these include
-        entityid, primaryname and entitytypeid.
-        """
-        record = {}
-        for column in schema:
-            if column['source'] == 'resource_name':
-                if resource_type != None:
-                    record[column['field_name']] = self.resource_type_configs[resource_type]['name']
-                else:
-                    record[column['field_name']] = resource['_source']['entitytypeid']
-            elif column['source'] in ('primaryname', 'entitytypeid', 'entityid'):
-                record[column['field_name']] = resource['_source'][column['source']]
-            elif column['source'] == 'alternatename':
-                record[column['field_name']] = []
-                for entity in resource['_source']['child_entities']:
-                    primaryname_type = self.resource_type_configs[resource_type]['primary_name_lookup']['entity_type']
-                    if entity['entitytypeid'] == primaryname_type and entity['label'] != resource['_source']['primaryname']:
-                        record[column['field_name']].append(entity['label'])
-            else:
-                record[column['field_name']] = []
-        return record
 
     def get_field_map_values(self, resource, template_record, field_map):
         """

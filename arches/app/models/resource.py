@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 import importlib
 from django.db.models import Q
-from django.conf import settings
 from arches.app.models import models
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
+from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -147,13 +147,14 @@ class Resource(models.ResourceInstance):
         """
 
         document = JSONSerializer().serializeToPython(self)
-        document['tiles'] = models.TileModel.objects.filter(resourceinstance=self) if fetchTiles else self.tiles
+        document['tiles'] = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
         document['strings'] = []
         document['dates'] = []
         document['domains'] = []
         document['geometries'] = []
         document['points'] = []
         document['numbers'] = []
+        document['date_ranges'] = []
 
         terms = []
 
@@ -162,10 +163,9 @@ class Resource(models.ResourceInstance):
                 datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    datatype_instance.append_to_document(document, nodevalue)
-                    node_terms = datatype_instance.get_search_terms(nodevalue)
+                    datatype_instance.append_to_document(document, nodevalue, tile)
+                    node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
-                        print term
                         terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id}})
 
         return document, terms
@@ -177,7 +177,7 @@ class Resource(models.ResourceInstance):
         """
 
         se = SearchEngineFactory().create()
-        related_resources = self.get_related_resources(lang="en-US", start=0, limit=15)
+        related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000)
         for rr in related_resources['resource_relationships']:
             models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
         query = Query(se)

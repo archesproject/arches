@@ -4,9 +4,9 @@ import types
 import sys
 import uuid
 import datetime
-from django.conf import settings
 from django.db import connection
 import arches.app.models.models as archesmodels
+from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
@@ -33,7 +33,7 @@ class JsonWriter(Writer):
         tiles = Tile.objects.filter(resourceinstance_id=resourceid).order_by('-parenttile_id')
         return tiles
 
-    def write_resources(self, resourceids, resource_export_configs=None):
+    def write_resources(self, resourceids, resource_export_configs=None, single_file=True):
         json_for_export = []
         resources = []
         relations = []
@@ -48,19 +48,19 @@ class JsonWriter(Writer):
                 resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
 
-        for relation in models.ResourceXResource.objects.all():
-            relations.append(relation)
-
         export['business_data']['resources'] = resources
-        export['business_data']['relations'] = relations
 
-        json_name_prefix = Graph.objects.get(graphid=export['business_data']['resources'][0]['resourceinstance'].graph_id).name
+        graph_id = export['business_data']['resources'][0]['resourceinstance'].graph_id
+        json_name_prefix = Graph.objects.get(graphid=graph_id).name.replace(' ', '_')
 
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
+        if str(graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            json_name = os.path.join('{0}_{1}.{2}'.format(json_name_prefix, iso_date, 'json'))
+        else:
+            json_name = os.path.join('{0}'.format(os.path.basename(settings.SYSTEM_SETTINGS_LOCAL_PATH)))
         dest = StringIO()
-        json.dump(export, dest)
+        json.dump(export, dest, indent=4)
         json_for_export.append({'name':json_name, 'outputfile': dest})
 
         return json_for_export

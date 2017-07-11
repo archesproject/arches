@@ -59,16 +59,6 @@ define(['arches',
                 return !!self.get('cards')().length;
             });
 
-            this.expanded = ko.pureComputed(function() {
-                var expanded = false;
-                _.each(this.get('widgets')(), function(widget) {
-                    if (widget.expanded()) {
-                        expanded = true;
-                    }
-                });
-                return expanded;
-            }, this)
-
             this.parse(attributes);
 
         },
@@ -154,8 +144,6 @@ define(['arches',
                         this.get(key)(value);
                         break;
                     case 'ontology_properties':
-                    case 'users':
-                    case 'groups':
                     case 'tiles':
                         this.set(key, koMapping.fromJS(value));
                         break;
@@ -178,9 +166,7 @@ define(['arches',
                 if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'
                  && key !== 'widgets' && key !== 'datatypes' && key !== 'data'){
                     if(ko.isObservable(this.attributes[key])){
-                        if(key === 'users' || key === 'groups'){
-                            ret[key] = koMapping.toJS(this.attributes[key]);
-                        }else if(key === 'cards'){
+                        if(key === 'cards'){
                             ret[key] = [];
                             this.attributes[key]().forEach(function(card){
                                 ret[key].push(card.toJSON());
@@ -207,22 +193,6 @@ define(['arches',
         save: function(callback){
             AbstractModel.prototype.save.call(this, function(request, status, self){
                 if(status === 'success'){
-                    // only user permissions data needs to be updated from the response because it's value can
-                    // vary based on the groups (and their permissions) to which the users belong
-                    var users = this.get('users')();
-                    users.forEach(function(user){
-                        var updatedUser = _.find(request.responseJSON.users, function(item){
-                            return item.id === user.id();
-                        })
-                        user.perms.local.removeAll();
-                        updatedUser.perms.local.forEach(function(perm){
-                            user.perms.local.push(perm);
-                        });
-                        user.perms.default.removeAll();
-                        updatedUser.perms.default.forEach(function(perm){
-                            user.perms.default.push(perm);
-                        });
-                    })
                     this._card(JSON.stringify(this.toJSON()));
                 }
                 if (typeof callback === 'function') {

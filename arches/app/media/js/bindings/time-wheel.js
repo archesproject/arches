@@ -212,8 +212,8 @@ define([
             }
 
             function highlightPeriod(d) {
-                count = d.value;
-                if (d.value < 1) {
+                count = d.size;
+                if (d.size < 1) {
                     count = "< 1";
                 }
 

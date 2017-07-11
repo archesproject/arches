@@ -20,11 +20,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 {% block graph_header_title %}
-{% trans "Resource Editor - " %}{% trans displayname %}
+{% trans "Resource Editor - " %}<span data-bind="text: displayName"></span>
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){openRelatedResources(!openRelatedResources())}, text: openRelatedResources() ? '{% trans "Return to Resource" %}' : '{% trans "Related Resources" %}'"></button>
+    <button id="related-resources-open-btn" class="btn btn-md btn-mint btn-labeled fa fa-code-fork" data-bind="click: function(){openRelatedResources(!openRelatedResources())}, text: openRelatedResources() ? '{% trans "Return to Resource" %}' : '{% trans "Related Resources" %}'"></button>
     {{ block.super }}
 {% endblock graph_header_buttons %}
 
@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Card Container -->
-    <div class="card-form-preview-container" data-bind="let: {'form': formView}">
+    <div class="card-form-preview-container" data-bind="let: {'form': formView}, css: {'loading-mask': cardLoading()}">
         {% include 'views/resource/editor/form.htm' %}
     </div>
 
@@ -62,8 +62,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             widgets: {{ widgets_json }},
             resourceid: '{{resourceid}}',
             graph: {{graph_json}},
-            relationship_types: {{ relationship_types }}
+            relationship_types: {{ relationship_types }},
+            displayName: '{{ displayname }}'
         };
+    });
+    define('search-data', [], function() {
+        return {{% autoescape off %}
+            searchable_nodes: {{ searchable_nodes }},
+            resource_cards: {{ resource_cards }},
+            datatypes: {{ datatypes_json }},
+            saved_searches: {{ saved_searches }}
+        {% endautoescape %}};
     });
     {% endautoescape %}
 </script>

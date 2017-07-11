@@ -16,11 +16,8 @@ define([
         map: null,
         geomNodes: [],
         loading: ko.observable(false),
-        zoom: ko.observable(arches.mapDefaultZoom),
         minZoom: ko.observable(arches.mapDefaultMinZoom),
         maxZoom: ko.observable(arches.mapDefaultMaxZoom),
-        centerX: ko.observable(arches.mapDefaultX),
-        centerY: ko.observable(arches.mapDefaultY),
         pitch: ko.observable(0),
         bearing: ko.observable(0),
         iconFilter: ko.observable(''),
@@ -40,6 +37,9 @@ define([
         layer.addtomap = ko.observable(layer.addtomap);
         layer.name = ko.observable(layer.name);
         layer.icon = ko.observable(layer.icon);
+        layer.centerX = ko.observable(layer.centerx);
+        layer.centerY = ko.observable(layer.centery);
+        layer.zoom = ko.observable(layer.zoom);
         layer.toJSON = ko.computed(function () {
             var layers;
             try {
@@ -56,7 +56,10 @@ define([
                 "icon": layer.icon(),
                 "activated": layer.activated(),
                 "addtomap": layer.addtomap(),
-                "is_resource_layer": false
+                "is_resource_layer": false,
+                "centerx": layer.centerX(),
+                "centery": layer.centerY(),
+                "zoom": layer.zoom()
             })
         });
         layer.dirty = ko.computed(function() {
@@ -100,6 +103,9 @@ define([
             layer.addtomap(_layer.addtomap),
             layer.name(_layer.name);
             layer.icon(_layer.icon);
+            layer.centerX(_layer.centerx);
+            layer.centerY(_layer.centery);
+            layer.zoom(_layer.zoom);
         };
         layer.delete = function () {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmMaplayerDelete.title, arches.confirmMaplayerDelete.text, function() {
@@ -231,8 +237,19 @@ define([
             })
         );
     });
-
-    vm.selection = ko.observable(vm.geomNodes[0] || null);
+    var selectedList;
+    switch (window.location.hash) {
+        case "#basemaps":
+            selectedList = vm.basemaps;
+            break;
+        case "#overlays":
+            selectedList = vm.overlays;
+            break;
+        default:
+            selectedList = vm.geomNodes;
+    }
+    vm.selectedList(selectedList);
+    vm.selection = ko.observable(ko.unwrap(selectedList)[0] || null);
     vm.selectedLayerJSON = ko.computed({
         read: function () {
             if (!vm.selection() || !vm.selection().maplayerid) {
@@ -265,6 +282,17 @@ define([
 
     vm.setupMap = function(map) {
         vm.map = map;
+        map.on('moveend', function (e) {
+            if (e.originalEvent) {
+                var center = map.getCenter()
+                var zoom = map.getZoom()
+                if (vm.zoom() !== zoom) {
+                    vm.zoom(zoom);
+                };
+                vm.centerX(center.lng);
+                vm.centerY(center.lat);
+            }
+        });
     }
 
     var updateMapStyle = function () {
@@ -289,7 +317,6 @@ define([
     vm.selectedBasemapName.subscribe(updateMapStyle);
     vm.selection.subscribe(updateMapStyle);
     vm.selectedLayerJSON.subscribe(updateMapStyle);
-    vm.selectedList(vm.geomNodes);
     vm.selectedList.subscribe(function (selectedList) {
         var selection = null;
         var layerList = ko.unwrap(vm.selectedList());
@@ -310,6 +337,28 @@ define([
             return name.indexOf(listFilter) > -1;
         })
     });
+    var addMapConfig = function (key, defaultValue) {
+        vm[key] = ko.computed({
+            read: function () {
+                var val;
+                var selection = vm.selection();
+                if (selection && selection[key]) {
+                    val = selection[key]();
+                }
+                return val || defaultValue;
+            },
+            write: function (val) {
+                var selection = vm.selection();
+                val = val===defaultValue ? null : val;
+                if (selection && selection[key]) {
+                    selection[key](val);
+                }
+            }
+        });
+    }
+    addMapConfig('centerX', arches.mapDefaultX);
+    addMapConfig('centerY', arches.mapDefaultY);
+    addMapConfig('zoom', arches.mapDefaultZoom);
 
     var pageView = new BaseManagerView({
         viewModel: vm

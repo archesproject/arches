@@ -130,9 +130,7 @@ INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', 'concept_types
 INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', 'concept_types.py', 'ConceptListDataType', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', FALSE, '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', 'datatypes.py', 'BooleanDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', 'datatypes.py', 'FileListDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000019');
-INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link', 'datatypes.py', 'BaseDataType', null, null, null, FALSE);
-INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType',  null, null, null, FALSE, '10000000-0000-0000-0000-000000000022');
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'Concept', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES CONCEPT');
@@ -238,12 +236,6 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'views/components/widgets/file', 'file-list', '{"acceptedFiles": "", "maxFilesize": "200"}');
-
-INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-
-INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
@@ -3336,6 +3328,21 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
             "id": "search-results-hex-outline"
         },
         {
+            "layout": {},
+            "source": "search-results-hex",
+            "filter": [
+                "==",
+                "id",
+                ""
+            ],
+            "paint": {
+                "line-color": "#54278f",
+                "line-opacity": 1
+            },
+            "type": "line",
+            "id": "search-results-hex-outline-highlighted"
+        },
+        {
            "layout": {},
            "source": "search-results-hex",
            "filter": [
@@ -3446,6 +3453,3 @@ INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, acti
            "paint": {}
        }
    ]', TRUE, 'ion-ios-location', TRUE, TRUE);
-
-INSERT INTO iiif_manifests(id, url)
-   VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');

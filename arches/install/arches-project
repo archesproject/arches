@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import arches
 import argparse
 import subprocess
@@ -54,8 +55,7 @@ def command_create_app(args):
     cmd.handle(options)
     bower_path = os.path.join(os.getcwd(), proj_name, proj_name)
     os.chdir(bower_path)
-    bower_install = 'bower install'
-    subprocess.call(bower_install.split(), shell=False)
+    subprocess.call("bower install", shell=True)
 
 parent_parser = argparse.ArgumentParser(add_help=False)
 

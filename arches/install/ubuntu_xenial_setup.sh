@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Use the yes command if you would like to include java, postgis and node by default
+# Example:
+# yes | sudo ./ubuntu_xenial_setup.sh
+
 function install_postgres {
 
     sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
@@ -29,7 +33,6 @@ function install_postgres {
     sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns TO PUBLIC;"
     sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
     sudo -u postgres createdb training -T template_postgis_20
-    # sudo -u postgres createdb -E UTF8 -T template_postgis_20 --locale=en_US.utf8 arches
 }
 
 function install_bower {
@@ -39,12 +42,8 @@ function install_bower {
     sudo npm install -g bower
 }
 
-function install_elasticsearch {
-    sudo sh -c 'echo "deb http://packages.elastic.co/elasticsearch/5.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch-5.x.list'
-    wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-    sudo apt-get update -y
-    sudo apt-get install openjdk-8-jre-headless -y elasticsearch=5.2.1
-    sudo service elasticsearch start
+function install_java {
+    sudo apt-get install openjdk-8-jre-headless -y
 }
 
 function main {
@@ -63,26 +62,34 @@ function main {
   sudo apt-get install -y libpq-dev
 
   sudo apt-get install python-pip -y
-  pip install virtualenv==15.1.0
+  pip install virtualenv==13.1.2
 
-  install_postgres
-  install_bower
-  # install_elasticsearch
-  # echo "Would you like to install and configure postgres/postgis?"
-  # select yn in "Yes" "No"; do
-  #     case $yn in
-  #         Yes ) install_postgres; break;;
-  #         No ) break;;
-  #     esac
-  # done
-  #
-  # echo "Would you like to install nodejs/npm/and bower?"
-  # select yn in "Yes" "No"; do
-  #     case $yn in
-  #         Yes ) install_bower; break;;
-  #         No ) break;;
-  #     esac
-  # done
+  echo -n "Would you like to install openjdk-8-jre? (y/n)? "
+  read answer
+  if echo "$answer" | grep -iq "^y" ;then
+      echo Yes, installing Java 8
+      install_java
+  else
+      echo Skipping Java installation
+  fi
+
+  echo -n "Would you like to install and configure postgres/postgis? (y/n)? "
+  read answer
+  if echo "$answer" | grep -iq "^y" ;then
+      echo Yes, Installing postgis
+      install_postgres
+  else
+      echo Skipping postgres/postgis installation
+  fi
+
+  echo -n "Would you like to install and nodejs/npm/and bower (y/n)? "
+  read answer
+  if echo "$answer" | grep -iq "^y" ;then
+      echo Yes, installing Node/Bower
+      install_bower
+  else
+      echo Skipping node/npm/bower installation
+  fi
 }
 
 main

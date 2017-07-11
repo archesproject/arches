@@ -25,7 +25,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Map Layer Manager" %}
 {% endblock title %}
 
-{% block login_header %}{% endblock login_header %}
 
 {% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
@@ -91,7 +90,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
-                        <!-- ko if: selection().nodeid -->
+                        <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
                         </div>
@@ -104,7 +103,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <!-- /ko -->
 
-                        <!-- ko if: !selection().nodeid -->
+                        <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading relative">
                             <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
 
@@ -171,21 +170,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs">
                                             <li class="active">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
                                             </li>
                                             <li class="">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> Settings</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> Service Styling</a>
                                             </li>
                                         </ul>
 
                                         <div class="tab-content">
-                                            <div id="styling-panel" class="tab-pane fade active in">
-                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
-                                                </div>
-                                            </div>
 
-                                            <div id="settings-panel" class="tab-pane fade">
+                                            <div id="settings-panel" class="tab-pane fade active in">
                                                 <div class="row service-widget-container">
                                                     <div class="form-horizontal">
                                                         <div class="panel-body" style="padding-top: 10px;">
@@ -246,6 +240,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div id="styling-panel" class="tab-pane fade">
+                                                <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
+                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>

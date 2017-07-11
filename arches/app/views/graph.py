@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
-from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -27,20 +26,23 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from django.views.generic import View, TemplateView
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
-from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
-from guardian.shortcuts import get_perms_for_model
+from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
 try:
     from cStringIO import StringIO
@@ -65,7 +67,7 @@ class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
         icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True))
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_data = []
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
@@ -311,12 +313,12 @@ class CardView(GraphBaseView):
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=card.graph_id).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         concept_collections = Concept().concept_tree(mode='collections', lang=lang)
-
         ontology_properties = []
         card_root_node = models.Node.objects.get(nodeid=card.nodegroup_id)
         for item in self.graph.get_valid_ontology_classes(nodeid=card.nodegroup_id):
@@ -328,8 +330,8 @@ class CardView(GraphBaseView):
             main_script='views/graph/card-configuration-manager',
             graph_id=self.graph.pk,
             card=JSONSerializer().serialize(card),
-            permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            geocoding_providers=geocoding_providers,
             datatypes=datatypes,
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
@@ -388,8 +390,10 @@ class FormManagerView(GraphBaseView):
                 ret = data['forms']
             if self.action == 'add_form':
                 form = models.Form(title=_('New Menu'), graph=graph)
+                form.sortorder = len(graph.form_set.all())
                 form.save()
                 ret = form
+
         return JSONResponse(ret)
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -441,9 +445,11 @@ class FormView(GraphBaseView):
         form.delete()
         return JSONResponse({'succces':True})
 
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportManagerView(GraphBaseView):
@@ -479,6 +485,7 @@ class ReportManagerView(GraphBaseView):
         report.save()
         return JSONResponse(report)
 
+
 @method_decorator(group_required('Graph Editor'), name='dispatch')
 class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
@@ -487,11 +494,13 @@ class ReportEditorView(GraphBaseView):
         forms = models.Form.objects.filter(graph=self.graph, visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        map_layers = models.MapLayer.objects.all()
+        map_sources = models.MapSource.objects.all()
         resource_graphs = Graph.objects.exclude(pk=report.graph.pk).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_sources = models.MapSource.objects.all()
 
         context = self.get_context_data(
@@ -504,11 +513,12 @@ class ReportEditorView(GraphBaseView):
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
+            map_layers=map_layers,
+            map_sources=map_sources,
+            geocoding_providers=geocoding_providers,
             resource_graphs=resource_graphs,
             widgets=widgets,
             graph_id=self.graph.pk,
-            map_layers=map_layers,
-            map_sources=map_sources,
          )
 
         context['nav']['title'] = self.graph.name
@@ -572,6 +582,13 @@ class FunctionManagerView(GraphBaseView):
                 )
                 item['id'] = functionXgraph.pk
 
+                # run post function save hook
+                func = functionXgraph.function.get_class_module()()
+                try:
+                    func.after_function_save(functionXgraph, request)
+                except NotImplementedError:
+                    pass
+
         return JSONResponse(data)
 
     def delete(self, request, graphid):
@@ -583,3 +600,131 @@ class FunctionManagerView(GraphBaseView):
                 functionXgraph.delete()
 
         return JSONResponse(data)
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        identities = []
+        for group in Group.objects.all():
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
+        for user in User.objects.filter(is_superuser=False):
+            groups = []
+            default_perms = []
+            for group in user.groups.all():
+                groups.append(group.name)
+                default_perms = default_perms + list(group.permissions.all())
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms)})
+
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+
+        root = {'children': []}
+        def extract_card_info(cards, root):
+            for card in cards:
+                d = {
+                    'name': card.name,
+                    'nodegroup': card.nodegroup_id,
+                    'children': [],
+                    'type': 'card_container' if len(card.cards) > 0 else 'card',
+                    'type_label': _('Card Container') if len(card.cards) > 0 else _('Card')
+                }
+                if len(card.cards) > 0:
+                    extract_card_info(card.cards, d)
+                else:
+                    for node in card.nodegroup.node_set.all():
+                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': 'node', 'type': _('Node')})
+                root['children'].append(d)
+
+        extract_card_info(cards, root)
+        #return JSONResponse(root)
+
+        content_type = ContentType.objects.get_for_model(models.NodeGroup)
+        nodegroupPermissions = Permission.objects.filter(content_type=content_type)
+
+        context = self.get_context_data(
+            main_script='views/graph/permission-manager',
+            identities=JSONSerializer().serialize(identities),
+            cards=JSONSerializer().serialize(root),
+            datatypes=JSONSerializer().serialize(models.DDataType.objects.all()),
+            nodegroupPermissions=JSONSerializer().serialize(nodegroupPermissions) #JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)])
+        )
+
+        context['nav']['title'] = self.graph.name
+        context['nav']['menu'] = True
+        context['nav']['help'] = ('Managing Permissions','help/permissions-manager-help.htm')
+
+        return render(request, 'views/graph/permission-manager.htm', context)
+
+
+@method_decorator(group_required('Graph Editor'), name='dispatch')
+class PermissionDataView(View):
+    perm_cache = {}
+
+    def get_perm_name(self, codename):
+        if codename not in self.perm_cache:
+            try:
+                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+                return self.perm_cache[codename]
+            except:
+                return None
+                # codename for nodegroup probably doesn't exist
+        return self.perm_cache[codename]
+
+    def get(self, request):
+        nodegroup_ids = JSONDeserializer().deserialize(request.GET.get('nodegroupIds'))
+        identityId = request.GET.get('identityId')
+        identityType = request.GET.get('identityType')
+
+        ret = []
+        if identityType == 'group':
+            identity = Group.objects.get(pk=identityId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(identity, nodegroup)]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+        else:
+            identity = User.objects.get(pk=identityId)
+            for nodegroup_id in nodegroup_ids:
+                nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(identity, nodegroup)]
+
+                # only get the group perms ("defaults") if no user defined object settings have been saved
+                if len(perms) == 0:
+                    perms = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in set(get_group_perms(identity, nodegroup))]
+                ret.append({'perms': perms, 'nodegroup_id': nodegroup_id})
+
+        return JSONResponse(ret)
+
+    def post(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data)
+        return JSONResponse(data)
+
+    def delete(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        self.apply_permissions(data, revert=True)
+        return JSONResponse(data)
+
+    def apply_permissions(self, data, revert=False):
+        with transaction.atomic():
+            for identity in data['selectedIdentities']:
+                if identity['type'] == 'group':
+                    identityModel = Group.objects.get(pk=identity['id'])
+                else:
+                    identityModel = User.objects.get(pk=identity['id'])
+
+                for card in data['selectedCards']:
+                    nodegroup = models.NodeGroup.objects.get(pk=card['nodegroup'])
+
+                    # first remove all the current permissions
+                    for perm in get_perms(identityModel, nodegroup):
+                        remove_perm(perm, identityModel, nodegroup)
+
+                    if not revert:
+                        # then add the new permissions
+                        for perm in data['selectedPermissions']:
+                            assign_perm(perm['codename'], identityModel, nodegroup)
