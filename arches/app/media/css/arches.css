@@ -8050,24 +8050,9 @@ table.table.dataTable {
     color: #666;
 }
 
-.facets-container {
-    position: absolute;
-    width: 250px;
-    right: 0px;
-    border-left: 1px solid #ddd;
-}
-
 a .search-type-link{
     height: 50px;
     width: 50px;
-}
-
-.search-type-btn {
-    height: 50px;
-    width: 60px;
-    font-size: 11px;
-    padding-top: 25px;
-    color: #888;
 }
 
 .search-type-btn.relative:hover {
@@ -8081,11 +8066,25 @@ a .search-type-link{
     color: #123;
 }
 
-.search-type-btn-icon {
-    position: absolute;
-    top: 10px;
-    left: 25px;
+.search-type-btn {
+    height: 50px;
+    font-size: 11px;
+    color: #888;
+}
+
+.search-type-btn i {
     font-size: 15px;
+}
+
+.search-type-btn p {
+    padding-top: 5px;
+}
+
+.facets-container {
+    position: absolute;
+    width: 250px;
+    right: 0px;
+    border-left: 1px solid #ddd;
 }
 
 .facets-search-container {
