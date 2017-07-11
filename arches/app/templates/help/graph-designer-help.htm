@@ -8,7 +8,8 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Graph Designer Overview</h4></a>
         <div class="ep-help-topic-content">
             <p>The interface is split into three sections, as shown in the image below.
-            <p><a href="{{ STATIC_URL }}img/help/graph-manager-panes.png" target="_blank"><img src="{{ STATIC_URL }}img/help/graph-manager-panes.png"></img></a></p>
+            <span class="ep-help-img-link-float"><a href="{{ STATIC_URL }}img/help/graph-manager-panes.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><img src="{{ STATIC_URL }}img/help/graph-manager-panes.png"></img></p>
             <p>
                 <strong>Node List</strong> - This panel lists all of the nodes present in this {% if graph.isresource %}Resource Model's{% else %}Branch's{% endif %} graph. You can select a node in the Node List to open the Node Manager.<br>
                 <strong>Graph</strong> This panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.<br>

@@ -68,11 +68,17 @@ class SearchView(BaseManagerView):
             if request.user.has_perm('read_nodegroup', card.nodegroup): 
                 searchable_cards.append(card)
 
+        # only allow date nodes that the user has permission to read
+        searchable_date_nodes = []
+        for node in date_nodes:
+            if request.user.has_perm('read_nodegroup', node.nodegroup): 
+                searchable_date_nodes.append(node)
+
         context = self.get_context_data(
             resource_cards=JSONSerializer().serialize(searchable_cards),
             searchable_nodes=JSONSerializer().serialize(searchable_nodes),
             saved_searches=saved_searches,
-            date_nodes=date_nodes,
+            date_nodes=searchable_date_nodes,
             map_layers=map_layers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
@@ -307,14 +313,13 @@ def build_search_results_dsl(request):
         start_year = start_date.year or 'null'
         end_year = end_date.year or 'null'
 
-        temporal_query = Bool()
-
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
         
         # apply permissions for nodegroups that contain date datatypes
         date_nodes = get_nodes_of_type_with_perm(request, 'date', 'read_nodegroup')
         date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+        temporal_query = Bool(filter=date_perms_filter)
 
         if temporal_filter['inverted']:
             # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
@@ -340,7 +345,6 @@ def build_search_results_dsl(request):
                 temporal_query.filter(date_range_query)
             else:
                 temporal_query.filter(inverted_date_filter)
-                temporal_query.filter(date_perms_filter)
 
                 # wrap the temporal_query into another bool query
                 # because we need to search on either dates OR date ranges
@@ -355,7 +359,6 @@ def build_search_results_dsl(request):
             else:
                 date_range_query = Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float())
                 temporal_query.filter(date_range_query)
-                temporal_query.filter(date_perms_filter)
 
                 # wrap the temporal_query into another bool query
                 # because we need to search on either dates OR date ranges
@@ -393,9 +396,9 @@ def build_search_results_dsl(request):
 
 def get_nodes_of_type_with_perm(request, datatype, permission):
     nodes = []
-    for date_node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, date_node.nodegroup): 
-            nodes.append(str(date_node.nodegroup_id)) 
+    for node in models.Node.objects.filter(datatype=datatype):
+        if request.user.has_perm(permission, node.nodegroup): 
+            nodes.append(str(node.nodegroup_id)) 
     return nodes
 
 def buffer(request):

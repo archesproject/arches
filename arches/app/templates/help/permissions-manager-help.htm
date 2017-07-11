@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load i18n %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
@@ -14,7 +15,8 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Permissions Manager Interface</h4></a>
         <div class="ep-help-topic-content">
             <p>The interface is split into three sections, as shown in the image below.</p>
-            <p><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank"><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></a></p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
             <p>
                 <strong>1 - Groups/Accounts List</strong> This panel lists all of the groups and user accounts you have in your database. By default, Arches comes with a number of pre-made groups, but all of them have the same set of permissions. It is up to to define what permissions are attached to each group. As you can see, user accounts can be members of a group, and will inherit all of the permissions attached to that group. If desired, you can further define permissions for each user.<br>
                 <em>To make new groups and user accounts you must use the Django admin interface, accessed at <code>yoursite.com/admin</code>.</em><br>
@@ -38,16 +40,16 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Example - Hiding Location Information</h4></a>
         <div class="ep-help-topic-content">
             <p>Below, the "Guest" group (please read the Non-Authenticated Users section above) has "read" permissions revoked for the Location card. This means that the general public would not be able to view any location information for resources made with this resource model.</p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example1.gif"></img></p>
-            <h5><a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">view larger&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
         </div>
     </div>
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Example - Allowing Crowdsourced Keywords</h4></a>
         <div class="ep-help-topic-content">
-            <p>Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will only see the Keyword card when they are editing or creating resources with this resource model.</p>
+            <p>Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {% trans nav.title %} resources, but only the Keyword card will be visible to them.</p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img></p>
-            <h5><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">view larger&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
         </div>
     </div>
 </div>
