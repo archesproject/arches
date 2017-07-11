@@ -96,6 +96,8 @@ class Tile(models.TileModel):
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
         edit.resourceinstanceid = self.resourceinstance.resourceinstanceid
+        edit.attributenodeid = self.nodegroup_id
+        edit.tileinstanceid = self.tileid
         edit.userid = getattr(user, 'id', '')
         edit.user_email = getattr(user, 'email', '')
         edit.user_firstname = getattr(user, 'first_name', '')
@@ -110,11 +112,12 @@ class Tile(models.TileModel):
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
-
         self.__preSave(request)
         if self.data != {}:
-            edit_type = 'tile create' if self._data == None else 'tile edit'
-            self.save_edit(edit_type=edit_type, old_value=self._data, new_value=self.data)
+            old_model = models.TileModel.objects.filter(pk=self.tileid)
+            old_data = old_model[0].data if len(old_model) > 0 else None
+            edit_type = 'tile create' if (old_data == None) else 'tile edit'
+            self.save_edit(edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
