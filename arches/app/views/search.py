@@ -317,14 +317,13 @@ def build_search_results_dsl(request):
             temporal_filter['inverted'] = False
 
         # apply permissions for nodegroups that contain date datatypes
-        date_nodes = get_nodes_by_datatype_and_perm(request, 'date', 'read_nodegroup')
-        # date_nodes = get_nodegroups_by_datatype_and_perm(request, 'date', 'read_nodegroup')
-        # date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+        date_nodes = get_nodegroups_by_datatype_and_perm(request, 'date', 'read_nodegroup')
+
         print '-' *33
         print date_nodes
         print request.user
         temporal_query = Bool()
-        #temporal_query = Bool(filter=date_perms_filter)
+
 
         if temporal_filter['inverted']:
             # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
@@ -346,58 +345,34 @@ def build_search_results_dsl(request):
                 inverted_date_ranges_filter.should(Range(field='date_ranges', gt=end_date))
 
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                #date_range_query = Nested(path='tiles', query=inverted_date_filter)
-                #temporal_query.filter(date_range_query)
-
-                for node in date_nodes:
-                    date_query = Bool()
-                    date_query.filter(Nested(path='tiles', query=inverted_date_filter))
-                    date_query.filter(Term(field='tiles.nodegroup_id', term=str(node.nodegroup_id)))
-                    date_range_query = Nested(path='tiles', query=date_query)
-                    temporal_query.should(date_range_query)
+                date_query = Bool()
+                date_query.filter(Nested(path='tiles', query=inverted_date_filter))
+                date_query.filter(Terms(field='tiles.nodegroup_id', terms=date_nodes))
+                date_range_query = Nested(path='tiles', query=date_query)
+                temporal_query.should(date_range_query)
             else:
-                #temporal_query.filter(inverted_date_filter)
-
-                # wrap the temporal_query into another bool query
-                # because we need to search on either dates OR date ranges
-                #temporal_query = Bool(should=temporal_query)
+                date_query = Bool()
+                date_query.filter(inverted_date_filter)
+                date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
+                date_range_query = Nested(path='dates', query=date_query)
+                temporal_query.should(date_range_query)
                 temporal_query.should(inverted_date_ranges_filter)
-
-                for node in date_nodes:
-                    date_query = Bool()
-                    date_query.filter(inverted_date_filter)
-                    date_query.filter(Term(field='dates.nodegroup_id', term=str(node.nodegroup_id)))
-                    date_range_query = Nested(path='dates', query=date_query)
-                    temporal_query.should(date_range_query)
 
         else:
             if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                # range_query = Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date)
-                # date_range_query = Nested(path='tiles', query=range_query)
-                # temporal_query.filter(date_range_query)
-
-                for node in date_nodes:
-                    date_query = Bool()
-                    date_query.filter(Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date))
-                    date_query.filter(Term(field='tiles.nodegroup_id', term=str(node.nodegroup_id)))
-                    date_range_query = Nested(path='tiles', query=date_query)
-                    temporal_query.should(date_range_query)
+                date_query = Bool()
+                date_query.filter(Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date))
+                date_query.filter(Terms(field='tiles.nodegroup_id', terms=date_nodes))
+                date_range_query = Nested(path='tiles', query=date_query)
+                temporal_query.should(date_range_query)
             else:
-                # date_range_query = Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float())
-                # temporal_query.filter(date_range_query)
-
-                # # wrap the temporal_query into another bool query
-                # # because we need to search on either dates OR date ranges
-                # temporal_query = Bool(should=temporal_query)
+                date_query = Bool()
+                date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
+                date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
+                date_range_query = Nested(path='dates', query=date_query)
+                temporal_query.should(date_range_query)
                 range_query = Range(field='date_ranges', gte=start_date.as_float(), lte=end_date.as_float(), relation='intersects')
                 temporal_query.should(range_query)
-
-                for node in date_nodes:
-                    date_query = Bool()
-                    date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
-                    date_query.filter(Term(field='dates.nodegroup_id', term=str(node.nodegroup_id)))
-                    date_range_query = Nested(path='dates', query=date_query)
-                    temporal_query.should(date_range_query)
 
 
         search_query.must(temporal_query)
@@ -433,13 +408,6 @@ def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     for node in models.Node.objects.filter(datatype=datatype):
         if request.user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
-    return nodes
-
-def get_nodes_by_datatype_and_perm(request, datatype, permission):
-    nodes = []
-    for node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, node.nodegroup):
-            nodes.append(node)
     return nodes
 
 def buffer(request):
