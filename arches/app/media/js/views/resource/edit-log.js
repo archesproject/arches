@@ -58,7 +58,7 @@ require([
                     edit.full_old_value = createFullValue(edit.oldvalue, edit)
                 };
             })
-
+            console.log(edits)
             this.viewModel.edits = ko.observableArray(edits);
             this.viewModel.edits.sort(function (left, right) { return left.timestamp == right.timestamp ? 0 : (left.timestamp > right.timestamp ? -1 : 1) })
             this.viewModel.currentDate = moment().format('MMMM D, YYYY');

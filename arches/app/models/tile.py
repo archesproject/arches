@@ -149,7 +149,7 @@ class Tile(models.TileModel):
             se.delete(index='strings', doc_type='term', id=result['_id'])
 
         self.__preDelete(request)
-        self.save_edit(edit_type='tile delete')
+        self.save_edit(edit_type='tile delete', old_value=self.data)
         super(Tile, self).delete(*args, **kwargs)
         resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
         resource.index()

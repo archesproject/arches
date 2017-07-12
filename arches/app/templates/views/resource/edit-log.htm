@@ -63,7 +63,7 @@
             <!--ko if: edittype == 'create' -->
                 <h4 class="mar-no pad-btm">{% trans 'Resource Record Created' %}</h4>
                 <div class="eh-node-group">
-                    <p>{% trans 'Record created by Arches with unique identifer' %}<span class="text-bold" data-bind="text: resourceinstanceid"></span></p>
+                    <p>{% trans 'Record created by Arches with unique identifer' %}<span class="text-bold" data-bind="text: ' ' + resourceinstanceid"></span></p>
                 </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile create'-->
@@ -127,7 +127,20 @@
             </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile delete'-->
-            <h4 class="mar-no pad-btm">Tile Deleted</h4>
+            <h4 class="mar-no pad-btm">{% trans 'Tile Deleted' %}</h4>
+            <div class="eh-node-group">
+                <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
+
+                <div class="tile-data-container">
+                    <ul class="tile-data-list">
+                        <div data-bind="foreach: full_old_value">
+                        <li class="tile-data-item">
+                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                        </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
             <!--/ko-->
 
             <div class="eh-footer">
