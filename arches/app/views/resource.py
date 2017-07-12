@@ -67,8 +67,9 @@ def get_resource_relationship_types():
 class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if graphid is not None:
-            # self.graph = Graph.objects.get(graphid=graphid)
-            resource_instance = Resource.objects.create(graph_id=graphid)
+            resource_instance = Resource()
+            resource_instance.graph_id = graphid
+            resource_instance.save(**{'request':request})
             resource_instance.index()
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:

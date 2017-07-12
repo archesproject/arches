@@ -117,7 +117,7 @@ class Tile(models.TileModel):
             old_model = models.TileModel.objects.filter(pk=self.tileid)
             old_data = old_model[0].data if len(old_model) > 0 else None
             edit_type = 'tile create' if (old_data == None) else 'tile edit'
-            self.save_edit(edit_type=edit_type, old_value=old_data, new_value=self.data)
+            self.save_edit(user=request.user, edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
@@ -149,7 +149,7 @@ class Tile(models.TileModel):
             se.delete(index='strings', doc_type='term', id=result['_id'])
 
         self.__preDelete(request)
-        self.save_edit(edit_type='tile delete', old_value=self.data)
+        self.save_edit(user=request.user, edit_type='tile delete', old_value=self.data)
         super(Tile, self).delete(*args, **kwargs)
         resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
         resource.index()

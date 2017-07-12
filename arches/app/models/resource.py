@@ -86,11 +86,12 @@ class Resource(models.ResourceInstance):
         Saves and indexes a single resource
 
         """
+        request = kwargs.pop('request', '')
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
-        self.save_edit(edit_type='create')
+        self.save_edit(user=request.user, edit_type='create')
         self.index()
 
     @staticmethod
