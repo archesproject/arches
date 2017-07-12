@@ -125,11 +125,14 @@ class Resource(models.ResourceInstance):
         TileModel.objects.bulk_create(tiles)
 
         for resource in resources:
+            resource.save_edit(edit_type='create')
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
 
+        for tile in tiles:
+            tile.save_edit(edit_type='tile create', new_value=tile.data)
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
         se.bulk_index(term_list)

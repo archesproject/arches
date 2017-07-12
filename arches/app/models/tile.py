@@ -96,7 +96,7 @@ class Tile(models.TileModel):
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
         edit.resourceinstanceid = self.resourceinstance.resourceinstanceid
-        edit.attributenodeid = self.nodegroup_id
+        edit.nodegroupid = self.nodegroup_id
         edit.tileinstanceid = self.tileid
         edit.userid = getattr(user, 'id', '')
         edit.user_email = getattr(user, 'email', '')

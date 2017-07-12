@@ -150,7 +150,7 @@ class ResourceEditLogView(BaseManagerView):
             displayname = Resource.objects.get(pk=resourceid).displayname
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
             if displayname == 'undefined':
-                displayname = 'Unnamed Resource'
+                displayname = _('Unnamed Resource')
             context = self.get_context_data(
                 main_script='views/resource/edit-log',
                 graph_json=JSONSerializer().serialize(graph),

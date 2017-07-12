@@ -12,7 +12,7 @@ require([
         initialize: function(options){
             var self = this;
             var cards = data.cards;
-            var edits = data.edits;
+            var edits = _.filter(data.edits, function(edit){ return (_.isEmpty(edit.newvalue) === false && edit.edittype == 'tile create') || edit.edittype != 'tile create'  });
             var editTypeLookup = {
                 'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
                 'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
@@ -20,15 +20,45 @@ require([
                 'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'}
             }
 
+            var assignCards = function(){
+                _.each(cards, function(card) {
+                    _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card})
+                    if (card.cards.length > 0) {
+                        _.each(card.cards, function(sub_card){
+                            _.each(_.where(edits, {nodegroupid: sub_card.nodegroup_id}), function(match){match.card = sub_card; match.card_container_name = card.name})
+                        }, this)
+                    }
+                }, this)
+            }
+
+            assignCards();
+
+            var createFullValue = function(value, edit) {
+                var full_value = {}
+                _.each(value, function(v, k){
+                    full_value[k] = {new_value: v}
+                    if (edit.card) {
+                        _.each(edit.card.nodes, function(node){
+                            if (k == node.nodeid) {
+                                full_value[node.nodeid].node = node
+                            }
+                        }, this)
+                        // console.log(edit.card.nodes)
+                    }
+                });
+                return full_value;
+            }
+
             _.each(edits, function(edit){
                 var datetime = moment(edit.timestamp)
                 edit.time = datetime.format("HH:mm");
                 edit.day = datetime.format('DD MMMM, YYYY');
                 edit.edit_type_icon = editTypeLookup[edit.edittype];
-                console.log(edit.edit_type, edit.edit_type_icon)
-                if (edit.attributenodeid) {
-                    edit.card = _.findWhere(cards, {nodegroup_id: edit.attributenodeid})
-                }
+                if (edit.nodegroupid) {
+                    edit.full_new_value = createFullValue(edit.newvalue, edit)
+                    edit.full_old_value = createFullValue(edit.oldvalue, edit)
+                };
+                console.log(edit)
             })
 
             this.viewModel.edits = ko.observableArray(edits);
