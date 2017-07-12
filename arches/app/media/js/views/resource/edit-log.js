@@ -22,7 +22,7 @@ require([
 
             var assignCards = function(){
                 _.each(cards, function(card) {
-                    _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card})
+                    _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card; match.card_container_name = null})
                     if (card.cards.length > 0) {
                         _.each(card.cards, function(sub_card){
                             _.each(_.where(edits, {nodegroupid: sub_card.nodegroup_id}), function(match){match.card = sub_card; match.card_container_name = card.name})
@@ -43,10 +43,9 @@ require([
                                 full_value[node.nodeid].node = node
                             }
                         }, this)
-                        // console.log(edit.card.nodes)
                     }
                 });
-                return full_value;
+                return _.map(full_value, function(v,k){return v;});
             }
 
             _.each(edits, function(edit){
@@ -58,7 +57,6 @@ require([
                     edit.full_new_value = createFullValue(edit.newvalue, edit)
                     edit.full_old_value = createFullValue(edit.oldvalue, edit)
                 };
-                console.log(edit)
             })
 
             this.viewModel.edits = ko.observableArray(edits);

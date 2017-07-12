@@ -2537,6 +2537,31 @@ ul .collapse li:last-of-type {
 	padding-left: 10px;
 }
 
+.tile-data-list {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.tile-data-item {
+    font-weight: 600;
+    color: #777;
+}
+
+.tile-node-name {
+    width: 245px;
+    display: table-cell;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tile-node-value {
+    font-weight: 400;
+    padding-left: 10px;
+    display: table-cell;
+}
+
 .flex {
     display: -ms-flexbox;
     display: -webkit-flex;
