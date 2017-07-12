@@ -174,16 +174,18 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'dates' : {
+                        'type' : 'nested',
                         'properties' : {
                             'date' : {'type': 'float'},
                             'nodegroup_id' : {'type': 'keyword'},
+                            'node_id' : {'type': 'keyword'},
                         }
                     },
                     'numbers' : {
                         "type" : "double"
                     },
                     "date_ranges": {
-                      "type": "float_range"
+                        "type": "float_range"
                     }
                 }
             }
