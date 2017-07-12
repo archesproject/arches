@@ -178,7 +178,7 @@ def prepare_search_index(resource_model_id, create=False):
                         'properties' : {
                             'date' : {'type': 'float'},
                             'nodegroup_id' : {'type': 'keyword'},
-                            'node_id' : {'type': 'keyword'},
+                            'nodeid' : {'type': 'keyword'},
                         }
                     },
                     'numbers' : {

@@ -9,7 +9,7 @@ class BaseDataType(object):
     def validate(self, value, source=None):
         return []
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         """
         Assigns a given node value to the corresponding key in a document in
         in preparation to index the document

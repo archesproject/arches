@@ -40,7 +40,7 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
         except AssertionError:

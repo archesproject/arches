@@ -310,73 +310,50 @@ def build_search_results_dsl(request):
         now = str(datetime.utcnow())
         start_date = SortableDate(temporal_filter['fromDate'])
         end_date = SortableDate(temporal_filter['toDate'])
-        start_year = start_date.year or 'null'
-        end_year = end_date.year or 'null'
 
-        if 'inverted' not in temporal_filter:
-            temporal_filter['inverted'] = False
+        temporal_query = Bool()
 
         # apply permissions for nodegroups that contain date datatypes
         date_nodes = get_nodegroups_by_datatype_and_perm(request, 'date', 'read_nodegroup')
+        date_nodeid = str(temporal_filter['dateNodeId']) if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '' else None
+        query_inverted = False if 'inverted' not in temporal_filter else temporal_filter['inverted']
 
-        print '-' *33
-        print date_nodes
-        print request.user
-        temporal_query = Bool()
-
-
-        if temporal_filter['inverted']:
+        if query_inverted:
             # inverted date searches need to use an OR clause and are generally more complicated to structure (can't use ES must_not)
             # eg: less than START_DATE OR greater than END_DATE
             inverted_date_filter = Bool()
             inverted_date_ranges_filter = Bool()
 
-            field = 'dates.date'
-            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                field='tiles.data.%s' % (temporal_filter['dateNodeId'])
-
             if start_date.is_valid():
-                start_date = start_date.as_float() if field == 'dates.date' else start_date.orig_date
-                inverted_date_filter.should(Range(field=field, lt=start_date))
-                inverted_date_ranges_filter.should(Range(field='date_ranges', lt=start_date))
+                inverted_date_filter.should(Range(field='dates.date', lt=start_date.as_float()))
+                inverted_date_ranges_filter.should(Range(field='date_ranges', lt=start_date.as_float()))
             if end_date.is_valid():
-                end_date = end_date.as_float() if field == 'dates.date' else end_date.orig_date
-                inverted_date_filter.should(Range(field=field, gt=end_date))
-                inverted_date_ranges_filter.should(Range(field='date_ranges', gt=end_date))
+                inverted_date_filter.should(Range(field='dates.date', gt=end_date.as_float()))
+                inverted_date_ranges_filter.should(Range(field='date_ranges', gt=end_date.as_float()))
 
-            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                date_query = Bool()
-                date_query.filter(Nested(path='tiles', query=inverted_date_filter))
-                date_query.filter(Terms(field='tiles.nodegroup_id', terms=date_nodes))
-                date_range_query = Nested(path='tiles', query=date_query)
-                temporal_query.should(date_range_query)
+            date_query = Bool()
+            date_query.filter(inverted_date_filter)
+            date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
+            if date_nodeid:
+                date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
-                date_query = Bool()
-                date_query.filter(inverted_date_filter)
-                date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
-                date_range_query = Nested(path='dates', query=date_query)
-                temporal_query.should(date_range_query)
                 temporal_query.should(inverted_date_ranges_filter)
-
+            temporal_query.should(Nested(path='dates', query=date_query))
+                
         else:
-            if 'dateNodeId' in temporal_filter and temporal_filter['dateNodeId'] != '':
-                date_query = Bool()
-                date_query.filter(Range(field='tiles.data.%s' % (temporal_filter['dateNodeId']), gte=start_date.orig_date, lte=end_date.orig_date))
-                date_query.filter(Terms(field='tiles.nodegroup_id', terms=date_nodes))
-                date_range_query = Nested(path='tiles', query=date_query)
-                temporal_query.should(date_range_query)
+            date_query = Bool()
+            date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
+            date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
+            if date_nodeid:
+                date_query.filter(Term(field='dates.nodeid', term=date_nodeid))
             else:
-                date_query = Bool()
-                date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
-                date_query.filter(Terms(field='dates.nodegroup_id', terms=date_nodes))
-                date_range_query = Nested(path='dates', query=date_query)
+                date_range_query = Range(field='date_ranges', gte=start_date.as_float(), lte=end_date.as_float(), relation='intersects')
                 temporal_query.should(date_range_query)
-                range_query = Range(field='date_ranges', gte=start_date.as_float(), lte=end_date.as_float(), relation='intersects')
-                temporal_query.should(range_query)
+            temporal_query.should(Nested(path='dates', query=date_query))
 
 
         search_query.must(temporal_query)
-        print search_query.dsl
+        #print search_query.dsl
 
     datatype_factory = DataTypeFactory()
     if len(advanced_filters) > 0:

@@ -55,7 +55,7 @@ class StringDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         document['strings'].append(nodevalue)
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -97,7 +97,7 @@ class NumberDataType(BaseDataType):
     def transform_import_values(self, value):
         return float(value)
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         document['numbers'].append(nodevalue)
 
     def append_search_filters(self, value, node, query, request):
@@ -157,8 +157,8 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def append_to_document(self, document, nodevalue, tile):
-        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id})
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -236,7 +236,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
         return GeometryCollection(wkt_geoms)
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
@@ -902,7 +902,7 @@ class IIIFDrawingDataType(BaseDataType):
                 string_list.append(feature['properties']['name'])
         return string_list
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
             document['strings'].append(string_item)
@@ -949,7 +949,7 @@ class DomainDataType(BaseDomainDataType):
                 terms.append(domain_text)
         return terms
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         domain_text = None
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -1003,7 +1003,7 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
-    def append_to_document(self, document, nodevalue, tile):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         domain_text_values = set([])
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
