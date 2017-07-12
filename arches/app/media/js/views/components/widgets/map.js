@@ -334,7 +334,7 @@ define([
                         if (this.queryFeature.properties.extent_search === true) {
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(this.queryFeature));
                             this.toggleExtentSearch()
-                            this.map.fitBounds(bounds, {padding: 100});
+                            this.map.fitBounds(bounds);
                         } else {
                             drawMode = geojsonToDrawMode[this.queryFeature.geometry.type]
                             this.draw.changeMode(drawMode.drawMode)
