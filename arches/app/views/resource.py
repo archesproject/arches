@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import uuid
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
@@ -143,10 +143,36 @@ class ResourceEditorView(BaseManagerView):
 
 @method_decorator(group_required('Resource Editor'), name='dispatch')
 class ResourceEditLogView(BaseManagerView):
+    def getEditConceptValue(self, values):
+        if values != None:
+            for k, v in values.iteritems():
+                try:
+                    uuid.UUID(v)
+                    v = models.Value.objects.get(pk=v).value
+                    values[k] = v
+                except Exception as e:
+                    print e
+                try:
+                    display_values = []
+                    for val in v:
+                        uuid.UUID(val)
+                        display_value = models.Value.objects.get(pk=val).value
+                        display_values.append(display_value)
+                    values[k] = display_values
+                except Exception as e:
+                    print e
+        print values
+
     def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
+            for edit in edits:
+                if edit.newvalue != None:
+                    self.getEditConceptValue(edit.newvalue)
+                if edit.oldvalue != None:
+                    self.getEditConceptValue(edit.oldvalue)
+
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             displayname = Resource.objects.get(pk=resourceid).displayname
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
