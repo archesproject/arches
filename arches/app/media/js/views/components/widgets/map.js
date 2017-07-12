@@ -633,7 +633,7 @@ define([
                                     };
                                 }
 
-                                if (self.value() && self.value()['features'].length > 0) {
+                                if (self.value() && self.value()['features'].length > 0 && self.extentSearch() === false) {
                                     var geojsonFC = self.buffer() ? turf.buffer(self.value(), self.buffer()/3.28084, 'meters') : self.value();
                                     var extent = geojsonExtent(geojsonFC);
                                     var bounds = new mapboxgl.LngLatBounds(extent);
@@ -1219,7 +1219,10 @@ define([
                         var boundsFeature = {
                             "type": "Feature",
                             "properties": {
-                                "buffer": 0,
+                                "buffer": {
+                                    "width": 0,
+                                    "unit": self.bufferUnit()
+                                },
                                 "extent_search": true
                             },
                             "geometry": {
