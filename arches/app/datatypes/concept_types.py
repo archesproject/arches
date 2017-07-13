@@ -52,7 +52,7 @@ class BaseConceptDataType(BaseDataType):
                 min_date = SortableDate(date_range['min_year']).as_float()
                 max_date = SortableDate(date_range['max_year']).as_float()
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
-                    document['date_ranges'].append({'gte': min_date, 'lte': max_date})
+                    document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
 
 

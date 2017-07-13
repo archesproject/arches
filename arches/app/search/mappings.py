@@ -148,6 +148,7 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'geometries' : {
+                        'type' : 'nested',
                         'properties': {
                             'geom': {
                                 'properties': {
@@ -168,6 +169,7 @@ def prepare_search_index(resource_model_id, create=False):
                         }
                     },
                     'points': {
+                        'type' : 'nested',
                         'properties' : {
                             'point' : {'type': 'geo_point'},
                             'nodegroup_id' : {'type': 'keyword'},
@@ -184,8 +186,12 @@ def prepare_search_index(resource_model_id, create=False):
                     'numbers' : {
                         "type" : "double"
                     },
-                    "date_ranges": {
-                        "type": "float_range"
+                    'date_ranges': {
+                        'type' : 'nested',
+                        'properties' : {
+                            'date_range' : {'type': 'float_range'},
+                            'nodegroup_id' : {'type': 'keyword'}
+                        }
                     }
                 }
             }
