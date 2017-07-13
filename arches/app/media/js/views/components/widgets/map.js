@@ -195,6 +195,7 @@ define([
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
                 } else if (val.features.length === 0 && self.context === 'search-filter') {
+                    self.searchBuffer(null);
                     self.updateSearchQueryLayer([]);
                 }
             };
@@ -660,6 +661,7 @@ define([
                                         padding: self.buffer()
                                     });
                                 } else {
+                                    console.log('fitting agg bounds')
                                     self.fitToAggregationBounds();
                                 }
                                 var features = [];

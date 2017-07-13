@@ -76,6 +76,7 @@ function(ko, BaseFilter, arches) {
         },
 
         clear: function(reset_features) {
+            console.log('clearing', reset_features)
             if (reset_features !== false){
                 if (this.filter.feature_collection().features.length > 0) {
                     this.filter.feature_collection({
