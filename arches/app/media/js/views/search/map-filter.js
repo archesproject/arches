@@ -9,6 +9,7 @@ function(ko, BaseFilter, arches) {
         initialize: function(options) {
             BaseFilter.prototype.initialize.call(this, options);
             this.aggregations = options.aggregations;
+            this.searchBuffer = options.searchBuffer;
             this.name = "Map Filter";
             this.resizeOnChange = ko.computed(function() {
                 return ko.unwrap(options.resizeOnChange);
@@ -75,6 +76,7 @@ function(ko, BaseFilter, arches) {
         },
 
         clear: function(reset_features) {
+            console.log('clearing', reset_features)
             if (reset_features !== false){
                 if (this.filter.feature_collection().features.length > 0) {
                     this.filter.feature_collection({
