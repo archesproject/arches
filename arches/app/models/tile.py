@@ -117,7 +117,11 @@ class Tile(models.TileModel):
             old_model = models.TileModel.objects.filter(pk=self.tileid)
             old_data = old_model[0].data if len(old_model) > 0 else None
             edit_type = 'tile create' if (old_data == None) else 'tile edit'
-            self.save_edit(user=request.user, edit_type=edit_type, old_value=old_data, new_value=self.data)
+            try:
+                user = request.user
+            except:
+                user = {}
+            self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)

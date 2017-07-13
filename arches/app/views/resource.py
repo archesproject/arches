@@ -167,11 +167,18 @@ class ResourceEditLogView(BaseManagerView):
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
+            permitted_edits = []
             for edit in edits:
-                if edit.newvalue != None:
-                    self.getEditConceptValue(edit.newvalue)
-                if edit.oldvalue != None:
-                    self.getEditConceptValue(edit.oldvalue)
+                if edit.nodegroupid != None:
+                    nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
+                    if request.user.has_perm('read_nodegroup', nodegroup):
+                        if edit.newvalue != None:
+                            self.getEditConceptValue(edit.newvalue)
+                        if edit.oldvalue != None:
+                            self.getEditConceptValue(edit.oldvalue)
+                        permitted_edits.append(edit)
+                else:
+                    permitted_edits.append(edit)
 
             graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             displayname = Resource.objects.get(pk=resourceid).displayname
@@ -184,7 +191,7 @@ class ResourceEditLogView(BaseManagerView):
                 cards=JSONSerializer().serialize(cards),
                 resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass,
-                edits=JSONSerializer().serialize(edits),
+                edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,
                 displayname=displayname,
             )
