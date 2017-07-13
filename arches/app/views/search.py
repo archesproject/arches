@@ -311,14 +311,15 @@ def build_search_results_dsl(request):
             if 'inverted' in feature_properties:
                 invert_spatial_search = feature_properties['inverted']
 
+            spatial_query = Bool()
             if invert_spatial_search == True:
-                search_query.must_not(geoshape)
+                spatial_query.must_not(geoshape)
             else:
-                search_query.filter(geoshape)
+                spatial_query.filter(geoshape)
 
             # get the nodegroup_ids that the user has permission to search
-            geojson_nodes = get_nodegroups_by_datatype_and_perm(request, 'geojson-feature-collection', 'read_nodegroup')
-            search_query.filter(Terms(field='geometries.nodegroup_id', terms=geojson_nodes))
+            spatial_query.filter(Terms(field='geometries.nodegroup_id', terms=permitted_nodegroups))
+            search_query.filter(Nested(path='geometries', query=spatial_query))
 
     if 'fromDate' in temporal_filter and 'toDate' in temporal_filter:
         now = str(datetime.utcnow())
