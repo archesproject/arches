@@ -124,6 +124,7 @@ class SearchTests(ArchesTestCase):
         response = cls.client.post(reverse('concept', kwargs={'conceptid':'00000000-0000-0000-0000-000000000001'}), post_data, content_type)
         response_json = json.loads(response.content)
         valueid = response_json['subconcepts'][0]['values'][0]['id']
+        cls.conceptid = response_json['subconcepts'][0]['id']
 
         # add resource instance with only a cultural period defined
         cls.cultural_period_resource = Resource(graph_id=cls.search_model_graphid)
@@ -305,7 +306,38 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, temporal_filter=temporal_filter, term_filter=term_filter)
         self.assertEqual(response_json['results']['hits']['total'], 0)
 
+    def test_term_search_1(self):
+        """
+        Search for resources that have the string "test" in them as a "string" search
 
+        """
+
+        term_filter = [{"type":"string","context":"","context_label":"","id":"test","text":"test","value":"test","inverted":False}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 2)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.name_resource.pk)])
+
+    def test_term_search_2(self):
+        """
+        Search for resources that have the string "test" in them as a "term" search
+
+        """
+
+        term_filter = [{"type":"term","context":"","context_label":"","id":"test","text":"test","value":"test","inverted":False}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 1)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.name_resource.pk)])
+
+    def test_concept_search_1(self):
+        """
+        Search for resources that have the concept "ANP TEST" in them as a "concept" search
+
+        """
+
+        term_filter = [{"type":"concept","context":"","context_label":"","id":"test","text":"test","value":self.conceptid,"inverted":False}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 2)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)])
     #
     # -- ADD TESTS THAT INCLUDE PERMISSIONS REQUIREMENTS -- #
     #
