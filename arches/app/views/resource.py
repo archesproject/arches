@@ -151,7 +151,7 @@ class ResourceEditLogView(BaseManagerView):
                     v = models.Value.objects.get(pk=v).value
                     values[k] = v
                 except Exception as e:
-                    print e
+                    pass
                 try:
                     display_values = []
                     for val in v:
@@ -160,8 +160,7 @@ class ResourceEditLogView(BaseManagerView):
                         display_values.append(display_value)
                     values[k] = display_values
                 except Exception as e:
-                    print e
-        print values
+                    pass
 
     def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
         if resourceid is not None:

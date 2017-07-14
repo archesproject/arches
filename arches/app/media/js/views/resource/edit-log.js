@@ -30,12 +30,21 @@ require([
                     }
                 }, this)
             }
-
             assignCards();
 
             var createFullValue = function(value, edit) {
                 var full_value = {}
+                function rounder(key, value) {
+                      if (typeof value === 'number') {
+                        return Math.round(value * 10000000) / 10000000;
+                      }
+                      return value;
+                    }
+
                 _.each(value, function(v, k){
+                    if (_.isObject(v) && v['features']) {
+                        v = _.map(v['features'], function(feature){return JSON.stringify(feature['geometry'], rounder, 4)})
+                    }
                     full_value[k] = {new_value: v}
                     if (edit.card) {
                         _.each(edit.card.nodes, function(node){
