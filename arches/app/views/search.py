@@ -265,18 +265,7 @@ def build_search_results_dsl(request):
     query.add_aggregation(nested_agg)
 
     search_query = Bool()
-    A = get_objects_for_user(request.user, [
-        'models.read_nodegroup',
-        'models.write_nodegroup',
-        'models.delete_nodegroup',
-        'models.no_access_to_nodegroup'
-        ], accept_global_perms=False, any_perm=True)
-    B = get_objects_for_user(request.user, 'models.read_nodegroup', accept_global_perms=False)
-    C = get_objects_for_user(request.user, 'models.read_nodegroup', accept_global_perms=True)
-    A = set([str(nodegroup.pk) for nodegroup in A])
-    B = set([str(nodegroup.pk) for nodegroup in B])
-    C = set([str(nodegroup.pk) for nodegroup in C])
-    permitted_nodegroups = list(C-A|B)
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
@@ -290,7 +279,7 @@ def build_search_results_dsl(request):
                     string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
 
                 string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
-                nested_string_filter = Nested(path='strings', query=string_filter, score_mode="max")
+                nested_string_filter = Nested(path='strings', query=string_filter)
                 if term['inverted']:
                     search_query.must_not(nested_string_filter)
                 else:
@@ -411,6 +400,20 @@ def build_search_results_dsl(request):
         search_buffer = search_buffer.geojson
     return {'query': query, 'search_buffer':search_buffer}
 
+def get_permitted_nodegroups(user):
+    A = get_objects_for_user(user, [
+        'models.read_nodegroup',
+        'models.write_nodegroup',
+        'models.delete_nodegroup',
+        'models.no_access_to_nodegroup'
+        ], accept_global_perms=False, any_perm=True)
+    B = get_objects_for_user(user, 'models.read_nodegroup', accept_global_perms=False)
+    C = get_objects_for_user(user, 'models.read_nodegroup', accept_global_perms=True)
+    A = set([str(nodegroup.pk) for nodegroup in A])
+    B = set([str(nodegroup.pk) for nodegroup in B])
+    C = set([str(nodegroup.pk) for nodegroup in C])
+    return list(C-A|B)
+
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
     for node in models.Node.objects.filter(datatype=datatype):
@@ -475,34 +478,42 @@ def export_results(request):
 def time_wheel_config(request):
     se = SearchEngineFactory().create()
     query = Query(se, limit=0)
-    query.add_aggregation(MinAgg(field='dates.date'))
-    query.add_aggregation(MaxAgg(field='dates.date'))
+    nested_agg = NestedAgg(path='dates', name='min_max_agg')
+    nested_agg.add_aggregation(MinAgg(field='dates.date'))
+    nested_agg.add_aggregation(MaxAgg(field='dates.date'))
+    query.add_aggregation(nested_agg)
     results = query.search(index='resource')
-    print results
-    print query.dsl
 
-    if results is not None and results['aggregations']['min_dates.date']['value'] is not None and results['aggregations']['max_dates.date']['value'] is not None:
-        min_date = int(results['aggregations']['min_dates.date']['value'])/10000
-        max_date = int(results['aggregations']['max_dates.date']['value'])/10000
+    if results is not None and results['aggregations']['min_max_agg']['min_dates.date']['value'] is not None and results['aggregations']['min_max_agg']['max_dates.date']['value'] is not None:
+        min_date = int(results['aggregations']['min_max_agg']['min_dates.date']['value'])/10000
+        max_date = int(results['aggregations']['min_max_agg']['max_dates.date']['value'])/10000
         # round min and max date to the nearest 1000 years
         min_date = math.ceil(math.fabs(min_date)/1000)*-1000 if min_date < 0 else math.floor(min_date/1000)*1000
         max_date = math.floor(math.fabs(max_date)/1000)*-1000 if max_date < 0 else math.ceil(max_date/1000)*1000
         query = Query(se, limit=0)
         range_lookup = {}
 
-        # apply permissions for nodegroups that contain date datatypes
-        date_nodes = get_nodegroups_by_datatype_and_perm(request, 'date', 'read_nodegroup')
-        date_perms_filter = Terms(field='dates.nodegroup_id', terms=date_nodes)
+        def gen_range_agg(gte=None, lte=None, permitted_nodegroups=None):
+            date_query = Bool()
+            date_query.filter(Range(field='dates.date', gte=gte, lte=lte, relation='intersects'))
+            if permitted_nodegroups:
+                date_query.filter(Terms(field='dates.nodegroup_id', terms=permitted_nodegroups))
+            date_ranges_query = Bool()
+            date_ranges_query.filter(Range(field='date_ranges.date_range', gte=gte, lte=lte, relation='intersects'))
+            if permitted_nodegroups:
+                date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
+            wrapper_query = Bool()
+            wrapper_query.should(Nested(path='date_ranges', query=date_ranges_query))
+            wrapper_query.should(Nested(path='dates', query=date_query))
+            return wrapper_query
 
         for millennium in range(int(min_date),int(max_date)+1000,1000):
             min_millenium = millennium
             max_millenium = millennium + 1000
             millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-            mill_boolquery = Bool()
-            mill_boolquery.filter(Range(field='dates.date', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float()))
-            mill_boolquery.filter(date_perms_filter)
-            mill_boolquery = Bool(should=mill_boolquery)
-            mill_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_millenium).as_float()-1, lte=SortableDate(max_millenium).as_float(), relation='intersects'))
+            mill_boolquery = gen_range_agg(gte=SortableDate(min_millenium).as_float()-1, 
+                lte=SortableDate(max_millenium).as_float(), 
+                permitted_nodegroups=get_permitted_nodegroups(request.user))
             millenium_agg = FiltersAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)
             range_lookup[millenium_name] = [min_millenium, max_millenium]
@@ -511,9 +522,7 @@ def time_wheel_config(request):
                 min_century = century
                 max_century = century + 100
                 century_name="Century (%s - %s)"%(min_century, max_century)
-                cent_boolquery = Bool()
-                cent_boolquery.should(Range(field='dates.date', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float()))
-                cent_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float(), relation='intersects'))
+                cent_boolquery = gen_range_agg(gte=SortableDate(min_century).as_float()-1, lte=SortableDate(max_century).as_float())
                 century_agg = FiltersAgg(name=century_name)
                 century_agg.add_filter(cent_boolquery)
                 millenium_agg.add_aggregation(century_agg)
@@ -523,17 +532,13 @@ def time_wheel_config(request):
                     min_decade = decade
                     max_decade = decade + 10
                     decade_name = "Decade (%s - %s)"%(min_decade, max_decade)
-
-                    dec_boolquery = Bool()
-                    dec_boolquery.should(Range(field='dates.date', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float()))
-                    dec_boolquery.should(Range(field='date_ranges', gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float(), relation='intersects'))
+                    dec_boolquery = gen_range_agg(gte=SortableDate(min_decade).as_float()-1, lte=SortableDate(max_decade).as_float())
                     decade_agg = FiltersAgg(name=decade_name)
                     decade_agg.add_filter(dec_boolquery)
                     century_agg.add_aggregation(decade_agg)
                     range_lookup[decade_name] = [min_decade, max_decade]
 
             query.add_aggregation(millenium_agg)
-
 
         root = d3Item(name='root')
         results = {'buckets':[query.search(index='resource')['aggregations']]}
