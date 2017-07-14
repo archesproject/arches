@@ -91,7 +91,11 @@ class Resource(models.ResourceInstance):
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
-        self.save_edit(user=request.user, edit_type='create')
+        if request == '':
+            user = {}
+        else:
+            user = request.user
+        self.save_edit(user=user, edit_type='create')
         self.index()
 
     @staticmethod
