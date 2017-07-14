@@ -51,6 +51,7 @@ except ImportError:
     from StringIO import StringIO
 
 class SearchView(BaseManagerView):
+
     def get(self, request):
         saved_searches = JSONSerializer().serialize(settings.SAVED_SEARCHES)
         map_layers = models.MapLayer.objects.all()
@@ -158,7 +159,9 @@ def search_terms(request):
     return JSONResponse(ret)
 
 def search_results(request):
-    dsl = build_search_results_dsl(request)
+    search_results_dsl = build_search_results_dsl(request)
+    dsl = search_results_dsl['query']
+    search_buffer = search_results_dsl['search_buffer']
     dsl.include('graph_id')
     dsl.include('resourceinstanceid')
     dsl.include('points')
@@ -192,7 +195,7 @@ def search_results(request):
 
         ret = {}
         ret['results'] = results
-
+        ret['search_buffer'] = JSONSerializer().serialize(search_buffer) if search_buffer != None else None
         ret['paginator'] = {}
         ret['paginator']['current_page'] = page.number
         ret['paginator']['has_next'] = page.has_next()
@@ -247,7 +250,7 @@ def build_search_results_dsl(request):
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', '{}'))
     advanced_filters = JSONDeserializer().deserialize(request.GET.get('advanced', '[]'))
-
+    search_buffer = None
     se = SearchEngineFactory().create()
 
     if export != None:
@@ -310,7 +313,8 @@ def build_search_results_dsl(request):
             buffer = {'width':0,'unit':'ft'}
             if 'buffer' in feature_properties:
                 buffer = feature_properties['buffer']
-            feature_geom = JSONDeserializer().deserialize(_buffer(feature_geom,buffer['width'],buffer['unit']).json)
+            search_buffer = _buffer(feature_geom, buffer['width'], buffer['unit'])
+            feature_geom = JSONDeserializer().deserialize(search_buffer.json)
             geoshape = GeoShape(field='geometries.geom.features.geometry', type=feature_geom['type'], coordinates=feature_geom['coordinates'] )
 
             invert_spatial_search = False
@@ -401,7 +405,9 @@ def build_search_results_dsl(request):
         search_query.must(advanced_query)
 
     query.add_query(search_query)
-    return query
+    if search_buffer != None:
+        search_buffer = search_buffer.geojson
+    return {'query': query, 'search_buffer':search_buffer}
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
@@ -445,7 +451,8 @@ def _get_child_concepts(conceptid):
     return list(ret)
 
 def export_results(request):
-    dsl = build_search_results_dsl(request)
+    search_results_dsl = build_search_results_dsl(request)
+    dsl = search_results_dsl['query']
     search_results = dsl.search(index='entity', doc_type='')
     response = None
     format = request.GET.get('export', 'csv')

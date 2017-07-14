@@ -29,7 +29,8 @@ define([
                         if (!childItem.filtered()){
                             item.filtered(false);
                         }
-                    })                }
+                    })
+                  }
             }, this);
         },
 
@@ -54,6 +55,9 @@ define([
                     item.filtered = ko.observable(false);
                 }
                 item.children.forEach(parseData, this);
+                item.children.sort(function (a, b) {
+                    return ko.unwrap(a.name).localeCompare(ko.unwrap(b.name));
+                });
             }
 
             parseData.call(this, options.cards);
@@ -96,9 +100,24 @@ define([
                 })
             }else{
                 if (parentItem){
-                   item.active(parentItem.selected()); 
+                   item.active(parentItem.selected());
                 }
             }
+        },
+
+        /**
+        * Unselect all items in the list
+        * @memberof ListView.prototype
+        */
+        clearSelection: function(){
+            this.items().forEach(function(item){
+                item.selected(false);
+                item.children.forEach(function(child) {
+                  if (child.type === 'Node') {
+                    child.active(false);
+                  }
+                })
+            }, this);
         },
 
         /**
