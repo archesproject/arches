@@ -2458,7 +2458,7 @@ ul .collapse li:last-of-type {
 
 .eh-timeline-panel {
     overflow-y: auto;
-    height: 100vh;
+    height: calc(100vh - 60px);
     background: #ebeef0;
 }
 
@@ -2486,6 +2486,14 @@ ul .collapse li:last-of-type {
 .eh-timeline {
 	margin-left: 20px;
 	padding-right: 25px;
+}
+
+.timeline:before {
+    left: 69px
+}
+
+.timeline:after {
+    left: 67px
 }
 
 .panel .timeline, .panel .timeline-time .eh-timeline-time {
