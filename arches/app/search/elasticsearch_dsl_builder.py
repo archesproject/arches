@@ -388,8 +388,8 @@ class Aggregation(Dsl):
 
         if self.field is not None and self.script is not None:
             raise Exception('You need to specify either a "field" or a "script"')
-        if self.field is None and self.script is None:
-            raise Exception('You need to specify either a "field" or a "script"')
+        # if self.field is None and self.script is None:
+        #     raise Exception('You need to specify either a "field" or a "script"')
         if self.name is None:
             raise Exception('You need to specify a name for your aggregation')
         if self.type is None:
@@ -572,3 +572,20 @@ class FiltersAgg(Aggregation):
     def add_filter(self, filter=None):
         if filter is not None:
             self.agg[self.name]['filters']['filters'].append(filter.dsl)
+
+
+class NestedAgg(Aggregation):
+    """
+    http://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-nested-aggregation.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.aggregation = kwargs.pop('agg', {})
+        self.path = kwargs.pop('path', None)
+        if self.path is None:
+            raise Exception('You need to specify a path for your nested aggregation')
+        super(NestedAgg, self).__init__(type='nested', path=self.path, **kwargs)
+
+        if self.name:
+            self.agg[self.name]['aggs'] = self.aggregation
