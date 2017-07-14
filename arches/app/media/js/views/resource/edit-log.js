@@ -58,13 +58,31 @@ require([
                     edit.full_old_value = createFullValue(edit.oldvalue, edit)
                 };
             })
-            console.log(edits)
+
+
+            this.viewModel.sortOrder = ko.observable('time_desc')
             this.viewModel.edits = ko.observableArray(edits);
             this.viewModel.edits.sort(function (left, right) { return left.timestamp == right.timestamp ? 0 : (left.timestamp > right.timestamp ? -1 : 1) })
             this.viewModel.currentDate = moment().format('MMMM D, YYYY');
             this.viewModel.graph = data.graph;
-            BaseManagerView.prototype.initialize.call(this, options);
 
+            this.viewModel.sortOrder.subscribe(function(val) {
+                var sortConditions = {
+                    'time_desc': {'property':'timestamp', 'direction': 'gt'},
+                    'time_asc': {'property':'timestamp', 'direction': 'lt'},
+                    'editor_asc': {'property':'user_email', 'direction': 'lt'},
+                    'type_desc': {'property':'edittype', 'direction': 'gt'}
+                }
+                var sortProperty = sortConditions[val].property
+                var sortDirection = sortConditions[val].direction
+                if (sortDirection == 'gt') {
+                    self.viewModel.edits.sort(function (left, right) { return left[sortProperty] == right[sortProperty] ? 0 : (left[sortProperty] > right[sortProperty] ? -1 : 1) })
+                } else {
+                    self.viewModel.edits.sort(function (left, right) { return left[sortProperty] == right[sortProperty] ? 0 : (left[sortProperty] < right[sortProperty] ? -1 : 1) })
+                }
+            })
+
+            BaseManagerView.prototype.initialize.call(this, options);
         }
     });
     return new ResourceEditLogView();

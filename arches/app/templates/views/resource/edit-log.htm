@@ -29,28 +29,16 @@
         <!-- Timeline header -->
         <div class="timeline-header eh-timeline-header">
             <div class="timeline-header-title bg-info">
-                Now
+                {% trans 'Now' %}
             </div>
             <span class="pull-right">
-                <select id="" class="resources" style="display: none;" data-placeholder="Find a Resource..." tabindex="-1">
-                    <option>Most recent</option>
-                    <option>Oldest</option>
-                    <option>By editor</option>
-                    <option>By edit type</option>
-                </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Most recent</span>
-            <div><b></b></div>
-            </a>
-            <div class="chosen-drop">
-                <div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div>
-                <ul class="chosen-results">
-                    <li class="active-result result-selected" data-option-array-index="0">Most recent</li>
-                    <li class="active-result" data-option-array-index="1">Oldest</li>
-                    <li class="active-result" data-option-array-index="2">By editor</li>
-                    <li class="active-result" data-option-array-index="3">By edit type</li>
-                </ul>
-            </div>
-        </div>
-        </span>
+                <select id="" style="width:135px" class="resources" tabindex="-1" data-bind="chosen: {disable_search: true}, value: sortOrder">
+                    <option value="time_desc">{% trans 'Most recent' %}</option>
+                    <option value="time_asc">{% trans 'Oldest' %}</option>
+                    <option value="editor_asc">{% trans 'By editor' %}</option>
+                    <option value="type_desc">{% trans 'By edit type' %}</option>
+                </select>
+            </span>
     </div>
 
 <div data-bind="foreach: edits">
