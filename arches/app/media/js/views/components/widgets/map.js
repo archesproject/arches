@@ -598,8 +598,8 @@ define([
                         self.fitToAggregationBounds = function(agg) {
                             var agg = self.searchAggregations();
                             var aggBounds;
-                            if (agg.bounds.bounds && self.map && !self.extentSearch()) {
-                                aggBounds = agg.bounds.bounds;
+                            if (agg.geo_aggs.bounds.bounds && self.map && !self.extentSearch()) {
+                                aggBounds = agg.geo_aggs.bounds.bounds;
                                 var bounds = [
                                     [
                                         aggBounds.top_left.lon,
@@ -646,7 +646,7 @@ define([
                             })
                             var getSearchAggregationGeoJSON = function() {
                                 var agg = ko.unwrap(self.searchAggregations);
-                                if (!agg || !agg.grid.buckets) {
+                                if (!agg || !agg.geo_aggs.grid.buckets) {
                                     return {
                                         "type": "FeatureCollection",
                                         "features": []
@@ -665,7 +665,7 @@ define([
                                     self.fitToAggregationBounds();
                                 }
                                 var features = [];
-                                _.each(agg.grid.buckets, function(cell) {
+                                _.each(agg.geo_aggs.grid.buckets, function(cell) {
                                     var pt = geohash.decode(cell.key);
                                     var feature = turf.point([pt.lon, pt.lat], {
                                         doc_count: cell.doc_count
