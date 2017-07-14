@@ -62,6 +62,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='editlog',
+            old_name='attributenodeid',
+            new_name='nodegroupid',
+        ),
+        migrations.AlterField(
+            model_name='editlog',
+            name='newvalue',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='newvalue', null=True),
+        ),
+        migrations.AlterField(
+            model_name='editlog',
+            name='oldvalue',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='oldvalue', null=True),
+        ),
         migrations.CreateModel(
             name='Geocoder',
             fields=[
