@@ -114,6 +114,7 @@ define(['jquery',
                         results: response.results.hits.hits
                     })
                 );
+                this.searchBuffer(response.search_buffer);
                 this.selectedResourceId(null);
 
                 response.results.hits.hits.forEach(function(result){

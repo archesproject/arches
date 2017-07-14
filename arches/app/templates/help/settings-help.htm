@@ -10,7 +10,7 @@
             <p>
                 <strong>Name</strong> - Used to identify this {%if graph.isresource%}Resource Model{%else%}Branch{%endif%} throughout the app interface. Default is {%if graph.isresource%}"New Resource Model"{%else%}"New Branch"{%endif%}.<br>
                 <strong>Subtitle</strong> - optional subtitle, displayed on the Arches Designer home page<br>
-                <strong>Ontology</strong> - Decide whether an ontology will be enforced in this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph. To learn more about what this means, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>. By default, you are allowed to choose between using the CIDOC CRM v6.2, or using no ontology. <em>Note that once a node has been added to this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph the <em>Ontology</em> setting becomes fixed.</em><br>
+                <strong>Ontology</strong> - Decide whether an ontology will be enforced in this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph. To learn more about what this means, read <a href="https://arches4.readthedocs.io/en/latest/ontologies-in-arches">Ontologies in Arches</a>. By default, you are allowed to choose between using the CIDOC CRM v6.2, or using no ontology. <em>Note that once a node has been added to this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph the <em>Ontology</em> setting becomes fixed.</em><br>
                 <strong>Root Class</strong> - This setting is only necessary if an <em>Ontology</em> has been chosen. Define the ontology class of the root node for this {%if graph.isresource%}Resource Model's{%else%}Branch's{%endif%} graph.
             </p>
         </div>
@@ -22,19 +22,6 @@
             <p><em>Arches uses the <a href="http://fontawesome.io/">Font Awesome</a> icon library; custom icons are not supported.</em></p>
         </div>
     </div>
-    {% if graph.isresource %}
-    <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Appearance</h4></a>
-        <div class="ep-help-topic-content">
-            <p>Define the appearance of Resources that are created using this Resource Model when they are displayed on a map. This setting may be modified after resources have been created using this model.</p>
-            <p>
-                <strong>Color</strong> - color of map symbol. You can use the color picker, enter an rgba value (red, green, blue, alpha), or enter a standard hex color code (#203731 or #FFB612, for example).<br>
-                <strong>Point Size</strong> - size of point marker, if point is shown on map<br>
-                <strong>Line Width</strong> - width of line, if line geometry is used on map<br>
-            </p>
-        </div>
-    </div>
-    {% endif %}
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Description</h4></a>
         <div class="ep-help-topic-content">

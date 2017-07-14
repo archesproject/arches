@@ -32,7 +32,7 @@ Dependencies
 * **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
 * **Mapnik** Version 2.2. Installation instructions: http://mapnik.org/pages/downloads.html. If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible. Please read `this note on our Wiki <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#mapnik>`_ about how this limitation affects Arches.
 * **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
-* **Elasticsearch** Please read `Installing Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ regarding Arches and Elasticsearch.
+* **Elasticsearch 5.2.1** Technically speaking, Elasticsearch is a dependency. However, Arches comes with an easy way to install it, which is described in `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_. We recommend waiting until the end of step 5 below to deal with Elasticsearch.
 
 These instructions will provide some guidance on installing the required dependencies and getting Arches up and running quickly.
 
@@ -43,7 +43,7 @@ These instructions will provide some guidance on installing the required depende
 Installing Arches
 ===================
 
-Once you have all of the dependencies installed, you can use ``pip`` to install Arches. It's best to do this in a virtual environment. Using a command prompt, follow these steps.
+Once you have all of the dependencies installed, open a command prompt and use the following steps to install the latest stable release of Arches. To install the latest non-stable Arches code (generally only necessary for developers), you can follow `these installation steps <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
 
 #. Create and enter a new directory called Projects::
 
@@ -87,7 +87,7 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
 
     .. note:: On Windows, with the current Arches beta release, v4.0b3, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
-    .. warning:: On Windows, you must specify the path to your GDAL library. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
+    .. warning:: On Windows, you must specify the path to your GDAL library before continuing. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
 
     At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ (unless you have done so already) before continuing.
 
@@ -106,8 +106,6 @@ Once you have all of the dependencies installed, you can use ``pip`` to install 
         python manage.py runserver
 
     You can now view Arches by navigating to ``localhost:8000`` in a browser.
-
-If you want to install Arches directly from the GitHub repo (instead of from the stable pip distribution), use the `developer installation documentation <https://github.com/archesproject/arches/wiki/Developer-Installation>`_ on the Arches repo wiki.
 
 More about Arches Projects
 ===========================
