@@ -179,24 +179,27 @@ class ResourceEditLogView(BaseManagerView):
                 else:
                     permitted_edits.append(edit)
 
-            graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             displayname = Resource.objects.get(pk=resourceid).displayname
-            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+            graph_name = resource_instance.graph.name
+
             if displayname == 'undefined':
                 displayname = _('Unnamed Resource')
+
             context = self.get_context_data(
                 main_script='views/resource/edit-log',
-                graph_json=JSONSerializer().serialize(graph),
                 cards=JSONSerializer().serialize(cards),
                 resource_type=resource_instance.graph.name,
+                resource_description=resource_instance.graph.description,
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,
                 displayname=displayname,
             )
-            if graph.iconclass:
-                context['nav']['icon'] = graph.iconclass
-            context['nav']['title'] = graph.name
+
+            context['nav']['res_edit'] = True
+            context['nav']['icon'] = resource_instance.graph.iconclass
+            context['nav']['title'] = resource_instance.graph.name
 
             return render(request, view_template, context)
 
