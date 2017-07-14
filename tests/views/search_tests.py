@@ -66,6 +66,7 @@ class SearchTests(ArchesTestCase):
         cls.search_model_destruction_date_nodeid = 'e771b8a1-65fe-11e7-9163-14109fd34195'
         cls.search_model_name_nodeid = '2fe14de3-fa61-11e6-897b-14109fd34195'
         cls.search_model_sensitive_info_nodeid = '57446fae-65ff-11e7-b63a-14109fd34195'
+        cls.search_model_geom_nodeid = '3ebc6785-fa61-11e6-8c85-14109fd34195'
 
         cls.user = User.objects.create_user('test', 'test@archesproject.org', 'test')
         cls.user.save()
@@ -153,6 +154,19 @@ class SearchTests(ArchesTestCase):
         # add resource instance with with no dates or periods defined
         cls.name_resource = Resource(graph_id=cls.search_model_graphid)
         tile = Tile(data={cls.search_model_name_nodeid: 'some test name'},nodegroup_id=cls.search_model_name_nodeid)
+        cls.name_resource.tiles.append(tile)
+        geom = {
+            "type": "FeatureCollection",
+            "features": [{
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [0, 0]
+                },
+                "type": "Feature",
+                "properties": {}
+            }]
+        }
+        tile = Tile(data={cls.search_model_geom_nodeid: geom},nodegroup_id=cls.search_model_geom_nodeid)
         cls.name_resource.tiles.append(tile)
         cls.name_resource.save()
 
@@ -319,6 +333,17 @@ class SearchTests(ArchesTestCase):
 
     def test_term_search_2(self):
         """
+        Search for resources that DON'T have the string "test" in them as a "string" search
+
+        """
+
+        term_filter = [{"type":"string","context":"","context_label":"","id":"test","text":"test","value":"test","inverted":True}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 2)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)])
+
+    def test_term_search_3(self):
+        """
         Search for resources that have the string "test" in them as a "term" search
 
         """
@@ -327,6 +352,17 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json['results']['hits']['total'], 1)
         self.assertItemsEqual(extract_pks(response_json), [str(self.name_resource.pk)])
+
+    def test_term_search_4(self):
+        """
+        Search for resources that DON'T have the string "test" in them as a "term" search
+
+        """
+
+        term_filter = [{"type":"term","context":"","context_label":"","id":"test","text":"test","value":"test","inverted":True}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 3)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)])
 
     def test_concept_search_1(self):
         """
@@ -338,13 +374,88 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json['results']['hits']['total'], 2)
         self.assertItemsEqual(extract_pks(response_json), [str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)])
+
+    def test_concept_search_2(self):
+        """
+        Search for resources that DON'T have the concept "ANP TEST" in them as a "concept" search
+
+        """
+
+        term_filter = [{"type":"concept","context":"","context_label":"","id":"test","text":"test","value":self.conceptid,"inverted":True}]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 2)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.name_resource.pk), str(self.date_resource.pk)])
+
+    def test_spatial_search_1(self):
+        """
+        Search for resources that fall within a polygon
+
+        """
+
+        spatial_filter ={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "ec1a2079cc12822bc71a6e6643c2f2b4",
+                    "type": "Feature",
+                    "properties": {
+                        "inverted": False,
+                        "buffer": {
+                            "width": "100",
+                            "unit": "ft"
+                        }
+                    },
+                    "geometry": {
+                        "coordinates": [
+                            [[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]
+                        ],
+                        "type": "Polygon"
+                    }
+                }
+            ]
+        }
+        response_json = get_response_json(self.client, spatial_filter=spatial_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 1)
+        self.assertItemsEqual(extract_pks(response_json), [str(self.name_resource.pk)])
+
+    def test_spatial_search_1(self):
+        """
+        Search for resources that DON'T fall within a polygon
+
+        """
+
+        spatial_filter ={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "ec1a2079cc12822bc71a6e6643c2f2b4",
+                    "type": "Feature",
+                    "properties": {
+                        "inverted": True,
+                        "buffer": {
+                            "width": "100",
+                            "unit": "ft"
+                        }
+                    },
+                    "geometry": {
+                        "coordinates": [
+                            [[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]
+                        ],
+                        "type": "Polygon"
+                    }
+                }
+            ]
+        }
+        response_json = get_response_json(self.client, spatial_filter=spatial_filter)
+        self.assertEqual(response_json['results']['hits']['total'], 0)
+        #self.assertItemsEqual(extract_pks(response_json), [str(self.name_resource.pk)])
+
     #
     # -- ADD TESTS THAT INCLUDE PERMISSIONS REQUIREMENTS -- #
     #
     def test_temporal_and_permission_search_1(self):
         """
         Search for resources that fall between 1945 and 1960 with user permissions
-        I'm not allowed to use the "search_model_destruction_date_nodeid" to search on, but yet...
 
         """
 
@@ -368,12 +479,14 @@ class SearchTests(ArchesTestCase):
 def extract_pks(response_json):
     return [result['_source']['resourceinstanceid'] for result in response_json['results']['hits']['hits']]
 
-def get_response_json(client, temporal_filter=None, term_filter=None):
+def get_response_json(client, temporal_filter=None, term_filter=None, spatial_filter=None):
     query = {}
     if temporal_filter is not None:
         query['temporalFilter'] = JSONSerializer().serialize(temporal_filter)
     if term_filter is not None:
         query['termFilter'] = JSONSerializer().serialize(term_filter)
+    if spatial_filter is not None:
+        query['mapFilter'] = JSONSerializer().serialize(spatial_filter)
 
     client.login(username='test', password='test')
     response = client.get('/search/resources', query)
