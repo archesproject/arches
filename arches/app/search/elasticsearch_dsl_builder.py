@@ -47,15 +47,21 @@ class Query(Dsl):
 
     def __init__(self, se, **kwargs):
         self.se = se
-        self.fields = kwargs.pop('fields', None)
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
 
         self.dsl = {
             'query': {
                 "match_all": { }
+            },
+            '_source': {
+                'includes': [],
+                'excludes': []
             }
         }
+
+        for key, value in kwargs.iteritems():
+            self.dsl[key]  = value
 
     def add_query(self, dsl=None):
         if dsl is not None:
@@ -74,23 +80,15 @@ class Query(Dsl):
             self.dsl['aggs'][agg.name] = agg.agg[agg.name]
 
     def include(self, include):
-        if '_source' not in self.dsl:
-            self.dsl['_source'] = {
-                'includes': [],
-                'excludes': []
-            }
         self.dsl['_source']['includes'].append(include)
 
     def exclude(self, exclude):
-        if '_source' not in self.dsl:
-            self.dsl['_source'] = {
-                'includes': [],
-                'excludes': []
-            }
         self.dsl['_source']['excludes'].append(exclude)
 
+    def min_score(self, min_score):
+        self.dsl['min_score'] = min_score
+
     def search(self, index='', doc_type='', **kwargs):
-        self.fields = kwargs.pop('fields', self.fields)
         self.start = kwargs.pop('start', self.start)
         self.limit = kwargs.pop('limit', self.limit)
 
@@ -104,9 +102,6 @@ class Query(Dsl):
     def prepare(self):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
-
-        if self.fields != None:
-            self.dsl['fields'] = self.fields
 
 
 class Bool(Dsl):
