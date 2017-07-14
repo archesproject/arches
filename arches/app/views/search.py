@@ -275,27 +275,33 @@ def build_search_results_dsl(request):
 
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
-            if term['type'] == 'term':
-                term_filter = Match(field='strings', query=term['value'], type='phrase')
+            term_query = Bool()
+            if term['type'] == 'term' or term['type'] == 'string':
+                string_filter = Bool()
+                if term['type'] == 'term':
+                    string_filter.must(Match(field='strings.string', query=term['value'], type='phrase'))
+                elif term['type'] == 'string':
+                    string_filter.should(Match(field='strings.string', query=term['value'], type='phrase_prefix'))
+                    string_filter.should(Match(field='strings.string.folded', query=term['value'], type='phrase_prefix'))
+
+                string_filter.filter(Terms(field='strings.nodegroup_id', terms=permitted_nodegroups))
+                nested_string_filter = Nested(path='strings', query=string_filter, score_mode="max")
                 if term['inverted']:
-                    search_query.must_not(term_filter)
+                    search_query.must_not(nested_string_filter)
                 else:
-                    search_query.must(term_filter)
+                    search_query.must(nested_string_filter)
+                    # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing                
+                    query.min_score('0.01') 
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
-                conceptid_filter = Terms(field='domains.conceptid', terms=concept_ids)
+                conceptid_filter = Bool()
+                conceptid_filter.filter(Terms(field='domains.conceptid', terms=concept_ids))
+                conceptid_filter.filter(Terms(field='domains.nodegroup_id', terms=permitted_nodegroups))
+                nested_conceptid_filter = Nested(path='domains', query=conceptid_filter)
                 if term['inverted']:
-                    search_query.must_not(conceptid_filter)
+                    search_query.must_not(nested_conceptid_filter)
                 else:
-                    search_query.must(conceptid_filter)
-            elif term['type'] == 'string':
-                string_filter = Bool()
-                string_filter.should(Match(field='strings', query=term['value'], type='phrase_prefix'))
-                string_filter.should(Match(field='strings.folded', query=term['value'], type='phrase_prefix'))
-                if term['inverted']:
-                    search_query.must_not(string_filter)
-                else:
-                    search_query.must(string_filter)
+                    search_query.filter(nested_conceptid_filter)
 
     if 'features' in spatial_filter:
         if len(spatial_filter['features']) > 0:
@@ -369,7 +375,7 @@ def build_search_results_dsl(request):
             temporal_query.should(Nested(path='dates', query=date_query))
 
 
-        search_query.must(temporal_query)
+        search_query.filter(temporal_query)
         #print search_query.dsl
 
     datatype_factory = DataTypeFactory()
@@ -463,6 +469,8 @@ def time_wheel_config(request):
     query.add_aggregation(MinAgg(field='dates.date'))
     query.add_aggregation(MaxAgg(field='dates.date'))
     results = query.search(index='resource')
+    print results
+    print query.dsl
 
     if results is not None and results['aggregations']['min_dates.date']['value'] is not None and results['aggregations']['max_dates.date']['value'] is not None:
         min_date = int(results['aggregations']['min_dates.date']['value'])/10000

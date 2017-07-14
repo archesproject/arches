@@ -56,7 +56,7 @@ class StringDataType(BaseDataType):
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['strings'].append(nodevalue)
+        document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
@@ -98,7 +98,7 @@ class NumberDataType(BaseDataType):
         return float(value)
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['numbers'].append(nodevalue)
+        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -905,12 +905,12 @@ class IIIFDrawingDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
-            document['strings'].append(string_item)
+            document['strings'].append({'string': string_item, 'nodegroup_id': tile.nodegroup_id})
         for feature in nodevalue['features']:
             if feature['properties']['type'] is not None:
                 valueid = feature['properties']['type']
                 value = models.Value.objects.get(pk=valueid)
-                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
+                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -958,7 +958,7 @@ class DomainDataType(BaseDomainDataType):
                     domain_text = self.get_option_text(node, v)
 
         if domain_text not in document['strings'] and domain_text != None:
-            document['strings'].append(domain_text)
+            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id})
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
@@ -1015,7 +1015,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for value in domain_text_values:
             if value not in document['strings']:
-                document['strings'].append(value)
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
 
     def get_display_value(self, tile, node):
         new_values = []
