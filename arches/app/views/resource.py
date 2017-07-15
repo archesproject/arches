@@ -179,7 +179,9 @@ class ResourceEditLogView(BaseManagerView):
                 else:
                     permitted_edits.append(edit)
 
-            displayname = Resource.objects.get(pk=resourceid).displayname
+            resource = Resource.objects.get(pk=resourceid)
+            displayname = resource.displayname
+            displaydescription = resource.displaydescription
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
 
@@ -190,7 +192,7 @@ class ResourceEditLogView(BaseManagerView):
                 main_script='views/resource/edit-log',
                 cards=JSONSerializer().serialize(cards),
                 resource_type=resource_instance.graph.name,
-                resource_description=resource_instance.graph.description,
+                resource_description=displaydescription,
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,

@@ -2488,6 +2488,19 @@ ul .collapse li:last-of-type {
 	padding-right: 25px;
 }
 
+.eh_resource_descriptors {
+    display: flex;
+    flex-direction: column;
+    margin-top: -6px;
+}
+
+.eh_description {
+    font-size: 11px;
+    color: #999;
+    padding-left: 45px;
+    margin-top: -15px;
+}
+
 .timeline:before {
     left: 69px
 }
