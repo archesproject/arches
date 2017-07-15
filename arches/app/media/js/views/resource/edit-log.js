@@ -68,12 +68,12 @@ require([
                 };
             })
 
-
+            this.viewModel.displayname = data.displayname;
+            this.viewModel.description = data.description;
             this.viewModel.sortOrder = ko.observable('time_desc')
             this.viewModel.edits = ko.observableArray(edits);
             this.viewModel.edits.sort(function (left, right) { return left.timestamp == right.timestamp ? 0 : (left.timestamp > right.timestamp ? -1 : 1) })
             this.viewModel.currentDate = moment().format('MMMM D, YYYY');
-            this.viewModel.graph = data.graph;
 
             this.viewModel.sortOrder.subscribe(function(val) {
                 var sortConditions = {

@@ -13,7 +13,10 @@
 
     <!-- Title Block -->
     <div class="report-toolbar-preview ep-form-toolbar">
-        <h4 class="report-toolbar-title" data-bind="text: 'Edit History'"></h4>
+        <div class="eh_resource_descriptors">
+            <h4 class="report-toolbar-title" data-bind="text: displayname"></h4>
+            <span class="eh_description" data-bind="text: description"></span>
+        </div>
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
@@ -155,11 +158,11 @@ define('resource-edit-history-data', [], function () {
     return {
         edits: {{edits}},
         cards: {{cards}},
-        graph: {{graph_json}},
         resource_type: '{{resource_type}}',
         iconclass: '{{iconclass}}',
         resourceid: '{{resourceid}}',
-        displayname: '{{displayname}}'
+        displayname: '{{displayname}}',
+        description: '{{resource_description}}'
     };
 });
 {% endautoescape %}</script>
