@@ -316,6 +316,14 @@ class GraphModel(models.Model):
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
 
+    @property
+    def has_instances(self):
+        result = False;
+        if self.isresource:
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
+            result = True if len(resource_instances) > 0 else False
+        return result
+
     class Meta:
         managed = True
         db_table = 'graphs'

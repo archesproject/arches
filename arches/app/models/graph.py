@@ -213,6 +213,7 @@ class Graph(models.GraphModel):
         edge -- a dictionary representing a Edge instance or an actual models.Edge instance
 
         """
+
         if not isinstance(edge, models.Edge):
             egdeobj = edge.copy()
             edge = models.Edge()
@@ -238,7 +239,6 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Card instance or an actual models.CardModel instance
 
         """
-
         if not isinstance(card, models.CardModel):
             cardobj = card.copy()
             card = models.CardModel()
@@ -303,7 +303,6 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
@@ -334,26 +333,27 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
-        with transaction.atomic():
-            for nodegroup in self.get_nodegroups():
-                nodegroup.delete()
+        if self.has_instances == False:
+            with transaction.atomic():
+                for nodegroup in self.get_nodegroups():
+                    nodegroup.delete()
 
-            for edge in self.edges.itervalues():
-                edge.delete()
+                for edge in self.edges.itervalues():
+                    edge.delete()
 
-            for node in self.nodes.itervalues():
-                node.delete()
+                for node in self.nodes.itervalues():
+                    node.delete()
 
-            for card in self.cards.itervalues():
-                card.delete()
+                for card in self.cards.itervalues():
+                    card.delete()
 
-            for widget in self.widgets.itervalues():
-                widget.delete()
+                for widget in self.widgets.itervalues():
+                    widget.delete()
 
-            # if self.isresource:
-            #     delete_search_index(self.graphid)
+                # if self.isresource:
+                #     delete_search_index(self.graphid)
 
-            super(Graph, self).delete()
+                super(Graph, self).delete()
 
     def get_tree(self, root=None):
         """
@@ -1119,6 +1119,11 @@ class Graph(models.GraphModel):
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
 
         """
+
+        # validates that the resource graph has no instances saved
+        if self.isresource == True:
+            if self.has_instances == True:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
 
         # validates that the top node of a resource graph is semantic and a collector
 
