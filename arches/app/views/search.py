@@ -91,7 +91,7 @@ class SearchView(BaseManagerView):
         context['nav']['title'] = 'Search'
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
-        context['nav']['help'] = ('Searching the Arches Database','')
+        context['nav']['help'] = ('Searching the Database','help/search-help.htm')
 
         return render(request, 'views/search.htm', context)
 
