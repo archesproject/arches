@@ -292,6 +292,25 @@ class Graph(models.GraphModel):
 
         return function
 
+    def compare(self, obj):
+        excluded_keys = 'created', '_state', 'timestamp', 'user', 'uid', 'changed' #Example. Modify to your likings.
+        return self._compare(self, obj, excluded_keys)
+
+    def _compare(self, obj1, obj2, excluded_keys):
+        d1, d2 = obj1.__dict__, obj2.__dict__
+        old, new = {}, {}
+        for k,v in d1.items():
+            if k in excluded_keys:
+                continue
+            try:
+                if v != d2[k]:
+                    old.update({k: v})
+                    new.update({k: d2[k]})
+            except KeyError:
+                old.update({k: v})
+
+        return old, new
+
     def save(self):
         """
         Saves an a graph and it's nodes, edges, and nodegroups back to the db
@@ -694,6 +713,8 @@ class Graph(models.GraphModel):
 
         """
 
+        self.resource_instance_check()
+
         if node is not None:
             if not isinstance(node, models.Node):
                 node = self.nodes[uuid.UUID(str(node))]
@@ -1095,6 +1116,7 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+        ret['has_instances'] = self.has_instances
         ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
 
         parentproperties = {
@@ -1109,6 +1131,11 @@ class Graph(models.GraphModel):
 
         return JSONSerializer().serializeToPython(ret)
 
+    def resource_instance_check(self):
+        if self.isresource == True:
+            if self.has_instances == True:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+
     def validate(self):
         """
         validates certain aspects of resource graphs according to defined rules:
@@ -1121,9 +1148,7 @@ class Graph(models.GraphModel):
         """
 
         # validates that the resource graph has no instances saved
-        if self.isresource == True:
-            if self.has_instances == True:
-                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+        self.resource_instance_check()
 
         # validates that the top node of a resource graph is semantic and a collector
 

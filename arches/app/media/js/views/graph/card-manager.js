@@ -51,6 +51,8 @@ require([
         items: viewModel.availableGraphs
     });
 
+    viewModel.cardsImmutable = viewModel.graphModel.get('has_instances')
+
     var alertFailure = function () {
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
@@ -69,17 +71,19 @@ require([
     };
 
     viewModel.deleteCard = function (card) {
-        var self = this
-        var node = _.find(this.graphModel.get('nodes')(), function(node) {
-            return node.nodeid === card.nodegroup_id;
-        });
-        if (node) {
-            this.loading(true);
-            this.graphModel.deleteNode(node, function(response, status){
-                var success = (status === 'success');
-                self.loading(false);
-                if (!success) alertFailure();
+        if (this.has_resources === false) {
+            var self = this
+            var node = _.find(this.graphModel.get('nodes')(), function(node) {
+                return node.nodeid === card.nodegroup_id;
             });
+            if (node) {
+                this.loading(true);
+                this.graphModel.deleteNode(node, function(response, status){
+                    var success = (status === 'success');
+                    self.loading(false);
+                    if (!success) alertFailure();
+                });
+            }
         }
     };
 

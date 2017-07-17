@@ -131,6 +131,9 @@
     color: #5f5f5f;
     border-width: 0;
 }
+.card-grid-item .panel-footer .disabled {
+    color: #ccc;
+}
 
 .branch-item {
     margin-bottom: 10px;
@@ -4734,6 +4737,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-card-indent {
     width: 100%;
     transition: all .30s ease;
+}
+
+.new-card.disabled {
+    background-color: #ccc;
 }
 
 .card-library {
