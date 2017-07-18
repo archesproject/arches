@@ -21,7 +21,7 @@
                 {% trans "Relation to Resource" %}
             </div>
             <div>
-                <select class="resources" data-bind="disable: $root.cardsImmutable, value: card().get('ontologyproperty'), options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: card().get('ontologyproperty'), options: $root.ontology_properties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
         <!-- /ko -->
