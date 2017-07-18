@@ -23,7 +23,7 @@ require([
         }),
         showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
-            if (this.cardsImmutable === false) {
+            if (this.cardsEditable === true) {
                 showCardLibrary(!showCardLibrary());
             };
         },
@@ -53,7 +53,7 @@ require([
         items: viewModel.availableGraphs
     });
 
-    viewModel.cardsImmutable = viewModel.graphModel.get('has_instances')
+    viewModel.cardsEditable = viewModel.graphModel.get('is_editable')
 
     var alertFailure = function () {
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
@@ -73,7 +73,7 @@ require([
     };
 
     viewModel.deleteCard = function (card) {
-        if (this.cardsImmutable === false) {
+        if (this.cardsEditable === true) {
             var self = this
             var node = _.find(this.graphModel.get('nodes')(), function(node) {
                 return node.nodeid === card.nodegroup_id;

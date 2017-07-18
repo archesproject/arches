@@ -317,11 +317,13 @@ class GraphModel(models.Model):
         return _('To make this resource editable: ') + ', '.join(msg)
 
     @property
-    def has_instances(self):
-        result = False;
+    def is_editable(self):
+        result = True
         if self.isresource:
             resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
-            result = True if len(resource_instances) > 0 else False
+            result = False if len(resource_instances) > 0 else True
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            result = True
         return result
 
     class Meta:

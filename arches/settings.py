@@ -335,6 +335,8 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+OVERRIDE_RESOURCE_MODEL_LOCK = False
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
