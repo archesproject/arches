@@ -569,37 +569,50 @@ class FunctionManagerView(GraphBaseView):
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
+        self.graph = Graph.objects.get(graphid=graphid)
+        try:
+            if self.graph.has_instances == False:
+                with transaction.atomic():
+                    for item in data:
+                        functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                            pk=item['id'],
+                            defaults = {
+                                'function_id': item['function_id'],
+                                'graph_id': graphid,
+                                'config': item['config']
+                            }
+                        )
+                        item['id'] = functionXgraph.pk
 
-        with transaction.atomic():
-            for item in data:
-                functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
-                    pk=item['id'],
-                    defaults = {
-                        'function_id': item['function_id'],
-                        'graph_id': graphid,
-                        'config': item['config']
-                    }
-                )
-                item['id'] = functionXgraph.pk
+                        # run post function save hook
+                        func = functionXgraph.function.get_class_module()()
+                        try:
+                            func.after_function_save(functionXgraph, request)
+                        except NotImplementedError:
+                            pass
+            else:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify functions of a Resource Model with instances.".format(self.graph.name)), 1006)
 
-                # run post function save hook
-                func = functionXgraph.function.get_class_module()()
-                try:
-                    func.after_function_save(functionXgraph, request)
-                except NotImplementedError:
-                    pass
+            return JSONResponse(data)
 
-        return JSONResponse(data)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
+        self.graph = Graph.objects.get(graphid=graphid)
+        try:
+            if self.graph.has_instances == False:
+                with transaction.atomic():
+                    for item in data:
+                        functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
+                        functionXgraph.delete()
+            else:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify functions of a Resource Model with instances.".format(self.graph.name)), 1006)
 
-        with transaction.atomic():
-            for item in data:
-                functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
-                functionXgraph.delete()
-
-        return JSONResponse(data)
+            return JSONResponse(data)
+        except GraphValidationError as e:
+            return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
