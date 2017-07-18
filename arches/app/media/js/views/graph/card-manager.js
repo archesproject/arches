@@ -23,7 +23,9 @@ require([
         }),
         showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
-            showCardLibrary(!showCardLibrary());
+            if (this.cardsImmutable === false) {
+                showCardLibrary(!showCardLibrary());
+            };
         },
         selectedCardId: ko.observable(null)
     };
@@ -71,7 +73,7 @@ require([
     };
 
     viewModel.deleteCard = function (card) {
-        if (this.has_resources === false) {
+        if (this.cardsImmutable === false) {
             var self = this
             var node = _.find(this.graphModel.get('nodes')(), function(node) {
                 return node.nodeid === card.nodegroup_id;

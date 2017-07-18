@@ -42,6 +42,7 @@ require([
         },
         selectedCardId: ko.observable(data.card.cardid)
     };
+    viewModel.cardsImmutable = viewModel.graphModel.get('has_instances')
     viewModel.dirty = viewModel.card.dirty;
     viewModel.selection = ko.observable(viewModel.card);
     var graphCards = viewModel.graphModel.graphCards();
