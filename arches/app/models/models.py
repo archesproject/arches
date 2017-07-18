@@ -322,8 +322,8 @@ class GraphModel(models.Model):
         if self.isresource:
             resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
             result = False if len(resource_instances) > 0 else True
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-            result = True
+            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+                result = True
         return result
 
     class Meta:
