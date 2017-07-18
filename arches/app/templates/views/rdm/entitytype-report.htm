@@ -13,7 +13,7 @@
         <span class="arches-search-filter-font text-muted" style="">
             ({{concept.nodetype}})
         </span>
-    
+
     </div>
     <!-- End Concept Preferred Label -->
 
@@ -40,7 +40,7 @@
                             <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                             {% endwith %}
                             <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Expand this entry" %}" data-action="viewddconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>
-                           
+
                         </dd>
                     {% if forloop.last %}{% with ''|center:forloop.counter as range %}
                         {% if show_children%}
@@ -82,7 +82,7 @@
                     {% if labels|length > 1 %}
                         <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                     {% endif %}
-                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
+                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title='{% trans "Edit this label" %}' data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a>
                     <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                 </dd>
             {% endfor %}
@@ -106,7 +106,7 @@
                 {% if value.category == 'note' %}
                 <dd class="arches-RDM-label">
                     <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this note?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
-                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a> 
+                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title='{% trans "Edit this note" %}' data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                     <span class="text-muted"> ({{value.language}})</span>
                 </dd>
 
@@ -153,10 +153,10 @@
         <dl>
             <dt>
                 <h5 id="arches-names-form" class="section-headline">
-                    {% trans "Identifiers" %}  
+                    {% trans "Identifiers" %}
                 </h5>
             </dt>
-            
+
             <dd class="arches-RDM-note">
                 {% trans "Arches ID:" %} {{concept.id}} </br>
                 <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->

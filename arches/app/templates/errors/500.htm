@@ -1,3 +1,4 @@
+{% load i18n %}
 <div>
 	<!--===================================================-->
 	<div class="cls-header">
@@ -8,17 +9,17 @@
 	        </a>
 	    </div>
 	</div>
-	
+
 	<!-- CONTENT -->
 	<!--===================================================-->
 	<div class="cls-content">
 	    <h1 class="error-code text-primary">Oops!</h1>
 	    <p class="h3 text-uppercase">Internal Server Error!</p>
 	    <div class="pad-btm">
-	        Something went wrong and we couldn't process your request.
+	        {% trans "Something went wrong and we couldn't process your request." %}"
 	    </div>
 
 	    <hr class="new-section-sm bord-no">
-	    <div class="pad-top"><a class="btn-link text-semibol" href="index.html">Back to Homepage</a></div>
+	    <div class="pad-top"><a class="btn-link text-semibol" href="index.html">{% trans "Back to Homepage" %}</a></div>
 	</div>
 </div>

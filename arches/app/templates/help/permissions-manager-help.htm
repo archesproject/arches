@@ -3,6 +3,7 @@
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
+      {% blocktrans %}
         <p>Arches allows you to define user and user group permissions on a per-nodegroup basis. For example, you may want to hide the coordinates of a Resource from the public, or allow a certain group of users to only update the condition assessment section of a Resource Model. Rules like these are all enforced using permissions.</p>
         <h4>Permission Levels</h4>
         <p>
@@ -12,8 +13,10 @@
         </p>
         <h4>Non-Authenticated Users</h4>
         <p>You may notice that by default Arches comes with a "Guest" group, as well as user named "anonymous" who is a member of that group. <em>Any non-authenticated user is treated as the "anonymous" user.</em> This means that all permissions applied to the Guest group will be given to anyone who views the website without logging in.</p>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Permissions Manager Interface</h4></a>
+        {% endblocktrans %}
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Permissions Manager Interface" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>The interface is split into three sections, as shown in the image below.</p>
             <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
@@ -23,32 +26,37 @@
                 <strong>2 - Cards and Card Containers</strong> This panel lists all the node groups in this Resource Model organized by Cards and Card Containers. Clicking on a Card or Card Container will select all of its constituent nodes. Note that a symbolic representation is shown when a node is selected.<br>
                 <strong>3 - Permissions</strong> This panel summarizes all permissions that selected group or user account has for the selected node groups. Permissions are changed in the bottom portion of the panel (read "Modifying Permissions" below for more).
             </p>
+          {% endblocktrans %}
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Modifying Permissions</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Modifying Permissions" %}</h4></a>
         <div class="ep-help-topic-content">
             <p>
+              {% blocktrans %}
                 <strong>1 - Select a Group or User</strong> Begin by selecting the group or user account whose permissions you wish to modify. Note that symbols are added to the listed Card and Card Containers showing the existing permissions for that group.<br>
                 <strong>2 - Select one or more Cards or Card Containers</strong> In the middle panel, find the Card or Card Container that represents the node group you would like to modify. You will see a summary of all the nodes and permissions appear in the right-hand panel.<br>
                 <strong>3 - Use the checkboxes to define the changes you want to make</strong> These changes will be applied to <em>all</em> of the currently selected nodes.<br>
                 <strong>4 - Apply Permissions</strong>
+              {% endblocktrans %}
             </p>
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Example - Hiding Location Information</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Hiding Location Information" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Below, the "Guest" group (please read the Non-Authenticated Users section above) has "read" permissions revoked for the Location card. This means that the general public would not be able to view any location information for resources made with this resource model.</p>
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+          {% endblocktrans %}
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example1.gif"></img></p>
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Example - Allowing Crowdsourced Keywords</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Allowing Crowdsourced Keywords" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {% trans nav.title %} resources, but only the Keyword card will be visible to them.</p>
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p>{% trans 'Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {% nav.title %} resources, but only the Keyword card will be visible to them.' %}</p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img></p>
         </div>
     </div>

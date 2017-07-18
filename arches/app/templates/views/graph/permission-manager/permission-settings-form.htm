@@ -47,7 +47,7 @@
                                     </ul>
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedCards, visible: selectedCards().length !== 0">
                                         <li class="permissions-node-row">
-                                            <i class="confirmation ion-ios-checkmark"></i> 
+                                            <i class="confirmation ion-ios-checkmark"></i>
                                             <span class="permissions-node" data-bind="text: $data.name"></span>
                                             <span class="permissions-readout" data-bind="text: $data.permsLiteral()"></span>
                                         </li>
@@ -55,16 +55,16 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Permissions Selector -->
                         <div id="" class="permission-selector" style="">
-                            <div class="row widget-container" style="">    
+                            <div class="row widget-container" style="">
                                 <div class="col-xs-12">
                                     <div class="form-group">
                                         <div class="relative">
                                             <label class="col-xs-12 control-label widget-input-label" for=""> {% trans "Select the permissions you wish to grant to the selected  Groups/Accounts and nodes" %}</label>
                                         </div>
-                                        
+
                                         <div class="col-xs-12">
                                             <div class="pad-hor columns" data-bind="foreach: nodegroupPermissions">
                                                 <label class="form-checkbox form-normal form-primary form-text"
@@ -84,13 +84,13 @@
 
                         <!-- Buttons -->
                         <div class="permission-buttons pull-right mar-btm">
-                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Revert Permissions
+                            <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
                             </button>
-                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"> Apply Permissions</button>
+                            <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
                         </div>
-                    </div>     
+                    </div>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
-</div>  
+</div>
