@@ -168,7 +168,7 @@ class ResourceEditLogView(BaseManagerView):
                 main_script='views/edit-history',
                 resource_instances=Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
             )
-            context['nav']['title'] = _('Edit History')
+            context['nav']['title'] = _('Recent Edits')
 
             return render(request, 'views/edit-history.htm', context)
         else:

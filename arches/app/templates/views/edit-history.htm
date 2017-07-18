@@ -13,10 +13,10 @@
             <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
                 <thead>
                     <tr>
-                        <th>Resource Id</th>
-                        <th>Resource Name</th>
-                        <th>Resource Type</th>
-                        <th class="min-desktop">Created</th>
+                        <th>{% trans "Resource Id" %}</th>
+                        <th>{% trans "Resource Name" %}</th>
+                        <th>{% trans "Resource Type" %}</th>
+                        <th class="min-desktop">{% trans "Created" %}</th>
                         <th class="min-tablet"></th>
                     </tr>
                 </thead>
@@ -38,19 +38,3 @@
     </div>
 
 {% endblock main_content %}
-
-{% block tabs %}{% endblock tabs %}
-
-{% block pre_require_js %}
-{{block.super}}
-    <script>
-        // define('search-data', [], function() {
-        //     return {{% autoescape off %}
-        //         searchable_nodes: {{ searchable_nodes }},
-        //         resource_cards: {{ resource_cards }},
-        //         datatypes: {{ datatypes_json }},
-        //         saved_searches: {{ saved_searches }}
-        //     {% endautoescape %}};
-        // });
-    </script>
-{% endblock pre_require_js %}
