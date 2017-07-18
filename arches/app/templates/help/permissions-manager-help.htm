@@ -55,9 +55,7 @@
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Allowing Crowdsourced Keywords" %}</h4></a>
         <div class="ep-help-topic-content">
-          {% blocktrans %}
-            <p>Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {% nav.title %} resources, but only the Keyword card will be visible to them.</p>
-          {% endblocktrans %}
+            <p>{% trans 'Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {% nav.title %} resources, but only the Keyword card will be visible to them.' %}</p>
             <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img></p>
         </div>
