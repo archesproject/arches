@@ -1,3 +1,4 @@
+{% load i18n %}
 <div>
 	<!--===================================================-->
 	<div class="cls-header">
@@ -8,17 +9,17 @@
 	        </a>
 	    </div>
 	</div>
-	
+
 	<!-- CONTENT -->
 	<!--===================================================-->
 	<div class="cls-content">
 	    <h1 class="error-code text-mint">Oops!</h1>
 	    <p class="h3 text-uppercase">Page Not Found!</p>
 	    <div class="pad-btm">
-	        Sorry, but the page you are looking for has not been found on our server.
+				{% trans "Sorry, but the page you are looking for has not been found on our server." %}
 	    </div>
-	    
+
 	    <hr class="new-section-sm bord-no">
-	    <div class="pad-top"><a class="btn-link" href="index.html">Back to Homepage</a></div>
+	    <div class="pad-top"><a class="btn-link" href="index.html">{% trans "Back to Homepage" %}</a></div>
 	</div>
 </div>

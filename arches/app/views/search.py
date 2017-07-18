@@ -93,7 +93,7 @@ class SearchView(BaseManagerView):
         context['nav']['title'] = 'Search'
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
-        context['nav']['help'] = ('Searching the Database','help/search-help.htm')
+        context['nav']['help'] = (_('Searching the Arches Database'),'help/search-help.htm')
 
         return render(request, 'views/search.htm', context)
 
@@ -284,8 +284,8 @@ def build_search_results_dsl(request):
                     search_query.must_not(nested_string_filter)
                 else:
                     search_query.must(nested_string_filter)
-                    # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing                
-                    query.min_score('0.01') 
+                    # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
+                    query.min_score('0.01')
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 conceptid_filter = Bool()
@@ -355,7 +355,7 @@ def build_search_results_dsl(request):
                 date_ranges_query.filter(Terms(field='date_ranges.nodegroup_id', terms=permitted_nodegroups))
                 temporal_query.should(Nested(path='date_ranges', query=date_ranges_query))
             temporal_query.should(Nested(path='dates', query=date_query))
-                
+
         else:
             date_query = Bool()
             date_query.filter(Range(field='dates.date', gte=start_date.as_float(), lte=end_date.as_float()))
@@ -511,8 +511,8 @@ def time_wheel_config(request):
             min_millenium = millennium
             max_millenium = millennium + 1000
             millenium_name = "Millennium (%s - %s)"%(min_millenium, max_millenium)
-            mill_boolquery = gen_range_agg(gte=SortableDate(min_millenium).as_float()-1, 
-                lte=SortableDate(max_millenium).as_float(), 
+            mill_boolquery = gen_range_agg(gte=SortableDate(min_millenium).as_float()-1,
+                lte=SortableDate(max_millenium).as_float(),
                 permitted_nodegroups=get_permitted_nodegroups(request.user))
             millenium_agg = FiltersAgg(name=millenium_name)
             millenium_agg.add_filter(mill_boolquery)

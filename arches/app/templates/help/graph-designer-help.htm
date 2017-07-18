@@ -1,65 +1,107 @@
 <!DOCTYPE html>
+{% load i18n %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
-        <p>The Graph Designer allows you to create, modify, and view the graph for a Resource Model or Branch. You are currently editing a {% if graph.isresource %}Resource Model{% else %}Branch{% endif %}, so note that the Graph Manager functions differently when editing a {% if graph.isresource %}Branch{% else %}Resource Model{% endif %}.</p>
+        {% if graph.isresource %}
+          {% blocktrans %}
+            <p>The Graph Designer allows you to create, modify, and view the graph for a Resource Model or Branch. You are currently editing a Resource Model, so note that the Graph Manager functions differently when editing a Branch.</p>
+          {% endblocktrans %}
+        {% else %}
+          {% blocktrans %}
+            <p>The Graph Designer allows you to create, modify, and view the graph for a Resource Model or Branch. You are currently editing a Branch, so note that the Graph Manager functions differently when editing a Resource Model.</p>
+          {% endblocktrans %}
+        {% endif %}
+
     </div>
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Graph Designer Overview</h4></a>
         <div class="ep-help-topic-content">
-            <p>The interface is split into three sections, as shown in the image below.
+            <p>{% trans "The interface is split into three sections, as shown in the image below." %}
             <span class="ep-help-img-link-float"><a href="{{ STATIC_URL }}img/help/graph-manager-panes.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img src="{{ STATIC_URL }}img/help/graph-manager-panes.png"></img></p>
-            <p>
-                <strong>Node List</strong> - This panel lists all of the nodes present in this {% if graph.isresource %}Resource Model's{% else %}Branch's{% endif %} graph. You can select a node in the Node List to open the Node Manager.<br>
-                <strong>Graph</strong> This panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.<br>
-                <strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new {% if graph.isresource %}Branches{% else %}nodes{% endif %}, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:
-            </p>
+
+            {% if graph.isresource %}
+              {% blocktrans %}
+                <p>
+                    <strong>Node List</strong> - This panel lists all of the nodes present in this Resource Model's graph. You can select a node in the Node List to open the Node Manager.<br>
+                    <strong>Graph</strong> This panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.<br>
+                    <strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new Branches, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:
+                </p>
+              {% endblocktrans %}
+            {% else %}
+              {% blocktrans %}
+                <p>
+                    <strong>Node List</strong> - This panel lists all of the nodes present in this Branch's graph. You can select a node in the Node List to open the Node Manager.<br>
+                    <strong>Graph</strong> This panel displays all nodes and their connections (called "properties"), showing the full branching structure. Every Graph will have a "top node" in the center, to which all other nodes will be connected. You can select a node in the Graph to open the Node Manager.<br>
+                    <strong>Node Manager</strong> This is where the action takes place. Within this panel you will be able to build the graph by adding new nodes, or refine it by modifying nodes that already exists. Once you have selected a node, the Node Manager settings tab will look something like this:
+                </p>
+              {% endblocktrans %}
+            {% endif %}
+
+
             <div class="col-xs-6">
                 <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
             </div>
             <div class="col-xs-6">
                 <p>
+                  {% blocktrans %}
                     <strong>Node Name</strong> - Used to identify this node within the graph interface. In other parts of app, custom labels can be used in place of this name. Node names need not be unique across a graph, but it will make everything easier if they are.<br>
-                    <strong>CRM Class</strong> - (only present if this {% if graph.isresource %}Resource Model{% else %}Branch{% endif %} uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
-                    <strong>Relationship from ...</strong> - (only present if this {% if graph.isresource %}Resource Model{% else %}Branch{% endif %} uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
-                    <strong>Data type</strong> - Choose what type of data will be collected in this node. See below for more information.<br>
-                    <strong>Make Sub-Card</strong> - NEEDS TO BE UPDATED - when the card collection/card terminology is fully implemented. -----OLD This setting defines data collection grouping for this node. Read more about what this means in the Cards documentation.
+                  {% endblocktrans %}
+
+                  {% if graph.isresource %}
+                    {% blocktrans %}
+                      <strong>CRM Class</strong> - (only present if this Resource Model uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
+                      <strong>Relationship from ...</strong> - (only present if this Resource Model uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
+                    {% endblocktrans %}
+                  {% else %}
+                    {% blocktrans %}
+                      <strong>CRM Class</strong> - (only present if this Branch uses an ontology) This setting defines what ontological class of data will be collected by this node. To learn more, read <a href="https://arches4.readthedocs.io/en/latest/managing-resources/#ontologies-in-arches">Ontologies in Arches</a>.<br>
+                      <strong>Relationship from ...</strong> - (only present if this Branch uses an ontology) Define what relationship this node has with its parent node (the one directly above it in the graph branch). A verbalization of your choice is shown below this setting.<br>
+                    {% endblocktrans %}
+                  {% endif %}
+
+                    {% blocktrans %}
+                      <strong>Data type</strong> - Choose what type of data will be collected in this node. See below for more information.<br>
+                      <strong>Make Sub-Card</strong> - NEEDS TO BE UPDATED - when the card collection/card terminology is fully implemented. -----OLD This setting defines data collection grouping for this node. Read more about what this means in the Cards documentation.
+                    {% endblocktrans %}
                 </p>
             </div>
         </div>
     </div>
 
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Editing a Branch's Graph</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Editing a Branch's Graph" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>To build the graph of a Branch, your main course of action will be adding nodes, naming them, and defining their data type. If your Branch uses an ontology, you'll also need to define the CRM class and property of each new node. When choosing classes and properties, the interface will automatically enforce preloaded ontological rules.</p>
-            <p>Below you can see a simple example of adding a node to a graph.</p>
+            <p>{% trans "To build the graph of a Branch, your main course of action will be adding nodes, naming them, and defining their data type. If your Branch uses an ontology, you'll also need to define the CRM class and property of each new node. When choosing classes and properties, the interface will automatically enforce preloaded ontological rules." %}</p>
+            <p>{% trans "Below you can see a simple example of adding a node to a graph." %}</p>
             <p><a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank"><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></a></img></p>
         </div>
     </div>
 
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Editing a Resouce Model's Graph</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Editing a Resouce Model's Graph" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times.</p>
-            <p>As shown below, you must select the top node and then use <i class="ion-ios-plus"></i> to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch.</p>
+            <p>{% trans "When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times." %}</p>
+            <p>{% blocktrans %}As shown below, you must select the top node and then use <i class="ion-ios-plus"></i> to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch. {% endblocktrans %}</p>
             <p><a href="{{ STATIC_URL }}img/help/add-graph-branch.gif" target="_blank"><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-graph-branch.gif"></img></a></p>
         </div>
     </div>
 
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>About Data Types</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "About Data Types" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Choosing a node's <strong>Data Type</strong> is the first step toward defining how that information will be collected. A few data types are intuitive (<code>string</code>, <code>number</code>, <code>date</code>), but here's an explanation of the less familiar types.</p>
-            <p><code>geojson-feature-collection</code> Stores geographic coordinates, and is used to show a resource on the map.</p>
-            <p><code>concept</code> Constrains the node to store one of a series of choices provided by the Reference Data Manager. This data functionally operates like a dropdown list or pick list. You'll further be prompted to choose a <strong>Concept Collection</strong>, where you'll choose which series of concepts to use.</p>
-            <p><code>concept-list</code> Same as above, but the user will be able to select multiple concepts.</p>
-            <p><code>domain-value</code> Like 'concept', choose this to present the user with a dropdown menu. Unlike 'concept' this dropdown menu will not come from your system-wide controlled vocubulary, but from a list of values that you define here.</p>
-            <p><code>domain-value-list</code> Same as above, but the user will be able to select multiple domain-values.</p>
-            <p><code>boolean</code> Use this to record a simple "yes or no" or "true or false" value.</p>
-            <p><code>file-list</code> Allows this node to store one or mores files. Use this to upload images, documents, etc.</p>
-            <p><code>semantic</code> A 'semantic' node <strong>does not store data</strong>. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of <em>every</em> graph is a semantic node.</p>
+            <p><code>geojson-feature-collection</code> {% trans "Stores geographic coordinates, and is used to show a resource on the map.</p>
+            <p><code>concept</code> {% trans "Constrains the node to store one of a series of choices provided by the Reference Data Manager. This data functionally operates like a dropdown list or pick list. You'll further be prompted to choose a <strong>Concept Collection</strong>, where you'll choose which series of concepts to use.</p>
+            <p><code>concept-list</code> {% trans "Same as above, but the user will be able to select multiple concepts.</p>
+            <p><code>domain-value</code> {% trans "Like 'concept', choose this to present the user with a dropdown menu. Unlike 'concept' this dropdown menu will not come from your system-wide controlled vocubulary, but from a list of values that you define here.</p>
+            <p><code>domain-value-list</code> {% trans "Same as above, but the user will be able to select multiple domain-values.</p>
+            <p><code>boolean</code> {% trans "Use this to record a simple "yes or no" or "true or false" value.</p>
+            <p><code>file-list</code> {% trans "Allows this node to store one or mores files. Use this to upload images, documents, etc.</p>
+            <p><code>semantic</code> {% trans "A 'semantic' node <strong>does not store data</strong>. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of <em>every</em> graph is a semantic node.</p>
+          {% endblocktrans %}
         </div>
     </div>
 </div>

@@ -60,7 +60,7 @@
           <div data-bind="with: overlayLibraryList">
            <!-- Title -->
            <div class="overlay-title">
-               Map Overlay Library
+               {% trans "Map Overlay Library" %}
                <span class="pull-right"><i class="overlay-close ion-close-round" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
            </div>
            <!-- Filter -->
@@ -95,8 +95,8 @@
             <div class="leaflet-control-container">
                 <div class="leaflet-top leaflet-left">
                     <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-                        <a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" data-bind="click: function(){map.zoomIn()}, css:{'leaflet-disabled': atMaxZoom}">+</a>
-                        <a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" data-bind="click: function(){map.zoomOut()}, css:{'leaflet-disabled': atMinZoom}">-</a>
+                        <a class="leaflet-control-zoom-in" href="#" title="{% trans "Zoom in" %}" role="button" aria-label='{% trans "Zoom in" %}' data-bind="click: function(){map.zoomIn()}, css:{'leaflet-disabled': atMaxZoom}">+</a>
+                        <a class="leaflet-control-zoom-out" href="#" title="{% trans "Zoom out" %}" role="button" aria-label='{% trans "Zoom out" %}' data-bind="click: function(){map.zoomOut()}, css:{'leaflet-disabled': atMinZoom}">-</a>
                     </div>
                     <div class="leaflet-draw leaflet-control">
 
@@ -104,7 +104,7 @@
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
                                     expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
-                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">{% trans "Map View" %}</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -120,7 +120,7 @@
                                 </a>
                                 <!-- /ko -->
                                 <!--ko if: context !== 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
                                 <div class="map-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
                                     <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
@@ -128,7 +128,7 @@
                                 <!-- /ko -->
 
                                 <!--ko if: context === 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Search Map Extent" data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">Search Map Extent</span><i class="fa fa-search"></i></a>
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
                                 <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode())">
                                     <div class="form-group form-inline">
                                       <label for="buffer-input">{% trans "Buffer" %}</label>
@@ -145,8 +145,8 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-                                <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
-                                <a class="leaflet-draw-edit-remove" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to delete."><span class="sr-only">Delete drawings.</span></a>
+                                <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to edit." %}'><span class="sr-only">{% trans "Edit drawings." %}"</span></a>
+                                <a class="leaflet-draw-edit-remove" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to delete." %}'><span class="sr-only">{% trans "Delete drawings." %}</span></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -458,7 +458,7 @@
 
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">Zoom</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">{% trans "Zoom" %}</a>
             </h4>
         </div>
 
@@ -489,7 +489,7 @@
 
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">Geocoder</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">{% trans "Geocoder" %}</a>
             </h4>
         </div>
 
