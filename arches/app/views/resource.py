@@ -163,7 +163,15 @@ class ResourceEditLogView(BaseManagerView):
                     pass
 
     def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
-        if resourceid is not None:
+        if resourceid is None:
+            context = self.get_context_data(
+                main_script='views/edit-history',
+                resource_instances=Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
+            )
+            context['nav']['title'] = _('Edit History')
+
+            return render(request, 'views/edit-history.htm', context)
+        else:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
             permitted_edits = []
