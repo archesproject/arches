@@ -1,0 +1,40 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {% trans "Recent Edits" %} {% endblock title %}
+
+
+{% block main_content %}
+
+    <div class="pad-all">
+        <div class="resource-grid-title">{% trans "Recently Added Resources" %}</div>
+        <div class="recent-additions-container">
+            <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>{% trans "Resource Id" %}</th>
+                        <th>{% trans "Resource Name" %}</th>
+                        <th>{% trans "Resource Type" %}</th>
+                        <th class="min-desktop">{% trans "Created" %}</th>
+                        <th class="min-tablet"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resource in resource_instances %}
+                    <tr>
+                        <td><a href="{% url 'resource_editor' resource.pk %}" class="regular-link" target="_blank">{{resource.pk}}</a></td>
+                        <td>{{resource.displayname}}</td>
+                        <td>{{resource.graph.name}}</td>
+                        <td>{{resource.createdtime}}</td>
+                        <td>
+                            <a href="{% url 'resource_report' resource.pk %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock main_content %}

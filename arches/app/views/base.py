@@ -34,10 +34,6 @@ class BaseManagerView(TemplateView):
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
-        if 'Resource Editor' in self.request.user.user_groups:
-            context['resource_instances'] = Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
-        else:
-            context['resource_instances'] = []
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
             'title':'',
@@ -48,6 +44,7 @@ class BaseManagerView(TemplateView):
             'login':True,
             'print':False,
         }
+        
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
