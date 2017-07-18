@@ -20,6 +20,7 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 });
 
             } else {
+                this.isEditable = params.graph ? params.graph.get('is_editable') : true;
                 this.options = params.config.options;
                 var setupOption = function(option) {
                     option.remove = function () {
