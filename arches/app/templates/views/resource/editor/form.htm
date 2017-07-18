@@ -30,7 +30,7 @@
                     </li>
                     <!-- ko if: isWizard && !forceBlank && $index() === outerCard.get('cards')().length - 1-->
                     <li class="wizard-card-tools">
-                        <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                        <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}'></i>
                     </li>
                     <!-- /ko -->
                 </ul>
@@ -45,7 +45,7 @@
 
                     <!-- ko if: isWizard && !forceBlank -->
                     <a href="#" class="library-tools-icon card-container-trash-icon" style="display: none;" data-bind="click: form.deleteTileGroup.bind(form, parentTile)">
-                        <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                        <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Delete" %}'></i>
                     </a>
                     <!-- /ko -->
 
@@ -60,7 +60,7 @@
                         <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 5px; display: block;" data-bind="visible: (parentTile.tiles[card.get('nodegroup_id')]().length > 0)">
 
                             <div class="card-tab-title">
-                                Saved <span data-bind="text: card.get('name')"/>
+                                {% trans "Saved" %} <span data-bind="text: card.get('name')"/>
                             </div>
 
                             <div class="list-group" style="margin-top: 5px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
@@ -68,7 +68,7 @@
                                 <div class="list-group-item crud-record-item" style="">
 
                                     <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
-                                        <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                                        <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Show/Hide" %}'></i>
                                         <span style="position: relative; top: -2px;">
                                             <!-- ko if: card.get('widgets')().length > 0 -->
                                                 <span class="text-semibold" data-bind="text: card.get('widgets')()[0].configJSON().label"></span>:
@@ -96,7 +96,7 @@
 
                                     <div class="effect" style="display:none; padding: 10px;">
                                         <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank, cardinality)">
-                                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Delete" %}'></i>
                                         </a>
 
                                         <!-- Card Instruction -->
@@ -245,7 +245,7 @@
                                 <div>
                                     <div class="panel-heading">
                                         <h3 class="panel-title help-panel-title" style="">
-                                            <span class="help-text-small">Help</span><span data-bind="text: card.get('helptitle')"></span>
+                                            <span class="help-text-small">{% trans "Help" %}</span><span data-bind="text: card.get('helptitle')"></span>
                                         </h3>
                                     </div>
                                     <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.get('helptext')">
@@ -282,7 +282,7 @@
 
                 <!-- Title -->
                 <div class="card-tab-title mar-top mar-btm">
-                    Saved <span data-bind="text: outerCard.get('name')"/>
+                    {% trans "Saved" %} <span data-bind="text: outerCard.get('name')"/>
                 </div>
 
                 <!-- Wizard Tile -->
