@@ -122,18 +122,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="3000" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            A Data Management and Integration Platform
-                            <br> To Preserve and Protect Cultural Heritage.
+                            {% trans "A Data Management and Integration Platform<br> To Preserve and Protect Cultural Heritage." %}
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
                             {% if user.username == 'anonymous' %}
-                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Login</a></span>
+                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Login" %}</a></span>
                             {% endif %}
                             {% if user.username != 'anonymous' %}
-                            <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Manage Data</a></span>
+                            <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Manage Data" %}</a></span>
                             {% endif %}
                         </div>
 
@@ -150,18 +149,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- LAYERS -->
                         <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="100" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
-                            Dynamically Define Your Inventory
+                            {% trans "Dynamically Define Your Inventory" %}
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-2 sft" data-x="center" data-hoffset="0" data-y="200" data-speed="1000" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            Arches Lets You Easily Create Inventory Databases
-                            <br> And Share Them With Others
+                            {% trans "Arches Lets You Easily Create Inventory Databases<br> And Share Them With Others" %}
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Learn More" %}</a></span>
                         </div>
 
                         <!-- Attribution -->
@@ -177,18 +175,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- LAYERS -->
                         <div class="tp-caption rs-caption-1 sft start text-bold" data-x="center" data-hoffset="0" data-y="110" data-speed="800" data-start="1500" data-easing="Back.easeInOut" data-endspeed="300">
-                            Data Discovery
+                            {% trans "Data Discovery" %}
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-2 sfb" data-x="center" data-hoffset="0" data-y="210" data-speed="800" data-start="2500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            Easily Find Relevant Projects, Artistic Works
-                            <br> and Retrieve Data for Interpretation and Analysis
+                            {% trans "Easily Find Relevant Projects, Artistic Works<br> and Retrieve Data for Interpretation and Analysis" %}
                         </div>
 
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sfb" data-x="center" data-hoffset="0" data-y="370" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
-                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Search Arches</a></span>
+                            <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Search Arches" %}</a></span>
                         </div>
 
                         <!-- Attribution -->
@@ -211,9 +208,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <div id="about" class="about-image bg-grey">
             <div class="container">
                 <div class="title-v1">
-                    <h1>What is Arches</h1>
-                    <p>Arches is <strong>Awesome</strong> technology designed to ease Cultural Heritage data management.
-                        <br> Use Arches to organize your project objectives, instruments, datasets, and interpreations.</p>
+                    <h1>{% trans "What is Arches" %}</h1>
+                    <p>{% trans "Arches is <strong>Awesome</strong> technology designed to ease Cultural Heritage data management.<br> Use Arches to organize your project objectives, instruments, datasets, and interpreations." %}</p>
                 </div>
                 <div class="img-center">
                     <img class="img-responsive" src="{% static 'img/landing/disco.jpg' %}" alt="">
@@ -228,51 +224,50 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <section id="services">
         <div class="container content-lg">
             <div class="title-v1">
-                <h2>Capabilities</h2>
-                <p>Arches can do things to <strong> streamline your work</strong> so that you can focus on understanding your data.
-                    <br> Build interoperable, shareable, and secure <strong> research data repositories</strong> as a natural part of your workflow.</p>
+                <h2>{% trans "Capabilities" %}</h2>
+                <p>{% trans "Arches can do things to <strong> streamline your work</strong> so that you can focus on understanding your data.<br> Build interoperable, shareable, and secure <strong> research data repositories</strong> as a natural part of your workflow." %}</p>
             </div>
 
             <div class="row service-box-v1">
                 <div class="col-md-4 col-sm-6">
                     <div class="service-block service-block-default">
                         <i class="icon-custom icon-lg icon-bg-u rounded-x fa fa-lightbulb-o"></i>
-                        <h2 class="heading-md">Manage Research Projects</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine. Fusce dapibus</p>
+                        <h2 class="heading-md">{% trans "Manage Research Projects" %}</h2>
+                        <p></p>
                         <ul class="list-unstyled">
-                            <li>Heritage Objects</li>
-                            <li>Research Objectives</li>
-                            <li>Digital Lab Notebook</li>
-                            <li>Notes &amp; Documents</li>
-                            <li>Share &amp; Collaborate</li>
+                            <li>{% trans "Heritage Objects" %}</li>
+                            <li>{% trans "Research Objectives" %}</li>
+                            <li>{% trans "Digital Lab Notebook" %}</li>
+                            <li>{% trans "Notes & Documents" %}</li>
+                            <li>{% trans "Share & Collaborate" %}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="service-block service-block-default">
                         <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-present"></i>
-                        <h2 class="heading-sm">Instruments &amp; Datasets</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine usce dapibus elit nondapibus</p>
+                        <h2 class="heading-md">{% trans "Instruments & Datasets" %}</h2>
+                        <p></p>
                         <ul class="list-unstyled">
-                            <li>Manage Lab Instruments</li>
-                            <li>Update Settings</li>
-                            <li>Easy Dataset Import</li>
-                            <li>View &amp; Manage Data</li>
-                            <li>Easy Access</li>
+                            <li>{% trans "Manage Lab Instruments" %}</li>
+                            <li>{% trans "Update Settings" %}</li>
+                            <li>{% trans "Easy Dataset Import" %}</li>
+                            <li>{% trans "View & Manage Data" %}</li>
+                            <li>{% trans "Easy Access" %}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-12">
                     <div class="service-block service-block-default">
                         <i class="icon-custom icon-lg icon-bg-u rounded-x icon-line icon-rocket"></i>
-                        <h2 class="heading-sm">Interpretations &amp; Results</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus id elit mi egetine. Fusce dapibus</p>
+                        <h2 class="heading-md">{% trans "Interpretations & Results" %}</h2>
+                        <p></p>
                         <ul class="list-unstyled">
-                            <li>Manage Data Interpretations</li>
-                            <li>Index Results to Heritage Objects</li>
-                            <li>Tie Results to Iconography </li>
-                            <li>Centralize Results</li>
-                            <li>Publish Results</li>
+                            <li>{% trans "Manage Data Interpretations" %}</li>
+                            <li>{% trans "Index Results to Heritage Objects" %}</li>
+                            <li>{% trans "Tie Results to Iconography" %}</li>
+                            <li>{% trans "Centralize Results" %}</li>
+                            <li>{% trans "Publish Results" %}</li>
                         </ul>
                     </div>
                 </div>
@@ -282,15 +277,14 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- End Services Section -->
 
     <!-- News Section -->
-    <section id="news" class="news-section bg-grey">
+    <section id="news" class="news-section bg-grey" >
         <div class="container content-lg">
             <div class="title-v1">
-                <h2>Latest News</h2>
-                <p>At vero eos et accusamus et iusto odio <strong>things</strong> dignissimos ducimus qui blanditiis praesentium voluptatum deleniti.
-                    <br> deleniti atque <strong>successful</strong> corrupti quos dolores. </p>
+                <h2>{% trans "Latest News" %}</h2>
+                <p></p>
             </div>
 
-            <div class="row news-v1">
+            <!-- <div class="row news-v1">
                 <div class="col-md-4 md-margin-bottom-40">
                     <div class="news-v1-in">
                         <img class="img-responsive" src="{% static 'img/landing/img1.jpg' %}" alt="">
@@ -330,7 +324,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </section>
     <!-- End News Section -->
@@ -339,7 +333,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Contact Section -->
     <section id="contact" class="contacts-section">
         <div class="copyright-section">
-            <p>2016 &copy; All Rights Reserved. </p>
+            <p>2016 &copy; {% trans "All Rights Reserved." %} </p>
             <ul class="social-icons">
                 <li>
                     <a href="#" data-original-title="Facebook" class="social_facebook rounded-x"></a>
