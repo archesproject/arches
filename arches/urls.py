@@ -22,7 +22,7 @@ from django.conf.urls.i18n import patterns
 from arches.app.views import concept, main, map, search, graph, tileserver
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
-from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView
 from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
@@ -70,7 +70,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
     url(r'^graph/(?P<graphid>%s)/export_mapping_file$' % uuid_regex, GraphDataView.as_view(action='export_mapping_file'), name='export_mapping_file'),
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
-    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
+    url(r'^components/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
@@ -87,7 +87,9 @@ urlpatterns = [
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
+    url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),
     url(r'^resource/related/(?P<resourceid>%s|())$' % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
     url(r'^resource/descriptors/(?P<resourceid>%s|())$' % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
@@ -115,8 +117,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 
-handler404 = 'app.views.main.custom_404'
-handler500 = 'app.views.main.custom_500'
+handler404 = 'arches.app.views.main.custom_404'
+handler500 = 'arches.app.views.main.custom_500'
 
 urlpatterns += staticfiles_urlpatterns()
 

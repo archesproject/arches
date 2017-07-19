@@ -1,30 +1,40 @@
 <!DOCTYPE html>
+{% load i18n %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
+      {% blocktrans %}
         <p>A number of global settings can be defined or altered here.</p>
+      {% endblocktrans %}
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>System Settings</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "System Settings" %}</h4></a>
         <div class="ep-help-topic-content">
-            <h4>Default Application Settings</h4>
+            <h4>{% trans "Default Application Settings" %}</h4>
             <p>
+              {% blocktrans %}
                 <strong>Application Name</strong> - Name of your Arches app, to be displayed in the browser title bar and elsewhere.<br>
                 <strong>Default Data Import/Export User</strong> - <br>
+              {% endblocktrans %}
             </p>
-            <h4>Web Analytics</h4>
+            <h4>{% trans "Web Analytics" %}</h4>
             <p>
+              {% blocktrans %}
                 <strong>Google Analytics Key</strong> - If you have made a Google Analytics Key to track your app's traffic, enter it here.<br>
+              {% endblocktrans %}
             </p>
-            <h4>Thesaurus Service Providers</h4>
+            <h4> {% trans "Thesaurus Service Providers" %}</h4>
             <p>
+              {% blocktrans %}
                 <strong>Thesaurus SPAQRL Endpoint</strong> - Advanced users may create more SPAQRL endpoints and register them here. These endpoints will be available in the RDM and allow you to import thesaurus entries from external sources.<br>
+              {% endblocktrans %}
             </p>
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Map Settings</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Map Settings" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <h4>Mapbox API</h4>
             <p>Arches uses the Mapbox mapping library for map display and data creation. Arches also supports Mapbox basemaps and other services.</p>
             <p>
@@ -39,33 +49,40 @@
             <h4>Search Results Grid</h4>
             <p>Arches aggregates search results and displays them as hexagons. You will need to set default parameters for the hexagon size and precision.</p>
             <p><em><strong>Warning:</strong> A large project area combined with a small hexagon size and/or high precision will take a very long time to load, and can crash your browser. We suggest changing these settings in small increments to find the best combination for your project.</em></p>
+          {% endblocktrans %}
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Basic Search Settings</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Basic Search Settings" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Set the default search results behavior. This is also where you will define the max number of resources per export operation.</p>
+          {% endblocktrans %}
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Temporal Search Settings</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Temporal Search Settings" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Arches creates a Time Wheel based on the resources in your database, to allow for quick temporal visualization and queries. A few aspects of this temporal search are defined here.</p>
             <p>
                 <strong>Color Ramp</strong> - The color ramp for the time wheel. For further reference, check out the <a href="https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md">d3 API reference</a>.<br>
                 <strong>Time wheel configuration</strong> - Configure the time wheel here (____).
             </p>
+          {% endblocktrans %}
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Saved Searches</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Saved Searches" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Arches allows you save a search and present it as convenience for your users. Saved Searches appear as search options in the main Search page. Creating a Saved Search is a three-step process.</p>
             <p>
                 <strong>1. Specify Search Criteria</strong> - Go to the Search page and enter all the criteria you would like to use to configure your Saved Search. You may notice that with the addition of each new search filter (either by using the term filter, map filtering tools, or temporal filters) the URL for the page will change.<br>
                 <strong>2. Copy the URL</strong> - In your browser address bar, copy the <em>entire</em> URL. This will be a long string that defines each of the search filters created in step 1.<br>
                 <strong>3. Create the Saved Search</strong> - Finally, head back to this page and fill out the settings that you see at left. You can also upload an image that will be shown along with your Search Search.
             </p>
+          {% endblocktrans %}
         </div>
     </div>
 </div>

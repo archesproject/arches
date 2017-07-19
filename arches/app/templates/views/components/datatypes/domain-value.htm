@@ -6,8 +6,8 @@
     </div>
     <div>
         <div data-bind="text: $data.search"></div>
-        <input type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="value: newOptionLabel, valueUpdate: 'keyup'">
-        <a href="#" data-bind="click: addNewOption">
+        <input type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="disable: !isEditable, value: newOptionLabel, valueUpdate: 'keyup'">
+        <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}">
              <i class="fa fa-plus-circle pull-right"></i>
         </a>
     </div>
@@ -18,8 +18,8 @@
     </div>
     <div data-bind="foreach: options">
         <div class="added-domain-option">
-            <input type="text" class="form-control library-search" data-bind="value: text, valueUpdate: 'keyup'">
-            <a href="#" data-bind="click: remove">
+            <input type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
+            <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
                  <i class="fa fa-minus-circle pull-right"></i>
             </a>
         </div>

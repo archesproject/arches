@@ -57,7 +57,7 @@ class JSONSerializer(object):
 
         ret = self.handle_object(obj)
 
-        return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())
+        return json.dumps(ret, cls=DjangoJSONEncoder, sort_keys=True, **options.copy())
 
 
     def handle_object(self, object):

@@ -1,12 +1,16 @@
 <!DOCTYPE html>
+{% load i18n %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
+      {% blocktrans %}
         <p>Three categories of Map Layers will appear on your map: <strong>Resource Layers</strong> (the contents of your database), <strong>Basemaps</strong> (static background layers), and <strong>Overlays</strong> (custom data layers from outside your database). To configure a layer, first select its category in the top bar, and then choose it from the list at left.</p>
+      {% endblocktrans %}
     </div>
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Resource Layers</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Resource Layers display the resource layers in your database. One Resource Layer is created for each node with a geospatial datatype (for example, <code>geojson-feature-collection</code>). You are able to customize the appearance and visibility of each Resource Layer in the following ways.</p>
             <h4>Service Styling</h4>
             <p>Define the way features will look on the map. The example map has demonstration features that give you a preview of the changes you make. You can choose to use <strong>Advanced Editing</strong> to create a more nuanced style. Note that changes made in Advanced Editing will not be reflected if you switch back to basic editing. For styling reference, checkout the <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/">MapBox Style Specification</a>.</p>
@@ -23,12 +27,14 @@
             <p>Caching tiles will improve the speed of map rendering. However, caching is not a simple matter, and it is disabled by default. Caching is only advisable if you know what you are doing.</p>
             <h4>Permissions</h4>
             <p>This tab shows the permissions for the nodegroup whose geometry is displayed in this Resource Layer. Permissions are defined in the Graph Designer.</p>
+          {% endblocktrans %}
         </div>
     </div>
 
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Basemaps</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Basemaps" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>A Basemap will always be present in your map. Arches comes with a few default basemaps, but advanced users are able to add more. Once added, there are few ways to configure each basemap.</p>
             <h4>Service Styling</h4>
             <p>Define a style for this basemap. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#layers">MapBox Style Specification</a>.</p>
@@ -38,12 +44,14 @@
                 <strong>Default search map</strong> - choose this layer to be the default basemap<br>
                 <strong>Layer icon</strong> - associate an icon with this layer
             </p>
+          {% endblocktrans %}
         </div>
     </div>
 
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Overlays</h4></a>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Overlays" %}</h4></a>
         <div class="ep-help-topic-content">
+          {% blocktrans %}
             <p>Overlays allow you to incorporate map layers from external sources. Note that Search Results and Search Markets are treated as overlays, and can be customize separately. New overlays can be added with a little behind-the-scenes work. Once added, there are few ways to configure each overlay.</p>
             <h4>Service Styling</h4>
             <p>Define a style for this overlay. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#layers">MapBox Style Specification</a>.</p>
@@ -53,7 +61,7 @@
                 <strong>Default search map</strong> - choose whether this overlay should be shown in the search map by default. Note that in the search map itself you can change the order of the layers.<br>
                 <strong>Layer icon</strong> - associate an icon with this layer
             </p>
+          {% endblocktrans %}
         </div>
     </div>
 </div>
-

@@ -101,6 +101,9 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             $(el).select2(select2Config);
             $(el).select2("val", value());
             $(el).on("change", function(val) {
+                if (val.val === "") {
+                  val.val = null
+                }
                 return value(val.val);
             });
             $(el).on("select2-opening", function(val) {

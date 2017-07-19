@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block loading_mask %}
 {% endblock loading_mask %}
@@ -35,7 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
        <div class="cls-brand">
            <a class="box-inline" href="{% url 'home' %}">
                <!-- <img alt="Arches Admin" src="img/logo.png" class="brand-icon"> -->
-               <span class="brand-title">Arches <span class="text-thin">Account Login</span></span>
+               <span class="brand-title">Arches <span class="text-thin">{% trans "Account Login" %}</span></span>
            </a>
        </div>
    </div>
@@ -45,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
    <div class="cls-content">
        <div class="cls-content-sm panel login-panel">
            <div class="panel-body">
-               <h3 class="login-panel-header">Sign In to your account</h3>
+               <h3 class="login-panel-header">{% trans "Sign In to your account" %}</h3>
                <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
                    {% csrf_token %}
                    <div class="form-group">
@@ -63,23 +64,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                    <div class="row">
                        <div class="col-xs-12">
                            <div class="form-group text-right">
-                           <button class="btn btn-success text-uppercase" type="submit">Sign In</button>
+                           <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
                            </div>
                        </div>
                    </div>
                    <div class="row" style="padding-top:10px;">
                         <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                            <h4>Login failed</h4>
-                            <span>Invalid username and/or password.</span>
+                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                            <h4>{% trans "Login failed" %}</h4>
+                            <span>{% trans "Invalid username and/or password." %}</span>
                         </div>
                     </div>
                </form>
            </div>
        </div>
        <div class="pad-ver hidden">
-           <a href="arches_password_reminder.html" class="btn-link mar-rgt">Forgot password ?</a>
-           <a href="arches_register.html" class="btn-link mar-lft">Create a new account</a>
+           <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
+           <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
        </div>
    </div>
 

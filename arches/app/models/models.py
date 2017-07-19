@@ -146,14 +146,14 @@ class Edge(models.Model):
 
 
 class EditLog(models.Model):
-    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclassid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    resourceinstanceid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    attributenodeid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    tileinstanceid = models.TextField(blank=True, null=True)  # This field type is a guess.
+    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourceclassid = models.TextField(blank=True, null=True)
+    resourceinstanceid = models.TextField(blank=True, null=True)
+    nodegroupid = models.TextField(blank=True, null=True)
+    tileinstanceid = models.TextField(blank=True, null=True)
     edittype = models.TextField(blank=True, null=True)
-    newvalue = models.TextField(blank=True, null=True)
-    oldvalue = models.TextField(blank=True, null=True)
+    newvalue = JSONField(blank=True, null=True, db_column='newvalue')
+    oldvalue = JSONField(blank=True, null=True, db_column='oldvalue')
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)
@@ -315,6 +315,16 @@ class GraphModel(models.Model):
         if len(msg) == 0:
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
+
+    @property
+    def is_editable(self):
+        result = True
+        if self.isresource:
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
+            result = False if len(resource_instances) > 0 else True
+            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+                result = True
+        return result
 
     class Meta:
         managed = True

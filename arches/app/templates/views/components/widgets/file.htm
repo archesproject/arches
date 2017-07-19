@@ -10,7 +10,7 @@
             <div class="bord-top pad-ver">
                 <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                     <i class="fa fa-plus"></i>
-                    <span>Add files...</span>
+                    <span>{% trans "Add files..." %}</span>
                 </span>
 
                 <div class="btn-group pull-right">
@@ -32,7 +32,7 @@
                                 <div class="media-body">
                                     <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
                                     <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
                                 </div>

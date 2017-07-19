@@ -109,49 +109,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
-                        <!-- Recently Added -->
-                        {% if nav.edit_history and 'Resource Editor' in user.user_groups %}
-                        <ul class="nav navbar-top-links pull-left">
-                            <li class="mega-dropdown open">
-                                <a href="#" class="mega-dropdown-toggle navbar-button" data-bind="click:function() { recentsActive(!recentsActive()); }, clickBubble: false">
-                                    <i class="ti-ticket icon-lg" data-placement="bottom" data-toggle="tooltip" data-original-title="Recent Edits"></i>
-                                </a>
-                                <div class="dropdown-menu mega-dropdown-menu dropdown-shim recent-edits-panel" style="display:none;" data-bind="visible:recentsActive()">
-                                    <!-- Resource Records Table, this should probably be split out into a separate .htm-->
-                                    <div class="pad-all">
-                                        <div class="resource-grid-title">{% trans "Recently Added Resources" %}</div>
-                                        <div class="recent-additions-container">
-                                            <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Resource Id</th>
-                                                        <th>Resource Name</th>
-                                                        <th>Resource Type</th>
-                                                        <th class="min-desktop">Created</th>
-                                                        <th class="min-tablet"></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for resource in resource_instances %}
-                                                    <tr>
-                                                        <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' resource.pk %}')">{{resource.pk}}</a></td>
-                                                        <td>{{resource.displayname}}</td>
-                                                        <td>{{resource.graph.name}}</td>
-                                                        <td>{{resource.createdtime}}</td>
-                                                        <td>
-                                                            <a href="{% url 'resource_report' resource.pk %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        {% endif %}
-
                         <!-- Search Bar -->
                         {% if nav.search %}
                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
@@ -162,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         <!-- cursory implementation of this button, need to fix the permissions test -->
-                        {% if nav.res_edit and user.username != 'anonymous' %}
+                        {% if nav.res_edit and user|has_group:"Resource Editor %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
                               <i class="ion-edit"></i>

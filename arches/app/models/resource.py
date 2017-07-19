@@ -18,8 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import importlib
+import datetime
 from django.db.models import Q
 from arches.app.models import models
+from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
@@ -65,16 +67,35 @@ class Resource(models.ResourceInstance):
     def displayname(self):
         return self.get_descriptor('name')
 
+    def save_edit(self, user={}, note='', edit_type=''):
+        timestamp = datetime.datetime.now()
+        edit = EditLog()
+        edit.resourceclassid = self.graph_id
+        edit.resourceinstanceid = self.resourceinstanceid
+        edit.userid = getattr(user, 'id', '')
+        edit.user_email = getattr(user, 'email', '')
+        edit.user_firstname = getattr(user, 'first_name', '')
+        edit.user_lastname = getattr(user, 'last_name', '')
+        edit.note = note
+        edit.timestamp = timestamp
+        edit.edittype = edit_type
+        edit.save()
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
 
         """
-
+        request = kwargs.pop('request', '')
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
+        if request == '':
+            user = {}
+        else:
+            user = request.user
+        self.save_edit(user=user, edit_type='create')
         self.index()
 
     @staticmethod
@@ -109,11 +130,14 @@ class Resource(models.ResourceInstance):
         TileModel.objects.bulk_create(tiles)
 
         for resource in resources:
+            resource.save_edit(edit_type='create')
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
 
+        for tile in tiles:
+            tile.save_edit(edit_type='tile create', new_value=tile.data)
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -163,14 +187,14 @@ class Resource(models.ResourceInstance):
                 datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    datatype_instance.append_to_document(document, nodevalue, tile)
+                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
                         terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id}})
 
         return document, terms
 
-    def delete(self):
+    def delete(self, user={}, note=''):
         """
         Deletes a single resource and any related indexed data
 
@@ -188,6 +212,7 @@ class Resource(models.ResourceInstance):
         for result in results:
             se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+        self.save_edit(edit_type='delete')
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=1000, start=0):

@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+import uuid
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
@@ -67,8 +67,9 @@ def get_resource_relationship_types():
 class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if graphid is not None:
-            # self.graph = Graph.objects.get(graphid=graphid)
-            resource_instance = Resource.objects.create(graph_id=graphid)
+            resource_instance = Resource()
+            resource_instance.graph_id = graphid
+            resource_instance.save(**{'request':request})
             resource_instance.index()
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
@@ -137,6 +138,81 @@ class ResourceEditorView(BaseManagerView):
             ret = Resource.objects.get(pk=resourceid)
             ret.delete()
             return JSONResponse(ret)
+        return HttpResponseNotFound()
+
+
+@method_decorator(group_required('Resource Editor'), name='dispatch')
+class ResourceEditLogView(BaseManagerView):
+    def getEditConceptValue(self, values):
+        if values != None:
+            for k, v in values.iteritems():
+                try:
+                    uuid.UUID(v)
+                    v = models.Value.objects.get(pk=v).value
+                    values[k] = v
+                except Exception as e:
+                    pass
+                try:
+                    display_values = []
+                    for val in v:
+                        uuid.UUID(val)
+                        display_value = models.Value.objects.get(pk=val).value
+                        display_values.append(display_value)
+                    values[k] = display_values
+                except Exception as e:
+                    pass
+
+    def get(self, request, resourceid=None, view_template='views/resource/edit-log.htm'):
+        if resourceid is None:
+            context = self.get_context_data(
+                main_script='views/edit-history',
+                resource_instances=Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
+            )
+            context['nav']['title'] = _('Recent Edits')
+
+            return render(request, 'views/edit-history.htm', context)
+        else:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
+            permitted_edits = []
+            for edit in edits:
+                if edit.nodegroupid != None:
+                    nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
+                    if request.user.has_perm('read_nodegroup', nodegroup):
+                        if edit.newvalue != None:
+                            self.getEditConceptValue(edit.newvalue)
+                        if edit.oldvalue != None:
+                            self.getEditConceptValue(edit.oldvalue)
+                        permitted_edits.append(edit)
+                else:
+                    permitted_edits.append(edit)
+
+            resource = Resource.objects.get(pk=resourceid)
+            displayname = resource.displayname
+            displaydescription = resource.displaydescription
+            cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+            graph_name = resource_instance.graph.name
+
+            if displayname == 'undefined':
+                displayname = _('Unnamed Resource')
+
+            context = self.get_context_data(
+                main_script='views/resource/edit-log',
+                cards=JSONSerializer().serialize(cards),
+                resource_type=resource_instance.graph.name,
+                resource_description=displaydescription,
+                iconclass=resource_instance.graph.iconclass,
+                edits=JSONSerializer().serialize(permitted_edits),
+                resourceid=resourceid,
+                displayname=displayname,
+            )
+
+            context['nav']['res_edit'] = True
+            context['nav']['icon'] = resource_instance.graph.iconclass
+            context['nav']['title'] = resource_instance.graph.name
+
+            return render(request, view_template, context)
+
         return HttpResponseNotFound()
 
 

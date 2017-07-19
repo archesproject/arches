@@ -131,6 +131,9 @@
     color: #5f5f5f;
     border-width: 0;
 }
+.card-grid-item .panel-footer .disabled {
+    color: #ccc;
+}
 
 .branch-item {
     margin-bottom: 10px;
@@ -2456,6 +2459,133 @@ ul .collapse li:last-of-type {
     color: #959595;
 }
 
+.eh-timeline-panel {
+    overflow-y: auto;
+    height: calc(100vh - 60px);
+    background: #ebeef0;
+}
+
+.eh-timeline-time {
+	max-width: 150px;
+	margin-top: 7px;
+}
+
+.eh-timeline-stat {
+	width: 140px;
+}
+
+.eh-timeline-label {
+	margin-left: 150px;
+}
+
+.panel .eh-timeline-label:after {
+    border-right-color: #fff;
+}
+
+.eh-timeline-header {
+	padding-left: 20px;
+}
+
+.eh-timeline {
+	margin-left: 20px;
+	padding-right: 25px;
+}
+
+.eh_resource_descriptors {
+    display: flex;
+    flex-direction: column;
+    margin-top: -6px;
+}
+
+.eh_description {
+    font-size: 11px;
+    color: #999;
+    padding-left: 45px;
+    margin-top: -15px;
+}
+
+.timeline:before {
+    left: 69px
+}
+
+.timeline:after {
+    left: 67px
+}
+
+.panel .timeline, .panel .timeline-time .eh-timeline-time {
+	background: #ebeef0;
+}
+
+.panel .eh-timeline-time {
+	background: #ebeef0;
+}
+
+.panel .eh-timeline-label {
+    box-shadow: none;
+    background-color: #fff;
+    border: 1px solid #e3e3e3;
+}
+
+.panel .eh-timeline-stat .timeline-icon {
+    box-shadow: 0 0 0 7px #ddd;
+}
+
+.eh-timeline:before {
+	margin-left: 20px;
+}
+
+.eh-timeline:after {
+	margin-left: 20px;
+}
+
+.eh-editor {
+	padding-top: 15px;
+	font-size: 12px;
+	color: #888;
+}
+
+.eh-footer {
+	padding: 10px;
+	margin: 20px -10px -10px -10px;
+    background: #f8f8f8;
+    border-top: 1px solid #ddd;
+}
+
+.eh-edit-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #666;
+}
+
+.eh-node-group {
+	padding-left: 10px;
+}
+
+.tile-data-list {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.tile-data-item {
+    font-weight: 600;
+    color: #777;
+}
+
+.tile-node-name {
+    width: 245px;
+    display: table-cell;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tile-node-value {
+    font-weight: 400;
+    padding-left: 10px;
+    display: table-cell;
+}
+
 .flex {
     display: -ms-flexbox;
     display: -webkit-flex;
@@ -4609,6 +4739,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     transition: all .30s ease;
 }
 
+.new-card.disabled {
+    background-color: #ccc;
+}
+
 .card-library {
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -4986,7 +5120,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .ep-form-alert {
     position: absolute;
     top: 0px;
-    z-index: 4000;
+    z-index: 5000;
     width: 100%;
     height: 90px;
     padding: 10px 25px;
@@ -7160,7 +7294,6 @@ a.clear-geojson-button:hover {
 
 .hover-feature-body {
     padding: 10px 10px 20px 10px;
-    height: 150px;
     overflow-y: scroll;
 }
 
@@ -8055,24 +8188,9 @@ table.table.dataTable {
     color: #666;
 }
 
-.facets-container {
-    position: absolute;
-    width: 250px;
-    right: 0px;
-    border-left: 1px solid #ddd;
-}
-
 a .search-type-link{
     height: 50px;
     width: 50px;
-}
-
-.search-type-btn {
-    height: 50px;
-    width: 60px;
-    font-size: 11px;
-    padding-top: 25px;
-    color: #888;
 }
 
 .search-type-btn.relative:hover {
@@ -8086,11 +8204,25 @@ a .search-type-link{
     color: #123;
 }
 
-.search-type-btn-icon {
-    position: absolute;
-    top: 10px;
-    left: 25px;
+.search-type-btn {
+    height: 50px;
+    font-size: 11px;
+    color: #888;
+}
+
+.search-type-btn i {
     font-size: 15px;
+}
+
+.search-type-btn p {
+    padding-top: 5px;
+}
+
+.facets-container {
+    position: absolute;
+    width: 250px;
+    right: 0px;
+    border-left: 1px solid #ddd;
 }
 
 .facets-search-container {
