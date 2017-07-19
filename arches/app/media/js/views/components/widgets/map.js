@@ -661,7 +661,6 @@ define([
                                         padding: self.buffer()
                                     });
                                 } else {
-                                    console.log('fitting agg bounds')
                                     self.fitToAggregationBounds();
                                 }
                                 var features = [];

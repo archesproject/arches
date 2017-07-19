@@ -13,7 +13,7 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                 this.searchValue = ko.observable(filter.val || '');
                 this.node = params.node;
                 if (!ko.isObservable(this.node.config.rdmCollection)) {
-                    this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);                    
+                    this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
                 }
                 ConceptWidgetViewModel.apply(this, [params]);
                 this.filterValue = ko.computed(function () {
@@ -27,6 +27,7 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                     params.filterValue(val);
                 });
             } else {
+                this.isEditable = params.graph ? params.graph.get('is_editable') : true;
                 this.topConcept = params.config.rdmCollection;
                 this.conceptCollections = arches.conceptCollections;
                 this.conceptCollections.unshift({
