@@ -70,7 +70,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
     url(r'^graph/(?P<graphid>%s)/export_mapping_file$' % uuid_regex, GraphDataView.as_view(action='export_mapping_file'), name='export_mapping_file'),
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
-    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
+    url(r'^components/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),

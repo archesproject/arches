@@ -448,7 +448,7 @@ class FormView(GraphBaseView):
 
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+        return render(request, 'views/components/datatypes/%s.htm' % template)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')

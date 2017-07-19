@@ -113,7 +113,7 @@ define([
             this.items().forEach(function(item){
                 item.selected(false);
                 item.children.forEach(function(child) {
-                  if (child.type === 'Node') {
+                  if (child.type === 'node') {
                     child.active(false);
                   }
                 })
