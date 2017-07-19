@@ -65,7 +65,7 @@ class Graph(models.GraphModel):
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
+                    if key not in ('root', 'nodes', 'edges', 'cards', 'functions', 'is_editable'):
                         setattr(self, key, value)
 
                 nodegroups = dict((item['nodegroupid'], item) for item in args[0]["nodegroups"])
