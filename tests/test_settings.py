@@ -65,6 +65,8 @@ REMOTE_BROWSERS = [
     #  "version": "45"}
 ]
 
+OVERRIDE_RESOURCE_MODEL_LOCK = True
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',

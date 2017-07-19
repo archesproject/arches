@@ -274,9 +274,12 @@ class GraphDataView(View):
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
         if data and self.action == 'delete_node':
-            graph = Graph.objects.get(graphid=graphid)
-            graph.delete_node(node=data.get('nodeid', None))
-            return JSONResponse({})
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_node(node=data.get('nodeid', None))
+                return JSONResponse({})
+            except GraphValidationError as e:
+                return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
         return HttpResponseNotFound()
 
@@ -448,7 +451,7 @@ class FormView(GraphBaseView):
 
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+        return render(request, 'views/components/datatypes/%s.htm' % template)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -569,7 +572,7 @@ class FunctionManagerView(GraphBaseView):
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
@@ -591,9 +594,10 @@ class FunctionManagerView(GraphBaseView):
 
         return JSONResponse(data)
 
+
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
