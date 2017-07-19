@@ -255,7 +255,7 @@
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
                 'name': '{{ provider.name }}',
                 'geocoderid': '{{ provider.geocoderid }}',
-                'api_key': '{{ provider.api_key }}',
+                'api_key': {% if provider.api_key != None %} '{{ provider.api_key }}' {% elif provider.api_key == None %} null {% endif %},
                 'component': '{{ provider.component }}'
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{

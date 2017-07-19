@@ -52,7 +52,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
             });
         },
         template: {
-            require: 'text!templates/views/components/geocoders/mapbox.htm'
+            require: 'text!templates/views/components/geocoders/geocoder.htm'
         }
     });
 })
