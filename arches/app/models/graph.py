@@ -710,7 +710,8 @@ class Graph(models.GraphModel):
 
         """
 
-        self.check_if_resource_is_editable()
+        if self.is_editable == False:
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
         if node is not None:
             if not isinstance(node, models.Node):

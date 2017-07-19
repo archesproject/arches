@@ -274,9 +274,12 @@ class GraphDataView(View):
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
         if data and self.action == 'delete_node':
-            graph = Graph.objects.get(graphid=graphid)
-            graph.delete_node(node=data.get('nodeid', None))
-            return JSONResponse({})
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_node(node=data.get('nodeid', None))
+                return JSONResponse({})
+            except GraphValidationError as e:
+                return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
         return HttpResponseNotFound()
 
