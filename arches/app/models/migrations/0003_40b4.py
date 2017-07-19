@@ -93,44 +93,47 @@ class Migration(migrations.Migration):
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/string',
+                    configcomponent = 'views/components/datatypes/string',
                     configname = 'string-datatype-config'
                 WHERE datatype = 'string';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/number',
+                    configcomponent = 'views/components/datatypes/number',
                     configname = 'number-datatype-config'
                 WHERE datatype = 'number';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/boolean',
+                    configcomponent = 'views/components/datatypes/boolean',
                     configname = 'boolean-datatype-config'
                 WHERE datatype = 'boolean';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configcomponent = 'views/components/datatypes/domain-value',
                     configname = 'domain-value-datatype-config'
                 WHERE datatype = 'domain-value';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/concept',
+                    configcomponent = 'views/components/datatypes/concept',
                     configname = 'concept-datatype-config'
                 WHERE datatype = 'concept';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/date',
+                    configcomponent = 'views/components/datatypes/date',
                     configname = 'date-datatype-config'
                 WHERE datatype = 'date';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/concept',
+                    configcomponent = 'views/components/datatypes/concept',
                     configname = 'concept-datatype-config'
                 WHERE datatype = 'concept-list';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configcomponent = 'views/components/datatypes/domain-value',
                     configname = 'domain-value-datatype-config'
                 WHERE datatype = 'domain-value-list';
+            UPDATE d_data_types
+                SET configcomponent = 'views/components/datatypes/geojson-feature-collection'
+                WHERE datatype = 'geojson-feature-collection';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -172,7 +175,9 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'domain-value-list';
-
+            UPDATE d_data_types
+                SET configcomponent = 'views/graph/datatypes/geojson-feature-collection',
+                WHERE datatype = 'geojson-feature-collection';
         """),
 
         migrations.RunSQL("""
@@ -197,7 +202,7 @@ class Migration(migrations.Migration):
                 );
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
             INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
+            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/components/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
             """,
