@@ -5,7 +5,7 @@
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Card Designer Overview" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>{% if not graph.isresource %}{% trans "Use the Card Designer to edit this Branch's Card.{% else %}Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click "Return to Cards" to go back and choose a new Card to edit." %}{% endif %}</p>
+            <p>{% if not graph.isresource %}{% trans "Use the Card Designer to edit this Branch's Card." %} {% else %} {% trans "Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click 'Return to Cards' to go back and choose a new Card to edit." %}{% endif %}</p>
             <p>{% trans "The Card Designer interface is split into three sections, as shown in the image below." %}</p>
             <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img src="{{ STATIC_URL }}img/help/card-designer-panes.png"></img></p>
@@ -33,7 +33,7 @@
                 <h5>{% trans "Example 2: Card Container with Cards" %}</h5>
             </div>
             <div class="col-xs-6">
-                <p>{% trans "In some cases, a complex Branch will have a Card Container, which aggregates multiple Cards (and their Widgets) in order to thematically organize data entry. These Cards will appear as "tabs" in the preview. You can reorder these tabs just as you would Widgets." %}</p>
+                <p>{% trans "In some cases, a complex Branch will have a Card Container, which aggregates multiple Cards (and their Widgets) in order to thematically organize data entry. These Cards will appear as 'tabs' in the preview. You can reorder these tabs just as you would Widgets." %}</p>
                 <p>{% trans "Note that different icons are used for different types of Widgets." %}</p>
             </div>
             <div class="col-xs-6">

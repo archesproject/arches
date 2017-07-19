@@ -63,7 +63,7 @@
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
         <!-- Tertiary Panel For Card Help Text-->
-        <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible: card().get('helpenabled')">
+        <div class="tertiary-panel help-text-crud" style="display: none;" data-bind="visible: card().get('helpenabled')">
             <div class="tertiary-panel-content">
                 <div class="">
                     <h4 class="title-block-title" style=""> {% trans "Card-Level Help" %} </h4>

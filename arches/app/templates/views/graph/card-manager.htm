@@ -51,7 +51,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Isotope Layout -->
             <div id="report-image-grid" class="report-image-grid">
 
-                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card" data-bind="click: toggleCardLibrary">
+                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card" data-bind="click: toggleCardLibrary, css: {'disabled': !cardsEditable}">
                     <a id="add-card" href="" data-toggle="modal" class="" style="">
                         <h3 class="text-thin" style="margin-top: 10px;">{% trans "Add Card" %}</h3>
 
@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i>{% trans "Remove Card" %}</a>
+                            <a href="#" class="pull-right" data-bind="css: {'disabled': !$parent.cardsEditable}, click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i> {% trans 'Remove Card' %}</a>
                         </div>
 
                     </div>
