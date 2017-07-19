@@ -112,16 +112,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Search Bar -->
                         {% if nav.search %}
                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
                               <i class="ion-search"></i>
                             </div>
                         </a>
                         {% endif %}
 
-                        <!-- cursory implementation of this button, need to fix the permissions test -->
-                        {% if nav.res_edit and user|has_group:"Resource Editor %}
+                        {% if nav.res_edit and user|has_group:"Resource Editor" %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Edit Resource">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
                               <i class="ion-edit"></i>
                             </div>
                         </a>
@@ -129,7 +128,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         {% if nav.print %}
                         <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Print">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
                               <i class="ion-printer"></i>
                             </div>
                         </a>
@@ -137,7 +136,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         {% if nav.help.0 != '' %}
                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
                               <i class="ion-help"></i>
                             </div>
                         </a>
@@ -151,7 +150,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span>{% trans nav.help.0 %}</span>
                             </div>
                             <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none;">
-                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Close Help">
+                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
                                   <i class="fa fa-times-circle fa-lg"></i>
                                 </div>
                             </a>
@@ -163,7 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% include nav.help.1 %}
                             {% endif %}
                             <hr>
-                            <h5>for more documentation, visit <a href="https://arches4.readthedocs.io/en/latest/">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                            <h5>{% trans "for more documentation, visit" %} <a href="https://arches4.readthedocs.io/en/latest/" target="_blank">arches4.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
                         </div>
                     </div>
                     {% endblock header %}
@@ -182,14 +181,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <ul id="mainnav-menu" class="list-group">
 
                                         <!-- Tools -->
-                                        <li class="list-header">Tools</li>
+                                        <li class="list-header">{% trans "Tools" %}</li>
+
+                                        <!-- System Settings list item -->
+                                        {% if request.user|has_group:"System Administrator" %}
+                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Manage System Settings" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
+                                                </li>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% endif %}
 
                                         <!--Menu list item-->
                                         <li>
                                             <a href="#">
                                                 <i class="fa fa-tachometer"></i>
                                                 <span class="menu-title">
-                                                    <strong>Dashboard</strong>
+                                                    <strong>{% trans "Dashboard" %}</strong>
                                                 </span>
                                             </a>
                                         </li>
@@ -200,7 +219,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
-                                                    <strong>Add New Resource</strong>
+                                                    <strong>{% trans "Add New Resource" %}</strong>
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in" aria-expanded="false">
@@ -240,28 +259,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-
-                                        <!-- System Settings list item -->
-                                        {% if request.user|has_group:"System Administrator" %}
-                                        <li{% if "system-settings" in main_script %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
-                                                <i class="ti-alarm-clock"></i>
-                                                <span class="menu-title">
-                                                    <strong>{% trans "Manage System Settings" %}</strong>
-                                                </span>
-                                            </a>
-                                            <ul class="collapse" aria-expanded="false">
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
-                                                </li>
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        {% endif %}
-
-
                                         <!--Menu list item-->
                                         {% if request.user|has_group:"Application Administrator" %}
                                         <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
@@ -286,48 +283,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         {% endif %}
 
 
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-globe"></i>
+                                        <!-- Recently Added -->
+                                        {% if request.user|has_group:"Resource Editor" %}
+                                        <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
+                                                <i class="ti-ticket"></i>
                                                 <span class="menu-title">
-                                                    <strong>Field Project Manager</strong>
+                                                    <strong>{% trans "Recent Edits" %}</strong>
                                                 </span>
                                             </a>
                                         </li>
+                                        {% endif %}
 
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-cloud-upload"></i>
-                                                <span class="menu-title">
-                                                    <strong>Import/Export Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-user-md"></i>
-                                                <span class="menu-title">
-                                                    <strong>Profile Manager</strong>
-                                                </span>
-                                            </a>
-                                        </li>
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
 
                                         <!-- Tools -->
-                                        <li class="list-header">Modules</li>
+                                        <li class="list-header">{% trans "Modules" %}</li>
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
                                             <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
-                                                    RDM
+                                                    {% trans "RDM" %}
                                                 </span>
                                             </a>
                                         </li>
