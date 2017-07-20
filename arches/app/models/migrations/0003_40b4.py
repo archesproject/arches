@@ -238,9 +238,9 @@ class Migration(migrations.Migration):
                 "bearing": 0.0,
                 "geocodePlaceholder": "Search",
                 "geocoderVisible": true,
-                "featureColor": null,
-                "featureLineWidth": null,
-                "featurePointSize": null,
+                "featureColor": "#FF0000",
+                "featureLineWidth": 1,
+                "featurePointSize": 3,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
             }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
@@ -260,9 +260,9 @@ class Migration(migrations.Migration):
                     "bearing": 0.0,
                     "geocodePlaceholder": "Search",
                     "geocoderVisible": true,
-                    "featureColor": null,
-                    "featureLineWidth": null,
-                    "featurePointSize": null
+                    "featureColor": "#FF0000",
+                    "featureLineWidth": 1,
+                    "featurePointSize": 3
                 }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
         """
