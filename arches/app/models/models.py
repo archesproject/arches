@@ -303,12 +303,12 @@ class GraphModel(models.Model):
         if not self.isactive:
             msg.append(_('change resource model status in graph manager'))
         if forms.count() == 0:
-            msg.append(_('add form(s)'))
+            msg.append(_('add menu(s)'))
         else:
             if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to form(s)'))
+                msg.append(_('add card(s) to menu(s)'))
             if forms.filter(visible=True).count() == 0:
-                msg.append(_('make form(s) visible'))
+                msg.append(_('make menu(s) visible'))
         if len(msg) == 0:
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
