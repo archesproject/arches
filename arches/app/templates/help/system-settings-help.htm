@@ -14,7 +14,7 @@
             <p>
               {% blocktrans %}
                 <strong>Application Name</strong> - Name of your Arches app, to be displayed in the browser title bar and elsewhere.<br>
-                <strong>Default Data Import/Export User</strong> - <br>
+                <strong>Default Data Import/Export User</strong> - Name to associate with data that is imported into the system.<br>
               {% endblocktrans %}
             </p>
             <h4>{% trans "Web Analytics" %}</h4>
@@ -44,7 +44,12 @@
             <h4>{% trans "Project Extent" %}</h4>
             <p>{% trans "Draw a polygon representing your project's extent. These bounds will serve as the default for the cache seed bounds, search result grid bounds, and map bounds in search, cards, and reports." %}</p>
             <h4>{% trans "Map Zoom" %}</h4>
-            <p>{% trans "You can define the zoom behavior of your maps by specifying max/min and default values. Zoom level 0 shows the whole world (and is the minimum zoom level). Most map services support a maximum of 20 or so zoom levels." %}</p>
+            <p>{% trans "You can define the zoom behavior of your maps by specifying the <strong>Min Zoom</strong> (how far youmax/min and default values. Zoom level 0 shows the whole world (and is the minimum zoom level). Most map services support a maximum of 20 or so zoom levels." %}</p>
+            <p>
+                {% trans "<strong>Default Zoom</strong> - Set the zoom level that the map will be shown at by default. Note that <br>
+                {% trans "<strong>Mapbox Sprites</strong> - Path to Mapbox sprites (use default)." %}<br>
+                {% trans "<strong>Mapbox Glyphs</strong> - Path to Mapbox glyphs (use default)." %}<br>
+            </p>
             <h4>{% trans "Search Results Grid" %}</h4>
             <p>{% trans "Arches aggregates search results and displays them as hexagons. You will need to set default parameters for the hexagon size and precision." %}</p>
             <p><em>{% trans "<strong>Warning:</strong> A large project area combined with a small hexagon size and/or high precision will take a very long time to load, and can crash your browser. We suggest changing these settings in small increments to find the best combination for your project." %}</em></p>
@@ -53,9 +58,14 @@
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Basic Search Settings" %}</h4></a>
         <div class="ep-help-topic-content">
-          {% blocktrans %}
-            <p>Set the default search results behavior. This is also where you will define the max number of resources per export operation.</p>
-          {% endblocktrans %}
+            <p>{% trans "Set the default search results behavior." %}</p>
+            {% blocktrans %}
+            <p>
+                <strong>Number of search results per page</strong> - Set the number of search results shown per page. Note this also defines the number of search result markers that are shown on the map.<br>
+                <strong>Number of search hints per dropdown</strong> - Set the number of search hints that will appear under the search bar as you type in search terms.<!--<br>
+                <strong>Max number of search results to export</strong> - Set the maximum number of resources to be exported from the search results.-->
+            </p>
+            {% endblocktrans %}
         </div>
     </div>
     <div>
@@ -63,8 +73,7 @@
         <div class="ep-help-topic-content">
             <p>{% trans "Arches creates a Time Wheel based on the resources in your database, to allow for quick temporal visualization and queries. A few aspects of this temporal search are defined here." %}</p>
             <p>
-                {% trans "<strong>Color Ramp</strong> - The color ramp for the time wheel. For further reference, check out the <a href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md'>d3 API reference</a>." %}<br>
-                {% trans "<strong>Time wheel configuration</strong> - Configure the time wheel here (____)." %}
+                {% trans "<strong>Color Ramp</strong> - The color ramp for the time wheel. For further reference, check out the <a href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md'>d3 API reference</a>." %}
             </p>
         </div>
     </div>
@@ -72,8 +81,10 @@
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Saved Searches" %}</h4></a>
         <div class="ep-help-topic-content">
             {% blocktrans %}
+            <p>Arches allows you save a search and present it as convenience for your users. Saved Searches appear as search options in the main Search page. Creating a Saved Search is a three-step process.</p>
+            {% endblocktrans %}
+            {% blocktrans %}
             <p>
-                <p>Arches allows you save a search and present it as convenience for your users. Saved Searches appear as search options in the main Search page. Creating a Saved Search is a three-step process.</p>
                 <strong>1. Specify Search Criteria</strong> - Go to the Search page and enter all the criteria you would like to use to configure your Saved Search. You may notice that with the addition of each new search filter (either by using the term filter, map filtering tools, or temporal filters) the URL for the page will change.<br>
                 <strong>2. Copy the URL</strong> - In your browser address bar, copy the <em>entire</em> URL. This will be a long string that defines each of the search filters created in step 1.<br>
                 <strong>3. Create the Saved Search</strong> - Finally, head back to this page and fill out the settings that you see at left. You can also upload an image that will be shown along with your Search Search.
