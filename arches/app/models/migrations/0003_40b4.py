@@ -90,6 +90,18 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mapfeaturecolor',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='maplinewidth',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mappointsize',
+        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
