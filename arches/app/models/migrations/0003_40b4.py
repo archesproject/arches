@@ -90,6 +90,18 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mapfeaturecolor',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='maplinewidth',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mappointsize',
+        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
@@ -238,9 +250,9 @@ class Migration(migrations.Migration):
                 "bearing": 0.0,
                 "geocodePlaceholder": "Search",
                 "geocoderVisible": true,
-                "featureColor": null,
-                "featureLineWidth": null,
-                "featurePointSize": null,
+                "featureColor": "#FF0000",
+                "featureLineWidth": 1,
+                "featurePointSize": 3,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
             }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
@@ -260,9 +272,9 @@ class Migration(migrations.Migration):
                     "bearing": 0.0,
                     "geocodePlaceholder": "Search",
                     "geocoderVisible": true,
-                    "featureColor": null,
-                    "featureLineWidth": null,
-                    "featurePointSize": null
+                    "featureColor": "#FF0000",
+                    "featureLineWidth": 1,
+                    "featurePointSize": 3
                 }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
         """

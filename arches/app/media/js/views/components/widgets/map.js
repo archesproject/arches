@@ -47,9 +47,9 @@ define([
      * @param {boolean} params.config.geocoderVisible - whether the geocoder is available on the map
      * @param {number} params.config.minZoom - the min zoom of the map
      * @param {number} params.config.maxZoom - the max zoom of the map
-     * @param {string} params.config.resourceColor - the color of resource geometries
-     * @param {number} params.config.resourcePointSize - the point size of resource geometries
-     * @param {number} params.config.resourceLineWidth - the line width of resource geometries
+     * @param {string} params.config.featureColor - the color of resource geometries
+     * @param {number} params.config.featurePointSize - the point size of resource geometries
+     * @param {number} params.config.featureLineWidth - the line width of resource geometries
      * @param {boolean} params.config.featureEditingDisabled - a config for reports that hides the draw tools
      * @param {object} params.config.overlayConfigs - an array of overlays saved to the widget
      */
@@ -225,7 +225,6 @@ define([
 
                     if (self.draw !== undefined) {
                         self.draw.changeMode('simple_select')
-                        self.featureColor(self.resourceColor)
                         self.loadGeometriesIntoDrawLayer();
                     }
 
@@ -244,22 +243,8 @@ define([
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
                 this.graphId = params.graph.get('graphid')
-                this.resourceColor = params.graph.get('mapfeaturecolor')
-                this.resourcePointSize = params.graph.get('mappointsize')
-                this.resourceLineWidth = params.graph.get('maplinewidth')
-                if (!this.featureColor()) {
-                    this.featureColor(this.resourceColor);
-                }
-                if (!this.featurePointSize()) {
-                    this.featurePointSize(this.resourcePointSize);
-                } else {
-                    this.featurePointSize(Number(this.featurePointSize()))
-                }
-                if (!this.featureLineWidth()) {
-                    this.featureLineWidth(this.resourceLineWidth);
-                } else {
-                    this.featureLineWidth(Number(this.featureLineWidth()));
-                }
+                this.featurePointSize(Number(this.featurePointSize()))
+                this.featureLineWidth(Number(this.featureLineWidth()));
                 this.featureColorCache = this.featureColor()
                 this.featurePointSizeCache = this.featurePointSize()
                 this.featureLineWidthCache = this.featureLineWidth()

@@ -290,9 +290,6 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
-    mapfeaturecolor = models.TextField(blank=True, null=True)
-    mappointsize = models.IntegerField(blank=True, null=True)
-    maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
@@ -306,12 +303,12 @@ class GraphModel(models.Model):
         if not self.isactive:
             msg.append(_('change resource model status in graph manager'))
         if forms.count() == 0:
-            msg.append(_('add form(s)'))
+            msg.append(_('add menu(s)'))
         else:
             if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to form(s)'))
+                msg.append(_('add card(s) to menu(s)'))
             if forms.filter(visible=True).count() == 0:
-                msg.append(_('make form(s) visible'))
+                msg.append(_('make menu(s) visible'))
         if len(msg) == 0:
             return False
         return _('To make this resource editable: ') + ', '.join(msg)

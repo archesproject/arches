@@ -130,9 +130,6 @@ class Graph(models.GraphModel):
             isresource=is_resource,
             isactive=False,
             iconclass="",
-            mapfeaturecolor="#FF0000",
-            mappointsize=3,
-            maplinewidth=1,
             ontology=None
         )
         if not is_resource:
@@ -1149,7 +1146,7 @@ class Graph(models.GraphModel):
                         unpermitted_edits.append(unpermitted_node_edits)
 
                 db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass', 'mapfeaturecolor', 'maplinewidth', 'mappointsize','author','description','isactive'])
+                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive'])
                 if unpermitted_graph_edits != None:
                     unpermitted_edits.append(unpermitted_graph_edits)
 
