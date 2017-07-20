@@ -48,7 +48,7 @@ class ResourceListView(BaseManagerView):
         )
 
         context['nav']['icon'] = "fa fa-bookmark"
-        context['nav']['title'] = "Resource Manager"
+        context['nav']['title'] = _("Resource Manager")
         context['nav']['login'] = True
         context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 

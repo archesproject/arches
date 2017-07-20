@@ -90,7 +90,7 @@ class SearchView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
         )
 
-        context['nav']['title'] = 'Search'
+        context['nav']['title'] = _('Search')
         context['nav']['icon'] = 'fa-search'
         context['nav']['search'] = False
         context['nav']['help'] = (_('Searching the Arches Database'),'help/search-help.htm')
