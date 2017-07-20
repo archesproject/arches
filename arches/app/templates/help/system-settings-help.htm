@@ -44,11 +44,11 @@
             <h4>{% trans "Project Extent" %}</h4>
             <p>{% trans "Draw a polygon representing your project's extent. These bounds will serve as the default for the cache seed bounds, search result grid bounds, and map bounds in search, cards, and reports." %}</p>
             <h4>{% trans "Map Zoom" %}</h4>
-            <p>{% trans "You can define the zoom behavior of your maps by specifying the <strong>Min Zoom</strong> (how far youmax/min and default values. Zoom level 0 shows the whole world (and is the minimum zoom level). Most map services support a maximum of 20 or so zoom levels." %}</p>
+            <p>{% trans "You can define the zoom behavior of your map. Zoom level 0 shows the whole world (and is the absolute minimum zoom level) and zoom level 20 is the maximum level that most map services support." %}</p>
             <p>
-                {% trans "<strong>Default Zoom</strong> - Set the zoom level that the map will be shown at by default. Note that <br>
-                {% trans "<strong>Mapbox Sprites</strong> - Path to Mapbox sprites (use default)." %}<br>
-                {% trans "<strong>Mapbox Glyphs</strong> - Path to Mapbox glyphs (use default)." %}<br>
+                {% trans "<strong>Default Zoom</strong> - Set the zoom level that the map will be shown at by default." %}<br>
+                {% trans "<strong>Min Zoom</strong> - Minimum zoom level defines how far the user can zoom out when viewing the map." %}<br>
+                {% trans "<strong>Max Zoom</strong> - Maximum zoom level defines how far the user can zoom in when viewing the map." %}<br>
             </p>
             <h4>{% trans "Search Results Grid" %}</h4>
             <p>{% trans "Arches aggregates search results and displays them as hexagons. You will need to set default parameters for the hexagon size and precision." %}</p>
