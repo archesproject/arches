@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <p>{% trans "The Reference Data Management (RDM) enables the creation and maintenance of controlled vocabularies that are used throughout your database. In Arches, controlled vocabularies consist of Concepts, and these Concepts are managed in Thesauri and Collections. In the RDM you can create new Thesauri, create new Concepts, import Concepts from external endpoint (like the Getty AAT), and ultimately, create Collections of Concepts, which will be passed to your app as data input dropdown lists." %}</p>
+        <p>{% blocktrans %}For more information on how to use the RDM interface, visit this <a href="https://arches4.readthedocs.io/en/latest/rdm/#">RDM documentation</a>.{% endblocktrans %}</p>
+        <div>
+            <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Concepts" %}</h4></a>
+            <div class="ep-help-topic-content">
+                <p>{% blocktrans %}A Concept is a qualitative property that can be attached to a resource, something like "Stone" (which may describe a building material) or "House" (which may describe a past use for a structure). The advantage of storing these properties as Concepts, is that a Concept may have attributes of its own. In the case of "House", we could add an AltLabel to that Concept of "Dwelling". That way, if a user searches for "dwelling", any resource with the "House" Concept attached to it will be found.{% endblocktrans %}</p>
+                <p>{% blocktrans %}Concepts can be nested as well, to allow more complex and meaningful relationships between them.{% endblocktrans %}</p>
+                <!--
+                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+                <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
+                <p>
+                    {% trans "<strong>1 - Groups/Accounts List</strong> This panel lists all of the groups and user accounts you have in your database. By default, Arches comes with a number of pre-made groups, but all of them have the same set of permissions. It is up to you define what permissions are attached to each group. As you can see, user accounts can be members of a group, and will inherit all of the permissions attached to that group. If desired, you can further define permissions for each user." %}<br>
+                    <em>{% trans "To make new groups and user accounts you must use the Django admin interface, accessed at <a href='/admin' target='_blank'>your_arches_site.com/admin</a>." %}</em><br>
+                    {% trans "<strong>2 - Cards and Card Containers</strong> This panel lists all the node groups in this Resource Model organized by Cards and Card Containers. Clicking on a Card or Card Container will select all of its constituent nodes. Note that a symbolic representation is shown when a node is selected." %}<br>
+                    {% trans "<strong>3 - Permissions</strong> This panel summarizes all permissions that selected group or user account has for the selected node groups. Permissions are changed in the bottom portion of the panel (read 'Modifying Permissions' below for more)." %}
+                </p>
+                -->
+            </div>
+        </div>
+        <div>
+            <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Thesauri" %}</h4></a>
+            <div class="ep-help-topic-content">
+                <p>{% blocktrans %}A Thesaurus is an entire set of concepts which can be imported and exported as a whole. You can create as many new Thesauri as you need, or just add new Concepts to the default "Arches" Thesaurus. The organization of your Thesauri has no impact on the way Concepts will be exposed to the public or used throughout the app.{% endblocktrans %}</p>
+                <!--
+                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+                <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
+                <p>
+                    {% trans "<strong>1 - Groups/Accounts List</strong> This panel lists all of the groups and user accounts you have in your database. By default, Arches comes with a number of pre-made groups, but all of them have the same set of permissions. It is up to you define what permissions are attached to each group. As you can see, user accounts can be members of a group, and will inherit all of the permissions attached to that group. If desired, you can further define permissions for each user." %}<br>
+                    <em>{% trans "To make new groups and user accounts you must use the Django admin interface, accessed at <a href='/admin' target='_blank'>your_arches_site.com/admin</a>." %}</em><br>
+                    {% trans "<strong>2 - Cards and Card Containers</strong> This panel lists all the node groups in this Resource Model organized by Cards and Card Containers. Clicking on a Card or Card Container will select all of its constituent nodes. Note that a symbolic representation is shown when a node is selected." %}<br>
+                    {% trans "<strong>3 - Permissions</strong> This panel summarizes all permissions that selected group or user account has for the selected node groups. Permissions are changed in the bottom portion of the panel (read 'Modifying Permissions' below for more)." %}
+                </p>
+                -->
+            </div>
+        </div>
+        <div>
+            <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Collections" %}</h4></a>
+            <div class="ep-help-topic-content">
+                <p>{% blocktrans %}Collections, or Concept Collections as they are sometimes called, are custom aggregations of Concepts that will be used in your app as dropdown lists during the data entry process. Collections allow you to reorganize your Concepts for the specific purpose of data entry, so your dropdown lists do not have to look anything like your Thesaurus. You can create as many Collections as you want, or add new Concepts to existing Collections.{% endblocktrans %}</p>
+            </div>
+        </div>
+    </div>
+</div>

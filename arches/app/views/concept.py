@@ -61,7 +61,7 @@ class RDMView(BaseManagerView):
 
         context['nav']['icon'] = 'fa fa-align-left'
         context['nav']['title'] = _('Reference Data Manager')
-        context['nav']['help_title'] = _('Using the RDM')
+        context['nav']['help'] = (_('Using the RDM'),'help/rdm-help.htm')
 
         return render(request, 'rdm.htm', context)
 
