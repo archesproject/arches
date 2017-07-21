@@ -227,12 +227,16 @@ class Resource(models.ResourceInstance):
             'related_resources': []
         }
         se = SearchEngineFactory().create()
-        query = Query(se, limit=limit, start=start)
-        bool_filter = Bool()
-        bool_filter.should(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid))
-        bool_filter.should(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid))
-        query.add_query(bool_filter)
-        resource_relations = query.search(index='resource_relations', doc_type='all')
+
+        def get_relations(resourceinstanceid):
+            query = Query(se, limit=limit, start=start)
+            bool_filter = Bool()
+            bool_filter.should(Terms(field='resourceinstanceidfrom', terms=resourceinstanceid))
+            bool_filter.should(Terms(field='resourceinstanceidto', terms=resourceinstanceid))
+            query.add_query(bool_filter)
+            return query.search(index='resource_relations', doc_type='all')
+
+        resource_relations = get_relations(self.resourceinstanceid)
         ret['total'] = resource_relations['hits']['total']
         instanceids = set()
         for relation in resource_relations['hits']['hits']:
@@ -246,8 +250,10 @@ class Resource(models.ResourceInstance):
         related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
         if related_resources:
             for resource in related_resources['docs']:
+                relations = get_relations(resource['_id'])
+                resource['_source']['total_relations'] = relations['hits']['total']
+                resource['_source']['loaded_relations'] = len(relations['hits']['hits'])
                 ret['related_resources'].append(resource['_source'])
-
         return ret
 
     def serialize(self):
