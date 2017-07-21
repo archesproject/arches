@@ -56,6 +56,9 @@ def command_create_app(args):
     bower_path = os.path.join(os.getcwd(), proj_name, proj_name)
     os.chdir(bower_path)
     subprocess.call("bower install", shell=True)
+    open(os.path.join(os.getcwd(),'arches.log'), 'w').close()
+    open(os.path.join(os.getcwd(), 'logs', 'authority_file_errors.txt'), 'w').close()
+    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
 
 parent_parser = argparse.ArgumentParser(add_help=False)
 
@@ -95,7 +98,7 @@ parser_start.add_argument(
     dest='extensions',
     help='The file extension(s) to render (default: py).',
     type=str,
-    default=['py','txt','html','js','css'])
+    default=['py','txt','html','js','css','log'])
 
 parser_start.add_argument(
     '-n', '--name',
