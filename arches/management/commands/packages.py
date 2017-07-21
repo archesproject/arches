@@ -234,6 +234,7 @@ class Command(BaseCommand):
             'LOCALE_PATHS',
             'USE_L10N',
             'MEDIA_URL',
+            'MEDIA_ROOT',
             'STATIC_ROOT',
             'STATIC_URL',
             'ADMIN_MEDIA_PREFIX',

@@ -38,6 +38,9 @@ LOGGING = {   'disable_existing_loggers': False,
                                  'propagate': True}},
     'version': 1}
 
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# MEDIA_ROOT =  os.path.join(APP_ROOT)
+
 try:
     from settings_local import *
 except ImportError:
