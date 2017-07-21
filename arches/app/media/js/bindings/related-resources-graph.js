@@ -365,7 +365,7 @@ define([
                                         relationType: 'Ancestor',
                                         relationCount: {
                                           total: related_resource.total_relations,
-                                          loaded: related_resource.loaded_relations
+                                          loaded: 1
                                         }
                                     };
                                     nodes.push(node);
