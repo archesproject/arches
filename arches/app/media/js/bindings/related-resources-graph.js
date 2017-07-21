@@ -363,7 +363,10 @@ define([
                                         name: related_resource.displayname,
                                         isRoot: false,
                                         relationType: 'Ancestor',
-                                        relationCount: null
+                                        relationCount: {
+                                          total: related_resource.total_relations,
+                                          loaded: 1
+                                        }
                                     };
                                     nodes.push(node);
                                     nodeMap[related_resource.resourceinstanceid] = node;
