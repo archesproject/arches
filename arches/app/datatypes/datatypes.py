@@ -212,7 +212,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         arches_geojson['type'] = "FeatureCollection"
         arches_geojson['features'] = []
         geometry = GEOSGeometry(value, srid=4326)
-        if geometry.num_geom > 1:
+        if geometry.geom_type == 'GeometryCollection':
             for geom in geometry:
                 arches_json_geometry = {}
                 arches_json_geometry['geometry'] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
