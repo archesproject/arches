@@ -235,6 +235,7 @@ class Command(BaseCommand):
             'USE_L10N',
             'MEDIA_URL',
             'MEDIA_ROOT',
+            'DATATYPE_LOCATIONS',
             'STATIC_ROOT',
             'STATIC_URL',
             'ADMIN_MEDIA_PREFIX',
@@ -254,11 +255,31 @@ class Command(BaseCommand):
             for setting_key in dir(settings):
                 if setting_key in settings_whitelist:
                     setting_value = getattr(settings, setting_key)
-                    if type(setting_value) == dict or (type(setting_value) in (list, tuple) and len(setting_value) >= 3):
-                        val = "'''\n{0} = {1}\n'''\n\n".format(setting_key, pprint.pformat(setting_value, indent=4, width=50, depth=None))
+                    if type(setting_value) == dict:
+                        val = "\n{0} = {1}\n\n\n".format(setting_key, JSONSerializer().serialize(setting_value, indent=4))
+                    elif type(setting_value) in (list, tuple):
+                        braces = ('[', ']') if type(setting_value) == list else ('(',')')
+                        val = "\n{0} = {1}\n".format(setting_key, braces[0])
+                        for value in setting_value:
+                            val = val + "    " + str(value) + ',\n'
+                        val = val + "{0}\n\n\n".format(braces[1])
                     else:
-                        val = "#{0} = {1}\n\n".format(setting_key, setting_value)
+                        val = "{0} = {1}\n\n".format(setting_key, setting_value)
                     f.write(val)
+
+        lines = None
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'r') as f:
+            lines = f.readlines()
+
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
+            f.write('import os\n')
+            
+            for line in lines:
+                if len(line) > 1:
+                    f.write('#' + line)
+                else:
+                    f.write(line)
+
 
     def setup(self, package_name, es_install_location=None):
         """
