@@ -10,11 +10,26 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('sample-widget', {
         viewModel: function(params) {
-            params.configKeys = ['x_placeholder','y_placeholder','x_value', 'y_value', 'width'];
+            params.configKeys = ['x_placeholder','y_placeholder'];
             WidgetViewModel.apply(this, [params]);
-            this.value = ko.computed(function() {
-                return this.x_value() + " " + this.y_value();
-                }, this);
+            var self = this;
+            if (this.value()) {
+                var coords = this.value().split('POINT(')[1].replace(')','').split(' ')
+                var srid = this.value().split(';')[0].split('=')[1]
+                this.x_value = ko.observable(coords[0]);
+                this.y_value = ko.observable(coords[1]);
+                this.srid = ko.observable('4326');
+            } else {
+                this.x_value = ko.observable();
+                this.y_value = ko.observable();
+                this.srid = ko.observable('4326');
+            };
+
+            this.preview = ko.pureComputed(function() {
+                var res = "SRID=" + this.srid() + ";POINT(" + this.x_value() + " " + this.y_value() + ")"
+                this.value(res);
+                return res;
+            }, this);
         },
         template: { require: 'text!templates/sample-widget.htm' }
     });

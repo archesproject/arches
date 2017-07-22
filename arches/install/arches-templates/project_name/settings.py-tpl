@@ -14,6 +14,7 @@ except ImportError:
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
+DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))

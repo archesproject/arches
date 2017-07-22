@@ -2,10 +2,7 @@
     "name": "sample-widget",
     "component": "views/components/widgets/sample-widget",
     "defaultconfig": {
-        "width":"100%",
-        "x_value": null,
         "x_placeholder":"Longitude",
-        "y_value": null,
         "y_placeholder":"Latitude"
     },
     "helptext": null,

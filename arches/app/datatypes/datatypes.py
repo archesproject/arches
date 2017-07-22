@@ -40,6 +40,8 @@ class DataTypeFactory(object):
                     module = importlib.import_module(datatype_dir + '.%s' % mod_path)
                 except ImportError:
                     print "MODULE NOT FOUND", datatype_dir + '.%s' % mod_path
+                if module != None:
+                    break
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
@@ -319,7 +321,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 	WHERE cid IS NOT NULL
                 	GROUP BY cid
             """
-            
+
             for i in range(int(config['clusterMaxZoom']) + 1):
                 arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
                 distance = arc * int(config['clusterDistance'])
