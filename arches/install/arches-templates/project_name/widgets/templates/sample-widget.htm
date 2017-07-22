@@ -6,10 +6,17 @@
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <input type="number" data-bind="textInput: x_value, attr: {placeholder: x_placeholder}, style: {width: width}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+            <input type="number" data-bind="textInput: x_value, attr: {placeholder: x_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
         </div>
         <div class="col-xs-12">
-            <input type="number" data-bind="textInput: y_value, attr: {placeholder: y_placeholder}, style: {width: width}" class="form-control input-lg widget-input">
+            <input type="number" data-bind="textInput: y_value, attr: {placeholder: y_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+        </div>
+        <div class="col-xs-12">
+            <input type="text" data-bind="textInput: srid" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+        </div>
+        <div class="col-xs-12">
+            <label class="control-label widget-input-label" for="">Preview</label>
+            <input disabled type="text" data-bind="textInput: preview" class="form-control input-lg widget-input">
         </div>
     </div>
 </div>
@@ -29,3 +36,10 @@
     <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: y_placeholder">
 </div>
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+  <div style='margin-bottom:2px' data-bind="text: value"></div>
+</dd>
+{% endblock report %}
