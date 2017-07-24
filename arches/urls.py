@@ -99,6 +99,7 @@ urlpatterns = [
     url(r'^report_editor/(?P<reportid>%s|())$' % uuid_regex, ReportEditorView.as_view(), name='report_editor'),
     url(r'^report_editor/(?P<reportid>%s)/delete$' % uuid_regex, ReportEditorView.as_view(), name='delete_report'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
+    url(r'^node_layer/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node_layer'), name='node_layer'),
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
     url(r'^report-templates/(?P<template>[a-zA-Z_-]*)', main.report_templates, name="report-templates"),
     url(r'^function-templates/(?P<template>[a-zA-Z_-]*)', main.function_templates, name="function-templates"),

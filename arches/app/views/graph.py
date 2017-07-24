@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
+import uuid
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -250,6 +251,13 @@ class GraphDataView(View):
                     graph.update_node(data)
                     ret = graph
                     graph.save()
+
+                elif self.action == 'update_node_layer':
+                    nodeid = uuid.UUID(str(data.get('nodeid')))
+                    node = graph.nodes[nodeid]
+                    node.config = data['config']
+                    ret = graph
+                    node.save()
 
                 elif self.action == 'append_branch':
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])

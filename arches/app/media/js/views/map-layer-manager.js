@@ -219,6 +219,7 @@ define([
     _.each(data.geom_nodes, function(node) {
         vm.geomNodes.push(
             new NodeModel({
+                url: arches.urls.node_layer,
                 loading: vm.loading,
                 permissions: data.node_permissions[node.nodeid],
                 source: node,
