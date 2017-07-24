@@ -199,10 +199,7 @@ class Command(BaseCommand):
 
         """
         files = [
-            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
-            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
-            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'}
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
@@ -273,7 +270,7 @@ class Command(BaseCommand):
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
             f.write('import os\n')
-            
+
             for line in lines:
                 if len(line) > 1:
                     f.write('#' + line)
