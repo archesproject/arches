@@ -7366,6 +7366,11 @@ a.clear-geojson-button:hover {
     -moz-transition: .6s all ease;
     -o-transition: .6s all ease;
     transition: .6s all ease;
+    -webkit-background-size: cover; 
+    -moz-background-size: cover;
+    -o-background-size: cover;  
+    background-size: cover;
+    background-color: white;
 }
 
 .search-caption-activeWrap {
@@ -7423,11 +7428,11 @@ a.clear-geojson-button:hover {
 
 .search-query {
     padding-top: 10px;
-    padding-bottom: 10px;
+padding-tom: 10px;
     margin-top: -20px;
     margin-left: 20px;
     margin-right: 20px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(200, 200, 200, 0.8);
 }
 
 a.search-query-link-captions:hover {
