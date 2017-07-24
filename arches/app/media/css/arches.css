@@ -87,6 +87,11 @@
 }
 
 
+.one-page-header .navbar-nav>li>a:before {
+    content: "";
+}
+
+
 /*Remove pointer from Mega drop panel button*/
 
 .open.mega-dropdown>.mega-dropdown-toggle:before {
