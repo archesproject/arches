@@ -20,11 +20,15 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
+from arches.app.models.system_settings import settings
 
 def index(request):
     return render(request, 'index.htm', {
         'main_script': 'index',
         'active_page': 'Home',
+        'app_title': settings.APP_TITLE,
+        'copyright_text': settings.COPYRIGHT_TEXT,
+        'copyright_year': settings.COPYRIGHT_YEAR
     })
 
 @never_cache
@@ -52,6 +56,7 @@ def auth(request):
             return redirect('auth')
         else:
             return render(request, 'login.htm', {
+                'app_name': settings.APP_NAME,
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next
             })
