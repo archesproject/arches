@@ -3755,6 +3755,14 @@ span.editable-card i.fa.fa-align-justify:hover {
     padding: 0 30px;
 }
 
+.recent-additions-container {
+    padding-left: 20px;
+}
+
+.dataTables_scrollBody {
+    max-height: 65vh !important;
+}
+
 .card-grid {
     -ms-flex: 1;
     -webkit-flex: 1;
@@ -5924,7 +5932,7 @@ h4.report-toolbar-title {
 
 .dataTable tr:hover {
     background-color: #dbf1f5 !important;
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 
 #container .table td {
