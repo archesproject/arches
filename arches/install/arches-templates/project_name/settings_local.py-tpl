@@ -4,9 +4,13 @@ import os
 #)
 
 
-#ADMIN_MEDIA_PREFIX = /media/admin/
+#ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 #ANONYMOUS_USER_NAME = None
+
+#APP_NAME = 'Arches'
+
+#APP_TITLE = 'Arches | Heritage Data Management'
 
 
 #AUTHENTICATION_BACKENDS = (
@@ -15,6 +19,10 @@ import os
 #    arches.app.utils.permission_backend.PermissionBackend,
 #)
 
+
+#COPYRIGHT_TEXT = 'All Rights Reserved.'
+
+#COPYRIGHT_YEAR = '2016'
 
 
 #DATABASES = {
@@ -85,7 +93,7 @@ import os
 #)
 
 
-#LANGUAGE_CODE = en-US
+#LANGUAGE_CODE = 'en-US'
 
 
 #LOCALE_PATHS = (
@@ -116,16 +124,16 @@ import os
 #}
 
 
-#LOGIN_URL = auth
+#LOGIN_URL = 'auth'
 
 
 #MANAGERS = (
 #)
 
 
-#MEDIA_ROOT = /Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches
+#MEDIA_ROOT = '/Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches'
 
-#MEDIA_URL = /files/
+#MEDIA_URL = '/files/'
 
 
 #MIDDLEWARE_CLASSES = (
@@ -140,15 +148,15 @@ import os
 #)
 
 
-#MODE = PROD
+#MODE = 'PROD'
 
-#ONTOLOGY_BASE = cidoc_crm_v6.2.xml
+#ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
 
-#ONTOLOGY_BASE_ID = e6e8db47-2ccf-11e6-927e-b8f6b115d7dd
+#ONTOLOGY_BASE_ID = 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd'
 
-#ONTOLOGY_BASE_NAME = CIDOC CRM v6.2
+#ONTOLOGY_BASE_NAME = 'CIDOC CRM v6.2'
 
-#ONTOLOGY_BASE_VERSION = 6.2
+#ONTOLOGY_BASE_VERSION = '6.2'
 
 
 #ONTOLOGY_EXT = [
@@ -160,7 +168,7 @@ import os
 #]
 
 
-#ONTOLOGY_PATH = /Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches/db/ontologies/cidoc_crm
+#ONTOLOGY_PATH = '/Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches/db/ontologies/cidoc_crm'
 
 
 #POSTGIS_VERSION = (
@@ -170,11 +178,11 @@ import os
 #)
 
 
-#ROOT_DIR = /Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches
+#ROOT_DIR = '/Users/cyrus/Documents/projects/GCI/arches_v4/arches/arches'
 
-#ROOT_URLCONF = arches.urls
+#ROOT_URLCONF = 'arches.urls'
 
-#SEARCH_BACKEND = arches.app.search.search.SearchEngine
+#SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
 
 
 #STATICFILES_DIRS = (
@@ -189,9 +197,9 @@ import os
 #)
 
 
-#STATIC_ROOT = 
+#STATIC_ROOT = ''
 
-#STATIC_URL = /media/
+#STATIC_URL = '/media/'
 
 
 #TEMPLATES = [
@@ -199,7 +207,7 @@ import os
 #]
 
 
-#TIME_ZONE = America/Chicago
+#TIME_ZONE = 'America/Chicago'
 
 #USE_I18N = True
 
@@ -207,5 +215,5 @@ import os
 
 #USE_TZ = False
 
-#WSGI_APPLICATION = arches.wsgi.application
+#WSGI_APPLICATION = 'arches.wsgi.application'
 

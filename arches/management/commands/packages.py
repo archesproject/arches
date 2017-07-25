@@ -265,7 +265,12 @@ class Command(BaseCommand):
                             val = val + "    " + str(value) + ',\n'
                         val = val + "{0}\n\n\n".format(braces[1])
                     else:
-                        val = "{0} = {1}\n\n".format(setting_key, setting_value)
+                        try:
+                            setting_value.upper()
+                            val = "{0} = '{1}'\n\n".format(setting_key, setting_value)
+                        except:
+                            val = "{0} = {1}\n\n".format(setting_key, setting_value)
+
                     f.write(val)
 
         lines = None
