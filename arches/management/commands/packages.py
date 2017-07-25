@@ -205,6 +205,10 @@ class Command(BaseCommand):
             shutil.copyfile(f['src'], f['dst'])
 
         settings_whitelist = [
+            'APP_NAME',
+            'APP_TITLE',
+            'COPYRIGHT_TEXT',
+            'COPYRIGHT_YEAR',
             'MODE',
             'DATABASES',
             'DEBUG',
