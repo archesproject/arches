@@ -213,6 +213,7 @@ class Command(BaseCommand):
             'MODE',
             'DATABASES',
             'DEBUG',
+            'RESOURCE_IMPORT_LOG',
             'INTERNAL_IPS',
             'ANONYMOUS_USER_NAME',
             'ELASTICSEARCH_HTTP_PORT',
@@ -280,8 +281,10 @@ class Command(BaseCommand):
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
             f.write('import os\n')
+            cwd = os.getcwd()
 
             for line in lines:
+                line = line.replace(cwd, '')
                 if len(line) > 1:
                     f.write('#' + line)
                 else:

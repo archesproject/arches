@@ -135,10 +135,10 @@ class Reader(object):
         if len(self.errors) == 0:
             print _("No import errors")
         else:
-            print _("***** Errors occured during import. Some data may not have been imported. For more information, check resource import error log: arches/logs/resource_import.log")
+            print _("***** Errors occured during import. Some data may not have been imported. For more information, check resource import error log: ") + settings.RESOURCE_IMPORT_LOG
             log_nums = [0]
-            if os.path.isfile('arches/logs/resource_import.log'):
-                if os.path.getsize('arches/logs/resource_import.log')/1000000 > 5:
+            if os.path.isfile(settings.RESOURCE_IMPORT_LOG):
+                if os.path.getsize(settings.RESOURCE_IMPORT_LOG)/1000000 > 5:
                     for file in os.listdir('arches/logs',):
                         try:
                             log_nums.append(int(file.split('.')[-1]))
@@ -146,12 +146,12 @@ class Reader(object):
                             pass
 
                     archive_log_num = str(max(log_nums) + 1)
-                    shutil.copy2('arches/logs/resource_import.log', 'arches/logs/resource_import.log' + '.' + archive_log_num)
-                    f = open('arches/logs/resource_import.log', 'w')
+                    shutil.copy2(settings.RESOURCE_IMPORT_LOG, settings.RESOURCE_IMPORT_LOG + '.' + archive_log_num)
+                    f = open(settings.RESOURCE_IMPORT_LOG, 'w')
                 else:
-                    f = open('arches/logs/resource_import.log', 'a')
+                    f = open(settings.RESOURCE_IMPORT_LOG, 'a')
             else:
-                f = open('arches/logs/resource_import.log', 'w')
+                f = open(settings.RESOURCE_IMPORT_LOG, 'w')
 
             for error in self.errors:
                 timestamp = (datetime.datetime.now() - datetime.timedelta(hours=2)).strftime('%a %b %d %H:%M:%S %Y')
