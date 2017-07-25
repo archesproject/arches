@@ -57,6 +57,7 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
+RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'

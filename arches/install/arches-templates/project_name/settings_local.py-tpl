@@ -97,7 +97,7 @@ import os
 
 
 #LOCALE_PATHS = (
-#    /Users/alexei/Work/Projects/arches4/arches/locale,
+#    /arches/locale,
 #)
 
 
@@ -107,7 +107,7 @@ import os
 #    "handlers": {
 #        "file": {
 #            "class": "logging.FileHandler", 
-#            "filename": "/Users/alexei/Work/Projects/arches4/arches/arches.log", 
+#            "filename": "/arches/arches.log", 
 #            "level": "DEBUG"
 #        }
 #    }, 
@@ -131,7 +131,7 @@ import os
 #)
 
 
-#MEDIA_ROOT = '/Users/alexei/Work/Projects/arches4/arches'
+#MEDIA_ROOT = '/arches'
 
 #MEDIA_URL = '/files/'
 
@@ -168,7 +168,7 @@ import os
 #]
 
 
-#ONTOLOGY_PATH = '/Users/alexei/Work/Projects/arches4/arches/db/ontologies/cidoc_crm'
+#ONTOLOGY_PATH = '/arches/db/ontologies/cidoc_crm'
 
 
 #POSTGIS_VERSION = (
@@ -178,7 +178,9 @@ import os
 #)
 
 
-#ROOT_DIR = '/Users/alexei/Work/Projects/arches4/arches'
+#RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
+
+#ROOT_DIR = '/arches'
 
 #ROOT_URLCONF = 'arches.urls'
 
@@ -186,7 +188,7 @@ import os
 
 
 #STATICFILES_DIRS = (
-#    /Users/alexei/Work/Projects/arches4/arches/app/media,
+#    /arches/app/media,
 #)
 
 
@@ -203,7 +205,7 @@ import os
 
 
 #TEMPLATES = [
-#    {'DIRS': ['/Users/alexei/Work/Projects/arches4/arches/app/templates'], 'APP_DIRS': True, 'OPTIONS': {'debug': True, 'context_processors': ['django.contrib.auth.context_processors.auth', 'django.template.context_processors.debug', 'django.template.context_processors.i18n', 'django.template.context_processors.media', 'django.template.context_processors.static', 'django.template.context_processors.tz', 'django.template.context_processors.request', 'django.contrib.messages.context_processors.messages', 'arches.app.utils.context_processors.livereload', 'arches.app.utils.context_processors.map_info', 'arches.app.utils.context_processors.app_settings']}, 'BACKEND': 'django.template.backends.django.DjangoTemplates'},
+#    {'DIRS': ['/arches/app/templates'], 'APP_DIRS': True, 'OPTIONS': {'debug': True, 'context_processors': ['django.contrib.auth.context_processors.auth', 'django.template.context_processors.debug', 'django.template.context_processors.i18n', 'django.template.context_processors.media', 'django.template.context_processors.static', 'django.template.context_processors.tz', 'django.template.context_processors.request', 'django.contrib.messages.context_processors.messages', 'arches.app.utils.context_processors.livereload', 'arches.app.utils.context_processors.map_info', 'arches.app.utils.context_processors.app_settings']}, 'BACKEND': 'django.template.backends.django.DjangoTemplates'},
 #]
 
 
