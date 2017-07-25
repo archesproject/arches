@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 <!-- Content -->
@@ -23,7 +24,7 @@
                 <div class="search-listing-body" data-bind="text: displaydescription"></div>
 
                 <div class="search-listing-footer">
-                    {% if 'Resource Editor' in user.user_groups %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
+                    {% if user|can_edit_resource_instance %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
                     <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
                     <!--ko ifnot: $root.resourceEditorContext -->
                     <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>

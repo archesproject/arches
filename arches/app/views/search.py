@@ -42,7 +42,7 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.views.base import BaseManagerView
 from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.datatypes.datatypes import DataTypeFactory
-from guardian.shortcuts import get_objects_for_user
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
 
 try:
@@ -401,18 +401,7 @@ def build_search_results_dsl(request):
     return {'query': query, 'search_buffer':search_buffer}
 
 def get_permitted_nodegroups(user):
-    A = get_objects_for_user(user, [
-        'models.read_nodegroup',
-        'models.write_nodegroup',
-        'models.delete_nodegroup',
-        'models.no_access_to_nodegroup'
-        ], accept_global_perms=False, any_perm=True)
-    B = get_objects_for_user(user, 'models.read_nodegroup', accept_global_perms=False)
-    C = get_objects_for_user(user, 'models.read_nodegroup', accept_global_perms=True)
-    A = set([str(nodegroup.pk) for nodegroup in A])
-    B = set([str(nodegroup.pk) for nodegroup in B])
-    C = set([str(nodegroup.pk) for nodegroup in C])
-    return list(C-A|B)
+    return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, 'models.read_nodegroup')]
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []

@@ -17,6 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -83,12 +84,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <li class="page-scroll">
                             <a href="{% url 'search_home' %}">{% trans "Search" %}</a>
                         </li>
-                        {% if user.username != 'anonymous' %}
+                        {% if user|can_create_resource_instance %}
                         <li class="page-scroll">
                             <a href="{% url 'resource' %}">{% trans "Manage Data" %}</a>
                         </li>
                         {% endif %}
-                        {% if user.username != 'anonymous' %}
+                        {% if user|has_group:"Graph Editor" %}
                         <li class="page-scroll">
                             <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
                         </li>
@@ -131,8 +132,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             {% if user.username == 'anonymous' %}
                             <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Login" %}</a></span>
                             {% endif %}
-                            {% if user.username != 'anonymous' %}
-                            <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Manage Data" %}</a></span>
+                            {% if user|can_create_resource_instance %}
+                            <span class="page-scroll"><a href="{% url 'resource' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">{% trans "Manage Data" %}</a></span>
                             {% endif %}
                         </div>
 

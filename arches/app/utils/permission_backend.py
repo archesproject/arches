@@ -1,7 +1,8 @@
+from arches.app.models.models import Node
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_perms
+from guardian.shortcuts import get_perms, get_objects_for_user
 from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group, Permission
 
@@ -78,3 +79,64 @@ def get_users_for_object(perm, obj):
         if user.has_perm(perm, obj):
             ret.append(user)
     return ret
+
+def get_nodegroups_by_perm(user, perms, any_perm=True):
+    """
+    returns a list of node groups that a user has the given permission on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_nodegroup" or list of strings
+    any_perm -- True to check ANY perm in "perms" or False to check ALL perms
+
+    """
+
+    A = set(get_objects_for_user(user, [
+        'models.read_nodegroup',
+        'models.write_nodegroup',
+        'models.delete_nodegroup',
+        'models.no_access_to_nodegroup'
+        ], accept_global_perms=False, any_perm=True))
+    B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
+    C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
+    return list(C-A|B)
+
+def get_editable_resource_types(user):
+    """
+    returns a list of graphs that a user can edit resource instances of
+
+    Arguments:
+    user -- the user to check
+
+    """
+
+    return get_resource_types_by_perm(user, ['models.write_nodegroup', 'models.delete_nodegroup'])
+
+def get_createable_resource_types(user):
+    """
+    returns a list of graphs that a user can create resource instances of
+
+    Arguments:
+    user -- the user to check
+
+    """
+
+    return get_resource_types_by_perm(user, 'models.write_nodegroup')
+
+
+def get_resource_types_by_perm(user, perms):
+    """
+    returns a list of graphs that a user have specific permissions on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_nodegroup" or list of strings
+
+    """
+
+    graphs = set()
+    nodegroups = get_nodegroups_by_perm(user, perms)
+    for node in Node.objects.filter(nodegroup__in=nodegroups).select_related('graph'):
+        if node.graph.isresource:
+            graphs.add(node.graph)
+    return list(graphs)

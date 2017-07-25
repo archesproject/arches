@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
-                        {% if nav.res_edit and user|has_group:"Resource Editor" %}
+                        {% if nav.res_edit and user|can_edit_resource_instance %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
                               <i class="ion-edit"></i>
@@ -206,7 +206,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <!--Menu list item-->
-                                        {% if request.user|has_group:"Resource Editor" %}
+                                        {% if request.user|can_edit_resource_instance %}
                                         <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
@@ -215,8 +215,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in" aria-expanded="false">
-                                                <!-- ko foreach: allGraphs -->
-                                                <!-- ko if: isresource -->
+                                                <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
@@ -225,7 +224,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
-                                                <!-- /ko -->
                                                 <!-- /ko -->
                                             </ul>
                                         </li>
@@ -276,7 +274,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <!-- Recently Added -->
-                                        {% if request.user|has_group:"Resource Editor" %}
+                                        {% if request.user|can_edit_resource_instance %}
                                         <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
                                                 <i class="ti-ticket"></i>
@@ -337,7 +335,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}
         define('view-data', [], function () {
             return {
-                graphs: {{graphs}}
+                graphs: {{graphs}},
+                createableResources: {{createable_resources}}
             };
         });
         {% endautoescape %}

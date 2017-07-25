@@ -29,7 +29,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.utils.decorators import group_required
+from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -40,7 +40,7 @@ from elasticsearch import Elasticsearch
 
 # print system_settings
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         context = self.get_context_data(
@@ -63,7 +63,7 @@ def get_resource_relationship_types():
     relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
         if graphid is not None:
@@ -141,7 +141,7 @@ class ResourceEditorView(BaseManagerView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditLogView(BaseManagerView):
     def getEditConceptValue(self, values):
         if values != None:
@@ -216,7 +216,7 @@ class ResourceEditLogView(BaseManagerView):
         return HttpResponseNotFound()
 
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
@@ -244,7 +244,6 @@ class ResourceDescriptors(View):
 
         return HttpResponseNotFound()
 
-@method_decorator(group_required('Resource Editor', 'Guest'), name='dispatch')
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -333,7 +332,7 @@ class ResourceReportView(BaseManagerView):
 
         return render(request, 'views/resource/report.htm', context)
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
