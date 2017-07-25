@@ -23,6 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.permission_backend import get_createable_resource_types
 
 class BaseManagerView(TemplateView):
 
@@ -34,6 +35,7 @@ class BaseManagerView(TemplateView):
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
+        context['createable_resources'] = JSONSerializer().serialize(get_createable_resource_types(self.request.user))
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
             'title':'',

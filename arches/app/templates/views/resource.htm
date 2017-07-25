@@ -63,8 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
 
-            <!-- ko foreach: allGraphs -->
-            <!-- ko if: isresource -->
+            <!-- ko foreach: createableResources -->
             <div class="card-grid-item" data-bind="css: { 'disabled': disable_instance_creation}">
                 <div class="panel mar-no">
                     <!-- card Name -->
@@ -91,7 +90,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-            <!-- /ko -->
             <!-- /ko -->
 
         </div>

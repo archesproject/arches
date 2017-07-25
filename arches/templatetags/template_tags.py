@@ -1,4 +1,4 @@
-from arches.app.utils.permission_backend import get_editable_resource_types
+from arches.app.utils.permission_backend import get_editable_resource_types, get_createable_resource_types
 from django import template
 
 register = template.Library()
@@ -13,3 +13,7 @@ def has_group(user, group_names):
 @register.filter(name='can_edit_resource_instance')
 def can_edit_resource_instance(user):
     return len(get_editable_resource_types(user)) > 0
+
+@register.filter(name='can_create_resource_instance')
+def can_create_resource_instance(user):
+    return len(get_createable_resource_types(user)) > 0

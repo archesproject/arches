@@ -42,6 +42,7 @@ define([
                     return graph.isresource;
                 });
             });
+            options.viewModel.createableResources = ko.observableArray(data.createableResources);
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {

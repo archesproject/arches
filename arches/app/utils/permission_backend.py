@@ -110,8 +110,32 @@ def get_editable_resource_types(user):
 
     """
 
+    return get_resource_types_by_perm(user, ['models.write_nodegroup', 'models.delete_nodegroup'])
+
+def get_createable_resource_types(user):
+    """
+    returns a list of graphs that a user can create resource instances of
+
+    Arguments:
+    user -- the user to check
+
+    """
+
+    return get_resource_types_by_perm(user, 'models.write_nodegroup')
+
+
+def get_resource_types_by_perm(user, perms):
+    """
+    returns a list of graphs that a user have specific permissions on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_nodegroup" or list of strings
+
+    """
+
     graphs = set()
-    nodegroups = get_nodegroups_by_perm(user, ['models.write_nodegroup', 'models.delete_nodegroup'])
+    nodegroups = get_nodegroups_by_perm(user, perms)
     for node in Node.objects.filter(nodegroup__in=nodegroups).select_related('graph'):
         if node.graph.isresource:
             graphs.add(node.graph)

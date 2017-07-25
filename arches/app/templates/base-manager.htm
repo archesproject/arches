@@ -215,8 +215,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in" aria-expanded="false">
-                                                <!-- ko foreach: allGraphs -->
-                                                <!-- ko if: isresource -->
+                                                <!-- ko foreach: createableResources -->
                                                 <li class="link-submenu-item">
                                                     <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
@@ -225,7 +224,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         }">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
-                                                <!-- /ko -->
                                                 <!-- /ko -->
                                             </ul>
                                         </li>
@@ -337,7 +335,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}
         define('view-data', [], function () {
             return {
-                graphs: {{graphs}}
+                graphs: {{graphs}},
+                createableResources: {{createable_resources}}
             };
         });
         {% endautoescape %}
