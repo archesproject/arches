@@ -199,15 +199,17 @@ class Command(BaseCommand):
 
         """
         files = [
-            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
-            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'}
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
 
         settings_whitelist = [
+            'APP_NAME',
+            'APP_TITLE',
+            'COPYRIGHT_TEXT',
+            'COPYRIGHT_YEAR',
             'MODE',
             'DATABASES',
             'DEBUG',
@@ -264,7 +266,12 @@ class Command(BaseCommand):
                             val = val + "    " + str(value) + ',\n'
                         val = val + "{0}\n\n\n".format(braces[1])
                     else:
-                        val = "{0} = {1}\n\n".format(setting_key, setting_value)
+                        try:
+                            setting_value.upper()
+                            val = "{0} = '{1}'\n\n".format(setting_key, setting_value)
+                        except:
+                            val = "{0} = {1}\n\n".format(setting_key, setting_value)
+
                     f.write(val)
 
         lines = None
@@ -273,7 +280,7 @@ class Command(BaseCommand):
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
             f.write('import os\n')
-            
+
             for line in lines:
                 if len(line) > 1:
                     f.write('#' + line)

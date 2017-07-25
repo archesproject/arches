@@ -56,6 +56,8 @@ def command_create_app(args):
     bower_path = os.path.join(os.getcwd(), proj_name, proj_name)
     os.chdir(bower_path)
     subprocess.call("bower install", shell=True)
+    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) != True:
+        os.mkdir(os.path.join(os.getcwd(), 'logs'))
     open(os.path.join(os.getcwd(),'arches.log'), 'w').close()
     open(os.path.join(os.getcwd(), 'logs', 'authority_file_errors.txt'), 'w').close()
     open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()

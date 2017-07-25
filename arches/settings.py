@@ -281,6 +281,10 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = 'Arches'
 
+APP_TITLE = 'Arches | Heritage Data Management'
+COPYRIGHT_TEXT = 'All Rights Reserved.'
+COPYRIGHT_YEAR = '2016'
+
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
 DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]

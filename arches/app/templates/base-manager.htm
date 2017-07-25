@@ -24,6 +24,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block body %}
 
+
+
     <div class="wrapper">
 
         <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
@@ -36,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <a href="{% url 'home' %}" class="navbar-brand">
                             <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
                             <div class="brand-title">
-                                <span class="brand-text">Arches</span>
+                                <span class="brand-text">{{ app_name }}</span>
                             </div>
                         </a>
                     </div>
@@ -44,7 +46,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             </header>
             {% endblock navheader %}
-
 
             <div class="boxed">
                 <div id="content-container" style="{% block content_container_style %}padding-bottom: 20px; padding-top: 0px;{% endblock content_container_style %}">
