@@ -20,6 +20,7 @@ import warnings
 import functools
 import logging
 import datetime
+from arches.app.utils.permission_backend import get_editable_resource_types
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -57,3 +58,14 @@ def group_required(*group_names):
                 return True
         return False
     return user_passes_test(in_groups)
+
+def can_edit_resource_instance():
+    """
+    Requires that a user be able to edit or delete a single nodegroup of a resource
+
+    """
+
+    def test(u):
+        return len(get_editable_resource_types(u)) > 0
+
+    return user_passes_test(test)

@@ -23,7 +23,7 @@ from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.decorators import group_required
+from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.views.tileserver import clean_resource_cache
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
@@ -32,7 +32,7 @@ from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.db import transaction
 
-@method_decorator(group_required('Resource Editor'), name='dispatch')
+@method_decorator(can_edit_resource_instance(), name='dispatch')
 class TileData(View):
     action = 'update_tile'
 
