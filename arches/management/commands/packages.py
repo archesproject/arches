@@ -199,6 +199,7 @@ class Command(BaseCommand):
 
         """
         files = [
+            {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
             {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'}
             ]
         for f in files:
