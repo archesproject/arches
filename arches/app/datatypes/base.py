@@ -1,4 +1,5 @@
 import json
+from django.core.urlresolvers import reverse
 from arches.app.models import models
 
 class BaseDataType(object):
@@ -82,11 +83,12 @@ class BaseDataType(object):
         should be a dictionary including (as in map_sources table):
         name, source (json)
         """
+        tileserver_url = reverse('tileserver')
         if node is None:
             return None
         source_config = {
             "type": "vector",
-            "tiles": ["/tileserver/%s/{z}/{x}/{y}.pbf" % node.nodeid]
+            "tiles": ["%s/%s/{z}/{x}/{y}.pbf" % (tileserver_url, node.nodeid)]
         }
         count = models.TileModel.objects.filter(data__has_key=str(node.nodeid)).count()
         if preview and count == 0:
