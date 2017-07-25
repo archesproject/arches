@@ -6514,6 +6514,12 @@ div.row.widget-wrapper.report-header:hover {
     transition-duration: .3s;
 }
 
+.effect>.install-buttons.expanded-buttons {
+    position: absolute;
+    top: -130px;
+    right: 250px;
+}
+
 .map-search-container.expanded-map {
     margin-top: -25px;
     margin-right: -15px;
