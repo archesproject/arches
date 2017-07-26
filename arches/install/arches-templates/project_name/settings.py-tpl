@@ -44,6 +44,19 @@ LOGGING = {   'disable_existing_loggers': False,
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # MEDIA_ROOT =  os.path.join(APP_ROOT)
 
+TILE_CACHE_CONFIG = {
+    "name": "Disk",
+    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
+
+    # to reconfigure to use S3 (recommended for production), use the following
+    # template:
+
+    # "name": "S3",
+    # "bucket": "<bucket name>",
+    # "access": "<access key>",
+    # "secret": "<secret key>"
+}
+
 try:
     from settings_local import *
 except ImportError:

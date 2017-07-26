@@ -209,6 +209,13 @@ import os
 #]
 
 
+
+#TILE_CACHE_CONFIG = {
+#    "name": "Disk", 
+#    "path": "/arches/tileserver/cache"
+#}
+
+
 #TIME_ZONE = 'America/Chicago'
 
 #USE_I18N = True

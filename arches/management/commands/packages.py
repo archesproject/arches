@@ -241,6 +241,7 @@ class Command(BaseCommand):
             'DATATYPE_LOCATIONS',
             'STATIC_ROOT',
             'STATIC_URL',
+            'TILE_CACHE_CONFIG',
             'ADMIN_MEDIA_PREFIX',
             'STATICFILES_DIRS',
             'STATICFILES_FINDERS',
