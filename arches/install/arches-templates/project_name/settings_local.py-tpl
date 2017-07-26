@@ -27,8 +27,8 @@ import os
 
 #DATABASES = {
 #    "default": {
-#        "ATOMIC_REQUESTS": false, 
-#        "AUTOCOMMIT": true, 
+#        "ATOMIC_REQUESTS": False, 
+#        "AUTOCOMMIT": True, 
 #        "CONN_MAX_AGE": 0, 
 #        "ENGINE": "django.contrib.gis.db.backends.postgis", 
 #        "HOST": "localhost", 
@@ -38,12 +38,12 @@ import os
 #        "PORT": "5432", 
 #        "POSTGIS_TEMPLATE": "template_postgis_20", 
 #        "TEST": {
-#            "CHARSET": null, 
-#            "COLLATION": null, 
-#            "MIRROR": null, 
-#            "NAME": null
+#            "CHARSET": None, 
+#            "COLLATION": None, 
+#            "MIRROR": None, 
+#            "NAME": None
 #        }, 
-#        "TIME_ZONE": null, 
+#        "TIME_ZONE": None, 
 #        "USER": "postgres"
 #    }
 #}
@@ -51,7 +51,7 @@ import os
 
 
 #DATATYPE_LOCATIONS = [
-#    arches.app.datatypes,
+#    "arches.app.datatypes"
 #]
 
 
@@ -65,7 +65,10 @@ import os
 
 
 #ELASTICSEARCH_HOSTS = [
-#    {'host': 'localhost', 'port': 9200},
+#    {
+#        "host": "localhost", 
+#        "port": 9200
+#    }
 #]
 
 
@@ -103,7 +106,7 @@ import os
 
 
 #LOGGING = {
-#    "disable_existing_loggers": false, 
+#    "disable_existing_loggers": False, 
 #    "handlers": {
 #        "file": {
 #            "class": "logging.FileHandler", 
@@ -117,7 +120,7 @@ import os
 #                "file"
 #            ], 
 #            "level": "DEBUG", 
-#            "propagate": true
+#            "propagate": True
 #        }
 #    }, 
 #    "version": 1
@@ -160,11 +163,11 @@ import os
 
 
 #ONTOLOGY_EXT = [
-#    CRMsci_v1.2.3.rdfs.xml,
-#    CRMarchaeo_v1.4.rdfs.xml,
-#    CRMgeo_v1.2.rdfs.xml,
-#    CRMdig_v3.2.1.rdfs.xml,
-#    CRMinf_v0.7.rdfs.xml,
+#    "CRMsci_v1.2.3.rdfs.xml", 
+#    "CRMarchaeo_v1.4.rdfs.xml", 
+#    "CRMgeo_v1.2.rdfs.xml", 
+#    "CRMdig_v3.2.1.rdfs.xml", 
+#    "CRMinf_v0.7.rdfs.xml"
 #]
 
 
@@ -205,7 +208,29 @@ import os
 
 
 #TEMPLATES = [
-#    {'DIRS': ['/arches/app/templates'], 'APP_DIRS': True, 'OPTIONS': {'debug': True, 'context_processors': ['django.contrib.auth.context_processors.auth', 'django.template.context_processors.debug', 'django.template.context_processors.i18n', 'django.template.context_processors.media', 'django.template.context_processors.static', 'django.template.context_processors.tz', 'django.template.context_processors.request', 'django.contrib.messages.context_processors.messages', 'arches.app.utils.context_processors.livereload', 'arches.app.utils.context_processors.map_info', 'arches.app.utils.context_processors.app_settings']}, 'BACKEND': 'django.template.backends.django.DjangoTemplates'},
+#    {
+#        "APP_DIRS": True, 
+#        "BACKEND": "django.template.backends.django.DjangoTemplates", 
+#        "DIRS": [
+#            "/arches/app/templates"
+#        ], 
+#        "OPTIONS": {
+#            "context_processors": [
+#                "django.contrib.auth.context_processors.auth", 
+#                "django.template.context_processors.debug", 
+#                "django.template.context_processors.i18n", 
+#                "django.template.context_processors.media", 
+#                "django.template.context_processors.static", 
+#                "django.template.context_processors.tz", 
+#                "django.template.context_processors.request", 
+#                "django.contrib.messages.context_processors.messages", 
+#                "arches.app.utils.context_processors.livereload", 
+#                "arches.app.utils.context_processors.map_info", 
+#                "arches.app.utils.context_processors.app_settings"
+#            ], 
+#            "debug": True
+#        }
+#    }
 #]
 
 

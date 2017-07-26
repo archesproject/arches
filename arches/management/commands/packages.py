@@ -259,10 +259,11 @@ class Command(BaseCommand):
             for setting_key in dir(settings):
                 if setting_key in settings_whitelist:
                     setting_value = getattr(settings, setting_key)
-                    if type(setting_value) == dict:
+                    if type(setting_value) == dict or type(setting_value) == list:
                         val = "\n{0} = {1}\n\n\n".format(setting_key, JSONSerializer().serialize(setting_value, indent=4))
-                    elif type(setting_value) in (list, tuple):
-                        braces = ('[', ']') if type(setting_value) == list else ('(',')')
+                        val = val.replace(' false', ' False').replace(' true', ' True').replace(' null', ' None')
+                    elif type(setting_value) == tuple:
+                        braces = ('(',')')
                         val = "\n{0} = {1}\n".format(setting_key, braces[0])
                         for value in setting_value:
                             val = val + "    " + str(value) + ',\n'
