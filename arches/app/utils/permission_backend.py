@@ -1,4 +1,5 @@
 from arches.app.models.models import Node
+from arches.app.models.system_settings import settings
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
@@ -137,6 +138,6 @@ def get_resource_types_by_perm(user, perms):
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
     for node in Node.objects.filter(nodegroup__in=nodegroups).select_related('graph'):
-        if node.graph.isresource:
+        if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             graphs.add(node.graph)
     return list(graphs)
