@@ -366,6 +366,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "database": database["NAME"],
                         "port": database["PORT"]
                     },
+                    "simplify": 0.3,
                     "queries": sql_list
                 },
             },
