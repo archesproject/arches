@@ -330,6 +330,8 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
+VECTOR_TILE_SIMPLIFICATION = 0.3
+
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
