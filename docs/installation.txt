@@ -20,7 +20,7 @@ To begin development or make a test installation of Arches, you will need the fo
 
 ----------------
 
-*Please note that Arches 4.0.0 beta release is only fully supported in Chrome.*
+*Please note that Arches 4.0.0 release is only fully supported in Chrome.*
 
 Dependencies
 ============
@@ -69,7 +69,7 @@ Once you have all of the dependencies installed, open a command prompt and use t
 
     You can install Arches with pip::
 
-        pip install arches==4.0b3
+        pip install arches
 
     .. note:: Windows users should add ``--no-binary :all:`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
 
