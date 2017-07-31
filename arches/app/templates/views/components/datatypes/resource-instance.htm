@@ -1,0 +1,21 @@
+{% load i18n %}
+<!-- ko ifnot: $data.search -->
+<div class="node-widget-label concept-label">
+    <div class="control-label">
+        {% trans "Resource Model" %}
+    </div>
+    <div>
+        <select data-bind="
+            disable: isEditable === false,
+            placeholder: '{% trans "Select a resource model" %}',
+            value: config.graphid,
+            options: resourceModels ,
+            optionsText: 'name',
+            optionsValue: 'graphid',
+            chosen: {
+                width: '100%'
+            }
+        "></select>
+    </div>
+</div>
+<!-- /ko -->
