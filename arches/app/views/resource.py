@@ -403,7 +403,7 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstanceidfrom = Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto = Resource(instanceid),
                     notes = notes,
-                    relationshiptype = models.Value(relationship_type),
+                    relationshiptype = relationship_type,
                     datestarted = datefrom,
                     dateended = dateto
                 )
@@ -414,7 +414,7 @@ class RelatedResourcesView(BaseManagerView):
         for relationshipid in relationships_to_update:
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
-            rr.relationshiptype = models.Value(relationship_type)
+            rr.relationshiptype = relationship_type
             rr.datestarted = datefrom
             rr.dateended = dateto
             rr.save()
