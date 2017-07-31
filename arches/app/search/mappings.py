@@ -113,6 +113,7 @@ def prepare_search_index(resource_model_id, create=False):
                 'properties' : {
                     'graphid': {'type': 'keyword'},
                     'resourceinstanceid': {'type': 'keyword'},
+                    'root_ontology_class': {'type':'keyword'},
                     'displayname': {'type': 'keyword'},
                     'displaydescription': {'type': 'keyword'},
                     'map_popup': {'type': 'keyword'},
