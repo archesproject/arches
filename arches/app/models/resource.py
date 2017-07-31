@@ -98,6 +98,18 @@ class Resource(models.ResourceInstance):
         self.save_edit(user=user, edit_type='create')
         self.index()
 
+    def get_root_ontology(self):
+        """
+        Finds and returns the ontology class of the instance's root node
+
+        """
+        root_ontology_class = None
+        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
+        if len(graph_nodes) > 0:
+            root_ontology_class = graph_nodes[0].ontologyclass
+
+        return root_ontology_class
+
     @staticmethod
     def bulk_save(resources):
         """
@@ -132,6 +144,7 @@ class Resource(models.ResourceInstance):
         for resource in resources:
             resource.save_edit(edit_type='create')
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document['root_ontology_class'] = resource.get_root_ontology()
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
@@ -151,8 +164,8 @@ class Resource(models.ResourceInstance):
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
-
         document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+        document['root_ontology_class'] = self.get_root_ontology()
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
@@ -239,6 +252,7 @@ class Resource(models.ResourceInstance):
         resource_relations = get_relations(self.resourceinstanceid, start, limit)
         ret['total'] = resource_relations['hits']['total']
         instanceids = set()
+        
         for relation in resource_relations['hits']['hits']:
             relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
             ret['resource_relationships'].append(relation['_source'])
