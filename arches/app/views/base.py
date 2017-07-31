@@ -46,6 +46,7 @@ class BaseManagerView(TemplateView):
             'login':True,
             'print':False,
         }
+        context['use_semantic_relationships'] = settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS
 
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)

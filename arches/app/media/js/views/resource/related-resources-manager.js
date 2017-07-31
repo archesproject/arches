@@ -5,11 +5,12 @@ define([
     'knockout-mapping',
     'arches',
     'views/resource/related-resources-node-list',
+    'view-data',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList) {
+], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList, viewData) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -28,6 +29,15 @@ define([
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
+
+            this.domainRelationshipTypes = ko.observableArray();
+            this.graphs = viewData.createableResources;
+            this.useSemanticRelationships = arches.useSemanticRelationships;
+            if (!this.useSemanticRelationships) {
+                this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'}];
+            } else {
+                this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'}];
+            }
 
             this.searchResults.relationshipCandidates.subscribe(function(val) {
                 if (val.length > 0) {
@@ -75,6 +85,7 @@ define([
                         this.resourceRelationships(sorted);
                         this.displayname = data.resource_instance.displayname;
                         this.graphid = data.resource_instance.graph_id;
+                        this.ontologyclass = data.resource_instance.root_ontology_class
                     },
                     get: function() {
                         $.ajax({
@@ -84,6 +95,7 @@ define([
                             })
                             .done(function(data) {
                                 this.parse(data)
+                                console.log('done')
                                 self.newResource(this)
                             })
                             .fail(function(data) {

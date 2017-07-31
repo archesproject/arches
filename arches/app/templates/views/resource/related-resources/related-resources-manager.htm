@@ -212,23 +212,21 @@
                                 <th class="rr-tab-field"><i class="center-header" data-bind="css: {'ion-checkmark-circled': selected}"></i></th>
                                 <th class="rr-tab-field">{% trans "Resource ID" %}</th>
                                 <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                                <!--ko if: useSemanticRelationships === false -->
                                 <th class="rr-tab-field">{% trans "From" %}</th>
                                 <th class="rr-tab-field">{% trans "To" %}</th>
                                 <th class="rr-tab-field">{% trans "Notes" %}</th>
+                                <!--/ko-->
+                                <!--ko if: useSemanticRelationships === true -->
+                                <th class="rr-tab-field">{% trans "Ontology Class" %}</th>
+                                <!--/ko-->
                             </tr>
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
                                               jQueryUI: true,
                                               paging: true,
                                               dom: 'rtip',
-                                              columns:[
-                                                  {width: '20px', orderable:true, className: 'data-table-selected'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width:'100px'}
-                                              ],
+                                              columns: columnConfig,
                                               fnInitComplete: function() {
                                                 var self = this;
                                                 setTimeout(function(){
@@ -251,6 +249,7 @@
                                 <td>
                                     <span data-bind="text: preflabel.value"></span>
                                 </td>
+                                <!--ko if: $parent.useSemanticRelationships === false -->
                                 <td>
                                     <span data-bind='text: datestarted'></span>
                                 </td>
@@ -260,6 +259,12 @@
                                 <td>
                                     <span class="rr-text-notes" data-bind='text: notes'></span>
                                 </td>
+                                <!--/ko-->
+                                <!--ko if: $parent.useSemanticRelationships === true -->
+                                <td>
+                                    <span class="rr-text-notes" data-bind='text: resource.root_ontology_class'></span>
+                                </td>
+                                <!--/ko-->
                             </tr>
                         </tbody>
                     </table>
