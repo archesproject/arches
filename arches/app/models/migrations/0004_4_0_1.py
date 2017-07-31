@@ -11,6 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+                model_name='resourcexresource',
+                name='relationshiptype',
+                field=models.TextField(blank=True, null=True),
+            ),
         migrations.RunSQL("""
             INSERT INTO widgets(
                 widgetid,
