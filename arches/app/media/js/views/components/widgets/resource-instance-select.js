@@ -36,7 +36,7 @@ define([
                         }
                         if (term) {
                             data.no_filters = false;
-                            termFilter = JSON.stringify([{
+                            data.termFilter = JSON.stringify([{
                                 "inverted": false,
                                 "type": "string",
                                 "context": "",
