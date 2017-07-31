@@ -366,6 +366,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "database": database["NAME"],
                         "port": database["PORT"]
                     },
+                    "simplify": settings.VECTOR_TILE_SIMPLIFICATION,
                     "queries": sql_list
                 },
             },
@@ -1039,3 +1040,12 @@ class DomainListDataType(BaseDomainDataType):
 
         except KeyError, e:
             pass
+
+
+class ResourceInstanceDataType(BaseDataType):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        return
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        return terms

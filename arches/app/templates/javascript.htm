@@ -266,6 +266,7 @@
               'name': '{{ resource.name }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
+            graphs: {% autoescape off %}{{graphs|default_if_none:"[]"}}{% endautoescape %}
         };
     });
 
