@@ -17,14 +17,26 @@ define([
                 multiple: false,
                 placeholder: this.placeholder,
                 allowClear: true,
-                minimumInputLength: 3,
                 ajax: {
                     url: arches.urls.search_results,
                     dataType: 'json',
                     quietMillis: 250,
                     data: function (term, page) {
-                        return {
-                            termFilter: [{
+                        var graphid = ko.unwrap(params.node.config.graphid);
+                        var data = {
+                            no_filters: true,
+                            page: page
+                        };
+                        if (graphid) {
+                            data.no_filters = false;
+                            data.typeFilter = JSON.stringify([{
+                                "graphid": graphid,
+                                "inverted": false
+                            }]);
+                        }
+                        if (term) {
+                            data.no_filters = false;
+                            termFilter = JSON.stringify([{
                                 "inverted": false,
                                 "type": "string",
                                 "context": "",
@@ -32,14 +44,9 @@ define([
                                 "id": term,
                                 "text": term,
                                 "value": term
-                            }],
-                            typeFilter: [{
-                                "graphid": ko.unwrap(params.node.config.graphid),
-                                "inverted": false
-                            }],
-                            no_filters: false,
-                            page: page
-                        };
+                            }]);
+                        }
+                        return data;
                     },
                     results: function (data, page) {
                         return {

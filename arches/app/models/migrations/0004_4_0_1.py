@@ -24,9 +24,10 @@ class Migration(migrations.Migration):
                 'views/components/widgets/resource-instance-select',
                 'resource-instance',
                 '{
-
+                    "placeholder": ""
                 }'
             );
+
             INSERT INTO d_data_types
                 VALUES (
                     'resource-instance',
@@ -43,7 +44,10 @@ class Migration(migrations.Migration):
             );
             """,
             """
-            DELETE FROM d_data_types WHERE datatype = 'resource-instance';
-            DELETE from widgets WHERE widgetid = '31f3728c-7613-11e7-a139-784f435179ea';
+            DELETE FROM d_data_types
+                WHERE datatype = 'resource-instance';
+
+            DELETE from widgets
+                WHERE widgetid = '31f3728c-7613-11e7-a139-784f435179ea';
         """),
     ]

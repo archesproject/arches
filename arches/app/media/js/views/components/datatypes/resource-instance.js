@@ -1,7 +1,8 @@
 define([
     'knockout',
+    'underscore',
     'arches'
-], function (ko, arches) {
+], function (ko, _, arches) {
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -9,7 +10,9 @@ define([
             this.resourceModels = [{
                 graphid: null,
                 name: ''
-            }].concat(arches.resources);
+            }].concat(_.filter(arches.graphs, function (graph) {
+                return graph.isresource && graph.isactive;
+            }));
             this.config = params.config;
             this.search = params.search;
             if (!this.search) {
