@@ -28,6 +28,21 @@ class Migration(migrations.Migration):
                 }'
             );
 
+            INSERT INTO d_data_types
+                VALUES (
+                    'resource-instance',
+                    'fa fa-external-link-o',
+                    'datatypes.py',
+                    'ResourceInstanceDataType',
+                    '{
+                        "graphid": null
+                    }',
+                    'views/components/datatypes/resource-instance',
+                    'resource-instance-datatype-config',
+                    FALSE,
+                    '31f3728c-7613-11e7-a139-784f435179ea'
+            );
+
             INSERT INTO widgets(
                 widgetid,
                 name,
@@ -42,21 +57,6 @@ class Migration(migrations.Migration):
                 '{
                     "placeholder": ""
                 }'
-            );
-
-            INSERT INTO d_data_types
-                VALUES (
-                    'resource-instance',
-                    'fa fa-external-link-o',
-                    'datatypes.py',
-                    'ResourceInstanceDataType',
-                    '{
-                        "graphid": null
-                    }',
-                    'views/components/datatypes/resource-instance',
-                    'resource-instance-datatype-config',
-                    FALSE,
-                    '31f3728c-7613-11e7-a139-784f435179ea'
             );
 
             INSERT INTO d_data_types
@@ -80,5 +80,11 @@ class Migration(migrations.Migration):
 
             DELETE from widgets
                 WHERE widgetid = '31f3728c-7613-11e7-a139-784f435179ea';
+
+            DELETE FROM d_data_types
+                WHERE datatype = 'resource-instance-list';
+
+            DELETE from widgets
+                WHERE widgetid = 'ff3c400a-76ec-11e7-a793-784f435179ea';
         """),
     ]
