@@ -115,11 +115,8 @@ define([
                         }, this)
                         var sorted = _(relationshipsWithResource).chain()
                             .sortBy(function(relate) {
-                                return relate.resource.displayname;
-                            })
-                            .sortBy(function(relate) {
-                                return relate.relationshiptype;
-                            }).value();
+                                return relate.created;
+                            }).value().reverse();
                         this.resourceRelationships(sorted);
                         this.displayname = data.resource_instance.displayname;
                         this.graphid = data.resource_instance.graph_id;
