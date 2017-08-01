@@ -1042,9 +1042,12 @@ class DomainListDataType(BaseDomainDataType):
 
 
 class ResourceInstanceDataType(BaseDataType):
+    # TODO: handle for search indexing here...
     def append_to_document(self, document, nodevalue, nodeid, tile):
         return
 
-    def get_search_terms(self, nodevalue, nodeid=None):
-        terms = []
-        return terms
+
+class ResourceInstanceListDataType(BaseDataType):
+    # TODO: handle for search indexing here...
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        return
