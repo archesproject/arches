@@ -283,7 +283,6 @@ define([
                             })
                         }, this);
                     }, this);
-                    console.log(this.ontology_cache())
                 }
             }, this);
         },
