@@ -241,7 +241,9 @@ def prepare_resource_relations_index(create=False):
                     'notes': {'type': 'text'},
                     'relationshiptype': {'type': 'keyword'},
                     'resourceinstanceidfrom': {'type': 'keyword'},
-                    'resourceinstanceidto': {'type': 'keyword'}
+                    'resourceinstanceidto': {'type': 'keyword'},
+                    'created': {'type': 'keyword'},
+                    'modified': {'type': 'keyword'}
                 }
             }
         }
