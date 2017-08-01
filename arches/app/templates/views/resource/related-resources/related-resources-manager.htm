@@ -236,9 +236,7 @@
                                                 }
                                           }
                                       }">
-                            <tr class="rr-table-row" data-bind="click: function () {
-                                selected(!selected());
-                            }">
+                            <tr class="rr-table-row" data-bind="click: updateSelection(), css: {'unselectable': unselectable}">
                                 <td>
                                     <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
                                     <span data-bind="text: resource.selected"></span>

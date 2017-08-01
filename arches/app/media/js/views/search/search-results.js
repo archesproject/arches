@@ -147,6 +147,7 @@ define(['jquery',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
+                        ontologyclass: result._source.root_ontology_class,
                         relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {

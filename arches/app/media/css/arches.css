@@ -5681,6 +5681,10 @@ a.mega-dropdown-toggle.disabled {
     height: 40px;
 }
 
+td .unselectable {
+    color: #ff0000;
+}
+
 .rr-text-notes {}
 
 .rr-result-grid-container {
@@ -7389,9 +7393,9 @@ a.clear-geojson-button:hover {
     -moz-transition: .6s all ease;
     -o-transition: .6s all ease;
     transition: .6s all ease;
-    -webkit-background-size: cover; 
+    -webkit-background-size: cover;
     -moz-background-size: cover;
-    -o-background-size: cover;  
+    -o-background-size: cover;
     background-size: cover;
     background-color: white;
 }
