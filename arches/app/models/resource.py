@@ -252,9 +252,14 @@ class Resource(models.ResourceInstance):
         resource_relations = get_relations(self.resourceinstanceid, start, limit)
         ret['total'] = resource_relations['hits']['total']
         instanceids = set()
-        
+
         for relation in resource_relations['hits']['hits']:
-            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            try:
+                preflabel = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+                relation['_source']['relationshiptype_label'] = preflabel['value']
+            except:
+                relation['_source']['relationshiptype_label'] = relation['_source']['relationshiptype']
+
             ret['resource_relationships'].append(relation['_source'])
             instanceids.add(relation['_source']['resourceinstanceidto'])
             instanceids.add(relation['_source']['resourceinstanceidfrom'])

@@ -29,10 +29,19 @@ define([
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
-
-            this.domainRelationshipTypes = ko.observableArray();
-            this.graphs = viewData.createableResources;
             this.useSemanticRelationships = arches.useSemanticRelationships;
+
+            this.validproperties = {}
+            this.graph.domain_connections.forEach(function(item) {
+                item.ontology_classes.forEach(function(ontologyclass) {
+                    if (!this.validproperties[ontologyclass]) {
+                        this.validproperties[ontologyclass] = []
+                    }  else {
+                        this.validproperties[ontologyclass].push({id:item.ontology_property, text:item.ontology_property})
+                    }
+                }, this);
+            }, this);
+
             if (!this.useSemanticRelationships) {
                 this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'}];
             } else {
@@ -47,13 +56,17 @@ define([
             this.resourceRelationships = ko.observableArray();
 
             this.selected = ko.computed(function() {
-                return _.filter(
+                var res = _.filter(
                     this.resourceRelationships(),
                     function(rr) {
                         if (rr.selected() === true) {
                             return rr
                         }
                     }, this);
+                if (res.length > 0 && this.useSemanticRelationships) {
+                    this.relationshipTypes(this.validproperties[res[0].resource.root_ontology_class])
+                }
+                return res;
             }, this);
 
             this.createResource = function(resourceinstanceid) {
@@ -85,7 +98,6 @@ define([
                         this.resourceRelationships(sorted);
                         this.displayname = data.resource_instance.displayname;
                         this.graphid = data.resource_instance.graph_id;
-                        this.ontologyclass = data.resource_instance.root_ontology_class
                     },
                     get: function() {
                         $.ajax({
@@ -148,7 +160,11 @@ define([
             };
 
             if (this.resourceEditorContext === true) {
-                this.relationshipTypes = ko.observableArray(options.relationship_types.values);
+                this.relationshipTypes = ko.observableArray()
+                if (!this.useSemanticRelationships) {
+                    this.relationshipTypes(options.relationship_types.values);
+                }
+
                 this.defaultRelationshipType = options.relationship_types.default;
                 this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
                 this.relatedProperties = koMapping.fromJS({
