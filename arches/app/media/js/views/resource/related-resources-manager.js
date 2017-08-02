@@ -83,7 +83,7 @@ define([
             });
 
             this.selectedOntologyClass.subscribe(function(){
-                self.relationshipTypes(self.validproperties[self.selectedOntologyClass()])
+                self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes([]);
             })
 
             this.createResource = function(resourceinstanceid) {
