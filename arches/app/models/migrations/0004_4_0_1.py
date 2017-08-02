@@ -28,8 +28,7 @@ class Migration(migrations.Migration):
                 }'
             );
 
-            INSERT INTO d_data_types
-                VALUES (
+            INSERT INTO d_data_types VALUES (
                     'resource-instance',
                     'fa fa-external-link-o',
                     'datatypes.py',
@@ -59,8 +58,7 @@ class Migration(migrations.Migration):
                 }'
             );
 
-            INSERT INTO d_data_types
-                VALUES (
+            INSERT INTO d_data_types VALUES (
                     'resource-instance-list',
                     'fa fa-external-link-square',
                     'datatypes.py',

@@ -31,3 +31,14 @@
     </div>
 </div>
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko foreach: valueObjects -->
+    <!-- ko if: name -->
+    <dd>
+        <a data-bind="text: name, attr: { href: reportUrl }" target="_blank"></a>
+    </dd>
+    <!-- /ko -->
+<!-- /ko -->
+{% endblock report %}

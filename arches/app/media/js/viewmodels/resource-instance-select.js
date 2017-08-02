@@ -4,6 +4,7 @@ define([
     'viewmodels/widget',
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
+    var nameLookup = {};
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
@@ -11,28 +12,49 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
-        var nameLookup = {};
         var displayName = ko.observable('');
-        var updateName = function() {
-            var valueList = self.multiple ? self.value() : [self.value()];
-            var names = [];
-            if (Array.isArray(valueList) && valueList.length > 0) {
-                valueList.forEach(function (val) {
-                    if (val) {
-                        if (nameLookup[val]) {
-                            names.push(nameLookup[val]);
-                            displayName(names.join(', '));
-                        } else {
-                            $.ajax(arches.urls.resource_descriptors + val, {
-                                dataType: "json"
-                            }).done(function(data) {
-                                names.push(data.displayname);
-                                displayName(names.join(', '));
-                            });
-                        }
-                    }
-                });
+
+        this.valueList = ko.computed(function () {
+            var valueList = self.value();
+            displayName();
+            if (!self.multiple && valueList) {
+                valueList = [valueList];
             }
+            if (Array.isArray(valueList)) {
+                return valueList;
+            }
+            return [];
+        });
+
+        this.valueObjects = ko.computed(function () {
+            displayName();
+            return self.valueList().map(function(value) {
+                return {
+                    id: value,
+                    name: nameLookup[value],
+                    reportUrl: arches.urls.resource_report + value
+                };
+            });
+        });
+
+        var updateName = function() {
+            var names = [];
+            self.valueList().forEach(function (val) {
+                if (val) {
+                    if (nameLookup[val]) {
+                        names.push(nameLookup[val]);
+                        displayName(names.join(', '));
+                    } else {
+                        $.ajax(arches.urls.resource_descriptors + val, {
+                            dataType: "json"
+                        }).done(function(data) {
+                            nameLookup[val] = data.displayname;
+                            names.push(data.displayname);
+                            displayName(names.join(', '));
+                        });
+                    }
+                }
+            });
         }
         this.value.subscribe(updateName);
         this.displayValue = ko.computed(function() {
@@ -102,7 +124,7 @@ define([
                 return item._source.displayname;
             },
             initSelection: function(el, callback) {
-                var valueList = self.multiple ? self.value() : [self.value()];
+                var valueList = self.valueList();
                 var setSelectionData = function () {
                     var valueData = valueList.map(function(value) {
                         return {
@@ -114,22 +136,20 @@ define([
                     });
                     callback(self.multiple ? valueData : valueData[0]);
                 };
-                if (Array.isArray(valueList) && valueList.length > 0) {
-                    valueList.forEach(function(value) {
-                        if (value) {
-                            if (nameLookup[value]) {
+                valueList.forEach(function(value) {
+                    if (value) {
+                        if (nameLookup[value]) {
+                            setSelectionData();
+                        } else {
+                            $.ajax(arches.urls.resource_descriptors + value, {
+                                dataType: "json"
+                            }).done(function(data) {
+                                nameLookup[value] = data.displayname
                                 setSelectionData();
-                            } else {
-                                $.ajax(arches.urls.resource_descriptors + value, {
-                                    dataType: "json"
-                                }).done(function(data) {
-                                    nameLookup[value] = data.displayname
-                                    setSelectionData();
-                                });
-                            }
+                            });
                         }
-                    });
-                }
+                    }
+                });
             }
         };
     };
