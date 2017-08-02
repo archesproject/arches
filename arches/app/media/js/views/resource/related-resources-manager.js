@@ -45,6 +45,9 @@ define([
                         }
                     }, this);
                 }, this);
+                _.each(this.validproperties, function(ontology_class){
+                    ontology_class.sort(function(a, b){if (a.id > b.id){return 1} else {return -1}})
+                })
                 this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'}];
             }
 
