@@ -31,24 +31,16 @@ define([
             });
             this.useSemanticRelationships = arches.useSemanticRelationships;
             this.graphs = _.indexBy(viewData.createableResources, 'graphid');
+            this.selectedOntologyClass = ko.observable();
+            this.resourceRelationships = ko.observableArray();
+
+            this.selectedOntologyClass.subscribe(function(){
+                self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
+            })
 
             if (!this.useSemanticRelationships) {
                 this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'}];
             } else {
-                this.selectedOntologyClass = ko.observable();
-                this.validproperties = {}
-                this.graph.domain_connections.forEach(function(item) {
-                    item.ontology_classes.forEach(function(ontologyclass) {
-                        if (!this.validproperties[ontologyclass]) {
-                            this.validproperties[ontologyclass] = []
-                        }  else {
-                            this.validproperties[ontologyclass].push({id:item.ontology_property, text:item.ontology_property})
-                        }
-                    }, this);
-                }, this);
-                _.each(this.validproperties, function(ontology_class){
-                    ontology_class.sort(function(a, b){if (a.id > b.id){return 1} else {return -1}})
-                })
                 this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'}];
             }
 
@@ -58,8 +50,6 @@ define([
                 }
             }, self);
 
-            this.resourceRelationships = ko.observableArray();
-
             this.selected = ko.computed(function() {
                 var res = _.filter(
                     self.resourceRelationships(),
@@ -68,8 +58,8 @@ define([
                             return rr
                         }
                     }, self);
-                if (self.useSemanticRelationships) {
-                    if (res.length > 0 && self.useSemanticRelationships) {
+                if (self.useSemanticRelationships && self.resourceEditorContext === true) {
+                    if (res.length > 0 && self.useSemanticRelationships && self.graph.root.ontologyclass) {
                         self.selectedOntologyClass(res[0].resource.root_ontology_class)
                         self.resourceRelationships().forEach(function(rr){
                             if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
@@ -85,10 +75,6 @@ define([
                 }
                 return res;
             });
-
-            this.selectedOntologyClass.subscribe(function(){
-                self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes([]);
-            })
 
             this.createResource = function(resourceinstanceid) {
                 return {
@@ -193,9 +179,23 @@ define([
 
             if (this.resourceEditorContext === true) {
                 this.relationshipTypes = ko.observableArray()
-                if (!this.useSemanticRelationships) {
+                if (!this.useSemanticRelationships || !this.graph.root.ontologyclass) {
                     this.relationshipTypes(options.relationship_types.values);
                 }
+
+                this.validproperties = {}
+                this.graph.domain_connections.forEach(function(item) {
+                    item.ontology_classes.forEach(function(ontologyclass) {
+                        if (!this.validproperties[ontologyclass]) {
+                            this.validproperties[ontologyclass] = []
+                        }  else {
+                            this.validproperties[ontologyclass].push({id:item.ontology_property, text:item.ontology_property})
+                        }
+                    }, this);
+                }, this);
+                _.each(this.validproperties, function(ontology_class){
+                    ontology_class.sort(function(a, b){if (a.id > b.id){return 1} else {return -1}})
+                })
 
                 this.relationshipTypePlaceholder = ko.observable('Select a Relationship Type')
                 this.relatedProperties = koMapping.fromJS({
@@ -254,7 +254,7 @@ define([
             var selectedResourceXids = _.pluck(this.selected(), 'resourcexid')
             var resource = this.currentResource()
             this.searchResults.relationshipCandidates().forEach(function(rr){
-                if (!this.relatedProperties.relationship_type() && rr.ontologyclass) {
+                if (!this.relatedProperties.relationship_type() && rr.ontologyclass && this.validproperties[rr.ontologyclass]) {
                     this.relatedProperties.relationship_type(this.validproperties[rr.ontologyclass][0].id)
                 } else {
                     this.relatedProperties.relationship_type(this.defaultRelationshipType)
