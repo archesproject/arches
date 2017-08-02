@@ -69,9 +69,9 @@ Once you have all of the dependencies installed, open a command prompt and use t
 
     You can install Arches with pip::
 
-        pip install arches
+        pip install arches --no-binary :all:
 
-    .. note:: Windows users should add ``--no-binary :all:`` to this command. This extra argument will avoid some extraneous error messages during the installation process. However, Arches will install successfully whether you add that argument or not.
+    .. warning:: Running a pip installation without the ``--no-binary :all:`` will install arches in your virtual environment, but will not install all of the separate python packages that you need. This will cause you to not be able to proceed with the following steps.
 
 #. Create a new Arches project
 
