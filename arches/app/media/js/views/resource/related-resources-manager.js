@@ -67,7 +67,6 @@ define([
                 if (self.useSemanticRelationships) {
                     if (res.length > 0 && self.useSemanticRelationships) {
                         self.selectedOntologyClass(res[0].resource.root_ontology_class)
-                        self.relationshipTypes(self.validproperties[self.selectedOntologyClass()])
                         self.resourceRelationships().forEach(function(rr){
                             if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
                                 rr.unselectable(true);
@@ -82,6 +81,10 @@ define([
                 }
                 return res;
             });
+
+            this.selectedOntologyClass.subscribe(function(){
+                self.relationshipTypes(self.validproperties[self.selectedOntologyClass()])
+            })
 
             this.createResource = function(resourceinstanceid) {
                 return {
@@ -132,12 +135,11 @@ define([
                                 self.newResource(this)
                             })
                             .fail(function(data) {
-                                console.log('failed', data)
+                                console.log('Related resource request failed', data)
                             });
                     },
                     save: function(candidateIds, relationshipProperties, relationshipIds) {
                         var root_resourceinstanceid = resourceinstanceid;
-                        var self = this;
                         this.defaultRelationshipType = options.relationship_types.default;
 
                         if (!relationshipProperties.relationship_type) {
@@ -160,11 +162,10 @@ define([
                                 this.parse(data, self)
                             })
                             .fail(function(data) {
-                                console.log('failed', data)
+                                console.log('Related resource request failed', data)
                             });
                     },
                     delete: function(relationshipIds) {
-                        var self = this;
                         var payload = {
                             resourcexids: relationshipIds,
                             root_resourceinstanceid: resourceinstanceid
@@ -179,7 +180,7 @@ define([
                                 this.parse(data, self)
                             })
                             .fail(function(data) {
-                                console.log('failed', data)
+                                console.log('Related resource request failed', data)
                             });
                     }
                 };

@@ -5681,9 +5681,18 @@ a.mega-dropdown-toggle.disabled {
     height: 40px;
 }
 
-td .unselectable {
+.unselectable {
     color: #ff0000;
 }
+
+#container .table-bordered .unselectable td {
+    color: #ddd;
+}
+
+/*
+#container .table-bordered .unselectable td, #container .table-bordered th.rr-tab-field {
+    color: red
+}*/
 
 .rr-text-notes {}
 
