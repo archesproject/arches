@@ -11,6 +11,36 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             var nameLookup = {};
+            var displayName = ko.observable('');
+            var updateName = function() {
+                var val = self.value();
+                if (val) {
+                    if (nameLookup[val]) {
+                        displayName(nameLookup[val])
+                    } else {
+                        $.ajax(arches.urls.resource_descriptors + val, {
+                            dataType: "json"
+                        }).done(function(data) {
+                            nameLookup[val] = data.displayname;
+                            displayName(data.displayname);
+                        });
+                    }
+                }
+            }
+            this.value.subscribe(updateName);
+            this.displayValue = ko.computed(function() {
+                var val = self.value();
+                var name = displayName();
+                var displayVal = null;
+
+                if (val) {
+                    displayVal = name;
+                }
+
+                return displayVal;
+            });
+            updateName();
+
             this.select2Config = {
                 value: this.value,
                 clickBubble: true,
@@ -36,7 +66,7 @@ define([
                         }
                         if (term) {
                             data.no_filters = false;
-                            termFilter = JSON.stringify([{
+                            data.termFilter = JSON.stringify([{
                                 "inverted": false,
                                 "type": "string",
                                 "context": "",
