@@ -7,7 +7,6 @@ rdflib
 unicodecsv
 pyyaml
 pyshp==1.2.3
-networkx
 django-guardian
 tilestache
 shapely
