@@ -122,7 +122,7 @@
                                                     </div>
                                                     <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
                                                         <div class="selected-resource">
-                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.displayname'></span>
+                                                            <i data-bind='css: item.iconclass'></i><span data-bind='text: " " + item.resource.displayname'></span>
                                                         </div>
                                                     </div>
                                                 </div>

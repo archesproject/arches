@@ -30,6 +30,7 @@ define([
                 items: self.graphNodeList
             });
             this.useSemanticRelationships = arches.useSemanticRelationships;
+            this.graphs = _.indexBy(viewData.createableResources, 'graphid');
 
             if (!this.useSemanticRelationships) {
                 this.columnConfig = [{width: '20px', orderable:true, className: 'data-table-selected'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'},{width: '100px'}];
@@ -117,6 +118,7 @@ define([
                                 }
                             }
                             relationship['resource'] = res.length > 0 ? res[0] : "";
+                            relationship.iconclass = viewModel.graphs[relationship.resource.graph_id].iconclass
                             relationshipsWithResource.push(relationship)
                         }, this)
                         var sorted = _(relationshipsWithResource).chain()
