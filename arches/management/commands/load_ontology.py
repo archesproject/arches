@@ -38,7 +38,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-s', '--source', action='store', dest='source', default=None,
             help='An XML file of describing an ontology graph')
-        parser.add_argument('-vn', '--vernum', action='store', dest='version', default=None, required=True,
+        parser.add_argument('-vn', '--vernum', action='store', dest='version', default=None,
             help='The version of the ontology being loaded')
         parser.add_argument('-n', '--name', action='store', dest='ontology_name', default=None,
             help='Name to use to identify the ontology')
@@ -48,6 +48,9 @@ class Command(BaseCommand):
             help='Extensions to append to the base ontology')
 
     def handle(self, *args, **options):
+        if options['version'] is None:
+            print _('You must supply a version number using the -vn/--version argument.')
+            return 
         if options['source'] is not None:
             self.run_loader(data_source=options['source'], name=options['ontology_name'], version=options['version'], id=options['id'], extensions=options['extensions'])
             return
@@ -109,12 +112,20 @@ class Command(BaseCommand):
         filename = os.path.split(data_source)[1]
         if name is None:
             name = os.path.splitext(filename)[0]
+        # print filepath
+        # print filename
+        # print models.get_ontology_storage_system().location
+        # if os.path.isfile(os.path.join(models.get_ontology_storage_system().location, filename)):
+        #     proposed_path = os.path.join(models.get_ontology_storage_system().location, filename)
+        #     proceed = raw_input(_('It looks like an ontology file has already been loaded with this exact name.\nThe file currently loaded is located here:\n   %s\n') % proposed_path)
         if models.get_ontology_storage_system().location in filepath:
             # if the file we're referencing already exists in the location where we 
             # usually store them then leave it there and just save a reference to it
             path = '.%s' % os.path.join(filepath.replace(models.get_ontology_storage_system().location, ''), filename)
         else:
             path = File(open(data_source))
+
+        print path
 
         ontology, created = models.Ontology.objects.get_or_create(path=path, parentontology=parentontology, defaults={'version': version, 'name': name, 'path': path, 'pk': id})
 
