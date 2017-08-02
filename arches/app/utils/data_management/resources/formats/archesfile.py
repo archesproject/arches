@@ -29,9 +29,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 from arches.app.models.tile import Tile
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
-from arches.app.models.models import ResourceXResource
 from arches.app.models.models import NodeGroup
-from arches.app.models.models import Value
 from django.core.exceptions import ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from copy import deepcopy

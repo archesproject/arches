@@ -14,6 +14,7 @@ import os
 import json
 import uuid
 import importlib
+import datetime
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -21,7 +22,6 @@ from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from datetime import datetime
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -535,9 +535,11 @@ class ResourceXResource(models.Model):
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
-    relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
+    relationshiptype = models.TextField(blank=True, null=True)
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     def delete(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -548,6 +550,9 @@ class ResourceXResource(models.Model):
     def save(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
+        if not self.created:
+            self.created = datetime.datetime.now()
+        self.modified = datetime.datetime.now()
         document = model_to_dict(self)
         se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         super(ResourceXResource, self).save()

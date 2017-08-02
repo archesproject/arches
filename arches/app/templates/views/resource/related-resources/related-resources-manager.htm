@@ -122,7 +122,7 @@
                                                     </div>
                                                     <div class="selected-resource-list relative" data-bind="foreach: {data: selected, as: 'item'}">
                                                         <div class="selected-resource">
-                                                            <i class="fa fa-university"></i><span data-bind='text: item.resource.displayname'></span>
+                                                            <i data-bind='css: item.iconclass'></i><span data-bind='text: " " + item.resource.displayname'></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -153,6 +153,7 @@
                                                             </div>
                                                         </div>
 
+                                                        <!--ko if: useSemanticRelationships === false -->
                                                         <div class="row widget-container shim">
                                                             <div class="form-group">
                                                                 <div class="relative" style="">
@@ -184,6 +185,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <!--/ko-->
                                                     </form>
                                                 </div>
                                             </div>
@@ -212,23 +214,21 @@
                                 <th class="rr-tab-field"><i class="center-header" data-bind="css: {'ion-checkmark-circled': selected}"></i></th>
                                 <th class="rr-tab-field">{% trans "Resource ID" %}</th>
                                 <th class="rr-tab-field">{% trans "Relationship" %}</th>
+                                <!--ko if: useSemanticRelationships === false -->
                                 <th class="rr-tab-field">{% trans "From" %}</th>
                                 <th class="rr-tab-field">{% trans "To" %}</th>
                                 <th class="rr-tab-field">{% trans "Notes" %}</th>
+                                <!--/ko-->
+                                <!--ko if: useSemanticRelationships === true -->
+                                <th class="rr-tab-field">{% trans "Ontology Class" %}</th>
+                                <!--/ko-->
                             </tr>
                         </thead>
                         <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
                                               jQueryUI: true,
                                               paging: true,
                                               dom: 'rtip',
-                                              columns:[
-                                                  {width: '20px', orderable:true, className: 'data-table-selected'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width: '100px'},
-                                                  {width:'100px'}
-                                              ],
+                                              columns: columnConfig,
                                               fnInitComplete: function() {
                                                 var self = this;
                                                 setTimeout(function(){
@@ -238,9 +238,7 @@
                                                 }
                                           }
                                       }">
-                            <tr class="rr-table-row" data-bind="click: function () {
-                                selected(!selected());
-                            }">
+                            <tr class="rr-table-row" data-bind="click: updateSelection(), css: {'unselectable': unselectable}">
                                 <td>
                                     <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
                                     <span data-bind="text: resource.selected"></span>
@@ -249,8 +247,9 @@
                                     <span data-bind="text: resource.displayname"></span>
                                 </td>
                                 <td>
-                                    <span data-bind="text: preflabel.value"></span>
+                                    <span data-bind="text: relationshiptype_label"></span>
                                 </td>
+                                <!--ko if: $parent.useSemanticRelationships === false -->
                                 <td>
                                     <span data-bind='text: datestarted'></span>
                                 </td>
@@ -260,6 +259,12 @@
                                 <td>
                                     <span class="rr-text-notes" data-bind='text: notes'></span>
                                 </td>
+                                <!--/ko-->
+                                <!--ko if: $parent.useSemanticRelationships === true -->
+                                <td>
+                                    <span class="rr-text-notes" data-bind='text: resource.root_ontology_class'></span>
+                                </td>
+                                <!--/ko-->
                             </tr>
                         </tbody>
                     </table>
