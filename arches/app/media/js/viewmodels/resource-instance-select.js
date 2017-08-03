@@ -34,6 +34,8 @@ define([
                     name: nameLookup[value],
                     reportUrl: arches.urls.resource_report + value
                 };
+            }).filter(function(item) {
+                return item.name;
             });
         });
 
@@ -126,11 +128,11 @@ define([
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 var setSelectionData = function () {
-                    var valueData = valueList.map(function(value) {
+                    var valueData = self.valueObjects().map(function(item) {
                         return {
-                            _id: value,
+                            _id: item.id,
                             _source: {
-                                displayname: nameLookup[value]
+                                displayname: item.name
                             }
                         };
                     });

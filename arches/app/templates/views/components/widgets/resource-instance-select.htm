@@ -35,10 +35,11 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko foreach: valueObjects -->
-    <!-- ko if: name -->
-    <dd>
-        <a data-bind="text: name, attr: { href: reportUrl }" target="_blank"></a>
-    </dd>
-    <!-- /ko -->
+<dd>
+    <a data-bind="text: name, attr: { href: reportUrl }" target="_blank"></a>
+</dd>
+<!-- /ko -->
+<!-- ko if: valueObjects().length === 0 -->
+<dd>{% trans "None" %}</dd>
 <!-- /ko -->
 {% endblock report %}
