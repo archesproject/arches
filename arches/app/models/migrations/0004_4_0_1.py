@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                     'resource-instance-list',
                     'fa fa-external-link-square',
                     'datatypes.py',
-                    'ResourceInstanceListDataType',
+                    'ResourceInstanceDataType',
                     '{
                         "graphid": null
                     }',
