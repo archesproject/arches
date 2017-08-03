@@ -31,3 +31,15 @@
     </div>
 </div>
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko foreach: valueObjects -->
+<dd>
+    <a data-bind="text: name, attr: { href: reportUrl }" target="_blank"></a>
+</dd>
+<!-- /ko -->
+<!-- ko if: valueObjects().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+{% endblock report %}

@@ -46,10 +46,9 @@ class Migration(migrations.Migration):
                 }'
             );
 
-            INSERT INTO d_data_types
-                VALUES (
+            INSERT INTO d_data_types VALUES (
                     'resource-instance',
-                    'fa fa-file-code-o',
+                    'fa fa-external-link-o',
                     'datatypes.py',
                     'ResourceInstanceDataType',
                     '{
@@ -60,6 +59,36 @@ class Migration(migrations.Migration):
                     FALSE,
                     '31f3728c-7613-11e7-a139-784f435179ea'
             );
+
+            INSERT INTO widgets(
+                widgetid,
+                name,
+                component,
+                datatype,
+                defaultconfig
+            ) VALUES (
+                'ff3c400a-76ec-11e7-a793-784f435179ea',
+                'resource-instance-multiselect-widget',
+                'views/components/widgets/resource-instance-multiselect',
+                'resource-instance-list',
+                '{
+                    "placeholder": ""
+                }'
+            );
+
+            INSERT INTO d_data_types VALUES (
+                    'resource-instance-list',
+                    'fa fa-external-link-square',
+                    'datatypes.py',
+                    'ResourceInstanceListDataType',
+                    '{
+                        "graphid": null
+                    }',
+                    'views/components/datatypes/resource-instance',
+                    'resource-instance-datatype-config',
+                    FALSE,
+                    'ff3c400a-76ec-11e7-a793-784f435179ea'
+            );
             """,
             """
             DELETE FROM d_data_types
@@ -67,5 +96,11 @@ class Migration(migrations.Migration):
 
             DELETE from widgets
                 WHERE widgetid = '31f3728c-7613-11e7-a139-784f435179ea';
+
+            DELETE FROM d_data_types
+                WHERE datatype = 'resource-instance-list';
+
+            DELETE from widgets
+                WHERE widgetid = 'ff3c400a-76ec-11e7-a793-784f435179ea';
         """),
     ]
