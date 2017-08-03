@@ -12,6 +12,7 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import SortableDate
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -19,6 +20,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from shapely.geometry import asShape
+from elasticsearch import Elasticsearch
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -1043,12 +1045,53 @@ class DomainListDataType(BaseDomainDataType):
 
 
 class ResourceInstanceDataType(BaseDataType):
-    # TODO: handle for search indexing here...
-    def append_to_document(self, document, nodevalue, nodeid, tile):
-        return
+    def get_id_list(self, nodevalue):
+        id_list = nodevalue
+        if type(nodevalue) is unicode:
+            id_list = [nodevalue]
+        return id_list
 
+    def get_resource_names(self, nodevalue):
+        resource_names = set([])
+        es = Elasticsearch()
+        se = SearchEngineFactory().create()
+        id_list = self.get_id_list(nodevalue)
+        for resourceid in id_list:
+            print resourceid
+            resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+            resource_names.add(resource_document['_source']['displayname'])
+        return resource_names
 
-class ResourceInstanceListDataType(BaseDataType):
-    # TODO: handle for search indexing here...
+    def validate(self, value, source=''):
+        errors = []
+        id_list = self.get_id_list(nodevalue)
+
+        for resourceid in id_list:
+            try:
+                models.Resource.objects.get(pk=resourceid)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid resource id. This data was not imported.'.format(v)})
+        return errors
+
+    def get_display_value(self, tile, node):
+        resource_names = self.get_resource_names(nodevalue)
+        return ', '.join(resource_names)
+
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        return
+        resource_names = self.get_resource_names(nodevalue)
+        for value in resource_names:
+            if value not in document['strings']:
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+                if '!' in value['op']:
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(search_query)
+        except KeyError, e:
+            pass

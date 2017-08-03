@@ -136,7 +136,10 @@ define([
                             }
                         };
                     });
-                    callback(self.multiple ? valueData : valueData[0]);
+                    valueData = self.multiple ? valueData : valueData[0];
+                    if (valueData) {
+                        callback(valueData);
+                    }
                 };
                 valueList.forEach(function(value) {
                     if (value) {

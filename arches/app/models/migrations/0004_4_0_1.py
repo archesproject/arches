@@ -57,7 +57,8 @@ class Migration(migrations.Migration):
                     'views/components/datatypes/resource-instance',
                     'resource-instance-datatype-config',
                     FALSE,
-                    '31f3728c-7613-11e7-a139-784f435179ea'
+                    '31f3728c-7613-11e7-a139-784f435179ea',
+                    TRUE
             );
 
             INSERT INTO widgets(
@@ -80,14 +81,15 @@ class Migration(migrations.Migration):
                     'resource-instance-list',
                     'fa fa-external-link-square',
                     'datatypes.py',
-                    'ResourceInstanceListDataType',
+                    'ResourceInstanceDataType',
                     '{
                         "graphid": null
                     }',
                     'views/components/datatypes/resource-instance',
                     'resource-instance-datatype-config',
                     FALSE,
-                    'ff3c400a-76ec-11e7-a793-784f435179ea'
+                    'ff3c400a-76ec-11e7-a793-784f435179ea',
+                    TRUE
             );
             """,
             """
