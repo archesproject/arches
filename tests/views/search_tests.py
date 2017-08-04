@@ -85,7 +85,7 @@ class SearchTests(ArchesTestCase):
                 {
                     "values": [
                         {
-                            "value": "ANP TEST",
+                            "value": "Mock concept",
                             "language": "en-US",
                             "category": "label",
                             "type": "prefLabel",
@@ -366,7 +366,7 @@ class SearchTests(ArchesTestCase):
 
     def test_concept_search_1(self):
         """
-        Search for resources that have the concept "ANP TEST" in them as a "concept" search
+        Search for resources that have the concept "Mock concept" in them as a "concept" search
 
         """
 
@@ -377,7 +377,7 @@ class SearchTests(ArchesTestCase):
 
     def test_concept_search_2(self):
         """
-        Search for resources that DON'T have the concept "ANP TEST" in them as a "concept" search
+        Search for resources that DON'T have the concept "Mock concept" in them as a "concept" search
 
         """
 
