@@ -11,17 +11,15 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
         var self = this;
         var mapWidget = params.mapWidget;
         this.active = ko.observable(false);
-        this.srid = ko.observable('+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs');
+        this.defaultProjection = _.findWhere(arches.preferredCoordinateSystems, {default: true}).proj4
+        this.defaultProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
         this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
         this.x = ko.observable(this.defaultCoords[0]);
         this.y = ko.observable(this.defaultCoords[1]);
-        this.availableSrids = [{
-                                text: 'Lat/Lon',
-                                id: '4326'
-                            }, {
-                                text: 'UTM 30N',
-                                id: '+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs'
-                            }]
+        this.availableSrids = _.map(arches.preferredCoordinateSystems, function(v, k) {
+            var id = (k === '4326') ? '4326' : v.proj4;
+            return {id: id, text: v.name}
+        })
 
         this.setMap = function (map) {
                 self.map = map;
@@ -29,7 +27,7 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
 
         this.coordinates = ko.computed(function() {
             var srcProj = self.srid();
-            var res = (srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
+            var res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
             return res;
         })
 
