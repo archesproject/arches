@@ -31,30 +31,18 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
             return res;
         })
 
-        this.addLocation = function(){
-            var feature = {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "Point",
-                "coordinates": _.map(self.coordinates(), function(coord){return ko.unwrap(coord)})
-              }
-            }
-
-            var fc = {
-              "type": "FeatureCollection",
-              "features": [feature]
-            }
-
-            mapWidget.draw.add(feature)
-
-            if ((ko.isObservable(mapWidget.value) && mapWidget.value().features) || mapWidget.value.features) {
-                mapWidget.value.features.push(feature)
-
-            } else {
-                mapWidget.value(koMapping.fromJS(fc));
-            }
+        this.clearCoordinates = function() {
+            self.x(null);
+            self.y(null);
         }
+
+        this.addLocation = function(){
+            var geom = {
+                    "type": "Point",
+                    "coordinates": _.map(self.coordinates(), function(coord){return ko.unwrap(coord)})
+                }
+            mapWidget.updateDrawLayerWithJson(JSON.stringify(geom))
+            }
 
     };
 

@@ -6885,6 +6885,12 @@ a.clear-geojson-button {
     color: #ddd;
 }
 
+.xy a.clear-geojson-button {
+    border-bottom: none;
+    top: 2px;
+    right: 4px;
+}
+
 a.clear-geojson-button.enabled {
     color: #555;
 }
