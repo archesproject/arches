@@ -9,11 +9,12 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
     */
     var XYInputViewModel = function(params) {
         var self = this;
-        var mapWidget = params.mapWidget
+        var mapWidget = params.mapWidget;
         this.active = ko.observable(false);
         this.srid = ko.observable('+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs');
-        this.x = ko.observable(622287.797002);
-        this.y = ko.observable(5991003.038972);
+        this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
+        this.x = ko.observable(this.defaultCoords[0]);
+        this.y = ko.observable(this.defaultCoords[1]);
         this.availableSrids = [{
                                 text: 'Lat/Lon',
                                 id: '4326'
@@ -27,16 +28,9 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
             }
 
         this.coordinates = ko.computed(function() {
-            var res = [Number(self.x()), Number(self.y())]
             var srcProj = self.srid();
-            if (srcProj !== '4326') {
-                res = proj4(srcProj).inverse([self.x(), self.y()]);
-            }
-            return res
-        })
-        // for testing UTM 30N: 622287.797002, 5991003.038972 === 4326: -1.1319575769761, 54.052734375
-        this.coordinates.subscribe(function(val){
-            console.log(val);
+            var res = (srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
+            return res;
         })
 
         this.addLocation = function(){
@@ -45,7 +39,7 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
               "properties": {},
               "geometry": {
                 "type": "Point",
-                "coordinates": self.coordinates
+                "coordinates": _.map(self.coordinates(), function(coord){return ko.unwrap(coord)})
               }
             }
 
@@ -54,12 +48,13 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
               "features": [feature]
             }
 
-            if (mapWidget.value()) {
-                var currentValue = koMapping.toJS(mapWidget.value)
-                currentValue.features.push(feature);
-                mapWidget.value(currentValue);
+            mapWidget.draw.add(feature)
+
+            if ((ko.isObservable(mapWidget.value) && mapWidget.value().features) || mapWidget.value.features) {
+                mapWidget.value.features.push(feature)
+
             } else {
-                mapWidget.value(fc)
+                mapWidget.value(koMapping.fromJS(fc));
             }
         }
 
