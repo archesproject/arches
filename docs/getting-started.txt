@@ -116,7 +116,7 @@ If you have installed the dependencies, you're ready to install Arches.
 
         Install Arches (your virtual environment must be activated)::
 
-        (ENV)$ pip install arches
+        (ENV)$ pip install arches==3.1.2
 
 
 
