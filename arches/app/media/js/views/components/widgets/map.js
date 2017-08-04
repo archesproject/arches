@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'proj4',
     'turf',
     'geohash',
     'knockout-mapping',
@@ -14,6 +13,7 @@ define([
     'views/list',
     'views/components/widgets/map/map-styles',
     'viewmodels/map-controls',
+    'viewmodels/xy-input',
     'mathjs',
     'select2',
     'bindings/select2v4',
@@ -22,7 +22,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, mathjs) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, XYInputViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -181,7 +181,7 @@ define([
             }, this)
 
             this.loadGeometriesIntoDrawLayer = function() {
-                self.geojsonInput(false)
+                self.geojsonInput(false);
                 if (self.draw) {
                     var val = koMapping.toJS(self.value);
                     self.draw.deleteAll()
@@ -237,6 +237,10 @@ define([
                 mapControlsHidden: this.mapControlsHidden,
                 overlaySelectorClosed: this.overlaySelectorClosed,
                 overlays: this.overlays
+            });
+
+            this.xyInput = new XYInputViewModel({
+                mapWidget: self
             });
 
             if (params.graph !== undefined) {
@@ -539,7 +543,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-
+                this.xyInput.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -807,6 +811,7 @@ define([
                     self.drawMode.subscribe(function(val) {
                         if (val !== undefined) {
                             self.geojsonInput(false);
+                            self.xyInput.active(false);
                         }
                     })
                 }
@@ -1122,20 +1127,31 @@ define([
                     }
                 };
 
+                this.deactivateDrawTools = function() {
+                    _.each(self.geometryTypeDetails, function(geomtype) {
+                        if (geomtype.active()) {
+                            geomtype.active(false);
+                        }
+                    });
+                    self.switchToEditMode();
+                };
+
                 this.geojsonInput.subscribe(function(val) {
                     if (!val) {
                         this.geoJsonStringValid(true);
                         this.geojsonString('');
-
                     } else {
-                        _.each(self.geometryTypeDetails, function(geomtype) {
-                            if (geomtype.active()) {
-                                geomtype.active(false);
-                            }
-                        })
-                        self.switchToEditMode()
+                        self.deactivateDrawTools();
+                        self.xyInput.active(false);
                     }
                 }, this);
+
+                this.xyInput.active.subscribe(function(val){
+                    if (val) {
+                        self.deactivateDrawTools();
+                        self.geojsonInput(false);
+                    }
+                })
 
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
