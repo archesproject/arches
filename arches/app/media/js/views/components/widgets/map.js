@@ -360,14 +360,18 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val) {
+                var zoomExtent = 500;
                 if (val !== '') {
                     try {
                         var data = JSON.parse(val)
                         try {
+                            if (self.context === 'search-filter') {
+                                self.clearGeometries(null)
+                            };
                             self.draw.add(data)
                             self.saveGeometries()
                             if (data['type'] === 'Point') {
-                                data = turf.buffer(data, 500, 'meters')
+                                data = turf.buffer(data, zoomExtent, 'meters')
                             }
                             var bbox = turf.bbox(data);
                             var ll = new mapboxgl.LngLat(bbox[0], bbox[1])
@@ -380,6 +384,9 @@ define([
                                 self.geojsonString('')
                             }, 500)
                             self.geoJsonStringValid(true);
+                            if (self.context === 'search-filter') {
+                                self.applySearchBuffer(self.buffer());
+                            };
                         } catch (err) {
                             self.geoJsonStringValid(false);
                         }
@@ -826,6 +833,7 @@ define([
                     self = self || this;
                     if (this.context === 'search-filter') {
                         this.extentSearch(false);
+                        this.xyInput.active(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
                         if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode() || this.geometryTypeDetails[selectedDrawTool].drawMode !== this.drawMode()) {
@@ -1212,10 +1220,8 @@ define([
                     self.extentSearch(!self.extentSearch())
                     if (self.extentSearch() === true) {
                         self.draw.deleteAll();
-                        self.switchToEditMode();
-                        _.each(self.geometryTypeDetails, function(geomtype) {
-                            geomtype.active(false);
-                        })
+                        self.xyInput.active(false);
+                        self.deactivateDrawTools();
                     } else {
                         self.value({
                             "type": "FeatureCollection",

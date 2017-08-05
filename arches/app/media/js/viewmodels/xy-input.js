@@ -1,4 +1,4 @@
-define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapping, proj4, arches) {
+define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
     /**
     * A base viewmodel for maptools
     *
@@ -44,7 +44,26 @@ define(['knockout', 'knockout-mapping', 'proj4', 'arches'], function (ko, koMapp
             mapWidget.updateDrawLayerWithJson(JSON.stringify(geom))
             }
 
+        this.active.subscribe(function(val){
+            if (mapWidget.context === 'search-filter') {
+                if (val) {
+                    if (mapWidget.extentSearch()) {
+                        mapWidget.toggleExtentSearch()
+                    } else {
+                        mapWidget.deactivateDrawTools();
+                        mapWidget.draw.deleteAll();
+                        mapWidget.value({
+                            "type": "FeatureCollection",
+                            "features": []
+                        });
+                    };
+                };
+            }
+        });
     };
 
     return XYInputViewModel;
 });
+
+//663952
+//5899830
