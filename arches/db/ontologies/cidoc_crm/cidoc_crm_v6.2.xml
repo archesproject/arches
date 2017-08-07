@@ -48,6 +48,11 @@ Property P81 is dedicated for modeling the Time-Span's maximum known temporal ex
 Property P82 is for modeling the minimum outer bounds of events i.e. at_some_time_within. 
 P81 has its time interval redefined by P81a and P81b. Similarly, we redefine P82 by P82a and P82b.
 
+
+EDITS FOR ARCHES (general typo fixes and obvious ommisions from the spec):
+Fixed P167i_was_place_of domain/range references which should be E53_Place/E93_Presence as per the spec
+Fixed typo in references to E93_Place which should be E53_Place
+
 -->
 <rdf:RDF xml:lang="en" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:base="http://www.cidoc-crm.org/cidoc-crm/">
 
@@ -586,7 +591,7 @@ The relationship of a physical copy of a book to the text it contains is modelle
     <rdfs:label xml:lang="fr">Titre</rdfs:label>
     <rdfs:label xml:lang="de">Titel</rdfs:label>
     <rdfs:label xml:lang="en">Title</rdfs:label>
-    <rdfs:label xml:lang="el"> Τίτλος</rdfs:label>
+    <rdfs:label xml:lang="el">Τίτλος</rdfs:label>
 	<rdfs:label xml:lang="pt">Título</rdfs:label>
 	<rdfs:label xml:lang="zh">题目</rdfs:label>
 	<rdfs:comment>This class comprises the names assigned to works, such as texts, artworks or pieces of music. 
@@ -5272,20 +5277,20 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:comment>This property points to a wider area in which my thing /event was… 
 	</rdfs:comment>
 	<rdfs:domain rdf:resource="E93_Presence"/>
-	<rdfs:range rdf:resource="E93_Place"/>
+	<rdfs:range rdf:resource="E53_Place"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P167i_was_place_of">
 	<rdfs:label xml:lang="en">was place of</rdfs:label>
-	<rdfs:domain rdf:resource="E93_Presence"/>
-	<rdfs:range rdf:resource="E92_Spacetime_Volume"/>
+	<rdfs:domain rdf:resource="E53_Place"/>
+	<rdfs:range rdf:resource="E93_Presence"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P168_place_is_defined_by">
 	<rdfs:label xml:lang="en">place is defined by </rdfs:label>
 	<rdfs:comment>This property associates an instance of E53 Place with an instance of E94 Space Primitive that defines it. Syntactic variants or use of different scripts may result in multiple instances of E94 Space Primitive defining exactly the same place. Transformations between different reference systems in general result in new definitions of places approximating each other and not in alternative definitions. Note that it is possible for a place to be defined by phenomena causal to it or other forms of identification rather than by an instance of E94 Space Primitive. In this case, this property must not be used for approximating the respective instance of E53 Place with an instance of E94 Space Primitive. 
 	</rdfs:comment>
-	<rdfs:domain rdf:resource="E93_Place"/>
+	<rdfs:domain rdf:resource="E53_Place"/>
 	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
