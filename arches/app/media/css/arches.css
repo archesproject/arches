@@ -8443,6 +8443,18 @@ a.search-facet-item.disabled {
     z-index: 1000;
 }
 
+.resource-instance-search .resource-instance-wrapper {
+    padding: 0;
+}
+
+.resource-instance-search .row.widget-wrapper {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
