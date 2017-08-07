@@ -216,6 +216,7 @@
             mapDefaultZoom: {{ map_info.zoom }},
             mapDefaultMinZoom: {{ map_info.map_min_zoom }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
+            preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
             useSemanticRelationships: {{ use_semantic_relationships|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
