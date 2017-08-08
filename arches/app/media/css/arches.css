@@ -6863,6 +6863,7 @@ a#close-map-tools.map-widget-icon:hover {
 
 .map-tool-item.xy {
     background: #fff;
+    width: 220px;
 }
 
 .map-tool-item.xy select {
