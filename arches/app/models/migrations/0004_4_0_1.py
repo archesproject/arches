@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+    
         migrations.AlterField(
                 model_name='resourcexresource',
                 name='relationshiptype',
@@ -28,81 +29,5 @@ class Migration(migrations.Migration):
             name='created',
             field=models.DateTimeField(default=datetime.datetime.now()),
             preserve_default=False,
-        ),
-        migrations.RunSQL("""
-            INSERT INTO widgets(
-                widgetid,
-                name,
-                component,
-                datatype,
-                defaultconfig
-            ) VALUES (
-                '31f3728c-7613-11e7-a139-784f435179ea',
-                'resource-instance-select-widget',
-                'views/components/widgets/resource-instance-select',
-                'resource-instance',
-                '{
-                    "placeholder": ""
-                }'
-            );
-
-            INSERT INTO d_data_types VALUES (
-                    'resource-instance',
-                    'fa fa-external-link-o',
-                    'datatypes.py',
-                    'ResourceInstanceDataType',
-                    '{
-                        "graphid": null
-                    }',
-                    'views/components/datatypes/resource-instance',
-                    'resource-instance-datatype-config',
-                    FALSE,
-                    '31f3728c-7613-11e7-a139-784f435179ea',
-                    TRUE
-            );
-
-            INSERT INTO widgets(
-                widgetid,
-                name,
-                component,
-                datatype,
-                defaultconfig
-            ) VALUES (
-                'ff3c400a-76ec-11e7-a793-784f435179ea',
-                'resource-instance-multiselect-widget',
-                'views/components/widgets/resource-instance-multiselect',
-                'resource-instance-list',
-                '{
-                    "placeholder": ""
-                }'
-            );
-
-            INSERT INTO d_data_types VALUES (
-                    'resource-instance-list',
-                    'fa fa-external-link-square',
-                    'datatypes.py',
-                    'ResourceInstanceDataType',
-                    '{
-                        "graphid": null
-                    }',
-                    'views/components/datatypes/resource-instance',
-                    'resource-instance-datatype-config',
-                    FALSE,
-                    'ff3c400a-76ec-11e7-a793-784f435179ea',
-                    TRUE
-            );
-            """,
-            """
-            DELETE FROM d_data_types
-                WHERE datatype = 'resource-instance';
-
-            DELETE from widgets
-                WHERE widgetid = '31f3728c-7613-11e7-a139-784f435179ea';
-
-            DELETE FROM d_data_types
-                WHERE datatype = 'resource-instance-list';
-
-            DELETE from widgets
-                WHERE widgetid = 'ff3c400a-76ec-11e7-a793-784f435179ea';
-        """),
+        )
     ]
