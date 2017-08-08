@@ -1,6 +1,6 @@
-###############################
-Arches v4 Documentation (draft)
-###############################
+#######################
+Arches v4 Documentation
+#######################
 
 .. toctree::
     :caption: Introduction
