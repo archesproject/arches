@@ -115,18 +115,6 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-                                <!-- ko foreach: geometryTypes -->
-                                <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
-                                        <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
-                                </a>
-                                <!-- /ko -->
-                                <!--ko if: context !== 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
-                                <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
-                                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
-                                </div>
-                                <!-- /ko -->
 
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200">
@@ -142,6 +130,20 @@
                                         <button class="btn btn-primary btn-sm btn-block" data-bind="click: function(){xyInput.addLocation()}">{% trans "Add Location" %}</button>
                                     </div>
                                 </div>
+
+                                <!-- ko foreach: geometryTypes -->
+                                <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
+                                        <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
+                                </a>
+                                <!-- /ko -->
+
+                                <!--ko if: context !== 'search-filter' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
+                                <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
+                                    <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
+                                </div>
+                                <!-- /ko -->
 
                                 <!--ko if: context === 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
