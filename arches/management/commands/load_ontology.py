@@ -87,6 +87,19 @@ class Command(BaseCommand):
         if options['extensions'] is not None:
             ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology to which you want to add the extension.\n'))
             if ontology:
+                for extension in options['extensions'].split(','):
+                    path_to_check = self.get_relative_path(extension)
+                    try:
+                        proposed_path = models.Ontology.objects.get(path=path_to_check).path.path
+                        print ''
+                        print _('It looks like an ontology file has already been loaded with the same name.')
+                        print _('The file currently loaded is located here:')
+                        print '   %s' % proposed_path
+                        print _('If you would simply like to reload the current ontology, you can run this command with the dash r (-r) flag')
+                        print 'eg:    python manage.py load_ontology -r\n'
+                        return
+                    except:
+                        pass
                 self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'])
             else:
                 print _('You must first define a base ontology (using -s) before loading an extension using the (-x) argument')
@@ -195,7 +208,10 @@ class Command(BaseCommand):
 
         ret = None
         try:
-            ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
+            if models.get_ontology_storage_system().location in data_source:
+                ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
+            else:
+                ret ='./%s' % os.path.split(data_source)[1]
         except:
             try:
                 ret = data_source.path
