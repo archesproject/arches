@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology which you want to reload.\n'))
             
             if ontology:
-                self.run_loader(data_source=ontology.path.path, name=ontology.name, version=ontology.version, id=ontology.pk, extensions=None)
+                self.run_loader(data_source=ontology.path.path, name=ontology.name, version=ontology.version, id=ontology.pk, extensions=None, verbosity=options['verbosity'])
             return
 
         if options['version'] is None:
@@ -81,7 +81,7 @@ class Command(BaseCommand):
             return 
 
         if options['source'] is not None:
-            self.run_loader(data_source=options['source'], name=options['ontology_name'], version=options['version'], id=options['id'], extensions=options['extensions'])
+            self.run_loader(data_source=options['source'], name=options['ontology_name'], version=options['version'], id=options['id'], extensions=options['extensions'], verbosity=options['verbosity'])
             return
 
         if options['extensions'] is not None:
@@ -100,13 +100,13 @@ class Command(BaseCommand):
                         return
                     except:
                         pass
-                self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'])
+                self.run_loader(data_source=ontology.path.path, version=options['version'], id=ontology.pk, extensions=options['extensions'], verbosity=options['verbosity'])
             else:
                 print _('You must first define a base ontology (using -s) before loading an extension using the (-x) argument')
             return
 
 
-    def run_loader(self, data_source=None, version=None, name=None, id=None, extensions=None):
+    def run_loader(self, data_source=None, version=None, name=None, id=None, extensions=None, verbosity=1):
         """
         load the given ontology file in xml format into the database
 
@@ -117,7 +117,9 @@ class Command(BaseCommand):
 
         """
 
-        print 'Loading Source Ontology: "%s"' % data_source
+        if verbosity > 0:
+            print ''
+            print 'Loading Source Ontology: "%s"' % data_source
 
         if data_source is not None and version is not None:
             self.graph = Graph()
@@ -133,7 +135,8 @@ class Command(BaseCommand):
                     extensions = extensions.split(',') + loaded_extensions
 
                 for extension in set(extensions):
-                    print 'Loading Extension: "%s"' % extension
+                    if verbosity > 0:
+                        print 'Loading Extension: "%s"' % extension
                     if os.path.isfile(extension):
                         self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
                     else:
@@ -151,9 +154,7 @@ class Command(BaseCommand):
         filename = os.path.split(data_source)[1]
         if name is None:
             name = os.path.splitext(filename)[0]
-        # if os.path.isfile(os.path.join(models.get_ontology_storage_system().location, filename)):
-        #     proposed_path = os.path.join(models.get_ontology_storage_system().location, filename)
-        #     proceed = raw_input(_('It looks like an ontology file has already been loaded with this exact name.\nThe file currently loaded is located here:\n   %s\n') % proposed_path)
+
         if models.get_ontology_storage_system().location in filepath:
             # if the file we're referencing already exists in the location where we 
             # usually store them then leave it there and just save a reference to it
