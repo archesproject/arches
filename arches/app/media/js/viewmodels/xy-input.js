@@ -16,6 +16,7 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
         this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
         this.x = ko.observable(this.defaultCoords[0]);
         this.y = ko.observable(this.defaultCoords[1]);
+        this.selectedPoint = ko.observable();
         this.availableSrids = _.map(arches.preferredCoordinateSystems, function(v, k) {
             var id = (k === '4326') ? '4326' : v.proj4;
             return {id: id, text: v.name}
@@ -44,7 +45,23 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
             mapWidget.updateDrawLayerWithJson(JSON.stringify(geom))
             }
 
+        this.updateSelectedPoint = function(){
+            if (mapWidget.draw.getSelected() && mapWidget.draw.getSelected().features) {
+                points = _.filter(mapWidget.draw.getSelected().features, function(item) {return _.some([item.geometry], {type:'Point'})});
+                if (points.length > 0) {
+                    self.selectedPoint(points[0])
+                    self.x(points[0].geometry.coordinates[0]), self.y(points[0].geometry.coordinates[1]);
+                } else {
+                    if (self.selectedPoint()) {
+                        self.active(false);
+                        self.selectedPoint(undefined);
+                    }
+                }
+            } 
+        }
+
         this.active.subscribe(function(val){
+            var points = [];
             if (mapWidget.context === 'search-filter') {
                 if (val) {
                     if (mapWidget.extentSearch()) {
@@ -58,6 +75,8 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
                         });
                     };
                 };
+            } else {
+                self.updateSelectedPoint();
             }
         });
     };

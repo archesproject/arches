@@ -818,8 +818,10 @@ define([
                 if (this.context === 'resource-editor') {
                     self.drawMode.subscribe(function(val) {
                         if (val !== undefined) {
-                            self.geojsonInput(false);
-                            self.xyInput.active(false);
+                            self.geojsonInput(false)
+                            if (!self.xyInput.selectedPoint() || val !== 'simple_select') {
+                                self.xyInput.active(false);
+                            }
                         }
                     })
                 }
@@ -1118,6 +1120,9 @@ define([
                         if (self.context !== 'search-filter') {
                             if (self.draw.getSelectedIds().length > 0) {
                                 selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                if (selectedFeatureType === 'Point') {
+                                    self.xyInput.updateSelectedPoint()
+                                };
                                 self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
                             } else {
                                 if (self.draw.getMode().endsWith("select")) {
@@ -1385,6 +1390,9 @@ define([
                 });
 
                 map.on('click', function(e) {
+                    if (self.context === 'resource-editor')
+                        {self.xyInput.updateSelectedPoint();
+                        };
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
@@ -1397,6 +1405,7 @@ define([
                         }
                     }) || null;
                     if (clickFeature) {
+                        console.log(clickFeature)
                         if (clickFeature.properties.resourceinstanceid) {
                             clickData = lookupResourceData(clickFeature.properties);
                         } else if (clickFeature.properties.total > 1) {
