@@ -163,6 +163,7 @@ def search_results(request):
     dsl = search_results_dsl['query']
     search_buffer = search_results_dsl['search_buffer']
     dsl.include('graph_id')
+    dsl.include('root_ontology_class')
     dsl.include('resourceinstanceid')
     dsl.include('points')
     dsl.include('geometries')

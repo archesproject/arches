@@ -6,7 +6,6 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'proj4',
     'turf',
     'geohash',
     'knockout-mapping',
@@ -14,6 +13,7 @@ define([
     'views/list',
     'views/components/widgets/map/map-styles',
     'viewmodels/map-controls',
+    'viewmodels/xy-input',
     'mathjs',
     'select2',
     'bindings/select2v4',
@@ -22,7 +22,7 @@ define([
     'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, proj4, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, mathjs) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, turf, geohash, koMapping, geojsonExtent, ListView, mapStyles, MapControlsViewModel, XYInputViewModel, mathjs) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -181,7 +181,8 @@ define([
             }, this)
 
             this.loadGeometriesIntoDrawLayer = function() {
-                self.geojsonInput(false)
+                self.geojsonInput(false);
+                self.xyInput.active(false);
                 if (self.draw) {
                     var val = koMapping.toJS(self.value);
                     self.draw.deleteAll()
@@ -237,6 +238,10 @@ define([
                 mapControlsHidden: this.mapControlsHidden,
                 overlaySelectorClosed: this.overlaySelectorClosed,
                 overlays: this.overlays
+            });
+
+            this.xyInput = new XYInputViewModel({
+                mapWidget: self
             });
 
             if (params.graph !== undefined) {
@@ -355,14 +360,18 @@ define([
             }
 
             this.updateDrawLayerWithJson = function(val) {
+                var zoomExtent = 500;
                 if (val !== '') {
                     try {
                         var data = JSON.parse(val)
                         try {
+                            if (self.context === 'search-filter') {
+                                self.clearGeometries(null)
+                            };
                             self.draw.add(data)
                             self.saveGeometries()
                             if (data['type'] === 'Point') {
-                                data = turf.buffer(data, 500, 'meters')
+                                data = turf.buffer(data, zoomExtent, 'meters')
                             }
                             var bbox = turf.bbox(data);
                             var ll = new mapboxgl.LngLat(bbox[0], bbox[1])
@@ -375,6 +384,9 @@ define([
                                 self.geojsonString('')
                             }, 500)
                             self.geoJsonStringValid(true);
+                            if (self.context === 'search-filter') {
+                                self.applySearchBuffer(self.buffer());
+                            };
                         } catch (err) {
                             self.geoJsonStringValid(false);
                         }
@@ -539,7 +551,7 @@ define([
                         _.defer(resize, 1);
                     });
                 }
-
+                this.xyInput.setMap(map);
                 this.draw = draw;
                 this.map.addControl(draw);
 
@@ -807,6 +819,7 @@ define([
                     self.drawMode.subscribe(function(val) {
                         if (val !== undefined) {
                             self.geojsonInput(false);
+                            self.xyInput.active(false);
                         }
                     })
                 }
@@ -820,6 +833,7 @@ define([
                     self = self || this;
                     if (this.context === 'search-filter') {
                         this.extentSearch(false);
+                        this.xyInput.active(false);
                         this.draw.deleteAll();
                         this.queryFeature = undefined;
                         if (selectedDrawTool === 'end' || this.geometryTypeDetails[selectedDrawTool].drawMode === this.drawMode() || this.geometryTypeDetails[selectedDrawTool].drawMode !== this.drawMode()) {
@@ -1122,20 +1136,31 @@ define([
                     }
                 };
 
+                this.deactivateDrawTools = function() {
+                    _.each(self.geometryTypeDetails, function(geomtype) {
+                        if (geomtype.active()) {
+                            geomtype.active(false);
+                        }
+                    });
+                    self.switchToEditMode();
+                };
+
                 this.geojsonInput.subscribe(function(val) {
                     if (!val) {
                         this.geoJsonStringValid(true);
                         this.geojsonString('');
-
                     } else {
-                        _.each(self.geometryTypeDetails, function(geomtype) {
-                            if (geomtype.active()) {
-                                geomtype.active(false);
-                            }
-                        })
-                        self.switchToEditMode()
+                        self.deactivateDrawTools();
+                        self.xyInput.active(false);
                     }
                 }, this);
+
+                this.xyInput.active.subscribe(function(val){
+                    if (val) {
+                        self.deactivateDrawTools();
+                        self.geojsonInput(false);
+                    }
+                })
 
                 this.overlays.subscribe(function(overlays) {
                     this.overlayConfigs([]);
@@ -1195,10 +1220,8 @@ define([
                     self.extentSearch(!self.extentSearch())
                     if (self.extentSearch() === true) {
                         self.draw.deleteAll();
-                        self.switchToEditMode();
-                        _.each(self.geometryTypeDetails, function(geomtype) {
-                            geomtype.active(false);
-                        })
+                        self.xyInput.active(false);
+                        self.deactivateDrawTools();
                     } else {
                         self.value({
                             "type": "FeatureCollection",

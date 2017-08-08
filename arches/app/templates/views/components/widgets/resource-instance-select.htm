@@ -6,7 +6,7 @@
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
-        <div class="col-xs-12">
+        <div class="col-xs-12 resource-instance-wrapper">
             <input style="width:30%; display:inline-block;"
                 data-bind="
                     value: value,
@@ -31,3 +31,15 @@
     </div>
 </div>
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko foreach: valueObjects -->
+<dd>
+    <a data-bind="text: name, attr: { href: reportUrl }" target="_blank"></a>
+</dd>
+<!-- /ko -->
+<!-- ko if: valueObjects().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+{% endblock report %}

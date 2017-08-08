@@ -5,7 +5,6 @@ import datetime
 from arches.app.models.concept import Concept
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
-from arches.app.models.models import Value
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.gis.geos import GEOSGeometry
@@ -122,7 +121,7 @@ class Reader(object):
                 relation = ResourceXResource(
                     resourceinstanceidfrom = Resource(resourceinstancefrom),
                     resourceinstanceidto = Resource(resourceinstanceto),
-                    relationshiptype = Value(uuid.UUID(str(relation['relationshiptype']))),
+                    relationshiptype = unicode(relation['relationshiptype']),
                     datestarted = relation['datestarted'],
                     dateended = relation['dateended'],
                     notes = relation['notes']

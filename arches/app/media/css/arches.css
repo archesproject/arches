@@ -5681,6 +5681,14 @@ a.mega-dropdown-toggle.disabled {
     height: 40px;
 }
 
+.unselectable {
+    color: #ff0000;
+}
+
+#container .table-bordered .unselectable td {
+    color: #ddd;
+}
+
 .rr-text-notes {}
 
 .rr-result-grid-container {
@@ -6843,10 +6851,30 @@ a#close-map-tools.map-widget-icon:hover {
     width: 75px;
 }
 
-.map-json-tool-item {
+.map-tool-item {
+    background: #aaa;
+}
+
+.map-tool-item.geojson {
     padding: 1px;
     background: #aaa;
     color: #aaa;
+}
+
+.map-tool-item.xy {
+    background: #fff;
+}
+
+.map-tool-item.xy select {
+    height: 24px;
+    width: 100px;
+    margin-bottom: 7px;
+}
+
+.map-tool-item.xy input {
+    height: 28px;
+    margin-bottom: 2px;
+    padding: 5px;
 }
 
 a.clear-geojson-button {
@@ -6855,6 +6883,12 @@ a.clear-geojson-button {
     top:5px;
     right:5px;
     color: #ddd;
+}
+
+.xy a.clear-geojson-button {
+    border-bottom: none;
+    top: 2px;
+    right: 4px;
 }
 
 a.clear-geojson-button.enabled {
@@ -7389,9 +7423,9 @@ a.clear-geojson-button:hover {
     -moz-transition: .6s all ease;
     -o-transition: .6s all ease;
     transition: .6s all ease;
-    -webkit-background-size: cover; 
+    -webkit-background-size: cover;
     -moz-background-size: cover;
-    -o-background-size: cover;  
+    -o-background-size: cover;
     background-size: cover;
     background-color: white;
 }
@@ -8407,6 +8441,18 @@ a.search-facet-item.disabled {
 
 .help-text-crud {
     z-index: 1000;
+}
+
+.resource-instance-search .resource-instance-wrapper {
+    padding: 0;
+}
+
+.resource-instance-search .row.widget-wrapper {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 @keyframes loader {

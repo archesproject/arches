@@ -53,7 +53,7 @@ ELASTICSEARCH_HOSTS = [
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 
-
+USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
@@ -73,6 +73,9 @@ ONTOLOGY_EXT = [
     'arches_crm_enhancements.xml'
 ]
 
+PREFERRED_COORDINATE_SYSTEMS = (
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
+)
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

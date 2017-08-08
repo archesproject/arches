@@ -122,15 +122,30 @@
                                 <!-- /ko -->
                                 <!--ko if: context !== 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
-                                <div class="map-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
+                                <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
                                     <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
                                 </div>
                                 <!-- /ko -->
 
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
+                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200">
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.active(false); xyInput.clearCoordinates()}"><span>x</span></a>
+                                    <div class="form-control">
+                                        <label for="input-easting">{% trans "Easting" %}</label>
+                                        <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <label for="input-northing">{% trans "Northing" %}</label>
+                                        <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <div>
+                                            <select class="form-control" class="design" style="width:100px;" data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid"></select>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-block" data-bind="click: function(){xyInput.addLocation()}">{% trans "Add Location" %}</button>
+                                    </div>
+                                </div>
+
                                 <!--ko if: context === 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
-                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode())">
+                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode()) || xyInput.active()">
                                     <div class="form-group form-inline">
                                       <label for="buffer-input">{% trans "Buffer" %}</label>
                                       <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
@@ -512,7 +527,6 @@
                     {% trans "Geocoder Availability" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-
                     <div class="toggle-container">
                         <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: function () { geocoderVisible(!geocoderVisible()) }"><small></small></span>
                         <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>

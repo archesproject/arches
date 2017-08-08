@@ -54,6 +54,7 @@ class BaseConceptDataType(BaseDataType):
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
                     document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
             document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
+            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id})
 
 
 class ConceptDataType(BaseConceptDataType):

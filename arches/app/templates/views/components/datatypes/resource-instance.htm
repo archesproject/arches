@@ -19,3 +19,29 @@
     </div>
 </div>
 <!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-sm-2">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">{% trans "References" %}</option>
+        <option value="!">{% trans "Does not reference" %}</option>
+    </select>
+</div>
+
+<div class="col-sm-10 resource-instance-search">
+    <!-- ko component: {
+        name: 'resource-instance-select-widget',
+        params: {
+            config: {
+                placeholder: '{% trans "Select a resource" %}'
+            },
+            label: '',
+            value: searchValue,
+            node: node,
+            disabled: false,
+            type: "resource-editor",
+            state: "form"
+        }
+    } --><!-- /ko -->
+</div>
+<!-- /ko -->
