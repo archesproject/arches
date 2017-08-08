@@ -117,9 +117,10 @@
                             <div class="leaflet-draw-toolbar leaflet-bar">
 
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
-                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200">
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.active(false); xyInput.clearCoordinates()}"><span>x</span></a>
+                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
+                                    <div class="tool-header">{% trans 'Create a point' %}</div>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.active(false); xyInput.clearCoordinates()}"><span>x</span></a>
                                         <label for="input-easting">{% trans "Easting" %}</label>
                                         <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
                                         <label for="input-northing">{% trans "Northing" %}</label>
