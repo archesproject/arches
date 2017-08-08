@@ -52,12 +52,12 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
                     self.selectedPoint(points[0])
                     self.x(points[0].geometry.coordinates[0]), self.y(points[0].geometry.coordinates[1]);
                 } else {
-                    if (self.selectedPoint()) {
+                    if (self.selectedPoint() && !_.contains(['draw_point','draw_polygon','draw_line_string'], mapWidget.draw.getMode())) {
                         self.active(false);
                         self.selectedPoint(undefined);
                     }
                 }
-            } 
+            }
         }
 
         this.active.subscribe(function(val){
