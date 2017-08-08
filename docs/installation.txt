@@ -71,7 +71,7 @@ Once you have all of the dependencies installed, open a command prompt and use t
 
         pip install arches --no-binary :all:
 
-    .. warning:: Running a pip installation without the ``--no-binary :all:`` will install arches in your virtual environment, but will not install all of the separate python packages that you need. This will cause you to not be able to proceed with the following steps.
+    .. warning:: Running a pip installation without the ``--no-binary :all:`` argument will install ``arches`` in your virtual environment, but will not install all of the separate python packages that you need. This will cause you to not be able to proceed with the following steps.
 
 #. Create a new Arches project
 
@@ -85,7 +85,7 @@ Once you have all of the dependencies installed, open a command prompt and use t
 
         python C:\Projects\ENV\Scripts\arches-project create my_project
 
-    .. note:: On Windows, with the current Arches beta release, v4.0b3, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
+    .. note:: On Windows, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
     .. warning:: On Windows, you must specify the path to your GDAL library before continuing. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
 
