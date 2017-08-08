@@ -46,11 +46,11 @@ E94 Space Primitive is not further elaborated upon within this model. Statement 
     <rdfs:subClassOf rdf:resource="E59_Primitive_Value"/>
 </rdfs:Class>
 
-<rdfs:Class rdf:about="E94_Space">
+<!-- <rdfs:Class rdf:about="E94_Space">
     <rdfs:label xml:lang="en">Space</rdfs:label>
     <rdfs:comment>This class comprises instances of E92 Spacetime Volume that result from intersection of instances of E92 Spacetime Volume with an instance of E52 Time-Span. The identity of an instance of this class is determined by the identities of the constituing spacetime volume and the time-span.</rdfs:comment>
     <rdfs:subClassOf rdf:resource="E92_Spacetime_Volume"/>
-</rdfs:Class>
+</rdfs:Class> -->
 
 <rdf:Property rdf:about="BM.PX_is_related_to">
    <rdfs:label xml:lang="en">is related to</rdfs:label>
