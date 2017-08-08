@@ -73,8 +73,7 @@ class Command(BaseCommand):
                 ontology = choose_ontology(_('Select the number corresponding to the\nbase ontology which you want to reload.\n'))
             
             if ontology:
-                print 'running loader'
-                #self.run_loader(data_source=ontology.path, name=onontology.name, version=ontology.version, id=ontology.id, extensions=None)
+                self.run_loader(data_source=ontology.path.path, name=ontology.name, version=ontology.version, id=ontology.pk, extensions=None)
             return
 
         if options['version'] is None:
@@ -105,6 +104,8 @@ class Command(BaseCommand):
 
         """
 
+        print 'Loading Source Ontology: "%s"' % data_source
+
         if data_source is not None and version is not None:
             self.graph = Graph()
             self.subclass_cache = {}
@@ -118,35 +119,34 @@ class Command(BaseCommand):
                 else:
                     extensions = extensions.split(',') + loaded_extensions
 
-                for extension in extensions:
-                    if extension:
+                for extension in set(extensions):
+                    print 'Loading Extension: "%s"' % extension
+                    if os.path.isfile(extension):
                         self.add_ontology(data_source=extension, version=version, name=name, parentontology=ontology)
+                    else:
+                        # delete references to ontolgy files that don't exist on disk
+                        models.Ontology.objects.filter(path=self.get_relative_path(extension)).delete()
 
+                models.OntologyClass.objects.filter(ontology=ontology).delete()
                 for ontology_class, data in self.crawl_graph().iteritems():
                     models.OntologyClass.objects.update_or_create(source=ontology_class, ontology=ontology, defaults={'target': data})
                 
     def add_ontology(self, id=None, data_source=None, version=None, name=None, parentontology=None):
         self.graph.parse(data_source)
 
-        
         filepath = os.path.split(os.path.abspath(data_source))[0]
         filename = os.path.split(data_source)[1]
         if name is None:
             name = os.path.splitext(filename)[0]
-        # print filepath
-        # print filename
-        # print models.get_ontology_storage_system().location
         # if os.path.isfile(os.path.join(models.get_ontology_storage_system().location, filename)):
         #     proposed_path = os.path.join(models.get_ontology_storage_system().location, filename)
         #     proceed = raw_input(_('It looks like an ontology file has already been loaded with this exact name.\nThe file currently loaded is located here:\n   %s\n') % proposed_path)
         if models.get_ontology_storage_system().location in filepath:
             # if the file we're referencing already exists in the location where we 
             # usually store them then leave it there and just save a reference to it
-            path = '.%s' % os.path.join(filepath.replace(models.get_ontology_storage_system().location, ''), filename)
+            path = self.get_relative_path(data_source)
         else:
             path = File(open(data_source))
-
-        print path
 
         ontology, created = models.Ontology.objects.get_or_create(path=path, parentontology=parentontology, defaults={'version': version, 'name': name, 'path': path, 'pk': id})
 
@@ -186,3 +186,19 @@ class Command(BaseCommand):
             ontology_class_resource = Resource(self.graph, ontology_class)
             self.subclass_cache[ontology_class] = [self.extract_friendly_name(subclass.identifier) for subclass in ontology_class_resource.transitive_subjects(RDFS.subClassOf)]
         return self.subclass_cache[ontology_class]
+
+    def get_relative_path(self, data_source):
+        """
+        get's a path suitable for saving in a FileField column (mimics what Django does to create a path reference from a File object)
+
+        """
+
+        ret = None
+        try:
+            ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
+        except:
+            try:
+                ret = data_source.path
+            except:
+                pass 
+        return ret
