@@ -83,6 +83,3 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
 
     return XYInputViewModel;
 });
-
-//663952
-//5899830
