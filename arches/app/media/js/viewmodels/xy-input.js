@@ -1,4 +1,4 @@
-define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
+define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, turf) {
     /**
     * A base viewmodel for maptools
     *
@@ -11,12 +11,14 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
         var self = this;
         var mapWidget = params.mapWidget;
         this.active = ko.observable(false);
+        this.projBounds = arches.hexBinBounds;
         this.defaultProjection = _.findWhere(arches.preferredCoordinateSystems, {default: true}).proj4
         this.defaultProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
         this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
         this.x = ko.observable();
         this.y = ko.observable();
         this.validCoords = ko.observable(false);
+        this.boundsWarning = ko.observable(false);
         this.selectedPoint = ko.observable();
         this.availableSrids = _.map(arches.preferredCoordinateSystems, function(v, k) {
             var id = (k === '4326') ? '4326' : v.proj4;
@@ -30,21 +32,27 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
         this.coordinates = ko.computed(function() {
             var srcProj = self.srid();
             var res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
+            (self.x() && self.y()) ? self.validCoords(true) : self.validCoords(false);
+            if (self.validCoords()) {
+                self.boundsWarning(!turf.inside(turf.point(res), turf.bboxPolygon(self.projBounds)));
+            }
             return res;
         })
 
         this.srid.subscribe(function(val){
-            var projectedVals;
-            if (self.srid() === '4326') {
-                projectedVals = proj4(self.defaultProjection).inverse([self.x(), self.y()]);
-            } else if (self.defaultProjection === '4326') {
-                projectedVals = proj4(self.srid(), [self.x(), self.y()])
-            } else {
-                projectedVals = proj4(self.defaultProjection, self.srid(), [self.x(), self.y()])
+            if (self.x() && self.y()) {
+                var projectedVals;
+                if (self.srid() === '4326') {
+                    projectedVals = proj4(self.defaultProjection).inverse([self.x(), self.y()]);
+                } else if (self.defaultProjection === '4326') {
+                    projectedVals = proj4(self.srid(), [self.x(), self.y()])
+                } else {
+                    projectedVals = proj4(self.defaultProjection, self.srid(), [self.x(), self.y()])
+                }
+                self.x(projectedVals[0])
+                self.y(projectedVals[1])
+                self.defaultProjection = self.srid();
             }
-            self.x(projectedVals[0])
-            self.y(projectedVals[1])
-            self.defaultProjection = self.srid();
         })
 
         this.clearCoordinates = function() {
@@ -53,11 +61,13 @@ define(['knockout', 'proj4', 'arches'], function (ko, proj4, arches) {
         }
 
         this.addLocation = function(){
-            var geom = {
+            if (self.x() && self.y()) {
+                var geom = {
                     "type": "Point",
                     "coordinates": _.map(self.coordinates(), function(coord){return ko.unwrap(coord)})
                 }
-            mapWidget.updateDrawLayerWithJson(JSON.stringify(geom))
+                mapWidget.updateDrawLayerWithJson(JSON.stringify(geom))
+                }
             }
 
         this.updateSelectedPoint = function(){

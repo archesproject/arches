@@ -6877,6 +6877,12 @@ a#close-map-tools.map-widget-icon:hover {
     color: #888;
 }
 
+.map-tool-item.xy .tool-warning {
+    color: #bd0a0a;
+    margin-right: 3px;
+    text-align: center; 
+}
+
 .map-tool-item.xy select {
     height: 24px;
     min-width: 195px;

@@ -126,9 +126,10 @@
                                         <label for="input-northing">{% trans "Northing" %}</label>
                                         <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
                                         <div>
-                                            <select class="form-control" class="design" style="width:100px;" data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid"></select>
+                                            <select class="form-control" class="design" style="width:100px;" disabled data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid, enable: xyInput.validCoords"></select>
                                         </div>
-                                        <button class="btn btn-primary btn-sm btn-block" data-bind="click: function(){xyInput.addLocation()}">{% trans "Add Location" %}</button>
+                                        <button class="btn btn-primary btn-sm btn-block" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
+                                        <h5 class="tool-warning" data-bind="visible: xyInput.boundsWarning">{% trans 'Outside project bounds' %}</h5>
                                     </div>
                                 </div>
 
