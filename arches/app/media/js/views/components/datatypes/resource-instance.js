@@ -26,7 +26,7 @@ define([
                 this.filterValue = ko.computed(function () {
                     return {
                         op: self.op(),
-                        val: self.searchValue()
+                        val: self.searchValue() || ''
                     }
                 }).extend({ throttle: 750 });
                 params.filterValue(this.filterValue());
