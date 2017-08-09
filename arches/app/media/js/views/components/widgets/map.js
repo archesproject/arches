@@ -1390,9 +1390,9 @@ define([
                 });
 
                 map.on('click', function(e) {
-                    if (self.context === 'resource-editor')
-                        {self.xyInput.updateSelectedPoint();
-                        };
+                    if (self.context === 'resource-editor') {
+                        self.xyInput.updateSelectedPoint();
+                    };
                     var features = self.map.queryRenderedFeatures(e.point);
                     var clickData = null;
                     var clickFeature = _.find(features, function(feature) {
@@ -1405,7 +1405,6 @@ define([
                         }
                     }) || null;
                     if (clickFeature) {
-                        console.log(clickFeature)
                         if (clickFeature.properties.resourceinstanceid) {
                             clickData = lookupResourceData(clickFeature.properties);
                         } else if (clickFeature.properties.total > 1) {
