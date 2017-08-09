@@ -99,6 +99,9 @@
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
                                     expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
+                                <!-- ko ifnot: context === 'search-filter' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Return to features' %}" data-bind="click: function(){zoomToDrawLayer()}, css:{'leaflet-disabled': !drawFeaturesOnMap()}"><span class="sr-only">{% trans "Return to features" %}</span><i class="fa fa-home"></i></a>
+                                <!--/ko-->
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">{% trans "Map View" %}</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
@@ -155,7 +158,7 @@
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
 
-
+                        <!-- ko ifnot: context === 'search-filter' -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
                                 <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to edit." %}'><span class="sr-only">{% trans "Edit drawings." %}"</span></a>
@@ -163,6 +166,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                     </div>
                 </div>

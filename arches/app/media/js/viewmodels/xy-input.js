@@ -34,7 +34,7 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
             var res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
             (self.x() && self.y()) ? self.validCoords(true) : self.validCoords(false);
             if (self.validCoords()) {
-                self.boundsWarning(!turf.inside(turf.point(res), turf.bboxPolygon(self.projBounds)));
+                self.boundsWarning((!turf.inside(turf.point(res), turf.bboxPolygon(self.projBounds)) && self.active() === true));
             }
             return res;
         })
@@ -58,6 +58,7 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
         this.clearCoordinates = function() {
             self.x(null);
             self.y(null);
+            self.boundsWarning(false);
         }
 
         this.addLocation = function(){

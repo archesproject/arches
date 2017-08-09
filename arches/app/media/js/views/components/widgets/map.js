@@ -113,6 +113,7 @@ define([
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
+            this.drawFeaturesOnMap = ko.observable(true);
 
             if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
                 //Infering that the default widget config settings are used and switching to system_settings for map position.
@@ -190,7 +191,15 @@ define([
                         self.draw.add(val);
                     }
                 }
+                self.drawFeaturesOnMap(self.draw.getAll().features.length > 0)
             };
+
+            this.zoomToDrawLayer = function(){
+                var allFeatures = self.draw.getAll()
+                if (allFeatures.features.length > 0) {
+                    this.map.fitBounds(geojsonExtent(allFeatures), {padding:20})
+                }
+            }
 
             this.clearGeometries = function(val, key) {
                 if (self.draw !== undefined && val === null) {
@@ -1083,6 +1092,7 @@ define([
                 };
 
                 this.saveGeometries = function() {
+                    self.drawFeaturesOnMap(self.draw.getAll().features.length > 0)
                     var currentDrawing = self.draw.getAll()
                     if (self.value.features !== undefined) {
                         _.each(self.value.features(), function(feature) {
