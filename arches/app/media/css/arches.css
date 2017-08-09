@@ -6863,11 +6863,29 @@ a#close-map-tools.map-widget-icon:hover {
 
 .map-tool-item.xy {
     background: #fff;
+    width: 220px;
+    top: 0px;
+}
+
+.map-tool-item.xy.buffer {
+    top: 44px;
+}
+
+.map-tool-item.xy .tool-header {
+    padding-bottom: 10px;
+    font-size: 15px;
+    color: #888;
+}
+
+.map-tool-item.xy .tool-warning {
+    color: #bd0a0a;
+    margin-right: 3px;
+    text-align: center; 
 }
 
 .map-tool-item.xy select {
     height: 24px;
-    width: 100px;
+    min-width: 195px;
     margin-bottom: 7px;
 }
 

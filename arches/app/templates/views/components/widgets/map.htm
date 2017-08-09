@@ -20,7 +20,7 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode() || geoJsonStringValid() === false -->
+        <!--ko if: drawMode() && drawMode() !== 'simple_select' || geoJsonStringValid() === false || xyInput.boundsWarning() === true -->
         <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
@@ -35,20 +35,14 @@
                         <!-- ko if: drawMode() === 'draw_line_string'-->
                         <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
                         <!-- /ko -->
-                        <!-- ko if: drawMode() === 'simple_select' -->
-                        <strong>{% trans "Edit Mode" %}</strong>
-                        <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>{% trans "Click and drag to move." %}</span>
-                        <!-- /ko -->
-                        <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>{% trans "Or, click it again to edit verticies." %}</span>
-                        <!-- /ko -->
-                        <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
                         <!-- ko ifnot: geoJsonStringValid -->
                         <strong>{% trans "Invalid GeoJSON" %}</strong>
+                        <!-- /ko -->
+                        <!-- ko if: xyInput.boundsWarning -->
+                        <strong>{% trans "Coordinates are outside project bounds" %}</strong>
                         <!-- /ko -->
                     </div>
                 </div>
@@ -105,6 +99,9 @@
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
                                     expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
+                                <!-- ko ifnot: context === 'search-filter' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Return to features' %}" data-bind="click: function(){zoomToDrawLayer()}, css:{'leaflet-disabled': !drawFeaturesOnMap()}"><span class="sr-only">{% trans "Return to features" %}</span><i class="fa fa-home"></i></a>
+                                <!--/ko-->
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">{% trans "Map View" %}</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
@@ -115,11 +112,29 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
+
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
+                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
+                                    <div class="form-control">
+                                    <div class="tool-header">{% trans 'Create a point' %}</div>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}"><span>x</span></a>
+                                        <label for="input-easting">{% trans "Easting" %}</label>
+                                        <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <label for="input-northing">{% trans "Northing" %}</label>
+                                        <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <div>
+                                            <select class="form-control" class="design" style="width:100px;" disabled data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid, enable: xyInput.validCoords"></select>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-block" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
+                                    </div>
+                                </div>
+
                                 <!-- ko foreach: geometryTypes -->
                                 <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
                                 </a>
                                 <!-- /ko -->
+
                                 <!--ko if: context !== 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
                                 <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
@@ -127,21 +142,6 @@
                                     <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
                                 </div>
                                 <!-- /ko -->
-
-                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
-                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200">
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.active(false); xyInput.clearCoordinates()}"><span>x</span></a>
-                                    <div class="form-control">
-                                        <label for="input-easting">{% trans "Easting" %}</label>
-                                        <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
-                                        <label for="input-northing">{% trans "Northing" %}</label>
-                                        <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
-                                        <div>
-                                            <select class="form-control" class="design" style="width:100px;" data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid"></select>
-                                        </div>
-                                        <button class="btn btn-primary btn-sm btn-block" data-bind="click: function(){xyInput.addLocation()}">{% trans "Add Location" %}</button>
-                                    </div>
-                                </div>
 
                                 <!--ko if: context === 'search-filter' -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
@@ -158,7 +158,7 @@
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
 
-
+                        <!-- ko ifnot: context === 'search-filter' -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
                                 <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to edit." %}'><span class="sr-only">{% trans "Edit drawings." %}"</span></a>
@@ -166,6 +166,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                     </div>
                 </div>
