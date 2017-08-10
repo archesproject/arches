@@ -6343,7 +6343,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 36px;
     border-radius: 2px;
     transition: all .450s ease;
-    z-index: 1;
+    z-index: 10;
     visibility: hidden;
 }
 
@@ -6372,6 +6372,17 @@ div.row.widget-wrapper.report-header:hover {
     width: -moz-calc(100% - 250px);
     width: calc(100% - 250px);*/
     width: 100%;
+}
+
+.notifications-minimized {
+    width: auto;
+}
+
+.geometry-editing-notifications span.arrow {
+    color: white;
+    position: absolute;
+    left: 10px;
+    top: 0px;
 }
 
 .geocode-container.hide-geocoder {
@@ -6880,7 +6891,7 @@ a#close-map-tools.map-widget-icon:hover {
 .map-tool-item.xy .tool-warning {
     color: #bd0a0a;
     margin-right: 3px;
-    text-align: center; 
+    text-align: center;
 }
 
 .map-tool-item.xy select {
@@ -6899,14 +6910,15 @@ a.clear-geojson-button {
     background-image: none;
     position:absolute;
     top:5px;
-    right:5px;
+    right:15px;
     color: #ddd;
 }
 
 .xy a.clear-geojson-button {
     border-bottom: none;
     top: 2px;
-    right: 4px;
+    right: 15px;
+    color: #ddd;
 }
 
 a.clear-geojson-button.enabled {
