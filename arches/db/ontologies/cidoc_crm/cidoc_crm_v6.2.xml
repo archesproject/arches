@@ -49,20 +49,9 @@ Property P82 is for modeling the minimum outer bounds of events i.e. at_some_tim
 P81 has its time interval redefined by P81a and P81b. Similarly, we redefine P82 by P82a and P82b.
 
 
-
-EDITS FOR ARCHES:
-Add E59, E60, E61, E62 classes for primitives.
-Add E94_Space class.
-Change any references in subProperties or domains/ranges from external literals to literal classes we added.
-Add P161i_is_spatial_projection_of as a subProperty of P156i_is_occupied_by.
-Add P160i_is_temporal_projection_of property.
-Add P161i_is_spatial_projection_of property.
-Make P156i_is_occupied_by a subproperty of P161i_is_spatial_projection_of.
-Add BM.PX_is_related_to property.
-Change P168 range from E92_Spacetime_Volume to E94_Space.
-Create P168i as inverse of P168.
-General syntax fixes including removing extra spaces in some scopenotes and removing language label tags with no closing tag.
-
+EDITS FOR ARCHES (general typo fixes and obvious ommisions from the spec):
+Fixed P167i_was_place_of domain/range references which should be E53_Place/E93_Presence as per the spec
+Fixed typo in references to E93_Place which should be E53_Place
 
 -->
 <rdf:RDF xml:lang="en" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:base="http://www.cidoc-crm.org/cidoc-crm/">
@@ -910,29 +899,6 @@ Syst?me International (SI) units or internationally recognized non-SI terms shou
 </rdfs:comment>
 	<rdfs:subClassOf rdf:resource="E55_Type"/>
 </rdfs:Class>
-<rdfs:Class rdf:about="E59_Primitive_Value">
-    <rdfs:label xml:lang="en-US">Primitive Value</rdfs:label>
-	<rdfs:comment>This class comprises values of primitive data types of programming languages or database management systems and data types composed of such values used as documentation elements, as well as their mathematical abstractions. 
-</rdfs:comment>
-</rdfs:Class>
-<rdfs:Class rdf:about="E60_Number">
-    <rdfs:label xml:lang="en-US">Number</rdfs:label>
-	<rdfs:comment>This class comprises any encoding of computable (algebraic) values such as integers, real numbers, complex numbers, vectors, tensors etc., including intervals of these values to express limited precision
-</rdfs:comment>
-	<rdfs:subClassOf rdf:resource="E59_Primitive_Value"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="E61_Time_Primitive">
-    <rdfs:label xml:lang="en">Time Primitive</rdfs:label>
-	<rdfs:comment>This class comprises instances of E59 Primitive Value for time that should be implemented with appropriate validation, precision and interval logic to express date ranges relevant to cultural documentation. 
-</rdfs:comment>
-	<rdfs:subClassOf rdf:resource="E59_Primitive_Value"/>
-</rdfs:Class>
-<rdfs:Class rdf:about="E62_String">
-    <rdfs:label xml:lang="en">String</rdfs:label>
-	<rdfs:comment>This class comprises the instances of E59 Primitive Values used for documentation such as free text strings, bitmaps, vector graphics, etc.
-</rdfs:comment>
-	<rdfs:subClassOf rdf:resource="E59_Primitive_Value"/>
-</rdfs:Class>
 <rdfs:Class rdf:about="E63_Beginning_of_Existence">
 	<rdfs:label xml:lang="fr">Début d'existence</rdfs:label>
     <rdfs:label xml:lang="en">Beginning of Existence</rdfs:label>
@@ -980,8 +946,9 @@ It may be used for temporal reasoning about things (physical items, groups of pe
 	<rdfs:label xml:lang="pt">Formação</rdfs:label>
 	<rdfs:label xml:lang="zh">组成</rdfs:label>
 	<rdfs:comment>This class comprises events that result in the formation of a formal or informal E74 Group of people, such as a club, society, association, corporation or nation. 
+
 E66 Formation does not include the arbitrary aggregation of people who do not act as a collective.
-The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining. 
+The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining.
 </rdfs:comment>
 	<rdfs:subClassOf rdf:resource="E7_Activity"/>
 	<rdfs:subClassOf rdf:resource="E63_Beginning_of_Existence"/>
@@ -1027,6 +994,7 @@ If a person is killed, their death should be instantiated as E69 Death and as E7
 </rdfs:Class>
 
 <rdfs:Class rdf:about="E70_Thing">
+<rdfs:label xml:lang="ru"/>    
    <rdfs:label xml:lang="fr">Chose</rdfs:label>
     <rdfs:label xml:lang="en">Thing</rdfs:label>
     <rdfs:label xml:lang="el">Πράγμα</rdfs:label>
@@ -1282,15 +1250,6 @@ This class can be used to define temporal snapshots at a particular time-span, s
 	<rdfs:subClassOf rdf:resource="E92_Spacetime_Volume"/>
 </rdfs:Class>
 
-<rdfs:Class rdf:about="E94_Space">
-	<rdfs:label xml:lang="en">Space</rdfs:label>
-	<rdfs:comment>This class comprises instances of E92 Spacetime Volume that result from intersection of instances of
-E92 Spacetime Volume with an instance of E52 Time-Span. The identity of an instance of this class is
-determined by the identities of the constituing spacetime volume and the time-span.
-</rdfs:comment>
-	<rdfs:subClassOf rdf:resource="E92_Spacetime_Volume"/>
-</rdfs:Class>
-
 <rdf:Property rdf:about="P1_is_identified_by">
 	<rdfs:label xml:lang="el">αναγνωρίζεται ως</rdfs:label>
     <rdfs:label xml:lang="de">wird bezeichnet als</rdfs:label>
@@ -1359,7 +1318,7 @@ Like property P2 has type (is type of), this property is a consequence of the re
 An item may have many notes, but a note is attached to a specific item.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E1_CRM_Entity"/>
-	<rdfs:range rdf:resource="E62_String"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P4_has_time-span">
@@ -2914,7 +2873,7 @@ This may be used as a method of checking inventory counts with regard to aggrega
 For a more complete description, objects may be decomposed into their components and constituents using P46 is composed of (forms parts of) and P45 consists of (is incorporated in). This allows each element to be described individually.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E19_Physical_Object"/>
-	<rdfs:range rdf:resource="E60_Number"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 
@@ -3382,7 +3341,7 @@ The residence may be either the Place where the Actor resides, or a legally regi
 The nature of the qualification may be certainty, precision, source etc.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E62_String"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 	<rdfs:subPropertyOf rdf:resource="P3_has_note"/>
 </rdf:Property>
 
@@ -3399,7 +3358,7 @@ The nature of the qualification may be certainty, precision, source etc.
 The nature of the qualification may be certainty, precision, source etc.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E62_String"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 	<rdfs:subPropertyOf rdf:resource="P3_has_note"/>
 </rdf:Property>
 
@@ -3416,7 +3375,7 @@ The nature of the qualification may be certainty, precision, source etc.
 Since Time-Spans may not have precisely known temporal extents, the CRM supports statements about the minimum and maximum temporal extents of Time-Spans. This property allows a Time-Span’s minimum temporal extent (i.e. its inner boundary) to be assigned an E61 Time Primitive value. Time Primitives are treated by the CRM as application or system specific date intervals, and are not further analysed.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P82_at_some_time_within">
@@ -3432,7 +3391,7 @@ Since Time-Spans may not have precisely known temporal extents, the CRM supports
 Since Time-Spans may not have precisely known temporal extents, the CRM supports statements about the minimum and maximum temporal extents of Time-Spans. This property allows a Time-Span’s maximum temporal extent (i.e. its outer boundary) to be assigned an E61 Time Primitive value. Time Primitives are treated by the CRM as application or system specific date intervals, and are not further analysed.
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P83_had_at_least_duration">
@@ -3486,6 +3445,7 @@ It allows an E52 Time-Span to be associated with an E54 Dimension representing i
     <rdfs:label xml:lang="el">είναι μέγιστη διάρκεια του/της</rdfs:label>
     <rdfs:label xml:lang="fr">a été la durée maximum de</rdfs:label>
 	<rdfs:label xml:lang="pt">foi a duração máxima de</rdfs:label>
+	<rdfs:label xml:lang="zh"/>
 
 	<rdfs:domain rdf:resource="E54_Dimension"/>
 	<rdfs:range rdf:resource="E52_Time-Span"/>
@@ -3590,7 +3550,7 @@ It addresses spatial containment only, and does not imply any relationship betwe
 
 	<rdfs:comment>This property allows an E54 Dimension to be approximated by an E60 Number primitive.</rdfs:comment>
 	<rdfs:domain rdf:resource="E54_Dimension"/>
-	<rdfs:range rdf:resource="E60_Number"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 
@@ -4625,7 +4585,7 @@ The E57 Material used during the E11 Modification does not necessarily become in
 	<rdfs:label xml:lang="pt">tem termo genérico</rdfs:label>
 	<rdfs:label xml:lang="zh">有广义术语</rdfs:label>
 	<rdfs:comment>This property identifies a super-Type to which an E55 Type is related. 
-		It allows Types to be organised into hierarchies. This is the sense of "broader term generic  		(BTG)" as defined in ISO 2788
+		It allows Types to be organised into hierarchies. This is the sense of "broader term generic  		(BTG)" as defined in ISO 2788
 </rdfs:comment>
 	<rdfs:domain rdf:resource="E55_Type"/>
 	<rdfs:range rdf:resource="E55_Type"/>
@@ -5320,8 +5280,8 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:range rdf:resource="E53_Place"/>
 </rdf:Property>
 
-<rdf:Property rdf:about="P167i_was_place_at">
-	<rdfs:label xml:lang="en">was place at</rdfs:label>
+<rdf:Property rdf:about="P167i_was_place_of">
+	<rdfs:label xml:lang="en">was place of</rdfs:label>
 	<rdfs:domain rdf:resource="E53_Place"/>
 	<rdfs:range rdf:resource="E93_Presence"/>
 </rdf:Property>
@@ -5331,20 +5291,7 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:comment>This property associates an instance of E53 Place with an instance of E94 Space Primitive that defines it. Syntactic variants or use of different scripts may result in multiple instances of E94 Space Primitive defining exactly the same place. Transformations between different reference systems in general result in new definitions of places approximating each other and not in alternative definitions. Note that it is possible for a place to be defined by phenomena causal to it or other forms of identification rather than by an instance of E94 Space Primitive. In this case, this property must not be used for approximating the respective instance of E53 Place with an instance of E94 Space Primitive. 
 	</rdfs:comment>
 	<rdfs:domain rdf:resource="E53_Place"/>
-	<rdfs:range rdf:resource="E94_Space"/>
-</rdf:Property>
-
-<rdf:Property rdf:about="P168i_defines_place">
-	<rdfs:label xml:lang="en">defines place</rdfs:label>
-	<rdfs:domain rdf:resource="E94_Space"/>
-	<rdfs:range rdf:resource="E53_Place"/>
-</rdf:Property>
-
-<rdf:Property rdf:about="BM.PX_is_related_to">
-	<rdfs:label xml:lang="en">is related to</rdfs:label>
-	<rdfs:comment>Relates E18 to E1</rdfs:comment>
-	<rdfs:domain rdf:resource="E18_Physical_Thing"/>
-	<rdfs:range rdf:resource="E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P81a_end_of_the_begin">
@@ -5356,7 +5303,7 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:label xml:lang="pt">fim do início</rdfs:label>
 	<rdfs:comment>This is defined as the first boundary of the property P81</rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
 	<rdfs:subPropertyOf rdf:resource="P81_ongoing_throughout"/>	
 </rdf:Property>
 
@@ -5369,7 +5316,7 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:label xml:lang="pt">começar do fim</rdfs:label>
 	<rdfs:comment>This is defined as the second boundary of the property P81</rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
 	<rdfs:subPropertyOf rdf:resource="P81_ongoing_throughout"/>	
 </rdf:Property>
 
@@ -5382,7 +5329,7 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:label xml:lang="pt">começar do início</rdfs:label>
 	<rdfs:comment>This is defined as the first boundary of the property P82</rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
 	<rdfs:subPropertyOf rdf:resource="P82_at_some_time_within"/>	
 </rdf:Property>
 
@@ -5395,7 +5342,7 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:label xml:lang="pt">fim do fim</rdfs:label>
 	<rdfs:comment>This is defined as the second boundary of the property P82</rdfs:comment>
 	<rdfs:domain rdf:resource="E52_Time-Span"/>
-	<rdfs:range rdf:resource="E61_Time_Primitive"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
 	<rdfs:subPropertyOf rdf:resource="P82_at_some_time_within"/>	
 </rdf:Property>
 
