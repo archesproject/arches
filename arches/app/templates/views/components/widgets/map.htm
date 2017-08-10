@@ -20,13 +20,18 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode() && drawMode() !== 'simple_select' || geoJsonStringValid() === false || xyInput.boundsWarning() === true -->
+        <!--ko if: drawFeaturesOnMap() || geojsonInput() === true || xyInput.active() === true ||  drawMode() === 'draw_point' || drawMode() === 'draw_polygon' || drawMode() === 'draw_line_string' -->
         <!--ko if: context !== 'search-filter' -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning relative" role="alert">
                     <div class="media">
-                        <!-- ko if: drawMode() === 'draw_point'  -->
+                        <!-- ko if: geojsonInput() === false && xyInput.active() === false -->
+                            <!-- ko if: drawMode() === undefined || drawMode() === 'simple_select' -->
+                            <strong>{% trans "Edit Mode" %}</strong> {% trans "Click a feature to drag or delete. Click lines or polygons a second time to edit verticies" %}
+                            <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_point'-->
                         <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_polygon'-->
@@ -38,11 +43,17 @@
                         <!-- ko if: drawMode() === 'direct_select'-->
                         <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
                         <!-- /ko -->
+                        <!-- ko if: geojsonInput -->
+                        <strong>{% trans "Geojson Mode "%}</strong>{% trans "Enter a GeoJSON geometry to add a feature" %}
+                        <!-- /ko -->
                         <!-- ko ifnot: geoJsonStringValid -->
-                        <strong>{% trans "Invalid GeoJSON" %}</strong>
+                        <strong>{% trans "GeoJSON is invalid" %}</strong>
+                        <!-- /ko -->
+                        <!-- ko if: xyInput.active -->
+                        <strong>{% trans "X/Y Mode " %}</strong>{% trans "Enter coordinates, or select a point on the map to load them" %}
                         <!-- /ko -->
                         <!-- ko if: xyInput.boundsWarning -->
-                        <strong>{% trans "Coordinates are outside project bounds" %}</strong>
+                        <strong>{% trans "Note: Coordinates are outside of project bounds" %}</strong>
                         <!-- /ko -->
                     </div>
                 </div>
