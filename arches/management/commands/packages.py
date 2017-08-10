@@ -18,11 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
+import urllib, uuid, glob
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.db import transaction
-import pprint
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
@@ -50,7 +50,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -190,6 +190,79 @@ class Command(BaseCommand):
 
         if options['operation'] == 'update_project_templates':
             self.update_project_templates()
+
+        if options['operation'] == 'load_package':
+            self.load_package(options['source'])
+
+
+    def load_package(self, source):
+        if source == '':
+            source = 'https://github.com/archesproject/disco_data/archive/remote_load.zip'
+
+        self.setup_db(settings.PACKAGE_NAME)
+
+        download_dir = os.path.join(os.getcwd(),'temp' + str(uuid.uuid4()))
+        if os.path.exists(download_dir) == False:
+            os.mkdir(download_dir)
+            zip_file = os.path.join(download_dir, 'source_data.zip')
+            urllib.urlretrieve(source, zip_file)
+            unzip_file(zip_file, download_dir)
+
+            manifest = json.load(open(glob.glob(os.path.join(download_dir, '*', 'manifest.json'))[0]))
+            business_data = []
+
+            for path in manifest['business_data_directories']:
+                csv_path = path.split('/')
+                csv_path.append('*.csv')
+                json_path = path.split('/')
+                json_path.append('*.json')
+                business_data += glob.glob(os.path.join(download_dir, '*', *csv_path))
+                business_data += glob.glob(os.path.join(download_dir, '*', *json_path))
+
+            branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
+            resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
+            mapbox_styles = glob.glob(os.path.join(download_dir, '*', 'mapbox_styles', '*', 'style.json'))
+            tile_layers = glob.glob(os.path.join(download_dir, '*', 'tilestache', '*', '.xml'))
+
+            reference_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', '*.xml'))
+            reference_data_load_order = manifest['reference_data_order']
+
+            if len(reference_data_load_order) > 0:
+                for item in reference_data_load_order:
+                    file_name = item.strip()
+                    for path in reference_data:
+                        if path.endswith(file_name):
+                            self.import_reference_data(path, 'overwrite', 'keep')
+
+            else:
+                for path in reference_data:
+                    self.import_reference_data(path, 'overwrite', 'keep')
+
+            self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'))
+            self.import_graphs(branches)
+            self.import_graphs(resource_models)
+
+            for path in mapbox_styles:
+                with open(path) as data_file:
+                    meta = json.load(open(path.replace('style.json', 'meta.json')))
+                    if meta['load'] == True:
+                        self.add_mapbox_layer(meta['name'], path, meta['icon'], meta['basemap'])
+
+            for path in business_data:
+                print path
+                if path.endswith('csv'):
+                    config_file = path.replace('.csv', '.mapping')
+                    self.import_business_data(path, overwrite=True, bulk_load=True)
+                else:
+                    self.import_business_data(path, overwrite=True)
+
+            # self.import_reference_data
+            # self.import_graphs
+            # self.add_mapbox_layer
+            # self.add_tileserver_layer
+            # self.import_business_data_relations
+
+
 
     def update_project_templates(self):
         """
