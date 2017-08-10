@@ -69,7 +69,8 @@ ONTOLOGY_EXT = [
     'CRMarchaeo_v1.4.rdfs.xml',
     'CRMgeo_v1.2.rdfs.xml',
     'CRMdig_v3.2.1.rdfs.xml',
-    'CRMinf_v0.7.rdfs.xml'
+    'CRMinf_v0.7.rdfs.xml',
+    'arches_crm_enhancements.xml'
 ]
 
 PREFERRED_COORDINATE_SYSTEMS = (
