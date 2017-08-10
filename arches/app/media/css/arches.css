@@ -6343,7 +6343,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 36px;
     border-radius: 2px;
     transition: all .450s ease;
-    z-index: 1;
+    z-index: 10;
     visibility: hidden;
 }
 
@@ -6372,6 +6372,17 @@ div.row.widget-wrapper.report-header:hover {
     width: -moz-calc(100% - 250px);
     width: calc(100% - 250px);*/
     width: 100%;
+}
+
+.notifications-minimized {
+    width: auto;
+}
+
+.geometry-editing-notifications span.arrow {
+    color: white;
+    position: absolute;
+    left: 10px;
+    top: 0px;
 }
 
 .geocode-container.hide-geocoder {

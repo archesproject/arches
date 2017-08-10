@@ -113,6 +113,7 @@ define([
             this.overlayLibraryList = new ListView({
                 items: self.overlayLibrary
             });
+            this.minimizeNotifications = ko.observable(false)
             this.drawFeaturesOnMap = ko.observable(true);
 
             if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
