@@ -6880,7 +6880,7 @@ a#close-map-tools.map-widget-icon:hover {
 .map-tool-item.xy .tool-warning {
     color: #bd0a0a;
     margin-right: 3px;
-    text-align: center; 
+    text-align: center;
 }
 
 .map-tool-item.xy select {
@@ -6899,14 +6899,15 @@ a.clear-geojson-button {
     background-image: none;
     position:absolute;
     top:5px;
-    right:5px;
+    right:15px;
     color: #ddd;
 }
 
 .xy a.clear-geojson-button {
     border-bottom: none;
     top: 2px;
-    right: 4px;
+    right: 15px;
+    color: #ddd;
 }
 
 a.clear-geojson-button.enabled {

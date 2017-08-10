@@ -128,7 +128,7 @@
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
                                     <div class="tool-header">{% trans 'Create a point' %}</div>
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}"><span>x</span></a>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}, css:{'enabled': xyInput.x() || xyInput.y() }"><span>{% trans 'clear' %}</span></a>
                                         <label for="input-easting">{% trans "Easting" %}</label>
                                         <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
                                         <label for="input-northing">{% trans "Northing" %}</label>
@@ -150,7 +150,7 @@
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
                                 <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>x</span></a>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>{% trans 'clear' %}</span></a>
                                 </div>
                                 <!-- /ko -->
 
