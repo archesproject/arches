@@ -6032,7 +6032,7 @@ a .csv-chart-menubar-item {
 
 .map-widget-container {
     position: absolute;
-    top: 10px;
+    top: 6px;
     right: 10px;
     padding-top: 5px;
     font-size: 17px;
@@ -6044,7 +6044,7 @@ a .csv-chart-menubar-item {
     border-radius: 2px;
     border: 1px solid #332DC1;
     transition: all .2s ease;
-    z-index: 1;
+    z-index: 10;
     line-height: 1.5;
 }
 
@@ -6089,7 +6089,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-selection-container {
     position: absolute;
-    top: 10px;
+    top: 6px;
     left: 10px;
     padding: 10px 25px;
     width: calc(100% - 325px);
@@ -6137,6 +6137,7 @@ div.row.widget-wrapper.report-header:hover {
     padding-top: 0px;
     padding-left: 0px;
     padding-bottom: 5px;
+    height: 100vh;
     overflow-y: auto;
 }
 
@@ -6334,7 +6335,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .geocode-container {
     position: absolute;
-    top: 10px;
+    top: 6px;
     right: 55px;
     padding: 0px;
     background: #fff;
@@ -6358,7 +6359,8 @@ div.row.widget-wrapper.report-header:hover {
     z-index: 2;
     width: -webkit-calc(100% - 55px);
     width: -moz-calc(100% - 55px);
-    width: calc(100% - 55px);
+    width: 100%;
+    opacity: .85;
 }
 
 .geometry-edit-button-group {
@@ -6382,7 +6384,15 @@ div.row.widget-wrapper.report-header:hover {
     color: white;
     position: absolute;
     left: 10px;
-    top: 0px;
+    top: 15px;
+}
+
+.geometry-editing-notifications span.arrow:hover {
+    cursor: pointer;
+}
+
+.alert-wrap>.alert>.media {
+    padding-left: 5px;
 }
 
 .geocode-container.hide-geocoder {
@@ -6399,7 +6409,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-panel {
     position: absolute;
-    top: 60px;
+    top: 56px;
     width: 299px;
     height: 450px;
     overflow-y: auto;
@@ -6409,7 +6419,7 @@ div.row.widget-wrapper.report-header:hover {
     background: transparent;
     border-top: 1px solid #ddd;
     /*transition: all .40s .15s ease;*/
-    z-index: 1;
+    z-index: 10;
 }
 
 #map-widget-basemaps.panel.map-widget-panel {
@@ -6528,7 +6538,7 @@ div.row.widget-wrapper.report-header:hover {
 .expanded-buttons {
     z-index: 1000;
     position: absolute;
-    top: 7px;
+    top: 5px;
     right: 315px;
     transition-duration: .3s;
 }
@@ -6561,10 +6571,10 @@ div.row.widget-wrapper.report-header:hover {
     width: 298px;
     height: 50px;
     right: 11px;
-    top: 10px;
+    top: 6px;
     display: table-cell;
     border-top: 1px solid #999;
-    z-index: 5;
+    z-index: 10;
 }
 
 
