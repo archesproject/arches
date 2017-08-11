@@ -195,74 +195,81 @@ class Command(BaseCommand):
             self.load_package(options['source'])
 
 
-    def load_package(self, source):
+    def load_package(self, source, setup_db=False):
+        print source
         if source == '':
-            source = 'https://github.com/archesproject/disco_data/archive/remote_load.zip'
+            source = 'https://github.com/chiatt/her-data/archive/master.zip'
 
-        self.setup_db(settings.PACKAGE_NAME)
+        remote = True if 'github.com' in source else False
 
-        download_dir = os.path.join(os.getcwd(),'temp' + str(uuid.uuid4()))
-        if os.path.exists(download_dir) == False:
-            os.mkdir(download_dir)
-            zip_file = os.path.join(download_dir, 'source_data.zip')
-            urllib.urlretrieve(source, zip_file)
-            unzip_file(zip_file, download_dir)
+        if setup_db == True:
+            self.setup_db(settings.PACKAGE_NAME)
 
-            manifest = json.load(open(glob.glob(os.path.join(download_dir, '*', 'manifest.json'))[0]))
-            business_data = []
+        if remote == True:
+            download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
+            if os.path.exists(download_dir) == False:
+                os.mkdir(download_dir)
+                zip_file = os.path.join(download_dir, 'source_data.zip')
+                urllib.urlretrieve(source, zip_file)
+        else:
+            download_dir = os.path.dirname(source)
 
-            for path in manifest['business_data_directories']:
-                csv_path = path.split('/')
-                csv_path.append('*.csv')
-                json_path = path.split('/')
-                json_path.append('*.json')
-                business_data += glob.glob(os.path.join(download_dir, '*', *csv_path))
-                business_data += glob.glob(os.path.join(download_dir, '*', *json_path))
+        unzip_file(source, download_dir)
 
+        def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
-            mapbox_styles = glob.glob(os.path.join(download_dir, '*', 'mapbox_styles', '*', 'style.json'))
-            tile_layers = glob.glob(os.path.join(download_dir, '*', 'tilestache', '*', '.xml'))
-
-            reference_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', '*.xml'))
-            reference_data_load_order = manifest['reference_data_order']
-
-            if len(reference_data_load_order) > 0:
-                for item in reference_data_load_order:
-                    file_name = item.strip()
-                    for path in reference_data:
-                        if path.endswith(file_name):
-                            self.import_reference_data(path, 'overwrite', 'keep')
-
-            else:
-                for path in reference_data:
-                    self.import_reference_data(path, 'overwrite', 'keep')
-
             self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'))
             self.import_graphs(branches)
             self.import_graphs(resource_models)
 
-            for path in mapbox_styles:
-                with open(path) as data_file:
-                    meta = json.load(open(path.replace('style.json', 'meta.json')))
-                    if meta['load'] == True:
-                        self.add_mapbox_layer(meta['name'], path, meta['icon'], meta['basemap'])
+        def load_concepts():
+            concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
+            collection_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'collections', '*.xml'))
+
+            for path in concept_data:
+                self.import_reference_data(path, 'overwrite', 'keep')
+
+            for path in collection_data:
+                self.import_reference_data(path, 'overwrite', 'keep')
+
+        def load_mapbox_styles(style_paths, basemap):
+            for path in style_paths:
+                style = json.load(open(path))
+                self.add_mapbox_layer(style['name'], path, "fa fa-globe", basemap)
+
+        def load_tile_server_layers(xml_paths, basemap):
+            for path in xml_paths:
+                print path
+
+        def load_map_layers():
+            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'basemaps', '*', '*.json'))
+            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'overlays', '*', '*.json'))
+            load_mapbox_styles(basemap_styles, True)
+            load_mapbox_styles(overlay_styles, False)
+
+            tile_server_basemaps = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'basemaps', '*', '.xml'))
+            tile_server_overlays = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'overlays', '*', '.xml'))
+            load_tile_server_layers(tile_server_basemaps, True)
+            load_tile_server_layers(tile_server_overlays, False)
+
+        def load_business_data():
+            business_data = []
+            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
+            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
 
             for path in business_data:
-                print path
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
                     self.import_business_data(path, overwrite=True, bulk_load=True)
                 else:
                     self.import_business_data(path, overwrite=True)
 
-            # self.import_reference_data
-            # self.import_graphs
-            # self.add_mapbox_layer
-            # self.add_tileserver_layer
-            # self.import_business_data_relations
-
-
+        print 'loading stuff'
+        # load_concepts()
+        # load_graphs()
+        # load_map_layers()
+        # load_business_data()
 
     def update_project_templates(self):
         """
