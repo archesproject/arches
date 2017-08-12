@@ -6895,7 +6895,7 @@ a#close-map-tools.map-widget-icon:hover {
 .map-tool-item.xy .tool-header {
     padding-bottom: 10px;
     font-size: 15px;
-    color: #888;
+    color: #555;
 }
 
 .map-tool-item.xy .tool-warning {
@@ -6919,20 +6919,27 @@ a#close-map-tools.map-widget-icon:hover {
 a.clear-geojson-button {
     background-image: none;
     position:absolute;
-    top:5px;
-    right:15px;
-    color: #ddd;
+    top: 7px;
+    right: 15px;
+    font-size: 12px;
+    color: steelblue;
 }
 
 .xy a.clear-geojson-button {
     border-bottom: none;
-    top: 2px;
+    top: 7px;
     right: 15px;
-    color: #ddd;
+    color: steelblue;
+    font-size: 12px;
+}
+
+.xy a.clear-geojson-button:hover {
+    cursor: pointer;
+    color: #555;
 }
 
 a.clear-geojson-button.enabled {
-    color: #555;
+    color: steelblue;
 }
 
 a.clear-geojson-button:hover {
@@ -6950,7 +6957,7 @@ a.clear-geojson-button:hover {
     padding-top: 13px;
     font-size: 19px;
     border-right: 1px solid #ddd;
-    color: inherit;
+    color: #777;
     vertical-align: middle;
     display: table-cell;
 }
