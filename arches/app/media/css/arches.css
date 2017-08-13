@@ -293,8 +293,7 @@
 }
 
 .card-help-panel {
-    max-width: 275px;
-    min-width: 250px;
+    width: 495px;
     padding-top: 0;
     top: 0px;
     position: absolute;
@@ -919,7 +918,7 @@ a.select2-search-choice-close {
 }
 
 .library-card {
-    height: 58px;
+    height: 60px;
     /*margin: 0px -7px;*/
     position: relative;
     padding: 5px;
@@ -976,7 +975,7 @@ a.select2-search-choice-close {
     width: 30px;
     position: absolute;
     left: 10px;
-    top: 9px;
+    top: 10px;
 }
 
 .user-groups {
@@ -4802,7 +4801,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .cc-link {
     display: inline-block;
     width: 100%;
-    height: 58px;
+    height: 60px;
     margin-top: -3px;
     margin-bottom: -2px;
     background: #f8f8f8;
@@ -4810,7 +4809,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 10px 0px 5px 10px;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 .cc-link:hover {
