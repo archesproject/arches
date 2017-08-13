@@ -299,11 +299,12 @@
     position: absolute;
     bottom: 0px;
     right: 0px;
-    background: #37495b;
+    background: #fff;
     opacity: .9;
     z-index: 500;
     overflow-y: scroll;
-    color: #fff;
+    color: #123;
+    border-left: 1px solid #ddd;
 }
 
 .card-checkbox {
@@ -4896,6 +4897,7 @@ ul .card-tree-list a .node-subname {
     height: 100%;
     width: 450px;
     padding: 10px;
+    overflow-y: scroll;
 }
 
 .accordion-body {
