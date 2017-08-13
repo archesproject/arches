@@ -6481,7 +6481,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-search-container {
-    top: 0px;
+    top: 3px;
     height: 100vh;
     background: #fbfbfb;
 }
@@ -6509,6 +6509,10 @@ div.row.widget-wrapper.report-header:hover {
     bottom: 0px;
     right: 0px;
     height: auto;
+}
+
+.map-search-container.expanded-edit-map {
+    top: 112px;
 }
 
 .iiif-wrapper {
