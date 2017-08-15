@@ -2,29 +2,25 @@
 Create a New Resource Model
 ###########################
 
-To get started with the Arches Designer, let's create the Building Resource Model that is illustrated in the What are Resource Models and Branches? page. The first step will be to create the Resource Model itself. After that we can create Branches and add them to the model.
-
-1. From the Arches Designer front page, click , and choose "New Resource Model". You are now presented with the Settings for your new Resource Model. (If you choose Manage… in the top left of the view, you will see other available resource tools, all of which we'll use later.)
-2. In the Identifiers tab, set the Name to "Building". (make GIF here for steps 1-2?)
-3. Set Ontology to "CIDOC CRM v6.2". (To learn more about what this means, read Ontologies in Arches.) 
+1. From the Arches Designer front page, click |add-btn| and choose "New Resource Model". You are now presented with the Settings for your new Resource Model. (If you choose |manage-btn| in the top left of the view, you will see other available Arches Designer tools, all of which we'll use later.)
+2. In the Identifiers tab, set the Name to "Building".
+3. Set Ontology to "CIDOC CRM v6.2". (To learn more about what this means, read :doc:`ontologies-in-arches`.) 
 4. In the Root Class dropdown, type "18" and choose "E18_Physical_Thing".
 5. In the Icon tab, type "building" to find the building icon, and select it.
-6. We can skip over the Appearance and Description tabs for now, as the data stored there is not crucial for this walkthrough, but feel free to add any of this information right now if you want.
-7. Finally, in the Status tab, make sure your model is Inactive. You don't want someone using the Building model before you are done with it!
+6. We can skip over the Description tab for now, as the data stored there is not necessary at this point.
+7. Finally, in the Status tab, make sure your model is Inactive. You don't want someone using the Building model before you are done creating it!
 8. Click |save-edits-btn| to save your edits.
 9. Click |done-btn| to return to the Arches Designer home page.
 
-This is all you need to do to create the new Resource Model, but it's not ready for use yet. We still need to add at least one Branch to it.
+This is all you need to do to create the new Resource Model, but it's not ready for use yet. We still need to add at least one Branch to it. Read :doc:`create-branch` to make a new Branch from scratch, or skip to :doc:`add-branch-to-resource-model` if you already have a Branch ready to go.
 
 .. |add-btn| image:: images/add-btn.png
   :align: middle
-  :height: 20
 .. |save-edits-btn| image:: images/save-edits-btn.png
   :align: middle
-  :height: 20
 .. |done-btn| image:: images/done-btn.png
   :align: middle
-  :height: 20
 .. |add-node-confirm-btn| image:: images/add-node-confirm-btn.png
   :align: middle
-  :height: 20
+.. |manage-btn| image:: images/manage-btn.png
+  :align: middle

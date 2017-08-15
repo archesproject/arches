@@ -114,6 +114,7 @@ define(['jquery',
                         results: response.results.hits.hits
                     })
                 );
+                this.searchBuffer(response.search_buffer);
                 this.selectedResourceId(null);
 
                 response.results.hits.hits.forEach(function(result){
@@ -125,14 +126,16 @@ define(['jquery',
                     }
                     var point = null;
                     if (result._source.points.length > 0) {
-                        point = result._source.points[0]
+                        point = result._source.points[0].point
                     }
                     var mapData = result._source.geometries.reduce(function (fc1, fc2) {
-                        fc1.features = fc1.features.concat(fc2.features);
+                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
                         return fc1;
                     }, {
-                      "type": "FeatureCollection",
-                      "features": []
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": []
+                        }
                     });
                     this.results.push({
                         displayname: result._source.displayname,
@@ -144,6 +147,7 @@ define(['jquery',
                         showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                         mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                         relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
+                        ontologyclass: result._source.root_ontology_class,
                         relatable: this.isResourceRelatable(result._source.graph_id),
                         point: point,
                         mapLinkClicked: function () {
@@ -151,7 +155,7 @@ define(['jquery',
                             if (self.viewModel.selectedTab() !== self.viewModel.mapFilter) {
                                 self.viewModel.selectedTab(self.viewModel.mapFilter)
                             }
-                            self.mapLinkData(mapData);
+                            self.mapLinkData(mapData.geom);
                         },
                         selected: ko.computed(function () {
                             return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);

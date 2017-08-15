@@ -53,10 +53,11 @@ ELASTICSEARCH_HOSTS = [
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 
-
+USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
+RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
@@ -68,9 +69,13 @@ ONTOLOGY_EXT = [
     'CRMarchaeo_v1.4.rdfs.xml',
     'CRMgeo_v1.2.rdfs.xml',
     'CRMdig_v3.2.1.rdfs.xml',
-    'CRMinf_v0.7.rdfs.xml'
+    'CRMinf_v0.7.rdfs.xml',
+    'arches_crm_enhancements.xml'
 ]
 
+PREFERRED_COORDINATE_SYSTEMS = (
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
+)
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -281,6 +286,10 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = 'Arches'
 
+APP_TITLE = 'Arches | Heritage Data Management'
+COPYRIGHT_TEXT = 'All Rights Reserved.'
+COPYRIGHT_YEAR = '2016'
+
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
 DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
@@ -299,6 +308,7 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+DATATYPE_LOCATIONS = ['arches.app.datatypes',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -324,6 +334,8 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
+VECTOR_TILE_SIMPLIFICATION = 0.3
+
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
@@ -333,6 +345,13 @@ MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
+
+# If True users can make edits to graphs that are locked
+# (generally because they have resource intances saved against them)
+# Changing this setting to True and making graph modifications may result in
+# disagreement between your Resource Models and Resource Instances potentially
+# causing your application to break.
+OVERRIDE_RESOURCE_MODEL_LOCK = False
 
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance

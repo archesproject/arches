@@ -28,6 +28,7 @@ def livereload(request):
         'livereload_port': settings.LIVERELOAD_PORT
     }
 
+
 def map_info(request):
     geo_utils = GeoUtils()
     hex_bin_bounds = geo_utils.get_bounds_from_geojson(settings.DEFAULT_BOUNDS)
@@ -45,7 +46,8 @@ def map_info(request):
             'mapbox_sprites': settings.MAPBOX_SPRITES,
             'mapbox_glyphs': settings.MAPBOX_GLYPHS,
             'hex_bin_bounds': json.dumps(hex_bin_bounds),
-            'geocoder_default': settings.DEFAULT_GEOCODER
+            'geocoder_default': settings.DEFAULT_GEOCODER,
+            'preferred_coordinate_systems': JSONSerializer().serialize(settings.PREFERRED_COORDINATE_SYSTEMS)
         }
     }
 

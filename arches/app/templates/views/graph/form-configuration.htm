@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- card Tools -->
                     <div class="panel-footer" style="height: 40px;">
-                        <a href="#" class="pull-right" data-bind="click: $root.addCard.bind($root)"><i class="ion-plus-circled"></i> Add Card</a>
+                        <a href="#" class="pull-right" data-bind="click: $root.addCard.bind($root)"><i class="ion-plus-circled"></i>{% trans "Add Card" %}</a>
                     </div>
                 </div>
             </div>
@@ -118,10 +118,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Message -->
                 <div class="add-card-message-placement">
                     <h3 class="text-thin text-center">
-                        Drag and drop cards here.
+                        {% trans "Drag and drop cards here." %}
                     </h3>
                     <p class="text-center add-card-message-subtitle">
-                        Order your cards as you want them to appear to your users.
+                        {% trans "Order your cards as you want them to appear to your users." %}
                     </p>
                 </div>
             </div>
@@ -152,7 +152,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="#" class="pull-right" data-bind="click: $root.removeCard.bind($root)"><i class="ion-minus-circled"></i> Remove Card</a>
+                            <a href="#" class="pull-right" data-bind="click: $root.removeCard.bind($root)"><i class="ion-minus-circled"></i>{% trans "Remove Card" %}</a>
                         </div>
                     </div>
                 </div>

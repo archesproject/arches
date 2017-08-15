@@ -25,12 +25,12 @@ define([
                 var opts = allBindings.get('ckeditorOptions');
                 options = (typeof opts === 'object') ? opts : {};
             };
-     
+
             // Set initial value and create the CKEditor
             $element.html(value);
             var editor = $element.ckeditor(options).editor;
 
-     
+
             // bind to change events and link it to the observable
             var onChange = function (e) {
                 var self = this;
@@ -50,15 +50,15 @@ define([
                 var $element = $(element);
                 var newValue = ko.utils.unwrapObservable(valueAccessor());
                 if ($element.ckeditorGet().getData() != newValue) {
-                    // remove the listener and then add back to prevent `setData` 
+                    // remove the listener and then add back to prevent `setData`
                     // from triggering the onChange event
                     editor.removeListener('change', onChange );
                     $element.ckeditorGet().setData(newValue);
                     editor.on('change', onChange, modelValue, element);
                 }
             }, this)
-     
-     
+
+
             // Handle disposal if KO removes an editor through template binding
             ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                 editor.updateElement();

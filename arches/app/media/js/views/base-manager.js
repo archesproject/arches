@@ -42,25 +42,12 @@ define([
                     return graph.isresource;
                 });
             });
+            options.viewModel.createableResources = ko.observableArray(data.createableResources);
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {
                 ko.applyBindingsToNode(option, {disable: item.disable_instance_creation}, item);
               }
-            };
-            options.viewModel.editResource = function(url, vm, e){
-                e.stopPropagation();
-                this.navigate(url)
-            };
-            options.viewModel.resourceTableConfig = {
-                "responsive": true,
-                "language": {
-                    "paginate": {
-                        "previous": '<i class="fa fa-angle-left"></i>',
-                        "next": '<i class="fa fa-angle-right"></i>'
-                    }
-                },
-                "order": [[ 3, "desc" ]]
             };
 
             PageView.prototype.constructor.call(this, options);

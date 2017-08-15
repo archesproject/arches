@@ -23,6 +23,7 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.permission_backend import get_createable_resource_types
 
 class BaseManagerView(TemplateView):
 
@@ -34,10 +35,7 @@ class BaseManagerView(TemplateView):
         context['system_settings_graphid'] = settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         context['graph_models'] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         context['graphs'] = JSONSerializer().serialize(context['graph_models'])
-        if 'Resource Editor' in self.request.user.user_groups:
-            context['resource_instances'] = Resource.objects.all().exclude(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by('-createdtime')[:100]
-        else:
-            context['resource_instances'] = []
+        context['createable_resources'] = JSONSerializer().serialize(get_createable_resource_types(self.request.user))
         context['nav'] = {
             'icon':'fa fa-chevron-circle-right',
             'title':'',
@@ -48,22 +46,23 @@ class BaseManagerView(TemplateView):
             'login':True,
             'print':False,
         }
+        context['use_semantic_relationships'] = settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS
+
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
-            # TODO: check user node level permissions here, if user does not
-            # have read permissions on this node, then do not create map layer
-            # or source
-            datatype = datatype_factory.get_instance(node.datatype)
-            map_source = datatype.get_map_source(node)
-            if map_source is not None:
-                resource_sources.append(map_source)
-            map_layer = datatype.get_map_layer(node)
-            if map_layer is not None:
-                resource_layers.append(map_layer)
+            if self.request.user.has_perm('read_nodegroup', node.nodegroup):
+                datatype = datatype_factory.get_instance(node.datatype)
+                map_source = datatype.get_map_source(node)
+                if map_source is not None:
+                    resource_sources.append(map_source)
+                map_layer = datatype.get_map_layer(node)
+                if map_layer is not None:
+                    resource_layers.append(map_layer)
 
+        context['app_name'] = settings.APP_NAME
         context['geom_nodes'] = geom_nodes
         context['resource_map_layers'] = resource_layers
         context['resource_map_sources'] = resource_sources

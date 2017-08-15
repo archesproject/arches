@@ -13,7 +13,7 @@ define(['jquery', 'knockout', 'arches', 'search-data', 'bindings/smartresize'], 
         self.items = ko.observableArray([]);
         data.saved_searches.forEach(
             function(search) {
-                var searchImageUrl = (search.IMAGE.length > 0) ? search.IMAGE[0].url : '';
+                var searchImageUrl = (search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '';
                 self.items.push({
                     image: searchImageUrl,
                     title: search.SEARCH_NAME,

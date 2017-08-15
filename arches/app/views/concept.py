@@ -23,6 +23,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
@@ -59,8 +60,8 @@ class RDMView(BaseManagerView):
         )
 
         context['nav']['icon'] = 'fa fa-align-left'
-        context['nav']['title'] = 'Reference Data Manager'
-        context['nav']['help_title'] = 'Using the RDM'
+        context['nav']['title'] = _('Reference Data Manager')
+        context['nav']['help'] = (_('Using the RDM'),'help/rdm-help.htm')
 
         return render(request, 'rdm.htm', context)
 

@@ -199,18 +199,21 @@ class Command(BaseCommand):
 
         """
         files = [
-            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'},
             {'src': 'arches/app/templates/index.htm', 'dst':'arches/install/arches-templates/project_name/templates/index.htm'},
-            {'src': 'arches/app/templates/login.htm', 'dst':'arches/install/arches-templates/project_name/templates/login.htm'},
-            {'src': 'arches/app/templates/base-manager.htm', 'dst':'arches/install/arches-templates/project_name/templates/base-manager.htm'}
+            {'src':'bower.json', 'dst':'arches/install/arches-templates/project_name/bower.json'}
             ]
         for f in files:
             shutil.copyfile(f['src'], f['dst'])
 
         settings_whitelist = [
+            'APP_NAME',
+            'APP_TITLE',
+            'COPYRIGHT_TEXT',
+            'COPYRIGHT_YEAR',
             'MODE',
             'DATABASES',
             'DEBUG',
+            'RESOURCE_IMPORT_LOG',
             'INTERNAL_IPS',
             'ANONYMOUS_USER_NAME',
             'ELASTICSEARCH_HTTP_PORT',
@@ -234,8 +237,11 @@ class Command(BaseCommand):
             'LOCALE_PATHS',
             'USE_L10N',
             'MEDIA_URL',
+            'MEDIA_ROOT',
+            'DATATYPE_LOCATIONS',
             'STATIC_ROOT',
             'STATIC_URL',
+            'TILE_CACHE_CONFIG',
             'ADMIN_MEDIA_PREFIX',
             'STATICFILES_DIRS',
             'STATICFILES_FINDERS',
@@ -253,11 +259,39 @@ class Command(BaseCommand):
             for setting_key in dir(settings):
                 if setting_key in settings_whitelist:
                     setting_value = getattr(settings, setting_key)
-                    if type(setting_value) == dict or (type(setting_value) in (list, tuple) and len(setting_value) >= 3):
-                        val = "'''\n{0} = {1}\n'''\n\n".format(setting_key, pprint.pformat(setting_value, indent=4, width=50, depth=None))
+                    if type(setting_value) == dict or type(setting_value) == list:
+                        val = "\n{0} = {1}\n\n\n".format(setting_key, JSONSerializer().serialize(setting_value, indent=4))
+                        val = val.replace(' false', ' False').replace(' true', ' True').replace(' null', ' None')
+                    elif type(setting_value) == tuple:
+                        braces = ('(',')')
+                        val = "\n{0} = {1}\n".format(setting_key, braces[0])
+                        for value in setting_value:
+                            val = val + "    " + str(value) + ',\n'
+                        val = val + "{0}\n\n\n".format(braces[1])
                     else:
-                        val = "#{0} = {1}\n\n".format(setting_key, setting_value)
+                        try:
+                            setting_value.upper()
+                            val = "{0} = '{1}'\n\n".format(setting_key, setting_value)
+                        except:
+                            val = "{0} = {1}\n\n".format(setting_key, setting_value)
+
                     f.write(val)
+
+        lines = None
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'r') as f:
+            lines = f.readlines()
+
+        with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
+            f.write('import os\n')
+            cwd = os.getcwd()
+
+            for line in lines:
+                line = line.replace(cwd, '')
+                if len(line) > 1:
+                    f.write('#' + line)
+                else:
+                    f.write(line)
+
 
     def setup(self, package_name, es_install_location=None):
         """

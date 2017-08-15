@@ -363,7 +363,10 @@ define([
                                         name: related_resource.displayname,
                                         isRoot: false,
                                         relationType: 'Ancestor',
-                                        relationCount: null
+                                        relationCount: {
+                                          total: related_resource.total_relations,
+                                          loaded: 1
+                                        }
                                     };
                                     nodes.push(node);
                                     nodeMap[related_resource.resourceinstanceid] = node;
@@ -377,11 +380,11 @@ define([
                                 var linkExists = _.find(data.links, function(link){
                                     return (link.source === sourceId && link.target === targetId);
                                 });
-                                var relationshipSource = resource_relationships.preflabel.value;
-                                var relationshipTarget = resource_relationships.preflabel.value;
-                                if (resource_relationships.preflabel.value.split('/').length === 2) {
-                                    relationshipSource = resource_relationships.preflabel.value.split('/')[0].trim();
-                                    relationshipTarget = resource_relationships.preflabel.value.split('/')[1].trim();
+                                var relationshipSource = resource_relationships.relationshiptype_label;
+                                var relationshipTarget = resource_relationships.relationshiptype_label;
+                                if (resource_relationships.relationshiptype_label.split('/').length === 2) {
+                                    relationshipSource = resource_relationships.relationshiptype_label.split('/')[0].trim();
+                                    relationshipTarget = resource_relationships.relationshiptype_label.split('/')[1].trim();
                                 }
                                 if (!linkExists) {
                                     links.push({

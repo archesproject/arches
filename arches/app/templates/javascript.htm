@@ -55,7 +55,8 @@
             'nvd3': '{{ STATIC_URL }}bower_components/nvd3/build/nv.d3.min',
             'leaflet': '{{ STATIC_URL }}bower_components/leaflet/dist/leaflet',
             'leaflet-iiif': '{{ STATIC_URL }}bower_components/leaflet-iiif/leaflet-iiif',
-            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw'
+            'leaflet-draw': '{{ STATIC_URL }}bower_components/leaflet-draw/dist/leaflet.draw',
+            'mathjs': '{{ STATIC_URL }}bower_components/mathjs/dist/math.min'
         },
         packages: [{
             name: "codemirror",
@@ -150,12 +151,14 @@
                 buffer: "{% url 'buffer'%}",
                 config: "{% url 'config' %}",
                 node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                node_layer: "{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
                 form: "{% url 'form' '' %}",
                 resource: "{% url 'resource' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
                 related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
@@ -213,6 +216,8 @@
             mapDefaultZoom: {{ map_info.zoom }},
             mapDefaultMinZoom: {{ map_info.map_min_zoom }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom }},
+            preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
+            useSemanticRelationships: {{ use_semantic_relationships|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
@@ -253,18 +258,16 @@
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
                 'name': '{{ provider.name }}',
                 'geocoderid': '{{ provider.geocoderid }}',
-                'api_key': '{{ provider.api_key }}',
+                'api_key': {% if provider.api_key != None %} '{{ provider.api_key }}' {% elif provider.api_key == None %} null {% endif %},
                 'component': '{{ provider.component }}'
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
               'graphid': '{{resource.graphid}}',
               'name': '{{ resource.name }}',
-              'color': '{{ resource.mapfeaturecolor }}',
-              'pointsize': '{{ resource.mappointsize }}',
-              'linewidth': '{{ resource.maplinewidth }}',
               'icon': '{{ resource.iconclass }}',
             },{% endfor %}{% endautoescape %}],
+            graphs: {% autoescape off %}{{graphs|default_if_none:"[]"}}{% endautoescape %}
         };
     });
 

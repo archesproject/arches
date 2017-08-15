@@ -12,11 +12,26 @@
 
         <div class="" style="margin-top: 0px;">
             <div class="">
-                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === mapFilter}, click: function(){selectedTab(mapFilter)}"><i class="fa fa-map-marker search-type-btn-icon"></i>{% trans 'Map' %}</button>
-                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}"><i class="fa fa-calendar search-type-btn-icon"></i>{% trans 'Time' %}</button>
-                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}"><i class="fa fa-bookmark search-type-btn-icon"></i>{% trans 'Saved' %}</button>
-                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}"><i class="fa fa-check-circle-o search-type-btn-icon"></i>{% trans 'Expert' %}</button>
-                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}"><i class="fa fa-code-fork search-type-btn-icon"></i>{% trans 'Related' %}</button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === mapFilter}, click: function(){selectedTab(mapFilter)}">
+                    <i class="fa fa-map-marker"></i>
+                    <p>{% trans 'Map' %}</p>
+                </button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === timeFilter}, click: function(){selectedTab(timeFilter)}">
+                    <i class="fa fa-calendar"></i>
+                    <p>{% trans 'Time' %}</p>
+                </button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === savedSearches}, click: function(){selectedTab(savedSearches)}">
+                    <i class="fa fa-bookmark"></i>
+                    <p>{% trans 'Saved' %}</p>
+                </button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === advancedFilter}, click: function(){selectedTab(advancedFilter)}">
+                    <i class="fa fa-check-circle-o"></i>
+                    <p>{% trans 'Advanced' %}</p>
+                </button>
+                <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}">
+                    <i class="fa fa-code-fork"></i>
+                    <p>{% trans 'Related' %}</p>
+                </button>
             </div>
         </div>
     </div>

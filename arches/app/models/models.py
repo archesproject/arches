@@ -14,6 +14,7 @@ import os
 import json
 import uuid
 import importlib
+import datetime
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -21,7 +22,6 @@ from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from datetime import datetime
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -146,14 +146,14 @@ class Edge(models.Model):
 
 
 class EditLog(models.Model):
-    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclassid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    resourceinstanceid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    attributenodeid = models.TextField(blank=True, null=True)  # This field type is a guess.
-    tileinstanceid = models.TextField(blank=True, null=True)  # This field type is a guess.
+    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    resourceclassid = models.TextField(blank=True, null=True)
+    resourceinstanceid = models.TextField(blank=True, null=True)
+    nodegroupid = models.TextField(blank=True, null=True)
+    tileinstanceid = models.TextField(blank=True, null=True)
     edittype = models.TextField(blank=True, null=True)
-    newvalue = models.TextField(blank=True, null=True)
-    oldvalue = models.TextField(blank=True, null=True)
+    newvalue = JSONField(blank=True, null=True, db_column='newvalue')
+    oldvalue = JSONField(blank=True, null=True, db_column='oldvalue')
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)
@@ -290,9 +290,6 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
-    mapfeaturecolor = models.TextField(blank=True, null=True)
-    mappointsize = models.IntegerField(blank=True, null=True)
-    maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
     functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
@@ -306,15 +303,25 @@ class GraphModel(models.Model):
         if not self.isactive:
             msg.append(_('change resource model status in graph manager'))
         if forms.count() == 0:
-            msg.append(_('add form(s)'))
+            msg.append(_('add menu(s)'))
         else:
             if FormXCard.objects.filter(form__in=forms).count() == 0:
-                msg.append(_('add card(s) to form(s)'))
+                msg.append(_('add card(s) to menu(s)'))
             if forms.filter(visible=True).count() == 0:
-                msg.append(_('make form(s) visible'))
+                msg.append(_('make menu(s) visible'))
         if len(msg) == 0:
             return False
         return _('To make this resource editable: ') + ', '.join(msg)
+
+    @property
+    def is_editable(self):
+        result = True
+        if self.isresource:
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
+            result = False if len(resource_instances) > 0 else True
+            if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+                result = True
+        return result
 
     class Meta:
         managed = True
@@ -528,9 +535,11 @@ class ResourceXResource(models.Model):
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
-    relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
+    relationshiptype = models.TextField(blank=True, null=True)
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
 
     def delete(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -541,6 +550,9 @@ class ResourceXResource(models.Model):
     def save(self):
         from arches.app.search.search_engine_factory import SearchEngineFactory
         se = SearchEngineFactory().create()
+        if not self.created:
+            self.created = datetime.datetime.now()
+        self.modified = datetime.datetime.now()
         document = model_to_dict(self)
         se.index_data(index='resource_relations', doc_type='all', body=document, idfield='resourcexid')
         super(ResourceXResource, self).save()

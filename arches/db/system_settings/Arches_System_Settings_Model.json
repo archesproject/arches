@@ -1548,7 +1548,7 @@
                     "helptext": "<p>You can see the color ramps at:</p><p><a href=\"https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md\"><font color=\"#f7f7f7\">https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md</font></a><br></p>",
                     "sortorder": null,
                     "cardid": "32f2daa6-fae4-11e6-a8c8-6c4008b05c4c",
-                    "helptitle": "<p>You can see the color ramps at:</p><p><a href=\"https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md\"><font color=\"#f7f7f7\">https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md</font></a><br></p>",
+                    "helptitle": null,
                     "instructions": "Arches supports temporal binning.  Define the configuration and colors to use in your time wheel",
                     "active": true,
                     "name": "Settings Time Search"

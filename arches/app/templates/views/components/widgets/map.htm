@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %} {% load i18n %} {% block form %}
+{% load template_tags %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
@@ -19,35 +20,41 @@
         }
     }, css: getContextCss()">
 
-        <!--ko if: drawMode() || geoJsonStringValid() === false -->
+        <!--ko if: drawFeaturesOnMap() || geojsonInput() === true || xyInput.active() === true ||  drawMode() === 'draw_point' || drawMode() === 'draw_polygon' || drawMode() === 'draw_line_string' -->
         <!--ko if: context !== 'search-filter' -->
-        <div class="geometry-editing-notifications" data-bind= "css: {'notifications-narrow': mapControls.mapControlsExpanded}">
+        <div class="geometry-editing-notifications" data-bind= "css: {'notifications-minimized': minimizeNotifications}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning relative" role="alert">
+                    <a data-bind="click: function(){minimizeNotifications(!minimizeNotifications())}"><span class="arrow ion-arrow-left-b" data-bind="css: {'ion-arrow-right-b': minimizeNotifications}"></span></a>
                     <div class="media">
-                        <!-- ko if: drawMode() === 'draw_point'  -->
-                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating points. Click the Point tool to exit." %}
+                        <!-- ko if: geojsonInput() === false && xyInput.active() === false -->
+                            <!-- ko if: drawMode() === undefined || drawMode() === 'simple_select' -->
+                            <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Click a feature to drag or delete. Click lines or polygons twice to edit verticies" %}</span>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_point'-->
+                        <strong>{% trans "Create Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are creating points. Click the Point tool to exit." %}</span>
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_polygon'-->
-                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating polygons. Click the Polygon tool to exit." %}
+                        <strong>{% trans "Create Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are creating polygons. Click the Polygon tool to exit." %}</span>
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_line_string'-->
-                        <strong>{% trans "Create Mode" %}</strong> {% trans "You are creating lines. Click the Line tool to exit." %}
-                        <!-- /ko -->
-                        <!-- ko if: drawMode() === 'simple_select' -->
-                        <strong>{% trans "Edit Mode" %}</strong>
-                        <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>{% trans "Click and drag to move." %}</span>
-                        <!-- /ko -->
-                        <!-- ko if: selectedFeatureType() !== 'point'-->
-                        <span>{% trans "Or, click it again to edit verticies." %}</span>
-                        <!-- /ko -->
+                        <strong>{% trans "Create Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are creating lines. Click the Line tool to exit." %}</span>
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}
+                        <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}</span>
+                        <!-- /ko -->
+                        <!-- ko if: geojsonInput -->
+                        <strong>{% trans "Geojson Mode "%}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Enter a GeoJSON geometry to add a feature" %}</span>
                         <!-- /ko -->
                         <!-- ko ifnot: geoJsonStringValid -->
-                        <strong>{% trans "Invalid GeoJSON" %}</strong>
+                        <i>{% trans " GeoJSON is invalid" %}</i>
+                        <!-- /ko -->
+                        <!-- ko if: xyInput.active -->
+                        <strong>{% trans "X/Y Mode " %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Enter coordinates or select a point to load values" %}</span>
+                        <!-- /ko -->
+                        <!-- ko if: xyInput.boundsWarning -->
+                        <i>{% trans " Note: Coordinates are outside of project bounds" %}</i>
                         <!-- /ko -->
                     </div>
                 </div>
@@ -60,7 +67,7 @@
           <div data-bind="with: overlayLibraryList">
            <!-- Title -->
            <div class="overlay-title">
-               Map Overlay Library
+               {% trans "Map Overlay Library" %}
                <span class="pull-right"><i class="overlay-close ion-close-round" data-bind="click: self.toggleOverlaySelector.bind(self)"></i></span>
            </div>
            <!-- Filter -->
@@ -95,8 +102,8 @@
             <div class="leaflet-control-container">
                 <div class="leaflet-top leaflet-left">
                     <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-                        <a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" data-bind="click: function(){map.zoomIn()}, css:{'leaflet-disabled': atMaxZoom}">+</a>
-                        <a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" data-bind="click: function(){map.zoomOut()}, css:{'leaflet-disabled': atMinZoom}">-</a>
+                        <a class="leaflet-control-zoom-in" href="#" title="{% trans "Zoom in" %}" role="button" aria-label='{% trans "Zoom in" %}' data-bind="click: function(){map.zoomIn()}, css:{'leaflet-disabled': atMaxZoom}">+</a>
+                        <a class="leaflet-control-zoom-out" href="#" title="{% trans "Zoom out" %}" role="button" aria-label='{% trans "Zoom out" %}' data-bind="click: function(){map.zoomOut()}, css:{'leaflet-disabled': atMinZoom}">-</a>
                     </div>
                     <div class="leaflet-draw leaflet-control">
 
@@ -104,7 +111,10 @@
                             <div class="leaflet-draw-toolbar leaflet-bar leaflet-draw-toolbar-top">
                                 <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle to Full Screen' %}" data-bind="click: function(){
                                     expanded(!expanded());}, css:{'active': expanded }"><span class="sr-only">{% trans 'Full Screen' %}</span><i class="fa fa-arrows-alt"></i></a>
-                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">Map View</span><i class="fa fa-map-o"></i></a>
+                                <!-- ko ifnot: context === 'search-filter' -->
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Return to features' %}" data-bind="click: function(){zoomToDrawLayer()}, css:{'leaflet-disabled': !drawFeaturesOnMap()}"><span class="sr-only">{% trans "Return to features" %}</span><i class="fa fa-home"></i></a>
+                                <!--/ko-->
+                                <a class="" style="background-position: -342px -2px;" href="#" title="{% trans 'Toggle Map Tilt and Rotate' %}" data-bind="click: function(){pitchAndZoomEnabled(!pitchAndZoomEnabled())}, css: {'active': pitchAndZoomEnabled()}"><span class="sr-only">{% trans "Map View" %}</span><i class="fa fa-map-o"></i></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
@@ -114,24 +124,44 @@
 
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
+
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
+                                <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
+                                    <div class="form-control">
+                                    <div class="tool-header">{% trans 'Create a point' %}</div>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}, css:{'enabled': xyInput.x() || xyInput.y() }"><span>{% trans 'clear' %}</span></a>
+                                        <label for="input-easting">{% trans "Easting" %}</label>
+                                        <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <label class="mar-top" for="input-northing">{% trans "Northing" %}</label>
+                                        <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+                                        <div class="mar-top">
+                                            <select class="form-control" class="design" style="width:100px;" disabled data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid, enable: xyInput.validCoords"></select>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm btn-block mar-top" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
+                                    </div>
+                                </div>
+
                                 <!-- ko foreach: geometryTypes -->
                                 <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
                                 </a>
                                 <!-- /ko -->
+
                                 <!--ko if: context !== 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Add GeoJSON" data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">Add GeoJSON</span><i class="ion-code-working"></i></a>
-                                <div class="map-tool-container map-json-tool-item" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add GeoJSON" %}' data-bind="click: function(){geojsonInput(!geojsonInput())}, css: {'active': geojsonInput}"><span class="sr-only">{% trans "Add GeoJSON" %}</span><i class="ion-code-working"></i></a>
+                                <div class="map-tool-container map-tool-item geojson" data-bind="fadeVisible: geojsonInput, delay:100, fade: 200">
                                     <textarea id="" placeholder="{% trans " Enter GeoJSON " %}" class="form-control input-md widget-input map-json-tool-input" data-bind="textInput: geojsonString, valueUpdate: 'keyup'"></textarea>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){geojsonString(''); geoJsonStringValid(true)}, css:{'enabled': geojsonString || geojsonString() !== ''}"><span>{% trans 'clear' %}</span></a>
                                 </div>
                                 <!-- /ko -->
 
                                 <!--ko if: context === 'search-filter' -->
-                                <a class="" style="background-position: -342px -2px;" href="#" title="Search Map Extent" data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">Search Map Extent</span><i class="fa fa-search"></i></a>
-                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode())">
+                                <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Search Map Extent" %}' data-bind="click: toggleExtentSearch, css:{'active': extentSearch}"><span class="sr-only">{% trans "Search Map Extent" %}</span><i class="fa fa-search"></i></a>
+                                <div class="map-tool-container form-control map-query-tool-input buffer" data-bind="visible: _.contains(drawModes, drawMode()) || xyInput.active()">
                                     <div class="form-group form-inline">
-                                      <label for="buffer-input">{% trans "Buffer(ft)" %}</label>
+                                      <label for="buffer-input">{% trans "Buffer" %}</label>
                                       <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="buffer" data-bind="textInput: buffer">
+                                      <select class="form-control"  data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
                                     </div>
                                 </div>
                                 <!-- /ko -->
@@ -140,14 +170,15 @@
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
 
-
+                        <!-- ko ifnot: context === 'search-filter' -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-                                <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to edit."><span class="sr-only">Edit drawings.</span></a>
-                                <a class="leaflet-draw-edit-remove" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title="No drawings to delete."><span class="sr-only">Delete drawings.</span></a>
+                                <a class="leaflet-draw-edit-edit" data-bind="click: function(){selectEditingTool(undefined, 'end')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to edit." %}'><span class="sr-only">{% trans "Edit drawings." %}"</span></a>
+                                <a class="leaflet-draw-edit-remove" data-bind="click: function(){selectEditingTool(undefined, 'delete')}, css: {'leaflet-disabled': drawMode() === undefined}" href="#" title='{% trans "No drawings to delete." %}'><span class="sr-only">{% trans "Delete drawings." %}</span></a>
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                     </div>
                 </div>
@@ -208,7 +239,7 @@
                 </div>
                 <div class="hover-feature-footer">
                     <a data-bind="click: function () { window.open(reportURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> {% trans "Report" %}</a>
-                    {% if 'Resource Editor' in user.user_groups %}
+                    {% if request.user|can_edit_resource_instance %}
                     <a data-bind="click: function () { window.open(editURL + ko.unwrap(popupData().resourceinstanceid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %}</a>
                     {% endif %}
                     <a data-bind="click: zoomToPopupData" href="javascript:void(0)"><i class="fa fa-map-marker"></i> {% trans "Map" %}</a>
@@ -270,10 +301,10 @@
             <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400">
               <ul class="map-widget-toolbar-list" style="">
                 <li class="map-widget-toolbar-item text-center basemaps-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'active': !mapControls.mapControlPanels.basemaps()}">
-                    <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
+                    <a id="" href="" class="map-widget-icon">{% trans "Basemaps" %}</a>
                 </li>
                 <li id="btn-overlays" class="map-widget-toolbar-item text-center overlays-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('overlays')}, css : { 'active': !mapControls.mapControlPanels.overlays()}">
-                    <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
+                    <a id="overlays" href="" class="map-widget-icon">{% trans "Overlays" %}</a>
                 </li>
 
                 <!-- TODO Uncomment this block once legend available -->
@@ -282,15 +313,12 @@
                 </li> -->
 
                 <li class="map-widget-toolbar-item text-center close-map-tools" data-bind="click: function(){mapControls.toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapControls.mapControlsExpanded}">
-                    <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: mapControls.toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                    <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: mapControls.toggleMapTools">{% trans "Hide" %}</a>
                 </li>
               </ul>
             </div>
 
             <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapControls.mapControlsExpanded, delay:200, fade:400, css : {'map-panel-inactive': mapControls.mapControlPanels.basemaps}">
-                <div class="map-widget-panel-title">
-                    <h4 class="">{% trans "Basemaps" %}</h4>
-                </div>
 
                 <!-- ko foreach: basemaps -->
                 <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap, css:{'selected': name === self.basemap()}">
@@ -307,9 +335,7 @@
 
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControls.mapControlPanels.overlays}">
             <div class="map-widget-panel-title">
-                <h4 class="" data-bind="click: toggleOverlaySelector">{% trans "Overlays" %}
-                  <button style="margin-top: -7px;" class="btn btn-primary pull-right btn-labeled ion-ios-plus">Add</button>
-                </h4>
+                <button class="btn btn-primary btn-block" data-bind="click: toggleOverlaySelector">{% trans "Add Overlay" %}</button>
             </div>
           <!--ko let: { self: $data }-->
             <div data-bind="sortable: overlays">
@@ -344,7 +370,9 @@
                         </div>
 
                         <div class="overlay-tool-group">
+                            <!-- Hide the info tool button until we wire it up
                             <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
+                            -->
                             <a href="#" data-bind="click: function () { self.mapControls.moveOverlay($data, 'up') }">
                                 <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
                             </a>
@@ -459,7 +487,7 @@
 
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">Zoom</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">{% trans "Zoom" %}</a>
             </h4>
         </div>
 
@@ -490,7 +518,7 @@
 
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">Geocoder</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">{% trans "Geocoder" %}</a>
             </h4>
         </div>
 
@@ -512,7 +540,6 @@
                     {% trans "Geocoder Availability" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-
                     <div class="toggle-container">
                         <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: function () { geocoderVisible(!geocoderVisible()) }"><small></small></span>
                         <p class="arches-toggle-sm">{% trans "Toggle on to show a geocoder on the map" %}</p>

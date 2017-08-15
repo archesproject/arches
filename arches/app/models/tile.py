@@ -17,8 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid, importlib
+import datetime
 from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.resource import EditLog
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -89,15 +91,42 @@ class Tile(models.TileModel):
                             tile.parenttile = self
                             self.tiles[key].append(tile)
 
+    def save_edit(self, user={}, note='', edit_type='', old_value=None, new_value=None):
+        timestamp = datetime.datetime.now()
+        edit = EditLog()
+        edit.resourceclassid = self.resourceinstance.graph_id
+        edit.resourceinstanceid = self.resourceinstance.resourceinstanceid
+        edit.nodegroupid = self.nodegroup_id
+        edit.tileinstanceid = self.tileid
+        edit.userid = getattr(user, 'id', '')
+        edit.user_email = getattr(user, 'email', '')
+        edit.user_firstname = getattr(user, 'first_name', '')
+        edit.user_lastname = getattr(user, 'last_name', '')
+        edit.note = note
+        edit.oldvalue = old_value
+        edit.newvalue = new_value
+        edit.timestamp = timestamp
+        edit.edittype = edit_type
+        edit.save()
+
     def save(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
         if self.data != {}:
+            old_model = models.TileModel.objects.filter(pk=self.tileid)
+            old_data = old_model[0].data if len(old_model) > 0 else None
+            edit_type = 'tile create' if (old_data == None) else 'tile edit'
+            try:
+                user = request.user
+            except:
+                user = {}
+            self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
                 datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
                 datatype.convert_value(self, nodeid)
+
         super(Tile, self).save(*args, **kwargs)
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             self.index()
@@ -124,6 +153,7 @@ class Tile(models.TileModel):
             se.delete(index='strings', doc_type='term', id=result['_id'])
 
         self.__preDelete(request)
+        self.save_edit(user=request.user, edit_type='tile delete', old_value=self.data)
         super(Tile, self).delete(*args, **kwargs)
         resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
         resource.index()

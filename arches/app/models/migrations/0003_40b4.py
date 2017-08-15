@@ -62,6 +62,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='editlog',
+            old_name='attributenodeid',
+            new_name='nodegroupid',
+        ),
+        migrations.AlterField(
+            model_name='editlog',
+            name='newvalue',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='newvalue', null=True),
+        ),
+        migrations.AlterField(
+            model_name='editlog',
+            name='oldvalue',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='oldvalue', null=True),
+        ),
         migrations.CreateModel(
             name='Geocoder',
             fields=[
@@ -75,47 +90,62 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mapfeaturecolor',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='maplinewidth',
+        ),
+        migrations.RemoveField(
+            model_name='graphmodel',
+            name='mappointsize',
+        ),
         migrations.RunSQL("""
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/string',
+                    configcomponent = 'views/components/datatypes/string',
                     configname = 'string-datatype-config'
                 WHERE datatype = 'string';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/number',
+                    configcomponent = 'views/components/datatypes/number',
                     configname = 'number-datatype-config'
                 WHERE datatype = 'number';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/boolean',
+                    configcomponent = 'views/components/datatypes/boolean',
                     configname = 'boolean-datatype-config'
                 WHERE datatype = 'boolean';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configcomponent = 'views/components/datatypes/domain-value',
                     configname = 'domain-value-datatype-config'
                 WHERE datatype = 'domain-value';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/concept',
+                    configcomponent = 'views/components/datatypes/concept',
                     configname = 'concept-datatype-config'
                 WHERE datatype = 'concept';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/date',
+                    configcomponent = 'views/components/datatypes/date',
                     configname = 'date-datatype-config'
                 WHERE datatype = 'date';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/concept',
+                    configcomponent = 'views/components/datatypes/concept',
                     configname = 'concept-datatype-config'
                 WHERE datatype = 'concept-list';
             UPDATE d_data_types
                 SET issearchable = true,
-                    configcomponent = 'views/graph/datatypes/domain-value',
+                    configcomponent = 'views/components/datatypes/domain-value',
                     configname = 'domain-value-datatype-config'
                 WHERE datatype = 'domain-value-list';
+            UPDATE d_data_types
+                SET configcomponent = 'views/components/datatypes/geojson-feature-collection'
+                WHERE datatype = 'geojson-feature-collection';
         """, """
             UPDATE d_data_types
                 SET issearchable = false,
@@ -157,7 +187,9 @@ class Migration(migrations.Migration):
                     configcomponent = NULL,
                     configname = NULL
                 WHERE datatype = 'domain-value-list';
-
+            UPDATE d_data_types
+                SET configcomponent = 'views/graph/datatypes/geojson-feature-collection',
+                WHERE datatype = 'geojson-feature-collection';
         """),
 
         migrations.RunSQL("""
@@ -182,7 +214,7 @@ class Migration(migrations.Migration):
                 );
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
             INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
+            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/components/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
             """,
@@ -218,9 +250,9 @@ class Migration(migrations.Migration):
                 "bearing": 0.0,
                 "geocodePlaceholder": "Search",
                 "geocoderVisible": true,
-                "featureColor": null,
-                "featureLineWidth": null,
-                "featurePointSize": null,
+                "featureColor": "#FF0000",
+                "featureLineWidth": 1,
+                "featurePointSize": 3,
                 "featureEditingDisabled": true,
                 "mapControlsHidden": false
             }') WHERE templateid = '50000000-0000-0000-0000-000000000002';
@@ -240,9 +272,9 @@ class Migration(migrations.Migration):
                     "bearing": 0.0,
                     "geocodePlaceholder": "Search",
                     "geocoderVisible": true,
-                    "featureColor": null,
-                    "featureLineWidth": null,
-                    "featurePointSize": null
+                    "featureColor": "#FF0000",
+                    "featureLineWidth": 1,
+                    "featurePointSize": 3
                 }') WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
         """

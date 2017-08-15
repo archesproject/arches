@@ -3,7 +3,7 @@
     <div id="" class="saved-search-grid" style="position: relative;">
         <div class="saved-search-grid" data-bind="smartresize: {childclass: '.ss-grid-item'}, foreach: items">
             <!-- Saved Search Query -->
-            <div class="ss-grid-item relative" style="-webkit-background-size: cover; -moz-background-size: cover;-o-background-size: cover;  background-size: cover;">
+            <div class="ss-grid-item relative">
                     <div class="search-caption-activeWrap">
                         <div class="search-caption-alignCenter">
                             <div class="search-caption-body">
@@ -16,7 +16,9 @@
                             </div>
                         </div>
                     </div>
+                <!-- ko if: image -->    
                 <img class="img-responsive" alt="Image" data-bind="attr: {src: image}">
+                <!-- /ko -->
             </div>
         </div>
     </div>

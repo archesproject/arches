@@ -65,7 +65,7 @@ class Graph(models.GraphModel):
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
+                    if key not in ('root', 'nodes', 'edges', 'cards', 'functions', 'is_editable'):
                         setattr(self, key, value)
 
                 nodegroups = dict((item['nodegroupid'], item) for item in args[0]["nodegroups"])
@@ -130,9 +130,6 @@ class Graph(models.GraphModel):
             isresource=is_resource,
             isactive=False,
             iconclass="",
-            mapfeaturecolor="#FF0000",
-            mappointsize=3,
-            maplinewidth=1,
             ontology=None
         )
         if not is_resource:
@@ -213,6 +210,7 @@ class Graph(models.GraphModel):
         edge -- a dictionary representing a Edge instance or an actual models.Edge instance
 
         """
+
         if not isinstance(edge, models.Edge):
             egdeobj = edge.copy()
             edge = models.Edge()
@@ -238,7 +236,6 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Card instance or an actual models.CardModel instance
 
         """
-
         if not isinstance(card, models.CardModel):
             cardobj = card.copy()
             card = models.CardModel()
@@ -292,9 +289,26 @@ class Graph(models.GraphModel):
 
         return function
 
+
+    def _compare(self, obj1, obj2, additional_excepted_keys = []):
+        excluded_keys = ['_state'] + additional_excepted_keys
+        d1, d2 = obj1.__dict__, obj2.__dict__
+        old, new = {}, {}
+        for k,v in d1.items():
+            if k in excluded_keys:
+                continue
+            try:
+                if v != d2[k]:
+                    old.update({k: v})
+                    new.update({k: d2[k]})
+            except KeyError:
+                old.update({k: v})
+
+        return old, new
+
     def save(self):
         """
-        Saves an a graph and it's nodes, edges, and nodegroups back to the db
+        Saves an a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
 
         """
@@ -303,7 +317,6 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
@@ -334,26 +347,27 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
-        with transaction.atomic():
-            for nodegroup in self.get_nodegroups():
-                nodegroup.delete()
+        if self.is_editable == True:
+            with transaction.atomic():
+                for nodegroup in self.get_nodegroups():
+                    nodegroup.delete()
 
-            for edge in self.edges.itervalues():
-                edge.delete()
+                for edge in self.edges.itervalues():
+                    edge.delete()
 
-            for node in self.nodes.itervalues():
-                node.delete()
+                for node in self.nodes.itervalues():
+                    node.delete()
 
-            for card in self.cards.itervalues():
-                card.delete()
+                for card in self.cards.itervalues():
+                    card.delete()
 
-            for widget in self.widgets.itervalues():
-                widget.delete()
+                for widget in self.widgets.itervalues():
+                    widget.delete()
 
-            # if self.isresource:
-            #     delete_search_index(self.graphid)
+                # if self.isresource:
+                #     delete_search_index(self.graphid)
 
-            super(Graph, self).delete()
+                super(Graph, self).delete()
 
     def get_tree(self, root=None):
         """
@@ -653,7 +667,6 @@ class Graph(models.GraphModel):
         node -- a python dictionary representing a node object to be used to update the graph
 
         """
-
         node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
         old_node = self.nodes.pop(node['nodeid'])
         new_node = self.add_node(node)
@@ -693,6 +706,9 @@ class Graph(models.GraphModel):
         node -- a node id or Node model to delete from the graph
 
         """
+
+        if self.is_editable == False:
+            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
         if node is not None:
             if not isinstance(node, models.Node):
@@ -1095,6 +1111,7 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+        ret['is_editable'] = self.is_editable
         ret['functions'] = models.FunctionXGraph.objects.filter(graph_id=self.graphid)
 
         parentproperties = {
@@ -1109,6 +1126,33 @@ class Graph(models.GraphModel):
 
         return JSONSerializer().serializeToPython(ret)
 
+    def check_if_resource_is_editable(self):
+
+        def find_unpermitted_edits(obj_a, obj_b, ignore_list):
+            res = None
+            pre_diff = self._compare(obj_a, obj_b, ignore_list)
+            diff = filter(lambda x: len(x.keys()) > 0, pre_diff)
+            if len(diff) > 0:
+                res = diff
+            return res
+
+        if self.isresource == True:
+            if self.is_editable == False:
+                unpermitted_edits = []
+                db_nodes = models.Node.objects.filter(graph=self)
+                for db_node in db_nodes:
+                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass','description'])
+                    if unpermitted_node_edits != None:
+                        unpermitted_edits.append(unpermitted_node_edits)
+
+                db_graph = Graph.objects.get(pk=self.graphid)
+                unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive'])
+                if unpermitted_graph_edits != None:
+                    unpermitted_edits.append(unpermitted_graph_edits)
+
+                if len(unpermitted_edits) > 0:
+                    raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.".format(self.name)), 1006)
+
     def validate(self):
         """
         validates certain aspects of resource graphs according to defined rules:
@@ -1119,6 +1163,8 @@ class Graph(models.GraphModel):
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
 
         """
+        # validates that the resource graph is editable despite having saved instances.
+        self.check_if_resource_is_editable()
 
         # validates that the top node of a resource graph is semantic and a collector
 

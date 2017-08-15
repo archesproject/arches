@@ -55,9 +55,10 @@ class MapLayerManagerView(BaseManagerView):
             query = Query(se, start=0, limit=0)
             search_query = Bool()
             query.add_query(search_query)
-            query.add_aggregation(GeoBoundsAgg(field='points', name='bounds'))
+            query.add_aggregation(GeoBoundsAgg(field='points.point', name='bounds'))
             results = query.search(index='resource', doc_type=[str(node.graph.pk)])
-            return results['aggregations']['bounds']['bounds']
+            bounds = results['aggregations']['bounds']['bounds'] if 'bounds' in results['aggregations']['bounds'] else None
+            return bounds
 
         context['geom_nodes_json'] = JSONSerializer().serialize(context['geom_nodes'])
         resource_layers = []

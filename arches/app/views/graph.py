@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import itertools
 import zipfile
 import json
+import uuid
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -95,7 +96,7 @@ class GraphSettingsView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Defining Settings','help/settings-help.htm')
+        context['nav']['help'] = (_('Defining Settings'),'help/settings-help.htm')
 
         return render(request, 'views/graph/graph-settings.htm', context)
 
@@ -104,7 +105,7 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive', 'mapfeaturecolor', 'mappointsize', 'maplinewidth']:
+                'ontology_id', 'version',  'subtitle', 'isactive']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
@@ -133,7 +134,7 @@ class GraphManagerView(GraphBaseView):
 
             context['nav']['title'] = 'Arches Designer'
             context['nav']['icon'] = 'fa-bookmark'
-            context['nav']['help'] = ('About the Arches Designer','help/arches-designer-help.htm')
+            context['nav']['help'] = (_('About the Arches Designer'),'help/arches-designer-help.htm')
 
             return render(request, 'views/graph.htm', context)
 
@@ -166,7 +167,7 @@ class GraphManagerView(GraphBaseView):
         )
 
         context['nav']['title'] = self.graph.name
-        context['nav']['help'] = ('Using the Graph Manager','help/graph-designer-help.htm')
+        context['nav']['help'] = (_('Using the Graph Manager'),'help/graph-designer-help.htm')
         context['nav']['menu'] = True
 
         return render(request, 'views/graph/graph-manager.htm', context)
@@ -251,6 +252,13 @@ class GraphDataView(View):
                     ret = graph
                     graph.save()
 
+                elif self.action == 'update_node_layer':
+                    nodeid = uuid.UUID(str(data.get('nodeid')))
+                    node = graph.nodes[nodeid]
+                    node.config = data['config']
+                    ret = graph
+                    node.save()
+
                 elif self.action == 'append_branch':
                     ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
                     graph.save()
@@ -274,9 +282,12 @@ class GraphDataView(View):
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
         if data and self.action == 'delete_node':
-            graph = Graph.objects.get(graphid=graphid)
-            graph.delete_node(node=data.get('nodeid', None))
-            return JSONResponse({})
+            try:
+                graph = Graph.objects.get(graphid=graphid)
+                graph.delete_node(node=data.get('nodeid', None))
+                return JSONResponse({})
+            except GraphValidationError as e:
+                return JSONResponse({'status':'false','message':e.message, 'title':e.title}, status=500)
 
         return HttpResponseNotFound()
 
@@ -296,7 +307,7 @@ class CardManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Cards','help/card-manager-help.htm')
+        context['nav']['help'] = (_('Managing Cards'),'help/card-manager-help.htm')
 
         return render(request, 'views/graph/card-manager.htm', context)
 
@@ -344,7 +355,7 @@ class CardView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Cards and Widgets','help/card-designer-help.htm')
+        context['nav']['help'] = (_('Configuring Cards and Widgets'),'help/card-designer-help.htm')
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
@@ -373,7 +384,7 @@ class FormManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Using the Menu Manager','help/menu-manager-help.htm')
+        context['nav']['help'] = (_('Using the Menu Manager'),'help/menu-manager-help.htm')
 
         return render(request, 'views/graph/form-manager.htm', context)
 
@@ -416,7 +427,7 @@ class FormView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Configuring Menus','help/menu-designer-help.htm')
+        context['nav']['help'] = (_('Configuring Menus'),'help/menu-designer-help.htm')
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
@@ -448,7 +459,7 @@ class FormView(GraphBaseView):
 
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+        return render(request, 'views/components/datatypes/%s.htm' % template)
 
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
@@ -473,7 +484,7 @@ class ReportManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Reports','help/report-manager-help.htm')
+        context['nav']['help'] = (_('Managing Reports'),'help/report-manager-help.htm')
 
         return render(request, 'views/graph/report-manager.htm', context)
 
@@ -523,7 +534,7 @@ class ReportEditorView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Designing Reports','help/report-designer-help.htm')
+        context['nav']['help'] = (_('Designing Reports'),'help/report-designer-help.htm')
 
         return render(request, 'views/graph/report-editor.htm', context)
 
@@ -563,13 +574,13 @@ class FunctionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Functions','help/function-help.htm')
+        context['nav']['help'] = (_('Managing Functions'),'help/function-help.htm')
 
         return render(request, 'views/graph/function-manager.htm', context)
 
     def post(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
@@ -591,9 +602,10 @@ class FunctionManagerView(GraphBaseView):
 
         return JSONResponse(data)
 
+
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
-
+        self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
                 functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
@@ -636,7 +648,8 @@ class PermissionManagerView(GraphBaseView):
                     extract_card_info(card.cards, d)
                 else:
                     for node in card.nodegroup.node_set.all():
-                        d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': 'node', 'type': _('Node')})
+                        if node.datatype != 'semantic':
+                            d['children'].append({'name': node.name, 'datatype': node.datatype, 'children': [], 'type_label': _('Node'), 'type': 'node'})
                 root['children'].append(d)
 
         extract_card_info(cards, root)
@@ -655,7 +668,7 @@ class PermissionManagerView(GraphBaseView):
 
         context['nav']['title'] = self.graph.name
         context['nav']['menu'] = True
-        context['nav']['help'] = ('Managing Permissions','help/permissions-help.htm')
+        context['nav']['help'] = (_('Managing Permissions'),'help/permissions-manager-help.htm')
 
         return render(request, 'views/graph/permission-manager.htm', context)
 

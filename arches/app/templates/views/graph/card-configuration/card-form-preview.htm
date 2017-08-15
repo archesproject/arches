@@ -32,9 +32,6 @@
                         </li>
                     </ul>
 
-                    <div id="db-arches-app-alert" class="panel data-card-alert"></div>
-
-
                     <!--Tabs Content-->
                     <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
@@ -54,7 +51,7 @@
 
                                         <!-- Help link -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -90,7 +87,7 @@
 
                                 <!-- Title -->
                                 <div class="card-tab-title mar-btm">
-                                    Saved <span data-bind="text: card.get('name')"/>
+                                    {% trans "Saved" %} <span data-bind="text: card.get('name')"/>
                                 </div>
 
                             </div>
@@ -107,7 +104,7 @@
                             <div>
                                 <div class="panel-heading">
                                     <h3 class="panel-title" style="padding: 0 10px 0 10px;">
-                                        <span class="help-text-small">Help</span>
+                                        <span class="help-text-small">{% trans "Help" %}</span>
                                         <span data-bind="text: self.currentTabCard() ? self.currentTabCard().get('helptitle') : ''"></span>
                                     </h3>
                                 </div>
@@ -132,7 +129,7 @@
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
-                        Saved <span data-bind="text: card.get('name')"/>
+                        {% trans "Saved" %} <span data-bind="text: card.get('name')"/>
                     </div>
 
                     <!-- Wizard Tile -->

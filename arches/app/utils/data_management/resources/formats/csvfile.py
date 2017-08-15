@@ -159,7 +159,7 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
-
+        
         def process_resourceid(resourceid, overwrite):
             # Test if resourceid is a UUID.
             try:
@@ -206,6 +206,7 @@ class CsvReader(Reader):
                 populated_nodegroups[resourceinstanceid] = []
                 previous_row_resourceid = None
                 populated_tiles = []
+                target_resource_model = None
                 single_cardinality_nodegroups = [str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list('nodegroupid', flat=True).filter(cardinality = '1')]
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
@@ -427,7 +428,8 @@ class CsvReader(Reader):
 
                 if bulk:
                     Resource.bulk_save(resources=resources)
-                    print _('%s total resource saved' % (save_count + 1))
+
+                print _('%s total resource saved' % (save_count + 1))
 
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()

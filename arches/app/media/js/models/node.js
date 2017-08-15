@@ -30,7 +30,10 @@ define([
             self.mapSource = options.mapSource;
             self.loading = options.loading;
             self.permissions = options.permissions;
-            
+            if (options.url) {
+                self.url = options.url;
+            }
+
             self._node = ko.observable('');
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);

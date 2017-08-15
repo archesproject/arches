@@ -42,6 +42,7 @@ define([
             this.viewModel.resultsExpanded = ko.observable(true);
 
             this.aggregations = ko.observable();
+            this.searchBuffer = ko.observable();
             this.filters = {};
             this.filters.termFilter = new TermFilter();
             this.filters.timeFilter = new TimeFilter({
@@ -61,13 +62,15 @@ define([
             this.filters.mapFilter = new MapFilter({
                 aggregations: this.aggregations,
                 resizeOnChange: this.viewModel.resultsExpanded,
-                termFilter: this.filters.termFilter
+                termFilter: this.filters.termFilter,
+                searchBuffer: this.searchBuffer
             });
 
             _.extend(this.viewModel, this.filters);
             this.viewModel.savedSearches = new SavedSearches();
             this.viewModel.searchResults = new SearchResults({
                 aggregations: this.aggregations,
+                searchBuffer: this.searchBuffer,
                 viewModel: this.viewModel
             });
 

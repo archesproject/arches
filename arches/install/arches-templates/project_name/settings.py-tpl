@@ -14,10 +14,11 @@ except ImportError:
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
-FUNCTION_TEMPLATES = os.path.join(APP_ROOT, 'functions', 'templates')
-PROJECT_TEMPLATES = os.path.join(APP_ROOT, 'templates')
-TEMPLATES[0]['DIRS'].append(FUNCTION_TEMPLATES)
-TEMPLATES[0]['DIRS'].insert(0, PROJECT_TEMPLATES)
+DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
+TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
+TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
+TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
 
@@ -28,6 +29,33 @@ ALLOWED_HOSTS = []
 
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 STATIC_ROOT = '/var/www/media'
+
+RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
+
+LOGGING = {   'disable_existing_loggers': False,
+    'handlers': {   'file': {   'class': 'logging.FileHandler',
+                                'filename': os.path.join(APP_ROOT, 'arches.log'),
+                                'level': 'DEBUG'}},
+    'loggers': {   'arches': {   'handlers': [   'file'],
+                                 'level': 'DEBUG',
+                                 'propagate': True}},
+    'version': 1}
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# MEDIA_ROOT =  os.path.join(APP_ROOT)
+
+TILE_CACHE_CONFIG = {
+    "name": "Disk",
+    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
+
+    # to reconfigure to use S3 (recommended for production), use the following
+    # template:
+
+    # "name": "S3",
+    # "bucket": "<bucket name>",
+    # "access": "<access key>",
+    # "secret": "<secret key>"
+}
 
 try:
     from settings_local import *

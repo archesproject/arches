@@ -31,7 +31,7 @@
 
                 <!-- Menu Item -->
                 <li id="history-manager" class="edit-menu-item">
-                    <a id="edit-history-btn" href="" target="" class="">
+                    <a id="edit-history-btn" href="#" data-bind="click: function () {window.open('{% url 'resource_edit_log' resourceid %}')}">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-step-backward"></i> {% trans "Review Edit History" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "View changes to this resource record" %}</span>

@@ -12,6 +12,7 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import SortableDate
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -19,6 +20,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from shapely.geometry import asShape
+from elasticsearch import Elasticsearch
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
@@ -34,7 +36,14 @@ class DataTypeFactory(object):
             datatype_instance = self.datatype_instances[d_datatype.classname]
         except:
             mod_path = d_datatype.modulename.replace('.py', '')
-            module = importlib.import_module('arches.app.datatypes.%s' % mod_path)
+            module = None
+            for datatype_dir in settings.DATATYPE_LOCATIONS:
+                try:
+                    module = importlib.import_module(datatype_dir + '.%s' % mod_path)
+                except ImportError:
+                    print "MODULE NOT FOUND", datatype_dir + '.%s' % mod_path
+                if module != None:
+                    break
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance
@@ -50,8 +59,8 @@ class StringDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
-    def append_to_document(self, document, nodevalue):
-        document['strings'].append(nodevalue)
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def transform_export_values(self, value, *args, **kwargs):
         if value != None:
@@ -92,8 +101,8 @@ class NumberDataType(BaseDataType):
     def transform_import_values(self, value):
         return float(value)
 
-    def append_to_document(self, document, nodevalue):
-        document['numbers'].append(nodevalue)
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -152,12 +161,8 @@ class DateDataType(BaseDataType):
 
         return errors
 
-    def append_to_document(self, document, nodevalue):
-        # fd = FlexiDate.from_str(nodevalue)
-        # fd.month = fd.month if fd.month else '1'
-        # fd.day = fd.day if fd.day else '1'
-        #document['dates'].append(fd.as_float())
-        document['dates'].append(SortableDate(nodevalue).as_float())
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -211,7 +216,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         arches_geojson['type'] = "FeatureCollection"
         arches_geojson['features'] = []
         geometry = GEOSGeometry(value, srid=4326)
-        if geometry.num_geom > 1:
+        if geometry.geom_type == 'GeometryCollection':
             for geom in geometry:
                 arches_json_geometry = {}
                 arches_json_geometry['geometry'] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
@@ -235,16 +240,19 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             wkt_geoms.append(GEOSGeometry(json.dumps(feature['geometry'])))
         return GeometryCollection(wkt_geoms)
 
-    def append_to_document(self, document, nodevalue):
-        document['geometries'].append(nodevalue)
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['geometries'].append({'geom':nodevalue, 'nodegroup_id': tile.nodegroup_id})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
             centerx = maxx - (maxx - minx) / 2
             centery = maxy - (maxy - miny) / 2
             document['points'].append({
-                "lon": centerx,
-                "lat": centery
+                'point': {
+                    "lon": centerx,
+                    "lat": centery
+                },
+                'nodegroup_id': tile.nodegroup_id
             })
 
     def get_bounds(self, tile, node):
@@ -274,77 +282,80 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return bounds
 
     def get_layer_config(self, node=None):
-        if node is None:
-            return None
-        elif node.config is None:
-            return None
-        database = settings.DATABASES['default']
-        config = node.config
-
-        cluster_sql = """
-            WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
-                SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-            	FROM mv_geojson_geoms m
-                WHERE nodeid = '%s'
-            )
-
-            SELECT resourceinstanceid::text,
-                    false AS poly_outline,
-            		row_number() over () as __id__,
-            		1 as total,
-            		ST_Centroid(geom) AS __geometry__,
-                    '' AS extent
-            	FROM clusters
-            	WHERE cid is NULL
-
-            UNION
-
-            SELECT NULL as resourceinstanceid,
-            		false AS poly_outline,
-            		row_number() over () as __id__,
-            		count(*) as total,
-            		ST_Centroid(
-                        ST_Collect(geom)
-                    ) AS __geometry__,
-                    ST_AsGeoJSON(
-                        ST_Transform(
-                            ST_SetSRID(
-                                ST_Extent(geom), 900913
-                            ), 4326
-                        )
-                    ) AS extent
-            	FROM clusters
-            	WHERE cid IS NOT NULL
-            	GROUP BY cid
-        """
-
         sql_list = []
-        for i in range(int(config['clusterMaxZoom']) + 1):
-            arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
-            distance = arc * int(config['clusterDistance'])
-            sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
-            sql_list.append(sql_string)
+        database = settings.DATABASES['default']
+        if node is not None and node.config is not None:
+            config = node.config
 
-        sql_list.append("""
-            SELECT resourceinstanceid::text,
-                    false AS poly_outline,
-                    (row_number() over ())::text as __id__,
-                    1 as total,
-                    geom AS __geometry__,
-                    '' AS extent
-                FROM mv_geojson_geoms
-                WHERE nodeid = '%s'
-            UNION
-            SELECT resourceinstanceid::text,
-                    true AS poly_outline,
-                    (row_number() over ())::text||'-outline' as __id__,
-                    1 as total,
-                    ST_ExteriorRing(geom) AS __geometry__,
-                    '' AS extent
-                FROM mv_geojson_geoms
-                WHERE ST_GeometryType(geom) = 'ST_Polygon'
-                AND nodeid = '%s'
-        """ % (node.pk, node.pk))
+            cluster_sql = """
+                WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid) AS (
+                    SELECT m.*, ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                	FROM mv_geojson_geoms m
+                    WHERE nodeid = '%s'
+                )
+
+                SELECT resourceinstanceid::text,
+                        false AS poly_outline,
+                		row_number() over () as __id__,
+                		1 as total,
+                		ST_Centroid(geom) AS __geometry__,
+                        '' AS extent
+                	FROM clusters
+                	WHERE cid is NULL
+
+                UNION
+
+                SELECT NULL as resourceinstanceid,
+                		false AS poly_outline,
+                		row_number() over () as __id__,
+                		count(*) as total,
+                		ST_Centroid(
+                            ST_Collect(geom)
+                        ) AS __geometry__,
+                        ST_AsGeoJSON(
+                            ST_Transform(
+                                ST_SetSRID(
+                                    ST_Extent(geom), 900913
+                                ), 4326
+                            )
+                        ) AS extent
+                	FROM clusters
+                	WHERE cid IS NOT NULL
+                	GROUP BY cid
+            """
+
+            for i in range(int(config['clusterMaxZoom']) + 1):
+                arc = EARTHCIRCUM / ((1 << i) * PIXELSPERTILE)
+                distance = arc * int(config['clusterDistance'])
+                sql_string = cluster_sql % (distance, int(config['clusterMinPoints']), node.pk)
+                sql_list.append(sql_string)
+
+            sql_list.append("""
+                SELECT resourceinstanceid::text,
+                        false AS poly_outline,
+                        (row_number() over ())::text as __id__,
+                        1 as total,
+                        geom AS __geometry__,
+                        '' AS extent
+                    FROM mv_geojson_geoms
+                    WHERE nodeid = '%s'
+                UNION
+                SELECT resourceinstanceid::text,
+                        true AS poly_outline,
+                        (row_number() over ())::text||'-outline' as __id__,
+                        1 as total,
+                        ST_ExteriorRing(geom) AS __geometry__,
+                        '' AS extent
+                    FROM mv_geojson_geoms
+                    WHERE ST_GeometryType(geom) = 'ST_Polygon'
+                    AND nodeid = '%s'
+            """ % (node.pk, node.pk))
+
+        else:
+            config = {"cacheTiles": False}
+            for i in range(23):
+                sql_list.append(None)
+
 
         return {
             "provider": {
@@ -357,6 +368,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "database": database["NAME"],
                         "port": database["PORT"]
                     },
+                    "simplify": settings.VECTOR_TILE_SIMPLIFICATION,
                     "queries": sql_list
                 },
             },
@@ -895,15 +907,15 @@ class IIIFDrawingDataType(BaseDataType):
                 string_list.append(feature['properties']['name'])
         return string_list
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         string_list = self.get_strings(nodevalue)
         for string_item in string_list:
-            document['strings'].append(string_item)
+            document['strings'].append({'string': string_item, 'nodegroup_id': tile.nodegroup_id})
         for feature in nodevalue['features']:
             if feature['properties']['type'] is not None:
                 valueid = feature['properties']['type']
                 value = models.Value.objects.get(pk=valueid)
-                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
+                document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -942,7 +954,7 @@ class DomainDataType(BaseDomainDataType):
                 terms.append(domain_text)
         return terms
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         domain_text = None
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -951,7 +963,7 @@ class DomainDataType(BaseDomainDataType):
                     domain_text = self.get_option_text(node, v)
 
         if domain_text not in document['strings'] and domain_text != None:
-            document['strings'].append(domain_text)
+            document['strings'].append({'string': domain_text, 'nodegroup_id': tile.nodegroup_id})
 
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
@@ -996,7 +1008,7 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         domain_text_values = set([])
         for tile in document['tiles']:
             for k, v in tile.data.iteritems():
@@ -1008,7 +1020,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for value in domain_text_values:
             if value not in document['strings']:
-                document['strings'].append(value)
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
 
     def get_display_value(self, tile, node):
         new_values = []
@@ -1028,5 +1040,58 @@ class DomainListDataType(BaseDomainDataType):
                 else:
                     query.must(search_query)
 
+        except KeyError, e:
+            pass
+
+
+class ResourceInstanceDataType(BaseDataType):
+    def get_id_list(self, nodevalue):
+        id_list = nodevalue
+        if type(nodevalue) is unicode:
+            id_list = [nodevalue]
+        return id_list
+
+    def get_resource_names(self, nodevalue):
+        resource_names = set([])
+        es = Elasticsearch()
+        se = SearchEngineFactory().create()
+        id_list = self.get_id_list(nodevalue)
+        for resourceid in id_list:
+            print resourceid
+            resource_document = se.search(index='resource', doc_type='_all', id=resourceid)
+            resource_names.add(resource_document['_source']['displayname'])
+        return resource_names
+
+    def validate(self, value, source=''):
+        errors = []
+        id_list = self.get_id_list(nodevalue)
+
+        for resourceid in id_list:
+            try:
+                models.Resource.objects.get(pk=resourceid)
+            except:
+                errors.append({'type': 'ERROR', 'message': '{0} is not a valid resource id. This data was not imported.'.format(v)})
+        return errors
+
+    def get_display_value(self, tile, node):
+        resource_names = self.get_resource_names(nodevalue)
+        return ', '.join(resource_names)
+
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        resource_names = self.get_resource_names(nodevalue)
+        for value in resource_names:
+            if value not in document['strings']:
+                document['strings'].append({'string': value, 'nodegroup_id': tile.nodegroup_id})
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value['val'] != '':
+                search_query = Match(field='tiles.data.%s' % (str(node.pk)), type="phrase", query=value['val'], fuzziness=0)
+                # search_query = Term(field='tiles.data.%s' % (str(node.pk)), term=str(value['val']))
+                if '!' in value['op']:
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(search_query)
         except KeyError, e:
             pass

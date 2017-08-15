@@ -40,7 +40,7 @@ class BaseConceptDataType(BaseDataType):
             result = date_range
         return result
 
-    def append_to_document(self, document, nodevalue):
+    def append_to_document(self, document, nodevalue, nodeid, tile):
         try:
             assert isinstance(nodevalue, (list, tuple)) #assert nodevalue is an array
         except AssertionError:
@@ -52,8 +52,9 @@ class BaseConceptDataType(BaseDataType):
                 min_date = SortableDate(date_range['min_year']).as_float()
                 max_date = SortableDate(date_range['max_year']).as_float()
                 if {'gte': min_date, 'lte': max_date} not in document['date_ranges']:
-                    document['date_ranges'].append({'gte': min_date, 'lte': max_date})
-            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid})
+                    document['date_ranges'].append({'date_range': {'gte': min_date, 'lte': max_date}, 'nodegroup_id': tile.nodegroup_id})
+            document['domains'].append({'label': value.value, 'conceptid': value.concept_id, 'valueid': valueid, 'nodegroup_id': tile.nodegroup_id})
+            document['strings'].append({'string': value.value, 'nodegroup_id': tile.nodegroup_id})
 
 
 class ConceptDataType(BaseConceptDataType):

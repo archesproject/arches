@@ -18,8 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import importlib
+import datetime
 from django.db.models import Q
 from arches.app.models import models
+from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
@@ -65,17 +67,48 @@ class Resource(models.ResourceInstance):
     def displayname(self):
         return self.get_descriptor('name')
 
+    def save_edit(self, user={}, note='', edit_type=''):
+        timestamp = datetime.datetime.now()
+        edit = EditLog()
+        edit.resourceclassid = self.graph_id
+        edit.resourceinstanceid = self.resourceinstanceid
+        edit.userid = getattr(user, 'id', '')
+        edit.user_email = getattr(user, 'email', '')
+        edit.user_firstname = getattr(user, 'first_name', '')
+        edit.user_lastname = getattr(user, 'last_name', '')
+        edit.note = note
+        edit.timestamp = timestamp
+        edit.edittype = edit_type
+        edit.save()
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
 
         """
-
+        request = kwargs.pop('request', '')
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
             saved_tile = tile.save(index=False)
+        if request == '':
+            user = {}
+        else:
+            user = request.user
+        self.save_edit(user=user, edit_type='create')
         self.index()
+
+    def get_root_ontology(self):
+        """
+        Finds and returns the ontology class of the instance's root node
+
+        """
+        root_ontology_class = None
+        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
+        if len(graph_nodes) > 0:
+            root_ontology_class = graph_nodes[0].ontologyclass
+
+        return root_ontology_class
 
     @staticmethod
     def bulk_save(resources):
@@ -109,11 +142,15 @@ class Resource(models.ResourceInstance):
         TileModel.objects.bulk_create(tiles)
 
         for resource in resources:
+            resource.save_edit(edit_type='create')
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document['root_ontology_class'] = resource.get_root_ontology()
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
 
+        for tile in tiles:
+            tile.save_edit(edit_type='tile create', new_value=tile.data)
         # bulk index the resources, tiles and terms
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -127,8 +164,8 @@ class Resource(models.ResourceInstance):
         se = SearchEngineFactory().create()
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
-
         document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+        document['root_ontology_class'] = self.get_root_ontology()
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
@@ -163,14 +200,14 @@ class Resource(models.ResourceInstance):
                 datatype = node_datatypes[nodeid]
                 if nodevalue != '' and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    datatype_instance.append_to_document(document, nodevalue)
+                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
                     for index, term in enumerate(node_terms):
                         terms.append({'_id':unicode(nodeid)+unicode(tile.tileid)+unicode(index), '_source': {'value': term, 'nodeid': nodeid, 'nodegroupid': tile.nodegroup_id, 'tileid': tile.tileid, 'resourceinstanceid':tile.resourceinstance_id}})
 
         return document, terms
 
-    def delete(self):
+    def delete(self, user={}, note=''):
         """
         Deletes a single resource and any related indexed data
 
@@ -188,6 +225,7 @@ class Resource(models.ResourceInstance):
         for result in results:
             se.delete(index='strings', doc_type='term', id=result['_id'])
         se.delete(index='resource', doc_type=str(self.graph_id), id=self.resourceinstanceid)
+        self.save_edit(edit_type='delete')
         super(Resource, self).delete()
 
     def get_related_resources(self, lang='en-US', limit=1000, start=0):
@@ -202,16 +240,26 @@ class Resource(models.ResourceInstance):
             'related_resources': []
         }
         se = SearchEngineFactory().create()
-        query = Query(se, limit=limit, start=start)
-        bool_filter = Bool()
-        bool_filter.should(Terms(field='resourceinstanceidfrom', terms=self.resourceinstanceid))
-        bool_filter.should(Terms(field='resourceinstanceidto', terms=self.resourceinstanceid))
-        query.add_query(bool_filter)
-        resource_relations = query.search(index='resource_relations', doc_type='all')
+
+        def get_relations(resourceinstanceid, start, limit):
+            query = Query(se, limit=limit, start=start)
+            bool_filter = Bool()
+            bool_filter.should(Terms(field='resourceinstanceidfrom', terms=resourceinstanceid))
+            bool_filter.should(Terms(field='resourceinstanceidto', terms=resourceinstanceid))
+            query.add_query(bool_filter)
+            return query.search(index='resource_relations', doc_type='all')
+
+        resource_relations = get_relations(self.resourceinstanceid, start, limit)
         ret['total'] = resource_relations['hits']['total']
         instanceids = set()
+
         for relation in resource_relations['hits']['hits']:
-            relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+            try:
+                preflabel = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
+                relation['_source']['relationshiptype_label'] = preflabel['value']
+            except:
+                relation['_source']['relationshiptype_label'] = relation['_source']['relationshiptype']
+
             ret['resource_relationships'].append(relation['_source'])
             instanceids.add(relation['_source']['resourceinstanceidto'])
             instanceids.add(relation['_source']['resourceinstanceidfrom'])
@@ -221,8 +269,9 @@ class Resource(models.ResourceInstance):
         related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
         if related_resources:
             for resource in related_resources['docs']:
+                relations = get_relations(resource['_id'], 0, 0)
+                resource['_source']['total_relations'] = relations['hits']['total']
                 ret['related_resources'].append(resource['_source'])
-
         return ret
 
     def serialize(self):
