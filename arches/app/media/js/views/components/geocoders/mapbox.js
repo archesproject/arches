@@ -19,7 +19,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
                         self.loading(true);
                         $.ajax({
                             type: 'GET',
-                            url: 'https://api.mapbox.com/geocoding/v5/mapbox.places/'+ self.query() + '.json',
+                            url: '//api.mapbox.com/geocoding/v5/mapbox.places/'+ self.query() + '.json',
                             data: {
                                 access_token: ko.unwrap(self.apiKey)
                             },
