@@ -28,6 +28,8 @@ Each row in the CSV can contain the attribute values of one and only one resourc
 
 The first column in the CSV must be named ``ResourceID``. ResourceID is a user-generated unique ID for each individual resource. If ResourceID is a valid UUID, Arches will adopt it internally as the new resource's identifier. If ResourceID is not a valid UUID Arches will create a new UUID and use that as the resource's identifier. Subsequent columns can have any name.
 
+ResourceIDs must be unique among all resources imported, not just within each csv, for this reason we suggest using UUIDs.
+
 +-------------+---------------------+--------------------+--------------------+
 | Resource ID | attribute 1         |  attribute 2       | attribute 3        |
 +=============+=====================+====================+====================+
@@ -63,7 +65,7 @@ Multiple lines may be used to add multiple attributes to a single resource. You 
 
 *CSV with three resources, one of which has two values for attribute 2.*
 
-Depending on your Resource Model's graph structure, some attributes will be handled as "groups". For example, ``Name`` and ``Name Type`` attributes would be a group. Attributes that are grouped must be on the same row. However, a single row can have many different groups of attributes in it, just not more than one value for any one group.
+Depending on your Resource Model's graph structure, some attributes will be handled as "groups". For example, ``Name`` and ``Name Type`` attributes would be a group. Attributes that are grouped must be on the same row. However, a single row can have many different groups of attributes in it, but there may be only one of each group type per row. (e.g. you cannot have two names and two name types in one row).
 
 +-------------+--------------------------+--------------------+---------------------------+
 | Resource ID |  name                    | name_type          | description               |
@@ -79,12 +81,15 @@ Depending on your Resource Model's graph structure, some attributes will be hand
 
 *CSV with three resources, one of which has two groups of* ``name`` *and* ``name_type`` *attributes. See below for more on the 'Primary' and 'Historic' labels.*
 
+You must have values for any required nodes in your resource models.
+
 The data_type attribute in the mapping file(see below) can help you determine what data type (string, number, conceptid, geometry, etc.) is valid for each column in your csv.
 
 Some data types require specially formatted values:
 
-* **Dates** All dates must be formatted as YYYY-MM-DD
-* **Geometry** All geometry must be formatted in `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and that all coordinates stored as WGS 84 (EPSG:4326) decimal degrees.
+* **Dates** All dates must be formatted as YYYY-MM-DD. Dates that are not four digits must be zero padded.
+* **Geometry** All geometry must be formatted in `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and that all coordinates stored as WGS 84 (EPSG:4326) decimal degrees. Multi geoms must be in quotes.
+* **Rich Text** Rich text must be quoted html.
 * **Concepts** See the Concepts_ section below.
 * ``concept-list`` and ``domain-value-list`` Values must be represented as quoted, comma-separated strings in the source CSV file. Each value within the concept/domain list does not need to be in quotation marks.
 
