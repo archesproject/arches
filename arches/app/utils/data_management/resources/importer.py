@@ -103,7 +103,7 @@ class BusinessDataImporter(object):
                             if 'business_data' in archesfile.keys():
                                 self.business_data = archesfile['business_data']
                     elif self.file_format == 'csv':
-                        data = unicodecsv.DictReader(open(file[0], 'r'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
+                        data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
                 else:
                     print str(file) + ' is not a valid file'
