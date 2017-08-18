@@ -57,7 +57,7 @@ class CsvWriter(Writer):
         concept_export_value_lookup = {}
         for resource_export_config in resource_export_configs:
             for node in resource_export_config['nodes']:
-                if node['file_field_name'] != '': # and node['export'] == True <-- Add this to enable the 'export' parameter in the mapping json
+                if node['file_field_name'] != '' and node['export'] == True:
                     mapping[node['arches_nodeid']] = node['file_field_name']
                 if 'concept_export_value' in node:
                     concept_export_value_lookup[node['arches_nodeid']] = node['concept_export_value']
@@ -86,6 +86,9 @@ class CsvWriter(Writer):
                                         csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
+                                    concept_export_value_type = None
+                                    if k in concept_export_value_lookup:
+                                        concept_export_value_type = concept_export_value_lookup[k]
                                     value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
                                     other_group_record[mapping[k]] = value
                             else:
