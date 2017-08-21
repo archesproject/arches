@@ -268,57 +268,54 @@ class Command(BaseCommand):
                 else:
                     self.import_business_data(path, overwrite=True)
 
-        def load_widgets():
-            import widget as Widget_cmd #For some reason this is out of scope when imported at top of page
-            widget_cmd = Widget_cmd.Command()
-            widget_configs = glob.glob(os.path.join(download_dir, '*', 'extensions', 'widgets', '*.json'))
-            widget_component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', 'widgets')
-            widget_template_dir = os.path.join(settings.APP_ROOT, 'widgets', 'templates')
-            widget_dir = os.path.join(settings.APP_ROOT, 'widgets')
+        def load_extensions(ext_type, cmd):
+            extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
+            component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
+            module_dir = os.path.join(settings.APP_ROOT, ext_type)
+            template_dir = os.path.join(settings.APP_ROOT, ext_type, 'templates')
 
-            for widget in widget_configs:
-                shutil.copy(widget, widget_dir)
-                shutil.copy(widget.replace('.json', '.js'), widget_component_dir)
-                shutil.copy(widget.replace('.json', '.htm'), widget_template_dir)
-                widget_cmd.register(widget)
+            for extension in extensions:
+                templates = glob.glob(os.path.join(extension, '*.htm'))
+                components = glob.glob(os.path.join(extension, '*.js'))
+
+                if len(templates) == 1 and len(components) == 1:
+                    if os.path.exists(template_dir) == False:
+                        os.mkdir(template_dir)
+                    if os.path.exists(component_dir) == False:
+                        os.mkdir(component_dir)
+                    shutil.copy(templates[0], template_dir)
+                    shutil.copy(components[0], component_dir)
+
+                modules = glob.glob(os.path.join(extension, '*.json'))
+                modules.extend(glob.glob(os.path.join(extension, '*.py')))
+
+                if len(modules) > 0:
+                    module = modules[0]
+                    shutil.copy(module, module_dir)
+                    cmd.register(module)
+
+        def load_widgets():
+            import widget as widget_cmd #For some reason this is out of scope when imported at top of page
+            widget_cmd = widget_cmd.Command()
+            load_extensions('widgets', widget_cmd)
 
         def load_functions():
             import fn as Fn_cmd
             fn_cmd = Fn_cmd.Command()
-            fn_modules = glob.glob(os.path.join(download_dir, '*', 'extensions', 'functions', '*'))
-            fn_module_dir = os.path.join(settings.APP_ROOT, 'functions')
-            fn_template_dir = os.path.join(settings.APP_ROOT, 'functions', 'templates')
-
-            for fn in fn_modules:
-                fn_module = glob.glob(os.path.join(fn, '*.py'))[0]
-                fn_template = glob.glob(os.path.join(fn, '*.htm'))[0]
-                shutil.copy(fn_module, fn_module_dir)
-                shutil.copy(fn_template, fn_template_dir)
-                fn_cmd.register(fn_module)
+            load_extensions('functions', fn_cmd)
 
         def load_datatypes():
             import datatype as Datatype_cmd
             datatype_cmd = Datatype_cmd.Command()
-            datatype_modules = glob.glob(os.path.join(download_dir, '*', 'extensions', 'datatypes', '*'))
-            datatype_module_dir = os.path.join(settings.APP_ROOT, 'datatypes')
-            datatype_template_dir = os.path.join(settings.APP_ROOT, 'datatypes', 'templates')
-
-            for datatype in datatype_modules:
-                datatype_module = glob.glob(os.path.join(datatype, '*.py'))[0]
-                shutil.copy(datatype_module, datatype_module_dir)
-                datatype_template = glob.glob(os.path.join(datatype, '*.htm'))
-                if len(datatype_template) == 1:
-                    if os.path.exists(datatype_template_dir) == False:
-                        os.mkdir(datatype_template_dir)
-                    shutil.copy(datatype_template, datatype_template_dir)
-                datatype_cmd.register(datatype)
+            load_extensions('datatypes', datatype_cmd)
 
         load_widgets()
-
-        # load_concepts()
-        # load_graphs()
-        # load_map_layers()
-        # load_business_data()
+        load_functions()
+        load_datatypes()
+        load_concepts()
+        load_graphs()
+        load_map_layers()
+        load_business_data()
 
     def update_project_templates(self):
         """
