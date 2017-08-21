@@ -26,7 +26,7 @@ function (ko, mapboxgl, arches, BaseGeocoderViewModel) {
                     self.loading(true);
                     $.ajax({
                         type: 'GET',
-                        url: 'http://search.mapzen.com/v1/search',
+                        url: '//search.mapzen.com/v1/search',
                         data: {
                             api_key: ko.unwrap(self.apiKey),
                             text: self.query()
