@@ -290,12 +290,9 @@ class Command(BaseCommand):
             datatype_cmd = Datatype_cmd.Command()
             load_extensions('datatypes', datatype_cmd)
 
-        if source == '':
-            source = 'https://github.com/chiatt/her-data/archive/master.zip'
-
         remote = True if 'github.com' in source else False
 
-        if source != '' or remote = True:
+        if source != '' or remote == True:
             if setup_db == True:
                 self.setup_db(settings.PACKAGE_NAME)
 
@@ -318,6 +315,7 @@ class Command(BaseCommand):
             load_graphs()
             load_map_layers()
             load_business_data()
+
         else:
             print "A path to a local or remote zipfile is required"
 
