@@ -31,9 +31,10 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
 
         this.coordinates = ko.computed(function() {
             var srcProj = self.srid();
-            var res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
+            var res = [undefined, undefined];
             (self.x() && self.y()) ? self.validCoords(true) : self.validCoords(false);
             if (self.validCoords()) {
+                res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
                 self.boundsWarning((!turf.inside(turf.point(res), turf.bboxPolygon(self.projBounds)) && self.active() === true));
             }
             return res;

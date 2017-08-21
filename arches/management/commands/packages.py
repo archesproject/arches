@@ -18,11 +18,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
+import urllib, uuid, glob
+import widget as widget_cmd
+import fn
+import datatype
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.db import transaction
-import pprint
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
@@ -50,7 +53,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates',],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -190,6 +193,131 @@ class Command(BaseCommand):
 
         if options['operation'] == 'update_project_templates':
             self.update_project_templates()
+
+        if options['operation'] == 'load_package':
+            self.load_package(options['source'])
+
+
+    def load_package(self, source, setup_db=True):
+
+        def load_graphs():
+            branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
+            resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
+            self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'))
+            self.import_graphs(branches)
+            self.import_graphs(resource_models)
+
+        def load_concepts():
+            concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
+            collection_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'collections', '*.xml'))
+
+            for path in concept_data:
+                self.import_reference_data(path, 'overwrite', 'keep')
+
+            for path in collection_data:
+                self.import_reference_data(path, 'overwrite', 'keep')
+
+        def load_mapbox_styles(style_paths, basemap):
+            for path in style_paths:
+                style = json.load(open(path))
+                self.add_mapbox_layer(style['name'], path, "fa fa-globe", basemap)
+
+        def load_tile_server_layers(xml_paths, basemap):
+            for path in xml_paths:
+                print path
+
+        def load_map_layers():
+            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'basemaps', '*', '*.json'))
+            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'overlays', '*', '*.json'))
+            load_mapbox_styles(basemap_styles, True)
+            load_mapbox_styles(overlay_styles, False)
+
+            tile_server_basemaps = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'basemaps', '*', '.xml'))
+            tile_server_overlays = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'overlays', '*', '.xml'))
+            load_tile_server_layers(tile_server_basemaps, True)
+            load_tile_server_layers(tile_server_overlays, False)
+
+        def load_business_data():
+            business_data = []
+            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
+            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
+
+            for path in business_data:
+                if path.endswith('csv'):
+                    config_file = path.replace('.csv', '.mapping')
+                    self.import_business_data(path, overwrite=True, bulk_load=True)
+                else:
+                    self.import_business_data(path, overwrite=True)
+
+        def load_extensions(ext_type, cmd):
+            extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
+            component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
+            module_dir = os.path.join(settings.APP_ROOT, ext_type)
+            template_dir = os.path.join(settings.APP_ROOT, ext_type, 'templates')
+
+            for extension in extensions:
+                templates = glob.glob(os.path.join(extension, '*.htm'))
+                components = glob.glob(os.path.join(extension, '*.js'))
+
+                if len(templates) == 1 and len(components) == 1:
+                    if os.path.exists(template_dir) == False:
+                        os.mkdir(template_dir)
+                    if os.path.exists(component_dir) == False:
+                        os.mkdir(component_dir)
+                    shutil.copy(templates[0], template_dir)
+                    shutil.copy(components[0], component_dir)
+
+                modules = glob.glob(os.path.join(extension, '*.json'))
+                modules.extend(glob.glob(os.path.join(extension, '*.py')))
+
+                if len(modules) > 0:
+                    module = modules[0]
+                    shutil.copy(module, module_dir)
+                    cmd.register(module)
+
+        def load_widgets():
+            import widget as widget_cmd #For some reason this is out of scope when imported at top of page
+            widget_cmd = widget_cmd.Command()
+            load_extensions('widgets', widget_cmd)
+
+        def load_functions():
+            import fn as Fn_cmd
+            fn_cmd = Fn_cmd.Command()
+            load_extensions('functions', fn_cmd)
+
+        def load_datatypes():
+            import datatype as Datatype_cmd
+            datatype_cmd = Datatype_cmd.Command()
+            load_extensions('datatypes', datatype_cmd)
+
+        remote = True if 'github.com' in source else False
+
+        if source != '' or remote == True:
+            if setup_db == True:
+                self.setup_db(settings.PACKAGE_NAME)
+
+            if remote == True:
+                download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
+                if os.path.exists(download_dir) == False:
+                    os.mkdir(download_dir)
+                    zip_file = os.path.join(download_dir, 'source_data.zip')
+                    urllib.urlretrieve(source, zip_file)
+            else:
+                download_dir = os.path.dirname(source)
+                zip_file = source
+
+            unzip_file(zip_file, download_dir)
+
+            load_widgets()
+            load_functions()
+            load_datatypes()
+            load_concepts()
+            load_graphs()
+            load_map_layers()
+            load_business_data()
+
+        else:
+            print "A path to a local or remote zipfile is required"
 
     def update_project_templates(self):
         """
