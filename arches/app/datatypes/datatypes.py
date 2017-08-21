@@ -1049,7 +1049,7 @@ class DomainListDataType(BaseDomainDataType):
             ret = value
         return ret
 
-    def transform_export_values(self, value, **kwargs):
+    def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
             if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':

@@ -57,7 +57,7 @@ class CsvWriter(Writer):
         concept_export_value_lookup = {}
         for resource_export_config in resource_export_configs:
             for node in resource_export_config['nodes']:
-                if node['file_field_name'] != '': # and node['export'] == True <-- Add this to enable the 'export' parameter in the mapping json
+                if node['file_field_name'] != '' and node['export'] == True:
                     mapping[node['arches_nodeid']] = node['file_field_name']
                 if 'concept_export_value' in node:
                     concept_export_value_lookup[node['arches_nodeid']] = node['concept_export_value']
@@ -70,14 +70,16 @@ class CsvWriter(Writer):
             resource_graphid = resource['_source']['graph_id']
             legacyid = resource['_source']['legacyid']
             csv_record['ResourceID'] = resourceid
+            csv_record['populated_node_groups'] = []
 
-            for tile in resource['_source']['tiles']:
+            tiles = sorted(resource['_source']['tiles'], key=lambda k: k['parenttile_id'])
+            for tile in tiles:
                 other_group_record = {}
                 other_group_record['ResourceID'] = resourceid
                 if tile['data'] != {}:
                     for k in tile['data'].keys():
-                            if tile['data'][k] != '' and k in mapping:
-                                if mapping[k] not in csv_record:
+                            if tile['data'][k] != '' and k in mapping and tile['data'][k] != None:
+                                if mapping[k] not in csv_record and tile['nodegroup_id'] not in csv_record['populated_node_groups']:
                                     concept_export_value_type = None
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
@@ -86,10 +88,15 @@ class CsvWriter(Writer):
                                         csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
+                                    concept_export_value_type = None
+                                    if k in concept_export_value_lookup:
+                                        concept_export_value_type = concept_export_value_lookup[k]
                                     value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
                                     other_group_record[mapping[k]] = value
                             else:
                                 del tile['data'][k]
+
+                    csv_record['populated_node_groups'].append(tile['nodegroup_id'])
 
                 if other_group_record != {'ResourceID': resourceid}:
                     other_group_records.append(other_group_record)
@@ -107,6 +114,8 @@ class CsvWriter(Writer):
             csvwriter.writeheader()
             csvs_for_export.append({'name':csv_name, 'outputfile': dest})
             for csv_record in csv_records:
+                if 'populated_node_groups' in csv_record:
+                    del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
             dest = StringIO()
@@ -114,6 +123,8 @@ class CsvWriter(Writer):
             csvwriter.writeheader()
             csvs_for_export.append({'name':csv_name.split('.')[0] + '_groups.' + csv_name.split('.')[1], 'outputfile': dest})
             for csv_record in other_group_records:
+                if 'populated_node_groups' in csv_record:
+                    del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
         elif single_file == True:
             all_records = csv_records + other_group_records
@@ -123,6 +134,8 @@ class CsvWriter(Writer):
             csvwriter.writeheader()
             csvs_for_export.append({'name':csv_name, 'outputfile': dest})
             for csv_record in all_records:
+                if 'populated_node_groups' in csv_record:
+                    del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
         return csvs_for_export
@@ -161,7 +174,7 @@ class CsvReader(Reader):
 
     def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
         # errors = businessDataValidator(self.business_data)
-        
+
         def process_resourceid(resourceid, overwrite):
             # Test if resourceid is a UUID.
             try:

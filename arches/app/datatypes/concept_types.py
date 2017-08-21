@@ -114,10 +114,10 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_import_values(self, value):
         return [v.strip() for v in value.split(',')]
 
-    def transform_export_values(self, value, concept_export_value_type):
+    def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            new_val = self.get_concept_export_value(val, concept_export_value_type)
+            new_val = self.get_concept_export_value(val, kwargs['concept_export_value_type'])
             new_values.append(new_val)
         return ','.join(new_values)
 
