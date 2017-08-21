@@ -199,25 +199,6 @@ class Command(BaseCommand):
 
 
     def load_package(self, source, setup_db=True):
-        if source == '':
-            source = 'https://github.com/chiatt/her-data/archive/master.zip'
-
-        remote = True if 'github.com' in source else False
-
-        if setup_db == True:
-            self.setup_db(settings.PACKAGE_NAME)
-
-        if remote == True:
-            download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
-            if os.path.exists(download_dir) == False:
-                os.mkdir(download_dir)
-                zip_file = os.path.join(download_dir, 'source_data.zip')
-                urllib.urlretrieve(source, zip_file)
-        else:
-            download_dir = os.path.dirname(source)
-            zip_file = source
-
-        unzip_file(zip_file, download_dir)
 
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
@@ -309,13 +290,36 @@ class Command(BaseCommand):
             datatype_cmd = Datatype_cmd.Command()
             load_extensions('datatypes', datatype_cmd)
 
-        load_widgets()
-        load_functions()
-        load_datatypes()
-        load_concepts()
-        load_graphs()
-        load_map_layers()
-        load_business_data()
+        if source == '':
+            source = 'https://github.com/chiatt/her-data/archive/master.zip'
+
+        remote = True if 'github.com' in source else False
+
+        if source != '' or remote = True:
+            if setup_db == True:
+                self.setup_db(settings.PACKAGE_NAME)
+
+            if remote == True:
+                download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
+                if os.path.exists(download_dir) == False:
+                    os.mkdir(download_dir)
+                    zip_file = os.path.join(download_dir, 'source_data.zip')
+                    urllib.urlretrieve(source, zip_file)
+            else:
+                download_dir = os.path.dirname(source)
+                zip_file = source
+
+            unzip_file(zip_file, download_dir)
+
+            load_widgets()
+            load_functions()
+            load_datatypes()
+            load_concepts()
+            load_graphs()
+            load_map_layers()
+            load_business_data()
+        else:
+            print "A path to a local or remote zipfile is required"
 
     def update_project_templates(self):
         """
