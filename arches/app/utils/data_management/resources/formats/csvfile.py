@@ -45,9 +45,9 @@ class CsvWriter(Writer):
         self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
 
-    def transform_value_for_export(self, datatype, value, concept_export_value_type):
+    def transform_value_for_export(self, datatype, value, concept_export_value_type, node):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type)
+        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
     def write_resources(self, resources, resource_export_configs=None, single_file=False):
@@ -57,7 +57,7 @@ class CsvWriter(Writer):
         concept_export_value_lookup = {}
         for resource_export_config in resource_export_configs:
             for node in resource_export_config['nodes']:
-                if node['file_field_name'] != '':
+                if node['file_field_name'] != '': # and node['export'] == True <-- Add this to enable the 'export' parameter in the mapping json
                     mapping[node['arches_nodeid']] = node['file_field_name']
                 if 'concept_export_value' in node:
                     concept_export_value_lookup[node['arches_nodeid']] = node['concept_export_value']
@@ -66,14 +66,14 @@ class CsvWriter(Writer):
 
         for resource in resources:
             csv_record = {}
-            other_group_record = {}
             resourceid = resource['_source']['resourceinstanceid']
             resource_graphid = resource['_source']['graph_id']
             legacyid = resource['_source']['legacyid']
             csv_record['ResourceID'] = resourceid
-            other_group_record['ResourceID'] = resourceid
 
             for tile in resource['_source']['tiles']:
+                other_group_record = {}
+                other_group_record['ResourceID'] = resourceid
                 if tile['data'] != {}:
                     for k in tile['data'].keys():
                             if tile['data'][k] != '' and k in mapping:
@@ -82,18 +82,20 @@ class CsvWriter(Writer):
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
                                     if tile['data'][k] != None:
-                                        value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                        value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
                                         csv_record[mapping[k]] = value
                                     del tile['data'][k]
                                 else:
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type)
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
                                     other_group_record[mapping[k]] = value
                             else:
                                 del tile['data'][k]
 
-            csv_records.append(csv_record)
-            if other_group_record != {}:
-                other_group_records.append(other_group_record)
+                if other_group_record != {'ResourceID': resourceid}:
+                    other_group_records.append(other_group_record)
+
+            if csv_record != {'ResourceID': resourceid}:
+                csv_records.append(csv_record)
 
         csv_name_prefix = resource_export_configs[0]['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -227,7 +229,9 @@ class CsvReader(Reader):
 
                 if len(non_contiguous_resource_ids) > 0:
                     print '*'*80
-                    print 'ERROR: Resources in your csv file are non-contiguous. Please sort your csv file by ResourceID and try import again.'
+                    for non_contiguous_resource_id in non_contiguous_resource_ids:
+                        print 'ResourceID: ' + non_contiguous_resource_id
+                    print 'ERROR: The preceding ResourceIDs are non-contiguous in yoru csv file. Please sort your csv file by ResourceID and try import again.'
                     print '*'*80
                     sys.exit()
 

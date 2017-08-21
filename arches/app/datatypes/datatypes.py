@@ -968,6 +968,16 @@ class DomainDataType(BaseDomainDataType):
     def get_display_value(self, tile, node):
         return self.get_option_text(node, tile.data[str(node.nodeid)])
 
+    def transform_export_values(self, value, *args, **kwargs):
+        ret = ''
+        if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
+            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
+        elif kwargs['concept_export_value_type'] == 'both':
+            ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
+        elif kwargs['concept_export_value_type'] == 'id':
+            ret = value
+        return ret
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value['val'] != '':
@@ -1027,6 +1037,27 @@ class DomainListDataType(BaseDomainDataType):
         for val in tile.data[str(node.nodeid)]:
             option = self.get_option_text(node, val)
             new_values.append(option)
+        return ','.join(new_values)
+
+    def transform_export_values(self, value, *args, **kwargs):
+        ret = ''
+        if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
+            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
+        elif kwargs['concept_export_value_type'] == 'both':
+            ret = value + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), value)
+        elif kwargs['concept_export_value_type'] == 'id':
+            ret = value
+        return ret
+
+    def transform_export_values(self, value, **kwargs):
+        new_values = []
+        for val in value:
+            if kwargs['concept_export_value_type'] == None or kwargs['concept_export_value_type'] == '' or kwargs['concept_export_value_type'] == 'label':
+                new_values.append(self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), val))
+            elif kwargs['concept_export_value_type'] == 'both':
+                new_values.append(val + '|' + self.get_option_text(models.Node.objects.get(nodeid=kwargs['node']), val))
+            elif kwargs['concept_export_value_type'] == 'id':
+                new_values.append(val)
         return ','.join(new_values)
 
     def append_search_filters(self, value, node, query, request):

@@ -132,12 +132,12 @@
                                     <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}, css:{'enabled': xyInput.x() || xyInput.y() }"><span>{% trans 'clear' %}</span></a>
                                         <label for="input-easting">{% trans "Easting" %}</label>
                                         <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
-                                        <label for="input-northing">{% trans "Northing" %}</label>
+                                        <label class="mar-top" for="input-northing">{% trans "Northing" %}</label>
                                         <input id="input-northing" type="number" data-bind="textInput: xyInput.y, attr: {placeholder: 'Northing'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
-                                        <div>
+                                        <div class="mar-top">
                                             <select class="form-control" class="design" style="width:100px;" disabled data-bind="options: xyInput.availableSrids, optionsText: 'text', optionsValue: 'id', value: xyInput.srid, enable: xyInput.validCoords"></select>
                                         </div>
-                                        <button class="btn btn-primary btn-sm btn-block" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
+                                        <button class="btn btn-primary btn-sm btn-block mar-top" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
                                     </div>
                                 </div>
 
