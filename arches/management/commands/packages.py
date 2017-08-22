@@ -277,18 +277,15 @@ class Command(BaseCommand):
 
         def load_widgets():
             import widget as widget_cmd #For some reason this is out of scope when imported at top of page
-            widget_cmd = widget_cmd.Command()
-            load_extensions('widgets', widget_cmd)
+            load_extensions('widgets', widget_cmd.Command())
 
         def load_functions():
             import fn as Fn_cmd
-            fn_cmd = Fn_cmd.Command()
-            load_extensions('functions', fn_cmd)
+            load_extensions('functions', Fn_cmd.Command())
 
         def load_datatypes():
             import datatype as Datatype_cmd
-            datatype_cmd = Datatype_cmd.Command()
-            load_extensions('datatypes', datatype_cmd)
+            load_extensions('datatypes', Datatype_cmd.Command())
 
         remote = True if 'github.com' in source else False
 
