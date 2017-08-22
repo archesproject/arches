@@ -108,6 +108,9 @@ class Command(BaseCommand):
         parser.add_argument('-b', '--is_basemap', action='store_true', dest='is_basemap',
             help='Add to make the layer a basemap.')
 
+        parser.add_argument('-db', '--setup_db', action='store', dest='setup_db', default=False,
+            help='Rebuild database')
+
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
@@ -195,7 +198,7 @@ class Command(BaseCommand):
             self.update_project_templates()
 
         if options['operation'] == 'load_package':
-            self.load_package(options['source'])
+            self.load_package(options['source'], options['setup_db'])
 
 
     def load_package(self, source, setup_db=True):
@@ -290,8 +293,9 @@ class Command(BaseCommand):
         remote = True if 'github.com' in source else False
 
         if source != '' or remote == True:
-            if setup_db == True:
-                self.setup_db(settings.PACKAGE_NAME)
+            if setup_db != False:
+                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
+                    self.setup_db(settings.PACKAGE_NAME)
 
             if remote == True:
                 download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
