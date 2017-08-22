@@ -71,7 +71,11 @@ class Command(BaseCommand):
             isgeometric = details['isgeometric']
             )
 
-        dt.save()
+
+        if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
+            dt.save()
+        else:
+            print "{0} already exists".format(dt.datatype)
 
     def unregister(self, datatype):
         """

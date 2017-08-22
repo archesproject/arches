@@ -69,10 +69,11 @@ class Command(BaseCommand):
             defaultconfig = details['defaultconfig'],
             component = details['component']
         )
-
-        if len(models.Widget.objects.filter(name=instance.name)) == 0:
+        
+        try:
             instance.save()
-        else:
+        except IntegrityError as e:
+            print e
             print "{0} already exists".format(instance.name)
 
     def update(self, source):

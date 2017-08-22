@@ -73,7 +73,11 @@ class Command(BaseCommand):
             component = details['component']
         )
 
-        fn.save()
+        try:
+            fn.save()
+        except IntegrityError as e:
+            print e
+            print "{0} already exists".format(fn.name)
 
     def unregister(self, fn_name):
         """
