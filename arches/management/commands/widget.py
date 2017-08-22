@@ -69,11 +69,10 @@ class Command(BaseCommand):
             defaultconfig = details['defaultconfig'],
             component = details['component']
         )
-        
+
         try:
             instance.save()
         except IntegrityError as e:
-            print e
             print "{0} already exists".format(instance.name)
 
     def update(self, source):
