@@ -58,7 +58,6 @@ class Command(BaseCommand):
         import imp
         fn_config = imp.load_source('', source_dir)
         details = fn_config.details
-        print 'detials', details
 
         dt = models.DDataType(
             datatype = details['datatype'],
