@@ -70,7 +70,10 @@ class Command(BaseCommand):
             component = details['component']
         )
 
-        instance.save()
+        if len(models.Widget.objects.filter(name=instance.name)) == 0:
+            instance.save()
+        else:
+            print "{0} already exists".format(instance.name)
 
     def update(self, source):
         """
