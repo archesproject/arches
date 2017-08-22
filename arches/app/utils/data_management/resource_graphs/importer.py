@@ -95,8 +95,11 @@ def import_graph(graphs):
                             graph.save()
                             reporter.update_graphs_saved()
                         else:
-                            raise GraphImportException('{0} - already exists and cannot be saved'.format(graph.name))
-
+                            overwrite_input = raw_input('Overwrite {0} (T/F) ? '.format(graph.name))
+                            if overwrite_input.lower() in ('t', 'true'):
+                                graph.save()
+                            else:
+                                raise GraphImportException('{0} - already exists. Skipping import.'.format(graph.name))
 
                 if not hasattr(graph, 'cards_x_nodes_x_widgets'):
                     errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
