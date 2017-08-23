@@ -411,7 +411,7 @@ class Command(BaseCommand):
         #if file_format in ['csv', 'json']:
         try:
             resource_exporter = ResourceExporter(file_format)
-        except KeyError as e
+        except KeyError as e:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
             print '*'*80
