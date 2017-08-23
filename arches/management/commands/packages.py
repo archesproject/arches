@@ -26,6 +26,7 @@ from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.db import transaction
+from django.db.utils import IntegrityError
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
@@ -64,7 +65,7 @@ class Command(BaseCommand):
             '\'livereload\'=Starts livereload for this package on port 35729')
 
         parser.add_argument('-s', '--source', action='store', dest='source', default='',
-            help='Directory containing a .arches or .shp file containing resource records')
+            help='Directory or file for processing')
 
         parser.add_argument('-f', '--format', action='store', dest='format', default='arches',
             help='Format: shp or arches')
@@ -198,10 +199,10 @@ class Command(BaseCommand):
             self.update_project_templates()
 
         if options['operation'] == 'load_package':
-            self.load_package(options['source'], options['setup_db'])
+            self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'])
 
 
-    def load_package(self, source, setup_db=True):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
 
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
@@ -210,15 +211,15 @@ class Command(BaseCommand):
             self.import_graphs(branches)
             self.import_graphs(resource_models)
 
-        def load_concepts():
+        def load_concepts(overwrite, stage):
             concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
             collection_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'collections', '*.xml'))
 
             for path in concept_data:
-                self.import_reference_data(path, 'overwrite', 'keep')
+                self.import_reference_data(path, overwrite, stage)
 
             for path in collection_data:
-                self.import_reference_data(path, 'overwrite', 'keep')
+                self.import_reference_data(path, overwrite, stage)
 
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
@@ -312,10 +313,10 @@ class Command(BaseCommand):
             load_widgets()
             load_functions()
             load_datatypes()
-            load_concepts()
+            load_concepts(overwrite_concepts, stage_concepts)
             load_graphs()
             load_map_layers()
-            load_business_data()
+            # load_business_data()
 
         else:
             print "A path to a local or remote zipfile is required"
@@ -757,7 +758,10 @@ class Command(BaseCommand):
                     for source_name, source_dict in data['sources'].iteritems():
                         map_source = models.MapSource.objects.get_or_create(name=source_name + '-' + layer_name, source=source_dict)
                     map_layer = models.MapLayer(name=layer_name, layerdefinitions=data['layers'], isoverlay=(not is_basemap), icon=layer_icon)
-                    map_layer.save()
+                    try:
+                        map_layer.save()
+                    except IntegrityError as e:
+                        print "Cannot save layer: {0} already exists".format(layer_name)
 
 
     def delete_tileserver_layer(self, layer_name=False):

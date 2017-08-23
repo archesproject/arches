@@ -20,6 +20,7 @@ import os
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
