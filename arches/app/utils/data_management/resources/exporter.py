@@ -117,14 +117,17 @@ class ResourceExporter(object):
         relations = []
 
         for relation in models.ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)):
-            if any(r.resourcexid == relation.resourcexid for r in relations) == False:
-                relation.__dict__['relationshiptype'] = relation.__dict__.pop('relationshiptype_id')
-                relation.__dict__['resourceinstanceidfrom'] = relation.__dict__.pop('resourceinstanceidfrom_id')
-                relation.__dict__['resourceinstanceidto'] = relation.__dict__.pop('resourceinstanceidto_id')
-                relation.__dict__['datestarted'] = relation.__dict__['datestarted'] if relation.__dict__['datestarted'] != None else ''
-                relation.__dict__['dateended'] = relation.__dict__['dateended'] if relation.__dict__['dateended'] != None else ''
-                relation.__dict__.pop('_state')
-                relations.append(relation)
+            if any(r['resourcexid'] == relation.resourcexid for r in relations) == False:
+                relation_dest = {}
+                relation_source = relation.__dict__
+                relation_dest['resourceinstanceidfrom'] = relation_source['resourceinstanceidfrom_id']
+                relation_dest['resourceinstanceidto'] = relation_source['resourceinstanceidto_id']
+                relation_dest['datestarted'] = relation_source['datestarted'] if relation_source['datestarted'] != None else ''
+                relation_dest['dateended'] = relation_source['dateended'] if relation_source['dateended'] != None else ''
+                relation_dest['notes'] = relation_source['notes'] if relation_source['notes'] != None else ''
+                relation_dest['resourcexid'] = relation_source['resourcexid']
+                relation_dest['relationshiptype'] = relation_source['relationshiptype']
+                relations.append(relation_dest)
 
         return relations
 
@@ -138,6 +141,6 @@ class ResourceExporter(object):
         csvwriter.writeheader()
         relations_for_export.append({'name':csv_name, 'outputfile': dest})
         for relation in relations:
-            csvwriter.writerow({k:str(v) for k,v in relation.__dict__.items()})
+            csvwriter.writerow({k:str(v) for k,v in relation.items()})
 
         return relations_for_export
