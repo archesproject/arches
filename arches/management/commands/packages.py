@@ -54,7 +54,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
-            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package'],
+            'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -201,6 +201,32 @@ class Command(BaseCommand):
         if options['operation'] == 'load_package':
             self.load_package(options['source'], options['setup_db'], options['overwrite'], options['stage'])
 
+        if options['operation'] == 'create_package':
+            self.create_package(options['dest_dir'])
+
+    def create_package(self, dest_dir):
+        if os.path.exists(dest_dir):
+            print 'Cannot create package', dest_dir, 'already exists'
+        else:
+            print 'Creating template package in', dest_dir
+            dirs = [
+                'business_data',
+                'business_data/files',
+                'business_data/relations',
+                'extensions/datatypes',
+                'extensions/functions',
+                'extensions/widgets',
+                'graphs/branches',
+                'graphs/resource_models',
+                'map_layers/mapbox_styles/overlays',
+                'map_layers/mapbox_styles/basemaps',
+                'map_layers/tile_server/basemaps',
+                'map_layers/tile_server/overlays',
+                'reference_data/concepts',
+                'reference_data/collections',
+            ]
+            for directory in dirs:
+                os.makedirs(os.path.join(dest_dir, directory))
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
 
@@ -241,7 +267,7 @@ class Command(BaseCommand):
                 }
                 if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
                     meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-                    
+
                 self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
         def load_map_layers():
