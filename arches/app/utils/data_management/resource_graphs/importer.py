@@ -55,7 +55,7 @@ class GraphImportException(Exception):
     pass
 
 
-def import_graph(graphs):
+def import_graph(graphs, overwrite_graphs=True):
     reporter = GraphImportReporter(graphs)
     def check_default_configs(default_configs, configs):
         if default_configs != None:
@@ -91,7 +91,7 @@ def import_graph(graphs):
                     if graph.cards == [] or graph.cards == {}:
                         errors.append('{0} graph has no cards'.format(graph.name))
                     else:
-                        if len(Graph.objects.filter(pk=graph.graphid)) == 0:
+                        if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs == True:
                             graph.save()
                             reporter.update_graphs_saved()
                         else:

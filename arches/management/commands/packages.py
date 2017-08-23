@@ -233,9 +233,9 @@ class Command(BaseCommand):
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
-            self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'))
-            self.import_graphs(branches)
-            self.import_graphs(resource_models)
+            self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
+            self.import_graphs(branches, overwrite_graphs=False)
+            self.import_graphs(resource_models, overwrite_graphs=False)
 
         def load_concepts(overwrite, stage):
             concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
@@ -680,7 +680,7 @@ class Command(BaseCommand):
                 sys.exit()
 
 
-    def import_graphs(self, data_source=''):
+    def import_graphs(self, data_source='', overwrite_graphs=True):
         """
         Imports objects from arches.json.
 
@@ -696,13 +696,13 @@ class Command(BaseCommand):
             if os.path.isfile(os.path.join(path)):
                 with open(path, 'rU') as f:
                     archesfile = JSONDeserializer().deserialize(f)
-                    ResourceGraphImporter(archesfile['graph'])
+                    ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
             else:
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith('.json')]
                 for file_path in file_paths:
                     with open(os.path.join(path, file_path), 'rU') as f:
                         archesfile = JSONDeserializer().deserialize(f)
-                        ResourceGraphImporter(archesfile['graph'])
+                        ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
 
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
