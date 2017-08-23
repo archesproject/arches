@@ -276,8 +276,8 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-            tile_server_basemaps = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'basemaps', '*', '.xml'))
-            tile_server_overlays = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'overlays', '*', '.xml'))
+            tile_server_basemaps = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'basemaps', '*', '*.xml'))
+            tile_server_overlays = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'overlays', '*', '*.xml'))
             load_tile_server_layers(tile_server_basemaps, True)
             load_tile_server_layers(tile_server_overlays, False)
 
