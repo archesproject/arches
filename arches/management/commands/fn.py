@@ -20,6 +20,7 @@ import os
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
@@ -73,7 +74,10 @@ class Command(BaseCommand):
             component = details['component']
         )
 
-        fn.save()
+        try:
+            fn.save()
+        except IntegrityError as e:
+            print "{0} already exists".format(fn.name)
 
     def unregister(self, fn_name):
         """

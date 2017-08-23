@@ -58,7 +58,6 @@ class Command(BaseCommand):
         import imp
         fn_config = imp.load_source('', source_dir)
         details = fn_config.details
-        print 'detials', details
 
         dt = models.DDataType(
             datatype = details['datatype'],
@@ -72,7 +71,11 @@ class Command(BaseCommand):
             isgeometric = details['isgeometric']
             )
 
-        dt.save()
+
+        if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
+            dt.save()
+        else:
+            print "{0} already exists".format(dt.datatype)
 
     def unregister(self, datatype):
         """

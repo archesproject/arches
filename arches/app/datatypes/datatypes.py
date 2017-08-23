@@ -37,13 +37,19 @@ class DataTypeFactory(object):
         except:
             mod_path = d_datatype.modulename.replace('.py', '')
             module = None
+            import_success = False
+            import_error = None
             for datatype_dir in settings.DATATYPE_LOCATIONS:
                 try:
                     module = importlib.import_module(datatype_dir + '.%s' % mod_path)
-                except ImportError:
-                    print "MODULE NOT FOUND", datatype_dir + '.%s' % mod_path
+                    import_success = True
+                except ImportError as e:
+                    import_error = e
                 if module != None:
                     break
+            if import_success == False:
+                print 'Failed to import ' + mod_path
+                print import_error
             datatype_instance = getattr(module, d_datatype.classname)(d_datatype)
             self.datatype_instances[d_datatype.classname] = datatype_instance
         return datatype_instance

@@ -50,7 +50,12 @@ class GraphImportReporter:
 
         print result.format(self.name, self.forms_saved, self.reports_saved)
 
-def import_graph(graphs):
+
+class GraphImportException(Exception):
+    pass
+
+
+def import_graph(graphs, overwrite_graphs=True):
     reporter = GraphImportReporter(graphs)
     def check_default_configs(default_configs, configs):
         if default_configs != None:
@@ -70,65 +75,75 @@ def import_graph(graphs):
     with transaction.atomic():
         errors = []
         for resource in graphs:
-            reporter.name = resource['name']
-            reporter.resource_model = resource['isresource']
-            graph = Graph(resource)
-
-            for node in graph.nodes.values():
-                node_config = node.config
-                default_config = DDataType.objects.get(datatype=node.datatype).defaultconfig
-                node.config = check_default_configs(default_config, node_config)
-
-            if not hasattr(graph, 'cards'):
-                errors.append('{0} graph has no attribute cards'.format(graph.name))
-            else:
-                if graph.cards == [] or graph.cards == {}:
-                    errors.append('{0} graph has no cards'.format(graph.name))
-                else:
-                    graph.save()
-                    reporter.update_graphs_saved()
-
-            if not hasattr(graph, 'cards_x_nodes_x_widgets'):
-                errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
-            else:
-                for card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
-                    card_x_node_x_widget_config = card_x_node_x_widget['config']
-                    default_config = Widget.objects.get(widgetid=card_x_node_x_widget['widget_id']).defaultconfig
-                    card_x_node_x_widget['config'] = check_default_configs(default_config, card_x_node_x_widget_config)
-                    cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
-
-            if not hasattr(graph, 'forms'):
-                errors.append('{0} graph has no attribute forms'.format)
-            else:
-                for form in graph.forms:
-                    form = Form.objects.update_or_create(**form)
-                    reporter.update_forms_saved()
-
-            if not hasattr(graph, 'forms_x_cards'):
-                errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
-            else:
-                for form_x_card in graph.forms_x_cards:
-                    formxcard = FormXCard.objects.update_or_create(**form_x_card)
-
-            if not hasattr(graph, 'reports'):
-                errors.append('{0} graph has no attribute reports'.format(graph.name))
-            else:
-                for report in graph.reports:
-                    report_config = report['config']
-                    default_config = ReportTemplate.objects.get(templateid=report['template_id']).defaultconfig
-                    report['config'] = check_default_configs(default_config, report_config)
-                    report = Report.objects.update_or_create(**report)
-                    reporter.update_reports_saved()
-
-            # try/except block here until all graphs have a resource_2_resource_constraints object.
             try:
-                if not hasattr(graph, 'resource_2_resource_constraints'):
-                    errors.append('{0} graph has no attribute resource_2_resource_constraints'.format(graph.resource_2_resource_constraints))
+                reporter.name = resource['name']
+                reporter.resource_model = resource['isresource']
+                graph = Graph(resource)
+
+                for node in graph.nodes.values():
+                    node_config = node.config
+                    default_config = DDataType.objects.get(datatype=node.datatype).defaultconfig
+                    node.config = check_default_configs(default_config, node_config)
+
+                if not hasattr(graph, 'cards'):
+                    errors.append('{0} graph has no attribute cards'.format(graph.name))
                 else:
-                    for resource_2_resource_constraint in graph.resource_2_resource_constraints:
-                        resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
-            except:
-                pass
+                    if graph.cards == [] or graph.cards == {}:
+                        errors.append('{0} graph has no cards'.format(graph.name))
+                    else:
+                        if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs == True:
+                            graph.save()
+                            reporter.update_graphs_saved()
+                        else:
+                            overwrite_input = raw_input('Overwrite {0} (T/F) ? '.format(graph.name))
+                            if overwrite_input.lower() in ('t', 'true'):
+                                graph.save()
+                            else:
+                                raise GraphImportException('{0} - already exists. Skipping import.'.format(graph.name))
+
+                if not hasattr(graph, 'cards_x_nodes_x_widgets'):
+                    errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
+                else:
+                    for card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+                        card_x_node_x_widget_config = card_x_node_x_widget['config']
+                        default_config = Widget.objects.get(widgetid=card_x_node_x_widget['widget_id']).defaultconfig
+                        card_x_node_x_widget['config'] = check_default_configs(default_config, card_x_node_x_widget_config)
+                        cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
+
+                if not hasattr(graph, 'forms'):
+                    errors.append('{0} graph has no attribute forms'.format)
+                else:
+                    for form in graph.forms:
+                        form = Form.objects.update_or_create(**form)
+                        reporter.update_forms_saved()
+
+                if not hasattr(graph, 'forms_x_cards'):
+                    errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
+                else:
+                    for form_x_card in graph.forms_x_cards:
+                        formxcard = FormXCard.objects.update_or_create(**form_x_card)
+
+                if not hasattr(graph, 'reports'):
+                    errors.append('{0} graph has no attribute reports'.format(graph.name))
+                else:
+                    for report in graph.reports:
+                        report_config = report['config']
+                        default_config = ReportTemplate.objects.get(templateid=report['template_id']).defaultconfig
+                        report['config'] = check_default_configs(default_config, report_config)
+                        report = Report.objects.update_or_create(**report)
+                        reporter.update_reports_saved()
+
+                # try/except block here until all graphs have a resource_2_resource_constraints object.
+                try:
+                    if not hasattr(graph, 'resource_2_resource_constraints'):
+                        errors.append('{0} graph has no attribute resource_2_resource_constraints'.format(graph.resource_2_resource_constraints))
+                    else:
+                        for resource_2_resource_constraint in graph.resource_2_resource_constraints:
+                            resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
+                except:
+                    pass
+            except Exception as e:
+                print e
 
         return errors, reporter
 
