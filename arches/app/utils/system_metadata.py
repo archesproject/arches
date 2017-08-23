@@ -1,4 +1,4 @@
-   '''
+'''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
