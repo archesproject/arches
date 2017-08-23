@@ -224,11 +224,25 @@ class Command(BaseCommand):
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
-                self.add_mapbox_layer(style['name'], path, "fa fa-globe", basemap)
+                meta = {
+                    "icon": "fa fa-globe",
+                    "name": style["name"]
+                }
+                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
+                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+
+                self.add_mapbox_layer(meta["name"], path, meta["icon"], basemap)
 
         def load_tile_server_layers(xml_paths, basemap):
             for path in xml_paths:
-                print path
+                meta = {
+                    "icon": "fa fa-globe",
+                    "name": os.path.basename(path)
+                }
+                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
+                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+                    
+                self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
         def load_map_layers():
             basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'basemaps', '*', '*.json'))
@@ -738,13 +752,16 @@ class Command(BaseCommand):
                         ],
                         "tileSize": tile_size
                     }
-                    map_source = models.MapSource(name=layer_name, source=source_dict)
-                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
-                    map_source.save()
-                    map_layer.save()
-                    tileserver_layer.map_layer = map_layer
-                    tileserver_layer.map_source = map_source
-                    tileserver_layer.save()
+                    try:
+                        map_source = models.MapSource(name=layer_name, source=source_dict)
+                        map_layer = models.MapLayer(name=layer_name, layerdefinitions=layer_list, isoverlay=(not is_basemap), icon=layer_icon)
+                        map_source.save()
+                        map_layer.save()
+                        tileserver_layer.map_layer = map_layer
+                        tileserver_layer.map_source = map_source
+                        tileserver_layer.save()
+                    except IntegrityError as e:
+                        print "Cannot save tile server layer: {0} already exists".format(layer_name)
 
 
     def add_mapbox_layer(self, layer_name=False, mapbox_json_path=False, layer_icon='fa fa-globe', is_basemap=False):
