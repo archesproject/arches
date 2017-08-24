@@ -22,35 +22,13 @@ except ImportError:
 
 class ResourceExporter(object):
 
-
     def __init__(self, file_format, **kwargs):
         self.filetypes = {'csv': CsvWriter, 'json': JsonWriter, 'rdf': RdfWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format](**kwargs)
 
     def export(self, graph_id=None, resourceinstanceids=None):
-        #business data export
-        #resources should be changed to query
-        #configs = self.read_export_configs(configs)
-        #business_data = self.get_resources_for_export(query, configs, graph)
-        #business_data = self.get_resourcesinstances(graph=graph)
-        #business_data = self.get_resourcesinstances(resourceinstanceid_list=["a755e16b-7e2a-11e7-8810-14109fd34195"])
         resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
-
-        #relation export
-        # if len(business_data) > 0:
-        #     if isinstance(business_data[0], dict):
-        #         resourceids = []
-        #         for resource in business_data:
-        #             resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
-        #     elif isinstance(business_data[0], str):
-        #         resourceids = [uuid.UUID(r) for r in business_data]
-        # if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-        #     relations = self.get_relations_for_export(resourceids)
-        #     relations_file_name = resources[0]['name'].split('.')[0]
-        #     relations_file = self.write_relations(relations, relations_file_name)
-        #     resources.extend(relations_file)
-
         return resources
 
     def zip_response(self, files_for_export, zip_file_name=None, file_type=None):
@@ -75,59 +53,3 @@ class ResourceExporter(object):
         response['Content-Type'] = 'application/zip'
         response.write(zip_stream)
         return response
-
-    def get_resources_for_export(self, query=None, configs=None, graph=None):
-        if query == None and graph == None and configs != []:
-            results = {}
-            results['hits']= {}
-            results['hits']['hits'] = []
-            resource_model_id = configs[0]['resource_model_id']
-
-            resource_instances = models.ResourceInstance.objects.filter(graph_id=resource_model_id)
-            for resource_instance in resource_instances:
-                resource_instance_dict = {}
-                resource_instance_dict['_source'] = JSONSerializer().serializeToPython(resource_instance)
-                resource_instance_dict['_source']['tiles'] = JSONSerializer().serializeToPython(models.TileModel.objects.filter(resourceinstance_id=resource_instance_dict['_source']['resourceinstanceid']))
-                results['hits']['hits'].append(resource_instance_dict)
-            resources = results['hits']['hits']
-        elif graph != None and query == None:
-            resources = [str(resourceid) for resourceid in models.ResourceInstance.objects.filter(graph_id=graph).values_list('resourceinstanceid', flat=True)]
-        else:
-            se = SearchEngineFactory().create()
-            query = query
-            results = query.search(index='resource', doc_type='')
-            resources = results['hits']['hits']
-
-        return resources
-
-    def get_relations_for_export(self, resourceids):
-        relations = []
-
-        for relation in models.ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)):
-            if any(r['resourcexid'] == relation.resourcexid for r in relations) == False:
-                relation_dest = {}
-                relation_source = relation.__dict__
-                relation_dest['resourceinstanceidfrom'] = relation_source['resourceinstanceidfrom_id']
-                relation_dest['resourceinstanceidto'] = relation_source['resourceinstanceidto_id']
-                relation_dest['datestarted'] = relation_source['datestarted'] if relation_source['datestarted'] != None else ''
-                relation_dest['dateended'] = relation_source['dateended'] if relation_source['dateended'] != None else ''
-                relation_dest['notes'] = relation_source['notes'] if relation_source['notes'] != None else ''
-                relation_dest['resourcexid'] = relation_source['resourcexid']
-                relation_dest['relationshiptype'] = relation_source['relationshiptype']
-                relations.append(relation_dest)
-
-        return relations
-
-    def write_relations(self, relations, file_name):
-        relations_for_export = []
-        csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
-        csv_name_prefix = file_name
-        csv_name = os.path.join('{0}.{1}'.format(csv_name_prefix, 'relations'))
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        relations_for_export.append({'name':csv_name, 'outputfile': dest})
-        for relation in relations:
-            csvwriter.writerow({k:str(v) for k,v in relation.items()})
-
-        return relations_for_export

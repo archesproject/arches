@@ -70,7 +70,6 @@ class CsvWriter(Writer):
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    #def write_resources(self, resources, resource_export_configs=None, single_file=False):
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         graph_id = self.resource_export_configs[0]['resource_model_id']
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
@@ -89,12 +88,7 @@ class CsvWriter(Writer):
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-
-        #for resource in resources:
             csv_record = {}
-            # resourceid = resource['_source']['resourceinstanceid']
-            # resource_graphid = resource['_source']['graph_id']
-            # legacyid = resource['_source']['legacyid']
             csv_record['ResourceID'] = resourceinstanceid
             csv_record['populated_node_groups'] = []
 

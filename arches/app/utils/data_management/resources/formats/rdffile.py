@@ -71,7 +71,6 @@ class RdfWriter(Writer):
 
         dest = StringIO()
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-            print resourceinstanceid
             g = ds.graph(URIRef('http:/archesproject.com/resource/%s' % resourceinstanceid))
             graphid = tiles[0].resourceinstance.graph_id
             graph_info = get_graph_parts(graphid)
@@ -117,6 +116,4 @@ class RdfWriter(Writer):
 
         rdf_for_export.append({'name':file_name, 'outputfile': dest})
         return rdf_for_export
-
-        # print g.connected()
 
