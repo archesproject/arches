@@ -185,8 +185,27 @@ class Writer(object):
 
         self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
 
+    def write_resource_relations(self):
+        """
+        Returns a list of dictionaries with the following format:
+
+        {'name':file name, 'outputfile': a SringIO buffer of resource relations data in the specified format}
+
+        """
+
+        pass
 
     def get_tiles(self, graph_id=None, resourceinstanceids=None):
+        """
+        Returns a dictionary of tiles keyed by their resourceinstanceid
+
+        {
+            'resourcs instance UUID': [tile list],
+            ...
+        }
+
+        """
+
         if graph_id is None and resourceinstanceids is None:
             raise Exception(_("Must supply either a graph id or a list of resource instance ids to export"))
         self.graph_id = graph_id

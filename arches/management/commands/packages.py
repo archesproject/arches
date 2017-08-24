@@ -410,7 +410,7 @@ class Command(BaseCommand):
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         #if file_format in ['csv', 'json']:
         try:
-            resource_exporter = ResourceExporter(file_format, config_file=None, single_file=False)
+            resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         except KeyError as e:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)

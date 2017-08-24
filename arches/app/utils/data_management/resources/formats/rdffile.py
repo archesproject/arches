@@ -109,6 +109,7 @@ class RdfWriter(Writer):
                     g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
                     g.add((domainnode, crm[edge.ontologyproperty], rangenode))
 
+            # maybe we have a pre-serialize hook here to allow for graph manipulation before serializing (so the Getty can add multiple classes to a node if need be)
             dest.write(g.serialize(format='pretty-xml'))
 
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")

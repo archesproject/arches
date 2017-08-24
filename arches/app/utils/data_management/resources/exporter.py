@@ -28,14 +28,14 @@ class ResourceExporter(object):
         self.format = file_format
         self.writer = self.filetypes[file_format](**kwargs)
 
-    def export(self, query=None, configs=None, graph_id=None, single_file=False):
+    def export(self, graph_id=None, resourceinstanceids=None):
         #business data export
         #resources should be changed to query
-        configs = self.read_export_configs(configs)
+        #configs = self.read_export_configs(configs)
         #business_data = self.get_resources_for_export(query, configs, graph)
         #business_data = self.get_resourcesinstances(graph=graph)
         #business_data = self.get_resourcesinstances(resourceinstanceid_list=["a755e16b-7e2a-11e7-8810-14109fd34195"])
-        resources = self.writer.write_resources(graph_id=graph_id)
+        resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
 
         #relation export
         # if len(business_data) > 0:
@@ -52,23 +52,6 @@ class ResourceExporter(object):
         #     resources.extend(relations_file)
 
         return resources
-
-    def read_export_configs(self, configs):
-        '''
-        Reads the export configuration file or object and adds an array for records to store property data
-        '''
-        if configs:
-            resource_export_configs = json.load(open(configs, 'r'))
-            resource_configs = [resource_export_configs]
-            configs = resource_configs
-        else:
-            resource_configs = []
-            configs = models.GraphXMapping.objects.values('mapping')
-            for val in configs:
-                resource_configs.append(val['mapping'])
-            configs = resource_configs
-
-        return configs
 
     def zip_response(self, files_for_export, zip_file_name=None, file_type=None):
         '''
