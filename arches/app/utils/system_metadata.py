@@ -21,7 +21,7 @@ import subprocess
 from django.db import connection, transaction
 from arches.app.models.system_settings import settings
 
-def system_metadata(self):
+def system_metadata():
     os_type = platform.system()
     os_release = platform.release()
     cursor = connection.cursor()
@@ -37,7 +37,6 @@ def system_metadata(self):
         full_tag = subprocess.Popen("git log --pretty=format:'%h %ai' --abbrev-commit --date=short -1", cwd=settings.PACKAGE_ROOT,
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         tag = full_tag.stdout.readline().strip()
-        print tag
     except:
         tag = 'git not found.'
 
