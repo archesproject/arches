@@ -23,31 +23,33 @@ except ImportError:
 class ResourceExporter(object):
 
 
-    def __init__(self, file_format):
+    def __init__(self, file_format, **kwargs):
         self.filetypes = {'csv': CsvWriter, 'json': JsonWriter, 'rdf': RdfWriter}
         self.format = file_format
-        self.writer = self.filetypes[file_format]()
+        self.writer = self.filetypes[file_format](**kwargs)
 
-    def export(self, data_dest=None, query=None, configs=None, graph=None, single_file=False):
+    def export(self, query=None, configs=None, graph_id=None, single_file=False):
         #business data export
         #resources should be changed to query
         configs = self.read_export_configs(configs)
-        business_data = self.get_resources_for_export(query, configs, graph)
-        resources = self.writer.write_resources(business_data, configs, single_file)
+        #business_data = self.get_resources_for_export(query, configs, graph)
+        #business_data = self.get_resourcesinstances(graph=graph)
+        #business_data = self.get_resourcesinstances(resourceinstanceid_list=["a755e16b-7e2a-11e7-8810-14109fd34195"])
+        resources = self.writer.write_resources(graph_id=graph_id)
 
         #relation export
-        if len(business_data) > 0:
-            if isinstance(business_data[0], dict):
-                resourceids = []
-                for resource in business_data:
-                    resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
-            elif isinstance(business_data[0], str):
-                resourceids = [uuid.UUID(r) for r in business_data]
-        if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            relations = self.get_relations_for_export(resourceids)
-            relations_file_name = resources[0]['name'].split('.')[0]
-            relations_file = self.write_relations(relations, relations_file_name)
-            resources.extend(relations_file)
+        # if len(business_data) > 0:
+        #     if isinstance(business_data[0], dict):
+        #         resourceids = []
+        #         for resource in business_data:
+        #             resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
+        #     elif isinstance(business_data[0], str):
+        #         resourceids = [uuid.UUID(r) for r in business_data]
+        # if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+        #     relations = self.get_relations_for_export(resourceids)
+        #     relations_file_name = resources[0]['name'].split('.')[0]
+        #     relations_file = self.write_relations(relations, relations_file_name)
+        #     resources.extend(relations_file)
 
         return resources
 

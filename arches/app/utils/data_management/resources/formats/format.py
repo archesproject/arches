@@ -3,6 +3,7 @@ import uuid
 import shutil
 import datetime
 from arches.app.models.concept import Concept
+from arches.app.models import models
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -161,7 +162,7 @@ class Reader(object):
 
 class Writer(object):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -172,6 +173,37 @@ class Writer(object):
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
         }
+        self.resourceinstances = {}
+
+    def write_resources(self, graph_id=None, resourceinstanceids=None):
+        """
+        Returns a list of dictionaries with the following format:
+
+        {'name':file name, 'outputfile': a SringIO buffer of resource instance data in the specified format}
+
+        """
+
+        self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+
+
+    def get_tiles(self, graph_id=None, resourceinstanceids=None):
+        if graph_id is None and resourceinstanceids is None:
+            raise Exception(_("Must supply either a graph id or a list of resource instance ids to export"))
+        self.graph_id = graph_id
+        if graph_id:
+            self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')
+            self.tiles = models.TileModel.objects.filter(resourceinstance__graph_id=graph_id)
+        else:
+            self.tiles = models.TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids)
+
+        for tile in self.tiles:
+            try:
+                self.resourceinstances[tile.resourceinstance_id].append(tile)
+            except:
+                self.resourceinstances[tile.resourceinstance_id] = []
+                self.resourceinstances[tile.resourceinstance_id].append(tile)
+
+        return self.resourceinstances
 
     def get_field_map_values(self, resource, template_record, field_map):
         """
