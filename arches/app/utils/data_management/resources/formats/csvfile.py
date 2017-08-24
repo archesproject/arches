@@ -14,6 +14,7 @@ from arches.app.models.concept import Concept
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.models import ResourceXResource
+from arches.app.models.models import GraphXMapping
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -26,6 +27,12 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+class MissingConfigException(Exception):
+     def __init__(self, value=None):
+         self.value = value
+     def __str__(self):
+         return repr(self.value)
+
 class CsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -35,20 +42,20 @@ class CsvWriter(Writer):
         self.single_file = kwargs.pop('single_file', False)
         self.resource_export_configs = self.read_export_configs(kwargs.pop('configs', None))
 
+        if len(self.resource_export_configs) == 0:
+            raise MissingConfigException()
+
     def read_export_configs(self, configs):
         '''
         Reads the export configuration file or object and adds an array for records to store property data
         '''
         if configs:
             resource_export_configs = json.load(open(configs, 'r'))
-            resource_configs = [resource_export_configs]
-            configs = resource_configs
+            configs = [resource_export_configs]
         else:
-            resource_configs = []
-            configs = models.GraphXMapping.objects.values('mapping')
-            for val in configs:
-                resource_configs.append(val['mapping'])
-            configs = resource_configs
+            configs = []
+            for val in GraphXMapping.objects.values('mapping'):
+                configs.append(val['mapping'])
 
         return configs
 

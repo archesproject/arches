@@ -16,6 +16,14 @@ from django.contrib.gis.geos import MultiLineString
 from django.db import connection, transaction
 from django.utils.translation import ugettext as _
 
+
+class MissingGraphException(Exception):
+     def __init__(self, value=None):
+         self.value = value
+     def __str__(self):
+         return repr(self.value)
+
+
 class ResourceImportReporter:
     def __init__(self, business_data):
         self.resources = 0
@@ -160,6 +168,7 @@ class Reader(object):
                 except TypeError as e:
                     f.write(timestamp + ' ' + e + unicode(error))
 
+
 class Writer(object):
 
     def __init__(self, **kwargs):
@@ -206,8 +215,8 @@ class Writer(object):
 
         """
 
-        if graph_id is None and resourceinstanceids is None:
-            raise Exception(_("Must supply either a graph id or a list of resource instance ids to export"))
+        if (graph_id is None or graph_id is False) and resourceinstanceids is None:
+            raise MissingGraphException(_("Must supply either a graph id or a list of resource instance ids to export"))
         self.graph_id = graph_id
         if graph_id:
             self.file_prefix = models.GraphModel.objects.get(graphid=graph_id).name.replace(' ', '_')

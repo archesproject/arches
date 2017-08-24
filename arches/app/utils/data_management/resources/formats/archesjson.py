@@ -12,7 +12,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-
 class JsonWriter(Writer):
 
     def __init__(self, **kwargs):
