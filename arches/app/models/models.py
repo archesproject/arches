@@ -249,7 +249,7 @@ class Function(models.Model):
     defaultconfig = JSONField(blank=True, null=True)
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    component = models.TextField(blank=True, null=True)
+    component = models.TextField(blank=True, null=True, unique=True)
 
     class Meta:
         managed = True
@@ -646,8 +646,8 @@ class FileValue(models.Model):
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
-    component = models.TextField()
+    name = models.TextField(unique=True)
+    component = models.TextField(unique=True)
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
     datatype = models.TextField()
@@ -664,8 +664,8 @@ class Widget(models.Model):
 
 class Geocoder(models.Model):
     geocoderid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
-    component = models.TextField()
+    name = models.TextField(unique=True)
+    component = models.TextField(unique=True)
     api_key = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
