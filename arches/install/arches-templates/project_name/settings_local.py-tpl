@@ -167,7 +167,8 @@ import os
 #    "CRMarchaeo_v1.4.rdfs.xml", 
 #    "CRMgeo_v1.2.rdfs.xml", 
 #    "CRMdig_v3.2.1.rdfs.xml", 
-#    "CRMinf_v0.7.rdfs.xml"
+#    "CRMinf_v0.7.rdfs.xml", 
+#    "arches_crm_enhancements.xml"
 #]
 
 
@@ -205,6 +206,8 @@ import os
 #STATIC_ROOT = ''
 
 #STATIC_URL = '/media/'
+
+#SYSTEM_SETTINGS_LOCAL_PATH = '/arches/db/system_settings/Arches_System_Settings_Local.json'
 
 
 #TEMPLATES = [
