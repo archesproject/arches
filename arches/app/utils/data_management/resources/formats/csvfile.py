@@ -20,6 +20,7 @@ from arches.app.models.models import Node, Value
 from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -130,7 +131,8 @@ class CsvWriter(Writer):
                 csv_records.append(csv_record)
 
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        csv_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'csv'))
+        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
+        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
 
         if self.single_file != True:
             dest = StringIO()
@@ -162,21 +164,49 @@ class CsvWriter(Writer):
                     del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        if self.graph_id != None:
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+
         return csvs_for_export
 
-    # def write_resource_relations(self):
-    #     if len(business_data) > 0:
-    #         if isinstance(business_data[0], dict):
-    #             resourceids = []
-    #             for resource in business_data:
-    #                 resourceids.append(uuid.UUID(resource['_source']['resourceinstanceid']))
-    #         elif isinstance(business_data[0], str):
-    #             resourceids = [uuid.UUID(r) for r in business_data]
-    #     if graph != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-    #         relations = self.get_relations_for_export(resourceids)
-    #         relations_file_name = resources[0]['name'].split('.')[0]
-    #         relations_file = self.write_relations(relations, relations_file_name)
-    #         resources.extend(relations_file)
+    def write_resource_relations(self, file_name):
+        resourceids = self.resourceinstances.keys()
+
+        if self.graph_id != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            relations = self.get_relations_for_export(resourceids)
+            relations_file = self.write_relations(relations, file_name)
+            return relations_file
+
+    def get_relations_for_export(self, resourceids):
+        relations = []
+
+        for relation in ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)):
+            if any(r['resourcexid'] == relation.resourcexid for r in relations) == False:
+                relation_dest = {}
+                relation_source = relation.__dict__
+                relation_dest['resourceinstanceidfrom'] = relation_source['resourceinstanceidfrom_id']
+                relation_dest['resourceinstanceidto'] = relation_source['resourceinstanceidto_id']
+                relation_dest['datestarted'] = relation_source['datestarted'] if relation_source['datestarted'] != None else ''
+                relation_dest['dateended'] = relation_source['dateended'] if relation_source['dateended'] != None else ''
+                relation_dest['notes'] = relation_source['notes'] if relation_source['notes'] != None else ''
+                relation_dest['resourcexid'] = relation_source['resourcexid']
+                relation_dest['relationshiptype'] = relation_source['relationshiptype']
+                relations.append(relation_dest)
+
+        return relations
+
+    def write_relations(self, relations, file_name):
+        relations_for_export = []
+        csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
+        csv_name = os.path.join('{0}.{1}'.format(file_name, 'relations'))
+        dest = StringIO()
+        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+        csvwriter.writeheader()
+        relations_for_export.append({'name':csv_name, 'outputfile': dest})
+        for relation in relations:
+            csvwriter.writerow({k:str(v) for k,v in relation.items()})
+
+        return relations_for_export
 
 class CsvReader(Reader):
 
