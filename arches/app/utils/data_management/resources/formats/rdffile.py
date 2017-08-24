@@ -3,8 +3,8 @@ import datetime
 from format import Writer
 from arches.app.models import models
 from rdflib import Namespace
-from rdflib import URIRef, BNode, Literal
-from rdflib import Graph, Dataset
+from rdflib import URIRef, Literal
+from rdflib import Dataset
 from rdflib.namespace import RDF, RDFS
 
 try:
@@ -77,8 +77,8 @@ class RdfWriter(Writer):
 
             for tile in tiles:
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.pk))] #BNode()
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))] #BNode()
+                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.pk))]
+                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
                     g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
                    
@@ -94,16 +94,16 @@ class RdfWriter(Writer):
 
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject[str(edge.domainnode.pk)] #BNode()
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))] #BNode()
+                    domainnode = archesproject[str(edge.domainnode.pk)]
+                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
                     g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
                     g.add((domainnode, crm[edge.ontologyproperty], rangenode))
 
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.parenttile.pk))] #BNode()
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))] #BNode()
+                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.parenttile.pk))]
+                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
                     g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
                     g.add((domainnode, crm[edge.ontologyproperty], rangenode))

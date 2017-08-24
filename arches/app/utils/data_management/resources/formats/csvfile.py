@@ -1,37 +1,24 @@
 import csv
-import codecs
 import cPickle
 import datetime
 import json
 import os
 import sys
 import uuid
-import distutils.util
 import traceback
 from copy import deepcopy
-from mimetypes import MimeTypes
-from os.path import isfile, join
 from format import Writer
 from format import Reader
-from format import ResourceImportReporter
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, Value
-from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
 from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.db import connection
 from django.db import transaction
 from django.db.models import Q
-from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
-from django.http import HttpRequest
-from django.core.files import File as DjangoFile
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import ugettext as _
 
 try:
