@@ -422,7 +422,8 @@ class Command(BaseCommand):
             'ROOT_URLCONF',
             'WSGI_APPLICATION',
             'LOGGING',
-            'LOGIN_URL'
+            'LOGIN_URL',
+            'SYSTEM_SETTINGS_LOCAL_PATH'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
