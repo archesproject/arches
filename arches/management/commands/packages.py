@@ -285,6 +285,7 @@ class Command(BaseCommand):
             business_data = []
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
+            relations = glob.glob(os.path.join(download_dir, '*', 'business_data', 'relations', '*.relations'))
 
             for path in business_data:
                 if path.endswith('csv'):
@@ -292,6 +293,9 @@ class Command(BaseCommand):
                     self.import_business_data(path, overwrite=True, bulk_load=True)
                 else:
                     self.import_business_data(path, overwrite=True)
+
+            for relation in relations:
+                self.import_business_data_relations(relation)
 
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
@@ -356,7 +360,7 @@ class Command(BaseCommand):
             load_concepts(overwrite_concepts, stage_concepts)
             load_graphs()
             load_map_layers()
-            # load_business_data()
+            load_business_data()
 
         else:
             print "A path to a local or remote zipfile is required"
