@@ -308,7 +308,7 @@ class Command(BaseCommand):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
             component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, ext_type, 'templates')
+            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
