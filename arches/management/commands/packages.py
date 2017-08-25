@@ -309,7 +309,7 @@ class Command(BaseCommand):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
             component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, ext_type, 'templates')
+            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
@@ -362,9 +362,13 @@ class Command(BaseCommand):
 
             unzip_file(zip_file, download_dir)
 
+            print 'loading widgets'
             load_widgets()
+            print 'loading functions'
             load_functions()
+            print 'loading datatypes'
             load_datatypes()
+
             load_concepts(overwrite_concepts, stage_concepts)
             load_graphs()
             load_map_layers()
