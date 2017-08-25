@@ -209,7 +209,7 @@ class Command(BaseCommand):
 
         ret = None
         try:
-            if models.get_ontology_storage_system().location in data_source:
+            if models.get_ontology_storage_system().location in os.path.abspath(data_source):
                 ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
             else:
                 ret ='./%s' % os.path.split(data_source)[1]
