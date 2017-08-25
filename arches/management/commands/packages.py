@@ -297,6 +297,13 @@ class Command(BaseCommand):
             for relation in relations:
                 self.import_business_data_relations(relation)
 
+            uploaded_files = glob.glob(os.path.join(download_dir, '*', 'business_data','files','*'))
+            dest_files_dir = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles')
+            if os.path.exists(dest_files_dir) == False:
+                os.makedirs(dest_files_dir)
+            for f in uploaded_files:
+                shutil.copy(f, dest_files_dir)
+
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
             component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
