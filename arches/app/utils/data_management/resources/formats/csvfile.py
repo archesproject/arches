@@ -1,36 +1,25 @@
 import csv
-import codecs
 import cPickle
 import datetime
 import json
 import os
 import sys
 import uuid
-import distutils.util
 import traceback
 from copy import deepcopy
-from mimetypes import MimeTypes
-from os.path import isfile, join
 from format import Writer
 from format import Reader
-from format import ResourceImportReporter
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node, Value
-from arches.app.models.models import File
 from arches.app.models.models import Node
 from arches.app.models.models import NodeGroup
+from arches.app.models.models import ResourceXResource
+from arches.app.models.models import GraphXMapping
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.db import connection
 from django.db import transaction
 from django.db.models import Q
-from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
-from django.http import HttpRequest
-from django.core.files import File as DjangoFile
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import ugettext as _
 
 try:
@@ -38,24 +27,52 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+class MissingConfigException(Exception):
+     def __init__(self, value=None):
+         self.value = value
+     def __str__(self):
+         return repr(self.value)
+
 class CsvWriter(Writer):
 
-    def __init__(self):
-        super(CsvWriter, self).__init__()
+    def __init__(self, **kwargs):
+        super(CsvWriter, self).__init__(**kwargs)
         self.datatype_factory = DataTypeFactory()
         self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
+        self.single_file = kwargs.pop('single_file', False)
+        self.resource_export_configs = self.read_export_configs(kwargs.pop('configs', None))
+
+        if len(self.resource_export_configs) == 0:
+            raise MissingConfigException()
+
+    def read_export_configs(self, configs):
+        '''
+        Reads the export configuration file or object and adds an array for records to store property data
+        '''
+        if configs:
+            resource_export_configs = json.load(open(configs, 'r'))
+            configs = [resource_export_configs]
+        else:
+            configs = []
+            for val in GraphXMapping.objects.values('mapping'):
+                configs.append(val['mapping'])
+
+        return configs
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type, node):
         datatype_instance = self.datatype_factory.get_instance(datatype)
         value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
         return value
 
-    def write_resources(self, resources, resource_export_configs=None, single_file=False):
+    def write_resources(self, graph_id=None, resourceinstanceids=None):
+        graph_id = self.resource_export_configs[0]['resource_model_id']
+        super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+
         csv_records = []
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
-        for resource_export_config in resource_export_configs:
+        for resource_export_config in self.resource_export_configs:
             for node in resource_export_config['nodes']:
                 if node['file_field_name'] != '' and node['export'] == True:
                     mapping[node['arches_nodeid']] = node['file_field_name']
@@ -64,51 +81,48 @@ class CsvWriter(Writer):
         csv_header = ['ResourceID'] + mapping.values()
         csvs_for_export = []
 
-        for resource in resources:
+        for resourceinstanceid, tiles in self.resourceinstances.iteritems():
             csv_record = {}
-            resourceid = resource['_source']['resourceinstanceid']
-            resource_graphid = resource['_source']['graph_id']
-            legacyid = resource['_source']['legacyid']
-            csv_record['ResourceID'] = resourceid
+            csv_record['ResourceID'] = resourceinstanceid
             csv_record['populated_node_groups'] = []
 
-            tiles = sorted(resource['_source']['tiles'], key=lambda k: k['parenttile_id'])
+            tiles = sorted(tiles, key=lambda k: k.parenttile_id)
             for tile in tiles:
                 other_group_record = {}
-                other_group_record['ResourceID'] = resourceid
-                if tile['data'] != {}:
-                    for k in tile['data'].keys():
-                            if tile['data'][k] != '' and k in mapping and tile['data'][k] != None:
-                                if mapping[k] not in csv_record and tile['nodegroup_id'] not in csv_record['populated_node_groups']:
+                other_group_record['ResourceID'] = resourceinstanceid
+                if tile.data != {}:
+                    for k in tile.data.keys():
+                            if tile.data[k] != '' and k in mapping and tile.data[k] != None:
+                                if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record['populated_node_groups']:
                                     concept_export_value_type = None
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
-                                    if tile['data'][k] != None:
-                                        value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
+                                    if tile.data[k] != None:
+                                        value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
                                         csv_record[mapping[k]] = value
-                                    del tile['data'][k]
+                                    del tile.data[k]
                                 else:
                                     concept_export_value_type = None
                                     if k in concept_export_value_lookup:
                                         concept_export_value_type = concept_export_value_lookup[k]
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile['data'][k], concept_export_value_type, k)
+                                    value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
                                     other_group_record[mapping[k]] = value
                             else:
-                                del tile['data'][k]
+                                del tile.data[k]
 
-                    csv_record['populated_node_groups'].append(tile['nodegroup_id'])
+                    csv_record['populated_node_groups'].append(tile.nodegroup_id)
 
-                if other_group_record != {'ResourceID': resourceid}:
+                if other_group_record != {'ResourceID': resourceinstanceid}:
                     other_group_records.append(other_group_record)
 
-            if csv_record != {'ResourceID': resourceid}:
+            if csv_record != {'ResourceID': resourceinstanceid}:
                 csv_records.append(csv_record)
 
-        csv_name_prefix = resource_export_configs[0]['resource_model_name']
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
+        file_name = '{0}_{1}'.format(self.file_prefix, iso_date)
+        csv_name = os.path.join('{0}.{1}'.format(file_name, 'csv'))
 
-        if single_file != True:
+        if self.single_file != True:
             dest = StringIO()
             csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
             csvwriter.writeheader()
@@ -126,7 +140,7 @@ class CsvWriter(Writer):
                 if 'populated_node_groups' in csv_record:
                     del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
-        elif single_file == True:
+        elif self.single_file == True:
             all_records = csv_records + other_group_records
             all_records = sorted(all_records, key=lambda k: k['ResourceID'])
             dest = StringIO()
@@ -138,7 +152,32 @@ class CsvWriter(Writer):
                     del csv_record['populated_node_groups']
                 csvwriter.writerow({k:str(v) for k,v in csv_record.items()})
 
+        if self.graph_id != None:
+            csvs_for_export = csvs_for_export + self.write_resource_relations(file_name=file_name)
+
         return csvs_for_export
+
+    def write_resource_relations(self, file_name):
+        resourceids = self.resourceinstances.keys()
+        relations_file = []
+
+        if self.graph_id != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            dest = StringIO()
+            csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csv_name = os.path.join('{0}.{1}'.format(file_name, 'relations'))
+            relations_file.append({'name':csv_name, 'outputfile': dest})
+
+            relations = ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)).values(*csv_header)
+            for relation in relations:
+                relation['datestarted'] = relation['datestarted'] if relation['datestarted'] != None else ''
+                relation['dateended'] = relation['dateended'] if relation['dateended'] != None else ''
+                relation['notes'] = relation['notes'] if relation['notes'] != None else ''
+                csvwriter.writerow({k:str(v) for k,v in relation.items()})
+
+        return relations_file
+
 
 class CsvReader(Reader):
 

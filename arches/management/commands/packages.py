@@ -36,6 +36,8 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
+from arches.app.utils.data_management.resources.formats.format import MissingGraphException
+from arches.app.utils.data_management.resources.formats.csvfile import MissingConfigException
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -43,7 +45,6 @@ from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
 from arches.management.commands import utils
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-
 
 class Command(BaseCommand):
     """
@@ -590,36 +591,34 @@ class Command(BaseCommand):
         resource_remover.clear_resources()
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
-        if file_format in ['csv', 'json']:
-            resource_exporter = ResourceExporter(file_format)
-            if file_format == 'json':
-                if graph == None or graph == False:
-                    print '*'*80
-                    print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
-                    print '*'*80
-                    sys.exit()
-                config_file = None
-            elif file_format == 'csv':
-                graph = None
-                if config_file == None:
-                    print '*'*80
-                    print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
-                    print '*'*80
-                    sys.exit()
-            if data_dest != '':
-                data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
-
-                for file in data:
-                    with open(os.path.join(data_dest, file['name']), 'wb') as f:
-                        f.write(file['outputfile'].getvalue())
-            else:
-                print '*'*80
-                print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
-                print '*'*80
-                sys.exit()
-        else:
+        try:
+            resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
+        except KeyError as e:
             print '*'*80
             print '{0} is not a valid export file format.'.format(file_format)
+            print '*'*80
+            sys.exit()
+        except MissingConfigException as e:
+            print '*'*80
+            print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
+            print '*'*80
+            sys.exit()
+            
+        if data_dest != '':
+            try:
+                data = resource_exporter.export(graph_id=graph)
+            except MissingGraphException as e:
+                print '*'*80
+                print 'No resource graph specified. Please rerun this command with the \'-g\' parameter populated.'
+                print '*'*80
+                sys.exit()
+
+            for file in data:
+                with open(os.path.join(data_dest, file['name']), 'wb') as f:
+                    f.write(file['outputfile'].getvalue())
+        else:
+            print '*'*80
+            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
             print '*'*80
             sys.exit()
 
@@ -718,11 +717,11 @@ class Command(BaseCommand):
 
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
-        resource_exporter = ResourceExporter(file_format)
+        resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         if data_dest == '.':
             data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != '':
-            data = resource_exporter.export(data_dest=data_dest, configs=config_file, graph=graph, single_file=single_file)
+            data = resource_exporter.export(graph_id=graph)
             for file in data:
                 with open(os.path.join(data_dest, file['name']), 'wb') as f:
                     f.write(file['outputfile'].getvalue())
