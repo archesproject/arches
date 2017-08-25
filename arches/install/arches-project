@@ -52,8 +52,6 @@ def command_create_app(args):
     options = vars(args)
     proj_name = options['name']
     cmd.handle(options)
-    if os.path.isdir(os.path.join(os.getcwd(), proj_name, 'uploadedfiles')) != True:
-        os.makedirs(os.path.join(os.getcwd(), proj_name, 'uploadedfiles'))
     bower_path = os.path.join(os.getcwd(), proj_name, proj_name)
     os.chdir(bower_path)
     subprocess.call("bower install", shell=True)
