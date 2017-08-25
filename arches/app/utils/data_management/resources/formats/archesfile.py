@@ -53,7 +53,21 @@ class ArchesFileReader(Reader):
         functions = FunctionXGraph.objects.filter(graph_id=graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
         for function in functions:
             mod_path = function.function.modulename.replace('.py', '')
-            module = importlib.import_module('arches.app.functions.%s' % mod_path)
+            module = None
+            import_success = False
+            import_error = None
+            for function_dir in settings.FUNCTION_LOCATIONS:
+                try:
+                    module = importlib.import_module(function_dir + '.%s' % mod_path)
+                    import_success = True
+                except ImportError as e:
+                    import_error = e
+                if module != None:
+                    break
+            if import_success == False:
+                print 'Failed to import ' + mod_path
+                print import_error
+
             func = getattr(module, function.function.classname)(function.config, tile['nodegroup_id'])
             ret.append(func)
         return ret

@@ -361,9 +361,13 @@ class Command(BaseCommand):
 
             unzip_file(zip_file, download_dir)
 
+            print 'loading widgets'
             load_widgets()
+            print 'loading functions'
             load_functions()
+            print 'loading datatypes'
             load_datatypes()
+
             load_concepts(overwrite_concepts, stage_concepts)
             load_graphs()
             load_map_layers()
