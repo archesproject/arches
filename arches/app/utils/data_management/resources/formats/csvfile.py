@@ -159,42 +159,25 @@ class CsvWriter(Writer):
 
     def write_resource_relations(self, file_name):
         resourceids = self.resourceinstances.keys()
+        relations_file = []
 
         if self.graph_id != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            relations = self.get_relations_for_export(resourceids)
-            relations_file = self.write_relations(relations, file_name)
-            return relations_file
+            dest = StringIO()
+            csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
+            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+            csvwriter.writeheader()
+            csv_name = os.path.join('{0}.{1}'.format(file_name, 'relations'))
+            relations_file.append({'name':csv_name, 'outputfile': dest})
 
-    def get_relations_for_export(self, resourceids):
-        relations = []
+            relations = ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)).values(*csv_header)
+            for relation in relations:
+                relation['datestarted'] = relation['datestarted'] if relation['datestarted'] != None else ''
+                relation['dateended'] = relation['dateended'] if relation['dateended'] != None else ''
+                relation['notes'] = relation['notes'] if relation['notes'] != None else ''
+                csvwriter.writerow({k:str(v) for k,v in relation.items()})
 
-        for relation in ResourceXResource.objects.filter(Q(resourceinstanceidfrom__in=resourceids)|Q(resourceinstanceidto__in=resourceids)):
-            if any(r['resourcexid'] == relation.resourcexid for r in relations) == False:
-                relation_dest = {}
-                relation_source = relation.__dict__
-                relation_dest['resourceinstanceidfrom'] = relation_source['resourceinstanceidfrom_id']
-                relation_dest['resourceinstanceidto'] = relation_source['resourceinstanceidto_id']
-                relation_dest['datestarted'] = relation_source['datestarted'] if relation_source['datestarted'] != None else ''
-                relation_dest['dateended'] = relation_source['dateended'] if relation_source['dateended'] != None else ''
-                relation_dest['notes'] = relation_source['notes'] if relation_source['notes'] != None else ''
-                relation_dest['resourcexid'] = relation_source['resourcexid']
-                relation_dest['relationshiptype'] = relation_source['relationshiptype']
-                relations.append(relation_dest)
+        return relations_file
 
-        return relations
-
-    def write_relations(self, relations, file_name):
-        relations_for_export = []
-        csv_header = ['resourcexid','resourceinstanceidfrom','resourceinstanceidto','relationshiptype','datestarted','dateended','notes']
-        csv_name = os.path.join('{0}.{1}'.format(file_name, 'relations'))
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-        csvwriter.writeheader()
-        relations_for_export.append({'name':csv_name, 'outputfile': dest})
-        for relation in relations:
-            csvwriter.writerow({k:str(v) for k,v in relation.items()})
-
-        return relations_for_export
 
 class CsvReader(Reader):
 
