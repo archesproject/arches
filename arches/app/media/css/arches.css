@@ -5349,6 +5349,10 @@ div.row.widget-wrapper {
     max-width: 300px;
 }
 
+.select2-container.select2-allowclear .select2-choice abbr {
+    margin-top: 2px;
+}
+
 .widget-preview div.row.widget-wrapper:hover {
     background: #fafafa;
 }
