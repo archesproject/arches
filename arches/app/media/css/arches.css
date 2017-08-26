@@ -5345,6 +5345,10 @@ div.row.widget-wrapper {
     margin-bottom: 0;
 }
 
+.input-group.date {
+    max-width: 300px;
+}
+
 .widget-preview div.row.widget-wrapper:hover {
     background: #fafafa;
 }
