@@ -4466,7 +4466,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .ep-card-crud-container div.panel {
-    border: 1px solid #ddd;
+    border: 0px solid #ddd;
+}
+
+.dz-cancel {
+    border-radius: 50%;
+    background: #FFA08E;
 }
 
 .ep-card-crud-container:last-of-type {
