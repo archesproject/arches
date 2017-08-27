@@ -8547,7 +8547,7 @@ a.search-facet-item.disabled {
     }
     .dl-horizontal dd {
         margin-left: 280px;
-        padding-right: 20px;
+        padding-right: 100px;
     }
     .dl-horizontal dt {
         float: left;
