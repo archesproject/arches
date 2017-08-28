@@ -78,6 +78,15 @@ ONTOLOGY_EXT = [
     'CRMinf_v0.7.rdfs.xml',
     'arches_crm_enhancements.xml'
 ]
+# ONTOLOGIES LISTED HERE WILL NOT BE PREFIXED WITH ANY XMLNS IDENTIFIER IN THE UI
+CRM_ONTOLOGIES = [
+    'http://www.cidoc-crm.org/cidoc-crm/',
+    'http://www.ics.forth.gr/isl/CRMarchaeo/',
+    'http://www.ics.forth.gr/isl/CRMdig/',
+    'http://www.ics.forth.gr/isl/CRMgeo/',
+    'http://www.ics.forth.gr/isl/CRMinf/',
+    'http://www.ics.forth.gr/isl/CRMsci/',
+]
 
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
@@ -260,6 +269,10 @@ LOGIN_URL = 'auth'
 
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 
+BULK_IMPORT_BATCH_SIZE = 2000
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -315,6 +328,7 @@ BUSINESS_DATA_FILES = (
 )
 
 DATATYPE_LOCATIONS = ['arches.app.datatypes',]
+FUNCTION_LOCATIONS = ['arches.app.functions',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -388,10 +402,6 @@ HEX_BIN_SIZE = 100
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
 # high precision binning may result in performance issues.
 HEX_BIN_PRECISION = 4
-
-BULK_IMPORT_BATCH_SIZE = 2000
-
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

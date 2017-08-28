@@ -286,6 +286,7 @@ class Command(BaseCommand):
             business_data = []
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
+            relations = glob.glob(os.path.join(download_dir, '*', 'business_data', 'relations', '*.relations'))
 
             for path in business_data:
                 if path.endswith('csv'):
@@ -294,11 +295,21 @@ class Command(BaseCommand):
                 else:
                     self.import_business_data(path, overwrite=True)
 
+            for relation in relations:
+                self.import_business_data_relations(relation)
+
+            uploaded_files = glob.glob(os.path.join(download_dir, '*', 'business_data','files','*'))
+            dest_files_dir = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles')
+            if os.path.exists(dest_files_dir) == False:
+                os.makedirs(dest_files_dir)
+            for f in uploaded_files:
+                shutil.copy(f, dest_files_dir)
+
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
             component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, ext_type, 'templates')
+            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
@@ -351,13 +362,17 @@ class Command(BaseCommand):
 
             unzip_file(zip_file, download_dir)
 
+            print 'loading widgets'
             load_widgets()
+            print 'loading functions'
             load_functions()
+            print 'loading datatypes'
             load_datatypes()
+
             load_concepts(overwrite_concepts, stage_concepts)
             load_graphs()
             load_map_layers()
-            # load_business_data()
+            load_business_data()
 
         else:
             print "A path to a local or remote zipfile is required"
