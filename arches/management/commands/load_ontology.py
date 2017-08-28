@@ -25,9 +25,12 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
+
+from arches.app.models.system_settings import settings
 # from rdflib import *  
 from rdflib import Graph, RDF, RDFS
 from rdflib.resource import Resource   
+from rdflib.namespace import Namespace, NamespaceManager
 
 class Command(BaseCommand):
     """
@@ -123,6 +126,7 @@ class Command(BaseCommand):
 
         if data_source is not None and version is not None:
             self.graph = Graph()
+            self.namespace_manager = NamespaceManager(self.graph)
             self.subclass_cache = {}
             
             with transaction.atomic():
@@ -193,7 +197,10 @@ class Command(BaseCommand):
         return ret
 
     def extract_friendly_name(self, uri):
-        return str(uri).split('/')[-1]
+        xmlns, term, name = self.namespace_manager.compute_qname(uri)
+        if str(term) in settings.CRM_ONTOLOGIES:
+            return name 
+        return '%s:%s' % (xmlns, name)
 
     def get_subclasses(self, ontology_class):
         if ontology_class not in self.subclass_cache:
@@ -209,7 +216,7 @@ class Command(BaseCommand):
 
         ret = None
         try:
-            if models.get_ontology_storage_system().location in data_source:
+            if models.get_ontology_storage_system().location in os.path.abspath(data_source):
                 ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
             else:
                 ret ='./%s' % os.path.split(data_source)[1]
