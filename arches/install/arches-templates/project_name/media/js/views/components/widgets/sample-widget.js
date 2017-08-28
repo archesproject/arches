@@ -31,6 +31,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 return res;
             }, this);
         },
-        template: { require: 'text!templates/sample-widget.htm' }
+        template: { require: 'text!templates/views/components/widgets/sample-widget.htm' }
     });
 });

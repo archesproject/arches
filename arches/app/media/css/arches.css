@@ -4466,7 +4466,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .ep-card-crud-container div.panel {
-    border: 1px solid #ddd;
+    border: 0px solid #ddd;
+}
+
+.dz-cancel {
+    border-radius: 50%;
+    background: #FFA08E;
 }
 
 .ep-card-crud-container:last-of-type {
@@ -5338,6 +5343,14 @@ div.row.widget-wrapper {
     float: left;
     width: 100%;
     margin-bottom: 0;
+}
+
+.input-group.date {
+    max-width: 300px;
+}
+
+.select2-container.select2-allowclear .select2-choice abbr {
+    margin-top: 2px;
 }
 
 .widget-preview div.row.widget-wrapper:hover {
@@ -8534,7 +8547,7 @@ a.search-facet-item.disabled {
     }
     .dl-horizontal dd {
         margin-left: 280px;
-        padding-right: 20px;
+        padding-right: 100px;
     }
     .dl-horizontal dt {
         float: left;

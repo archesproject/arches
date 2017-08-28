@@ -249,7 +249,7 @@ class Function(models.Model):
     defaultconfig = JSONField(blank=True, null=True)
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    component = models.TextField(blank=True, null=True)
+    component = models.TextField(blank=True, null=True, unique=True)
 
     class Meta:
         managed = True
@@ -262,10 +262,23 @@ class Function(models.Model):
 
     def get_class_module(self):
         mod_path = self.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.functions.%s' % mod_path)
+        module = None
+        import_success = False
+        import_error = None
+        for function_dir in settings.FUNCTION_LOCATIONS:
+            try:
+                module = importlib.import_module(function_dir + '.%s' % mod_path)
+                import_success = True
+            except ImportError as e:
+                import_error = e
+            if module != None:
+                break
+        if import_success == False:
+            print 'Failed to import ' + mod_path
+            print import_error
+
         func = getattr(module, self.classname)
         return func
-
 
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -646,8 +659,8 @@ class FileValue(models.Model):
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
-    component = models.TextField()
+    name = models.TextField(unique=True)
+    component = models.TextField(unique=True)
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
     datatype = models.TextField()
@@ -664,8 +677,8 @@ class Widget(models.Model):
 
 class Geocoder(models.Model):
     geocoderid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
-    component = models.TextField()
+    name = models.TextField(unique=True)
+    component = models.TextField(unique=True)
     api_key = models.TextField(blank=True, null=True)
 
     def __unicode__(self):

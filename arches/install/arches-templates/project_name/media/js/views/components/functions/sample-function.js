@@ -29,7 +29,7 @@ function (ko, koMapping, ListView, FunctionViewModel, chosen) {
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
-            require: 'text!templates/sample-function.htm'
+            require: 'text!templates/views/components/functions/sample-function.htm'
         }
     });
 })

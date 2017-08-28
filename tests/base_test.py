@@ -135,12 +135,7 @@ class TestSearchEngine(SearchEngine):
         kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).bulk_index(**kwargs)
 
-    def create_bulk_item(self, op_type='index', index=None, type=None, id=None, data=None, **kwargs):
-        kwargs['op_type'] = op_type
-        kwargs['index'] = index
-        kwargs['type'] = type
-        kwargs['id'] = id
-        kwargs['data'] = data
+    def create_bulk_item(self, **kwargs):
         kwargs = self.reset_index(**kwargs)
         return super(TestSearchEngine, self).create_bulk_item(**kwargs)
 

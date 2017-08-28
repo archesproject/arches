@@ -37,10 +37,9 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
-from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
+from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
@@ -186,7 +185,7 @@ class GraphDataView(View):
     def get(self, request, graphid, nodeid=None):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
-            graph['metadata'] = ArchesFileExporter().export_metadata()
+            graph['metadata'] = system_metadata()
             f = JSONSerializer().serialize(graph, indent=4)
             graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 

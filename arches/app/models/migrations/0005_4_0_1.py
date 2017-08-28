@@ -131,10 +131,35 @@ class Migration(migrations.Migration):
             UPDATE public.edges
                SET ontologyproperty='P168i_defines_place'
              WHERE ontologyproperty='P167_was_at';
-             
+
             UPDATE public.edges
                SET ontologyproperty='P167i_was_place_at'
              WHERE ontologyproperty='P167i_was_place_of';
         """),
         migrations.RunPython(forwards_func, reverse_func),
+                migrations.AlterField(
+                    model_name='function',
+                    name='component',
+                    field=models.TextField(blank=True, null=True, unique=True),
+                ),
+                migrations.AlterField(
+                    model_name='geocoder',
+                    name='component',
+                    field=models.TextField(unique=True),
+                ),
+                migrations.AlterField(
+                    model_name='geocoder',
+                    name='name',
+                    field=models.TextField(unique=True),
+                ),
+                migrations.AlterField(
+                    model_name='widget',
+                    name='component',
+                    field=models.TextField(unique=True),
+                ),
+                migrations.AlterField(
+                    model_name='widget',
+                    name='name',
+                    field=models.TextField(unique=True),
+                ),
     ]
