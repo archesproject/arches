@@ -111,7 +111,7 @@ wait_for_db() {
 	echo "Testing if database server is up..."
 	while [[ ! ${return_code} == 0 ]]
 	do
-		psql -h ${PGHOST} -U postgres -c "select 1" >&/dev/null
+		psql -h ${PGHOST} -p ${PGPORT} -U postgres -c "select 1" >&/dev/null
 		return_code=$?
 		sleep 1
 	done
@@ -120,7 +120,7 @@ wait_for_db() {
 
 db_exists() {
 	echo "Checking if database "${PGDBNAME}" exists..."
-	count=`psql -h ${PGHOST} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
+	count=`psql -h ${PGHOST} -p ${PGPORT} -U postgres -Atc "SELECT COUNT(*) FROM pg_catalog.pg_database WHERE datname='${PGDBNAME}'"`
 
 	# Check if returned value is a number and not some error message
 	re='^[0-9]+$'
@@ -192,7 +192,7 @@ init_arches_projects() {
 
 
 graphs_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.graphs")
+	row_count=$(psql -h ${PGHOST} -p ${PGPORT} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.graphs")
 	if [[ ${row_count} -le 3 ]]; then
 		return 1
 	else
@@ -201,7 +201,7 @@ graphs_exist() {
 }
 
 concepts_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Concept'")
+	row_count=$(psql -h ${PGHOST} -p ${PGPORT} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Concept'")
 	if [[ ${row_count} -le 2 ]]; then
 		return 1
 	else
@@ -210,7 +210,7 @@ concepts_exist() {
 }
 
 collections_exist() {
-	row_count=$(psql -h ${PGHOST} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Collection'")
+	row_count=$(psql -h ${PGHOST} -p ${PGPORT} -U postgres -d ${PGDBNAME} -Atc "SELECT COUNT(*) FROM public.concepts WHERE nodetype = 'Collection'")
 	if [[ ${row_count} -le 1 ]]; then
 		return 1
 	else
