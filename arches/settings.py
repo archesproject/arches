@@ -59,6 +59,12 @@ PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
+RESOURCE_FORMATERS = {
+    'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
+    'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'rdf': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+}
+
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
 ONTOLOGY_BASE_VERSION = '6.2'
