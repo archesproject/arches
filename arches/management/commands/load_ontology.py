@@ -25,6 +25,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
+
+from arches.app.models.system_settings import settings
 # from rdflib import *  
 from rdflib import Graph, RDF, RDFS
 from rdflib.resource import Resource   
@@ -125,8 +127,6 @@ class Command(BaseCommand):
         if data_source is not None and version is not None:
             self.graph = Graph()
             self.namespace_manager = NamespaceManager(self.graph)
-            crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
-            self.graph.bind('crm', crm, False)
             self.subclass_cache = {}
             
             with transaction.atomic():
@@ -198,7 +198,7 @@ class Command(BaseCommand):
 
     def extract_friendly_name(self, uri):
         xmlns, term, name = self.namespace_manager.compute_qname(uri)
-        if xmlns == 'crm':
+        if str(term) in settings.CRM_ONTOLOGIES:
             return name 
         return '%s:%s' % (xmlns, name)
 
