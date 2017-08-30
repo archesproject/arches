@@ -47,7 +47,7 @@ class RdfWriter(Writer):
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
                 graph_cache[graphid] = {
-                    'rootgraph': None,
+                    'rootedges': [],
                     'subgraphs': {}
                 }
                 graph = models.GraphModel.objects.get(pk=graphid)
@@ -56,7 +56,9 @@ class RdfWriter(Writer):
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
-                        root_edges = get_nodegroup_edges_by_collector_node(node)
+                        for edge in get_nodegroup_edges_by_collector_node(node):
+                            if edge.rangenode.nodegroup is None:
+                                graph_cache[graphid]['rootedges'].append(edge)
                 for nodegroup in nodegroups:
                     graph_cache[graphid]['subgraphs'][nodegroup] = {
                         'edges': [],
@@ -69,20 +71,30 @@ class RdfWriter(Writer):
 
             return graph_cache[graphid]
 
+
+        def add_edge_to_graph(graph, domainnode, rangenode, edge):
+            graph.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
+            graph.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
+            graph.add((domainnode, crm[edge.ontologyproperty], rangenode))
+
+
         dest = StringIO()
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
             g = ds.graph(URIRef('http:/archesproject.com/resource/%s' % resourceinstanceid))
             graphid = tiles[0].resourceinstance.graph_id
             graph_info = get_graph_parts(graphid)
 
+            for edge in graph_cache[graphid]['rootedges']:
+                domainnode = archesproject[str(edge.domainnode.pk)]
+                rangenode = archesproject[str(edge.rangenode.pk)]
+                add_edge_to_graph(g, domainnode, rangenode, edge)
+
             for tile in tiles:
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
                     domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.pk))]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
-                    g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
-                    g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
-                   
-                    g.add((domainnode, crm[edge.ontologyproperty], rangenode))
+                    add_edge_to_graph(g, domainnode, rangenode, edge)
+
                     try:
                         g.add((domainnode, RDF.value, Literal(tile.data[str(edge.domainnode_id)]))) 
                     except:
@@ -96,17 +108,13 @@ class RdfWriter(Writer):
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
-                    g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
-                    g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
-                    g.add((domainnode, crm[edge.ontologyproperty], rangenode))
+                    add_edge_to_graph(g, domainnode, rangenode, edge)
 
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.parenttile.pk))]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
-                    g.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
-                    g.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
-                    g.add((domainnode, crm[edge.ontologyproperty], rangenode))
+                    add_edge_to_graph(g, domainnode, rangenode, edge)
 
             # maybe we have a pre-serialize hook here to allow for graph manipulation before serializing (so the Getty can add multiple classes to a node if need be)
             dest.write(g.serialize(format='pretty-xml'))
