@@ -26,7 +26,7 @@ class RdfWriter(Writer):
         ds = Dataset()
 
         archesproject = Namespace('http://archesproject.com/')
-        crm = Namespace('http://cidoc-crm/')
+        crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
 
         ds.bind('archesproject', archesproject, False)
         ds.bind('crm', crm, False)
