@@ -200,6 +200,12 @@ class Command(BaseCommand):
         xmlns, term, name = self.namespace_manager.compute_qname(uri)
         if str(term) in settings.CRM_ONTOLOGIES:
             return name 
+        try:
+            # if the namespace is something like "ns1" then no xmlns was defined and so we should just use the full uri
+            int(xmlns.partition('ns')[2])
+            return uri
+        except:
+            pass
         return '%s:%s' % (xmlns, name)
 
     def get_subclasses(self, ontology_class):
