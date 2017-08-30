@@ -16,7 +16,7 @@ except ImportError:
 class RdfWriter(Writer):
 
     def __init__(self, **kwargs):
-        self.format = 'rdf-xml'
+        self.format = kwargs.pop('format', 'xml')
         super(RdfWriter, self).__init__(**kwargs)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
@@ -116,8 +116,7 @@ class RdfWriter(Writer):
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
-            # maybe we have a pre-serialize hook here to allow for graph manipulation before serializing (so the Getty can add multiple classes to a node if need be)
-            dest.write(g.serialize(format='pretty-xml'))
+            dest.write(g.serialize(format=self.format))
 
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'rdf'))
@@ -125,3 +124,15 @@ class RdfWriter(Writer):
         rdf_for_export.append({'name':file_name, 'outputfile': dest})
         return rdf_for_export
 
+# to override thess formats, do this
+# class PrettyRdfWriter(RdfWriter):
+
+#     def __init__(self, **kwargs):
+#         super(PrettyRdfWriter, self).__init__(**kwargs)
+#         self.format = 'pretty-xml'
+
+# class JsonLdWriter(RdfWriter):
+
+#     def __init__(self, **kwargs):
+#         super(JsonLdWriter, self).__init__(**kwargs)
+#         self.format = 'json-ld'

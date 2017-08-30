@@ -62,7 +62,13 @@ RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 RESOURCE_FORMATERS = {
     'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
     'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
-    'rdf': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+    'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'rdfa': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
 }
 
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')

@@ -11,10 +11,9 @@ except ImportError:
 
 class ResourceExporter(object):
 
-    def __init__(self, file_format, **kwargs):
-        #self.filetypes = {'csv': CsvWriter, 'json': JsonWriter, 'rdf': RdfWriter}
-        self.format = file_format
-        self.writer = import_class_from_string(settings.RESOURCE_FORMATERS[file_format])(**kwargs)
+    def __init__(self, format=None, **kwargs):
+        kwargs['format'] = format
+        self.writer = import_class_from_string(settings.RESOURCE_FORMATERS[format])(**kwargs)
 
     def export(self, graph_id=None, resourceinstanceids=None):
         resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
