@@ -205,8 +205,7 @@ class Command(BaseCommand):
             int(xmlns.partition('ns')[2])
             return uri
         except:
-            pass
-        return '%s:%s' % (xmlns, name)
+            return '%s:%s' % (xmlns, name)
 
     def get_subclasses(self, ontology_class):
         if ontology_class not in self.subclass_cache:
