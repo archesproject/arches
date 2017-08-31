@@ -175,6 +175,32 @@ define([
                     self.getValidNodesEdges();
                 }
             })
+
+            self.ontologyclass_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.ontologyclass());
+            });
+            self.parentproperty_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.parentproperty());
+            });
+        },
+
+        getFriendlyOntolgyName: function(ontologyname){
+            // xmlns, term, name = self.namespace_manager.compute_qname(uri)
+            // if str(term) in settings.CRM_ONTOLOGIES:
+            //     return name 
+            // try:
+            //     //if the namespace is something like "ns1" then no xmlns was defined and so we should just use the full uri
+            //     int(xmlns.partition('ns')[2])
+            //     return uri
+            // except:
+            //     return '%s:%s' % (xmlns, name)
+
+            if(!!ontologyname){
+                return ontologyname.split('/').slice(-1)[0]
+            }else{
+                return '';
+            }
+
         },
 
         /**

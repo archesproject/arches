@@ -18,7 +18,7 @@
     </div>
 
     <!-- ko if: $data.ontologyclass() !== null -->
-    <div class="library-card-subtitle" data-bind="text: $data.datatype().toLowerCase() + '; ' + $data.ontologyclass()"></div>
+    <div class="library-card-subtitle" data-bind="text: $data.datatype().toLowerCase() + '; ' + $data.ontologyclass_friendlyname()"></div>
     <!-- /ko -->
 
     <!-- ko if: $data.ontologyclass() === null -->
