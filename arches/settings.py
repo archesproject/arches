@@ -98,6 +98,10 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
 
+# This is the namespace to use for export of data (for RDF/XML for example)
+# Ideally this should point to the url where you host your site
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
+
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
 )

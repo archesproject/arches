@@ -2,6 +2,7 @@ import os
 import datetime
 from format import Writer
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from rdflib import Namespace
 from rdflib import URIRef, Literal
 from rdflib import Dataset
@@ -25,11 +26,8 @@ class RdfWriter(Writer):
         rdf_for_export = []
         ds = Dataset()
 
-        archesproject = Namespace('http://archesproject.com/')
-        crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
-
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
         ds.bind('archesproject', archesproject, False)
-        ds.bind('crm', crm, False)
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -73,14 +71,14 @@ class RdfWriter(Writer):
 
 
         def add_edge_to_graph(graph, domainnode, rangenode, edge):
-            graph.add((domainnode, RDF.type, crm[edge.domainnode.ontologyclass]))
-            graph.add((rangenode, RDF.type, crm[edge.rangenode.ontologyclass]))
-            graph.add((domainnode, crm[edge.ontologyproperty], rangenode))
+            graph.add((domainnode, RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            graph.add((rangenode, RDF.type, URIRef(edge.rangenode.ontologyclass)))
+            graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 
         dest = StringIO()
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-            g = ds.graph(URIRef('http:/archesproject.com/resource/%s' % resourceinstanceid))
+            g = ds.graph(archesproject['resource/%s' % resourceinstanceid])
             graphid = tiles[0].resourceinstance.graph_id
             graph_info = get_graph_parts(graphid)
 
