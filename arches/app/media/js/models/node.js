@@ -30,6 +30,7 @@ define([
             self.mapSource = options.mapSource;
             self.loading = options.loading;
             self.permissions = options.permissions;
+            self.ontology_namespaces = options.ontology_namespaces || {};
             if (options.url) {
                 self.url = options.url;
             }
@@ -184,23 +185,35 @@ define([
             });
         },
 
+        /**
+         * Gets the name for an ontology uri that is more user friendly
+         * by using a namespace if possible
+         * "http://www.cidoc-crm.org/cidoc-crm/E1_Entity" could become "E1_Entity"
+         * @memberof NodeModel.prototype
+         * @param {string} ontologyname - the ontology URI to get the friendly name for
+         */
         getFriendlyOntolgyName: function(ontologyname){
-            // xmlns, term, name = self.namespace_manager.compute_qname(uri)
-            // if str(term) in settings.CRM_ONTOLOGIES:
-            //     return name 
-            // try:
-            //     //if the namespace is something like "ns1" then no xmlns was defined and so we should just use the full uri
-            //     int(xmlns.partition('ns')[2])
-            //     return uri
-            // except:
-            //     return '%s:%s' % (xmlns, name)
-
             if(!!ontologyname){
-                return ontologyname.split('/').slice(-1)[0]
+                var uri = _.chain(this.ontology_namespaces)
+                .keys()
+                .find(function(namespace){
+                    return ontologyname.indexOf(namespace) !== -1;
+                })
+                .value();
+
+                if(!!uri){
+                    namespace = this.ontology_namespaces[uri];
+                    if(!!namespace){
+                        return ontologyname.replace(uri, namespace + ":")
+                    }else{
+                        return ontologyname.replace(uri, '');
+                    }
+                }else{
+                    return ontologyname
+                }
             }else{
                 return '';
             }
-
         },
 
         /**

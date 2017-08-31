@@ -84,15 +84,19 @@ ONTOLOGY_EXT = [
     'CRMinf_v0.7.rdfs.xml',
     'arches_crm_enhancements.xml'
 ]
-# ONTOLOGIES LISTED HERE WILL NOT BE PREFIXED WITH ANY XMLNS IDENTIFIER IN THE UI
-CRM_ONTOLOGIES = [
-    'http://www.cidoc-crm.org/cidoc-crm/',
-    'http://www.ics.forth.gr/isl/CRMarchaeo/',
-    'http://www.ics.forth.gr/isl/CRMdig/',
-    'http://www.ics.forth.gr/isl/CRMgeo/',
-    'http://www.ics.forth.gr/isl/CRMinf/',
-    'http://www.ics.forth.gr/isl/CRMsci/',
-]
+
+# Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
+# Users can also override existing namespaces as well if you like
+ONTOLOGY_NAMESPACES = {
+    #'http://my_namespace_here/': 'some_ns',
+    #'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'RDF' <-- note the all caps
+    'http://www.cidoc-crm.org/cidoc-crm/': '',
+    'http://www.ics.forth.gr/isl/CRMarchaeo/': '',
+    'http://www.ics.forth.gr/isl/CRMdig/': '',
+    'http://www.ics.forth.gr/isl/CRMgeo/': '',
+    'http://www.ics.forth.gr/isl/CRMinf/': '',
+    'http://www.ics.forth.gr/isl/CRMsci/': '',
+}
 
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},

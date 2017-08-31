@@ -24,7 +24,8 @@ require([
     var rootNode = new NodeModel({
         source: data.node,
         datatypelookup: [],
-        graph: graph
+        graph: graph,
+        ontology_namespaces: data.ontology_namespaces
     })
     var ontologyClass = ko.observable(data.node.ontologyclass);
     var jsonData = ko.computed(function() {
