@@ -82,12 +82,14 @@ class RdfWriter(Writer):
             graphid = tiles[0].resourceinstance.graph_id
             graph_info = get_graph_parts(graphid)
 
+            # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
             for edge in graph_cache[graphid]['rootedges']:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
                 add_edge_to_graph(g, domainnode, rangenode, edge)
 
             for tile in tiles:
+                # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
                     domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.pk))]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
@@ -100,14 +102,18 @@ class RdfWriter(Writer):
                     try:
                         g.add((rangenode, RDF.value, Literal(tile.data[str(edge.rangenode_id)]))) 
                     except:
-                        pass    
+                        pass 
 
+                # add the edge from the parent node to this tile's root node
+                # tile has no parent tile, which means the domain node has no tile_id
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
+                # add the edge from the parent node to this tile's root node
+                # tile has a parent tile
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
                     domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.parenttile.pk))]
