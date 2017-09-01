@@ -38,7 +38,6 @@ def forwards_func(apps, schema_editor):
             ontology_classes.add(ontology_class)
 
         for ontology_class in ontology_classes:
-            print ontology_class
             for node in Node.objects.filter(ontologyclass=str(ontology_class).split('/')[-1], graph__in=ontology.graphs.all()):
                 node.ontologyclass = ontology_class
                 node.save()
