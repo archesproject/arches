@@ -25,8 +25,9 @@ import datatype
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.utils import IntegrityError
+from django.forms.models import model_to_dict
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
@@ -206,6 +207,7 @@ class Command(BaseCommand):
             self.create_package(options['dest_dir'])
 
     def create_package(self, dest_dir):
+
         if os.path.exists(dest_dir):
             print 'Cannot create package', dest_dir, 'already exists'
         else:
@@ -229,7 +231,33 @@ class Command(BaseCommand):
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
 
+            with open(os.path.join(dest_dir, 'package_config.json'), 'w') as config_file:
+                constraints = models.Resource2ResourceConstraint.objects.all()
+                configs = {"permitted_resource_relationships":constraints}
+                config_file.write(JSONSerializer().serialize(configs))
+
+
+
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
+
+        def load_resource_to_resource_constraints():
+            config_paths = glob.glob(os.path.join(download_dir, '*', 'package_config.json'))
+            if len(config_paths) > 0:
+                configs = json.load(open(config_paths[0]))
+                for relationship in configs['permitted_resource_relationships']:
+                    obj, created = models.Resource2ResourceConstraint.objects.update_or_create(
+                        resourceclassfrom_id=uuid.UUID(relationship['resourceclassfrom_id']),
+                        resourceclassto_id=uuid.UUID(relationship['resourceclassto_id']),
+                        resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
+                    )
+
+        def load_resource_views():
+            resource_views = glob.glob(os.path.join(download_dir, '*', 'business_data','resource_views', '*.sql'))
+            with connection.cursor() as cursor:
+                for view in resource_views:
+                    with open(view, 'r') as f:
+                        sql = f.read()
+                        cursor.execute(sql)
 
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
@@ -368,11 +396,18 @@ class Command(BaseCommand):
             load_functions()
             print 'loading datatypes'
             load_datatypes()
-
+            print 'loading concepts'
             load_concepts(overwrite_concepts, stage_concepts)
+            print 'loading resource models and branches'
             load_graphs()
+            print 'loading resource to resource constraints'
+            load_resource_to_resource_constraints()
+            print 'loading map layers'
             load_map_layers()
+            print 'loading business data - resource instances and relationships'
             load_business_data()
+            print 'loading resource views'
+            load_resource_views()
 
         else:
             print "A path to a local or remote zipfile is required"
@@ -607,7 +642,7 @@ class Command(BaseCommand):
             print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
             print '*'*80
             sys.exit()
-            
+
         if data_dest != '':
             try:
                 data = resource_exporter.export(graph_id=graph)
