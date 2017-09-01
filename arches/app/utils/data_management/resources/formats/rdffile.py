@@ -5,7 +5,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from rdflib import Namespace
 from rdflib import URIRef, Literal
-from rdflib import Dataset
+from rdflib import Graph
 from rdflib.namespace import RDF, RDFS
 
 try:
@@ -22,12 +22,14 @@ class RdfWriter(Writer):
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
-        
-        rdf_for_export = []
-        ds = Dataset()
 
-        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        ds.bind('archesproject', archesproject, False)
+        g = self.get_rdf_graph()
+        dest = StringIO()
+        self.serialize(g, destination=dest, format=self.format)
+
+        return [{'name':self.get_filename(), 'outputfile': dest}]
+
+    def get_rdf_graph(self):
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
@@ -76,9 +78,11 @@ class RdfWriter(Writer):
             graph.add((domainnode, URIRef(edge.ontologyproperty), rangenode))
 
 
-        dest = StringIO()
+        archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+        g = Graph()
+        g.bind('archesproject', archesproject, False)
+
         for resourceinstanceid, tiles in self.resourceinstances.iteritems():
-            g = ds.graph(archesproject['resource/%s' % resourceinstanceid])
             graphid = tiles[0].resourceinstance.graph_id
             graph_info = get_graph_parts(graphid)
 
@@ -108,7 +112,10 @@ class RdfWriter(Writer):
                 # tile has no parent tile, which means the domain node has no tile_id
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] == None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject[str(edge.domainnode.pk)]
+                    if edge.domainnode.istopnode:
+                        domainnode = archesproject['resource/%s' % resourceinstanceid]
+                    else:
+                        domainnode = archesproject[str(edge.domainnode.pk)]
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
@@ -120,23 +127,18 @@ class RdfWriter(Writer):
                     rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
-            dest.write(g.serialize(format=self.format))
+        return g
 
+    def get_filename(self):
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = os.path.join('{0}_{1}.{2}'.format(self.file_prefix, iso_date, 'rdf'))
+        return file_name
+    
+    def serialize(self, g, **kwargs):
+        g.serialize(**kwargs)
 
-        rdf_for_export.append({'name':file_name, 'outputfile': dest})
-        return rdf_for_export
 
-# to override thess formats, do this
-# class PrettyRdfWriter(RdfWriter):
+class JsonLdWriter(RdfWriter):
 
-#     def __init__(self, **kwargs):
-#         super(PrettyRdfWriter, self).__init__(**kwargs)
-#         self.format = 'pretty-xml'
-
-# class JsonLdWriter(RdfWriter):
-
-#     def __init__(self, **kwargs):
-#         super(JsonLdWriter, self).__init__(**kwargs)
-#         self.format = 'json-ld'
+    def serialize(self, g, **kwargs):
+        g.serialize(context=settings.JSON_LD_CONTEXT, **kwargs)
