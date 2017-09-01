@@ -95,8 +95,8 @@ class RdfWriter(Writer):
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info['subgraphs'][tile.nodegroup]['edges']:
-                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.pk))]
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
+                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
+                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
                     try:
@@ -116,15 +116,15 @@ class RdfWriter(Writer):
                         domainnode = archesproject['resource/%s' % resourceinstanceid]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
+                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
                 # add the edge from the parent node to this tile's root node
                 # tile has a parent tile
                 if graph_info['subgraphs'][tile.nodegroup]['parentnode_nodegroup'] != None:
                     edge = graph_info['subgraphs'][tile.nodegroup]['inedge']
-                    domainnode = archesproject["%s--%s" % (str(edge.domainnode.pk), str(tile.parenttile.pk))]
-                    rangenode = archesproject["%s--%s" % (str(edge.rangenode.pk), str(tile.pk))]
+                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
+                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
                     add_edge_to_graph(g, domainnode, rangenode, edge)
 
         return g
