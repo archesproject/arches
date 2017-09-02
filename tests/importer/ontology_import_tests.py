@@ -41,45 +41,45 @@ class OntologyModelTests(ArchesTestCase):
         ontology.delete()
 
     def test_load_ontology(self):
-        ontology_class = models.OntologyClass.objects.get(ontology__pk='11111111-0000-0000-0000-000000000000', source='E53_Place')
+        ontology_class = models.OntologyClass.objects.get(ontology__pk='11111111-0000-0000-0000-000000000000', source='http://www.cidoc-crm.org/cidoc-crm/E53_Place')
 
         predicted_property_list = set([
-            'P1_is_identified_by',
-            'P2_has_type',
-            'P3_has_note',
-            'P48_has_preferred_identifier',
-            'P137_exemplifies',
-            'P15i_influenced',
-            'P17i_motivated',
-            'P136i_supported_type_creation',
-            'P62i_is_depicted_by',
-            'P67i_is_referred_to_by',
-            'P70i_is_documented_in',
-            'P71i_is_listed_in',
-            'P129i_is_subject_of',
-            'P138i_has_representation',
-            'P140i_was_attributed_by',
-            'P39i_was_measured_by',
-            'P41i_was_classified_by',
-            'P141i_was_assigned_by',
-            'P87_is_identified_by',
-            'P89_falls_within',
-            'P121_overlaps_with',
-            'P122_borders_with',
-            'P157_is_at_rest_relative_to',
-            'P168_place_is_defined_by',
-            'P7i_witnessed',
-            'P26i_was_destination_of',
-            'P27i_was_origin_of',
-            'P53i_is_former_or_current_location_of',
-            'P54i_is_current_permanent_location_of',
-            'P55i_currently_holds',
-            'P59i_is_located_on_or_within',
-            'P74i_is_current_or_former_residence_of',
-            'P89i_contains',
-            'P161i_is_spatial_projection_of',
-            'P156i_is_occupied_by',
-            'P167i_was_place_at'
+            'http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P2_has_type',
+            'http://www.cidoc-crm.org/cidoc-crm/P3_has_note',
+            'http://www.cidoc-crm.org/cidoc-crm/P48_has_preferred_identifier',
+            'http://www.cidoc-crm.org/cidoc-crm/P137_exemplifies',
+            'http://www.cidoc-crm.org/cidoc-crm/P15i_influenced',
+            'http://www.cidoc-crm.org/cidoc-crm/P17i_motivated',
+            'http://www.cidoc-crm.org/cidoc-crm/P136i_supported_type_creation',
+            'http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P70i_is_documented_in',
+            'http://www.cidoc-crm.org/cidoc-crm/P71i_is_listed_in',
+            'http://www.cidoc-crm.org/cidoc-crm/P129i_is_subject_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P138i_has_representation',
+            'http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P39i_was_measured_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P41i_was_classified_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P141i_was_assigned_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P87_is_identified_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P89_falls_within',
+            'http://www.cidoc-crm.org/cidoc-crm/P121_overlaps_with',
+            'http://www.cidoc-crm.org/cidoc-crm/P122_borders_with',
+            'http://www.cidoc-crm.org/cidoc-crm/P157_is_at_rest_relative_to',
+            'http://www.cidoc-crm.org/cidoc-crm/P168_place_is_defined_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P7i_witnessed',
+            'http://www.cidoc-crm.org/cidoc-crm/P26i_was_destination_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P27i_was_origin_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P53i_is_former_or_current_location_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P54i_is_current_permanent_location_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P55i_currently_holds',
+            'http://www.cidoc-crm.org/cidoc-crm/P59i_is_located_on_or_within',
+            'http://www.cidoc-crm.org/cidoc-crm/P74i_is_current_or_former_residence_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P89i_contains',
+            'http://www.cidoc-crm.org/cidoc-crm/P161i_is_spatial_projection_of',
+            'http://www.cidoc-crm.org/cidoc-crm/P156i_is_occupied_by',
+            'http://www.cidoc-crm.org/cidoc-crm/P167i_was_place_at'
         ])
         self.assertEqual(len(ontology_class.target['down']), len(predicted_property_list))
         
@@ -90,23 +90,23 @@ class OntologyModelTests(ArchesTestCase):
 
 
         predicted_subclass_list = set([
-            'E41_Appellation',
-            'E42_Identifier',
-            'E44_Place_Appellation',
-            'E45_Address',
-            'E46_Section_Definition'
-            'E47_Spatial_Coordinates',
-            'E48_Place_Name',
-            'E49_Time_Appellation',
-            'E50_Date',
-            'E75_Conceptual_Object_Appellation',
-            'E82_Actor_Appellation',
-            'E51_Contact_Point',
-            'E35_Title',
+            'http://www.cidoc-crm.org/cidoc-crm/E41_Appellation',
+            'http://www.cidoc-crm.org/cidoc-crm/E42_Identifier',
+            'http://www.cidoc-crm.org/cidoc-crm/E44_Place_Appellation',
+            'http://www.cidoc-crm.org/cidoc-crm/E45_Address',
+            'http://www.cidoc-crm.org/cidoc-crm/E46_Section_Definition'
+            'http://www.cidoc-crm.org/cidoc-crm/E47_Spatial_Coordinates',
+            'http://www.cidoc-crm.org/cidoc-crm/E48_Place_Name',
+            'http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation',
+            'http://www.cidoc-crm.org/cidoc-crm/E50_Date',
+            'http://www.cidoc-crm.org/cidoc-crm/E75_Conceptual_Object_Appellation',
+            'http://www.cidoc-crm.org/cidoc-crm/E82_Actor_Appellation',
+            'http://www.cidoc-crm.org/cidoc-crm/E51_Contact_Point',
+            'http://www.cidoc-crm.org/cidoc-crm/E35_Title',
         ])
 
         for item in ontology_class.target['down']:
-            if item['ontology_classes'] == 'P1_is_identified_by':
+            if item['ontology_classes'] == 'http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by':
                 self.assertEqual(set(item['ontology_classes']), predicted_subclass_list)
 
         # {u'ontology_property': u'P89_falls_within', u'ontology_classes': [u'E53_Place']}
