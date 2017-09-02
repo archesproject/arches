@@ -1079,7 +1079,7 @@ define([
                 };
 
                 this.updateConfigs = function() {
-                    if (this.form === null && this.context !== 'report-header') {
+                    if (!this.form) {
                         var mapCenter = this.getCenter()
                         var zoom = self.map.getZoom()
                         if (self.zoom() !== zoom) {
