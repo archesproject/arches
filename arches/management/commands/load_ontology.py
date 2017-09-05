@@ -176,41 +176,30 @@ class Command(BaseCommand):
             for s,p,domain_class in self.graph.triples((ontology_property, RDFS.domain, None)):
                 domain_class = Resource(self.graph, domain_class)
                 for domain_subclass in domain_class.transitive_subjects(RDFS.subClassOf):
-                    if self.extract_friendly_name(domain_subclass.identifier) not in ret:
-                        ret[self.extract_friendly_name(domain_subclass.identifier)] = {'down':[], 'up':[]}
+                    if domain_subclass.identifier not in ret:
+                        ret[domain_subclass.identifier] = {'down':[], 'up':[]}
                     for s,p,range_class in self.graph.triples((ontology_property, RDFS.range, None)):
-                        ret[self.extract_friendly_name(domain_subclass.identifier)]['down'].append({
-                            'ontology_property':self.extract_friendly_name(ontology_property),
+                        ret[domain_subclass.identifier]['down'].append({
+                            'ontology_property':ontology_property,
                             'ontology_classes':self.get_subclasses(range_class)
                         })
 
             for s,p,range_class in self.graph.triples((ontology_property, RDFS.range, None)):
                 range_class = Resource(self.graph, range_class)
                 for range_subclass in range_class.transitive_subjects(RDFS.subClassOf):
-                    if self.extract_friendly_name(range_subclass.identifier) not in ret:
-                        ret[self.extract_friendly_name(range_subclass.identifier)] = {'down':[], 'up':[]}
+                    if range_subclass.identifier not in ret:
+                        ret[range_subclass.identifier] = {'down':[], 'up':[]}
                     for s,p,o in self.graph.triples((ontology_property, RDFS.domain, None)):
-                        ret[self.extract_friendly_name(range_subclass.identifier)]['up'].append({
-                            'ontology_property':self.extract_friendly_name(ontology_property),
+                        ret[range_subclass.identifier]['up'].append({
+                            'ontology_property':ontology_property,
                             'ontology_classes':self.get_subclasses(o)
                         })
         return ret
 
-    def extract_friendly_name(self, uri):
-        xmlns, term, name = self.namespace_manager.compute_qname(uri)
-        if str(term) in settings.CRM_ONTOLOGIES:
-            return name 
-        try:
-            # if the namespace is something like "ns1" then no xmlns was defined and so we should just use the full uri
-            int(xmlns.partition('ns')[2])
-            return uri
-        except:
-            return '%s:%s' % (xmlns, name)
-
     def get_subclasses(self, ontology_class):
         if ontology_class not in self.subclass_cache:
             ontology_class_resource = Resource(self.graph, ontology_class)
-            self.subclass_cache[ontology_class] = [self.extract_friendly_name(subclass.identifier) for subclass in ontology_class_resource.transitive_subjects(RDFS.subClassOf)]
+            self.subclass_cache[ontology_class] = [subclass.identifier for subclass in ontology_class_resource.transitive_subjects(RDFS.subClassOf)]
         return self.subclass_cache[ontology_class]
 
     def get_relative_path(self, data_source):

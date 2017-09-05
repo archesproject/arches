@@ -18,7 +18,8 @@ require([
     */
     var graphModel = new GraphModel({
         data: data.graph,
-        datatypes: data.datatypes
+        datatypes: data.datatypes,
+        ontology_namespaces: data.ontology_namespaces
     });
 
     var nextSelection = null;

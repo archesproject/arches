@@ -1,128 +1,128 @@
 {
     "graph": [
         {
-            "subtitle": "Stores the file and file type related to an Information Resource",
-            "mapfeaturecolor": null,
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-film",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "93304b14-955f-11e6-b664-024f9e178154",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E84_Information_Carrier",
-                    "nodeid": "93304b14-955f-11e6-b664-024f9e178154",
-                    "datatype": "file-list",
-                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154",
-                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Information Carrier"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "514b446f-9560-11e6-b664-024f9e178154",
-                    "datatype": "concept-list",
-                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154",
-                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "3b5a3cd9-c0ff-4053-88a2-9ce94aeec2cb"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Information Carrier Format Type"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "An object or substance used to record and accumulate data",
-            "edges": [
-                {
-                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "514b4470-9560-11e6-b664-024f9e178154",
-                    "domainnode_id": "93304b14-955f-11e6-b664-024f9e178154",
-                    "rangenode_id": "514b446f-9560-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                }
-            ],
-            "maplinewidth": null,
-            "mappointsize": null,
-            "graphid": "93304b15-955f-11e6-b664-024f9e178154",
-            "name": "Information Carrier",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000019",
-                    "card_id": "93304b17-955f-11e6-b664-024f9e178154",
-                    "label": "Information Carrier",
-                    "node_id": "93304b14-955f-11e6-b664-024f9e178154",
-                    "sortorder": 1,
-                    "config": "{\"maxFilesize\":\"200\",\"acceptedFiles\":\"\",\"label\":\"Information Carrier\"}",
-                    "id": "da8af226-dd11-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000012",
-                    "card_id": "93304b17-955f-11e6-b664-024f9e178154",
-                    "label": "Information Carrier Format Type",
-                    "node_id": "514b446f-9560-11e6-b664-024f9e178154",
-                    "sortorder": 0,
-                    "config": "{\"placeholder\":\"Select type\",\"options\":[{\"conceptid\":\"505ac91d-a38f-4984-bee9-269f013951fa\",\"text\":\"DIGITAL FILE FORMAT\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"0535e43a-6a48-4878-8d43-9ce85e1a3d21\",\"text\":\"AAC\",\"id\":\"2de1613a-b235-49fb-8d1e-52295b370b77\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"54b07799-7eb3-42bf-80f2-1af9f5e9e3b2\",\"text\":\"AVI\",\"id\":\"1d240430-23c4-48c0-abf5-ea6c6a232817\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb99b706-105f-4d8d-a64b-ff4acb5647e4\",\"text\":\"CSV\",\"id\":\"f25dce1e-662b-466f-9459-8a44690b39e3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"721a77a5-7d9f-4fb7-bf15-0828e21e6f8f\",\"text\":\"GIF\",\"id\":\"6843d9d4-cea7-4f4d-b559-a8c84b966338\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0336d346-192e-4868-9513-bbe07b5e854e\",\"text\":\"HTML\",\"id\":\"251e0d30-bf6f-4709-b970-a78a89877b92\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"59bfe7c3-28c8-4ff9-9cef-2e5b66699187\",\"text\":\"JPEG\",\"id\":\"e2ca29d9-bf19-4025-a11c-99860f2fde88\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"32a1c08e-a0a8-4d20-b266-112e3e215bdd\",\"text\":\"MOV\",\"id\":\"d655b1c4-e325-4580-a0b4-b5b8f9d976f6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f71f43d2-4618-426c-bf45-8f53b9c89822\",\"text\":\"MP3\",\"id\":\"9a32dd59-e450-4d14-b900-f58c614ea07c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c8f09288-1dc1-4994-958f-d4a5cce20a5d\",\"text\":\"MP4\",\"id\":\"6d86f933-5aa5-40b3-bbb0-54030fddd781\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ca7a757f-5144-4534-9ccb-f340a43de491\",\"text\":\"PDF\",\"id\":\"8b36b6ee-5a92-493f-901d-b165d67b4d9f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5bc20863-ddf7-4016-83ff-bfc9a363adb8\",\"text\":\"PNG\",\"id\":\"80f7d94d-e982-4f87-b9d1-7024783fd7f3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"dfa661f6-d20f-4a9f-9719-815b491e47a4\",\"text\":\"RAW\",\"id\":\"88229316-c2ef-4aad-a958-6e688bbf19c3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"db159fa7-e219-45cc-b4d7-8363d87b8404\",\"text\":\"RDF\",\"id\":\"bcd13a48-770a-4564-893f-bd40eebe8cfe\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bd366ab3-d017-4628-89e7-7d6d0555fa2f\",\"text\":\"SVG\",\"id\":\"f3678843-09eb-4fb4-81b3-6efd891eedc0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2c0651c1-b846-48dc-a3dd-fa6b4e50a9b6\",\"text\":\"TIFF\",\"id\":\"8ce2920c-b3b2-442f-8508-616d0282db52\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3cba21e5-317f-4150-94a7-4324bbc952ea\",\"text\":\"TXT\",\"id\":\"e8951895-b1c4-406f-977d-5ee80faa6d0f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b17667a0-446a-4c63-b251-73626598084d\",\"text\":\"XML\",\"id\":\"55fe9feb-4141-4a55-a8f7-96e146f0ac86\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"00e4438d-1f01-4a5d-a066-c85f2d6e2754\",\"text\":\"other digital file format\",\"id\":\"a1114112-2e5f-470d-84b2-6e33e5e3e21f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"d62ea2bc-2fa7-424d-b6eb-40877a078d37\",\"text\":\"PHYSICAL MATERIAL\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"41f7cd8f-9d1f-42e9-beab-4fae2ad456ef\",\"text\":\"33rpm record\",\"id\":\"dc83d787-1013-4c5c-87cd-6d3f3ff04099\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"58c76a7e-732a-47f4-987a-db90e216bbdc\",\"text\":\"45rpm record\",\"id\":\"d9e265f2-6ea2-417b-892b-819f4d98d03a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ae01a386-713d-4907-91ee-2f7900e76027\",\"text\":\"78rpm record\",\"id\":\"d40eec11-8931-4b78-bedd-8769b07be685\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8169689e-8600-4748-aaa0-e426f06d9c4a\",\"text\":\"VHS tape\",\"id\":\"3717852b-d34d-4fc1-977d-736d23bc1efe\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d7097b31-b504-4dc1-85d6-87b0c572f8f9\",\"text\":\"acetate photographic film\",\"id\":\"a26b605f-c3a8-4aca-9c0b-b384b7b3d974\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9303bfb-2454-4b3b-b0a8-2692ffcad5b6\",\"text\":\"archival paper\",\"id\":\"8fb28833-0715-4c02-98e8-e90100929a45\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bb4fae61-41fd-4137-84ee-a6da71b5eda5\",\"text\":\"art paper\",\"id\":\"f71c4966-ff11-4246-b74d-b23ad80d8f38\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"101ecd1d-42ee-4a74-8fae-7268c2220668\",\"text\":\"board\",\"id\":\"c229f8a1-ece6-4c3f-84ca-de3336989876\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6985d68f-290b-4014-81a1-48a6705a93be\",\"text\":\"card - paper\",\"id\":\"e8b024c8-5e4a-43da-b82f-5fcfd69fd1ff\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"387eefbe-b654-42d4-b4d9-7d0cc1798fb1\",\"text\":\"cartridge paper\",\"id\":\"f1a9ee82-d3d0-4a7a-a8fe-eada5849ad0a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78c05875-2eb0-475f-8adc-02087c64ac7a\",\"text\":\"cassette tape\",\"id\":\"9ea193c2-4529-47f9-a185-fd94bed4c79f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e6ad0955-0c66-47e3-a457-00855def3389\",\"text\":\"cd-recordable\",\"id\":\"025561c6-a496-4ebd-976b-639166b30429\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d9086884-27ce-4a7b-97e1-38be30bc7d5b\",\"text\":\"clear drawing film\",\"id\":\"5405c4f7-c5cf-4ad5-a4d6-fc6639f9114d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f78af5c6-5201-4f26-8bea-841e2c10367f\",\"text\":\"cloth\",\"id\":\"470d9b75-c1f7-4f36-a9f5-e1f7acd522f1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0b69aee6-bb29-41c4-a5b0-b4d6d5af9e96\",\"text\":\"compact disc\",\"id\":\"cd68c769-1633-465d-b93d-d5cc6aea6c16\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2394f582-e1c1-4387-966c-056be566b2cc\",\"text\":\"drawing paper\",\"id\":\"cd78d3d7-9a37-4ebf-9e9a-231a2c6e3785\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fc21651e-8b72-4c55-8087-b6af7f7122e0\",\"text\":\"general/ordinary paper\",\"id\":\"a4382984-9ac4-4a94-91db-9b77f9082b9e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9315e4da-0898-4d0a-b588-8effec936360\",\"text\":\"glass photographic plate\",\"id\":\"821023fa-d400-4d12-a6a7-2809105514b5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b25655ee-68e0-4d9a-ad8c-fb8d7f99e2a1\",\"text\":\"graph paper\",\"id\":\"802c0197-100d-49d4-beac-ce52dc233785\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b4be45f3-9568-48c8-8fab-0f75733f11d3\",\"text\":\"linen backed paper\",\"id\":\"3a101e07-cf07-4440-843e-9a0c64a9bbe0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a0189eb1-95b4-4939-86ef-e50a2ae5db97\",\"text\":\"magnetic disk\",\"id\":\"3c1755c7-e363-4186-b1df-58db266c9c2a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"521b3573-a128-4653-9b33-549f79f74c64\",\"text\":\"nitrate photographic film\",\"id\":\"4d4e3aba-9f22-4968-8f71-ba33876ac9ef\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3286331f-3433-4e93-a324-f57a4069cc6d\",\"text\":\"other material\",\"id\":\"3c838bf5-bc62-4128-b613-5fc0b0f9622d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"23b940a1-2e45-4e87-8d7f-8001f4f3fb3e\",\"text\":\"paper coated with photographic emulsion\",\"id\":\"30f7a8f8-f8cf-46df-9f03-14b917f55db4\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"62162a5b-5b37-45cb-99c7-a7ccfb9acfe3\",\"text\":\"phonograph cylinder\",\"id\":\"2b8bd4a6-7628-4f85-afde-7bb800e00cbf\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2164afde-d0c7-4954-87a2-d4ace493c331\",\"text\":\"photographic film\",\"id\":\"25ab8da9-b382-47ba-a60a-daeae8e1c511\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb2ec001-058f-4133-b658-6363c53991fb\",\"text\":\"photographic paper\",\"id\":\"7167ee46-ae7a-4d33-b143-c72427c7675f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0110d541-0782-4c88-980a-420dba8e5360\",\"text\":\"polyester photographic film\",\"id\":\"f65d352e-e6da-41e5-a777-e68978d23d14\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9deea42-e194-4e92-8e01-45be8dd62e8c\",\"text\":\"specialised paper\",\"id\":\"e2cdef2e-124e-4c5b-9633-8803835ba70a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cf03aaac-c6db-4c42-88f9-fd2638c75974\",\"text\":\"tracing paper\",\"id\":\"a9d95fef-9b5a-4aa2-8b7d-7be35ad13860\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f4fdd8c1-3c77-44fd-8c8c-57e6157c47ea\",\"text\":\"translucent drawing film\",\"id\":\"9a14a540-be81-4f7a-af65-80197e1ef6f8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7e425af6-d064-49e8-9a1f-1cd10991f099\",\"text\":\"translucent paper\",\"id\":\"0687e743-82a7-41f8-9be0-71734c89c3f9\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"46dec84b-a50d-47c2-b3b5-4e6a22d4eb93\",\"text\":\"unknown\",\"id\":\"b17e9188-576a-47fa-9718-393ed38bf342\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"965680f6-92cc-4eb4-a418-124b0a06600e\",\"text\":\"watercolour paper\",\"id\":\"a73327e3-2da8-4b71-b4ea-fc8b49bb6c14\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"04928ecc-27a4-4204-b922-dc25a482d4a1\",\"text\":\"waxed linen\",\"id\":\"f90612eb-210e-4584-a876-a28abe0bb81e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Information Carrier Format Type\"}",
-                    "id": "f6ce6ede-b8f1-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
-                    "description": "An object or substance used to record and accumulate data",
-                    "visible": true,
-                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "93304b17-955f-11e6-b664-024f9e178154",
-                    "helptitle": null,
-                    "instructions": "Select the information carrier for the information resource.",
-                    "active": true,
-                    "name": "Information Carrier"
+                    "active": true, 
+                    "cardid": "93304b17-955f-11e6-b664-024f9e178154", 
+                    "description": "An object or substance used to record and accumulate data", 
+                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Select the information carrier for the information resource.", 
+                    "name": "Information Carrier", 
+                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "93304b17-955f-11e6-b664-024f9e178154", 
+                    "config": "{\"maxFilesize\":\"200\",\"acceptedFiles\":\"\",\"label\":\"Information Carrier\"}", 
+                    "id": "da8af226-dd11-11e6-84a5-026d961c88e6", 
+                    "label": "Information Carrier", 
+                    "node_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
+                }, 
+                {
+                    "card_id": "93304b17-955f-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Select type\",\"options\":[{\"conceptid\":\"505ac91d-a38f-4984-bee9-269f013951fa\",\"text\":\"DIGITAL FILE FORMAT\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"0535e43a-6a48-4878-8d43-9ce85e1a3d21\",\"text\":\"AAC\",\"id\":\"2de1613a-b235-49fb-8d1e-52295b370b77\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"54b07799-7eb3-42bf-80f2-1af9f5e9e3b2\",\"text\":\"AVI\",\"id\":\"1d240430-23c4-48c0-abf5-ea6c6a232817\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb99b706-105f-4d8d-a64b-ff4acb5647e4\",\"text\":\"CSV\",\"id\":\"f25dce1e-662b-466f-9459-8a44690b39e3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"721a77a5-7d9f-4fb7-bf15-0828e21e6f8f\",\"text\":\"GIF\",\"id\":\"6843d9d4-cea7-4f4d-b559-a8c84b966338\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0336d346-192e-4868-9513-bbe07b5e854e\",\"text\":\"HTML\",\"id\":\"251e0d30-bf6f-4709-b970-a78a89877b92\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"59bfe7c3-28c8-4ff9-9cef-2e5b66699187\",\"text\":\"JPEG\",\"id\":\"e2ca29d9-bf19-4025-a11c-99860f2fde88\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"32a1c08e-a0a8-4d20-b266-112e3e215bdd\",\"text\":\"MOV\",\"id\":\"d655b1c4-e325-4580-a0b4-b5b8f9d976f6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f71f43d2-4618-426c-bf45-8f53b9c89822\",\"text\":\"MP3\",\"id\":\"9a32dd59-e450-4d14-b900-f58c614ea07c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c8f09288-1dc1-4994-958f-d4a5cce20a5d\",\"text\":\"MP4\",\"id\":\"6d86f933-5aa5-40b3-bbb0-54030fddd781\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ca7a757f-5144-4534-9ccb-f340a43de491\",\"text\":\"PDF\",\"id\":\"8b36b6ee-5a92-493f-901d-b165d67b4d9f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5bc20863-ddf7-4016-83ff-bfc9a363adb8\",\"text\":\"PNG\",\"id\":\"80f7d94d-e982-4f87-b9d1-7024783fd7f3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"dfa661f6-d20f-4a9f-9719-815b491e47a4\",\"text\":\"RAW\",\"id\":\"88229316-c2ef-4aad-a958-6e688bbf19c3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"db159fa7-e219-45cc-b4d7-8363d87b8404\",\"text\":\"RDF\",\"id\":\"bcd13a48-770a-4564-893f-bd40eebe8cfe\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bd366ab3-d017-4628-89e7-7d6d0555fa2f\",\"text\":\"SVG\",\"id\":\"f3678843-09eb-4fb4-81b3-6efd891eedc0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2c0651c1-b846-48dc-a3dd-fa6b4e50a9b6\",\"text\":\"TIFF\",\"id\":\"8ce2920c-b3b2-442f-8508-616d0282db52\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3cba21e5-317f-4150-94a7-4324bbc952ea\",\"text\":\"TXT\",\"id\":\"e8951895-b1c4-406f-977d-5ee80faa6d0f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b17667a0-446a-4c63-b251-73626598084d\",\"text\":\"XML\",\"id\":\"55fe9feb-4141-4a55-a8f7-96e146f0ac86\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"00e4438d-1f01-4a5d-a066-c85f2d6e2754\",\"text\":\"other digital file format\",\"id\":\"a1114112-2e5f-470d-84b2-6e33e5e3e21f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"d62ea2bc-2fa7-424d-b6eb-40877a078d37\",\"text\":\"PHYSICAL MATERIAL\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"41f7cd8f-9d1f-42e9-beab-4fae2ad456ef\",\"text\":\"33rpm record\",\"id\":\"dc83d787-1013-4c5c-87cd-6d3f3ff04099\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"58c76a7e-732a-47f4-987a-db90e216bbdc\",\"text\":\"45rpm record\",\"id\":\"d9e265f2-6ea2-417b-892b-819f4d98d03a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ae01a386-713d-4907-91ee-2f7900e76027\",\"text\":\"78rpm record\",\"id\":\"d40eec11-8931-4b78-bedd-8769b07be685\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8169689e-8600-4748-aaa0-e426f06d9c4a\",\"text\":\"VHS tape\",\"id\":\"3717852b-d34d-4fc1-977d-736d23bc1efe\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d7097b31-b504-4dc1-85d6-87b0c572f8f9\",\"text\":\"acetate photographic film\",\"id\":\"a26b605f-c3a8-4aca-9c0b-b384b7b3d974\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9303bfb-2454-4b3b-b0a8-2692ffcad5b6\",\"text\":\"archival paper\",\"id\":\"8fb28833-0715-4c02-98e8-e90100929a45\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bb4fae61-41fd-4137-84ee-a6da71b5eda5\",\"text\":\"art paper\",\"id\":\"f71c4966-ff11-4246-b74d-b23ad80d8f38\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"101ecd1d-42ee-4a74-8fae-7268c2220668\",\"text\":\"board\",\"id\":\"c229f8a1-ece6-4c3f-84ca-de3336989876\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6985d68f-290b-4014-81a1-48a6705a93be\",\"text\":\"card - paper\",\"id\":\"e8b024c8-5e4a-43da-b82f-5fcfd69fd1ff\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"387eefbe-b654-42d4-b4d9-7d0cc1798fb1\",\"text\":\"cartridge paper\",\"id\":\"f1a9ee82-d3d0-4a7a-a8fe-eada5849ad0a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78c05875-2eb0-475f-8adc-02087c64ac7a\",\"text\":\"cassette tape\",\"id\":\"9ea193c2-4529-47f9-a185-fd94bed4c79f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e6ad0955-0c66-47e3-a457-00855def3389\",\"text\":\"cd-recordable\",\"id\":\"025561c6-a496-4ebd-976b-639166b30429\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d9086884-27ce-4a7b-97e1-38be30bc7d5b\",\"text\":\"clear drawing film\",\"id\":\"5405c4f7-c5cf-4ad5-a4d6-fc6639f9114d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f78af5c6-5201-4f26-8bea-841e2c10367f\",\"text\":\"cloth\",\"id\":\"470d9b75-c1f7-4f36-a9f5-e1f7acd522f1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0b69aee6-bb29-41c4-a5b0-b4d6d5af9e96\",\"text\":\"compact disc\",\"id\":\"cd68c769-1633-465d-b93d-d5cc6aea6c16\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2394f582-e1c1-4387-966c-056be566b2cc\",\"text\":\"drawing paper\",\"id\":\"cd78d3d7-9a37-4ebf-9e9a-231a2c6e3785\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fc21651e-8b72-4c55-8087-b6af7f7122e0\",\"text\":\"general/ordinary paper\",\"id\":\"a4382984-9ac4-4a94-91db-9b77f9082b9e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9315e4da-0898-4d0a-b588-8effec936360\",\"text\":\"glass photographic plate\",\"id\":\"821023fa-d400-4d12-a6a7-2809105514b5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b25655ee-68e0-4d9a-ad8c-fb8d7f99e2a1\",\"text\":\"graph paper\",\"id\":\"802c0197-100d-49d4-beac-ce52dc233785\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b4be45f3-9568-48c8-8fab-0f75733f11d3\",\"text\":\"linen backed paper\",\"id\":\"3a101e07-cf07-4440-843e-9a0c64a9bbe0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a0189eb1-95b4-4939-86ef-e50a2ae5db97\",\"text\":\"magnetic disk\",\"id\":\"3c1755c7-e363-4186-b1df-58db266c9c2a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"521b3573-a128-4653-9b33-549f79f74c64\",\"text\":\"nitrate photographic film\",\"id\":\"4d4e3aba-9f22-4968-8f71-ba33876ac9ef\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3286331f-3433-4e93-a324-f57a4069cc6d\",\"text\":\"other material\",\"id\":\"3c838bf5-bc62-4128-b613-5fc0b0f9622d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"23b940a1-2e45-4e87-8d7f-8001f4f3fb3e\",\"text\":\"paper coated with photographic emulsion\",\"id\":\"30f7a8f8-f8cf-46df-9f03-14b917f55db4\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"62162a5b-5b37-45cb-99c7-a7ccfb9acfe3\",\"text\":\"phonograph cylinder\",\"id\":\"2b8bd4a6-7628-4f85-afde-7bb800e00cbf\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2164afde-d0c7-4954-87a2-d4ace493c331\",\"text\":\"photographic film\",\"id\":\"25ab8da9-b382-47ba-a60a-daeae8e1c511\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb2ec001-058f-4133-b658-6363c53991fb\",\"text\":\"photographic paper\",\"id\":\"7167ee46-ae7a-4d33-b143-c72427c7675f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0110d541-0782-4c88-980a-420dba8e5360\",\"text\":\"polyester photographic film\",\"id\":\"f65d352e-e6da-41e5-a777-e68978d23d14\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9deea42-e194-4e92-8e01-45be8dd62e8c\",\"text\":\"specialised paper\",\"id\":\"e2cdef2e-124e-4c5b-9633-8803835ba70a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cf03aaac-c6db-4c42-88f9-fd2638c75974\",\"text\":\"tracing paper\",\"id\":\"a9d95fef-9b5a-4aa2-8b7d-7be35ad13860\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f4fdd8c1-3c77-44fd-8c8c-57e6157c47ea\",\"text\":\"translucent drawing film\",\"id\":\"9a14a540-be81-4f7a-af65-80197e1ef6f8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7e425af6-d064-49e8-9a1f-1cd10991f099\",\"text\":\"translucent paper\",\"id\":\"0687e743-82a7-41f8-9be0-71734c89c3f9\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"46dec84b-a50d-47c2-b3b5-4e6a22d4eb93\",\"text\":\"unknown\",\"id\":\"b17e9188-576a-47fa-9718-393ed38bf342\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"965680f6-92cc-4eb4-a418-124b0a06600e\",\"text\":\"watercolour paper\",\"id\":\"a73327e3-2da8-4b71-b4ea-fc8b49bb6c14\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"04928ecc-27a4-4204-b922-dc25a482d4a1\",\"text\":\"waxed linen\",\"id\":\"f90612eb-210e-4584-a876-a28abe0bb81e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Information Carrier Format Type\"}", 
+                    "id": "f6ce6ede-b8f1-11e6-84a5-026d961c88e6", 
+                    "label": "Information Carrier Format Type", 
+                    "node_id": "514b446f-9560-11e6-b664-024f9e178154", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "An object or substance used to record and accumulate data", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "edgeid": "514b4470-9560-11e6-b664-024f9e178154", 
+                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "514b446f-9560-11e6-b664-024f9e178154"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "93304b15-955f-11e6-b664-024f9e178154", 
+            "iconclass": "fa fa-film", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": null, 
+            "maplinewidth": null, 
+            "mappointsize": null, 
+            "name": "Information Carrier", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": null, 
+                    "datatype": "file-list", 
+                    "description": "", 
+                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Information Carrier", 
+                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "nodeid": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E84_Information_Carrier", 
+                    "parentproperty": ""
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "3b5a3cd9-c0ff-4053-88a2-9ce94aeec2cb"
+                    }, 
+                    "datatype": "concept-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "93304b15-955f-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Information Carrier Format Type", 
+                    "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                    "nodeid": "514b446f-9560-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E84_Information_Carrier",
-                "nodeid": "93304b14-955f-11e6-b664-024f9e178154",
-                "datatype": "file-list",
-                "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154",
-                "graph_id": "93304b15-955f-11e6-b664-024f9e178154",
-                "config": null,
-                "name": "Information Carrier"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "file-list", 
+                "description": "", 
+                "graph_id": "93304b15-955f-11e6-b664-024f9e178154", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Information Carrier", 
+                "nodegroup_id": "93304b14-955f-11e6-b664-024f9e178154", 
+                "nodeid": "93304b14-955f-11e6-b664-024f9e178154", 
+                "ontologyclass": "E84_Information_Carrier"
+            }, 
+            "subtitle": "Stores the file and file type related to an Information Resource", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }

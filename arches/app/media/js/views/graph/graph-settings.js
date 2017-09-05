@@ -4,8 +4,9 @@ require([
     'knockout',
     'knockout-mapping',
     'views/graph/graph-page-view',
-    'graph-settings-data'
-], function($, _, ko, koMapping, PageView, data) {
+    'graph-settings-data',
+    'models/node'
+], function($, _, ko, koMapping, PageView, data, NodeModel) {
     /**
     * prep data for models
     */
@@ -20,6 +21,12 @@ require([
     */
     var graph = koMapping.fromJS(data.graph);
     var iconFilter = ko.observable('');
+    var rootNode = new NodeModel({
+        source: data.node,
+        datatypelookup: [],
+        graph: graph,
+        ontology_namespaces: data.ontology_namespaces
+    })
     var ontologyClass = ko.observable(data.node.ontologyclass);
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
@@ -54,6 +61,7 @@ require([
         ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {
             return _.filter(data.ontologyClasses, function (ontologyClass) {
+                ontologyClass.display = rootNode.getFriendlyOntolgyName(ontologyClass.source);
                 return ontologyClass.ontology_id === graph.ontology_id();
             });
         }),

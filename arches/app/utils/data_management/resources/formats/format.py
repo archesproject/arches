@@ -183,6 +183,9 @@ class Writer(object):
             "RECORDS":[]
         }
         self.resourceinstances = {}
+        self.file_prefix = ''
+        self.tiles = []
+        self.graph_id = None
 
     def write_resources(self, graph_id=None, resourceinstanceids=None):
         """
