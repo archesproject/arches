@@ -227,18 +227,39 @@ class Command(BaseCommand):
                 'map_layers/tile_server/overlays',
                 'reference_data/concepts',
                 'reference_data/collections',
+                'system_settings',
             ]
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
 
             with open(os.path.join(dest_dir, 'package_config.json'), 'w') as config_file:
-                constraints = models.Resource2ResourceConstraint.objects.all()
-                configs = {"permitted_resource_relationships":constraints}
-                config_file.write(JSONSerializer().serialize(configs))
+                try:
+                    constraints = models.Resource2ResourceConstraint.objects.all()
+                    configs = {"permitted_resource_relationships":constraints}
+                    config_file.write(JSONSerializer().serialize(configs))
+                except Exception as e:
+                    print e
+                    print 'Could not read resource to resource constraints'
 
-
+            self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
+
+        def load_system_settings():
+            update_system_settings = True
+            if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
+                response = raw_input('Overwrite current system settings with package settings? (T/F): ')
+                if response.lower() in ('t', 'true', 'y', 'yes'):
+                    update_system_settings = True
+                    print 'Using package system settings'
+                else:
+                    update_system_settings = False
+
+            if update_system_settings == True:
+                if len(glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))) > 0:
+                    system_settings = glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))[0]
+                    shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
+
 
         def load_resource_to_resource_constraints():
             config_paths = glob.glob(os.path.join(download_dir, '*', 'package_config.json'))
@@ -253,11 +274,15 @@ class Command(BaseCommand):
 
         def load_resource_views():
             resource_views = glob.glob(os.path.join(download_dir, '*', 'business_data','resource_views', '*.sql'))
-            with connection.cursor() as cursor:
-                for view in resource_views:
-                    with open(view, 'r') as f:
-                        sql = f.read()
-                        cursor.execute(sql)
+            try:
+                with connection.cursor() as cursor:
+                    for view in resource_views:
+                        with open(view, 'r') as f:
+                            sql = f.read()
+                            cursor.execute(sql)
+            except Exception as e:
+                print e
+                print 'Could not connect to db'
 
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
@@ -374,9 +399,6 @@ class Command(BaseCommand):
         remote = True if 'github.com' in source else False
 
         if source != '' or remote == True:
-            if setup_db != False:
-                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                    self.setup_db(settings.PACKAGE_NAME)
 
             if remote == True:
                 download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
@@ -389,6 +411,12 @@ class Command(BaseCommand):
                 zip_file = source
 
             unzip_file(zip_file, download_dir)
+
+            if setup_db != False:
+                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
+                    print 'loading system settings'
+                    load_system_settings()
+                    self.setup_db(settings.PACKAGE_NAME)
 
             print 'loading widgets'
             load_widgets()
