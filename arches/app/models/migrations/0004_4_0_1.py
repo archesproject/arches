@@ -29,5 +29,30 @@ class Migration(migrations.Migration):
             name='created',
             field=models.DateTimeField(default=datetime.datetime.now()),
             preserve_default=False,
-        )
+        ),
+        migrations.AlterField(
+            model_name='function',
+            name='component',
+            field=models.TextField(blank=True, null=True, unique=True),
+        ),
+        migrations.AlterField(
+            model_name='geocoder',
+            name='component',
+            field=models.TextField(unique=True),
+        ),
+        migrations.AlterField(
+            model_name='geocoder',
+            name='name',
+            field=models.TextField(unique=True),
+        ),
+        migrations.AlterField(
+            model_name='widget',
+            name='component',
+            field=models.TextField(unique=True),
+        ),
+        migrations.AlterField(
+            model_name='widget',
+            name='name',
+            field=models.TextField(unique=True),
+        ),
     ]

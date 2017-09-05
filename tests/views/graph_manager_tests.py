@@ -49,13 +49,13 @@ class GraphManagerViewTests(ArchesTestCase):
 
         graph.root.name = 'ROOT NODE'
         graph.root.description = 'Test Root Node'
-        graph.root.ontologyclass = 'E1_CRM_Entity'
+        graph.root.ontologyclass = 'http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity'
         graph.root.datatype = 'semantic'
         graph.root.save()
 
         graph = Graph.objects.get(graphid=graph.pk)
-        self.appended_branch_1 = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
-        self.appended_branch_2 = graph.append_branch('L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
+        self.appended_branch_1 = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
+        self.appended_branch_2 = graph.append_branch('http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         self.ROOT_ID = graph.root.nodeid
@@ -126,7 +126,7 @@ class GraphManagerViewTests(ArchesTestCase):
         nodegroup, created = NodeGroup.objects.get_or_create(pk=str(self.appended_branch_1.root.pk))
         node.nodegroup = nodegroup
         post_data = JSONSerializer().serializeToPython(node)
-        post_data["parentproperty"] = "L54_is_same-as"
+        post_data["parentproperty"] = "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, JSONSerializer().serialize(post_data), content_type)
         response_json = json.loads(response.content)

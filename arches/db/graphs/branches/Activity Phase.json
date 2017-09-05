@@ -1,245 +1,245 @@
 {
     "graph": [
         {
-            "subtitle": "Describes the time span and type of an Activity Resource",
-            "mapfeaturecolor": "#FF0000",
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-tasks",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                    "parentnodegroup_id": null
-                },
-                {
-                    "cardinality": "1",
-                    "legacygroupid": null,
-                    "nodegroupid": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "parentnodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6"
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E4_Period",
-                    "nodeid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Activity Phase"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E52_Time-Span",
-                    "nodeid": "10146735-9bd5-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P4_has_time-span",
-                    "name": "Time Span Phase"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E49_Time_Appellation",
-                    "nodeid": "361c725b-9bd5-11e6-84a5-026d961c88e6",
-                    "datatype": "date",
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P78_is_identified_by",
-                    "name": "To Date"
-                },
-                {
-                    "is_collector": true,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E17_Type_Assignment",
-                    "nodeid": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P41i_was_classified_by",
-                    "name": "Phase Type Assignment"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "fb6498f5-9bd4-11e6-84a5-026d961c88e6",
-                    "datatype": "concept",
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": {
-                        "rdmCollection": "eaf99308-095e-424d-ac8b-51d1da78deb4"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Activity Type"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E49_Time_Appellation",
-                    "nodeid": "242f4feb-9bd5-11e6-84a5-026d961c88e6",
-                    "datatype": "date",
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P78_is_identified_by",
-                    "name": "From Date"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "Describes the time span and type of an Activity Resource.",
-            "edges": [
-                {
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "10146736-9bd5-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "10146735-9bd5-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P4_has_time-span",
-                    "description": null
-                },
-                {
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "242f4fec-9bd5-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "10146735-9bd5-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "242f4feb-9bd5-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P78_is_identified_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "361c725c-9bd5-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "10146735-9bd5-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "361c725b-9bd5-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P78_is_identified_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "fb6498f6-9bd4-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "fb6498f5-9bd4-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "e1776e00-9bd4-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P41i_was_classified_by",
-                    "description": null
-                }
-            ],
-            "maplinewidth": 1,
-            "mappointsize": 3,
-            "graphid": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-            "name": "Activity Phase",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000004",
-                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6",
-                    "label": "From Date",
-                    "node_id": "242f4feb-9bd5-11e6-84a5-026d961c88e6",
-                    "sortorder": 2,
-                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"From Date\"}",
-                    "id": "cdb6a55f-b8ea-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000002",
-                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6",
-                    "label": "Activity Type",
-                    "node_id": "fb6498f5-9bd4-11e6-84a5-026d961c88e6",
-                    "sortorder": 0,
-                    "config": "{\"placeholder\":\"Select an activity type\",\"options\":[{\"conceptid\":\"44908366-a476-4dc3-800e-80fe5a7cdd19\",\"text\":\"Designation or Protection\",\"id\":\"e200e79d-be67-4dc5-8988-ff25e7f93c9f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"ee84b77b-be7e-4d8b-ad47-792ccaf18e5a\",\"text\":\"designation\",\"id\":\"02d173f9-b761-41ba-9808-add3e69a25e7\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"06629fe7-c073-47d4-97de-a71101377a30\",\"text\":\"mills act \",\"id\":\"e9b8858f-2014-4edd-8383-76d2dd79dfe8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"91e835b8-cdee-40f5-ad48-d4b8494a6fe3\",\"text\":\"Investigation\",\"id\":\"b748a257-b005-495b-b182-0c95d83ed266\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"e9f09161-6b43-4ca2-bca1-54b41e6d9d41\",\"text\":\"aerial photograph interpretation\",\"id\":\"e9bb690f-5296-4248-8bd1-0f4236b4e980\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"acd6626b-ec30-49a1-89c7-8d48995c20a3\",\"text\":\"archaeological intervention\",\"id\":\"0438f064-0994-4fc3-a330-bd99702f0cff\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c7a0d1b3-35ec-44fe-83fb-ba74bf81e3bc\",\"text\":\"archaeological survey\",\"id\":\"dc1ec573-5a63-4a03-9162-65c74e9b21cb\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9552f97c-7ff6-46ef-84c8-32bcd28f99a5\",\"text\":\"architectural survey\",\"id\":\"f82ad47f-3618-4876-8d25-030ae93f2fc2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d580e179-32db-4e13-8df7-6c9f616f914e\",\"text\":\"desk based assessment\",\"id\":\"14212bc8-4c37-4d38-8d00-ae7aea14a650\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2cf47d3b-b10e-4e78-8eae-a6cd24cfa87b\",\"text\":\"environmental impact assessment\",\"id\":\"acf07ae5-ead2-444c-88f7-d76831244fed\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9635781a-5e96-4430-b5c7-fa57e7bfe901\",\"text\":\"excavation\",\"id\":\"a305c6ff-e1d7-495a-b539-ec183914f64f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"769b7783-44ae-4621-9ad9-baad5a97abe5\",\"text\":\"field survey\",\"id\":\"7bc760cd-ec62-422f-8036-98ab255767a8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"761f3fb3-3376-4ea3-b121-b2196845dac9\",\"text\":\"heritage assessment\",\"id\":\"4d7745d2-889b-4ae5-bdc2-d32644b61797\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"30ea83c2-c00b-408c-bece-10790860506c\",\"text\":\"historic landscape characterisation\",\"id\":\"1a732f44-a1b1-4678-8d3d-8d70ae9e3953\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c45237ff-a470-4d39-ac11-922c84c9ec0c\",\"text\":\"in-depth condition assessment\",\"id\":\"2e2fbb10-a83c-4bdb-9a01-ec284f6a4651\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a3f222b3-909d-43d4-a002-8fa48cf60aab\",\"text\":\"measured survey\",\"id\":\"35a6b99c-0053-40fc-8c22-1a0ba2df25e3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f4965455-f7be-45b3-8415-28e5365a809f\",\"text\":\"photographic recording\",\"id\":\"9c94b4a0-032e-488d-ba75-596f0fe19006\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"339921d8-cb4a-471e-b540-408b04dc6916\",\"text\":\"remote sensing\",\"id\":\"900cf4dd-7181-4917-a4c8-321fa8cacfc6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"93813dc8-a305-450f-8610-ef3651c8912c\",\"text\":\"salvage recording\",\"id\":\"74cb0706-8acb-465e-85e7-23239e2b89b8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d2b1cf04-78b4-4c0f-a931-fcb009285c45\",\"text\":\"topographic survey\",\"id\":\"93fca9bc-87b3-4d73-acf4-f1a4a6eaa00b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"dcbcafd1-406b-4c09-9165-d315d732680a\",\"text\":\"Management\",\"id\":\"7e1b3b1c-701c-4a0b-99ec-cb445c6520a6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"229f23c9-e733-42e4-bb5b-eee1aff1b514\",\"text\":\"conservation intervention\",\"id\":\"39516933-a187-453b-8b42-83a2c41aba50\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"09e5bece-a444-41f3-830b-107ae8c54d87\",\"text\":\"fencing\",\"id\":\"f65977fe-6d34-4ea9-8557-991e51c8a6bd\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0566a9e6-c403-471f-9b4f-456487064612\",\"text\":\"fire mitigation\",\"id\":\"b1f9295d-38bf-4384-a66d-fc8fb0763eb3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8dc8da6a-2188-4955-a583-f77ab7bbf4f5\",\"text\":\"management intervention\",\"id\":\"ebbd6e17-960c-46d5-8400-f42d6601410c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b097f48a-c643-4ad3-8354-00ae1083d3da\",\"text\":\"reburial\",\"id\":\"2c679386-6e2f-48b1-8e94-ff84ed5079a0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"e6fd644b-8a84-4df9-8554-94c4f81cf0e4\",\"text\":\"building permit\",\"id\":\"0fc96718-eb49-403d-8c60-5d7a4eba4080\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Activity Type\"}",
-                    "id": "cdb6a560-b8ea-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000004",
-                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6",
-                    "label": "To Date",
-                    "node_id": "361c725b-9bd5-11e6-84a5-026d961c88e6",
-                    "sortorder": 1,
-                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"To Date\"}",
-                    "id": "cdb6a55e-b8ea-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "description": "Describes the time span and type of an Activity Resource.",
-                    "visible": true,
-                    "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c88e6",
-                    "helptitle": null,
-                    "instructions": null,
-                    "active": true,
-                    "name": "Activity Phase"
-                },
+                    "active": true, 
+                    "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c88e6", 
+                    "description": "Describes the time span and type of an Activity Resource.", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": null, 
+                    "name": "Activity Phase", 
+                    "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                    "sortorder": null, 
+                    "visible": true
+                }, 
                 {
-                    "helpenabled": false,
-                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                    "description": "Represents a single node in a graph",
-                    "visible": true,
-                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6",
-                    "helptext": null,
-                    "sortorder": 0,
-                    "cardid": "f87bf08a-9bd4-11e6-84a5-026d961c88e6",
-                    "helptitle": null,
-                    "instructions": "Select an activity type and its corresponding to and from dates.",
-                    "active": true,
-                    "name": "Phase Type Assignment"
+                    "active": true, 
+                    "cardid": "f87bf08a-9bd4-11e6-84a5-026d961c88e6", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Select an activity type and its corresponding to and from dates.", 
+                    "name": "Phase Type Assignment", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6", 
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"From Date\"}", 
+                    "id": "cdb6a55f-b8ea-11e6-84a5-026d961c88e6", 
+                    "label": "From Date", 
+                    "node_id": "242f4feb-9bd5-11e6-84a5-026d961c88e6", 
+                    "sortorder": 2, 
+                    "widget_id": "10000000-0000-0000-0000-000000000004"
+                }, 
+                {
+                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6", 
+                    "config": "{\"placeholder\":\"Select an activity type\",\"options\":[{\"conceptid\":\"44908366-a476-4dc3-800e-80fe5a7cdd19\",\"text\":\"Designation or Protection\",\"id\":\"e200e79d-be67-4dc5-8988-ff25e7f93c9f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"ee84b77b-be7e-4d8b-ad47-792ccaf18e5a\",\"text\":\"designation\",\"id\":\"02d173f9-b761-41ba-9808-add3e69a25e7\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"06629fe7-c073-47d4-97de-a71101377a30\",\"text\":\"mills act \",\"id\":\"e9b8858f-2014-4edd-8383-76d2dd79dfe8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"91e835b8-cdee-40f5-ad48-d4b8494a6fe3\",\"text\":\"Investigation\",\"id\":\"b748a257-b005-495b-b182-0c95d83ed266\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"e9f09161-6b43-4ca2-bca1-54b41e6d9d41\",\"text\":\"aerial photograph interpretation\",\"id\":\"e9bb690f-5296-4248-8bd1-0f4236b4e980\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"acd6626b-ec30-49a1-89c7-8d48995c20a3\",\"text\":\"archaeological intervention\",\"id\":\"0438f064-0994-4fc3-a330-bd99702f0cff\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c7a0d1b3-35ec-44fe-83fb-ba74bf81e3bc\",\"text\":\"archaeological survey\",\"id\":\"dc1ec573-5a63-4a03-9162-65c74e9b21cb\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9552f97c-7ff6-46ef-84c8-32bcd28f99a5\",\"text\":\"architectural survey\",\"id\":\"f82ad47f-3618-4876-8d25-030ae93f2fc2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d580e179-32db-4e13-8df7-6c9f616f914e\",\"text\":\"desk based assessment\",\"id\":\"14212bc8-4c37-4d38-8d00-ae7aea14a650\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2cf47d3b-b10e-4e78-8eae-a6cd24cfa87b\",\"text\":\"environmental impact assessment\",\"id\":\"acf07ae5-ead2-444c-88f7-d76831244fed\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9635781a-5e96-4430-b5c7-fa57e7bfe901\",\"text\":\"excavation\",\"id\":\"a305c6ff-e1d7-495a-b539-ec183914f64f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"769b7783-44ae-4621-9ad9-baad5a97abe5\",\"text\":\"field survey\",\"id\":\"7bc760cd-ec62-422f-8036-98ab255767a8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"761f3fb3-3376-4ea3-b121-b2196845dac9\",\"text\":\"heritage assessment\",\"id\":\"4d7745d2-889b-4ae5-bdc2-d32644b61797\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"30ea83c2-c00b-408c-bece-10790860506c\",\"text\":\"historic landscape characterisation\",\"id\":\"1a732f44-a1b1-4678-8d3d-8d70ae9e3953\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c45237ff-a470-4d39-ac11-922c84c9ec0c\",\"text\":\"in-depth condition assessment\",\"id\":\"2e2fbb10-a83c-4bdb-9a01-ec284f6a4651\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a3f222b3-909d-43d4-a002-8fa48cf60aab\",\"text\":\"measured survey\",\"id\":\"35a6b99c-0053-40fc-8c22-1a0ba2df25e3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f4965455-f7be-45b3-8415-28e5365a809f\",\"text\":\"photographic recording\",\"id\":\"9c94b4a0-032e-488d-ba75-596f0fe19006\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"339921d8-cb4a-471e-b540-408b04dc6916\",\"text\":\"remote sensing\",\"id\":\"900cf4dd-7181-4917-a4c8-321fa8cacfc6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"93813dc8-a305-450f-8610-ef3651c8912c\",\"text\":\"salvage recording\",\"id\":\"74cb0706-8acb-465e-85e7-23239e2b89b8\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d2b1cf04-78b4-4c0f-a931-fcb009285c45\",\"text\":\"topographic survey\",\"id\":\"93fca9bc-87b3-4d73-acf4-f1a4a6eaa00b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"dcbcafd1-406b-4c09-9165-d315d732680a\",\"text\":\"Management\",\"id\":\"7e1b3b1c-701c-4a0b-99ec-cb445c6520a6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"229f23c9-e733-42e4-bb5b-eee1aff1b514\",\"text\":\"conservation intervention\",\"id\":\"39516933-a187-453b-8b42-83a2c41aba50\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"09e5bece-a444-41f3-830b-107ae8c54d87\",\"text\":\"fencing\",\"id\":\"f65977fe-6d34-4ea9-8557-991e51c8a6bd\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0566a9e6-c403-471f-9b4f-456487064612\",\"text\":\"fire mitigation\",\"id\":\"b1f9295d-38bf-4384-a66d-fc8fb0763eb3\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8dc8da6a-2188-4955-a583-f77ab7bbf4f5\",\"text\":\"management intervention\",\"id\":\"ebbd6e17-960c-46d5-8400-f42d6601410c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b097f48a-c643-4ad3-8354-00ae1083d3da\",\"text\":\"reburial\",\"id\":\"2c679386-6e2f-48b1-8e94-ff84ed5079a0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"e6fd644b-8a84-4df9-8554-94c4f81cf0e4\",\"text\":\"building permit\",\"id\":\"0fc96718-eb49-403d-8c60-5d7a4eba4080\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Activity Type\"}", 
+                    "id": "cdb6a560-b8ea-11e6-84a5-026d961c88e6", 
+                    "label": "Activity Type", 
+                    "node_id": "fb6498f5-9bd4-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }, 
+                {
+                    "card_id": "f87bf08a-9bd4-11e6-84a5-026d961c88e6", 
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"To Date\"}", 
+                    "id": "cdb6a55e-b8ea-11e6-84a5-026d961c88e6", 
+                    "label": "To Date", 
+                    "node_id": "361c725b-9bd5-11e6-84a5-026d961c88e6", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000004"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Describes the time span and type of an Activity Resource.", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "edgeid": "10146736-9bd5-11e6-84a5-026d961c88e6", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span", 
+                    "rangenode_id": "10146735-9bd5-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "10146735-9bd5-11e6-84a5-026d961c88e6", 
+                    "edgeid": "242f4fec-9bd5-11e6-84a5-026d961c88e6", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by", 
+                    "rangenode_id": "242f4feb-9bd5-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "10146735-9bd5-11e6-84a5-026d961c88e6", 
+                    "edgeid": "361c725c-9bd5-11e6-84a5-026d961c88e6", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by", 
+                    "rangenode_id": "361c725b-9bd5-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "edgeid": "fb6498f6-9bd4-11e6-84a5-026d961c88e6", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "fb6498f5-9bd4-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                    "edgeid": "e1776e00-9bd4-11e6-84a5-026d961c88e6", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P41i_was_classified_by", 
+                    "rangenode_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+            "iconclass": "fa fa-tasks", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": "#FF0000", 
+            "maplinewidth": 1, 
+            "mappointsize": 3, 
+            "name": "Activity Phase", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                    "parentnodegroup_id": null
+                }, 
+                {
+                    "cardinality": "1", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "parentnodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Activity Phase", 
+                    "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+                    "parentproperty": ""
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Time Span Phase", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "10146735-9bd5-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "date", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "To Date", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "361c725b-9bd5-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": true, 
+                    "istopnode": false, 
+                    "name": "Phase Type Assignment", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P41i_was_classified_by"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "eaf99308-095e-424d-ac8b-51d1da78deb4"
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Activity Type", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "fb6498f5-9bd4-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "date", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "From Date", 
+                    "nodegroup_id": "e1776dff-9bd4-11e6-84a5-026d961c88e6", 
+                    "nodeid": "242f4feb-9bd5-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E4_Period",
-                "nodeid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                "datatype": "semantic",
-                "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6",
-                "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6",
-                "config": null,
-                "name": "Activity Phase"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "4ff978b9-9bd4-11e6-84a5-026d961c88e6", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Activity Phase", 
+                "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                "nodeid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
+                "ontologyclass": "E4_Period"
+            }, 
+            "subtitle": "Describes the time span and type of an Activity Resource", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }

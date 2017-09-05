@@ -43,11 +43,23 @@ from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model, assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from rdflib import Graph as RDFGraph, RDF, RDFS
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+
+def get_ontology_namespaces():
+    ontology_namespaces = settings.ONTOLOGY_NAMESPACES
+    g = RDFGraph()
+    for ontology in models.Ontology.objects.all():
+        g.parse(ontology.path.path)
+    for namespace in g.namespaces():
+        if str(namespace[1]) not in ontology_namespaces:
+            ontology_namespaces[str(namespace[1])] = namespace[0]
+    return ontology_namespaces
+
 
 class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
@@ -91,6 +103,7 @@ class GraphSettingsView(GraphBaseView):
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
             node_count=models.Node.objects.filter(graph=self.graph).count(),
+            ontology_namespaces = get_ontology_namespaces()
         )
 
         context['nav']['title'] = self.graph.name
@@ -163,6 +176,7 @@ class GraphManagerView(GraphBaseView):
                 'title': _('Branch Library'),
                 'search_placeholder': _('Find a graph branch')
             },
+            ontology_namespaces = get_ontology_namespaces()
         )
 
         context['nav']['title'] = self.graph.name

@@ -1,205 +1,205 @@
 {
     "graph": [
         {
-            "subtitle": "Stores measurement type, values, and units",
-            "mapfeaturecolor": "#FF0000",
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-anchor",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E58_Measurement_Unit",
-                    "nodeid": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
-                    "datatype": "concept",
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "config": {
-                        "rdmCollection": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77"
-                    },
-                    "parentproperty": "P91_has_unit",
-                    "name": "Measurement Unit"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E54_Dimension",
-                    "nodeid": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P40_observed_dimension",
-                    "name": "Measurement"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E60_Number",
-                    "nodeid": "578120f5-ab8d-11e6-84a5-026d961c88e6",
-                    "datatype": "number",
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P90_has_value",
-                    "name": "Measurement Value"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
-                    "datatype": "concept",
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "config": {
-                        "rdmCollection": "c3e69b80-982f-4e99-bb9c-18a177cbabde"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Measurement Type"
-                },
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E16_Measurement",
-                    "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Measurement Event"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
-            "edges": [
-                {
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "f4a13702-ab8a-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "578120f6-ab8d-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "578120f5-ab8d-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P90_has_value",
-                    "description": null
-                },
-                {
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "8ceadf52-ab8d-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P91_has_unit",
-                    "description": null
-                },
-                {
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "f2d2fbe8-ab8c-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P40_observed_dimension",
-                    "description": null
-                }
-            ],
-            "maplinewidth": 1,
-            "mappointsize": 3,
-            "graphid": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-            "name": "Measurement",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000008",
-                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
-                    "label": "Measurement Value",
-                    "node_id": "578120f5-ab8d-11e6-84a5-026d961c88e6",
-                    "sortorder": 2,
-                    "config": "{\"max\":\"\",\"placeholder\":\"Enter value\",\"width\":\"100%\",\"min\":\"\",\"label\":\"Measurement Value\"}",
-                    "id": "fc0448fe-ab8d-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000002",
-                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
-                    "label": "Measurement Unit",
-                    "node_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6",
-                    "sortorder": 1,
-                    "config": "{\"placeholder\":\"Select unit\",\"options\":[{\"conceptid\":\"0e492db2-a026-4d6b-81f5-e409775be21f\",\"text\":\"inches\",\"id\":\"5509b823-7ace-4253-a3e5-0ebb5b976392\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"14923c78-a07a-478f-9d5b-d054de6d98e4\",\"text\":\"meters\",\"id\":\"b7611b55-55e2-4889-b923-687a89765c02\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ef64d304-a3c8-450a-a4cd-4462bbd00262\",\"text\":\"kilometers\",\"id\":\"928219af-a567-40c0-a9ad-8640c8afc800\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5a2383f4-10d8-41d8-8a2b-c66b4919b955\",\"text\":\"grams\",\"id\":\"d7a48024-8240-40b9-b8db-dce1067721fa\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"67ffe1c8-3399-481c-87c8-65a0b61bf868\",\"text\":\"kilograms\",\"id\":\"1064db18-7c59-4e02-9080-d1664bb3742e\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"73f04aea-6da6-4b06-aa2e-332126f3a240\",\"text\":\"feet\",\"id\":\"04705f94-7f76-4021-8490-12546cd323f9\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"00d2586d-0739-45f5-8812-993ae25a540e\",\"text\":\"yards\",\"id\":\"9eb07bbd-70d6-4929-8d0f-fdd2ffdbf616\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bf2c2b08-9a80-4a01-b063-2cac9fb16eac\",\"text\":\"miles\",\"id\":\"b555a5f5-4ac5-43c9-b6f0-8582e06bd2b1\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a65d1d4a-04b9-4ae5-9ee6-be8cba3da3f0\",\"text\":\"ounces\",\"id\":\"fda6e884-8eae-4c13-8490-1ff30b6c8246\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ce8628de-2c44-48ca-a2ee-40375a27c5d5\",\"text\":\"pounds\",\"id\":\"b9214765-3e1f-4a25-a57e-dfb8af66ad6d\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"701743e7-595b-4a8b-9576-3d46fa52b14c\",\"text\":\"tons\",\"id\":\"ccd30536-474c-496b-a617-538750c5a714\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a048b03a-f279-454b-baa3-253891cf47bb\",\"text\":\"millimeters\",\"id\":\"bd87e569-754e-4738-ad22-887be1feb92b\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5884d60d-1b8c-40fc-99c8-055bca602fa7\",\"text\":\"centimeters\",\"id\":\"41722438-4e84-45ed-a3b5-f12e04dcfd5c\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}],\"label\":\"Measurement Unit\"}",
-                    "id": "fc044900-ab8d-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000002",
-                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
-                    "label": "Measurement Type",
-                    "node_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6",
-                    "sortorder": 0,
-                    "config": "{\"placeholder\":\"Select type\",\"options\":[{\"conceptid\":\"2d152d1d-17e5-4fed-ac36-919f823be256\",\"text\":\"breadth\",\"id\":\"857d8806-0e0f-4f7d-aed6-fad250ef97ea\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"99e96cb3-21ec-499b-9536-2ed69754d2c5\",\"text\":\"depth\",\"id\":\"8a3fe0fe-3c5f-4a8e-a08d-b2fe4ad95653\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5e0124cc-c308-4fec-ab60-08a39ba1f643\",\"text\":\"height\",\"id\":\"db42d2f8-d2d7-465f-b1b2-189f433a6b7c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8a0cf26a-2184-4af4-9df4-5ee5dc4879b0\",\"text\":\"length\",\"id\":\"88f2a040-48c0-4240-a9e2-75312a6dd04d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"32a94c6d-d55f-4019-9f56-3ac7934b59a3\",\"text\":\"weight\",\"id\":\"a9bfce58-2a2f-4c48-a8fe-88f1b24463d6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"26980537-8582-4bdb-8aea-38d60202face\",\"text\":\"tonnage\",\"id\":\"5d6a0c6c-40b0-409c-a88f-3378761c5562\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Measurement Type\"}",
-                    "id": "fc0448ff-ab8d-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                    "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i",
-                    "visible": true,
-                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "9bab22c1-ab8a-11e6-84a5-026d961c88e6",
-                    "helptitle": null,
-                    "instructions": "Capture the measurements associated to this resource.",
-                    "active": true,
-                    "name": "Measurement"
+                    "active": true, 
+                    "cardid": "9bab22c1-ab8a-11e6-84a5-026d961c88e6", 
+                    "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Capture the measurements associated to this resource.", 
+                    "name": "Measurement", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6", 
+                    "config": "{\"max\":\"\",\"placeholder\":\"Enter value\",\"width\":\"100%\",\"min\":\"\",\"label\":\"Measurement Value\"}", 
+                    "id": "fc0448fe-ab8d-11e6-84a5-026d961c88e6", 
+                    "label": "Measurement Value", 
+                    "node_id": "578120f5-ab8d-11e6-84a5-026d961c88e6", 
+                    "sortorder": 2, 
+                    "widget_id": "10000000-0000-0000-0000-000000000008"
+                }, 
+                {
+                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6", 
+                    "config": "{\"placeholder\":\"Select unit\",\"options\":[{\"conceptid\":\"0e492db2-a026-4d6b-81f5-e409775be21f\",\"text\":\"inches\",\"id\":\"5509b823-7ace-4253-a3e5-0ebb5b976392\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"14923c78-a07a-478f-9d5b-d054de6d98e4\",\"text\":\"meters\",\"id\":\"b7611b55-55e2-4889-b923-687a89765c02\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ef64d304-a3c8-450a-a4cd-4462bbd00262\",\"text\":\"kilometers\",\"id\":\"928219af-a567-40c0-a9ad-8640c8afc800\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5a2383f4-10d8-41d8-8a2b-c66b4919b955\",\"text\":\"grams\",\"id\":\"d7a48024-8240-40b9-b8db-dce1067721fa\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"67ffe1c8-3399-481c-87c8-65a0b61bf868\",\"text\":\"kilograms\",\"id\":\"1064db18-7c59-4e02-9080-d1664bb3742e\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"73f04aea-6da6-4b06-aa2e-332126f3a240\",\"text\":\"feet\",\"id\":\"04705f94-7f76-4021-8490-12546cd323f9\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"00d2586d-0739-45f5-8812-993ae25a540e\",\"text\":\"yards\",\"id\":\"9eb07bbd-70d6-4929-8d0f-fdd2ffdbf616\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bf2c2b08-9a80-4a01-b063-2cac9fb16eac\",\"text\":\"miles\",\"id\":\"b555a5f5-4ac5-43c9-b6f0-8582e06bd2b1\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a65d1d4a-04b9-4ae5-9ee6-be8cba3da3f0\",\"text\":\"ounces\",\"id\":\"fda6e884-8eae-4c13-8490-1ff30b6c8246\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ce8628de-2c44-48ca-a2ee-40375a27c5d5\",\"text\":\"pounds\",\"id\":\"b9214765-3e1f-4a25-a57e-dfb8af66ad6d\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"701743e7-595b-4a8b-9576-3d46fa52b14c\",\"text\":\"tons\",\"id\":\"ccd30536-474c-496b-a617-538750c5a714\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a048b03a-f279-454b-baa3-253891cf47bb\",\"text\":\"millimeters\",\"id\":\"bd87e569-754e-4738-ad22-887be1feb92b\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5884d60d-1b8c-40fc-99c8-055bca602fa7\",\"text\":\"centimeters\",\"id\":\"41722438-4e84-45ed-a3b5-f12e04dcfd5c\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}],\"label\":\"Measurement Unit\"}", 
+                    "id": "fc044900-ab8d-11e6-84a5-026d961c88e6", 
+                    "label": "Measurement Unit", 
+                    "node_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }, 
+                {
+                    "card_id": "9bab22c1-ab8a-11e6-84a5-026d961c88e6", 
+                    "config": "{\"placeholder\":\"Select type\",\"options\":[{\"conceptid\":\"2d152d1d-17e5-4fed-ac36-919f823be256\",\"text\":\"breadth\",\"id\":\"857d8806-0e0f-4f7d-aed6-fad250ef97ea\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"99e96cb3-21ec-499b-9536-2ed69754d2c5\",\"text\":\"depth\",\"id\":\"8a3fe0fe-3c5f-4a8e-a08d-b2fe4ad95653\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5e0124cc-c308-4fec-ab60-08a39ba1f643\",\"text\":\"height\",\"id\":\"db42d2f8-d2d7-465f-b1b2-189f433a6b7c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8a0cf26a-2184-4af4-9df4-5ee5dc4879b0\",\"text\":\"length\",\"id\":\"88f2a040-48c0-4240-a9e2-75312a6dd04d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"32a94c6d-d55f-4019-9f56-3ac7934b59a3\",\"text\":\"weight\",\"id\":\"a9bfce58-2a2f-4c48-a8fe-88f1b24463d6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[{\"conceptid\":\"26980537-8582-4bdb-8aea-38d60202face\",\"text\":\"tonnage\",\"id\":\"5d6a0c6c-40b0-409c-a88f-3378761c5562\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Measurement Type\"}", 
+                    "id": "fc0448ff-ab8d-11e6-84a5-026d961c88e6", 
+                    "label": "Measurement Type", 
+                    "node_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "The Measurement branch measures instances of a Heritage Resource E18 or a Heritage Resource Group E27\n\nRelates to those resource models via P39i", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "edgeid": "f4a13702-ab8a-11e6-84a5-026d961c88e6", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "f4a13701-ab8a-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6", 
+                    "edgeid": "578120f6-ab8d-11e6-84a5-026d961c88e6", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P90_has_value", 
+                    "rangenode_id": "578120f5-ab8d-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6", 
+                    "edgeid": "8ceadf52-ab8d-11e6-84a5-026d961c88e6", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P91_has_unit", 
+                    "rangenode_id": "8ceadf51-ab8d-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "edgeid": "f2d2fbe8-ab8c-11e6-84a5-026d961c88e6", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P40_observed_dimension", 
+                    "rangenode_id": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+            "iconclass": "fa fa-anchor", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": "#FF0000", 
+            "maplinewidth": 1, 
+            "mappointsize": 3, 
+            "name": "Measurement", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": {
+                        "rdmCollection": "fa8a9bcc-82ee-4882-bf56-1c029c3d8a77"
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Measurement Unit", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "nodeid": "8ceadf51-ab8d-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E58_Measurement_Unit", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P91_has_unit"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Measurement", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "nodeid": "f2d2fbe7-ab8c-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P40_observed_dimension"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "number", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Measurement Value", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "nodeid": "578120f5-ab8d-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E60_Number", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P90_has_value"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "c3e69b80-982f-4e99-bb9c-18a177cbabde"
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Measurement Type", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "nodeid": "f4a13701-ab8a-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Measurement Event", 
+                    "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E16_Measurement", 
+                    "parentproperty": ""
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E16_Measurement",
-                "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                "datatype": "semantic",
-                "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6",
-                "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6",
-                "config": null,
-                "name": "Measurement Event"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "9bab22bf-ab8a-11e6-84a5-026d961c88e6", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Measurement Event", 
+                "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
+                "ontologyclass": "E16_Measurement"
+            }, 
+            "subtitle": "Stores measurement type, values, and units", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }
