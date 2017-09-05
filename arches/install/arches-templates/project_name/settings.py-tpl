@@ -52,6 +52,7 @@ DATABASES = {
 
 ALLOWED_HOSTS = []
 
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 STATIC_ROOT = '/var/www/media'
 
