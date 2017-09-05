@@ -1,225 +1,225 @@
 {
     "graph": [
         {
-            "subtitle": "Describes modification of a Heritage Resource",
-            "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-pencil",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E11_Modification",
-                    "nodeid": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Modification Event"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E49_Time_Appellation",
-                    "nodeid": "2a4aca73-b8f3-11e6-84a5-026d961c88e6",
-                    "datatype": "date",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P78_is_identified_by",
-                    "name": "Modification Date"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E13_Attribute_Assignment",
-                    "nodeid": "0a5212ef-ab82-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P140i_was_attributed_by",
-                    "name": "Modification Description Assignment"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E62_String",
-                    "nodeid": "ecae1d87-ab82-11e6-84a5-026d961c88e6",
-                    "datatype": "string",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P3_has_note",
-                    "name": "Modification Description"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E52_Time-Span",
-                    "nodeid": "188e400d-b8f3-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": null,
-                    "parentproperty": "P4_has_time-span",
-                    "name": "Modification Time Span"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "3e2fcafb-97cf-11e6-84a5-026d961c88e6",
-                    "datatype": "concept-list",
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "config": {
-                        "rdmCollection": "6a00055c-437b-4fed-b788-43e5b7a8201b"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Modification Type"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i",
-            "edges": [
-                {
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "0a5212f0-ab82-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "0a5212ef-ab82-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P140i_was_attributed_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "2a4aca74-b8f3-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "188e400d-b8f3-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "2a4aca73-b8f3-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P78_is_identified_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "188e400e-b8f3-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "188e400d-b8f3-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P4_has_time-span",
-                    "description": null
-                },
-                {
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "3e2fcafc-97cf-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "3e2fcafb-97cf-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "name": null,
-                    "edgeid": "ecae1d88-ab82-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "0a5212ef-ab82-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "ecae1d87-ab82-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P3_has_note",
-                    "description": null
-                }
-            ],
-            "maplinewidth": 1,
-            "mappointsize": 4,
-            "graphid": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-            "name": "Modification Event",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000005",
-                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6",
-                    "label": "Modification/Alteration Description",
-                    "node_id": "ecae1d87-ab82-11e6-84a5-026d961c88e6",
-                    "sortorder": 2,
-                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"label\":\"Modification/Alteration Description\"}",
-                    "id": "e7da4835-b8f2-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000004",
-                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6",
-                    "label": "Modification/Alteration Date",
-                    "node_id": "2a4aca73-b8f3-11e6-84a5-026d961c88e6",
-                    "sortorder": 0,
-                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Modification/Alteration Date\"}",
-                    "id": "4172dbea-b8f3-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000012",
-                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6",
-                    "label": "Modification/Alteration Type",
-                    "node_id": "3e2fcafb-97cf-11e6-84a5-026d961c88e6",
-                    "sortorder": 1,
-                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"722d9ff4-c470-466c-8e96-d8037979d5ba\",\"text\":\"Addition to primary elevation\",\"id\":\"496d7001-5912-48c4-b9b1-5a60d8afec27\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2e234b26-d24a-4cf3-99f4-f8c355f8b9be\",\"text\":\"Addition to rear/side elevation\",\"id\":\"9e416521-dc78-4690-b658-1e128ce81ec2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3674c32c-d89f-45a6-bff8-eef76bee4d50\",\"text\":\"Addition to upper story\",\"id\":\"07adc1d8-2f7a-4799-ac2b-371b593d6be6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ab586613-9ec2-4a7f-931f-e4cc4633081f\",\"text\":\"Appears to be unaltered\",\"id\":\"711fc7aa-7e53-4b3d-9c76-951a6bf0d020\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b103fec3-bbcf-4b76-b817-42c3a769d11d\",\"text\":\"Awnings added\",\"id\":\"28c9f8c7-9c5d-4d8d-8781-dc51d12a0614\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"76dea51c-0f17-474c-a1d5-c5bfebecf53f\",\"text\":\"Balcony added\",\"id\":\"068f4791-4845-41bd-8d09-f49769c8344e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"19fea997-ca00-4c00-a25d-25d1590b7b66\",\"text\":\"Balcony altered or enclosed\",\"id\":\"eeea1e2e-ba3b-4007-9a40-35a78ab40115\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9c9c5138-f4a4-459a-97fb-1e59980c2f2b\",\"text\":\"Brickwork/stone painted\",\"id\":\"a7fcd074-00fc-49bd-b213-e128d95ec53a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4c9cb8ef-7afe-4f4b-adcc-948f6f02a6ee\",\"text\":\"Carport added\",\"id\":\"ff6dba95-bae6-4289-927d-20bfc9683a0b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8a6bd560-b494-4dab-ab91-9566dbc52d08\",\"text\":\"Carport altered or enclosed\",\"id\":\"7da367ed-379c-4b17-a1bb-b9b47895a215\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9c6235e2-f5f1-456c-b136-7ebb5be4dd9e\",\"text\":\"Carport removed\",\"id\":\"b1ca9c93-c368-41c0-b5a8-4ef4a5eb07a0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a3c50729-179a-4bf5-94b7-137df07b6eb5\",\"text\":\"Chimney altered\",\"id\":\"e84b812c-4e6d-4d97-8b18-64394c5344cb\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e7571328-ab5b-4083-8c30-66cf41ac4316\",\"text\":\"Completely altered\",\"id\":\"d84e1720-027d-48a4-b947-36a6b22d9eee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ece925a3-8bf6-475e-a63f-8cc30eefbe32\",\"text\":\"Decorative elements added\",\"id\":\"df0ad63d-c926-4d32-bf7d-c600fca1d950\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d8c9c16d-21ad-4213-9c9f-b05c9cc0eb2b\",\"text\":\"Decorative elements removed\",\"id\":\"93b76072-816e-47cd-9371-7c5d5668fe2f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"66e0a7ba-bf49-4f48-b40e-1d78f45a2bd7\",\"text\":\"Door (primary) opening or entrance altered\",\"id\":\"97a82c25-8acc-4546-8adb-ac2b8152f0ef\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"afdd437d-b7d3-430c-b71a-3173a12f9818\",\"text\":\"Door (primary) replaced\",\"id\":\"76e75d2e-b9db-43b9-a114-9430f8da9b80\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1a60452a-4a58-4027-b872-f1c407ae08d8\",\"text\":\"Door/entrance added\",\"id\":\"e06c79e4-629a-4a00-b1f9-3bd2d7f256ee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7c5db7f1-e3a4-4b41-9631-39580343136d\",\"text\":\"Exterior staircases added\",\"id\":\"6e8e64cd-480a-436e-acbf-b303865a1b32\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f2b24e50-4df0-452f-a1cf-9802a80829f6\",\"text\":\"Garage altered or replaced\",\"id\":\"f3850419-758e-45f0-8264-d1c8f53b6fd1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4ad2324d-20c2-40d7-b790-d768045f20e4\",\"text\":\"Garage door replaced\",\"id\":\"eb87fd5d-3bf4-4aba-9465-1766b920280f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"64138cf0-9c32-4a72-834b-7b56c01b32d8\",\"text\":\"Garage postdates residence\",\"id\":\"6ca711c4-5f1f-4153-b0e9-c4ea177d055d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0f916134-f57f-46c1-93b3-e1c9ebcf1ac6\",\"text\":\"Landscape/hardscape altered\",\"id\":\"d64c28ba-b418-4aca-ae99-1b346e74788b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bdbf4fd0-2233-487c-b0d4-ac65a31aae47\",\"text\":\"No major alterations\",\"id\":\"18310916-7403-4f31-a8ef-600363ff4b5f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fb01e551-3d33-4d20-849a-7587e060f527\",\"text\":\"Parapet altered or removed\",\"id\":\"7786d45a-ae12-421b-b267-994c1f82d373\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78a5445b-3086-4cbe-9a1a-c8f127f4b7aa\",\"text\":\"Perimeter fence or wall added\",\"id\":\"42db092d-b3dd-4813-9869-99ba3db8cc46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a9d3ccb1-0db7-48d2-a3c7-3d90f1d1146e\",\"text\":\"Porch added\",\"id\":\"9d114895-8a59-4cf1-bd39-34dbabfe0497\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9e11871-1b1f-489e-a38b-0ed2c1b90363\",\"text\":\"Porch altered or enclosed\",\"id\":\"e702213d-08ce-4078-ac3b-685112a09d94\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"30b7a498-9959-4269-96eb-800d77d9b3a1\",\"text\":\"Porch rails altered or replaced\",\"id\":\"8f3e61e4-80f0-41ba-9318-4c8333402ea5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4a6219ac-dba5-430c-9926-ed6dbfbf50c7\",\"text\":\"Porch removed\",\"id\":\"37a83a92-a962-495f-9d54-28672a54a92c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"476aee69-8ca9-4960-971d-9bb0b2a6f299\",\"text\":\"Porte cochere added\",\"id\":\"8e13bbe2-2b90-43ba-bc60-4cbe1ee3bde5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e67906a5-24a4-4914-8d2f-2ba109d32a6d\",\"text\":\"Porte cochere altered or removed\",\"id\":\"dcd817dc-64ee-48d0-be7f-44149e709876\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"dfed084f-fe7f-45c3-84ac-80f52bd7335b\",\"text\":\"Roof dormer added\",\"id\":\"673f762d-4444-485a-9660-bc6237518f06\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"38653962-7965-41c7-ad45-d5e5c50c0918\",\"text\":\"Roof dormer altered\",\"id\":\"3803442d-4c31-4bd0-9f69-62f5ff512d2a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"153cfd84-7208-499e-9575-c131a96984fe\",\"text\":\"Roof replaced with incompatible materials\",\"id\":\"38e69e10-b953-4200-8c09-7e9c0ce8736f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9fc0b4c5-5df7-450b-93d1-3768be234f0a\",\"text\":\"Roofline altered\",\"id\":\"9bc61bd7-d09b-4c13-97a0-ceee3e02be46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d6cf0af7-d58e-4a24-8684-88dec3b1961a\",\"text\":\"Security door(s) added\",\"id\":\"77b7ce4c-a645-4687-acdb-e6aec563cb40\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"91d7c00f-4ca3-444a-9e32-8d16ffea4697\",\"text\":\"Security window bars added\",\"id\":\"b8ebcd34-5d07-4e93-87d9-e95ce9fda9a6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78f80db2-2f21-4089-9473-bb35df779c3f\",\"text\":\"Seismic anchor plates added\",\"id\":\"5bfa94f0-fd1b-4fe4-8217-086598188890\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e0f8be08-2153-4574-a6b9-483a0e0c4c0f\",\"text\":\"Signage added\",\"id\":\"947a9561-b189-4fb5-9758-23d0e05f594e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b0101c83-6c3d-4627-9f64-e6e87ee7052a\",\"text\":\"Signage altered\",\"id\":\"c817866f-ed07-4347-b26e-ddfa2250c317\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9d7434a7-598a-4d9c-b479-ad23f008d924\",\"text\":\"Signage removed\",\"id\":\"d2c71e8a-4b5a-437b-b3ed-a24aba8d4b5b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1583eae9-7145-4148-bf64-35b744e5b13c\",\"text\":\"Single-family converted to multi-family\",\"id\":\"43e85383-11e4-4f76-9ad4-8f00d454e298\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a0f1b60a-8022-4bca-920e-3efe18901acc\",\"text\":\"Stonework painted\",\"id\":\"01423229-dd8b-4506-ad4d-dd914ef3c697\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"12358bc8-0ef0-474e-a34a-93fc96eaf3ae\",\"text\":\"Storefront altered or replaced\",\"id\":\"3cb10e8d-15a2-4574-9f44-b62b11d2d364\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c684bb1d-45a8-4971-8f4f-c0910216ab08\",\"text\":\"Unknown/not visible\",\"id\":\"bccaa536-01eb-452f-ada3-65b196718646\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"01e9e313-04aa-4e19-bd4f-d349ec8f6afe\",\"text\":\"Wall cladding replaced\",\"id\":\"063ddb6f-953f-4a3e-bf72-652d60ba050f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3b955768-3358-4f1d-96dd-7095a737778d\",\"text\":\"Window openings altered\",\"id\":\"8f5203c5-8ef9-4be8-941a-2362b36dc8e5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6be61848-32c4-4039-b9bf-ce621c679fa7\",\"text\":\"Window openings infilled\",\"id\":\"80e412a8-d0f2-423a-a755-05563a300450\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"31323cf4-4bb7-4559-a6bf-f267f086d7fd\",\"text\":\"Windows boarded up\",\"id\":\"97a5ee2b-e899-4194-9817-d8004df3ca16\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bf8c90b3-5536-422a-93fe-6873b7a437cb\",\"text\":\"Windows replaced - all\",\"id\":\"9f1f3e67-dca3-4f5e-b020-da5ac4c25c46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"458cd156-e2fa-4f1c-bbef-aa6c7c27358d\",\"text\":\"Windows replaced - some\",\"id\":\"639a237c-f79e-4831-a17d-af8773873ed2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Modification/Alteration Type\"}",
-                    "id": "e7da4834-b8f2-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                    "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i",
-                    "visible": true,
-                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "1108fc43-97cf-11e6-84a5-026d961c88e6",
-                    "helptitle": null,
-                    "instructions": "Describe modification or alteration to the resource.",
-                    "active": true,
-                    "name": "Modification Event"
+                    "active": true, 
+                    "cardid": "1108fc43-97cf-11e6-84a5-026d961c88e6", 
+                    "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Describe modification or alteration to the resource.", 
+                    "name": "Modification Event", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6", 
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"label\":\"Modification/Alteration Description\"}", 
+                    "id": "e7da4835-b8f2-11e6-84a5-026d961c88e6", 
+                    "label": "Modification/Alteration Description", 
+                    "node_id": "ecae1d87-ab82-11e6-84a5-026d961c88e6", 
+                    "sortorder": 2, 
+                    "widget_id": "10000000-0000-0000-0000-000000000005"
+                }, 
+                {
+                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6", 
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Modification/Alteration Date\"}", 
+                    "id": "4172dbea-b8f3-11e6-84a5-026d961c88e6", 
+                    "label": "Modification/Alteration Date", 
+                    "node_id": "2a4aca73-b8f3-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000004"
+                }, 
+                {
+                    "card_id": "1108fc43-97cf-11e6-84a5-026d961c88e6", 
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"722d9ff4-c470-466c-8e96-d8037979d5ba\",\"text\":\"Addition to primary elevation\",\"id\":\"496d7001-5912-48c4-b9b1-5a60d8afec27\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2e234b26-d24a-4cf3-99f4-f8c355f8b9be\",\"text\":\"Addition to rear/side elevation\",\"id\":\"9e416521-dc78-4690-b658-1e128ce81ec2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3674c32c-d89f-45a6-bff8-eef76bee4d50\",\"text\":\"Addition to upper story\",\"id\":\"07adc1d8-2f7a-4799-ac2b-371b593d6be6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ab586613-9ec2-4a7f-931f-e4cc4633081f\",\"text\":\"Appears to be unaltered\",\"id\":\"711fc7aa-7e53-4b3d-9c76-951a6bf0d020\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b103fec3-bbcf-4b76-b817-42c3a769d11d\",\"text\":\"Awnings added\",\"id\":\"28c9f8c7-9c5d-4d8d-8781-dc51d12a0614\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"76dea51c-0f17-474c-a1d5-c5bfebecf53f\",\"text\":\"Balcony added\",\"id\":\"068f4791-4845-41bd-8d09-f49769c8344e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"19fea997-ca00-4c00-a25d-25d1590b7b66\",\"text\":\"Balcony altered or enclosed\",\"id\":\"eeea1e2e-ba3b-4007-9a40-35a78ab40115\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9c9c5138-f4a4-459a-97fb-1e59980c2f2b\",\"text\":\"Brickwork/stone painted\",\"id\":\"a7fcd074-00fc-49bd-b213-e128d95ec53a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4c9cb8ef-7afe-4f4b-adcc-948f6f02a6ee\",\"text\":\"Carport added\",\"id\":\"ff6dba95-bae6-4289-927d-20bfc9683a0b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"8a6bd560-b494-4dab-ab91-9566dbc52d08\",\"text\":\"Carport altered or enclosed\",\"id\":\"7da367ed-379c-4b17-a1bb-b9b47895a215\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9c6235e2-f5f1-456c-b136-7ebb5be4dd9e\",\"text\":\"Carport removed\",\"id\":\"b1ca9c93-c368-41c0-b5a8-4ef4a5eb07a0\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a3c50729-179a-4bf5-94b7-137df07b6eb5\",\"text\":\"Chimney altered\",\"id\":\"e84b812c-4e6d-4d97-8b18-64394c5344cb\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e7571328-ab5b-4083-8c30-66cf41ac4316\",\"text\":\"Completely altered\",\"id\":\"d84e1720-027d-48a4-b947-36a6b22d9eee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ece925a3-8bf6-475e-a63f-8cc30eefbe32\",\"text\":\"Decorative elements added\",\"id\":\"df0ad63d-c926-4d32-bf7d-c600fca1d950\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d8c9c16d-21ad-4213-9c9f-b05c9cc0eb2b\",\"text\":\"Decorative elements removed\",\"id\":\"93b76072-816e-47cd-9371-7c5d5668fe2f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"66e0a7ba-bf49-4f48-b40e-1d78f45a2bd7\",\"text\":\"Door (primary) opening or entrance altered\",\"id\":\"97a82c25-8acc-4546-8adb-ac2b8152f0ef\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"afdd437d-b7d3-430c-b71a-3173a12f9818\",\"text\":\"Door (primary) replaced\",\"id\":\"76e75d2e-b9db-43b9-a114-9430f8da9b80\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1a60452a-4a58-4027-b872-f1c407ae08d8\",\"text\":\"Door/entrance added\",\"id\":\"e06c79e4-629a-4a00-b1f9-3bd2d7f256ee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7c5db7f1-e3a4-4b41-9631-39580343136d\",\"text\":\"Exterior staircases added\",\"id\":\"6e8e64cd-480a-436e-acbf-b303865a1b32\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f2b24e50-4df0-452f-a1cf-9802a80829f6\",\"text\":\"Garage altered or replaced\",\"id\":\"f3850419-758e-45f0-8264-d1c8f53b6fd1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4ad2324d-20c2-40d7-b790-d768045f20e4\",\"text\":\"Garage door replaced\",\"id\":\"eb87fd5d-3bf4-4aba-9465-1766b920280f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"64138cf0-9c32-4a72-834b-7b56c01b32d8\",\"text\":\"Garage postdates residence\",\"id\":\"6ca711c4-5f1f-4153-b0e9-c4ea177d055d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0f916134-f57f-46c1-93b3-e1c9ebcf1ac6\",\"text\":\"Landscape/hardscape altered\",\"id\":\"d64c28ba-b418-4aca-ae99-1b346e74788b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bdbf4fd0-2233-487c-b0d4-ac65a31aae47\",\"text\":\"No major alterations\",\"id\":\"18310916-7403-4f31-a8ef-600363ff4b5f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fb01e551-3d33-4d20-849a-7587e060f527\",\"text\":\"Parapet altered or removed\",\"id\":\"7786d45a-ae12-421b-b267-994c1f82d373\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78a5445b-3086-4cbe-9a1a-c8f127f4b7aa\",\"text\":\"Perimeter fence or wall added\",\"id\":\"42db092d-b3dd-4813-9869-99ba3db8cc46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a9d3ccb1-0db7-48d2-a3c7-3d90f1d1146e\",\"text\":\"Porch added\",\"id\":\"9d114895-8a59-4cf1-bd39-34dbabfe0497\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e9e11871-1b1f-489e-a38b-0ed2c1b90363\",\"text\":\"Porch altered or enclosed\",\"id\":\"e702213d-08ce-4078-ac3b-685112a09d94\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"30b7a498-9959-4269-96eb-800d77d9b3a1\",\"text\":\"Porch rails altered or replaced\",\"id\":\"8f3e61e4-80f0-41ba-9318-4c8333402ea5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4a6219ac-dba5-430c-9926-ed6dbfbf50c7\",\"text\":\"Porch removed\",\"id\":\"37a83a92-a962-495f-9d54-28672a54a92c\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"476aee69-8ca9-4960-971d-9bb0b2a6f299\",\"text\":\"Porte cochere added\",\"id\":\"8e13bbe2-2b90-43ba-bc60-4cbe1ee3bde5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e67906a5-24a4-4914-8d2f-2ba109d32a6d\",\"text\":\"Porte cochere altered or removed\",\"id\":\"dcd817dc-64ee-48d0-be7f-44149e709876\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"dfed084f-fe7f-45c3-84ac-80f52bd7335b\",\"text\":\"Roof dormer added\",\"id\":\"673f762d-4444-485a-9660-bc6237518f06\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"38653962-7965-41c7-ad45-d5e5c50c0918\",\"text\":\"Roof dormer altered\",\"id\":\"3803442d-4c31-4bd0-9f69-62f5ff512d2a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"153cfd84-7208-499e-9575-c131a96984fe\",\"text\":\"Roof replaced with incompatible materials\",\"id\":\"38e69e10-b953-4200-8c09-7e9c0ce8736f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9fc0b4c5-5df7-450b-93d1-3768be234f0a\",\"text\":\"Roofline altered\",\"id\":\"9bc61bd7-d09b-4c13-97a0-ceee3e02be46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d6cf0af7-d58e-4a24-8684-88dec3b1961a\",\"text\":\"Security door(s) added\",\"id\":\"77b7ce4c-a645-4687-acdb-e6aec563cb40\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"91d7c00f-4ca3-444a-9e32-8d16ffea4697\",\"text\":\"Security window bars added\",\"id\":\"b8ebcd34-5d07-4e93-87d9-e95ce9fda9a6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"78f80db2-2f21-4089-9473-bb35df779c3f\",\"text\":\"Seismic anchor plates added\",\"id\":\"5bfa94f0-fd1b-4fe4-8217-086598188890\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e0f8be08-2153-4574-a6b9-483a0e0c4c0f\",\"text\":\"Signage added\",\"id\":\"947a9561-b189-4fb5-9758-23d0e05f594e\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b0101c83-6c3d-4627-9f64-e6e87ee7052a\",\"text\":\"Signage altered\",\"id\":\"c817866f-ed07-4347-b26e-ddfa2250c317\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9d7434a7-598a-4d9c-b479-ad23f008d924\",\"text\":\"Signage removed\",\"id\":\"d2c71e8a-4b5a-437b-b3ed-a24aba8d4b5b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1583eae9-7145-4148-bf64-35b744e5b13c\",\"text\":\"Single-family converted to multi-family\",\"id\":\"43e85383-11e4-4f76-9ad4-8f00d454e298\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a0f1b60a-8022-4bca-920e-3efe18901acc\",\"text\":\"Stonework painted\",\"id\":\"01423229-dd8b-4506-ad4d-dd914ef3c697\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"12358bc8-0ef0-474e-a34a-93fc96eaf3ae\",\"text\":\"Storefront altered or replaced\",\"id\":\"3cb10e8d-15a2-4574-9f44-b62b11d2d364\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c684bb1d-45a8-4971-8f4f-c0910216ab08\",\"text\":\"Unknown/not visible\",\"id\":\"bccaa536-01eb-452f-ada3-65b196718646\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"01e9e313-04aa-4e19-bd4f-d349ec8f6afe\",\"text\":\"Wall cladding replaced\",\"id\":\"063ddb6f-953f-4a3e-bf72-652d60ba050f\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3b955768-3358-4f1d-96dd-7095a737778d\",\"text\":\"Window openings altered\",\"id\":\"8f5203c5-8ef9-4be8-941a-2362b36dc8e5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6be61848-32c4-4039-b9bf-ce621c679fa7\",\"text\":\"Window openings infilled\",\"id\":\"80e412a8-d0f2-423a-a755-05563a300450\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"31323cf4-4bb7-4559-a6bf-f267f086d7fd\",\"text\":\"Windows boarded up\",\"id\":\"97a5ee2b-e899-4194-9817-d8004df3ca16\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bf8c90b3-5536-422a-93fe-6873b7a437cb\",\"text\":\"Windows replaced - all\",\"id\":\"9f1f3e67-dca3-4f5e-b020-da5ac4c25c46\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"458cd156-e2fa-4f1c-bbef-aa6c7c27358d\",\"text\":\"Windows replaced - some\",\"id\":\"639a237c-f79e-4831-a17d-af8773873ed2\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Modification/Alteration Type\"}", 
+                    "id": "e7da4834-b8f2-11e6-84a5-026d961c88e6", 
+                    "label": "Modification/Alteration Type", 
+                    "node_id": "3e2fcafb-97cf-11e6-84a5-026d961c88e6", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Describes the modification of a Heritage Resource.\n\nConnects to Heritage Resource (E18) via P12i", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "edgeid": "0a5212f0-ab82-11e6-84a5-026d961c88e6", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by", 
+                    "rangenode_id": "0a5212ef-ab82-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "188e400d-b8f3-11e6-84a5-026d961c88e6", 
+                    "edgeid": "2a4aca74-b8f3-11e6-84a5-026d961c88e6", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by", 
+                    "rangenode_id": "2a4aca73-b8f3-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "edgeid": "188e400e-b8f3-11e6-84a5-026d961c88e6", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span", 
+                    "rangenode_id": "188e400d-b8f3-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "edgeid": "3e2fcafc-97cf-11e6-84a5-026d961c88e6", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "3e2fcafb-97cf-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "0a5212ef-ab82-11e6-84a5-026d961c88e6", 
+                    "edgeid": "ecae1d88-ab82-11e6-84a5-026d961c88e6", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note", 
+                    "rangenode_id": "ecae1d87-ab82-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+            "iconclass": "fa fa-pencil", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)", 
+            "maplinewidth": 1, 
+            "mappointsize": 4, 
+            "name": "Modification Event", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Modification Event", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E11_Modification", 
+                    "parentproperty": ""
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "date", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Modification Date", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "2a4aca73-b8f3-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Modification Description Assignment", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "0a5212ef-ab82-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "string", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Modification Description", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "ecae1d87-ab82-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E62_String", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Modification Time Span", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "188e400d-b8f3-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "6a00055c-437b-4fed-b788-43e5b7a8201b"
+                    }, 
+                    "datatype": "concept-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Modification Type", 
+                    "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                    "nodeid": "3e2fcafb-97cf-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E11_Modification",
-                "nodeid": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                "datatype": "semantic",
-                "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6",
-                "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6",
-                "config": null,
-                "name": "Modification Event"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "1108fc41-97cf-11e6-84a5-026d961c88e6", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Modification Event", 
+                "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                "nodeid": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
+                "ontologyclass": "E11_Modification"
+            }, 
+            "subtitle": "Describes modification of a Heritage Resource", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }
