@@ -861,6 +861,8 @@ class ConceptValue(object):
     def delete(self):
         if self.id != '':
             newvalue = models.Value.objects.get(pk=self.id)
+            if newvalue.valuetype.valuetype == 'image':
+                newvalue = models.FileValue.objects.get(pk=self.id)
             newvalue.delete()
             self = ConceptValue()
             return self
