@@ -24,7 +24,7 @@ Loading a Package
 
     \*It is important to note that you cannot load a package directly into core Arches. Currently packages must be loaded into a project. :doc:`Create a project <../project-setup>`.
 
-    If you are a developer running the latest arches you probably want to create a project in a fresh Arches installation. This ensures that the `arches_project create` command uses the latest project templates.
+    If you are a developer running the latest arches you probably want to create a project with a new arches installation. This ensures that the `arches_project create` command uses the latest project templates.
 
         #. Uninstall arches from your virtualenv
 
