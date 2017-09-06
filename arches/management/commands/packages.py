@@ -232,6 +232,11 @@ class Command(BaseCommand):
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
 
+            for directory in dirs:
+                if len(glob.glob(os.path.join(dest_dir, directory, '*'))) == 0:
+                    with open(os.path.join(dest_dir, directory, '.gitkeep'), 'w'):
+                        print 'added', os.path.join(dest_dir, directory, '.gitkeep')
+
             with open(os.path.join(dest_dir, 'package_config.json'), 'w') as config_file:
                 try:
                     constraints = models.Resource2ResourceConstraint.objects.all()
@@ -241,7 +246,11 @@ class Command(BaseCommand):
                     print e
                     print 'Could not read resource to resource constraints'
 
-            self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
+            try:
+                self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
+            except Exception as e:
+                print e
+                print "Could not save system settings"
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
 
