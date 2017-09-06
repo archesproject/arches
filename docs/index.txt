@@ -21,6 +21,7 @@ Arches v4 Documentation
     import-export
     ontologies-in-arches
     rdm
+    create-package
 
 .. toctree::
     :caption: Tutorials
