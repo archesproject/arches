@@ -657,6 +657,47 @@ class FileValue(models.Model):
             return self.value.name
         return ''
 
+
+# These two event listeners auto-delete files from filesystem when they are unneeded:
+# from http://stackoverflow.com/questions/16041232/django-delete-filefield
+@receiver(models.signals.post_delete, sender=FileValue)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `FileValue` object is deleted.
+    """
+    if instance.value.path:
+        try:
+            if os.path.isfile(instance.value.path):
+                os.remove(instance.value.path)
+        ## except block added to deal with S3 file deletion
+        ## see comments on 2nd answer below
+        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except:
+            storage, name = instance.value.storage, instance.value.name
+            storage.delete(name)
+
+@receiver(models.signals.pre_save, sender=FileValue)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `FileValue` object is changed.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = FileValue.objects.get(pk=instance.pk).value
+    except FileValue.DoesNotExist:
+        return False
+
+    new_file = instance.value
+    if not old_file == new_file:
+        try:
+            if os.path.isfile(old_file.value):
+                os.remove(old_file.value)
+        except Exception:
+            return False
+
+
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(unique=True)

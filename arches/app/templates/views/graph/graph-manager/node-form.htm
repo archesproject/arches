@@ -54,7 +54,7 @@
                         {% trans "CRM Class" %}
                     </div>
                     <div>
-                        <select class="design" data-bind="value: node().ontologyclass, options: node().validclasses, valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                         {% trans "Relationship from" %} <span data-bind="text: graphModel.getParentNode(node()).name"></span>
                     </div>
                     <div>
-                        <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@
                         (<strong data-bind="text: graphModel.getParentNode(node()).name"></strong>
                     </div>
                     <div class="">
-                        <em data-bind="text: node().parentproperty"></em>
+                        <em data-bind="text: node().parentproperty_friendlyname"></em>
                     </DIV>
                     <div class="">
                         <strong data-bind="text: node().name"></strong>)

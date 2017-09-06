@@ -253,8 +253,7 @@ define([
 
                     if (data.action === 'delete-value') {
                         model = new ValueModel(data);
-                        model.delete();
-                        self.render();
+                        model.delete(self.render, self);
                     }
                     if (data.action === 'delete-relationship') {
                         model = new ConceptModel(data);

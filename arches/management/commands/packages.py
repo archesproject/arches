@@ -25,8 +25,9 @@ import datatype
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.utils import IntegrityError
+from django.forms.models import model_to_dict
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
@@ -206,6 +207,7 @@ class Command(BaseCommand):
             self.create_package(options['dest_dir'])
 
     def create_package(self, dest_dir):
+
         if os.path.exists(dest_dir):
             print 'Cannot create package', dest_dir, 'already exists'
         else:
@@ -225,11 +227,71 @@ class Command(BaseCommand):
                 'map_layers/tile_server/overlays',
                 'reference_data/concepts',
                 'reference_data/collections',
+                'system_settings',
             ]
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
 
+            for directory in dirs:
+                if len(glob.glob(os.path.join(dest_dir, directory, '*'))) == 0:
+                    with open(os.path.join(dest_dir, directory, '.gitkeep'), 'w'):
+                        print 'added', os.path.join(dest_dir, directory, '.gitkeep')
+
+            with open(os.path.join(dest_dir, 'package_config.json'), 'w') as config_file:
+                try:
+                    constraints = models.Resource2ResourceConstraint.objects.all()
+                    configs = {"permitted_resource_relationships":constraints}
+                    config_file.write(JSONSerializer().serialize(configs))
+                except Exception as e:
+                    print e
+                    print 'Could not read resource to resource constraints'
+
+            try:
+                self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
+            except Exception as e:
+                print e
+                print "Could not save system settings"
+
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
+
+        def load_system_settings():
+            update_system_settings = True
+            if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
+                response = raw_input('Overwrite current system settings with package settings? (T/F): ')
+                if response.lower() in ('t', 'true', 'y', 'yes'):
+                    update_system_settings = True
+                    print 'Using package system settings'
+                else:
+                    update_system_settings = False
+
+            if update_system_settings == True:
+                if len(glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))) > 0:
+                    system_settings = glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))[0]
+                    shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
+
+
+        def load_resource_to_resource_constraints():
+            config_paths = glob.glob(os.path.join(download_dir, '*', 'package_config.json'))
+            if len(config_paths) > 0:
+                configs = json.load(open(config_paths[0]))
+                for relationship in configs['permitted_resource_relationships']:
+                    obj, created = models.Resource2ResourceConstraint.objects.update_or_create(
+                        resourceclassfrom_id=uuid.UUID(relationship['resourceclassfrom_id']),
+                        resourceclassto_id=uuid.UUID(relationship['resourceclassto_id']),
+                        resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
+                    )
+
+        def load_resource_views():
+            resource_views = glob.glob(os.path.join(download_dir, '*', 'business_data','resource_views', '*.sql'))
+            try:
+                with connection.cursor() as cursor:
+                    for view in resource_views:
+                        with open(view, 'r') as f:
+                            sql = f.read()
+                            cursor.execute(sql)
+            except Exception as e:
+                print e
+                print 'Could not connect to db'
 
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
@@ -346,9 +408,6 @@ class Command(BaseCommand):
         remote = True if 'github.com' in source else False
 
         if source != '' or remote == True:
-            if setup_db != False:
-                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                    self.setup_db(settings.PACKAGE_NAME)
 
             if remote == True:
                 download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
@@ -362,17 +421,30 @@ class Command(BaseCommand):
 
             unzip_file(zip_file, download_dir)
 
+            if setup_db != False:
+                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
+                    print 'loading system settings'
+                    load_system_settings()
+                    self.setup_db(settings.PACKAGE_NAME)
+
             print 'loading widgets'
             load_widgets()
             print 'loading functions'
             load_functions()
             print 'loading datatypes'
             load_datatypes()
-
+            print 'loading concepts'
             load_concepts(overwrite_concepts, stage_concepts)
+            print 'loading resource models and branches'
             load_graphs()
+            print 'loading resource to resource constraints'
+            load_resource_to_resource_constraints()
+            print 'loading map layers'
             load_map_layers()
+            print 'loading business data - resource instances and relationships'
             load_business_data()
+            print 'loading resource views'
+            load_resource_views()
 
         else:
             print "A path to a local or remote zipfile is required"
@@ -607,7 +679,7 @@ class Command(BaseCommand):
             print 'No mapping file specified. Please rerun this command with the \'-c\' parameter populated.'
             print '*'*80
             sys.exit()
-            
+
         if data_dest != '':
             try:
                 data = resource_exporter.export(graph_id=graph)

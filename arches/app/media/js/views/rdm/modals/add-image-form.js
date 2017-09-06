@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'dropzone', 'arches', 'bootstrap'], function ($, Backbone, dropzone, arches) {
+define(['jquery', 'backbone', 'dropzone', 'arches', 'js-cookie', 'bootstrap'], function ($, Backbone, dropzone, arches, Cookies) {
     return Backbone.View.extend({
         events: {
             'click button': 'close'
@@ -11,7 +11,10 @@ define(['jquery', 'backbone', 'dropzone', 'arches', 'bootstrap'], function ($, B
             if (!dropzoneEl.hasClass('dz-clickable')) {
                 dropzoneInstance = new dropzone(dropzoneEl[0], {
                     url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-                    acceptedFiles: 'image/*'
+                    acceptedFiles: 'image/*',
+                    headers: {
+                        'X-CSRFToken': Cookies.get('csrftoken')
+                    }
                 });
 
                 dropzoneInstance.on("addedfile", function(file) {
