@@ -18,6 +18,7 @@ Loading a Package
     -ow    `overwrite` to overwrite concepts and collections. default = 'ignore'
     -st    `stage` to stage concepts and collections. default = 'stage'
     -s     a path to a zipfile located on github or locally
+    -o     operation name
 
     If you do not pass the `-db True` to the load_package command, your database will not be recreated. If you already have resource models and branches with the same id as those you are importing, you will be prompted to confirm whether you would like to keep or overwrite each model or branch.
 
@@ -29,11 +30,16 @@ If you want to create additional projects with the same data or share your data 
 
 The `create_package` command will help you get started by generating the folder structure of a new package.
 
-#. To create new package simply run the following command using your project's manage.py file:
+#. To create new package simply run the create_package command. The following example would create a package called `mypackge`.
 
-    python manage.py packages -o create_package -d /Users/me/path/to/mypackage
+    .. code-block:: bash
 
-#. In your packages directory you will find the following files and directories
+        python manage.py packages -o create_package -d /Full/path/to/mypackage
+
+    -d    full path to the package directory you would like to create
+    -o    operation name
+
+#. Below is a list of directories created by the `create_package` command and a brief description of what belongs in each. Be sure not to place files that you do not want loaded into these directories. If, for example, you have draft business_data that is not ready for loading, just add a new directory and stage your files there. Directories other than what is listed below will be ignored by the loader.
 
     business_data
         Resource instance .csv and corresponding .mapping files, each sharing the same base name.
