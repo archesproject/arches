@@ -45,7 +45,6 @@ activate_virtualenv() {
 #### Install 
 
 init_arches() {
-
 	if db_exists; then
 		echo "Database ${PGDBNAME} already exists, skipping initialization."
 		echo ""
@@ -153,6 +152,7 @@ install_bower_components() {
 	echo ""
 	echo "----- INSTALLING BOWER COMPONENTS -----"
 	echo ""
+	cd_bower_folder
 	bower --allow-root install
 }
 
@@ -166,6 +166,7 @@ setup_elasticsearch() {
 #### Misc
 
 init_arches_projects() {
+	cd_arches_root
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
@@ -256,6 +257,7 @@ run_migrations() {
 	echo ""
 	echo "----- RUNNING DATABASE MIGRATIONS -----"
 	echo ""
+	cd_app_folder
 	python manage.py migrate
 }
 
@@ -264,6 +266,7 @@ collect_static(){
 	echo ""
 	echo "----- COLLECTING DJANGO STATIC FILES -----"
 	echo ""
+	cd_app_folder
 	python manage.py collectstatic --noinput
 }
 
@@ -273,6 +276,7 @@ run_django_server() {
 	echo ""
 	echo "----- *** RUNNING DJANGO SERVER *** -----"
 	echo ""
+	cd_app_folder
 	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
 	    echo "Running Django with options --noreload --nothreading."
 		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
@@ -286,23 +290,16 @@ run_django_server() {
 
 #### Main commands 
 run_arches() {
-	# Run first commands from ${ARCHES_ROOT}
-	cd_arches_root
+
 	init_arches
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
 	fi
 
-	# Run from folder where user's bower.json lives
-	cd_bower_folder
 	install_bower_components
 
-	# From here on, run from the user's ${APP_FOLDER}
-	cd_app_folder
-
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
-		echo "Running database migrations..."
 		run_migrations
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 		collect_static
@@ -315,12 +312,12 @@ run_arches() {
 
 
 run_tests() {
-	cd_arches_root
 	set_dev_mode
 	echo ""
 	echo ""
 	echo "----- RUNNING ARCHES TESTS -----"
 	echo ""
+	cd_arches_root
 	python manage.py test tests --pattern="*.py" --settings="tests.test_settings" --exe
 	if [ $? -ne 0 ]; then
         echo "Error: Not all tests ran succesfully."
@@ -366,6 +363,9 @@ do
 			wait_for_db
 			run_tests
 		;;
+		run_migrations)
+			wait_for_db
+			run_migrations
 		help|-h)
 			display_help
 		;;
