@@ -246,7 +246,11 @@ class Command(BaseCommand):
                     print e
                     print 'Could not read resource to resource constraints'
 
-            self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
+            try:
+                self.save_system_settings(data_dest=os.path.join(dest_dir, 'system_settings'))
+            except Exception as e:
+                print e
+                print "Could not save system settings"
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
 
