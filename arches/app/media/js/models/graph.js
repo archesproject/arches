@@ -416,7 +416,7 @@ define(['arches',
                                 source: node,
                                 datatypelookup: datatypelookup,
                                 graph: self,
-                                namespaces: attributes.ontology_namespaces
+                                ontology_namespaces: attributes.ontology_namespaces
                             });
                             if(node.istopnode){
                                 this.set('root', nodeModel);
