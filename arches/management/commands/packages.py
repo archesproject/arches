@@ -232,6 +232,11 @@ class Command(BaseCommand):
             for directory in dirs:
                 os.makedirs(os.path.join(dest_dir, directory))
 
+            for directory in dirs:
+                if len(glob.glob(os.path.join(dest_dir, directory, '*'))) == 0:
+                    with open(os.path.join(dest_dir, directory, '.gitkeep'), 'w'):
+                        print 'added', os.path.join(dest_dir, directory, '.gitkeep')
+
             with open(os.path.join(dest_dir, 'package_config.json'), 'w') as config_file:
                 try:
                     constraints = models.Resource2ResourceConstraint.objects.all()
