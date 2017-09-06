@@ -14,10 +14,12 @@ Loading a Package
         python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
 
 
-    -db    `true` to run setup_py to rebuild your database
-    -ow    `overwrite` to overwrite concepts and collections
-    -st    `stage` to stage concepts and collections
-    -s     a zipfile located on github or locally
+    -db    `true` to run setup_py to rebuild your database. default = 'false'
+    -ow    `overwrite` to overwrite concepts and collections. default = 'ignore'
+    -st    `stage` to stage concepts and collections. default = 'stage'
+    -s     a path to a zipfile located on github or locally
+
+    If you do not pass the `-db True` to the load_package command, your database will not be recreated. If you already have resource models and branches with the same id as those you are importing, you will be prompted to confirm whether you would like to keep or overwrite each model or branch.
 
 
 Creating a New Package
@@ -34,36 +36,35 @@ The `create_package` command will help you get started by generating the folder 
 #. In your packages directory you will find the following files and directories
 
     business_data
-        resource instance .csv and corresponding .mapping files
+        Resource instance .csv and corresponding .mapping files, each sharing the same base name.
     business_data/files
-        files to be added to the uploaded files directory
+        Files to be added to the uploaded files directory
     business_data/relations
-        resource relationship files (.relations)
+        Resource relationship files (.relations)
     extensions/function
-        each function in this directory should have its own directory with a template (.htm), viewmodel (.js) and module (.py). Each file must share the same base name.
+        Each function in this directory should have its own directory with a template (.htm), viewmodel (.js) and module (.py). Each file must share the same base name.
     extensions/datatypes
-        each datatype in this directory should have its own directory with a template (.htm), viewmodel (.js) and module (.py). Each file must share the same base name.
+        Each datatype in this directory should have its own directory with a template (.htm), viewmodel (.js) and module (.py). Each file must share the same base name.
     extensions/widgets
-        each widget in this directory should have its own folder with a template (.htm), viewmodel (.js) and configuration file (.json). Each file must share the same base name.
+        Each widget in this directory should have its own folder with a template (.htm), viewmodel (.js) and configuration file (.json). Each file must share the same base name.
     graphs/branches
         arches.json files representing branches
     graphs/resource_models
         arches.json files representing resource models
     map_layers/mapbox_styles/overlays*
-        each overlay should have a directory with a mapbox style as exported from mapbox including a `style.json` file, `license.txt` file and an `icons` directory
-        ## configuration
+        Each overlay should have a directory with a mapbox style as exported from mapbox including a `style.json` file, `license.txt` file and an `icons` directory
     map_layers/mapbox_styles/basemaps*
-        each basemap should have a directory with a mapbox style as exported from mapbox including a `style.json` file, `license.txt` file and an `icons` directory
+        Each basemap should have a directory with a mapbox style as exported from mapbox including a `style.json` file, `license.txt` file and an `icons` directory
     map_layers/tile_server/overlays*
-        each overlay should have a directory with a `.vrt` file and `.xml` to style and configure the layer. Each file must share the same base name.
+        Each overlay should have a directory with a `.vrt` file and `.xml` to style and configure the layer. Each file must share the same base name.
     map_layers/tile_server/basemaps*
-        each overlay should have a directory with a `.vrt` file and `.xml` to style and configure the layer. Each file must share the same base name.
+        Each overlay should have a directory with a `.vrt` file and `.xml` to style and configure the layer. Each file must share the same base name.
     reference_data/concepts
         SKOS concepts .xml files
     reference_data/collections
         SKOS collection .xml files
     system_settings
-        The system settings file for your project.
+        The system settings file for your project
 
     \* map layer configuration
         By default mapbox-style layers will be loaded with the name property found in the layer's style.json file. The default name for tile server layers will be the basename of the layer's xml file. For both mapbox-style and tile server layers the default icon-class will be `fa fa-globe`. To customize the name and icon-class, simply add a meta.json file to the layer's directory with the following object:
@@ -77,4 +78,4 @@ The `create_package` command will help you get started by generating the folder 
 
 #. It is not necessary to populate every directory with data. Only add those files that you would like to share.
 
-    Once you've added the necessary files to your package, simply zip it up the package or push it to a github repository and it's ready to be loaded.
+    Once you've added the necessary files to your package, simply compress it as a zip file or push it to a github repository and it's ready to be loaded.
