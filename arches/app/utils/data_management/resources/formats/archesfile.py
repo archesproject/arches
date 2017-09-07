@@ -105,8 +105,10 @@ class ArchesFileReader(Reader):
 
                         resourceinstance, created = ResourceInstance.objects.update_or_create(
                             resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
-                            graph_id = uuid.UUID(str(resource['resourceinstance']['graph_id'])),
-                            legacyid = resource['resourceinstance']['legacyid']
+                            defaults = {
+                                'graph_id': uuid.UUID(str(resource['resourceinstance']['graph_id'])),
+                                'legacyid': resource['resourceinstance']['legacyid']
+                            }
                         )
                         if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
                             reporter.update_resources_saved()
@@ -117,11 +119,13 @@ class ArchesFileReader(Reader):
                             tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
 
                             tile, created = Tile.objects.update_or_create(
-                                resourceinstance = resourceinstance,
-                                parenttile = Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                                nodegroup = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
                                 tileid = uuid.UUID(str(tile['tileid'])),
-                                data = tile['data']
+                                defaults = {
+                                    'resourceinstance': resourceinstance,
+                                    'parenttile': Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
+                                    'nodegroup': NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                                    'data': tile['data']                                
+                                }
                             )
                             if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
                                 reporter.update_tiles_saved()
