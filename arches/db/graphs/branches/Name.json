@@ -113,7 +113,8 @@
                 "name": "Name", 
                 "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
                 "nodeid": "bbd0d022-955d-11e6-b664-024f9e178154", 
-                "ontologyclass": "E41_Appellation"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+                "parentproperty": ""
             }, 
             "subtitle": "Stores the name(s) of a resource.", 
             "version": ""

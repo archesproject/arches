@@ -124,7 +124,8 @@
                 "name": "Resource Update Event", 
                 "nodegroup_id": "fb06d30a-a088-11e6-84a5-026d961c88e6", 
                 "nodeid": "fb06d30a-a088-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E11_Modification"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E11_Modification", 
+                "parentproperty": ""
             }, 
             "subtitle": "Stores the date when an update to the information resource occurred", 
             "version": ""

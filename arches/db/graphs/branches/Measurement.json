@@ -190,7 +190,8 @@
                 "name": "Measurement Event", 
                 "nodegroup_id": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
                 "nodeid": "9bab22be-ab8a-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E16_Measurement"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E16_Measurement", 
+                "parentproperty": ""
             }, 
             "subtitle": "Stores measurement type, values, and units", 
             "version": ""

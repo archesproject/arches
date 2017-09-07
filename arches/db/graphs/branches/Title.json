@@ -113,7 +113,8 @@
                 "name": "Title", 
                 "nodegroup_id": "fe350938-97d3-11e6-84a5-026d961c88e6", 
                 "nodeid": "fe350938-97d3-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E41_Appellation"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes the title of an Information Resource.", 
             "version": ""

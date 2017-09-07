@@ -102,7 +102,8 @@
                 "name": "Temporal Coverage", 
                 "nodegroup_id": "76c90e2e-957e-11e6-b664-024f9e178154", 
                 "nodeid": "76c90e2e-957e-11e6-b664-024f9e178154", 
-                "ontologyclass": "E4_Period"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+                "parentproperty": ""
             }, 
             "subtitle": "Defines time span for which the Information Resource is relevant", 
             "version": ""

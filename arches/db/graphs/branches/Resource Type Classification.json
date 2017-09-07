@@ -83,7 +83,8 @@
                 "name": "Resource Type Classification", 
                 "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154", 
                 "nodeid": "95931698-957d-11e6-b664-024f9e178154", 
-                "ontologyclass": "E55_Type"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                "parentproperty": ""
             }, 
             "subtitle": "Stores the classification of Resource Types", 
             "version": ""

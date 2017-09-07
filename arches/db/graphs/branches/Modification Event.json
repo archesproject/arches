@@ -210,7 +210,8 @@
                 "name": "Modification Event", 
                 "nodegroup_id": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
                 "nodeid": "1108fc40-97cf-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E11_Modification"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E11_Modification", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes modification of a Heritage Resource", 
             "version": ""

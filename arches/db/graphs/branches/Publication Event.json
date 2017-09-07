@@ -156,7 +156,8 @@
                 "name": "Publication", 
                 "nodegroup_id": "abfca178-a78f-11e6-84a5-026d961c88e6", 
                 "nodeid": "abfca178-a78f-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E84_Information_Carrier"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E84_Information_Carrier", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes the publication of an Information Resource", 
             "version": ""

@@ -197,7 +197,8 @@
                 "name": "Saved Searches", 
                 "nodegroup_id": "b6f17257-fa13-11e6-8173-6c4008b05c4c", 
                 "nodeid": "b6f17257-fa13-11e6-8173-6c4008b05c4c", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Saved search settings", 
             "version": ""

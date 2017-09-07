@@ -301,7 +301,8 @@
                 "name": "System Settings", 
                 "nodegroup_id": "d8fd2851-fad8-11e6-85d8-6c4008b05c4c", 
                 "nodeid": "d8fd2851-fad8-11e6-85d8-6c4008b05c4c", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Configuration for Application Settings", 
             "version": ""

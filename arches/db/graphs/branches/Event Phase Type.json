@@ -243,7 +243,8 @@
                 "name": "Arches Event Phase", 
                 "nodegroup_id": "db074690-9640-11e6-8a28-026d961c88e6", 
                 "nodeid": "db074690-9640-11e6-8a28-026d961c88e6", 
-                "ontologyclass": "E4_Period"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes a Historical Event Type within a given timespan/phase", 
             "version": ""

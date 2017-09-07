@@ -135,7 +135,8 @@
                 "name": "Description Assignment", 
                 "nodegroup_id": "3d532c7a-a063-11e6-84a5-026d961c88e6", 
                 "nodeid": "3d532c7a-a063-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Generic branch for capturing free-form written descriptive information", 
             "version": ""

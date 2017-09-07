@@ -964,7 +964,8 @@
                 "name": "Map Settings", 
                 "nodegroup_id": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c", 
                 "nodeid": "aadcc9cf-fac0-11e6-b6fc-6c4008b05c4c", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Configure default settings for maps in reports, cards, and search", 
             "version": ""
