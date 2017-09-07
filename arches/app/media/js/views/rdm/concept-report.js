@@ -12,8 +12,9 @@ define([
     'views/rdm/modals/import-concept-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
-    'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph) {
+    'views/concept-graph',
+    'viewmodels/alert',
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph, AlertViewModel) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -33,6 +34,7 @@ define([
         },
 
         initialize: function(options) {
+            this.viewModel = options.viewModel;
             this.render();
         },
 
@@ -40,12 +42,7 @@ define([
             var self = this;
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
-            
-            if (this.model.get('in_use')) {
-                self.in_use = true;
-            }
 
-            self.inuse = false;
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
@@ -53,16 +50,7 @@ define([
                 this.xhr.abort();
             }
 
-            self.displayInUse = function() {
-                if (self.in_use === true) {
-                    self.cannot_delete_modal = self.$el.find('.cannot-delete-modal');
-                    self.cannot_delete_modal.modal('show');
-                    self.in_use = false;
-                }
-            }
-
             this.xhr = $.ajax({
-                in_use: self.inuse,
                 url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid),
                 data: {
                     'f': 'html',
@@ -93,8 +81,7 @@ define([
                             }
                         }
                     }
-                },
-                complete: self.displayInUse
+                }
             });
         },
 
@@ -241,11 +228,14 @@ define([
                 model = new ConceptModel(data)
                 self.model.set('subconcepts', [model]);
 
-                self.model.delete(function(){
+                self.model.delete(function(response, status){
                     modal.find('h4').text(title);
                     modal.find('.modal-title').removeClass('loading');
                     modal.modal('hide');
                     $('.modal-backdrop.fade.in').remove();  // a hack for now
+                    if(!!response.responseJSON.in_use){
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                    }
                 }, self);
             }else{
                 modal.on('hidden.bs.modal', function () {

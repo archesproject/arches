@@ -230,7 +230,7 @@ def concept(request, conceptid):
                             concept.delete_index(delete_self=delete_self)
                             concept.delete(delete_self=delete_self)
                         else:
-                            return JSONResponse({"in_use": in_use})
+                            return JSONResponse({"in_use": in_use, 'message':{'title': _('Unable to Delete'), 'text': _('This concept or one of it\'s subconcepts is already in use by an existing resource.')}})
 
                 return JSONResponse(concept)
 
