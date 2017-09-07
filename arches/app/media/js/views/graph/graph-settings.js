@@ -5,6 +5,7 @@ require([
     'knockout-mapping',
     'views/graph/graph-page-view',
     'graph-settings-data',
+    'bindings/color-picker',
     'models/node'
 ], function($, _, ko, koMapping, PageView, data, NodeModel) {
     /**
