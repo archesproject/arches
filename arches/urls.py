@@ -87,6 +87,7 @@ urlpatterns = [
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
     url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),

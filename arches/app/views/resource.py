@@ -65,7 +65,11 @@ def get_resource_relationship_types():
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class ResourceEditorView(BaseManagerView):
+    action = None
     def get(self, request, graphid=None, resourceid=None, view_template='views/resource/editor.htm', main_script='views/resource/editor', nav_menu=True):
+        if self.action == 'copy':
+            return self.copy(request, resourceid)
+
         if graphid is not None:
             resource_instance = Resource()
             resource_instance.graph_id = graphid
@@ -139,6 +143,10 @@ class ResourceEditorView(BaseManagerView):
             ret.delete()
             return JSONResponse(ret)
         return HttpResponseNotFound()
+
+    def copy(self, request, resourceid=None):
+        resource_instance = Resource.objects.get(pk=resourceid)
+        return JSONResponse(resource_instance.copy())
 
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
