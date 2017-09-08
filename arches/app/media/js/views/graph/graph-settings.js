@@ -7,7 +7,7 @@ require([
     'graph-settings-data',
     'bindings/color-picker',
     'models/node'
-], function($, _, ko, koMapping, PageView, data, NodeModel) {
+], function($, _, ko, koMapping, PageView, data, colorpicker, NodeModel) {
     /**
     * prep data for models
     */
@@ -20,6 +20,7 @@ require([
     /**
     * setting up page view model
     */
+
     var graph = koMapping.fromJS(data.graph);
     var iconFilter = ko.observable('');
     var rootNode = new NodeModel({
