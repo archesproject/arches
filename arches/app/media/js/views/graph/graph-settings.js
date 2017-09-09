@@ -29,7 +29,21 @@ require([
         graph: graph,
         ontology_namespaces: data.ontology_namespaces
     })
+
+    var rootNodeConfig = ko.observable(rootNode.config)
     var ontologyClass = ko.observable(data.node.ontologyclass);
+    var topNode = _.filter(graph.nodes(), function(node) {
+                    if (node.istopnode() === true) {
+                        return node
+                    }
+                    })[0];
+
+    var rootNodeColor = ko.observable('rgba(233,112,111,0.8)')
+    if (_.has(ko.unwrap(topNode.config),'fillColor')) {
+        rootNodeColor = ko.unwrap(topNode.config).fillColor
+    } else {
+        topNode.config = ko.observable({fillColor:rootNodeColor});
+    }
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
             return resource.isRelatable();
@@ -50,6 +64,7 @@ require([
         return jsonData() !== jsonCache();
     });
     var viewModel = {
+        rootNodeColor: rootNodeColor,
         dirty: dirty,
         iconFilter: iconFilter,
         icons: ko.computed(function () {
