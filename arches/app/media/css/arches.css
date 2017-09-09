@@ -6559,6 +6559,9 @@ div.row.widget-wrapper.report-header:hover {
     top: 5px;
     right: 315px;
     transition-duration: .3s;
+    background: #f2b251;
+    width: 213px;
+    height: 40px;
 }
 
 .effect>.install-buttons.expanded-buttons {
