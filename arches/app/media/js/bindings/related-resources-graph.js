@@ -174,6 +174,9 @@ define([
                     .data(data.nodes, function(d) { return d.id; });
                 node.enter()
                     .append("circle")
+                    .style('fill', function(d){
+                        return d.color;
+                    })
                     .attr("r",function(d){
                         return d.isRoot ? 24 : 18;
                     })
@@ -336,6 +339,7 @@ define([
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
+                                    color: response.root_node_config.fillColor,
                                     relationCount: {
                                         total: response.total,
                                         loaded: response.resource_relationships.length
@@ -361,6 +365,7 @@ define([
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
+                                        color: _.has(related_resource, 'displaycolor') == true ? related_resource['displaycolor']: 'rgba(254,000,000,1.0)',
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {

@@ -70,11 +70,12 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         if clear_index:
             q = Query(se=se)
             q.delete(index='resource', doc_type=str(resource_type))
-        
+
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
                 for resource in resources:
                     document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+                    document['displaycolor'] =  models.Node.objects.filter(graph_id=resource.graph.graphid).filter(istopnode=True)[0].config['fillColor']
                     doc_indexer.add(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document)
                     for term in terms:
                         term_indexer.add(index='strings', doc_type='term', id=term['_id'], data=term['_source'])
@@ -140,7 +141,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     if clear_index:
         q = Query(se=se)
         q.delete(index='strings', doc_type='concept')
-        
+
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as concept_indexer:
         concept_strings = []
         for conceptValue in models.Value.objects.filter(Q(concept__nodetype='Collection') | Q(concept__nodetype='ConceptScheme'), valuetype__category ='label'):
@@ -185,7 +186,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                         and (d.relationtype = 'narrower' or d.relationtype = 'hasTopConcept')
                 ) SELECT valueid, value, conceptid, languageid, valuetype FROM children_inclusive ORDER BY depth;
             """.format(topConcept, valueTypes)
-            
+
             cursor.execute(sql)
             for conceptValue in cursor.fetchall():
                 doc  = {
@@ -198,9 +199,8 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
                     'top_concept': topConcept
                 }
                 concept_indexer.add(index='strings', doc_type='concept', id=doc['id'], data=doc)
-            
+
     cursor.execute("SELECT count(*) from values WHERE valuetype in ({0})".format(valueTypes))
     concept_count_in_db = cursor.fetchone()[0]
     index_count = se.es.count(index='strings', doc_type='concept')['count']
     print "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format('Passed' if concept_count_in_db == index_count else 'Failed', concept_count_in_db, index_count, (datetime.now()-start).seconds)
-
