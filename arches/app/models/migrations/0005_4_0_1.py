@@ -180,5 +180,11 @@ class Migration(migrations.Migration):
                SET ontologyproperty='P167i_was_place_at'
              WHERE ontologyproperty='P167i_was_place_of';
         """),
+        migrations.RunSQL("""
+            UPDATE nodes AS n SET config = '{"fillColor": "rgba(111,222,333,0.8)"}' FROM graphs AS g WHERE g.graphid = n.graphid AND g.isresource = true AND n.istopnode = true;
+            """,
+            """
+            UPDATE nodes AS n SET config = null FROM graphs AS g WHERE g.graphid = n.graphid AND g.isresource = true AND n.istopnode = true;
+            """),
         migrations.RunPython(forwards_func, reverse_func),
     ]
