@@ -118,6 +118,22 @@ require([
                         },
                     });
                 }));
+            },
+            copyResource: function(){
+                loading(true);
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.resource_copy.replace('//', '/' + data.resourceid + '/'),
+                    success: function(response) {
+                        pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
+                    },
+                    error: function(response) {
+                        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
+                    },
+                    complete: function (request, status) {
+                        loading(false);
+                    },
+                });
             }
         }
     });
