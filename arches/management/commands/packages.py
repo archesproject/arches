@@ -369,20 +369,18 @@ class Command(BaseCommand):
 
     def remove_resources(self, load_id='', force=False):
         """
-        Runs the resource_remover command found in package_utils
-
+        Runs the resource_remover command found in data_management.resources
         """
         # resource_remover.delete_resources(load_id)
         if not force:
-            opt = raw_input("all resources will be deleted from your database. continue? y/n ")
+            opt = raw_input("all resources will be removed from your database. continue? y/n ")
         else:
             opt = "y"
         if opt.lower().startswith("y"):
             resource_remover.clear_resources()
-            return
         else:
             print "operation cancelled."
-            return
+        return
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         if file_format in ['csv', 'json']:
