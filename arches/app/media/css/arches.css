@@ -4761,6 +4761,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background-color: #ccc;
 }
 
+.new-card.disabled #add-card {
+   cursor: default;
+}
+
+.project-grid-item.disabled:hover {
+    cursor: default;
+}
+
 .card-library {
     display: -webkit-flex;
     display: -ms-flexbox;
