@@ -66,6 +66,7 @@ def can_edit_resource_instance():
     """
 
     def test(u):
-        return len(get_editable_resource_types(u)) > 0
-
+        if u.is_authenticated():
+            return u.is_superuser or len(get_editable_resource_types(u)) > 0
+        return False
     return user_passes_test(test)
