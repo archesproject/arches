@@ -145,7 +145,6 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type='create')
             document, terms = resource.get_documents_to_index(fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
             document['root_ontology_class'] = resource.get_root_ontology()
-            document['displaycolor'] =  models.Node.objects.filter(graph_id=resource.graph.graphid).filter(istopnode=True)[0].config['fillColor']
             documents.append(se.create_bulk_item(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document))
             for term in terms:
                 term_list.append(se.create_bulk_item(index='strings', doc_type='term', id=term['_id'], data=term['_source']))
@@ -167,7 +166,6 @@ class Resource(models.ResourceInstance):
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list('nodeid', 'datatype')}
         document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
         document['root_ontology_class'] = self.get_root_ontology()
-        document['displaycolor'] =  models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config['fillColor']
         se.index_data('resource', self.graph_id, JSONSerializer().serializeToPython(document), id=self.pk)
 
         for term in terms:
@@ -240,9 +238,9 @@ class Resource(models.ResourceInstance):
             'resource_instance': self,
             'resource_relationships': [],
             'related_resources': [],
-            'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config
+            'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config,
+            'node_config_lookup': { unicode(node.graph_id): node.config for node in models.Node.objects.filter(istopnode=True) if node.config != None}
         }
-
         se = SearchEngineFactory().create()
 
         def get_relations(resourceinstanceid, start, limit):

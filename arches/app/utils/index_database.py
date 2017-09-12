@@ -75,7 +75,6 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
                 for resource in resources:
                     document, terms = resource.get_documents_to_index(fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes)
-                    document['displaycolor'] =  models.Node.objects.filter(graph_id=resource.graph.graphid).filter(istopnode=True)[0].config['fillColor']
                     doc_indexer.add(index='resource', doc_type=document['graph_id'], id=document['resourceinstanceid'], data=document)
                     for term in terms:
                         term_indexer.add(index='strings', doc_type='term', id=term['_id'], data=term['_source'])

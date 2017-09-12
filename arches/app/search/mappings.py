@@ -115,7 +115,6 @@ def prepare_search_index(resource_model_id, create=False):
                     'resourceinstanceid': {'type': 'keyword'},
                     'root_ontology_class': {'type':'keyword'},
                     'displayname': {'type': 'keyword'},
-                    'displaycolor': {'type': 'keyword'},
                     'displaydescription': {'type': 'keyword'},
                     'map_popup': {'type': 'keyword'},
                     'tiles' : {
