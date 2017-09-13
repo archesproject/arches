@@ -174,6 +174,9 @@ define([
                     .data(data.nodes, function(d) { return d.id; });
                 node.enter()
                     .append("circle")
+                    .style('fill', function(d){
+                        return d.color;
+                    })
                     .attr("r",function(d){
                         return d.isRoot ? 24 : 18;
                     })
@@ -336,6 +339,7 @@ define([
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
+                                    color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
                                     relationCount: {
                                         total: response.total,
                                         loaded: response.resource_relationships.length
@@ -354,13 +358,16 @@ define([
                             }
                             rootNode.loading = false;
                             updateNodeInfo(rootNode);
-                            _.each(response.related_resources, function (related_resource) {
+
+                            var getRelated = function (related_resource) {
+                                var nodeConfigLookup = response.node_config_lookup;
                                 if (!nodeMap[related_resource.resourceinstanceid]) {
                                     var node = {
                                         id: newNodeId,
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
+                                        color: nodeConfigLookup[related_resource.graph_id].fillColor,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
@@ -372,7 +379,9 @@ define([
                                     nodeMap[related_resource.resourceinstanceid] = node;
                                     newNodeId += 1;
                                 }
-                            });
+                            }
+
+                            _.each(response.related_resources, getRelated);
 
                             _.each(response.resource_relationships, function (resource_relationships) {
                                 var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];

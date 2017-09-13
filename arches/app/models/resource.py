@@ -237,7 +237,9 @@ class Resource(models.ResourceInstance):
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
-            'related_resources': []
+            'related_resources': [],
+            'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config,
+            'node_config_lookup': { unicode(node.graph_id): node.config for node in models.Node.objects.filter(istopnode=True) if node.config != None}
         }
         se = SearchEngineFactory().create()
 
