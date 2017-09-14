@@ -3,9 +3,8 @@ define([
     'jquery',
     'underscore',
     'arches',
-    'd3',
-    'plugins/d3-tip'
-], function(ko, $, _, arches, d3, d3Tip) {
+    'd3'
+], function(ko, $, _, arches, d3) {
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var modelMap = arches.resources.reduce(function(a, v) {
@@ -128,15 +127,6 @@ define([
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
                     " scale(" + d3.event.scale + ")");
-                if (sourceTip) {
-                    sourceTip.hide();
-                }
-                if (targetTip) {
-                    targetTip.hide();
-                }
-                if (nodeTip) {
-                    nodeTip.hide();
-                }
             };
 
             var svg = d3.select(element).append("svg:svg")
@@ -145,31 +135,6 @@ define([
                 .call(d3.behavior.zoom().on("zoom", redraw));
 
             var vis = svg.append('svg:g');
-
-            var sourceTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d) {
-                    return '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
-                });
-            var targetTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .direction('s')
-                .offset([10, 0])
-                .html(function(d) {
-                    return '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
-                });
-            var nodeTip = d3Tip()
-                .attr('class', 'd3-tip')
-                .direction('n')
-                .offset([-10, 0])
-                .html(function(d) {
-                    return '<span class="graph-tooltip-name">' + d.name + "</span>";
-                });
-
-            vis.call(sourceTip)
-                .call(targetTip)
-                .call(nodeTip);
 
             var update = function() {
                 data = {
@@ -188,11 +153,9 @@ define([
                         vis.selectAll("circle").attr("class", function(d1) {
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
-                                var tip = (d.target === d1) ? targetTip : sourceTip;
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
                                 hoveredNodes.push(d1);
-                                tip.show(d1, this);
                             } else if (d1.selected()) {
                                 className += '-selected';
                             }
@@ -211,8 +174,6 @@ define([
                             }
                             return className;
                         });
-                        sourceTip.hide();
-                        targetTip.hide();
                         if (selectedState() === false) {
                             nodeSelection.removeAll()
                         }
@@ -269,7 +230,6 @@ define([
                             .attr('class', function(l) {
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
-                        nodeTip.show(d, this);
                     })
                     .on('mouseout', function(d) {
                         vis.selectAll("circle")
@@ -292,8 +252,6 @@ define([
                         }
                         vis.selectAll("line")
                             .attr('class', 'link');
-                        nodeTip.hide();
-
                     })
 
                     .on("click", function(d) {
@@ -322,7 +280,6 @@ define([
                                 return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                             });
                         updateNodeInfo(d);
-                        nodeTip.show(d, this);
                     })
                     .call(drag);
                 node.exit()
