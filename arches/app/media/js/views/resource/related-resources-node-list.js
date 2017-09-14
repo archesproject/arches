@@ -31,6 +31,9 @@ define([
                 if (!item.selected) {
                     item.selected = ko.observable(false);
                 }
+                if (!item.hovered) {
+                    item.hovered = ko.observable(false);
+                }
                 if (!item.total) {
                     item.total = ko.observable(minimumRelations);
                 }
@@ -46,6 +49,21 @@ define([
                 this.filter.subscribe(this.filter_function, this, 'change');
                 this.filter_function();
             }
+
+            this.selectNode = function(e) {
+                _.each(self.selectedItems(), function(item) {
+                    item.selected(false)
+                });
+                e.selected(true)
+            };
+
+            this.hoverNode = function(e) {
+                if (e.hovered() === false) {
+                    e.hovered(true)
+                } else {
+                    e.hovered(false)
+                }
+            };
 
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){
