@@ -52,9 +52,11 @@ define([
 
             this.selectNode = function(e) {
                 _.each(self.selectedItems(), function(item) {
-                    item.selected(false)
-                });
-                e.selected(true)
+                    if (this.entityid != item.entityid) {
+                        item.selected(false)
+                    }
+                }, this);
+                e.selected(!e.selected())
             };
 
             this.hoverNode = function(e) {
