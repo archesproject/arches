@@ -3372,11 +3372,21 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .node-current-over, .node-ancestor-over {
-    /* The currently selected/moused-over node */
-    stroke: #000;
-    stroke-width: 3px;
+    /* The currently moused-over node */
+    stroke: #115fa5;
+    stroke-width: 2px;
     fill: #dcecfa;
-    opacity: 1.;
+    opacity: 1.0;
+    cursor: pointer;
+}
+
+.node-current-selected, .node-ancestor-selected {
+    /* The currently selected node */
+    stroke: #115fa5;
+    stroke-width: 5px;
+    stroke-dasharray: 5,1;
+    fill: #dcecfa;
+    opacity: 1.0;
     cursor: pointer;
 }
 
@@ -5013,6 +5023,16 @@ li.aside-li.active:hover, .library-dark .tab-content {
 .library-card.relative.selected {
     background: #ffffff;
     border-left: 5px solid steelblue;
+}
+
+.library-card.relative.hovered {
+    background: #ffffff;
+    border-left: 5px solid #ccc;
+}
+
+.library-card.relative.selected.hovered {
+    background: #ffffff;
+    border-left: 5px solid steelBlue;
 }
 
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {

@@ -29,6 +29,7 @@ define([
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
+            console.log(self.graphNodeList())
             this.useSemanticRelationships = arches.useSemanticRelationships;
             this.graphs = _.indexBy(viewData.createableResources, 'graphid');
             this.selectedOntologyClass = ko.observable();

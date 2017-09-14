@@ -43,7 +43,7 @@ define([
                     .attr("class", function(d1){
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
-                            className += '-over';
+                            className += '-selected';
                         } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
                             className += '-neighbor';
                         }
@@ -56,6 +56,29 @@ define([
                 updateNodeInfo(d);
             }
 
+            var hoverNode = function(d){
+                vis.selectAll("circle")
+                    .attr("class", function(d1){
+                        var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
+                        if (d1 === d) {
+                            className += d1.selected() ? '-selected' : '-over';
+                        } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
+                            if (d1.selected() === false) {
+                                className += '-neighbor';
+                            } else {
+                                className += '-selected';
+                            }
+                        } else if (d1.selected()) {
+                            className += '-selected';
+                        }
+                        return className;
+                    });
+                vis.selectAll("line")
+                    .attr('class', function(l) {
+                        return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
+                    });
+            }
+
             var updateSelected = function(item) {
                 var item = item;
                 return function(val){
@@ -65,9 +88,19 @@ define([
                 }
             }
 
+            var updateHovered = function(item) {
+                var item = item;
+                return function(val){
+                    if (val === true) {
+                        hoverNode(item);
+                    }
+                }
+            }
+
             nodeList.subscribe(function(list){
                 _.each(list, function(item){
                     item.selected.subscribe(updateSelected(item), this)
+                    item.hovered.subscribe(updateHovered(item), this)
                     if (item.relationCount) {
                         item.loaded(item.relationCount.loaded)
                         item.total(item.relationCount.total)
@@ -123,6 +156,7 @@ define([
             vis.call(sourceTip)
                 .call(targetTip)
                 .call(nodeTip);
+
             var update = function () {
                 data = {
                     nodes: force.nodes(data.nodes).nodes(),
@@ -140,11 +174,11 @@ define([
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
                                 var tip = (d.target === d1) ? targetTip : sourceTip;
-                                className += '-neighbor';
+                                className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
                                 tip.show(d1, this);
-                            } else if (d1 === selectedNode) {
-                                className += '-over';
+                            } else if (d1.selected()) {
+                                className += '-selected';
                             }
                             return className;
                         });
@@ -153,8 +187,8 @@ define([
                         d3.select(this).attr("class", "link");
                         vis.selectAll("circle").attr("class", function(d1){
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
-                            if (d1 === selectedNode) {
-                                className += '-over';
+                            if (d1.selected()) {
+                                className += '-selected';
                             }
                             return className;
                         });
@@ -188,7 +222,59 @@ define([
                             .attr("class", function(d1){
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
-                                    className += '-over';
+                                    className += d1.selected() ? '-selected' : '-over';
+                                    _.each(nodeList(), function(n){
+                                        if (n.entityid === d.entityid){
+                                            n.hovered(true)
+                                        } else {n.hovered(false)}
+                                    })
+                                } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
+                                    if (d1.selected() === false) {
+                                        className += '-neighbor';
+                                    } else {
+                                        className += '-selected';
+                                    }
+                                } else if (d1.selected() === true) {
+                                    className += '-selected';
+                                }
+                                return className;
+                            });
+                        vis.selectAll("line")
+                            .attr('class', function(l) {
+                                return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
+                            });
+                        nodeTip.show(d, this);
+                    })
+                    .on('mouseout', function (d) {
+                        vis.selectAll("circle")
+                            .attr("class", function(d1){
+                                var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
+                                if (d1.selected()) {
+                                    className += '-selected';
+                                    _.each(nodeList(), function(n){
+                                        n.hovered(false)
+                                        if (n.relationCount) {
+                                            n.loaded(n.relationCount.loaded)
+                                            n.total(n.relationCount.total)
+                                        }
+                                    })
+                                }
+                                return className;
+                            });
+                        vis.selectAll("line")
+                            .attr('class', 'link');
+                        nodeTip.hide();
+                    })
+
+                    .on("click", function (d) {
+                        if (!d3.event.defaultPrevented){
+                            getResourceDataForNode(d);
+                        }
+                        vis.selectAll("circle")
+                            .attr("class", function(d1){
+                                var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
+                                if (d1 === d) {
+                                    className += '-selected';
                                     _.each(nodeList(), function(n){
                                         if (n.entityid === d.entityid){
                                             n.selected(true)
@@ -205,33 +291,6 @@ define([
                             });
                         updateNodeInfo(d);
                         nodeTip.show(d, this);
-                    })
-                    .on('mouseout', function (d) {
-                        vis.selectAll("circle")
-                            .attr("class", function(d1){
-                                var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
-                                if (d1 === selectedNode) {
-                                    className += '-over';
-                                    _.each(nodeList(), function(n){
-                                        if (n.entityid === d.entityid){
-                                            n.selected(true)
-                                        } else {n.selected(false)}
-                                        if (n.relationCount) {
-                                            n.loaded(n.relationCount.loaded)
-                                            n.total(n.relationCount.total)
-                                        }
-                                    })
-                                }
-                                return className;
-                            });
-                        vis.selectAll("line")
-                            .attr('class', 'link');
-                        nodeTip.hide();
-                    })
-                    .on("click", function (d) {
-                        if (!d3.event.defaultPrevented){
-                            getResourceDataForNode(d);
-                        }
                     })
                     .call(drag);
                 node.exit()

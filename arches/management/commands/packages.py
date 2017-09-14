@@ -423,10 +423,10 @@ class Command(BaseCommand):
 
             if setup_db != False:
                 if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                    print 'loading system settings'
-                    load_system_settings()
                     self.setup_db(settings.PACKAGE_NAME)
 
+            print 'loading system settings'
+            load_system_settings()
             print 'loading widgets'
             load_widgets()
             print 'loading functions'
