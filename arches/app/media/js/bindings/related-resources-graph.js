@@ -93,6 +93,7 @@ define([
                     if (val === true) {
                         selectNode(item);
                     } else {
+                        nodeSelection.removeAll()
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
                                 return 'node-' + (d1.isRoot ? 'current' : 'ancestor');
@@ -237,14 +238,14 @@ define([
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1.selected()) {
                                     className += '-selected';
-                                    _.each(nodeList(), function(n) {
-                                        n.hovered(false)
-                                        if (n.relationCount) {
-                                            n.loaded(n.relationCount.loaded)
-                                            n.total(n.relationCount.total)
-                                        }
-                                    })
                                 }
+                                _.each(nodeList(), function(n) {
+                                    n.hovered(false)
+                                    if (n.relationCount) {
+                                        n.loaded(n.relationCount.loaded)
+                                        n.total(n.relationCount.total)
+                                    }
+                                })
                                 return className;
                             });
                         if (selectedState() === false) {
@@ -262,10 +263,14 @@ define([
                             .attr("class", function(d1) {
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
-                                    className += '-selected';
                                     _.each(nodeList(), function(n) {
                                         if (n.entityid === d.entityid) {
-                                            n.selected(true)
+                                            if (n.selected() === false) {
+                                                n.selected(true);
+                                                className += '-selected';
+                                            } else {
+                                                n.selected(false);
+                                            }
                                         } else {
                                             n.selected(false)
                                         }
