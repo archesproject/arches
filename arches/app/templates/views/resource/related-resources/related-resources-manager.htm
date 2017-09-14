@@ -7,8 +7,58 @@
     <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
         nodeList: graphNodeList,
         currentResource: newResource,
-        subscriptions: currentResourceSubscriptions
+        subscriptions: currentResourceSubscriptions,
+        nodeSelection: graphNodeSelection
     }">
+
+
+    <!--ko if: graphNodeSelection().length == 1 -->
+    <div class="hover-rr-node-info">
+        <div class="hover-feature-title-bar">
+            <div class="hover-feature-title">
+                <span class="">{%trans 'Resource Details'%}</span>
+                <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss" style="cursor: pointer;" data-placement="left" data-toggle="tooltip" data-original-title="add overlay" data-bind="visible: graphNodeSelection().length > 0, click: function(){
+                    _.each(graphNodeList(), function(n){
+                    if (n.selected()) {
+                        n.selected(false)
+                    };
+                    graphNodeSelection.removeAll()
+                })}"></i>
+            </div>
+        </div>
+        <div class="hover-feature-body">
+            <div class="hover-feature" data-bind="text: graphNodeSelection()[0].name"></div>
+            <div class="hover-feature-metadata">
+                {% trans 'Resource ID:' %}
+                <span data-bind="text: graphNodeSelection()[0].entityid"></span>
+            </div>
+            <div class="hover-feature-metadata">
+                {% trans 'Resource Model:' %}
+                <span data-bind="text: graphNameLookup[graphNodeSelection()[0].entitytypeid].name"></span>
+            </div>
+        </div>
+        <div class="hover-feature-footer">
+            <a data-bind="click: function () { window.open(reportURL + ko.unwrap(graphNodeSelection()[0].entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
+            <a data-bind="click: function () { window.open(editURL + ko.unwrap(graphNodeSelection()[0].entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
+        </div>
+    </div>
+    <!--/ko-->
+    <!--ko if: graphNodeSelection().length == 2 -->
+    <div class="hover-rr-node-info">
+        <div class="hover-feature-title-bar">
+            <div class="hover-feature-title">
+                <span class="">{%trans 'Relationship Details'%}</span>
+                <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss" style="cursor: pointer;" data-placement="left" data-toggle="tooltip" data-original-title="add overlay" data-bind="visible: graphNodeSelection()[0], click: function () { console.log('stuff'); }"></i>
+            </div>
+        </div>
+        <div class="hover-feature-body">
+            <div class="hover-feature" data-bind="text: graphNodeSelection()[1].name"></div>
+            <span data-bind="text: graphNodeSelection()[0].relationship"></span>
+            <div class="hover-feature" data-bind="text: graphNodeSelection()[0].name"></div>
+        </div>
+    </div>
+    <!--/ko-->
+
 
         <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
         <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">

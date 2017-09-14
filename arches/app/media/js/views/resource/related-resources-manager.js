@@ -18,18 +18,21 @@ define([
             this.searchResults = options.searchResults;
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
+            this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
+            this.reportURL = arches.urls.resource_report;
+            this.editURL = arches.urls.resource_editor;
             this.currentResource = ko.observable();
             this.currentResourceSubscriptions = [];
             this.resourceEditorContext = options.resourceEditorContext;
             this.containerBottomMargin = ko.observable(700);
             this.showRelatedProperties = ko.observable(false);
             this.showGraph = ko.observable(this.editingInstanceId === undefined ? true : false);
+            this.graphNodeSelection = ko.observableArray()
             this.graphNodeList = ko.observableArray();
             this.newResource = ko.observableArray();
             this.fdgNodeListView = new RelatedResourcesNodeList({
                 items: self.graphNodeList
             });
-            console.log(self.graphNodeList())
             this.useSemanticRelationships = arches.useSemanticRelationships;
             this.graphs = _.indexBy(viewData.createableResources, 'graphid');
             this.selectedOntologyClass = ko.observable();

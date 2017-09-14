@@ -14,6 +14,8 @@ define([
             }, {});
             var options = ko.unwrap(valueAccessor());
             var subscriptions = options.subscriptions;
+            var nodeSelection = options.nodeSelection;
+            var selectedState = ko.observable(false);
             var $el = $(element);
             var width = $el.parent().width();
             var height = $el.parent().height();
@@ -53,6 +55,7 @@ define([
                     .attr('class', function(l) {
                         return (l.source === d || l.target === d) ? 'linkMouseover' : 'link';
                     });
+                nodeSelection([d])
                 updateNodeInfo(d);
             }
 
@@ -62,6 +65,9 @@ define([
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
                             className += d1.selected() ? '-selected' : '-over';
+                            if (selectedState() === false) {
+                                nodeSelection([d1]);
+                            }
                         } else if (linkMap[d1.id+'_'+d.id] || linkMap[d.id+'_'+d1.id]){
                             if (d1.selected() === false) {
                                 className += '-neighbor';
@@ -82,8 +88,14 @@ define([
             var updateSelected = function(item) {
                 var item = item;
                 return function(val){
+                    selectedState(val);
                     if (val === true) {
                         selectNode(item);
+                    } else {
+                        vis.selectAll("circle")
+                            .attr("class", function(d1){
+                               return 'node-' + (d1.isRoot ? 'current' : 'ancestor');
+                            });
                     }
                 }
             }
@@ -169,6 +181,7 @@ define([
                     .insert("line", "circle")
                     .attr("class", "link")
                     .on("mouseover", function(d) {
+                        var hoveredNodes = []
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1){
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
@@ -176,12 +189,16 @@ define([
                                 var tip = (d.target === d1) ? targetTip : sourceTip;
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
+                                hoveredNodes.push(d1);
                                 tip.show(d1, this);
                             } else if (d1.selected()) {
                                 className += '-selected';
                             }
                             return className;
                         });
+                        if (selectedState() === false) {
+                            nodeSelection(hoveredNodes)
+                        }
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
@@ -194,6 +211,9 @@ define([
                         });
                         sourceTip.hide();
                         targetTip.hide();
+                        if (selectedState() === false) {
+                            nodeSelection.removeAll()
+                        }
                     });
                 link.exit()
                     .remove();
@@ -261,9 +281,13 @@ define([
                                 }
                                 return className;
                             });
+                        if (selectedState() === false) {
+                            nodeSelection.removeAll()
+                        }
                         vis.selectAll("line")
                             .attr('class', 'link');
                         nodeTip.hide();
+
                     })
 
                     .on("click", function (d) {

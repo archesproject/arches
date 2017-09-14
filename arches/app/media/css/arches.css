@@ -7429,6 +7429,22 @@ a.clear-geojson-button:hover {
     opacity: 0.9;
 }
 
+.hover-rr-node-info {
+    position: absolute;
+    top: 50px;
+    z-index: 1000;
+    left: 15px;
+    margin: 10px;
+    width: 400px;
+    padding: 0px;
+    border: solid 1px #999;
+    border-radius: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    background-color: rgb(249, 249, 249);
+    opacity: 0.9;
+}
+
+
 .iiif-widget {
     position: relative;
 }
