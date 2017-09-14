@@ -222,7 +222,7 @@ define([
                             .attr("class", function(d1){
                                 var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                                 if (d1 === d) {
-                                    className += '-over';
+                                    className += d1.selected() ? '-selected' : '-over';
                                     _.each(nodeList(), function(n){
                                         if (n.entityid === d.entityid){
                                             n.hovered(true)

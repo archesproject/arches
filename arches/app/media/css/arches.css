@@ -3372,8 +3372,8 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .node-current-over, .node-ancestor-over {
-    /* The currently selected/moused-over node */
-    stroke: #0000ff;
+    /* The currently moused-over node */
+    stroke: #115fa5;
     stroke-width: 2px;
     fill: #dcecfa;
     opacity: 1.0;
@@ -3381,9 +3381,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .node-current-selected, .node-ancestor-selected {
-    /* The currently selected/moused-over node */
-    stroke: #0000ff;
-    stroke-width: 4px;
+    /* The currently selected node */
+    stroke: #115fa5;
+    stroke-width: 5px;
+    stroke-dasharray: 5,1;
     fill: #dcecfa;
     opacity: 1.0;
     cursor: pointer;
