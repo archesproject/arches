@@ -5024,6 +5024,16 @@ li.aside-li.active:hover, .library-dark .tab-content {
     border-left: 5px solid steelblue;
 }
 
+.library-card.relative.hovered {
+    background: #ffffff;
+    border-left: 5px solid #ccc;
+}
+
+.library-card.relative.selected.hovered {
+    background: #ffffff;
+    border-left: 5px solid steelBlue;
+}
+
 .bg-gray-dark, .bg-gray-dark a, .design a.chosen-single:hover, .design a.chosen-single:hover, .bg-gray-dark, .bg-gray-dark a {
     color: #999;
 }
