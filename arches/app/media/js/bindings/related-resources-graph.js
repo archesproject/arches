@@ -401,6 +401,7 @@ define([
                                 nodes = [];
 
                             if (isRoot) {
+                                nodeSelection.removeAll()
                                 rootNode = {
                                     id: newNodeId,
                                     entityid: resourceId,
