@@ -107,6 +107,10 @@ define([
                 return function(val) {
                     if (val === true) {
                         hoverNode(item);
+                    } else {
+                        if (selectedState() === false) {
+                            nodeSelection.removeAll();
+                        }
                     }
                 }
             }
@@ -401,7 +405,8 @@ define([
                                 nodes = [];
 
                             if (isRoot) {
-                                nodeSelection.removeAll()
+                                nodeSelection.removeAll();
+                                selectedState(false);
                                 rootNode = {
                                     id: newNodeId,
                                     entityid: resourceId,
