@@ -80,7 +80,7 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if not (key == 'cards' or key == 'widgets' or key == 'nodes'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
                         setattr(self, key, value)
 
                 for card in args[0]["cards"]:
@@ -181,6 +181,7 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
+        ret['is_editable'] = self.is_editable
         ret['ontologyproperty'] = self.ontologyproperty
 
         if self.graph and self.graph.ontology and self.graph.isresource:
