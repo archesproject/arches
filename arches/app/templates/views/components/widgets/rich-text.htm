@@ -16,3 +16,7 @@
 <dt data-bind="text: label"></dt>
 <dd data-bind="html: value() || '{% trans "None" %}'"></dd>
 {% endblock report %}
+
+{% block display_value %}
+<div data-bind="html: value()" style="padding:20px;"></div>
+{% endblock display_value %}
