@@ -362,6 +362,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             for i in range(23):
                 sql_list.append(None)
 
+        try:
+            simplification = config['simplification']
+        except KeyError, e:
+            simplification = 0.3
 
         return {
             "provider": {
@@ -374,7 +378,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "database": database["NAME"],
                         "port": database["PORT"]
                     },
-                    "simplify": settings.VECTOR_TILE_SIMPLIFICATION,
+                    "simplify": simplification,
                     "queries": sql_list
                 },
             },

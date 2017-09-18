@@ -97,7 +97,7 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMinf/': '',
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
- 
+
 # A context to supply for use in export of resource instances in JSON-LD format
 JSON_LD_CONTEXT = {
     # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
@@ -398,8 +398,6 @@ TILE_CACHE_CONFIG = {
     # "access": "<access key>",
     # "secret": "<secret key>"
 }
-
-VECTOR_TILE_SIMPLIFICATION = 0.3
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 

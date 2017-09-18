@@ -245,6 +245,15 @@ define([
         setupConfig: function(config) {
             var self = this;
             var keys = [];
+            var datatypeRecord = this.datatypelookup[this.datatype()];
+            if (datatypeRecord) {
+                var defaultConfig = datatypeRecord.defaultconfig;
+                _.each(defaultConfig, function (value, key) {
+                    if (!config.hasOwnProperty(key)) {
+                        config[key] = value;
+                    }
+                });
+            }
             _.each(config, function(configVal, configKey) {
                 if (!ko.isObservable(self.config[configKey])) {
                     self.config[configKey] = Array.isArray(configVal) ?
