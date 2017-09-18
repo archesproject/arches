@@ -1143,6 +1143,10 @@ class Graph(models.GraphModel):
                     if 'cards' in diff[0] and 'cards' in diff[1]:
                         if len(diff[0]['cards']) > len(diff[1]['cards']):
                             res = None
+                    if 'datatype' in diff[0] and 'datatype' in diff[1]:
+                        res = None
+                    if 'config' in diff[0] and 'config' in diff[1]:
+                        res = None
             return res
 
         if self.isresource == True:
