@@ -86,7 +86,6 @@ def concept(request, conceptid):
     pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
-
         include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
         include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
@@ -253,6 +252,15 @@ def export_collections(request):
 
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
+
+def make_collection(request, conceptid):
+    concept = Concept().get(id=conceptid, values=[])
+    try:
+        collection_concept = concept.make_collection()
+        raise
+        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the supplied concept')}})
+    except:
+        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the concept selected.')}}, status=500)
 
 def manage_parents(request, conceptid):
     #  need to check user credentials here
