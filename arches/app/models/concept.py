@@ -327,6 +327,9 @@ class Concept(object):
 
                 concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
                 concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+            
+            if len(rows) == 0:
+                concepts_to_delete[concept.id] = concept
 
         if concept.nodetype == 'Collection':
             concepts_to_delete[concept.id] = concept
