@@ -707,9 +707,6 @@ class Graph(models.GraphModel):
 
         """
 
-        if self.is_editable == False:
-            raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
-
         if node is not None:
             if not isinstance(node, models.Node):
                 node = self.nodes[uuid.UUID(str(node))]
@@ -719,6 +716,11 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+
+            if self.is_editable == False and len(tiles) > 0:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
+
             def traverse_tree(tree):
                 nodes.append(tree['node'])
                 if tree['node'].is_collector:
@@ -1128,12 +1130,22 @@ class Graph(models.GraphModel):
 
     def check_if_resource_is_editable(self):
 
+
         def find_unpermitted_edits(obj_a, obj_b, ignore_list):
             res = None
             pre_diff = self._compare(obj_a, obj_b, ignore_list)
             diff = filter(lambda x: len(x.keys()) > 0, pre_diff)
             if len(diff) > 0:
                 res = diff
+                if len(diff) == 2:
+                    #Allowing edit if user is adding cards:
+                    if 'cards' in diff[0] and 'cards' in diff[1]:
+                        if len(diff[0]['cards']) > len(diff[1]['cards']):
+                            res = None
+                    if 'datatype' in diff[0] and 'datatype' in diff[1]:
+                        res = None
+                    if 'config' in diff[0] and 'config' in diff[1]:
+                        res = None
             return res
 
         if self.isresource == True:
@@ -1144,7 +1156,6 @@ class Graph(models.GraphModel):
                     unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass','description'])
                     if unpermitted_node_edits != None:
                         unpermitted_edits.append(unpermitted_node_edits)
-
                 db_graph = Graph.objects.get(pk=self.graphid)
                 unpermitted_graph_edits = find_unpermitted_edits(self, db_graph, ['name','ontology_id','subtitle','iconclass','author','description','isactive'])
                 if unpermitted_graph_edits != None:

@@ -80,6 +80,7 @@
         <div class="ep-help-topic-content">
             <p>{% trans "When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times." %}</p>
             <p>{% blocktrans %}As shown below, you must select the top node and then use <i class="ion-ios-plus"></i> to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch. {% endblocktrans %}</p>
+            <p>{% trans "Once data is saved to a nodegroup, nodes belonging to that nodegroup cannot be deleted" %}</p>
             <p><a href="{{ STATIC_URL }}img/help/add-graph-branch.gif" target="_blank"><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-graph-branch.gif"></img></a></p>
         </div>
     </div>
@@ -96,6 +97,7 @@
             <p>{% trans "<code>boolean</code> Use this to record a simple 'yes or no' or 'true or false' value." %}</p>
             <p>{% trans "<code>file-list</code> Allows this node to store one or mores files. Use this to upload images, documents, etc." %}</p>
             <p>{% trans "<code>semantic</code> A 'semantic' node <strong>does not store data</strong>. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of <em>every</em> graph is a semantic node." %}</p>
+            <p>{% trans "Once a user saves data belonging to a node, the datatype and the datatype configs <strong>cannot be modified</strong>" %}</p>
         </div>
     </div>
 </div>
