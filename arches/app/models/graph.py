@@ -708,33 +708,32 @@ class Graph(models.GraphModel):
         """
 
         if node is not None:
-
             if not isinstance(node, models.Node):
                 node = self.nodes[uuid.UUID(str(node))]
 
-                nodes = []
-                edges = []
-                nodegroups = []
+            nodes = []
+            edges = []
+            nodegroups = []
 
-                tree = self.get_tree(root=node)
-                tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
+            tree = self.get_tree(root=node)
+            tiles = models.TileModel.objects.filter(nodegroup=node.nodegroup)
 
-                if self.is_editable == False and len(tiles) > 0:
-                    raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
+            if self.is_editable == False and len(tiles) > 0:
+                raise GraphValidationError(_("Your resource model: {0}, already has instances saved. You cannot delete nodes from a Resource Model with instances.".format(self.name)), 1006)
 
-                def traverse_tree(tree):
-                    nodes.append(tree['node'])
-                    if tree['node'].is_collector:
-                        nodegroups.append(tree['node'].nodegroup)
-                    for child in tree['children']:
-                        edges.append(child['parent_edge'])
-                        traverse_tree(child)
-                traverse_tree(tree)
+            def traverse_tree(tree):
+                nodes.append(tree['node'])
+                if tree['node'].is_collector:
+                    nodegroups.append(tree['node'].nodegroup)
+                for child in tree['children']:
+                    edges.append(child['parent_edge'])
+                    traverse_tree(child)
+            traverse_tree(tree)
 
-                with transaction.atomic():
-                    [nodegroup.delete() for nodegroup in nodegroups]
-                    [edge.delete() for edge in edges]
-                    [node.delete() for node in nodes]
+            with transaction.atomic():
+                [nodegroup.delete() for nodegroup in nodegroups]
+                [edge.delete() for edge in edges]
+                [node.delete() for node in nodes]
 
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
