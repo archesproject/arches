@@ -167,6 +167,14 @@ class DateDataType(BaseDataType):
 
         return errors
 
+    def transform_import_values(self, value):
+        if type(value) == list:
+            try:
+                value = str(datetime(*value).date())
+            except:
+                pass
+        return value
+
     def append_to_document(self, document, nodevalue, nodeid, tile):
         document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
