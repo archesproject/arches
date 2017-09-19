@@ -140,6 +140,10 @@
     color: #ccc;
 }
 
+.card-grid-item.card-locked .mar-no {
+    background-color: #ececec;
+}
+
 .branch-item {
     margin-bottom: 10px;
 }

@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- card -->
                 <!-- ko foreach: graphModel.graphCards -->
-                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }, attr:{'data-arches-nodegroupid': nodegroup_id, 'data-arches-cardid': cardid}">
+                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }, attr:{'data-arches-nodegroupid': nodegroup_id, 'data-arches-cardid': cardid}, css: {'card-locked': is_editable === false}">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
@@ -84,9 +84,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <!-- card Tools -->
+                        <!-- ko if: is_editable === false -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="#" class="pull-right" data-bind="css: {'disabled': is_editable === false }, click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i> {% trans 'Remove Card' %}</a>
+                            <a href="#" class="pull-right disabled"><i class="ion-locked"></i> {% trans 'Card Has Data' %}</a>
                         </div>
+                        <!-- /ko -->
+                        <!-- ko if: is_editable === true -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i> {% trans 'Remove Card' %}</a>
+                        </div>
+                        <!-- /ko -->
 
                     </div>
                 </div>
