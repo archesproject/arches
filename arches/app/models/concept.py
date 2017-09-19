@@ -515,9 +515,7 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             delete_concept_values_index(concepts_to_delete)
-
         else:
-            delete_concept_values_index({self.id: self})
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 delete_concept_values_index(concepts_to_delete)
