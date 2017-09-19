@@ -107,7 +107,7 @@ require([
                         conceptReport.render();
                     },
                     'parentsChanged': function() {
-                        //conceptTree.render();
+                        conceptTree.render();
                         conceptReport.render();
                     },
                     'conceptsImported': function() {

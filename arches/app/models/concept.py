@@ -217,7 +217,6 @@ class Concept(object):
                         concept.add_relation(subconcept, relatedconcept.relationshiptype)
                 child_concepts.traverse(applyRelationship)
 
-
         return concept
 
     def delete(self, delete_self=False):
@@ -238,7 +237,7 @@ class Concept(object):
                 models.Concept.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
-            conceptrelations = models.Relation.objects.filter(relationtype__category = 'Semantic Relations', conceptfrom = parentconcept.id, conceptto = self.id)
+            conceptrelations = models.Relation.objects.filter(Q(relationtype__category = 'Semantic Relations') | Q(relationtype = 'hasTopConcept'), conceptfrom = parentconcept.id, conceptto = self.id)
             for relation in conceptrelations:
                 relation.delete()
 
@@ -286,7 +285,7 @@ class Concept(object):
         Relates this concept to 'concepttorelate' via the relationtype
 
         """
-        
+
         relation, created = models.Relation.objects.get_or_create(conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype)
         return relation
 

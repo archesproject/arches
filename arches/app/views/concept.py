@@ -253,18 +253,17 @@ def export_collections(request):
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
+@group_required('RDM Administrator')
 def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
         collection_concept = concept.make_collection()
-        raise
         return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the supplied concept')}})
     except:
         return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the concept selected.')}}, status=500)
 
+@group_required('RDM Administrator')
 def manage_parents(request, conceptid):
-    #  need to check user credentials here
-
     if request.method == 'POST':
         json = request.body
         if json != None:
@@ -283,7 +282,11 @@ def manage_parents(request, conceptid):
                     for added in data['added']:
                         concept.addparent(added)
 
-                    concept.save()
+                    concept_model = concept.save()
+                    if concept_model.nodetype_id == 'ConceptScheme':
+                        concept_model.nodetype_id = 'Concept'
+                        concept_model.save()
+                        #concept.index()
 
                 return JSONResponse(data)
 
