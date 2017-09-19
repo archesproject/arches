@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
+    url(r'^concepts/(?P<conceptid>%s)/make_collection/$' % uuid_regex, concept.make_collection, name="make_collection"),
     url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , concept.concept, name="concept"),
     url(r'^concepts/tree/(?P<mode>.*)', concept.concept_tree, name="concept_tree"),
     url(r'^concepts/search$', concept.search, name="concept_search"),

@@ -286,13 +286,7 @@ class Concept(object):
         Relates this concept to 'concepttorelate' via the relationtype
 
         """
-
-        # relation = models.Relation()
-        # relation.pk = str(uuid.uuid4())
-        # relation.conceptfrom_id = self.id
-        # relation.conceptto_id = concepttorelate.id
-        # relation.relationtype_id = relationtype
-        # relation.save()
+        
         relation, created = models.Relation.objects.get_or_create(conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype)
         return relation
 
@@ -804,6 +798,32 @@ class Concept(object):
             _findNarrower(result, path, rec)
 
         return JSONSerializer().serializeToPython(result)['children']
+
+    def make_collection(self):
+        if len(self.values) == 0:
+            raise Exception('Need to include values when creating a collection')
+        values = JSONSerializer().serializeToPython(self.values)
+        for value in values:
+            value['id'] = ''
+        collection_concept = Concept({
+            'nodetype': 'Collection',
+            'values': values
+        })
+
+        def create_collection(conceptfrom):
+            for relation in models.Relation.objects.filter(Q(conceptfrom_id = conceptfrom.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related')):
+                conceptto = Concept(relation.conceptto)
+                if conceptfrom == self:
+                    collection_concept.add_relation(conceptto, 'member')
+                else:
+                    conceptfrom.add_relation(conceptto, 'member')
+                create_collection(conceptto)
+        
+        with transaction.atomic():
+            collection_concept.save()
+            create_collection(self)
+
+        return collection_concept
 
 
 class ConceptValue(object):
