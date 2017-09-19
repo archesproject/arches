@@ -6,6 +6,9 @@ import uuid
 import importlib
 import datetime
 import unicodecsv
+import shapefile
+from zipfile import ZipFile
+from shapely.geometry import shape
 from time import time
 from copy import deepcopy
 from optparse import make_option
@@ -37,6 +40,10 @@ from formats.archesjson import JsonReader
 from formats.csvfile import CsvReader
 from formats.archesfile import ArchesFileReader
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 class BusinessDataImporter(object):
 
@@ -106,8 +113,14 @@ class BusinessDataImporter(object):
                     elif self.file_format == 'csv':
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
+                    elif self.file_format == 'zip':
+                        zipfile = ZipFile(StringIO(open(file[0], 'r').read()))
+                        filenames = [y for y in sorted(zipfile.namelist()) for ending in ['dbf', 'prj', 'shp', 'shx'] if y.endswith(ending)]
+                        dbf, prj, shp, shx = [StringIO(zipfile.read(filename)) for filename in filenames]
+                        shape_file = shapefile.Reader(shp=shp, shx=shx, dbf=dbf)
+                        self.business_data = self.shape_to_csv(shape_file)
                     elif self.file_format == 'shp':
-                        self.business_data = self.shape_to_csv(file)
+                        self.business_data = self.shape_to_csv(shapefile.Reader(file[0]))
                 else:
                     print str(file) + ' is not a valid file'
             else:
@@ -128,7 +141,7 @@ class BusinessDataImporter(object):
             if file_format == 'json':
                 reader = ArchesFileReader()
                 reader.import_business_data(business_data, mapping)
-            elif file_format == 'csv' or file_format == 'shp':
+            elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
                     reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
@@ -151,17 +164,11 @@ class BusinessDataImporter(object):
                 datatype_instance.after_update_all()
 
     def shape_to_csv(self, shapefile):
-        shpfile=os.path.join(shapefile)
         csv_records = []
-        ds = DataSource(shpfile[0])
-        layer = ds[0]
-
-        for feature in layer:
-            csv_record = {}
-            for field in layer.fields:
-                csv_record[field] = str(feature[field])
-            geom = str(feature.geom.wkt)
-            csv_record['geom'] = geom
+        field_names = [field[0] for field in shapefile.fields[1:]]
+        for feature in shapefile.shapeRecords():
+            csv_record = (dict(zip(field_names, feature.record)))
+            csv_record['geom'] = shape(feature.shape.__geo_interface__).wkt
             csv_records.append(csv_record)
 
         return csv_records
