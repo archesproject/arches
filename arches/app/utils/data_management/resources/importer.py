@@ -12,6 +12,7 @@ from optparse import make_option
 from os.path import isfile, join
 from django.db import connection, transaction
 from django.contrib.auth.models import User
+from django.contrib.gis.gdal import DataSource
 from django.forms.models import model_to_dict
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ValidationError
@@ -105,6 +106,8 @@ class BusinessDataImporter(object):
                     elif self.file_format == 'csv':
                         data = unicodecsv.DictReader(open(file[0], 'rU'), encoding='utf-8-sig', restkey='ADDITIONAL', restval='MISSING')
                         self.business_data = list(data)
+                    elif self.file_format == 'shp':
+                        self.business_data = self.shape_to_csv(file)
                 else:
                     print str(file) + ' is not a valid file'
             else:
@@ -125,7 +128,7 @@ class BusinessDataImporter(object):
             if file_format == 'json':
                 reader = ArchesFileReader()
                 reader.import_business_data(business_data, mapping)
-            elif file_format == 'csv':
+            elif file_format == 'csv' or file_format == 'shp':
                 if mapping != None:
                     reader = CsvReader()
                     reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk)
@@ -147,6 +150,21 @@ class BusinessDataImporter(object):
                 datatype_instance = datatype_factory.get_instance(datatype.datatype)
                 datatype_instance.after_update_all()
 
+    def shape_to_csv(self, shapefile):
+        shpfile=os.path.join(shapefile)
+        csv_records = []
+        ds = DataSource(shpfile[0])
+        layer = ds[0]
+
+        for feature in layer:
+            csv_record = {}
+            for field in layer.fields:
+                csv_record[field] = str(feature[field])
+            geom = str(feature.geom.wkt)
+            csv_record['geom'] = geom
+            csv_records.append(csv_record)
+
+        return csv_records
 
 class ResourceLoader(object):
 
