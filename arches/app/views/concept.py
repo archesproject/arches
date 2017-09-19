@@ -258,9 +258,9 @@ def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
         collection_concept = concept.make_collection()
-        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the supplied concept')}})
+        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the selected concept')}})
     except:
-        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the concept selected.')}}, status=500)
+        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the selected concept.')}}, status=500)
 
 @group_required('RDM Administrator')
 def manage_parents(request, conceptid):
