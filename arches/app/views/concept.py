@@ -276,22 +276,15 @@ def manage_parents(request, conceptid):
                         concept.addparent(deleted)
 
                     concept.delete()
+                    concept.index()
 
                 if len(data['added']) > 0:
                     concept = Concept().get(id=conceptid, include_subconcepts=True, values=['label'])
                     for added in data['added']:
                         concept.addparent(added)
 
-                    concept_model = concept.save()
-                    if concept_model.nodetype_id == 'ConceptScheme':
-                        concept_model.nodetype_id = 'Concept'
-                        concept_model.save()
-                        
-                        for relation in models.Relation.objects.filter(conceptfrom=concept_model, relationtype_id='hasTopConcept'):
-                            relation.relationtype_id = 'narrower'
-                            relation.save()
-                        
-                        concept.index()
+                    concept.save()
+                    concept.index()
 
                 return JSONResponse(data)
 

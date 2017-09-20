@@ -202,10 +202,19 @@ class Concept(object):
         for parentconcept in self.parentconcepts:
             parentconcept.save()
             parentconcept.add_relation(self, parentconcept.relationshiptype)
-
+            
         for subconcept in self.subconcepts:
             subconcept.save()
             self.add_relation(subconcept, subconcept.relationshiptype)
+            
+        # if we're moving a Concept Scheme below another Concept or Concept Scheme
+        if len(self.parentconcepts) > 0 and concept.nodetype_id == 'ConceptScheme':
+            concept.nodetype_id = 'Concept'
+            concept.save()
+            
+            for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='hasTopConcept'):
+                relation.relationtype_id = 'narrower'
+                relation.save()
 
         for relatedconcept in self.relatedconcepts:
             self.add_relation(relatedconcept, relatedconcept.relationshiptype)
