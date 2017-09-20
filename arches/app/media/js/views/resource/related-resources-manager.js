@@ -19,8 +19,6 @@ define([
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
             this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
-            this.reportURL = arches.urls.resource_report;
-            this.editURL = arches.urls.resource_editor;
             this.currentResource = ko.observable();
             this.currentResourceSubscriptions = [];
             this.resourceEditorContext = options.resourceEditorContext;

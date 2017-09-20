@@ -1,7 +1,8 @@
 define([
     'knockout',
-    'views/list'
-], function(ko, ListView) {
+    'views/list',
+    'arches'
+], function(ko, ListView, arches) {
     var RelatedResourcesNodeList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -66,6 +67,9 @@ define([
                     e.hovered(false)
                 }
             };
+
+            this.reportURL = arches.urls.resource_report;
+            this.editURL = arches.urls.resource_editor;
 
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){

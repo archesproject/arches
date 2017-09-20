@@ -414,6 +414,7 @@ define([
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
+                                    iconclass: response.node_config_lookup[response.resource_instance.graph_id].iconclass,
                                     color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
                                     relationCount: {
                                         total: response.total,
@@ -443,6 +444,7 @@ define([
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
                                         color: nodeConfigLookup[related_resource.graph_id].fillColor,
+                                        iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
@@ -450,6 +452,7 @@ define([
                                             loaded: 1
                                         }
                                     };
+                                    console.log(node)
                                     nodes.push(node);
                                     nodeMap[related_resource.resourceinstanceid] = node;
                                     newNodeId += 1;

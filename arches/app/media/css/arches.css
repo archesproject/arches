@@ -3065,6 +3065,10 @@ input.cmn-toggle-yes-no:checked+label:after {
     padding-right: 10px;
 }
 
+.node-list-item-icon {
+    padding-right: 3px;
+}
+
 .resource-list a.chosen-single {
     background: transparent;
     color: #333;
