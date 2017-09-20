@@ -1,5 +1,6 @@
 import uuid
 from arches.app.models import models
+from arches.app.models import concept
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
@@ -68,8 +69,27 @@ class ConceptDataType(BaseConceptDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
-    def transform_import_values(self, value):
-        return value.strip()
+    def transform_import_values(self, value, nodeid):
+        ret = value.strip()
+        try:
+            uuid.UUID(value)
+        except:
+            collection_id = models.Node.objects.get(nodeid=nodeid).config['rdmCollection']
+            collection = concept.Concept().get_e55_domain(collection_id)
+
+            def traverse_collection(value, collection):
+                for concept in collection:
+                    if value == concept['text']:
+                        ret = concept['id']
+                        return ret
+                    else:
+                        traverse_collection(value, concept['children'])
+
+            ret = traverse_collection(value, collection)
+            if ret == None:
+                ret = value.strip()
+
+        return ret
 
     def transform_export_values(self, value, *args, **kwargs):
         if 'concept_export_value_type' in kwargs:

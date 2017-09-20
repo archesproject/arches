@@ -312,7 +312,7 @@ class CsvReader(Reader):
                                     new_row.append({row['arches_nodeid']: value})
                     return new_row
 
-                def transform_value(datatype, value, source):
+                def transform_value(datatype, value, source, nodeid):
                     '''
                     Transforms values from probably string/wkt representation to specified datatype in arches.
                     This code could probably move to somehwere where it can be accessed by other importers.
@@ -322,7 +322,7 @@ class CsvReader(Reader):
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
                         try:
-                            value = datatype_instance.transform_import_values(value)
+                            value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
@@ -407,7 +407,7 @@ class CsvReader(Reader):
                                                 if source_key == target_key:
                                                     if target_tile.data[source_key] == None:
                                                         # If match populate target_tile node with transformed value.
-                                                        value = transform_value(node_datatypes[source_key], source_tile[source_key], row_number)
+                                                        value = transform_value(node_datatypes[source_key], source_tile[source_key], row_number, source_key)
                                                         target_tile.data[source_key] = value['value']
                                                         # target_tile.request = value['request']
                                                         # Delete key from source_tile so we do not populate another tile based on the same data.
@@ -436,7 +436,7 @@ class CsvReader(Reader):
                                                         for source_key in source_column.keys():
                                                             if source_key == target_key:
                                                                 if prototype_tile_copy.data[source_key] == None:
-                                                                    value = transform_value(node_datatypes[source_key], source_column[source_key], row_number)
+                                                                    value = transform_value(node_datatypes[source_key], source_column[source_key], row_number, source_key)
                                                                     prototype_tile_copy.data[source_key] = value['value']
                                                                     # target_tile.request = value['request']
                                                                     del source_column[source_key]
