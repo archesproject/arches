@@ -237,9 +237,15 @@ class Concept(object):
                 models.Concept.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
-            conceptrelations = models.Relation.objects.filter(Q(relationtype__category = 'Semantic Relations') | Q(relationtype = 'hasTopConcept'), conceptfrom = parentconcept.id, conceptto = self.id)
+            relations_filter = (Q(relationtype__category = 'Semantic Relations') | Q(relationtype = 'hasTopConcept')) & Q(conceptfrom = parentconcept.id) &  Q(conceptto = self.id)
+            conceptrelations = models.Relation.objects.filter(relations_filter)
             for relation in conceptrelations:
                 relation.delete()
+            if models.Relation.objects.filter(relations_filter).count() == 0:
+                # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
+                concept = models.Concept.objects.get(pk=self.id)
+                concept.nodetype_id = 'ConceptScheme'
+                concept.save()
 
         deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:
