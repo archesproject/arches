@@ -183,8 +183,11 @@ class SKOSReader(object):
                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': 'member', 'target': self.generate_uuid_from_subject(baseuuid, o)})
 
             # insert and index the concpets
+            scheme_node = None
             with transaction.atomic():
                 for node in self.nodes:
+                    if node.nodetype == 'ConceptScheme':
+                        scheme_node = node
                     if staging_options == 'stage':
                         try:
                             models.Concept.objects.get(pk=node.id)
@@ -216,7 +219,7 @@ class SKOSReader(object):
                 for node in self.nodes:
                     node.index()
 
-            return self
+            return scheme_node
         else:
             raise Exception('graph argument should be of type rdflib.graph.Graph')
 

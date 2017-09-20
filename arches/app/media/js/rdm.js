@@ -52,19 +52,21 @@ require([
                         window.history.pushState({}, "conceptid", concept.get('id'));
                     },
                     'save': function(){
-                        if(concept.get('nodetype') === 'ConceptScheme'){
-                            conceptTree.render();
-                        }
+                        conceptTree.render();
+                        dropdownTree.render();
                         conceptReport.render();
                         concept.reset()
                     },
                     'delete': function(){
-                        if(concept.get('nodetype') === 'ConceptScheme'){
-                            conceptTree.render();
-                        }
+                        conceptTree.render();
+                        dropdownTree.render();
                         conceptReport.render();
                         concept.reset()
-                    }
+                    },
+                    'collection_created': function() {
+                        //window.location.reload();
+                        dropdownTree.render();
+                    },
                 });
 
                 conceptTree.on({
@@ -148,8 +150,10 @@ require([
                     });
                     form.modal.modal('show');
                     form.on({
-                        'conceptSchemeAdded': function(){
-                            window.location.reload();
+                        'conceptSchemeAdded': function(newScheme){
+                            conceptTree.render();
+                            concept.set('id', newScheme.id);
+                            conceptReport.render()
                         }
                     })
                 });
@@ -184,8 +188,10 @@ require([
                     });
                     form.modal.modal('show');
                     form.on({
-                        'conceptSchemeAdded': function(){
-                            window.location.reload();
+                        'conceptSchemeAdded': function(newScheme){
+                            conceptTree.render();
+                            concept.set('id', newScheme.id);
+                            conceptReport.render()
                         }
                     })
                 });
@@ -197,8 +203,10 @@ require([
                     });
                     form.modal.modal('show');
                     form.on({
-                        'collectionAdded': function(){
-                            window.location.reload();
+                        'collectionAdded': function(newCollection){
+                            dropdownTree.render();
+                            concept.set('id', newCollection.id);
+                            conceptReport.render()
                         }
                     })
                 });
@@ -212,7 +220,7 @@ require([
                     form.modal.modal('show');
                     form.on({
                         'collectionDeleted': function(){
-                            //window.location.reload();
+                            dropdownTree.render();
                         }
                     })
                 });

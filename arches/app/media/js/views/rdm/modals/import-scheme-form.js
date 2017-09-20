@@ -26,11 +26,11 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
                         data: data,
                         processData: false,
                         contentType: false,
-                        complete: function(xhr, status){
+                        complete: function(response, status){
                             self.modal.find('h4').text(self.title);
                             self.modal.find('.modal-title').removeClass('loading');
                             self.modal.on('hidden.bs.modal', function (e) {
-                                self.trigger('conceptSchemeAdded');
+                                self.trigger('conceptSchemeAdded', response.responseJSON);
                             })
                             self.modal.modal('hide');
                         }
