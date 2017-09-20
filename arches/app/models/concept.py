@@ -206,7 +206,7 @@ class Concept(object):
         for subconcept in self.subconcepts:
             subconcept.save()
             self.add_relation(subconcept, subconcept.relationshiptype)
-            
+
         # if we're moving a Concept Scheme below another Concept or Concept Scheme
         if len(self.parentconcepts) > 0 and concept.nodetype_id == 'ConceptScheme':
             concept.nodetype_id = 'Concept'
@@ -250,11 +250,16 @@ class Concept(object):
             conceptrelations = models.Relation.objects.filter(relations_filter)
             for relation in conceptrelations:
                 relation.delete()
+            
             if models.Relation.objects.filter(relations_filter).count() == 0:
                 # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
                 concept = models.Concept.objects.get(pk=self.id)
                 concept.nodetype_id = 'ConceptScheme'
                 concept.save()
+
+                for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='narrower'):
+                    relation.relationtype_id = 'hasTopConcept'
+                    relation.save()
 
         deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:

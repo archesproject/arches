@@ -276,6 +276,7 @@ def manage_parents(request, conceptid):
                         concept.addparent(deleted)
 
                     concept.delete()
+                    concept = Concept().get(id=conceptid, include_subconcepts=True, values=['label'])
                     concept.index()
 
                 if len(data['added']) > 0:
