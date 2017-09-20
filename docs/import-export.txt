@@ -183,19 +183,21 @@ Thus, using the concepts file, the example above should be changed to look like 
 Uploading a Shapefile to Arches
 -------------------------
 
-Uploading a shapefile to Arches is very similar to uploading a csv file with a few exceptions. Just like a csv file the shapefile must be in WGS 84 (EPSG:4326) decimal degrees and the same rules apply to rich text, concept data, grouped data, and contiguousness. And, like csv import, shapefile import requires a mapping file.
+Uploading a shapefile to Arches is very similar to uploading a csv file with a few exceptions. The same rules apply to rich text, concept data, grouped data, and contiguousness. And, like csv import, shapefile import requires a mapping file.
 
-The shapefile must contain a field with a unique identifier for each resource named 'ResourceID'
+The shapefile must contain a field with a unique identifier for each resource named 'ResourceID'.
+
+The shapefile must be in WGS 84 (EPSG:4326) decimal degrees.
 
 The shapefile must consist of at least a .shp, .dbf, .shx, and .prj file. It may be zipped or unzipped.
 
-Dates in a shapefile can be in Esri Shapefile date format, Arches will convert it to the appropriate date format.
+Dates in a shapefile can be in Esri Shapefile date format, Arches will convert them to the appropriate date format.
 
 In your mapping file, the node you wish to map the geometry to must have a ``file_field_name`` value of 'geom'.
 
-To import a shapefile use the same command as csv import, simply point to your shapefile instead of your csv file. `import_business_data <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`
+To import a shapefile use the same command as csv import, simply point to your shapefile instead of your csv file. `import_business_data <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_
 
-Note: More complex geometries may encounter a ``mapping_parser_exception`` error. This error occurs when a geometry is not valid in elasticsearch. To resolve this, first make sure your geometry is valid using ArcMap, QGIS, or PostGIS. Next, you can modify the precision of your geometry to 5 decimals or you can simplify your geometry using the QGIS simplify geometry geoprocessing tool, or the PostGIS st_snaptogrid function.
+**Note:** More complex geometries may encounter a ``mapping_parser_exception`` error. This error occurs when a geometry is not valid in elasticsearch. To resolve this, first make sure your geometry is valid using ArcMap, QGIS, or PostGIS. Next, you can modify the precision of your geometry to 5 decimals or you can simplify your geometry using the QGIS simplify geometry geoprocessing tool, or the PostGIS st_snaptogrid function.
 
 Exporting Arches Data
 ---------------------
