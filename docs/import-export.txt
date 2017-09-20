@@ -9,7 +9,7 @@ Uploading a CSV to Arches
 
 To do a bulk import of resources to your Arches database, you must create a correctly formatted CSV (comma-separated values) file. We recommend MS Excel or Open Office for this task. More advanced users will likely find a custom scripting effort to be worthwhile.
 
-The CSV upload is also the best way to upload an ESRI Shapefile to Arches. Using mapping software like QGIS you will be able to save the shapefile as a CSV. Make sure that any geometry values are stored as `"well-known text" (WKT) <https://en.wikipedia.org/wiki/Well-known_text>`_, and that all coordinates are stored as WGS 84 (EPSG:4326) decimal degrees.
+To upload a shapefile see Uploading a Shapefile to Arches below.
 
 All values containing commas must be quoted so the value is not misinterpreted by the importer as multiple csv columns. This includes strings, concept-lists, and multi-geoms.
 
@@ -94,7 +94,7 @@ Some data types require specially formatted values:
 * ``concept-list`` and ``domain-value-list`` Values must be represented as quoted, comma-separated strings in the source CSV file. Each value within the concept/domain list does not need to be in quotation marks.
 
     ``concept-list`` example::
-        
+
         "3b4bddbb-0ca6-44d5-8622-ce9982412883,10ac2b9b-3425-4c3c-9b5c-983bb16f93d3,052e8714-3f19-4179-b1f9-dcbe45df673e"
 
 Mapping File Requirements
@@ -109,22 +109,22 @@ To create a mapping file for a Resource Model in your database, go to the Arches
 Unzip the download, and you'll find a ``.mapping`` file as well as a ``...concepts.json`` file (more on the latter below). The contents of the mapping file will look something like this::
 
     {
-        "resource_model_id": "bbc5cee8-fa16-11e6-9e3e-026d961c88e6", 
-        "resource_model_name": "HER Buildings", 
+        "resource_model_id": "bbc5cee8-fa16-11e6-9e3e-026d961c88e6",
+        "resource_model_name": "HER Buildings",
         "nodes": [
             {
-                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
-                "arches_node_name": "Name", 
-                "file_field_name": "", 
+                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6",
+                "arches_node_name": "Name",
+                "file_field_name": "",
                 "data_type": "concept",
-                "concept_export_value": "label", 
+                "concept_export_value": "label",
                 "export": false
-            }, 
+            },
             {
-                "arches_nodeid": "d4896e3b-fa30-11e6-9e3e-026d961c88e6", 
-                "arches_node_name": "Name Type", 
-                "file_field_name": "", 
-                "data_type": "concept", 
+                "arches_nodeid": "d4896e3b-fa30-11e6-9e3e-026d961c88e6",
+                "arches_node_name": "Name Type",
+                "file_field_name": "",
+                "data_type": "concept",
                 "concept_export_value": "label",
                 "export": false
             },
@@ -136,14 +136,14 @@ The mapping file contains cursory information about the resource model (name and
 
 You will now need to enter the column name from your CSV into the ``file_field_name`` in appropriate node in the mapping file. For example, if your CSV has a column named "activity_type" and you want the values in this column to populate "Activity Type" nodes in Arches, you would add that name to the mapping file like so::
 
-    {   
+    {
         ...
             {
-                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6", 
-                "arches_node_name": "Activity Type", 
+                "arches_nodeid": "bbc5cf1f-fa16-11e6-9e3e-026d961c88e6",
+                "arches_node_name": "Activity Type",
                 "file_field_name": "activity_type", <-- place column name here
                 "data_type": "concept",
-                "concept_export_value": "label",  
+                "concept_export_value": "label",
                 "export": false
             },
        ...
@@ -161,7 +161,7 @@ Values in the CSV that represent concepts in the RDM (Reference Data Manager) mu
 To aid with the process, a **concepts file** is created every time you download a mapping file, which lists the concept valueids and corresponding labels for all of the Concept Collections associated with any of the Resource Model's nodes. For example::
 
     "Name Type": {
-        "ecb20ae9-a457-4011-83bf-1c936e2d6b6a": "Historic", 
+        "ecb20ae9-a457-4011-83bf-1c936e2d6b6a": "Historic",
         "81dd62d2-6701-4195-b74b-8057456bba4b": "Primary"
     },
 
@@ -178,6 +178,24 @@ Thus, using the concepts file, the example above should be changed to look like 
 +-------------+--------------------------+--------------------------------------+---------------------------+
 | 3           | Writer's Cabin           | 81dd62d2-6701-4195-b74b-8057456bba4b | housed resident authors   |
 +-------------+--------------------------+--------------------------------------+---------------------------+
+
+
+Uploading a Shapefile to Arches
+-------------------------
+
+Uploading a shapefile to Arches is very similar to uploading a csv file with a few exceptions. Just like a csv file the shapefile must be in WGS 84 (EPSG:4326) decimal degrees and the same rules apply to rich text, concept data, grouped data, and contiguousness. And, like csv import, shapefile import requires a mapping file.
+
+The shapefile must contain a field with a unique identifier for each resource named 'ResourceID'
+
+The shapefile must consist of at least a .shp, .dbf, .shx, and .prj file. It may be zipped or unzipped.
+
+Dates in a shapefile can be in Esri Shapefile date format, Arches will convert it to the appropriate date format.
+
+In your mapping file, the node you wish to map the geometry to must have a ``file_field_name`` value of 'geom'.
+
+To import a shapefile use the same command as csv import, simply point to your shapefile instead of your csv file. `import_business_data <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`
+
+Note: More complex geometries may encounter a ``mapping_parser_exception`` error. This error occurs when a geometry is not valid in elasticsearch. To resolve this, first make sure your geometry is valid using ArcMap, QGIS, or PostGIS. Next, you can modify the precision of your geometry to 5 decimals or you can simplify your geometry using the QGIS simplify geometry geoprocessing tool, or the PostGIS st_snaptogrid function.
 
 Exporting Arches Data
 ---------------------
