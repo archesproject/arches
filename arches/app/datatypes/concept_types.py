@@ -131,7 +131,7 @@ class ConceptListDataType(BaseConceptDataType):
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(',')]
 
     def transform_export_values(self, value, *args, **kwargs):
