@@ -12,19 +12,12 @@
     }">
 
         <!--ko if: graphNodeSelection().length == 2 -->
-        <div class="hover-rr-node-info">
-            <div class="hover-feature-title-bar">
-                <div class="hover-feature-title">
-                    <span class="">{%trans 'Relationship Details'%}</span>
-                </div>
-            </div>
+        <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 120) + 'px', left: (panelPosition().x - 320) + 'px'}">
             <div class="hover-feature-body">
                 <dl>
-                  <dt>{% trans 'Resources: ' %}</dt>
-                      <dd data-bind="text: graphNodeSelection()[0].name"></dd>
-                      <dd data-bind="text: graphNodeSelection()[1].name"></dd>
-                  <dt>{% trans 'Relationship: ' %}</dt>
-                      <dd data-bind="text: graphNodeSelection()[0].relationship"></dd>
+                  <dt data-bind="text: graphNodeSelection()[0].name"></dt>
+                    <dd data-bind="text: graphNodeSelection()[0].relationship"></dd>
+                  <dt data-bind="text: graphNodeSelection()[1].name"></dt>
                 </dl>
             </div>
         </div>

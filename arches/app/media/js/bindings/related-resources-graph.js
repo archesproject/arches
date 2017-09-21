@@ -156,10 +156,15 @@ define([
                         var hoveredNodes = []
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1) {
+                            var matrix;
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
+                                matrix = this.getScreenCTM()
+                                //transform svg coords to screen coords
+                                d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e
+                                d1.absY = matrix.b * d1.x + matrix.d * d1.y + matrix.f
                                 hoveredNodes.push(d1);
                             } else if (d1.selected()) {
                                 className += '-selected';
@@ -452,7 +457,6 @@ define([
                                             loaded: 1
                                         }
                                     };
-                                    console.log(node)
                                     nodes.push(node);
                                     nodeMap[related_resource.resourceinstanceid] = node;
                                     newNodeId += 1;
