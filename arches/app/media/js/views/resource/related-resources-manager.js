@@ -41,11 +41,13 @@ define([
             })
 
             this.panelPosition = ko.computed(function() {
-                var res = {x:0, y:0}
+                var res = {x:0, y:0, first:[0,0], second:[0,0]}
                 var nodes = self.graphNodeSelection()
                 if (nodes.length === 2) {
                     res.x = nodes[0].absX < nodes[1].absX ? nodes[0].absX : nodes[1].absX
                     res.y = nodes[0].absY < nodes[1].absY ? nodes[0].absY : nodes[1].absY
+                    res.first = nodes[0];
+                    res.second = nodes[1];
                 }
                 return res;
             })
