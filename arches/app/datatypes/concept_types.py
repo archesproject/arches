@@ -72,20 +72,27 @@ class ConceptDataType(BaseConceptDataType):
     def transform_import_values(self, value, nodeid):
         ret = value.strip()
         try:
-            uuid.UUID(value)
+            uuid.UUID(ret)
         except:
             collection_id = models.Node.objects.get(nodeid=nodeid).config['rdmCollection']
-            collection = concept.Concept().get_e55_domain(collection_id)
+            if collection_id:
+                collection = concept.Concept().get_e55_domain(collection_id)
+                new_collection = []
 
-            def traverse_collection(value, collection):
-                for concept in collection:
-                    if value == concept['text']:
-                        ret = concept['id']
-                        return ret
-                    else:
-                        traverse_collection(value, concept['children'])
+                def flatten_json(collection):
+                    for t in collection:
+                        if t not in new_collection:
+                            new_collection.append(t)
+                        if len(t['children']) > 0:
+                            for child in t['children']:
+                                flatten_json(t['children'])
 
-            ret = traverse_collection(value, collection)
+                flatten_json(collection)
+
+                for c in new_collection:
+                    if value == c['text']:
+                        ret = c['id']
+
             if ret == None:
                 ret = value.strip()
 
@@ -132,7 +139,11 @@ class ConceptListDataType(BaseConceptDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(',')]
+        ret = []
+        concept = ConceptDataType()
+        for val in [v.strip() for v in value.split(',')]:
+            ret.append(concept.transform_import_values(val, nodeid))
+        return ret
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
