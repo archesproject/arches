@@ -367,9 +367,10 @@ class Command(BaseCommand):
 
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
-            component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
-            module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
+            root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
+            component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
+            module_dir = os.path.join(root, ext_type)
+            template_dir = os.path.join(root, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
