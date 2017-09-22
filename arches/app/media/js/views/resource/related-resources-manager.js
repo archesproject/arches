@@ -19,8 +19,6 @@ define([
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
             this.graphNameLookup = _.indexBy(arches.resources, 'graphid');
-            this.reportURL = arches.urls.resource_report;
-            this.editURL = arches.urls.resource_editor;
             this.currentResource = ko.observable();
             this.currentResourceSubscriptions = [];
             this.resourceEditorContext = options.resourceEditorContext;
@@ -40,6 +38,18 @@ define([
 
             this.selectedOntologyClass.subscribe(function() {
                 self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
+            })
+
+            this.panelPosition = ko.computed(function() {
+                var res = {x:0, y:0, first:[0,0], second:[0,0]}
+                var nodes = self.graphNodeSelection()
+                if (nodes.length === 2) {
+                    res.x = nodes[0].absX < nodes[1].absX ? nodes[0].absX : nodes[1].absX
+                    res.y = nodes[0].absY < nodes[1].absY ? nodes[0].absY : nodes[1].absY
+                    res.first = nodes[0];
+                    res.second = nodes[1];
+                }
+                return res;
             })
 
             if (!this.useSemanticRelationships) {

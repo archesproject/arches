@@ -233,13 +233,23 @@ class Resource(models.ResourceInstance):
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
+        root_nodes = models.Node.objects.filter(istopnode=True)
+        # node_config_lookup = { unicode(node.graph_id): node.config for node in root_nodes if node.config != None}
+        node_config_lookup = {}
+
+        for node in root_nodes:
+            graph_id = unicode(node.graph_id)
+            if node.config != None:
+                node_config_lookup[graph_id] = node.config
+                node_config_lookup[graph_id]['iconclass'] = node.graph.iconclass
+                node_config_lookup[graph_id]['name'] = node.graph.name
 
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
             'related_resources': [],
             'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config,
-            'node_config_lookup': { unicode(node.graph_id): node.config for node in models.Node.objects.filter(istopnode=True) if node.config != None}
+            'node_config_lookup': node_config_lookup
         }
         se = SearchEngineFactory().create()
 
@@ -298,7 +308,7 @@ class Resource(models.ResourceInstance):
             new_tile.parenttile = tile.parenttile
             new_tile.resourceinstance = new_resource
             new_tile.sortorder = tile.sortorder
-            
+
             new_resource.tiles.append(new_tile)
             id_map[tile.pk] = new_tile
 

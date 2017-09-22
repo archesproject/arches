@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -60,8 +60,7 @@ class Command(BaseCommand):
             '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'install\'=Runs the setup file defined in your package root' +
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
-            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
-            '\'livereload\'=Starts livereload for this package on port 35729')
+            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping')
 
         parser.add_argument('-s', '--source', action='store', dest='source', default='',
             help='Directory or file for processing')
@@ -145,9 +144,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'setup_elasticsearch':
             self.setup_elasticsearch(install_location=options['dest_dir'])
-
-        if options['operation'] == 'livereload':
-            self.start_livereload()
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
@@ -806,15 +802,6 @@ class Command(BaseCommand):
             print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
             print '*'*80
             sys.exit()
-
-    def start_livereload(self):
-        from livereload import Server
-        server = Server()
-        for path in settings.STATICFILES_DIRS:
-            server.watch(path)
-        for path in settings.TEMPLATES[0]['DIRS']:
-            server.watch(path)
-        server.serve(port=settings.LIVERELOAD_PORT)
 
     def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
         if layer_name != False:
