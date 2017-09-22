@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
-            self.register(source_dir=options['dt_source'])
+            self.register(source=options['dt_source'])
 
         if options['operation'] == 'unregister':
             self.unregister(datatype=options['datatype'])
@@ -49,20 +49,20 @@ class Command(BaseCommand):
         if options['operation'] == 'list':
             self.list()
 
-    def register(self, source_dir):
+    def register(self, source):
         """
         Inserts a datatype into the arches db
 
         """
 
         import imp
-        fn_config = imp.load_source('', source_dir)
+        fn_config = imp.load_source('', source)
         details = fn_config.details
 
         dt = models.DDataType(
             datatype = details['datatype'],
             iconclass = details['iconclass'],
-            modulename = os.path.basename(source_dir),
+            modulename = os.path.basename(source),
             classname = details['classname'],
             defaultwidget = details['defaultwidget'],
             defaultconfig = details['defaultconfig'],
