@@ -115,19 +115,6 @@ define([
                 }
             }
 
-            nodeList.subscribe(function(list) {
-                _.each(list, function(item) {
-                    item.selected.subscribe(updateSelected(item), this)
-                    item.hovered.subscribe(updateHovered(item), this)
-                    if (item.relationCount) {
-                        item.loaded(item.relationCount.loaded)
-                        item.total(item.relationCount.total)
-                    }
-                })
-            }, this)
-
-            nodeList([])
-
             var redraw = function() {
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
@@ -380,6 +367,15 @@ define([
                 }, false);
             };
 
+            var getMoreData = function(item) {
+                var item = item;
+                return function(val) {
+                    if (val) {
+                        getResourceDataForNode(item);
+                    }
+                }
+            }
+
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
@@ -530,9 +526,23 @@ define([
                 svg.attr("width", $el.parent().width());
             }).trigger("resize");
 
-            $el.find('.load-more-relations-link').click(function() {
-                getResourceDataForNode(selectedNode);
-            })
+
+            nodeList.subscribe(function(list) {
+                _.each(list, function(item) {
+                    if (item.selectedSubscription === undefined) {
+                        item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
+                        item.hovered.subscribe(updateHovered(item), this)
+                        item.loadcount.subscribe(getMoreData(item), this)
+                    }
+                    if (item.relationCount) {
+                        item.loaded(item.relationCount.loaded)
+                        item.total(item.relationCount.total)
+                    }
+                })
+            }, this)
+
+            nodeList([])
+
         }
     };
 

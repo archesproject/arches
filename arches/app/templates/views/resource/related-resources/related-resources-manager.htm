@@ -52,9 +52,9 @@
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">
-                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span> {% trans 'relations loaded' %}
+                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
-                            <!-- <div class="crud-card-link">add</div> -->
+
                             <div class="node-list-footer" data-bind="fadeVisible: selected, delay:100, fade: 250">
                                 <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
                                 <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>

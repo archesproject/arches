@@ -1063,6 +1063,20 @@ a.select2-search-choice-close {
 
 .related-resources-nodes .crud-card-subtitle {
     top: 50px;
+    display: flex;
+    flex-direction: row;
+    margin-left: -2px;
+    padding-bottom: 2px;
+    width: 250px
+}
+
+.related-resources-nodes .crud-card-subtitle span {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.related-resources-nodes .crud-card-main {
+    width: 250px;
 }
 
 .crud-card-link {
@@ -1073,6 +1087,16 @@ a.select2-search-choice-close {
     font-size: 9px;
     background: #3acaa1;
     padding: 3px 5px;
+}
+
+.load-relations {
+    color: steelblue;
+    margin-left: 5px;
+}
+
+.load-relations.disabled {
+    color: #ddd;
+    margin-left: 5px;
 }
 
 .permission-level-icon {

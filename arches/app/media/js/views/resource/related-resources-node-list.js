@@ -41,6 +41,9 @@ define([
                 if (!item.loaded) {
                     item.loaded = ko.observable(minimumRelations);
                 }
+                if (!item.loadcount) {
+                    item.loadcount = ko.observable(0);
+                }
             }
             this.items.subscribe(function (items) {
                 items.forEach(initializeItem, this);
