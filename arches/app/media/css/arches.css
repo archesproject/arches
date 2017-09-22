@@ -935,6 +935,10 @@ a.select2-search-choice-close {
     opacity: .825;
 }
 
+.related-resources-nodes .library-card {
+    height: 75px;
+}
+
 .library-card.active {
     background: #ffffff;
     border-left: 5px solid steelblue;
@@ -1055,6 +1059,10 @@ a.select2-search-choice-close {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.related-resources-nodes .crud-card-subtitle {
+    top: 50px;
 }
 
 .crud-card-link {
@@ -3051,7 +3059,7 @@ input.cmn-toggle-yes-no:checked+label:after {
 .node-list-footer {
     height: 45px;
     position: absolute;
-    top: 50px;
+    top: 70px;
     width: 100%;
     border-top: 1px solid #efefef;
     padding: 5px;
@@ -5045,7 +5053,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 }
 
 .library-card.relative.selected {
-    height: 95px;
+    height: 115px;
     -webkit-transition: height 0.25s; /* Safari */
     transition: height 0.25s;
     background: #ffffff;
@@ -7494,6 +7502,11 @@ a.clear-geojson-button:hover {
 .rr-fdg-edge {
     padding-left: 25px;
     font-style: italic;
+}
+
+.related-node-details {
+    display: flex;
+    flex-direction: column;
 }
 
 

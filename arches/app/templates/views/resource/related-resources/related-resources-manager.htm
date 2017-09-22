@@ -45,7 +45,10 @@
 
                         <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
                             <div class="crud-card-main" style="left: 5px;">
-                                <i class="node-list-item-icon" data-bind="css: iconclass, style:{'color': color}"></i><a class="listitem_name" data-bind="text: name"></a>
+                                <div class="related-node-details">
+                                <a class="listitem_name" data-bind="text: name"></a>
+                                <div><i class="node-list-item-icon" data-bind="css: iconclass, style:{'color': color}"></i><a class="listitem_name" data-bind="text: graphname"></a></div>
+                                </div>
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">

@@ -415,6 +415,7 @@ define([
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
+                                    graphname: response.node_config_lookup[response.resource_instance.graph_id].name,
                                     iconclass: response.node_config_lookup[response.resource_instance.graph_id].iconclass,
                                     color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
                                     relationCount: {
@@ -446,6 +447,7 @@ define([
                                         name: related_resource.displayname,
                                         color: nodeConfigLookup[related_resource.graph_id].fillColor,
                                         iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
+                                        graphname: nodeConfigLookup[related_resource.graph_id].name,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
