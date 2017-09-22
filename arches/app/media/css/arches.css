@@ -7485,7 +7485,17 @@ a.clear-geojson-button:hover {
 .rr-fdg-name {
     display: flex;
     flex-direction: row;
-    padding: 5px
+    padding: 5px;
+    background-color: #f4f4f4;
+}
+
+.rr-fdg-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.rr-fdg-details span {
+    flex-direction: row;
 }
 
 .rr-number {
@@ -7499,16 +7509,27 @@ a.clear-geojson-button:hover {
     text-shadow: 0px 0px 0.08em #fff;
 }
 
+.rr-fdg-name .node-list-item-icon {
+    padding-right: 5px;
+    padding-top: 2px;
+    margin-left: -5px;
+}
+
 .rr-fdg-edge {
     padding-left: 25px;
     font-style: italic;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-color: #ddd;
+    border-width: 1px;
 }
 
 .related-node-details {
     display: flex;
     flex-direction: column;
 }
-
 
 .iiif-widget {
     position: relative;
