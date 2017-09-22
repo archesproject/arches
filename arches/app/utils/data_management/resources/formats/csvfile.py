@@ -33,6 +33,50 @@ class MissingConfigException(Exception):
      def __str__(self):
          return repr(self.value)
 
+class ConceptLookup():
+    def __init__(self, create=False):
+        self.lookups = {}
+        self.create = create
+
+    def lookup_labelid_from_label(self, label, collectionid):
+        ret = label
+        if collectionid not in self.lookups:
+            try:
+                self.lookups[collectionid] = Concept().get_child_concepts(collectionid, ['member'], ['prefLabel'], 'prefLabel')
+                ret = self.lookup_labelid_from_label(label, collectionid)
+            except:
+                return label
+        else:
+            for concept in self.lookups[collectionid]:
+                if label == concept[3]:
+                    ret = concept[5]
+        return ret
+
+    # def get_or_create_concept(self, label, collectionid):
+    #     if self.create == False:
+    #         ret = self.lookup_labelid_from_label(label, collectionid)
+    #     else:
+    #         if collectionid in self.lookups:
+    #             try:
+    #                 ret = str(uuid.UUID(self.lookup_labelid_from_label(label, collectionid)))
+    #             except:
+    #                 self.add_new_concept(label, collectionid)
+    #                 ret = self.get_or_create_concept(label, collectionid)
+    #         else:
+    #             ret = self.get_or_create_concept(label, self.add_new_collection())
+    #
+    #     return ret
+    #
+    # def add_new_collection(self):
+    #     collectionid = str(uuid.uuid4())
+    #     self.lookups[collectionid] = []
+    #     return collectionid
+    #
+    # def add_new_concept(self, label, collectionid):
+    #     valueid = str(uuid.uuid4())
+    #     self.lookups[collectionid].append(('0', '1', '2', label, '4', valueid))
+    #     return valueid
+
 class CsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -265,6 +309,8 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
+                concept_lookup = ConceptLookup()
+                new_concepts = {}
 
                 # This code can probably be moved into it's own module.
                 resourceids = []
@@ -321,6 +367,10 @@ class CsvReader(Reader):
                     if datatype != '':
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
+                        if datatype in ['concept']:
+                            collection_id = Node.objects.get(nodeid=nodeid).config['rdmCollection']
+                            if collection_id != None:
+                                value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
                             value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, source)

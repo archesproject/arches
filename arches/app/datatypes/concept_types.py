@@ -71,30 +71,19 @@ class ConceptDataType(BaseConceptDataType):
 
     def transform_import_values(self, value, nodeid):
         ret = value.strip()
-        try:
-            uuid.UUID(ret)
-        except:
-            collection_id = models.Node.objects.get(nodeid=nodeid).config['rdmCollection']
-            if collection_id:
-                collection = concept.Concept().get_e55_domain(collection_id)
-                new_collection = []
-
-                def flatten_json(collection):
-                    for t in collection:
-                        if t not in new_collection:
-                            new_collection.append(t)
-                        if len(t['children']) > 0:
-                            for child in t['children']:
-                                flatten_json(t['children'])
-
-                flatten_json(collection)
-
-                for c in new_collection:
-                    if value == c['text']:
-                        ret = c['id']
-
-            if ret == None:
-                ret = value.strip()
+        # try:
+        #     uuid.UUID(ret)
+        # except:
+        #     collection_id = models.Node.objects.get(nodeid=nodeid).config['rdmCollection']
+        #     if collection_id:
+        #         collection = concept.Concept().get_child_concepts(collection_id, ['member'], ['prefLabel'], 'prefLabel')
+        #
+        #         for c in collection:
+        #             if value == c[3]:
+        #                 ret = c[5]
+        #
+        #     if ret == None:
+        #         ret = value.strip()
 
         return ret
 
