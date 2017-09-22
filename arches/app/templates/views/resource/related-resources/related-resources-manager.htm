@@ -12,17 +12,15 @@
     }">
 
         <!--ko if: graphNodeSelection().length == 2 -->
-        <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 120) + 'px', left: (panelPosition().x - 320) + 'px'}">
-            <div class="hover-feature-body">
-                <dl>
-                  <dt data-bind="text: graphNodeSelection()[0].name"></dt>
-                    <dd data-bind="text: graphNodeSelection()[0].relationship"></dd>
-                  <dt data-bind="text: graphNodeSelection()[1].name"></dt>
-                </dl>
+        <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
+            <div>
+                <div class="rr-fdg-name"><div class='rr-number'>1. </div><div data-bind="text: graphNodeSelection()[0].name"></div></div>
+                <div class="rr-fdg-edge" data-bind="text: graphNodeSelection()[0].relationship"></div>
+                <div class="rr-fdg-name"><div class='rr-number'>2. </div><div data-bind="text: graphNodeSelection()[1].name"></div></div>
             </div>
         </div>
-        <div data-bind="style: {position: 'fixed', top: panelPosition().first.absY + 'px', left: panelPosition().first.absX + 'px'}">1</div>
-        <div data-bind="style: {position: 'fixed', top: panelPosition().second.absY + 'px', left: panelPosition().second.absX + 'px'}">2</div>
+        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().first.absY - 25) + 'px', left: (panelPosition().first.absX + 20) + 'px'}">1</div>
+        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().second.absY - 25) + 'px', left: (panelPosition().second.absX + 20) + 'px'}">2</div>
         <!--/ko-->
 
 

@@ -171,9 +171,7 @@ define([
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection(hoveredNodes)
-                        }
+                        nodeSelection(hoveredNodes)
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
@@ -184,9 +182,7 @@ define([
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection.removeAll()
-                        }
+                        nodeSelection.removeAll()
                     });
                 link.exit()
                     .remove();
