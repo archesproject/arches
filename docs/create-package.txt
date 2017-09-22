@@ -14,7 +14,7 @@ Loading a Package
         python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
 
 
-    -db    `true` to run setup_py to rebuild your database. default = 'false'
+    -db    `true` to run setup_db to rebuild your database. default = 'false'
     -ow    `overwrite` to overwrite concepts and collections. default = 'ignore'
     -st    `stage` to stage concepts and collections. default = 'stage'
     -s     a path to a zipfile located on github or locally

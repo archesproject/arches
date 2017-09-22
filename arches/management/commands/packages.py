@@ -19,9 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
 import urllib, uuid, glob
-import widget as widget_cmd
-import fn
-import datatype
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
@@ -221,8 +218,8 @@ class Command(BaseCommand):
                 'extensions/widgets',
                 'graphs/branches',
                 'graphs/resource_models',
-                'map_layers/mapbox_styles/overlays',
-                'map_layers/mapbox_styles/basemaps',
+                'map_layers/mapbox_spec_json/overlays',
+                'map_layers/mapbox_spec_json/basemaps',
                 'map_layers/tile_server/basemaps',
                 'map_layers/tile_server/overlays',
                 'reference_data/concepts',
@@ -252,7 +249,7 @@ class Command(BaseCommand):
                 print e
                 print "Could not save system settings"
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
 
         def load_system_settings():
             update_system_settings = True
@@ -265,9 +262,10 @@ class Command(BaseCommand):
                     update_system_settings = False
 
             if update_system_settings == True:
-                if len(glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))) > 0:
-                    system_settings = glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))[0]
+                if len(glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))) > 0:
+                    system_settings = glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))[0]
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
+                    self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
 
         def load_resource_to_resource_constraints():
@@ -334,8 +332,8 @@ class Command(BaseCommand):
                 self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
         def load_map_layers():
-            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'basemaps', '*', '*.json'))
-            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'overlays', '*', '*.json'))
+            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
+            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
@@ -369,9 +367,10 @@ class Command(BaseCommand):
 
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
-            component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
-            module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
+            root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
+            component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
+            module_dir = os.path.join(root, ext_type)
+            template_dir = os.path.join(root, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
@@ -391,23 +390,24 @@ class Command(BaseCommand):
                 if len(modules) > 0:
                     module = modules[0]
                     shutil.copy(module, module_dir)
-                    cmd.register(module)
+                    management.call_command(cmd, 'register', source=module)
 
         def load_widgets():
-            import widget as widget_cmd #For some reason this is out of scope when imported at top of page
-            load_extensions('widgets', widget_cmd.Command())
+            load_extensions('widgets', 'widget')
 
         def load_functions():
-            import fn as Fn_cmd
-            load_extensions('functions', Fn_cmd.Command())
+            load_extensions('functions', 'fn')
 
         def load_datatypes():
-            import datatype as Datatype_cmd
-            load_extensions('datatypes', Datatype_cmd.Command())
+            load_extensions('datatypes', 'datatype')
 
-        remote = True if 'github.com' in source else False
+        try:
+            urllib.urlopen(source)
+            remote = True
+        except:
+            remote = False
 
-        if source != '' or remote == True:
+        if os.path.exists(source) or remote == True:
 
             if remote == True:
                 download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
