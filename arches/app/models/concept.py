@@ -353,11 +353,11 @@ class Concept(object):
         return concepts_to_delete
 
     def get_child_collections(self, conceptid, child_valuetypes=['prefLabel'], parent_valuetype='prefLabel', depth_limit=''):
-        columns = "conceptidto::text, valueto, valueidto::text"
+        columns = "conceptidto, valueto, valueidto"
         return self.get_child_edges(conceptid, ['member'], child_valuetypes, parent_valuetype, columns, depth_limit)
 
     def get_child_concepts(self, conceptid, child_valuetypes=['prefLabel', 'altLabel', 'hiddenLabel'], parent_valuetype='prefLabel', depth_limit=''):
-        columns = "conceptidto::text, valueto, valueidto::text"
+        columns = "conceptidto, valueto, valueidto"
         return self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
 
     def get_child_edges(self, conceptid, relationtypes, child_valuetypes, parent_valuetype, columns=None, depth_limit=None):
@@ -371,22 +371,36 @@ class Concept(object):
         depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
         sql = """
             WITH RECURSIVE children AS (
-                SELECT relations.conceptidfrom, relations.conceptidto, valuefrom.value as valuefrom, valueto.value as valueto, 
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, valueto.valuetype, 1 AS depth       ---|NonRecursive Part
+                SELECT relations.conceptidfrom, relations.conceptidto, 
+                    valuefrom.value as valuefrom, valueto.value as valueto, 
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, 
+                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto, 
+                    valuefrom.languageid as languagefrom, valueto.languageid as languageto,
+                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto, 
+                    1 AS depth       ---|NonRecursive Part
                     FROM relations
                     JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
                     JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
+                    JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
+                    JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
                     WHERE relations.conceptidfrom = '{0}'
                     and valuefrom.valuetype = '{3}'
                     and valueto.valuetype in ('{2}')
                     and ({1})
                 UNION
-                    SELECT relations.conceptidfrom, relations.conceptidto, valuefrom.value as valuefrom, valueto.value as valueto, 
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, valueto.valuetype, depth+1      ---|RecursivePart
+                    SELECT relations.conceptidfrom, relations.conceptidto, 
+                    valuefrom.value as valuefrom, valueto.value as valueto, 
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, 
+                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto, 
+                    valuefrom.languageid as languagefrom, valueto.languageid as languageto,
+                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
+                    depth+1      ---|RecursivePart
                     FROM relations
                     JOIN children b ON(b.conceptidto = relations.conceptidfrom)
                     JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
                     JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
+                    JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
+                    JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
                     WHERE valuefrom.valuetype = '{3}'
                     and valueto.valuetype in ('{2}')
                     and ({1})
@@ -395,7 +409,14 @@ class Concept(object):
             SELECT {4} FROM children;
         """
         if not columns:
-            columns = "conceptidfrom::text, conceptidto::text, valuefrom, valueto, valueidfrom::text, valueidto::text"
+            columns = """
+                conceptidfrom, conceptidto, 
+                valuefrom, valueto, 
+                valueidfrom, valueidto, 
+                valuetypefrom, valuetypeto, 
+                languagefrom, languageto, 
+                categoryfrom, categoryto
+            """
         sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit)
         cursor.execute(sql)
         rows = cursor.fetchall()
