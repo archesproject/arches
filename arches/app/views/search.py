@@ -440,9 +440,8 @@ def _buffer(geojson, width=0, unit='ft'):
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
-    for row in Concept().get_child_concepts(conceptid, ['narrower'], ['prefLabel'], 'prefLabel'):
+    for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
-        ret.add(row[1])
     return list(ret)
 
 def export_results(request):

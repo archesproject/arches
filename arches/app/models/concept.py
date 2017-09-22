@@ -337,16 +337,12 @@ class Concept(object):
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly
         if concept.nodetype == 'ConceptScheme':
-            rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel', 'altLabel', 'hiddenLabel'], 'prefLabel')
+            rows = Concept().get_child_concepts(concept.id)
             for row in rows:
                 if row[0] not in concepts_to_delete:
                     concepts_to_delete[row[0]] = Concept({'id': row[0]})
 
-                if row[1] not in concepts_to_delete:
-                    concepts_to_delete[row[1]] = Concept({'id': row[1]})
-
-                concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
-                concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+                concepts_to_delete[row[0]].addvalue({'id':row[2], 'conceptid':row[0], 'value':row[1]})
             
             if len(rows) == 0:
                 concepts_to_delete[concept.id] = concept
@@ -356,35 +352,51 @@ class Concept(object):
 
         return concepts_to_delete
 
-    def get_child_concepts(self, conceptid, relationtypes, child_valuetypes, parent_valuetype):
+    def get_child_collections(self, conceptid, child_valuetypes=['prefLabel'], parent_valuetype='prefLabel', depth_limit=''):
+        columns = "conceptidto::text, valueto, valueidto::text"
+        return self.get_child_edges(conceptid, ['member'], child_valuetypes, parent_valuetype, columns, depth_limit)
+
+    def get_child_concepts(self, conceptid, child_valuetypes=['prefLabel', 'altLabel', 'hiddenLabel'], parent_valuetype='prefLabel', depth_limit=''):
+        columns = "conceptidto::text, valueto, valueidto::text"
+        return self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
+
+    def get_child_edges(self, conceptid, relationtypes, child_valuetypes, parent_valuetype, columns=None, depth_limit=None):
         """
-        Recursively builds a list of child concepts for a given concept based on its relationship type and valuetypes.
+        Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
 
         cursor = connection.cursor()
-        relationtypes = ' or '.join(["d.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        sql = """WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c2.valueid, c.valueid as valueidto, c.valuetype, 1 AS depth       ---|NonRecursive Part
-                    FROM relations d
-                    JOIN values c ON(c.conceptid = d.conceptidto)
-                    JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
-                    WHERE d.conceptidfrom = '{0}'
-                    and c2.valuetype = '{3}'
-                    and c.valuetype in ('{2}')
+        relationtypes = ' or '.join(["relations.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
+        depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
+        sql = """
+            WITH RECURSIVE children AS (
+                SELECT relations.conceptidfrom, relations.conceptidto, valuefrom.value as valuefrom, valueto.value as valueto, 
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, valueto.valuetype, 1 AS depth       ---|NonRecursive Part
+                    FROM relations
+                    JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
+                    JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
+                    WHERE relations.conceptidfrom = '{0}'
+                    and valuefrom.valuetype = '{3}'
+                    and valueto.valuetype in ('{2}')
                     and ({1})
                 UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v2.valueid, v.valueid as valueidto, v.valuetype, depth+1      ---|RecursivePart
-                    FROM relations  d
-                    JOIN children b ON(b.conceptidto = d.conceptidfrom)
-                    JOIN values v ON(v.conceptid = d.conceptidto)
-                    JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
-                    WHERE v2.valuetype = '{3}'
-                    and v.valuetype in ('{2}')
+                    SELECT relations.conceptidfrom, relations.conceptidto, valuefrom.value as valuefrom, valueto.value as valueto, 
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, valueto.valuetype, depth+1      ---|RecursivePart
+                    FROM relations
+                    JOIN children b ON(b.conceptidto = relations.conceptidfrom)
+                    JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
+                    JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
+                    WHERE valuefrom.valuetype = '{3}'
+                    and valueto.valuetype in ('{2}')
                     and ({1})
+                    {5}
             )
-            SELECT conceptidfrom::text, conceptidto::text, value, valueto, valueid::text, valueidto::text FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
-
+            SELECT {4} FROM children;
+        """
+        if not columns:
+            columns = "conceptidfrom::text, conceptidto::text, valuefrom, valueto, valueidfrom::text, valueidto::text"
+        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit)
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -514,13 +526,16 @@ class Concept(object):
             raise Exception('Invalid value definition: %s' % (value))
 
     def index(self, scheme=None):
+        if scheme == None:
+            scheme = self.get_context()
         for value in self.values:
-            if scheme == None:
-                scheme = self.get_context()
             value.index(scheme=scheme)
 
+        if self.nodetype == 'ConceptScheme':
+            scheme = None
+
         for subconcept in self.subconcepts:
-            subconcept.index(scheme=subconcept.get_context())
+            subconcept.index(scheme=scheme)
 
     def delete_index(self, delete_self=False):
 
