@@ -22,6 +22,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from arches.app.models.system_settings import settings
 
+
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+
+
 def index(request):
     return render(request, 'index.htm', {
         'main_script': 'index',
@@ -60,6 +66,23 @@ def auth(request):
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next
             })
+
+@never_cache
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.htm', {
+        'form': form
+    })
 
 def search(request):
     return render(request, 'views/search.htm')
