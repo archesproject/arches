@@ -321,11 +321,8 @@ def search(request):
 
     ids = []
     if removechildren != None:
-        concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
-        def get_children(concept):
-            ids.append(concept.id)
-
-        concepts.traverse(get_children)
+        ids =  [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
+        ids.append(removechildren)
 
     newresults = []
     cached_scheme_names = {}
