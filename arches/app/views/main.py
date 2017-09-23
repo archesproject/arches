@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
+from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from arches.app.models.system_settings import settings
 
@@ -74,10 +75,8 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
+            messages.success(request, _('Your password has been updated'))
             return redirect('change_password')
-        else:
-            messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'change_password.htm', {

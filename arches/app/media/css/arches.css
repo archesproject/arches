@@ -3226,6 +3226,11 @@ input.cmn-toggle-yes-no:checked+label:after {
     font-weight: 300;
 }
 
+.change-password-form .success {
+    color: steelblue;
+    padding: 5px;
+}
+
 .img-login {
     background-image: url(../img/backgrounds/easter_island_night.jpg);
 }
