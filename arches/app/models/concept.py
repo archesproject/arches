@@ -211,6 +211,7 @@ class Concept(object):
         if len(self.parentconcepts) > 0 and concept.nodetype_id == 'ConceptScheme':
             concept.nodetype_id = 'Concept'
             concept.save()
+            self.load(concept)
             
             for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='hasTopConcept'):
                 relation.relationtype_id = 'narrower'
@@ -256,6 +257,7 @@ class Concept(object):
                 concept = models.Concept.objects.get(pk=self.id)
                 concept.nodetype_id = 'ConceptScheme'
                 concept.save()
+                self.load(concept)
 
                 for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='narrower'):
                     relation.relationtype_id = 'hasTopConcept'
@@ -337,38 +339,39 @@ class Concept(object):
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly
         if concept.nodetype == 'ConceptScheme':
+            concepts_to_delete[concept.id] = concept
             rows = Concept().get_child_concepts(concept.id)
             for row in rows:
                 if row[0] not in concepts_to_delete:
                     concepts_to_delete[row[0]] = Concept({'id': row[0]})
 
                 concepts_to_delete[row[0]].addvalue({'id':row[2], 'conceptid':row[0], 'value':row[1]})
-            
-            if len(rows) == 0:
-                concepts_to_delete[concept.id] = concept
 
         if concept.nodetype == 'Collection':
             concepts_to_delete[concept.id] = concept
 
         return concepts_to_delete
 
-    def get_child_collections(self, conceptid, child_valuetypes=['prefLabel'], parent_valuetype='prefLabel', depth_limit=''):
-        columns = "conceptidto, valueto, valueidto"
+    def get_child_collections(self, conceptid, child_valuetypes, parent_valuetype='prefLabel', depth_limit=''):
+        child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
+        columns = "conceptidto::text, valueto, valueidto::text"
         return self.get_child_edges(conceptid, ['member'], child_valuetypes, parent_valuetype, columns, depth_limit)
 
-    def get_child_concepts(self, conceptid, child_valuetypes=['prefLabel', 'altLabel', 'hiddenLabel'], parent_valuetype='prefLabel', depth_limit=''):
-        columns = "conceptidto, valueto, valueidto"
+    def get_child_concepts(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', depth_limit=''):
+        columns = "conceptidto::text, valueto, valueidto::text"
         return self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
 
-    def get_child_edges(self, conceptid, relationtypes, child_valuetypes, parent_valuetype, columns=None, depth_limit=None):
+    def get_child_concepts_for_indexing(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', depth_limit=''):
+        columns = "valueidto::text, conceptidto::text, valuetypeto, categoryto, valueto, languageto"
+        data = self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
+        return [dict(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d), top_concept='') for d in data]
+
+    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
 
-        cursor = connection.cursor()
-        relationtypes = ' or '.join(["relations.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
         sql = """
             WITH RECURSIVE children AS (
                 SELECT relations.conceptidfrom, relations.conceptidto, 
@@ -408,16 +411,22 @@ class Concept(object):
             )
             SELECT {4} FROM children;
         """
+
         if not columns:
             columns = """
-                conceptidfrom, conceptidto, 
+                conceptidfrom::text, conceptidto::text, 
                 valuefrom, valueto, 
-                valueidfrom, valueidto, 
+                valueidfrom::text, valueidto::text, 
                 valuetypefrom, valuetypeto, 
                 languagefrom, languageto, 
                 categoryfrom, categoryto
             """
+        relationtypes = ' or '.join(["relations.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
+        depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
+        child_valuetypes = child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True)
+        
         sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit)
+        cursor = connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -557,6 +566,32 @@ class Concept(object):
 
         for subconcept in self.subconcepts:
             subconcept.index(scheme=scheme)
+
+    def bulk_index(self):
+        se = SearchEngineFactory().create()
+        concept_docs = []
+
+        if self.nodetype == 'ConceptScheme':
+            concept = Concept().get(id=self.id, values=['label'])
+            concept.index()
+            for topConcept in self.get_child_concepts_for_indexing(self.id, depth_limit=1):
+                concept = Concept().get(id=topConcept['conceptid'])
+                scheme = concept.get_context()
+                topConcept['top_concept'] = scheme.id
+                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=topConcept['id'], data=topConcept))
+                for childConcept in concept.get_child_concepts_for_indexing(topConcept['conceptid']):
+                    childConcept['top_concept'] = scheme.id
+                    concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=childConcept['id'], data=childConcept))
+        
+        if self.nodetype == 'Concept':
+            concept = Concept().get(id=self.id, values=['label'])
+            scheme = concept.get_context()
+            concept.index(scheme)
+            for childConcept in concept.get_child_concepts_for_indexing(self.id):
+                childConcept['top_concept'] = scheme.id
+                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=childConcept['id'], data=childConcept))
+
+        se.bulk_index(concept_docs)
 
     def delete_index(self, delete_self=False):
 
