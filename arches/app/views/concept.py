@@ -271,23 +271,22 @@ def manage_parents(request, conceptid):
 
             with transaction.atomic():
                 if len(data['deleted']) > 0:
-                    concept = Concept({'id':conceptid})
+                    concept = Concept().get(id=conceptid, include=None)
                     for deleted in data['deleted']:
                         concept.addparent(deleted)
 
                     concept.delete()
-                    concept = Concept().get(id=conceptid, include_subconcepts=True, values=['label'])
-                    concept.index()
+                    concept.bulk_index()
 
                 if len(data['added']) > 0:
-                    concept = Concept().get(id=conceptid, include_subconcepts=True, values=['label'])
+                    concept = Concept().get(id=conceptid)
                     for added in data['added']:
                         concept.addparent(added)
 
                     concept.save()
-                    concept.index()
+                    concept.bulk_index()
 
-                return JSONResponse(data)
+            return JSONResponse(data)
 
     else:
         return HttpResponseNotAllowed(['POST'])
