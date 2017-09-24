@@ -270,7 +270,8 @@ class ResourceReportView(BaseManagerView):
                     relationship_summary = []
                     for relationship in relationships:
                         if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
-                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
+                            rr_type = resource_relationship_type_values[relationship['relationshiptype']] if relationship['relationshiptype'] in resource_relationship_type_values else relationship['relationshiptype']
+                            relationship_summary.append(rr_type)
                     summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
 
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
