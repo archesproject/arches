@@ -216,7 +216,9 @@ class SKOSReader(object):
 
                 # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
-                scheme_node.bulk_index()
+                if scheme_node:
+                    scheme_node.bulk_index()
+
 
             return scheme_node
         else:
