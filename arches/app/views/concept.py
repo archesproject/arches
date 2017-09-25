@@ -253,18 +253,17 @@ def export_collections(request):
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
+@group_required('RDM Administrator')
 def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
         collection_concept = concept.make_collection()
-        raise
-        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the supplied concept')}})
+        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the selected concept')}})
     except:
-        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the concept selected.')}}, status=500)
+        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the selected concept.')}}, status=500)
 
+@group_required('RDM Administrator')
 def manage_parents(request, conceptid):
-    #  need to check user credentials here
-
     if request.method == 'POST':
         json = request.body
         if json != None:
@@ -272,20 +271,22 @@ def manage_parents(request, conceptid):
 
             with transaction.atomic():
                 if len(data['deleted']) > 0:
-                    concept = Concept({'id':conceptid})
+                    concept = Concept().get(id=conceptid, include=None)
                     for deleted in data['deleted']:
                         concept.addparent(deleted)
 
                     concept.delete()
+                    concept.bulk_index()
 
                 if len(data['added']) > 0:
-                    concept = Concept({'id':conceptid})
+                    concept = Concept().get(id=conceptid)
                     for added in data['added']:
                         concept.addparent(added)
 
                     concept.save()
+                    concept.bulk_index()
 
-                return JSONResponse(data)
+            return JSONResponse(data)
 
     else:
         return HttpResponseNotAllowed(['POST'])
@@ -320,11 +321,8 @@ def search(request):
 
     ids = []
     if removechildren != None:
-        concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
-        def get_children(concept):
-            ids.append(concept.id)
-
-        concepts.traverse(get_children)
+        ids =  [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
+        ids.append(removechildren)
 
     newresults = []
     cached_scheme_names = {}
