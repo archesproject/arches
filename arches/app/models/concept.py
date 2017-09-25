@@ -352,7 +352,7 @@ class Concept(object):
 
         return concepts_to_delete
 
-    def get_child_collections(self, conceptid, child_valuetypes, parent_valuetype='prefLabel', columns=None, depth_limit=''):
+    def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=''):
         child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
         columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
         return self.get_child_edges(conceptid, ['member'], child_valuetypes, parent_valuetype, columns, depth_limit)
