@@ -17,9 +17,12 @@ define([
             this.config = params.config;
             this.search = params.search;
             if (!this.search) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                this.isEditable = true;
+                if (params.graph) {
+                    var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                    if (cards.length) {
+                        this.isEditable = cards[0].is_editable
+                    }
                 }
             } else {
                 var filter = params.filterValue();

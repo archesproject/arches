@@ -20,9 +20,12 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 });
 
             } else {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                this.isEditable = true;
+                if (params.graph) {
+                    var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                    if (cards.length) {
+                        this.isEditable = cards[0].is_editable
+                    }
                 }
                 this.options = params.config.options;
                 var setupOption = function(option) {
