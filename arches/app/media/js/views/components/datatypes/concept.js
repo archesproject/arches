@@ -33,6 +33,8 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                     if (cards.length) {
                         this.isEditable = cards[0].is_editable
                     }
+                } else if (params.widget) {
+                    this.isEditable = params.widget.card.get('is_editable')
                 }
                 this.topConcept = params.config.rdmCollection;
                 this.conceptCollections = arches.conceptCollections;
