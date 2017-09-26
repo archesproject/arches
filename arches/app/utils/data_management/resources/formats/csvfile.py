@@ -42,14 +42,14 @@ class ConceptLookup():
         ret = label
         if collectionid not in self.lookups:
             try:
-                self.lookups[collectionid] = Concept().get_child_concepts(collectionid, ['member'], ['prefLabel'], 'prefLabel')
+                self.lookups[collectionid] = Concept().get_child_collections(collectionid)
                 ret = self.lookup_labelid_from_label(label, collectionid)
             except:
                 return label
         else:
             for concept in self.lookups[collectionid]:
-                if label == concept[3]:
-                    ret = concept[5]
+                if label == concept[1]:
+                    ret = concept[2]
         return ret
 
 class CsvWriter(Writer):
