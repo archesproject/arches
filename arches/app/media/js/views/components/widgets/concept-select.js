@@ -1,12 +1,12 @@
 define([
     'knockout',
-    'viewmodels/paged-concept-select',
+    'viewmodels/concept-select',
     'bindings/select2-query'
-], function(ko, PagedConceptSelectViewModel) {
+], function(ko, ConceptSelectViewModel) {
     return ko.components.register('concept-select-widget', {
-        viewModel: PagedConceptSelectViewModel,
+        viewModel: ConceptSelectViewModel,
         template: {
-            require: 'text!widget-templates/paged-concept-select'
+            require: 'text!widget-templates/concept-select'
         }
     });
 });

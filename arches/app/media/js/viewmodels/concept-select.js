@@ -5,7 +5,7 @@ define([
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
     var nameLookup = {};
-    var PagedConceptSelectViewModel = function(params) {
+    var ConceptSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder'];
         this.multiple = params.multiple || false;
@@ -140,5 +140,5 @@ define([
         };
     };
 
-    return PagedConceptSelectViewModel;
+    return ConceptSelectViewModel;
 });
