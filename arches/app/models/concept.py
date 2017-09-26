@@ -380,7 +380,6 @@ class Concept(object):
                     valuefrom.languageid as languagefrom, valueto.languageid as languageto,
                     dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
                     {8}
-                    {10}
                     1 AS depth       ---|NonRecursive Part
                     FROM relations
                     JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
@@ -399,7 +398,6 @@ class Concept(object):
                     valuefrom.languageid as languagefrom, valueto.languageid as languageto,
                     dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
                     {9}
-                    {11}
                     depth+1      ---|RecursivePart
                     FROM relations
                     JOIN children b ON(b.conceptidto = relations.conceptidfrom)
@@ -411,8 +409,8 @@ class Concept(object):
                     and valueto.valuetype in ('{2}')
                     and ({1})
                     {5}
-            )
-            SELECT {4} FROM children{12}{6}{7};
+            ){10}
+            SELECT {4} FROM {11}{6}{7};
         """
 
         if not columns:
@@ -429,14 +427,20 @@ class Concept(object):
         child_valuetypes = child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True)
         limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
         get_root_row_number = "to_char(row_number() OVER (), 'fm000000') as row," if order_hierarchically else ""
-        get_child_row_number = "row || '-' || to_char(row_number() OVER (), 'fm00000')," if order_hierarchically else ""
+        get_child_row_number = "row || '-' || to_char(row_number() OVER (), 'fm000000')," if order_hierarchically else ""
         order_clause = " order by row" if order_hierarchically else ""
-        get_root_valuepath = "LOWER(valueto.value) as valuepath," if query is not None else ""
-        get_child_valuepath = "valuepath || ' - ' || LOWER(valueto.value)," if query is not None else ""
-        where_clause = " where valuepath like '%%%s%%'" % query if query is not None else ""
+        query_results = """, results as (
+            select *
+             FROM children
+             where LOWER(valueto) like '%%%s%%'
+            union
+              select c.*
+              FROM children c
+              join results r on(r.valueidfrom=c.valueidto)
+        )""" % query.lower() if query is not None else ""
+        recursive_table = "results" if query is not None else "children"
 
-        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit, order_clause, limit_clause, get_root_row_number, get_child_row_number, get_root_valuepath, get_child_valuepath, where_clause)
-        print sql
+        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit, order_clause, limit_clause, get_root_row_number, get_child_row_number, query_results, recursive_table)
         cursor = connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
