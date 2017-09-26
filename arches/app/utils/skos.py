@@ -75,11 +75,7 @@ class SKOSReader(object):
         skos_value_types_list = list(skos_value_types.values_list('valuetype', flat=True))
         skos_value_types = {valuetype.valuetype: valuetype for valuetype in skos_value_types}
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
-
-
-
-        # relation_types = models.DRelationType.objects.all()
-        # skos_relation_types = relation_types.filter(namespace = 'skos')
+        dcterms_identifier_type = dcterms_value_types.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ''))
 
 
         # if the graph is of the type rdflib.graph.Graph
@@ -87,6 +83,7 @@ class SKOSReader(object):
 
             # Search for ConceptSchemes first
             for scheme, v, o in graph.triples((None, RDF.type , SKOS.ConceptScheme)):
+                identifier = self.unwrapJsonLiteral(str(scheme))
                 scheme_id = self.generate_uuid_from_subject(baseuuid, scheme)
                 concept_scheme = Concept({
                     'id': scheme_id,
@@ -109,6 +106,8 @@ class SKOSReader(object):
                             elif predicate == DCTERMS.description:
                                 concept_scheme.addvalue({'id': val['value_id'], 'value':val['value'], 'language': object.language or default_lang, 'type': 'scopeNote', 'category': value_type.category})
                                 print 'Casting dcterms:description to skos:scopeNote'
+                            elif predicate == DCTERMS.identifier:
+                                identifier = self.unwrapJsonLiteral(str(object))
                         except:
                             pass
 
@@ -118,14 +117,12 @@ class SKOSReader(object):
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': top_concept_id})
 
-
+                concept_scheme.addvalue({'id': identifier['value_id'], 'value':identifier['value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                 self.nodes.append(concept_scheme)
-
-                if len(self.nodes) == 0:
-                    raise Exception('No ConceptScheme found in file.')
 
                 # Search for Concepts
                 for s, v, o in graph.triples((None, SKOS.inScheme , scheme)):
+                    identifier = self.unwrapJsonLiteral(str(s))
                     concept = Concept({
                         'id': self.generate_uuid_from_subject(baseuuid, s),
                         'legacyoid': str(s),
@@ -152,6 +149,10 @@ class SKOSReader(object):
                             elif predicate == SKOS.related:
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
+                        elif predicate == DCTERMS.identifier:
+                            identifier = self.unwrapJsonLiteral(str(object))
+
+                    concept.addvalue({'id': identifier['value_id'], 'value':identifier['value'], 'language': default_lang, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                     self.nodes.append(concept)
 
 
@@ -308,6 +309,8 @@ class SKOSWriter(object):
                                     rdf_graph.add((ARCHES[node.id], DCTERMS.description, Literal(jsonLiteralValue, lang = value.language)))
                             else:
                                 rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(jsonLiteralValue, lang = value.language)))
+                        elif value.type == 'identifier':
+                            rdf_graph.add((ARCHES[node.id], DCTERMS.identifier, Literal(jsonLiteralValue, lang = value.language)))
                         else:
                             rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(jsonLiteralValue, lang = value.language)))
 
