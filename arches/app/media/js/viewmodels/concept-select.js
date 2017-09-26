@@ -46,7 +46,7 @@ define([
                         names.push(nameLookup[val]);
                         displayName(names.join(', '));
                     } else {
-                        $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
+                        $.ajax(arches.urls.concept_value + '?valueid=' + val, {
                             dataType: "json"
                         }).done(function(data) {
                             nameLookup[val] = data.value;
@@ -127,7 +127,7 @@ define([
                         if (nameLookup[value]) {
                             setSelectionData();
                         } else {
-                            $.ajax(arches.urls.get_pref_label + '?valueid=' + value, {
+                            $.ajax(arches.urls.concept_value + '?valueid=' + value, {
                                 dataType: "json"
                             }).done(function(data) {
                                 nameLookup[value] = data.value

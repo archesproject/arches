@@ -489,5 +489,9 @@ def concept_value(request):
                 value.delete_index()
                 value.delete()
                 return JSONResponse(value)
+    if request.method == 'GET':
+        valueid = request.GET.get('valueid')
+        value = models.Value.objects.get(pk=valueid)
+        return JSONResponse(value)
 
     return HttpResponseNotFound
