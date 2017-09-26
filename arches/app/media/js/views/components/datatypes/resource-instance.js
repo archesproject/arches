@@ -23,6 +23,8 @@ define([
                     if (cards.length) {
                         this.isEditable = cards[0].is_editable
                     }
+                } else if (params.widget) {
+                    this.isEditable = params.widget.card.get('is_editable')
                 }
             } else {
                 var filter = params.filterValue();
