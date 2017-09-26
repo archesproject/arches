@@ -3206,9 +3206,11 @@ input.cmn-toggle-yes-no:checked+label:after {
     right: 220px;
 }
 
-.widget-label-required {
-    font-size: 16px;
-    color: #666;
+.ion-asterisk.widget-label-required {
+    padding-left: 3px;
+    font-size: 9px;
+    margin-top: 2px;
+    position: absolute;
 }
 
 .login-panel {
