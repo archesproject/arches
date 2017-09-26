@@ -1,10 +1,10 @@
 define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
     return Backbone.View.extend({
 
-        initialize: function(e){
+        initialize: function(options){
             var self = this;
             this.modal = this.$el.find('.modal');
-            this.title = this.modal.find('h4').text();
+            this.viewModel = options.viewModel;
 
             this.select2 = this.$el.find('[name=language_dd]').select2({
                 minimumResultsForSearch: -1
@@ -18,8 +18,7 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
                 },
                 submitHandler: function(form) {
                     var data = new FormData(form);
-                    self.modal.find('h4').text(' ' + self.title);
-                    self.modal.find('.modal-title').addClass('loading');
+                    self.viewModel.loading(true);
                     $.ajax({
                         url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                         type: 'POST',
@@ -27,12 +26,9 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
                         processData: false,
                         contentType: false,
                         complete: function(response, status){
-                            self.modal.find('h4').text(self.title);
-                            self.modal.find('.modal-title').removeClass('loading');
-                            self.modal.on('hidden.bs.modal', function (e) {
-                                self.trigger('conceptSchemeAdded', response.responseJSON);
-                            })
                             self.modal.modal('hide');
+                            self.viewModel.loading(false);
+                            self.trigger('conceptSchemeAdded', response, status);
                         }
                     });
 

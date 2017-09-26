@@ -13,9 +13,10 @@ require([
     'views/rdm/modals/add-collection-form',
     'views/rdm/modals/delete-collection-form',
     'views/base-manager',
+    'viewmodels/alert',
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, 
-    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, DeleteCollectionForm, BaseManagerView) {
+    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, DeleteCollectionForm, BaseManagerView, AlertViewModel) {
 
         var RDMView = BaseManagerView.extend({
             initialize: function(options){
@@ -184,17 +185,23 @@ require([
                     var self = this;
                     var form = new ImportSchemeForm({
                         el: $('#import-scheme-form'),
-                        model: concept
+                        model: concept,
+                        viewModel: this.viewModel
                     });
                     form.modal.modal('show');
                     form.on({
-                        'conceptSchemeAdded': function(newScheme){
-                            conceptTree.render();
-                            concept.set('id', newScheme.id);
-                            conceptReport.render()
+                        'conceptSchemeAdded': function(response, status){
+                            if (status === 'success'){
+                                conceptTree.render();
+                                concept.set('id', response.responseJSON.id);
+                                conceptReport.render()
+
+                            }else{
+                                self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text)); 
+                            }
                         }
                     })
-                });
+                }.bind(this));
 
                 $('a[data-toggle="#add-collection-form"]').on( "click", function(){
                     var self = this;
