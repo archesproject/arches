@@ -28,9 +28,11 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                 });
             } else {
                 this.isEditable = true;
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                if (params.graph) {
+                    var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                    if (cards.length) {
+                        this.isEditable = cards[0].is_editable
+                    }
                 }
                 this.topConcept = params.config.rdmCollection;
                 this.conceptCollections = arches.conceptCollections;
