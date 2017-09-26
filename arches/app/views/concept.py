@@ -308,6 +308,23 @@ def dropdown(request):
     results = Concept().get_e55_domain(conceptid)
     return JSONResponse(results)
 
+def paged_dropdown(request):
+    conceptid = request.GET.get('conceptid')
+    query = request.GET.get('query')
+    page = int(request.GET.get('page', 1))
+    limit = 50
+    offset = (page - 1) * limit
+    if query == '':
+        query = None
+    columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
+    results = Concept().get_child_edges(conceptid, ['member', 'hasTopConcept'], offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
+    total_count = results[0][5] if len(results) > 0 else 0
+    data = [dict(zip(['id', 'conceptid', 'text', 'type', 'depth'], d)) for d in results]
+    return JSONResponse({
+        'results': data,
+        'more': offset+limit < total_count
+    })
+
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
@@ -475,5 +492,9 @@ def concept_value(request):
                 value.delete_index()
                 value.delete()
                 return JSONResponse(value)
+    if request.method == 'GET':
+        valueid = request.GET.get('valueid')
+        value = models.Value.objects.get(pk=valueid)
+        return JSONResponse(value)
 
     return HttpResponseNotFound

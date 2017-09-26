@@ -1,4 +1,4 @@
-define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko, ConceptWidgetViewModel) {
+define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko, ConceptSelectViewModel) {
     var name = 'concept-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -15,7 +15,7 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                 if (!ko.isObservable(this.node.config.rdmCollection)) {
                     this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
                 }
-                ConceptWidgetViewModel.apply(this, [params]);
+                ConceptSelectViewModel.apply(this, [params]);
                 this.filterValue = ko.computed(function () {
                     return {
                         op: self.op(),

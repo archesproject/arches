@@ -202,7 +202,7 @@ class Concept(object):
         for parentconcept in self.parentconcepts:
             parentconcept.save()
             parentconcept.add_relation(self, parentconcept.relationshiptype)
-            
+
         for subconcept in self.subconcepts:
             subconcept.save()
             self.add_relation(subconcept, subconcept.relationshiptype)
@@ -212,7 +212,7 @@ class Concept(object):
             concept.nodetype_id = 'Concept'
             concept.save()
             self.load(concept)
-            
+
             for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='hasTopConcept'):
                 relation.relationtype_id = 'narrower'
                 relation.save()
@@ -251,7 +251,7 @@ class Concept(object):
             conceptrelations = models.Relation.objects.filter(relations_filter)
             for relation in conceptrelations:
                 relation.delete()
-            
+
             if models.Relation.objects.filter(relations_filter).count() == 0:
                 # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
                 concept = models.Concept.objects.get(pk=self.id)
@@ -366,20 +366,20 @@ class Concept(object):
         data = self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
         return [dict(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d), top_concept='') for d in data]
 
-    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None):
+    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None, offset=None, limit=20, order_hierarchically=False, query=None):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
-
         sql = """
             WITH RECURSIVE children AS (
-                SELECT relations.conceptidfrom, relations.conceptidto, 
-                    valuefrom.value as valuefrom, valueto.value as valueto, 
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, 
-                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto, 
+                SELECT relations.conceptidfrom, relations.conceptidto,
+                    valuefrom.value as valuefrom, valueto.value as valueto,
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
+                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
                     valuefrom.languageid as languagefrom, valueto.languageid as languageto,
-                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto, 
+                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
+                    {8}
                     1 AS depth       ---|NonRecursive Part
                     FROM relations
                     JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
@@ -391,12 +391,13 @@ class Concept(object):
                     and valueto.valuetype in ('{2}')
                     and ({1})
                 UNION
-                    SELECT relations.conceptidfrom, relations.conceptidto, 
-                    valuefrom.value as valuefrom, valueto.value as valueto, 
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto, 
-                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto, 
+                    SELECT relations.conceptidfrom, relations.conceptidto,
+                    valuefrom.value as valuefrom, valueto.value as valueto,
+                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
+                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
                     valuefrom.languageid as languagefrom, valueto.languageid as languageto,
                     dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
+                    {9}
                     depth+1      ---|RecursivePart
                     FROM relations
                     JOIN children b ON(b.conceptidto = relations.conceptidfrom)
@@ -408,24 +409,38 @@ class Concept(object):
                     and valueto.valuetype in ('{2}')
                     and ({1})
                     {5}
-            )
-            SELECT {4} FROM children;
+            ){10}
+            SELECT {4} FROM {11}{6}{7};
         """
 
         if not columns:
             columns = """
-                conceptidfrom::text, conceptidto::text, 
-                valuefrom, valueto, 
-                valueidfrom::text, valueidto::text, 
-                valuetypefrom, valuetypeto, 
-                languagefrom, languageto, 
+                conceptidfrom::text, conceptidto::text,
+                valuefrom, valueto,
+                valueidfrom::text, valueidto::text,
+                valuetypefrom, valuetypeto,
+                languagefrom, languageto,
                 categoryfrom, categoryto
             """
         relationtypes = ' or '.join(["relations.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
         child_valuetypes = child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True)
-        
-        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit)
+        limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
+        get_root_row_number = "to_char(row_number() OVER (), 'fm000000') as row," if order_hierarchically else ""
+        get_child_row_number = "row || '-' || to_char(row_number() OVER (), 'fm000000')," if order_hierarchically else ""
+        order_clause = " order by row" if order_hierarchically else ""
+        query_results = """, results as (
+            select *
+             FROM children
+             where LOWER(valueto) like '%%%s%%'
+            union
+              select c.*
+              FROM children c
+              join results r on(r.valueidfrom=c.valueidto)
+        )""" % query.lower() if query is not None else ""
+        recursive_table = "results" if query is not None else "children"
+
+        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit, order_clause, limit_clause, get_root_row_number, get_child_row_number, query_results, recursive_table)
         cursor = connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
@@ -582,7 +597,7 @@ class Concept(object):
                 for childConcept in concept.get_child_concepts_for_indexing(topConcept['conceptid']):
                     childConcept['top_concept'] = scheme.id
                     concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=childConcept['id'], data=childConcept))
-        
+
         if self.nodetype == 'Concept':
             concept = Concept().get(id=self.id, values=['label'])
             scheme = concept.get_context()
@@ -909,7 +924,7 @@ class Concept(object):
                 else:
                     conceptfrom.add_relation(conceptto, 'member')
                 create_collection(conceptto)
-        
+
         with transaction.atomic():
             collection_concept.save()
             create_collection(self)

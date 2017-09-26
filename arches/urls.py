@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
     url(r'^concepts/dropdown', concept.dropdown, name="dropdown"),
+    url(r'^concepts/paged_dropdown', concept.paged_dropdown, name="paged_dropdown"),
     url(r'^concepts/export/(?P<conceptid>%s)$' % uuid_regex , concept.export, name="export_concept"),
     url(r'^concepts/export/collections', concept.export_collections, name="export_concept_collections"),
     url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
