@@ -79,8 +79,11 @@ def reverse_func(apps, schema_editor):
     query.add_query(Term(field='conceptid', term='00000000-0000-0000-0000-000000000001'))
     query.delete(index='strings', doc_type='concept')
 
-    DValueType = apps.get_model("models", "DValueType")
-    DValueType.objects.get(valuetype='identifier').delete()
+    try:
+        DValueType = apps.get_model("models", "DValueType")
+        DValueType.objects.get(valuetype='identifier').delete()
+    except:
+        pass
 
 class Migration(migrations.Migration):
 
