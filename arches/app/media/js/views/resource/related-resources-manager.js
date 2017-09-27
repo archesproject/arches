@@ -121,9 +121,11 @@ define([
                     relationships: ko.observableArray(),
                     resourceRelationships: ko.observableArray(),
                     parse: function(data, viewModel) {
+                        var rr = data.related_resources;
+                        var paginator = data.paginator;
                         var relationshipsWithResource = [];
-                        var resources = data.related_resources;
-                        data.resource_relationships.forEach(function(relationship) {
+                        var resources = rr.related_resources;
+                        rr.resource_relationships.forEach(function(relationship) {
                             var res = _.filter(resources, function(resource) {
                                 if (_.contains([relationship.resourceinstanceidto, relationship.resourceinstanceidfrom], resource.resourceinstanceid)) {
                                     return resource;
@@ -150,14 +152,18 @@ define([
                                 return relate.created;
                             }).value().reverse();
                         this.resourceRelationships(sorted);
-                        this.displayname = data.resource_instance.displayname;
-                        this.graphid = data.resource_instance.graph_id;
+                        this.displayname = rr.resource_instance.displayname;
+                        this.graphid = rr.resource_instance.graph_id;
                     },
                     get: function() {
+                        console.log(this)
                         $.ajax({
                                 url: arches.urls.related_resources + resourceinstanceid,
                                 context: this,
-                                dataType: 'json'
+                                dataType: 'json',
+                                data: {
+                                    page: 1
+                                }
                             })
                             .done(function(data) {
                                 this.parse(data, self)

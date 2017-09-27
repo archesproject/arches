@@ -29,6 +29,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -347,8 +348,30 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         resource = Resource.objects.get(pk=resourceid)
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
-        return JSONResponse(related_resources, indent=4)
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        if related_resources is not None:
+            total=related_resources['total']
+            paginator, pages = get_paginator(request, related_resources, total, page, settings.SEARCH_ITEMS_PER_PAGE)
+            page = paginator.page(page)
+
+            ret = {}
+            ret['related_resources'] = related_resources
+            ret['paginator'] = {}
+            ret['paginator']['current_page'] = page.number
+            ret['paginator']['has_next'] = page.has_next()
+            ret['paginator']['has_previous'] = page.has_previous()
+            ret['paginator']['has_other_pages'] = page.has_other_pages()
+            ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
+            ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
+            ret['paginator']['start_index'] = page.start_index()
+            ret['paginator']['end_index'] = page.end_index()
+            ret['paginator']['pages'] = pages
+            return JSONResponse(ret)
+            # return JSONResponse(related_resources, indent=4)
+
+
+
 
     def delete(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
