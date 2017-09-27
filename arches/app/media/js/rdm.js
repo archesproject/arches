@@ -13,9 +13,10 @@ require([
     'views/rdm/modals/add-collection-form',
     'views/rdm/modals/delete-collection-form',
     'views/base-manager',
+    'viewmodels/alert',
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, 
-    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, DeleteCollectionForm, BaseManagerView) {
+    AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm, DeleteCollectionForm, BaseManagerView, AlertViewModel) {
 
         var RDMView = BaseManagerView.extend({
             initialize: function(options){
@@ -52,19 +53,21 @@ require([
                         window.history.pushState({}, "conceptid", concept.get('id'));
                     },
                     'save': function(){
-                        if(concept.get('nodetype') === 'ConceptScheme'){
-                            conceptTree.render();
-                        }
+                        conceptTree.render();
+                        dropdownTree.render();
                         conceptReport.render();
                         concept.reset()
                     },
                     'delete': function(){
-                        if(concept.get('nodetype') === 'ConceptScheme'){
-                            conceptTree.render();
-                        }
+                        conceptTree.render();
+                        dropdownTree.render();
                         conceptReport.render();
                         concept.reset()
-                    }
+                    },
+                    'collection_created': function() {
+                        //window.location.reload();
+                        dropdownTree.render();
+                    },
                 });
 
                 conceptTree.on({
@@ -107,7 +110,7 @@ require([
                         conceptReport.render();
                     },
                     'parentsChanged': function() {
-                        //conceptTree.render();
+                        conceptTree.render();
                         conceptReport.render();
                     },
                     'conceptsImported': function() {
@@ -148,8 +151,10 @@ require([
                     });
                     form.modal.modal('show');
                     form.on({
-                        'conceptSchemeAdded': function(){
-                            window.location.reload();
+                        'conceptSchemeAdded': function(newScheme){
+                            conceptTree.render();
+                            concept.set('id', newScheme.id);
+                            conceptReport.render()
                         }
                     })
                 });
@@ -166,29 +171,38 @@ require([
                     var self = this;
                     var form = new DeleteSchemeForm({
                         el: $('#delete-scheme-form'),
-                        model: null
+                        model: null,
+                        viewModel: this.viewModel
                     });
                     form.modal.modal('show');
                     form.on({
                         'conceptSchemeDeleted': function(){
-                            window.location.reload();
+                            window.location = arches.urls.rdm;
                         }
                     })
-                });
+                }.bind(this));
 
                 $('a[data-toggle="#import-scheme-form"]').on( "click", function(){
                     var self = this;
                     var form = new ImportSchemeForm({
                         el: $('#import-scheme-form'),
-                        model: concept
+                        model: concept,
+                        viewModel: this.viewModel
                     });
                     form.modal.modal('show');
                     form.on({
-                        'conceptSchemeAdded': function(){
-                            window.location.reload();
+                        'conceptSchemeAdded': function(response, status){
+                            if (status === 'success'){
+                                conceptTree.render();
+                                concept.set('id', response.responseJSON.id);
+                                conceptReport.render()
+
+                            }else{
+                                self.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text)); 
+                            }
                         }
                     })
-                });
+                }.bind(this));
 
                 $('a[data-toggle="#add-collection-form"]').on( "click", function(){
                     var self = this;
@@ -197,8 +211,10 @@ require([
                     });
                     form.modal.modal('show');
                     form.on({
-                        'collectionAdded': function(){
-                            window.location.reload();
+                        'collectionAdded': function(newCollection){
+                            dropdownTree.render();
+                            concept.set('id', newCollection.id);
+                            conceptReport.render()
                         }
                     })
                 });
@@ -212,7 +228,7 @@ require([
                     form.modal.modal('show');
                     form.on({
                         'collectionDeleted': function(){
-                            //window.location.reload();
+                            dropdownTree.render();
                         }
                     })
                 });

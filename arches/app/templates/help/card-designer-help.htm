@@ -7,8 +7,8 @@
         <div class="ep-help-topic-content">
             <p>{% if not graph.isresource %}{% trans "Use the Card Designer to edit this Branch's Card." %} {% else %} {% trans "Here in the Card Designer you will be able to edit one of the Cards (or Card Containers) associated with your Resource Model. Click 'Return to Cards' to go back and choose a new Card to edit." %}{% endif %}</p>
             <p>{% trans "The Card Designer interface is split into three sections, as shown in the image below." %}</p>
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-            <p><img src="{{ STATIC_URL }}img/help/card-designer-panes.png"></img></p>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <p><a href="{{ STATIC_URL }}img/help/card-designer-panes.png" target="_blank"><img src="{{ STATIC_URL }}img/help/card-designer-panes.png"></img></a></p>
             <p>{% blocktrans %}The <strong>Contents</strong> panel show all Widgets within this Card. In some cases, a third, over-arching tier is added to this heirarchy, called a "Card Container". This happens when multiple Cards are used to organize complex Branches.{% endblocktrans %}</p>
             <p>{% blocktrans %}The <strong>Manager</strong> panel is where you will make changes to a Card Container, Card, or Widget. Select an item in the contents panel, or in the preview, and you will see the manager panel update based on your selection.{% endblocktrans %}</p>
             <p>{% blocktrans %}The <strong>Preview</strong> allows you to see the Card just as a user would encounter it while creating a new resource. As you make changes in the contents or manager panels, you'll see the the preview update accordingly.{% endblocktrans %}</p>
@@ -26,8 +26,7 @@
                 <p>{% trans "Note that different icons are used for different types of Widgets." %}</p>
             </div>
             <div class="col-xs-6">
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img"src="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></p>
+                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/reorganize-contents-card.gif" style="border: 2px solid #eee"></img></p>
             </div>
             <div class="col-xs-12">
                 <h5>{% trans "Example 2: Card Container with Cards" %}</h5>
@@ -37,7 +36,6 @@
                 <p>{% trans "Note that different icons are used for different types of Widgets." %}</p>
             </div>
             <div class="col-xs-6">
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/reorganize-contents-card-container.gif" target="_blank">expand&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
                 <p><img class="reloadable-img"src="{{ STATIC_URL }}img/help/reorganize-contents-card-container.gif" style="border: 2px solid #eee"></img></p>
             </div>
         </div>

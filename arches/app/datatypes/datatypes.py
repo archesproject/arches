@@ -104,7 +104,7 @@ class NumberDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'not a properly formatted number', 'This data was not imported.')})
         return errors
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         return float(value)
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
@@ -136,7 +136,7 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         return bool(distutils.util.strtobool(str(value)))
 
     def append_search_filters(self, value, node, query, request):
@@ -166,6 +166,14 @@ class DateDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': '{0} is not in the correct format, should be formatted YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or MM-DD. This data was not imported.'.format(value)})
 
         return errors
+
+    def transform_import_values(self, value, nodeid):
+        if type(value) == list:
+            try:
+                value = str(datetime(*value).date())
+            except:
+                pass
+        return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
         document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
@@ -217,7 +225,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         return errors
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         arches_geojson = {}
         arches_geojson['type'] = "FeatureCollection"
         arches_geojson['features'] = []
@@ -362,6 +370,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             for i in range(23):
                 sql_list.append(None)
 
+        try:
+            simplification = config['simplification']
+        except KeyError, e:
+            simplification = 0.3
 
         return {
             "provider": {
@@ -374,7 +386,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         "database": database["NAME"],
                         "port": database["PORT"]
                     },
-                    "simplify": settings.VECTOR_TILE_SIMPLIFICATION,
+                    "simplify": simplification,
                     "queries": sql_list
                 },
             },
@@ -821,7 +833,7 @@ class FileListDataType(BaseDataType):
                         file_json["url"] = str(file_model.path.url)
                         file_json["status"] = 'uploaded'
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         '''
         # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
 
@@ -1010,7 +1022,7 @@ class DomainListDataType(BaseDomainDataType):
                 errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         return [v.strip() for v in value.split(',')]
 
     def get_search_terms(self, nodevalue, nodeid=None):

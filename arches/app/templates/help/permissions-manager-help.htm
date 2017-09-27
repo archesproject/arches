@@ -14,8 +14,7 @@
         <p>{% trans "You may notice that by default Arches comes with a 'Guest' group, as well as user named 'anonymous' who is a member of that group. <em>Any non-authenticated user is treated as the 'anonymous' user.</em> This means that all permissions applied to the Guest group will be given to anyone who views the website without logging in." %}</p>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Permissions Manager Interface" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>{% trans "The interface is split into three sections, as shown in the image below." %}</p>
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img src="{{ STATIC_URL }}img/help/permissions-manager-sections.jpg"></img></p>
             <p>
                 {% trans "<strong>1 - Groups/Accounts List</strong> This panel lists all of the groups and user accounts you have in your database. By default, Arches comes with a number of pre-made groups, but all of them have the same set of permissions. It is up to you define what permissions are attached to each group. As you can see, user accounts can be members of a group, and will inherit all of the permissions attached to that group. If desired, you can further define permissions for each user." %}<br>
@@ -42,8 +41,14 @@
           {% blocktrans %}
             <p>Below, the "Guest" group (please read the Non-Authenticated Users section above) has "read" permissions revoked for the Location card. This means that the general public would not be able to view any location information for resources made with this resource model.</p>
           {% endblocktrans %}
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example1.gif"></img></p>
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/permissions-example1.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/permissions-example1.gif"></img>
+			</p>
         </div>
     </div>
     <div>
@@ -51,11 +56,17 @@
         <div class="ep-help-topic-content">
             <p>
                 {% blocktrans %} 
-                Below, the "Crowdsource Editor" group is given permission to create or edit the Keyword nodegroup. This means that users who are Crowdsource Editor members will be able to edit {{nav.title}} resources, but only the Keyword card will be visible to them.
+                Below, the "Crowdsource Editor" group is given permission to create or edit the <em>Keyword</em> nodegroup. This means that users who are Crowdsource Editor members will be able to edit {{nav.title}} resources, but only the Keyword card will be visible to them.
                 {% endblocktrans %}
             </p>
-            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-            <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img></p>
+            <p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/permissions-example2.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/permissions-example2.gif"></img>
+			</p>
         </div>
     </div>
 </div>

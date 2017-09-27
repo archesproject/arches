@@ -55,12 +55,12 @@ class ResourceListView(BaseManagerView):
         return render(request, 'views/resource.htm', context)
 
 def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
     default_relationshiptype_valueid = None
     for relationship_type in resource_relationship_types:
-        if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
-            default_relationshiptype_valueid = relationship_type[5]
-    relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[2]
+    relationship_type_values = {'values':[{'id':str(c[2]), 'text':str(c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
@@ -270,7 +270,8 @@ class ResourceReportView(BaseManagerView):
                     relationship_summary = []
                     for relationship in relationships:
                         if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
-                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
+                            rr_type = resource_relationship_type_values[relationship['relationshiptype']] if relationship['relationshiptype'] in resource_relationship_type_values else relationship['relationshiptype']
+                            relationship_summary.append(rr_type)
                     summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
 
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)

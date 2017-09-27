@@ -13,10 +13,8 @@
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Graph Designer Overview" %}</h4></a>
         <div class="ep-help-topic-content">
-            <p>{% trans "The interface is split into three sections, as shown in the image below." %}
-            <span class="ep-help-img-link-float"><a href="{{ STATIC_URL }}img/help/graph-manager-panes.gif" target="_blank">{% trans "expand" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
+            <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/graph-manager-panes.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
             <p><img src="{{ STATIC_URL }}img/help/graph-manager-panes.png"></img></p>
-
             {% if graph.isresource %}
                 <p>
                   {% blocktrans %}
@@ -34,8 +32,6 @@
                   {% endblocktrans %}
                 </p>
             {% endif %}
-
-
             <div class="col-xs-6">
                 <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
             </div>
@@ -65,22 +61,34 @@
             </div>
         </div>
     </div>
-
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Editing a Branch's Graph" %}</h4></a>
         <div class="ep-help-topic-content">
             <p>{% trans "To build the graph of a Branch, your main course of action will be adding nodes, naming them, and defining their data type. If your Branch uses an ontology, you'll also need to define the CRM class and property of each new node. When choosing classes and properties, the interface will automatically enforce preloaded ontological rules." %}</p>
-            <p>{% trans "Below you can see a simple example of adding a node to a graph." %}</p>
-            <p><a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank"><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></a></img></p>
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a node to the graph - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></img>
+			</p>
         </div>
     </div>
-
     <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Editing a Resouce Model's Graph" %}</h4></a>
         <div class="ep-help-topic-content">
             <p>{% trans "When editing a Resource Model's graph, you will be adding entire Branch's to the top node of the graph (the one in the middle). By adding Branches (instead of individual nodes) This encourages consistency between Resource Models by allowing you to reuse a single Branch many times." %}</p>
             <p>{% blocktrans %}As shown below, you must select the top node and then use <i class="ion-ios-plus"></i> to add a Branch. Once you have added a Branch, you may fine-tune the settings of its descendant nodes if desired. Note that any changes you make here will not be applied back to the original Branch. {% endblocktrans %}</p>
-            <p><a href="{{ STATIC_URL }}img/help/add-graph-branch.gif" target="_blank"><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-graph-branch.gif"></img></a></p>
+            <p>{% trans "Once data is saved to a nodegroup, nodes belonging to that nodegroup cannot be deleted" %}</p>
+			<p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a branch to the graph - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-graph-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-graph-branch.gif"></img>
+			</p>
         </div>
     </div>
 
@@ -96,6 +104,7 @@
             <p>{% trans "<code>boolean</code> Use this to record a simple 'yes or no' or 'true or false' value." %}</p>
             <p>{% trans "<code>file-list</code> Allows this node to store one or mores files. Use this to upload images, documents, etc." %}</p>
             <p>{% trans "<code>semantic</code> A 'semantic' node <strong>does not store data</strong>. Semantic nodes are used where necessary to make symbolic connections between nodes, generally in order to follow ontoligical rules. Note that the top node of <em>every</em> graph is a semantic node." %}</p>
+            <p>{% trans "Once a user saves data belonging to a node, the datatype and the datatype configs <strong>cannot be modified</strong>" %}</p>
         </div>
     </div>
 </div>

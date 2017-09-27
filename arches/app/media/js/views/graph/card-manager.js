@@ -23,9 +23,7 @@ require([
         }),
         showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
-            if (this.cardsEditable === true) {
-                showCardLibrary(!showCardLibrary());
-            };
+            showCardLibrary(!showCardLibrary());
         },
         selectedCardId: ko.observable(null)
     };
@@ -53,8 +51,6 @@ require([
         items: viewModel.availableGraphs
     });
 
-    viewModel.cardsEditable = viewModel.graphModel.get('is_editable')
-
     var alertFailure = function () {
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
@@ -73,7 +69,7 @@ require([
     };
 
     viewModel.deleteCard = function (card) {
-        if (this.cardsEditable === true) {
+        if (card.is_editable === true) {
             var self = this
             var node = _.find(this.graphModel.get('nodes')(), function(node) {
                 return node.nodeid === card.nodegroup_id;

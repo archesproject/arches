@@ -115,19 +115,6 @@ define([
                 }
             }
 
-            nodeList.subscribe(function(list) {
-                _.each(list, function(item) {
-                    item.selected.subscribe(updateSelected(item), this)
-                    item.hovered.subscribe(updateHovered(item), this)
-                    if (item.relationCount) {
-                        item.loaded(item.relationCount.loaded)
-                        item.total(item.relationCount.total)
-                    }
-                })
-            }, this)
-
-            nodeList([])
-
             var redraw = function() {
                 vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
@@ -156,19 +143,22 @@ define([
                         var hoveredNodes = []
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1) {
+                            var matrix;
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
+                                matrix = this.getScreenCTM()
+                                //transform svg coords to screen coords
+                                d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e
+                                d1.absY = matrix.b * d1.x + matrix.d * d1.y + matrix.f
                                 hoveredNodes.push(d1);
                             } else if (d1.selected()) {
                                 className += '-selected';
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection(hoveredNodes)
-                        }
+                        nodeSelection(hoveredNodes)
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
@@ -179,9 +169,7 @@ define([
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection.removeAll()
-                        }
+                        nodeSelection.removeAll()
                     });
                 link.exit()
                     .remove();
@@ -379,6 +367,15 @@ define([
                 }, false);
             };
 
+            var getMoreData = function(item) {
+                var item = item;
+                return function(val) {
+                    if (val) {
+                        getResourceDataForNode(item);
+                    }
+                }
+            }
+
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
@@ -414,6 +411,8 @@ define([
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
+                                    graphname: response.node_config_lookup[response.resource_instance.graph_id].name,
+                                    iconclass: response.node_config_lookup[response.resource_instance.graph_id].iconclass,
                                     color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
                                     relationCount: {
                                         total: response.total,
@@ -443,6 +442,8 @@ define([
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
                                         color: nodeConfigLookup[related_resource.graph_id].fillColor,
+                                        iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
+                                        graphname: nodeConfigLookup[related_resource.graph_id].name,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
@@ -525,9 +526,23 @@ define([
                 svg.attr("width", $el.parent().width());
             }).trigger("resize");
 
-            $el.find('.load-more-relations-link').click(function() {
-                getResourceDataForNode(selectedNode);
-            })
+
+            nodeList.subscribe(function(list) {
+                _.each(list, function(item) {
+                    if (item.selectedSubscription === undefined) {
+                        item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
+                        item.hovered.subscribe(updateHovered(item), this)
+                        item.loadcount.subscribe(getMoreData(item), this)
+                    }
+                    if (item.relationCount) {
+                        item.loaded(item.relationCount.loaded)
+                        item.total(item.relationCount.total)
+                    }
+                })
+            }, this)
+
+            nodeList([])
+
         }
     };
 

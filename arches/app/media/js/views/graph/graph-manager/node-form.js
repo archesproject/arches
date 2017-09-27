@@ -35,11 +35,15 @@ define([
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
             this.disableDatatype = ko.computed(function () {
-                var is_immutable = !self.graphModel.get('is_editable');
+                var is_immutable = false;
                 var node = self.node();
                 var isInParentGroup = false;
                 if (node) {
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
+                    var cards = _.filter(node.graph.get('cards')(), function(card){return card.nodegroup_id === node.nodeGroupId()})
+                    if (cards.length) {
+                        is_immutable = !cards[0].is_editable
+                    }
                 }
                 return self.isResourceTopNode() || isInParentGroup || is_immutable;
             });

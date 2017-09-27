@@ -11,78 +11,17 @@
         nodeSelection: graphNodeSelection
     }">
 
-
-        <!--ko if: graphNodeSelection().length == 1 -->
-        <div class="hover-rr-node-info">
-            <div class="hover-feature-title-bar">
-                <div class="hover-feature-title">
-                    <span class="">{%trans 'Resource Details'%}</span>
-                    <i class="ion-ios-close pull-right add-tooltip hover-panel-dismiss" style="cursor: pointer;" data-placement="left" data-toggle="tooltip" data-original-title="add overlay" data-bind="visible: graphNodeSelection().length > 0, click: function(){
-                    _.each(graphNodeList(), function(n){
-                    if (n.selected()) {
-                        n.selected(false)
-                    };
-                    graphNodeSelection.removeAll()
-                })}"></i>
-                </div>
-            </div>
-            <div class="hover-feature-body">
-                <div class="hover-feature" data-bind="text: graphNodeSelection()[0].name"></div>
-                <div class="hover-feature-metadata">
-                    {% trans 'Resource Model:' %}
-                    <span data-bind="text: graphNameLookup[graphNodeSelection()[0].entitytypeid].name"></span>
-                </div>
-                <div class="hover-feature-metadata">
-                    {% trans 'Resource ID:' %}
-                    <span data-bind="text: graphNodeSelection()[0].entityid"></span>
-                </div>
-            </div>
-            <div class="hover-feature-footer">
-                <a data-bind="click: function () { window.open(reportURL + ko.unwrap(graphNodeSelection()[0].entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
-                <a data-bind="click: function () { window.open(editURL + ko.unwrap(graphNodeSelection()[0].entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
-            </div>
-        </div>
-        <!--/ko-->
         <!--ko if: graphNodeSelection().length == 2 -->
-        <div class="hover-rr-node-info">
-            <div class="hover-feature-title-bar">
-                <div class="hover-feature-title">
-                    <span class="">{%trans 'Relationship Details'%}</span>
-                </div>
-            </div>
-            <div class="hover-feature-body">
-                <dl>
-                  <dt>{% trans 'Resources: ' %}</dt>
-                      <dd data-bind="text: graphNodeSelection()[0].name"></dd>
-                      <dd data-bind="text: graphNodeSelection()[1].name"></dd>
-                  <dt>{% trans 'Relationship: ' %}</dt>
-                      <dd data-bind="text: graphNodeSelection()[0].relationship"></dd>
-                </dl>
+        <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
+            <div>
+                <div class="rr-fdg-name"><div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'color': graphNodeSelection()[0].color}"></i><div data-bind="text: graphNodeSelection()[0].graphname"></span></div></div></div>
+                <div class="rr-fdg-edge" data-bind="text: graphNodeSelection()[0].relationship"></div>
+                <div class="rr-fdg-name"><div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'color': graphNodeSelection()[1].color}"></i><div data-bind="text: graphNodeSelection()[1].graphname"></span></div></div></div>
             </div>
         </div>
+        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().first.absY - 25) + 'px', left: (panelPosition().first.absX + 20) + 'px'}">1</div>
+        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().second.absY - 25) + 'px', left: (panelPosition().second.absX + 20) + 'px'}">2</div>
         <!--/ko-->
-
-
-        <!-- Remove next block of code and replace with Resource Node Search/Listing (below) -->
-        <div class="node_info hidden" style="position: absolute;margin-top: 65px;right: 35px; z-index: 5;">
-            <dl style="margin-bottom: 0;">
-                <dd class="arches-concept-heirarchy">
-                    <div>
-                        <a href="#" target="_blank" class="arches-CRUD-child selected-resource-name"></a>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle"><i class="resource-type-icon" style="padding-right:5px;"></i><span class="resource-type-name"></span></small>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle relation-count" style="display:none;"><span class="relation-load-count"></span> {% trans 'out of' %} <span class="relation-total-count"></span> {% trans 'relations loaded' %}</small>
-                        <small class="arches-search-subtitle relation-unloaded">{% trans 'relations not loaded!' %}</small>
-                    </div>
-                    <div>
-                        <small class="arches-search-subtitle"><a href="javascript:void(0);" class="load-more-relations-link">{% trans 'load more relations' %}</a></small>
-                    </div>
-                </dd>
-            </dl>
-        </div>
 
         <!-- Resource Node Search/Listing -->
         <div class="related-resources-nodes form-list">
@@ -104,15 +43,22 @@
                 <div class="report-image-grid relative">
                     <div class="grid" style="margin-left: 0px; background: transparent;" data-bind="foreach: {data: items}">
 
-                        <div class="library-card relative" data-bind="event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
+                        <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
                             <div class="crud-card-main" style="left: 5px;">
+                                <div class="related-node-details">
                                 <a class="listitem_name" data-bind="text: name"></a>
+                                <div><i class="node-list-item-icon" data-bind="css: iconclass, style:{'color': color}"></i><a class="listitem_name" data-bind="text: graphname"></a></div>
+                                </div>
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">
-                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span> {% trans 'relations loaded' %}
+                                <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
-                            <!-- <div class="crud-card-link">add</div> -->
+
+                            <div class="node-list-footer" data-bind="fadeVisible: selected, delay:100, fade: 250">
+                                <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
+                                <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
+                            </div>
                         </div>
 
                     </div>

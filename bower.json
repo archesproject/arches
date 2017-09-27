@@ -50,7 +50,7 @@
 		"turf": "https://cdnjs.cloudflare.com/ajax/libs/Turf.js/4.4.0/turf.min.js",
 		"geohash": "chrisveness/latlon-geohash#1.1.0",
 		"nvd3": "^1.8.5",
-		"leaflet": "^1.0.3",
+		"leaflet": "1.0.3",
 		"leaflet-iiif": "^1.1.1",
 		"leaflet-draw": "^0.4.9",
 		"ckeditor": "~4.6.2",

@@ -19,9 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
 import urllib, uuid, glob
-import widget as widget_cmd
-import fn
-import datatype
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
@@ -55,7 +52,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -63,8 +60,7 @@ class Command(BaseCommand):
             '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'install\'=Runs the setup file defined in your package root' +
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
-            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
-            '\'livereload\'=Starts livereload for this package on port 35729')
+            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping')
 
         parser.add_argument('-s', '--source', action='store', dest='source', default='',
             help='Directory or file for processing')
@@ -149,9 +145,6 @@ class Command(BaseCommand):
         if options['operation'] == 'setup_elasticsearch':
             self.setup_elasticsearch(install_location=options['dest_dir'])
 
-        if options['operation'] == 'livereload':
-            self.start_livereload()
-
         if options['operation'] == 'build_permissions':
             self.build_permissions()
 
@@ -221,8 +214,8 @@ class Command(BaseCommand):
                 'extensions/widgets',
                 'graphs/branches',
                 'graphs/resource_models',
-                'map_layers/mapbox_styles/overlays',
-                'map_layers/mapbox_styles/basemaps',
+                'map_layers/mapbox_spec_json/overlays',
+                'map_layers/mapbox_spec_json/basemaps',
                 'map_layers/tile_server/basemaps',
                 'map_layers/tile_server/overlays',
                 'reference_data/concepts',
@@ -252,7 +245,7 @@ class Command(BaseCommand):
                 print e
                 print "Could not save system settings"
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='stage'):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
 
         def load_system_settings():
             update_system_settings = True
@@ -265,9 +258,10 @@ class Command(BaseCommand):
                     update_system_settings = False
 
             if update_system_settings == True:
-                if len(glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))) > 0:
-                    system_settings = glob.glob(os.path.join(download_dir, '*', 'System_Settings.json'))[0]
+                if len(glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))) > 0:
+                    system_settings = glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))[0]
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
+                    self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
 
         def load_resource_to_resource_constraints():
@@ -334,8 +328,8 @@ class Command(BaseCommand):
                 self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
         def load_map_layers():
-            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'basemaps', '*', '*.json'))
-            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_styles', 'overlays', '*', '*.json'))
+            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
+            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
@@ -369,9 +363,10 @@ class Command(BaseCommand):
 
         def load_extensions(ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
-            component_dir = os.path.join(settings.APP_ROOT, 'media', 'js', 'views', 'components', ext_type)
-            module_dir = os.path.join(settings.APP_ROOT, ext_type)
-            template_dir = os.path.join(settings.APP_ROOT, 'templates', 'views', 'components', ext_type)
+            root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
+            component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
+            module_dir = os.path.join(root, ext_type)
+            template_dir = os.path.join(root, 'templates', 'views', 'components', ext_type)
 
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
@@ -391,23 +386,24 @@ class Command(BaseCommand):
                 if len(modules) > 0:
                     module = modules[0]
                     shutil.copy(module, module_dir)
-                    cmd.register(module)
+                    management.call_command(cmd, 'register', source=module)
 
         def load_widgets():
-            import widget as widget_cmd #For some reason this is out of scope when imported at top of page
-            load_extensions('widgets', widget_cmd.Command())
+            load_extensions('widgets', 'widget')
 
         def load_functions():
-            import fn as Fn_cmd
-            load_extensions('functions', Fn_cmd.Command())
+            load_extensions('functions', 'fn')
 
         def load_datatypes():
-            import datatype as Datatype_cmd
-            load_extensions('datatypes', Datatype_cmd.Command())
+            load_extensions('datatypes', 'datatype')
 
-        remote = True if 'github.com' in source else False
+        try:
+            urllib.urlopen(source)
+            remote = True
+        except:
+            remote = False
 
-        if source != '' or remote == True:
+        if os.path.exists(source) or remote == True:
 
             if remote == True:
                 download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
@@ -806,15 +802,6 @@ class Command(BaseCommand):
             print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
             print '*'*80
             sys.exit()
-
-    def start_livereload(self):
-        from livereload import Server
-        server = Server()
-        for path in settings.STATICFILES_DIRS:
-            server.watch(path)
-        for path in settings.TEMPLATES[0]['DIRS']:
-            server.watch(path)
-        server.serve(port=settings.LIVERELOAD_PORT)
 
     def add_tileserver_layer(self, layer_name=False, mapnik_xml_path=False, layer_icon='fa fa-globe', is_basemap=False, tile_config_path=False):
         if layer_name != False:

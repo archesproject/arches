@@ -33,6 +33,25 @@ class MissingConfigException(Exception):
      def __str__(self):
          return repr(self.value)
 
+class ConceptLookup():
+    def __init__(self, create=False):
+        self.lookups = {}
+        self.create = create
+
+    def lookup_labelid_from_label(self, label, collectionid):
+        ret = label
+        if collectionid not in self.lookups:
+            try:
+                self.lookups[collectionid] = Concept().get_child_collections(collectionid)
+                ret = self.lookup_labelid_from_label(label, collectionid)
+            except:
+                return label
+        else:
+            for concept in self.lookups[collectionid]:
+                if label == concept[1]:
+                    ret = concept[2]
+        return ret
+
 class CsvWriter(Writer):
 
     def __init__(self, **kwargs):
@@ -265,6 +284,8 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
+                concept_lookup = ConceptLookup()
+                new_concepts = {}
 
                 # This code can probably be moved into it's own module.
                 resourceids = []
@@ -312,7 +333,7 @@ class CsvReader(Reader):
                                     new_row.append({row['arches_nodeid']: value})
                     return new_row
 
-                def transform_value(datatype, value, source):
+                def transform_value(datatype, value, source, nodeid):
                     '''
                     Transforms values from probably string/wkt representation to specified datatype in arches.
                     This code could probably move to somehwere where it can be accessed by other importers.
@@ -321,8 +342,15 @@ class CsvReader(Reader):
                     if datatype != '':
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
+                        if datatype in ['concept']:
+                            try:
+                                uuid.UUID(value)
+                            except:
+                                collection_id = Node.objects.get(nodeid=nodeid).config['rdmCollection']
+                                if collection_id != None:
+                                    value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_import_values(value)
+                            value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
                             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
@@ -407,7 +435,7 @@ class CsvReader(Reader):
                                                 if source_key == target_key:
                                                     if target_tile.data[source_key] == None:
                                                         # If match populate target_tile node with transformed value.
-                                                        value = transform_value(node_datatypes[source_key], source_tile[source_key], row_number)
+                                                        value = transform_value(node_datatypes[source_key], source_tile[source_key], row_number, source_key)
                                                         target_tile.data[source_key] = value['value']
                                                         # target_tile.request = value['request']
                                                         # Delete key from source_tile so we do not populate another tile based on the same data.
@@ -436,7 +464,7 @@ class CsvReader(Reader):
                                                         for source_key in source_column.keys():
                                                             if source_key == target_key:
                                                                 if prototype_tile_copy.data[source_key] == None:
-                                                                    value = transform_value(node_datatypes[source_key], source_column[source_key], row_number)
+                                                                    value = transform_value(node_datatypes[source_key], source_column[source_key], row_number, source_key)
                                                                     prototype_tile_copy.data[source_key] = value['value']
                                                                     # target_tile.request = value['request']
                                                                     del source_column[source_key]

@@ -37,7 +37,7 @@
             <h4>{% trans "Mapbox API" %}</h4>
             <p>{% trans "Arches uses the Mapbox mapping library for map display and data creation. Arches also supports Mapbox basemaps and other services." %}</p>
             <p>
-                {% trans "<strong>Mapbox API Key (Optional)</strong> - By default, Arches uses some basemap web services from Mapbox. You will need to <a href='https://www.mapbox.com/help/create-api-access-token/'>create a free API key</a> (or 'access token') for these services to be activated. Alternatively, you could remove all of the default basemaps and add your own, non-Mapbox layers." %}<br>
+                {% blocktrans %}<strong>Mapbox API Key (Optional)</strong> - By default, Arches uses some basemap web services from Mapbox. You will need to <a href='https://www.mapbox.com/help/create-api-access-token/'>create a free API key</a> (or "access token") for these services to be activated. Alternatively, you could remove all of the default basemaps and add your own, non-Mapbox layers.{% endblocktrans %}<br>
                 {% trans "<strong>Mapbox Sprites</strong> - Path to Mapbox sprites (use default)." %}<br>
                 {% trans "<strong>Mapbox Glyphs</strong> - Path to Mapbox glyphs (use default)." %}<br>
             </p>
@@ -77,8 +77,8 @@
         <div class="ep-help-topic-content">
             <p>{% trans "Arches creates a Time Wheel based on the resources in your database, to allow for quick temporal visualization and queries. A few aspects of this temporal search are defined here." %}</p>
             <p>
-                {% trans "<strong>Color Ramp</strong> - Currently unused (saved for future implementation). The color ramp for the time wheel. For further reference, check out the <a href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md'>d3 API reference</a>." %}<br>
-                {% trans "<strong>Time wheel configuration</strong> - Currently unused (saved for future implementation)." %}
+                {% trans "<strong>Color Ramp</strong> - <em>not currently implemented</em> The color ramp for the time wheel. For further reference, check out the <a href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md'>d3 API reference</a>." %}<br>
+                {% trans "<strong>Time wheel configuration</strong> - <em>not currently implemented</em>" %}
             </p>
         </div>
     </div>

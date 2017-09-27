@@ -39,8 +39,8 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                     });
 
                     self.modal.on('hidden.bs.modal', function (e) {
-                        conceptscheme.save(function() {
-                            self.trigger('conceptSchemeAdded');
+                        conceptscheme.save(function(response, status) {
+                            self.trigger('conceptSchemeAdded', response.responseJSON);
                         }, self);
                     })
                     self.modal.modal('hide');

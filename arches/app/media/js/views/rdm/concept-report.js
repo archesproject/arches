@@ -31,6 +31,7 @@ define([
             'click a[data-toggle="#add-top-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts',
             'click a[data-toggle="#import-concept-form"]': 'importConcept',
+            'click a[data-toggle="#make-collection"]': 'makeCollection',
         },
 
         initialize: function(options) {
@@ -169,6 +170,17 @@ define([
                     self.trigger('parentsChanged');
                 }
             });
+        },    
+
+        makeCollection: function(e){
+            this.model.makeCollection(function(response, status){
+                if(status === 'success'){
+                    this.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.message.title, response.responseJSON.message.text));   
+                }
+                if(status === 'error'){
+                    this.viewModel.alert(new AlertViewModel('ep-alert-red', response.responseJSON.message.title, response.responseJSON.message.text));   
+                }
+            }, this);
         },    
 
         importConcept: function(e){

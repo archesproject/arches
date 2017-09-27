@@ -86,7 +86,6 @@ def concept(request, conceptid):
     pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
-
         include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
         include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
@@ -191,9 +190,12 @@ def concept(request, conceptid):
                 overwrite_options = request.POST.get('overwrite_options', None)
                 staging_options = request.POST.get('staging_options', None)
                 skos = SKOSReader()
-                rdf = skos.read_file(skosfile)
-                ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
-                return JSONResponse(ret)
+                try:
+                    rdf = skos.read_file(skosfile)
+                    ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
+                    return JSONResponse(ret)
+                except:
+                    return JSONResponse({'message':{'title': _('Unable to Load SKOS File'), 'text': _('There was an issue saving the contents of the file to Arches.')}}, status=500)
 
         else:
             data = JSONDeserializer().deserialize(request.body)
@@ -254,9 +256,17 @@ def export_collections(request):
     skos = SKOSWriter()
     return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
 
-def manage_parents(request, conceptid):
-    #  need to check user credentials here
+@group_required('RDM Administrator')
+def make_collection(request, conceptid):
+    concept = Concept().get(id=conceptid, values=[])
+    try:
+        collection_concept = concept.make_collection()
+        return JSONResponse({'collection': collection_concept, 'message':{'title': _('Success'), 'text': _('Collection successfully created from the selected concept')}})
+    except:
+        return JSONResponse({'message':{'title': _('Unable to Make Collection'), 'text': _('Unable to make a collection from the selected concept.')}}, status=500)
 
+@group_required('RDM Administrator')
+def manage_parents(request, conceptid):
     if request.method == 'POST':
         json = request.body
         if json != None:
@@ -264,20 +274,22 @@ def manage_parents(request, conceptid):
 
             with transaction.atomic():
                 if len(data['deleted']) > 0:
-                    concept = Concept({'id':conceptid})
+                    concept = Concept().get(id=conceptid, include=None)
                     for deleted in data['deleted']:
                         concept.addparent(deleted)
 
                     concept.delete()
+                    concept.bulk_index()
 
                 if len(data['added']) > 0:
-                    concept = Concept({'id':conceptid})
+                    concept = Concept().get(id=conceptid)
                     for added in data['added']:
                         concept.addparent(added)
 
                     concept.save()
+                    concept.bulk_index()
 
-                return JSONResponse(data)
+            return JSONResponse(data)
 
     else:
         return HttpResponseNotAllowed(['POST'])
@@ -296,6 +308,23 @@ def dropdown(request):
     results = Concept().get_e55_domain(conceptid)
     return JSONResponse(results)
 
+def paged_dropdown(request):
+    conceptid = request.GET.get('conceptid')
+    query = request.GET.get('query')
+    page = int(request.GET.get('page', 1))
+    limit = 50
+    offset = (page - 1) * limit
+    if query == '':
+        query = None
+    columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
+    results = Concept().get_child_edges(conceptid, ['member', 'hasTopConcept'], child_valuetypes=['prefLabel'], offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
+    total_count = results[0][5] if len(results) > 0 else 0
+    data = [dict(zip(['id', 'conceptid', 'text', 'type', 'depth'], d)) for d in results]
+    return JSONResponse({
+        'results': data,
+        'more': offset+limit < total_count
+    })
+
 def get_pref_label(request):
     valueid = request.GET.get('valueid')
     label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
@@ -312,11 +341,8 @@ def search(request):
 
     ids = []
     if removechildren != None:
-        concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
-        def get_children(concept):
-            ids.append(concept.id)
-
-        concepts.traverse(get_children)
+        ids =  [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
+        ids.append(removechildren)
 
     newresults = []
     cached_scheme_names = {}
@@ -466,5 +492,9 @@ def concept_value(request):
                 value.delete_index()
                 value.delete()
                 return JSONResponse(value)
+    if request.method == 'GET':
+        valueid = request.GET.get('valueid')
+        value = models.Value.objects.get(pk=valueid)
+        return JSONResponse(value)
 
     return HttpResponseNotFound
