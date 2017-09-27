@@ -55,7 +55,7 @@ def forwards_func(apps, schema_editor):
     arches_concept.index()
 
     DValueType = apps.get_model("models", "DValueType")
-    DValueType.objects.create(valuetype='identifier', category='undefined', namespace='dcterms', datatype='text')
+    DValueType.objects.create(valuetype='identifier', category='identifiers', namespace='dcterms', datatype='text')
 
 def reverse_func(apps, schema_editor):
     extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
