@@ -46,18 +46,21 @@
                         <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
                             <div class="crud-card-main" style="left: 5px;">
                                 <div class="related-node-details">
-                                <a class="listitem_name" data-bind="text: name"></a>
-                                <div><i class="node-list-item-icon" data-bind="css: iconclass, style:{'color': color}"></i><a class="listitem_name" data-bind="text: graphname"></a></div>
-                                </div>
+                                <a class="list-item-name" data-bind="text: name"></a>
+                                <div class="graph-name"><i class="resource-graph-node-icon" data-bind="css: iconclass, style:{'background-color': color}"></i><a class="list-item-name graph" data-bind="text: graphname"></a></div>
+                            </div>
                             </div>
 
                             <div class="crud-card-subtitle" style="left: 5px;">
                                 <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
 
-                            <div class="node-list-footer" data-bind="fadeVisible: selected, delay:100, fade: 250">
-                                <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
-                                <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
+                            <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
+                                <div class="rr-fdg-description" data-bind="text: description"></div>
+                                <div class="node-list-footer">
+                                    <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a>
+                                    <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i>{% trans 'Edit' %}</a>
+                                </div>
                             </div>
                         </div>
 

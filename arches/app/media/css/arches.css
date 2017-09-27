@@ -3080,15 +3080,68 @@ input.cmn-toggle-yes-no:checked+label:after {
     margin-bottom: -10px;
 }
 
-.node-list-footer {
-    height: 45px;
+.list-item-name {
+    color: #555;
+    font-size: 16px;
+}
+
+.list-item-name.graph {
+    color: #999;
+    font-size: 14px;
+    padding-left: 3px;
+    margin-top: -3px;
+}
+
+.node-list-details {
     position: absolute;
+    font-size: 11px;
     top: 70px;
     width: 100%;
-    border-top: 1px solid #efefef;
     padding: 5px;
+    margin-left: -5px;
+    background: #fff;
+}
+
+.rr-fdg-description {
+    font-size: 12px;
+    line-height: 1.35;
+    color: #888;
+    background: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.node-list-footer {
+    position: absolute;
+    font-size: 11px;
+    top: 70px;
+    width: 100%;
+    border-top: 1px solid #ddd;
+    padding-left: 5px;
     padding-top: 10px;
-    margin-left: -5px
+    padding-bottom: 11px;
+    margin-left: -5px;
+    background: #fafafa;
+}
+
+.resource-graph-node-icon {
+    display: block;
+    height: 15px;
+    width: 15px;
+    line-height: 15px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    font-size: 0.75em;
+}
+
+.related-node-details .graph-name {
+    display: flex;
+    flex-direction: row;
+    padding-top: 1px;
 }
 
 .node-list-footer a {
@@ -3097,8 +3150,8 @@ input.cmn-toggle-yes-no:checked+label:after {
     padding-right: 10px;
 }
 
-.node-list-item-icon {
-    padding-right: 3px;
+.node-list-footer a i {
+    padding-right: 2px;
 }
 
 .resource-list a.chosen-single {
@@ -5082,7 +5135,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
 }
 
 .library-card.relative.selected {
-    height: 115px;
+    height: 180px;
     -webkit-transition: height 0.25s; /* Safari */
     transition: height 0.25s;
     background: #ffffff;
@@ -7538,7 +7591,7 @@ a.clear-geojson-button:hover {
     text-shadow: 0px 0px 0.08em #fff;
 }
 
-.rr-fdg-name .node-list-item-icon {
+.rr-fdg-name {
     padding-right: 5px;
     padding-top: 2px;
     margin-left: -5px;

@@ -290,7 +290,7 @@ class Command(BaseCommand):
         def load_graphs():
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
-            self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
+            # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             self.import_graphs(branches, overwrite_graphs=False)
             self.import_graphs(resource_models, overwrite_graphs=False)
 
