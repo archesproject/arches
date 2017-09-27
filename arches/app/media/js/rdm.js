@@ -171,15 +171,16 @@ require([
                     var self = this;
                     var form = new DeleteSchemeForm({
                         el: $('#delete-scheme-form'),
-                        model: null
+                        model: null,
+                        viewModel: this.viewModel
                     });
                     form.modal.modal('show');
                     form.on({
                         'conceptSchemeDeleted': function(){
-                            window.location.reload();
+                            window.location = arches.urls.rdm;
                         }
                     })
-                });
+                }.bind(this));
 
                 $('a[data-toggle="#import-scheme-form"]').on( "click", function(){
                     var self = this;
