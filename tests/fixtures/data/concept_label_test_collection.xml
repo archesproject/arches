@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:ConceptScheme rdf:about="http://www.archesproject.org/7c90899a-dbe9-4574-9175-e69481a80b3c">
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://www.archesproject.org/0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8">
+        <skos:inScheme rdf:resource="http://www.archesproject.org/7c90899a-dbe9-4574-9175-e69481a80b3c"/>
+        <skos:prefLabel xml:lang="en-US">{"id": "7949d7b5-6e57-469a-8f38-87aac08e1788", "value": "Test Concept 2"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://www.archesproject.org/6490ac87-ac80-41d7-a135-1119b4cd912d">
+        <skos:prefLabel xml:lang="en-US">{"id": "fad6f17d-f7c8-4fa1-b358-e8626571599e", "value": "Test Concept 3"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://www.archesproject.org/7c90899a-dbe9-4574-9175-e69481a80b3c"/>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://www.archesproject.org/89ff530a-f350-44f0-ac88-bdd8904eb57e">
+        <skos:inScheme rdf:resource="http://www.archesproject.org/7c90899a-dbe9-4574-9175-e69481a80b3c"/>
+        <skos:prefLabel xml:lang="en-US">{"id": "9fa56006-6828-480f-8395-ad5c5a84726b", "value": "Test Concept 1"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <dcterms:title xml:lang="en-US">{"id": "f5e1a756-c658-4a3c-bc3a-e9293242e8f7", "value": "Concept Label Import Test"}</dcterms:title>
+  </skos:ConceptScheme>
+</rdf:RDF>

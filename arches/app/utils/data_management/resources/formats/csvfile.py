@@ -37,6 +37,7 @@ class ConceptLookup():
     def __init__(self, create=False):
         self.lookups = {}
         self.create = create
+        self.add_domain_values_to_lookups()
 
     def lookup_labelid_from_label(self, label, collectionid):
         ret = label
@@ -51,6 +52,14 @@ class ConceptLookup():
                 if label == concept[1]:
                     ret = concept[2]
         return ret
+
+    def add_domain_values_to_lookups(self):
+        for node in Node.objects.filter(datatype='domain-value'):
+            domain_collection_id = str(node.nodeid)
+            self.lookups[domain_collection_id] = []
+            for val in node.config['options']:
+                self.lookups[domain_collection_id].append(('0', val['text'], val['id']))
+
 
 class CsvWriter(Writer):
 
@@ -342,11 +351,14 @@ class CsvReader(Reader):
                     if datatype != '':
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
-                        if datatype in ['concept']:
+                        if datatype in ['concept', 'domain-value']:
                             try:
                                 uuid.UUID(value)
                             except:
-                                collection_id = Node.objects.get(nodeid=nodeid).config['rdmCollection']
+                                if datatype == 'domain-value':
+                                    collection_id = nodeid
+                                else:
+                                    collection_id = Node.objects.get(nodeid=nodeid).config['rdmCollection']
                                 if collection_id != None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
