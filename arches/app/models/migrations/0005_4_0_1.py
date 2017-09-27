@@ -54,6 +54,9 @@ def forwards_func(apps, schema_editor):
     arches_concept = Concept().get(id='00000000-0000-0000-0000-000000000001', include=['label'])
     arches_concept.index()
 
+    DValueType = apps.get_model("models", "DValueType")
+    DValueType.objects.create(valuetype='identifier', category='identifiers', namespace='dcterms', datatype='text')
+
 def reverse_func(apps, schema_editor):
     extensions = [os.path.join(settings.ONTOLOGY_PATH, x) for x in settings.ONTOLOGY_EXT]
     management.call_command('load_ontology', source=os.path.join(settings.ONTOLOGY_PATH, settings.ONTOLOGY_BASE),
@@ -75,6 +78,12 @@ def reverse_func(apps, schema_editor):
     query = Query(se, start=0, limit=10000)
     query.add_query(Term(field='conceptid', term='00000000-0000-0000-0000-000000000001'))
     query.delete(index='strings', doc_type='concept')
+
+    try:
+        DValueType = apps.get_model("models", "DValueType")
+        DValueType.objects.get(valuetype='identifier').delete()
+    except:
+        pass
 
 class Migration(migrations.Migration):
 

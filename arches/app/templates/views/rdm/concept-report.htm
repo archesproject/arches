@@ -277,10 +277,16 @@
                 </h5>
             </dt>
 
-            <dd class="arches-RDM-note">
-                {% trans "Arches ID:" %} {{concept.id}} </br>
-                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+            <dd class="arches-concept-heirarchy">
+                {% trans "Arches ID:" %} {{concept.id}}
             </dd>
+            {% for value in concept.values %}
+                {% if value.category == 'identifiers' %}
+                    <dd class="arches-concept-heirarchy">
+                        <a href="{{value.value}}" target="_blank">{{value.value}}</a>
+                    </dd>
+                {% endif %}
+            {% endfor %}
 
             </dl>
         </div>
