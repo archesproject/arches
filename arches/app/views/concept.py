@@ -317,7 +317,7 @@ def paged_dropdown(request):
     if query == '':
         query = None
     columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
-    results = Concept().get_child_edges(conceptid, ['member', 'hasTopConcept'], offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
+    results = Concept().get_child_edges(conceptid, ['member', 'hasTopConcept'], child_valuetypes=['prefLabel'], offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
     total_count = results[0][5] if len(results) > 0 else 0
     data = [dict(zip(['id', 'conceptid', 'text', 'type', 'depth'], d)) for d in results]
     return JSONResponse({
