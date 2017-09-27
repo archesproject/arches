@@ -27,6 +27,7 @@ from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
 from arches.app.models.tile import Tile
+import arches.app.models.models as models
 from arches.app.models.models import ResourceInstance
 from arches.app.models.models import FunctionXGraph
 from arches.app.models.models import NodeGroup
@@ -102,33 +103,33 @@ class ArchesFileReader(Reader):
             if mapping == None or mapping == '':
                 for resource in business_data['resources']:
                     if resource['resourceinstance'] != None:
-
-                        resourceinstance, created = ResourceInstance.objects.update_or_create(
-                            resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
-                            defaults = {
-                                'graph_id': uuid.UUID(str(resource['resourceinstance']['graph_id'])),
-                                'legacyid': resource['resourceinstance']['legacyid']
-                            }
-                        )
-                        if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
-                            reporter.update_resources_saved()
-
-                    if resource['tiles'] != []:
-                        reporter.update_tiles(len(resource['tiles']))
-                        for tile in resource['tiles']:
-                            tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
-
-                            tile, created = Tile.objects.update_or_create(
-                                tileid = uuid.UUID(str(tile['tileid'])),
+                        if models.GraphModel.objects.filter(graphid=str(resource['resourceinstance']['graph_id'])).count() > 0:
+                            resourceinstance, created = ResourceInstance.objects.update_or_create(
+                                resourceinstanceid = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid'])),
                                 defaults = {
-                                    'resourceinstance': resourceinstance,
-                                    'parenttile': Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
-                                    'nodegroup': NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
-                                    'data': tile['data']                                
+                                    'graph_id': uuid.UUID(str(resource['resourceinstance']['graph_id'])),
+                                    'legacyid': resource['resourceinstance']['legacyid']
                                 }
                             )
-                            if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
-                                reporter.update_tiles_saved()
+                            if len(ResourceInstance.objects.filter(resourceinstanceid=resource['resourceinstance']['resourceinstanceid'])) == 1:
+                                reporter.update_resources_saved()
+
+                            if resource['tiles'] != []:
+                                reporter.update_tiles(len(resource['tiles']))
+                                for tile in resource['tiles']:
+                                    tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
+
+                                    tile, created = Tile.objects.update_or_create(
+                                        tileid = uuid.UUID(str(tile['tileid'])),
+                                        defaults = {
+                                            'resourceinstance': resourceinstance,
+                                            'parenttile': Tile(uuid.UUID(str(tile['parenttile_id']))) if tile['parenttile_id'] else None,
+                                            'nodegroup': NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None,
+                                            'data': tile['data']
+                                        }
+                                    )
+                                    if len(Tile.objects.filter(tileid=tile.tileid)) == 1:
+                                        reporter.update_tiles_saved()
             else:
 
                 blanktilecache = {}
