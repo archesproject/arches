@@ -156,7 +156,6 @@ define([
                         this.graphid = rr.resource_instance.graph_id;
                     },
                     get: function() {
-                        console.log(this)
                         $.ajax({
                                 url: arches.urls.related_resources + resourceinstanceid,
                                 context: this,
