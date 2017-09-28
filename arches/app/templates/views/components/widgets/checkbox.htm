@@ -5,7 +5,7 @@
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
-        </label>
+        </label><i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <div class="col-xs-12">
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
                 <label class="form-checkbox form-normal form-primary form-text"
