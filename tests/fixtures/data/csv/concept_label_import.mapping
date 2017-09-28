@@ -1,0 +1,64 @@
+{
+    "resource_model_id": "8e672ab0-c6e2-11e6-9725-685b3597724b", 
+    "resource_model_name": "Target", 
+    "nodes": [
+        {
+            "arches_nodeid": "8e673623-c6e2-11e6-92cf-685b3597724b", 
+            "arches_node_name": "child 1-1", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "8e674da8-c6e2-11e6-bc55-685b3597724b", 
+            "arches_node_name": "child 1-n", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "8e673a21-c6e2-11e6-a15b-685b3597724b", 
+            "arches_node_name": "child n-1", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "8e6749ca-c6e2-11e6-817b-685b3597724b", 
+            "arches_node_name": "child n-n", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "4120298c-a3d9-11e7-9979-b8f6b115d7dd", 
+            "arches_node_name": "concept value label import", 
+            "file_field_name": "Concept Value",
+            "data_type": "concept", 
+            "concept_export_value": "label", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "6fbbc273-a3d1-11e7-8615-b8f6b115d7dd", 
+            "arches_node_name": "domain value label import", 
+            "file_field_name": "",
+            "data_type": "domain-value", 
+            "concept_export_value": "label", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "8e674600-c6e2-11e6-a906-685b3597724b", 
+            "arches_node_name": "single 1", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }, 
+        {
+            "arches_nodeid": "8e672c7d-c6e2-11e6-958d-685b3597724b", 
+            "arches_node_name": "single n", 
+            "file_field_name": "",
+            "data_type": "string", 
+            "export": false
+        }
+    ]
+}

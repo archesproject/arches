@@ -605,6 +605,10 @@ class Command(BaseCommand):
 
         management.call_command('migrate')
 
+        self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
+        self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
+
+
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
 
