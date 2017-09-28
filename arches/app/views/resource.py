@@ -352,7 +352,7 @@ class RelatedResourcesView(BaseManagerView):
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
         if related_resources is not None:
             total=related_resources['total']
-            paginator, pages = get_paginator(request, related_resources, total, page, settings.SEARCH_ITEMS_PER_PAGE)
+            paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
             page = paginator.page(page)
 
             ret = {}

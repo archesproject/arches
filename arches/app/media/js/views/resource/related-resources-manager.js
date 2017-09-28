@@ -35,6 +35,7 @@ define([
             this.graphs = _.indexBy(viewData.createableResources, 'graphid');
             this.selectedOntologyClass = ko.observable();
             this.resourceRelationships = ko.observableArray();
+            this.paginator = koMapping.fromJS({});
 
             this.selectedOntologyClass.subscribe(function() {
                 self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
@@ -114,15 +115,21 @@ define([
                 return res;
             });
 
+            this.newPage = function(page, e){
+                if(page){
+                    this.currentResource().get(page)
+                }
+            },
+
             this.createResource = function(resourceinstanceid) {
                 return {
                     resourceinstanceid: resourceinstanceid,
                     relatedresources: ko.observableArray(),
                     relationships: ko.observableArray(),
                     resourceRelationships: ko.observableArray(),
+                    paging: ko.observable(),
                     parse: function(data, viewModel) {
                         var rr = data.related_resources;
-                        var paginator = data.paginator;
                         var relationshipsWithResource = [];
                         var resources = rr.related_resources;
                         rr.resource_relationships.forEach(function(relationship) {
@@ -151,17 +158,19 @@ define([
                             .sortBy(function(relate) {
                                 return relate.created;
                             }).value().reverse();
+                        this.paging(data.paginator);
                         this.resourceRelationships(sorted);
                         this.displayname = rr.resource_instance.displayname;
                         this.graphid = rr.resource_instance.graph_id;
                     },
-                    get: function() {
+                    get: function(newPage) {
+                        var page = newPage || 1
                         $.ajax({
                                 url: arches.urls.related_resources + resourceinstanceid,
                                 context: this,
                                 dataType: 'json',
                                 data: {
-                                    page: 1
+                                    page: page
                                 }
                             })
                             .done(function(data) {
@@ -262,12 +271,19 @@ define([
                 this.currentResource().resourceRelationships.subscribe(function(val) {
                     this.resourceRelationships(val);
                 }, this)
+                this.currentResource().paging.subscribe(function(val) {
+                    koMapping.fromJS(val, this.paginator);
+                }, this)
             } else {
                 this.searchResults.showRelationships.subscribe(function(val) {
                     self.currentResource(self.createResource(val.resourceinstanceid))
                     self.getRelatedResources();
                     self.currentResource().resourceRelationships.subscribe(function(val) {
                         self.resourceRelationships(val);
+                    }, self)
+                    self.currentResource().paging.subscribe(function(val) {
+                        koMapping.fromJS(val, self.paginator);
+                        console.log(self)
                     }, self)
                 })
             }
