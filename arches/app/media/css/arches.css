@@ -141,7 +141,15 @@
 }
 
 .card-grid-item.card-locked .mar-no {
-    background-color: #ececec;
+    background-color: #fafafa;
+}
+
+.card-locked div div > .library-card-panel-title {
+    color: #888;
+}
+
+.card-locked div div a.pull-right.disabled {
+    color: #888; 
 }
 
 .branch-item {
@@ -3851,7 +3859,8 @@ span.editable-card i.fa.fa-align-justify:hover {
     float: left;
     width: 290px;
     border: 1px solid #ddd;
-    opacity: .79;
+    background: #fff;
+    opacity: .9;
     margin: 3px;
 }
 
