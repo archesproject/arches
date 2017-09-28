@@ -7524,7 +7524,7 @@ a.clear-geojson-button:hover {
     display: flex;
     flex-direction: row;
     padding: 5px;
-    background-color: #f4f4f4;
+    background-color: #fff;
 }
 
 .rr-fdg-details {
@@ -7567,6 +7567,15 @@ a.clear-geojson-button:hover {
 .related-node-details {
     display: flex;
     flex-direction: column;
+}
+
+.list-item-name {
+    font-size: 14px;
+    margin-top: -5px;
+}
+
+.list-item-model-name {
+    font-size: 12px;
 }
 
 .iiif-widget {
