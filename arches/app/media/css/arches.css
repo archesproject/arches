@@ -8847,14 +8847,21 @@ a.search-facet-item.disabled {
 }
 
 @media print {
-    header, nav, footer, button, aside, .print-btn {
+    header,
+    nav,
+    footer,
+    button,
+    aside,
+    .print-btn,
+    .ep-tools,
+    .geocode-container,
+    .geometry-tools-container,
+    .geometry-editing-notifications,
+    #map-widget-container > .map-widget-container {
         display: none;
     }
     #content-container {
         padding: 0 !important;
-    }
-    .rp-report-tile {
-        padding-left: 340px;
     }
     .scroll-y {
         height: auto;
@@ -8867,7 +8874,26 @@ a.search-facet-item.disabled {
     dd {
         margin-left: 2px;
     }
-    .ep-tools {
-        display: none;
+    a[href]:after{
+        content: none;
+    }
+    .dl-horizontal dd {
+        margin-left: 280px;
+        padding-right: 100px;
+    }
+    .dl-horizontal dt {
+        float: left;
+        width: 260px;
+        overflow: hidden;
+        clear: left;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .rp-report-section {
+        border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    }
+    .mapboxgl-canvas {
+        width: calc(100% - 0px) !important;
     }
 }

@@ -257,6 +257,7 @@ class ResourceReportView(BaseManagerView):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         resource = Resource.objects.get(pk=resourceid)
+        displayname = resource.displayname
         resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
         related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
@@ -330,6 +331,7 @@ class ResourceReportView(BaseManagerView):
             graph_name=resource_instance.graph.name,
             graph_json = JSONSerializer().serialize(graph),
             resourceid=resourceid,
+            displayname=displayname,
          )
 
         if graph.iconclass:
