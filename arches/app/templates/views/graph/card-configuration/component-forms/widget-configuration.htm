@@ -21,16 +21,6 @@
             </div>
         </div>
 
-        <div class="node-widget-label">
-            <span class="switch switch-small arches-switch" data-bind="css: {'on': widget().node.isrequired()}, click: function (){ widget().node.isrequired( !widget().node.isrequired() ) }"><small></small></span>
-
-            <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
-                {% trans "Required" %}
-            </p>
-            <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                {% trans "Activate to require that data be collected for this node when a card value is edited" %}
-            </span>
-        </div>
 
         <div data-bind='component: {
             name: widgetLookup[widget().get("widget_id")()].name,
@@ -50,6 +40,7 @@
         }'></div>
         <!-- /ko -->
 
+
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Template" %}
@@ -57,6 +48,17 @@
             <div class="pad-no" data-bind="with: widget">
                 <select class="design" data-bind="value: $data.get('widget_id'), options: $parent.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
+        </div>
+
+        <div class="node-widget-label">
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': widget().node.isrequired()}, click: function (){ widget().node.isrequired( !widget().node.isrequired() ) }"><small></small></span>
+
+            <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
+                {% trans "Required" %}
+            </p>
+            <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                {% trans "Activate to require that data be collected for this node when a card value is edited" %}
+            </span>
         </div>
 
     </div>
