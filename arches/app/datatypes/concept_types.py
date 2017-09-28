@@ -71,20 +71,6 @@ class ConceptDataType(BaseConceptDataType):
 
     def transform_import_values(self, value, nodeid):
         ret = value.strip()
-        # try:
-        #     uuid.UUID(ret)
-        # except:
-        #     collection_id = models.Node.objects.get(nodeid=nodeid).config['rdmCollection']
-        #     if collection_id:
-        #         collection = concept.Concept().get_child_concepts(collection_id, ['member'], ['prefLabel'], 'prefLabel')
-        #
-        #         for c in collection:
-        #             if value == c[3]:
-        #                 ret = c[5]
-        #
-        #     if ret == None:
-        #         ret = value.strip()
-
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
