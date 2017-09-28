@@ -1501,6 +1501,17 @@ define([
                     self.map.getMinZoom() >= self.map.getZoom() ? self.atMinZoom(true) : self.atMinZoom(false)
                 })
 
+                if (window.matchMedia) {
+                    var mediaQueryList = window.matchMedia('print');
+                    mediaQueryList.addListener(function(mql) {
+                        if (mql.matches) {
+                            //beforePrint
+                        } else {
+                            //afterPrint
+                        }
+                    });
+                }
+
                 if (this.context === 'search-filter') {
                     self.map.on('dragend', this.searchByExtent);
                     self.map.on('zoomend', this.searchByExtent);
