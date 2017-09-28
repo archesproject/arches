@@ -5,7 +5,6 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
         this.reportDate = moment().format('MMMM D, YYYY');
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
-
         this.config = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
