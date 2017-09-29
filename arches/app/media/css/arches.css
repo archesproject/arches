@@ -3407,14 +3407,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .relatedlink {
-    stroke: #E4E4E4;
+    stroke: #4291d7;
     stroke-width: 3px;
     stroke-dasharray: 8, 5;
 }
 
 .linkMouseover {
     /*Styles the link between selected/moused-over nodes*/
-    stroke: #a1a1a1;
+    stroke: #063967;
     stroke-opacity: .6;
     stroke-width: 5px;
 }
