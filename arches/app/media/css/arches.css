@@ -7627,6 +7627,9 @@ a.clear-geojson-button:hover {
     flex-direction: row;
     padding: 5px;
     background-color: #fff;
+    border-bottom-style: solid;
+    border-color: #ddd;
+    border-width: 1px;
 }
 
 .rr-fdg-model-name {
@@ -7641,7 +7644,6 @@ a.clear-geojson-button:hover {
     font-style: italic;
     padding-top: 3px;
     padding-bottom: 3px;
-    border-top-style: solid;
     border-bottom-style: solid;
     border-color: #ddd;
     border-width: 1px;
