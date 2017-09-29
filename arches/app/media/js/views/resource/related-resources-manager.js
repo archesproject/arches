@@ -283,7 +283,6 @@ define([
                     }, self)
                     self.currentResource().paging.subscribe(function(val) {
                         koMapping.fromJS(val, self.paginator);
-                        console.log(self)
                     }, self)
                 })
             }
