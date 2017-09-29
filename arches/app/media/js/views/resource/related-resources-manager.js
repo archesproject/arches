@@ -35,6 +35,7 @@ define([
             this.graphs = _.indexBy(viewData.createableResources, 'graphid');
             this.selectedOntologyClass = ko.observable();
             this.resourceRelationships = ko.observableArray();
+            this.paginator = koMapping.fromJS({});
 
             this.selectedOntologyClass.subscribe(function() {
                 self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
@@ -114,16 +115,24 @@ define([
                 return res;
             });
 
+            this.newPage = function(page, e){
+                if(page){
+                    this.currentResource().get(page)
+                }
+            },
+
             this.createResource = function(resourceinstanceid) {
                 return {
                     resourceinstanceid: resourceinstanceid,
                     relatedresources: ko.observableArray(),
                     relationships: ko.observableArray(),
                     resourceRelationships: ko.observableArray(),
+                    paging: ko.observable(),
                     parse: function(data, viewModel) {
+                        var rr = data.related_resources;
                         var relationshipsWithResource = [];
-                        var resources = data.related_resources;
-                        data.resource_relationships.forEach(function(relationship) {
+                        var resources = rr.related_resources;
+                        rr.resource_relationships.forEach(function(relationship) {
                             var res = _.filter(resources, function(resource) {
                                 if (_.contains([relationship.resourceinstanceidto, relationship.resourceinstanceidfrom], resource.resourceinstanceid)) {
                                     return resource;
@@ -149,15 +158,20 @@ define([
                             .sortBy(function(relate) {
                                 return relate.created;
                             }).value().reverse();
+                        this.paging(data.paginator);
                         this.resourceRelationships(sorted);
-                        this.displayname = data.resource_instance.displayname;
-                        this.graphid = data.resource_instance.graph_id;
+                        this.displayname = rr.resource_instance.displayname;
+                        this.graphid = rr.resource_instance.graph_id;
                     },
-                    get: function() {
+                    get: function(newPage) {
+                        var page = newPage || 1
                         $.ajax({
                                 url: arches.urls.related_resources + resourceinstanceid,
                                 context: this,
-                                dataType: 'json'
+                                dataType: 'json',
+                                data: {
+                                    page: page
+                                }
                             })
                             .done(function(data) {
                                 this.parse(data, self)
@@ -257,12 +271,18 @@ define([
                 this.currentResource().resourceRelationships.subscribe(function(val) {
                     this.resourceRelationships(val);
                 }, this)
+                this.currentResource().paging.subscribe(function(val) {
+                    koMapping.fromJS(val, this.paginator);
+                }, this)
             } else {
                 this.searchResults.showRelationships.subscribe(function(val) {
                     self.currentResource(self.createResource(val.resourceinstanceid))
                     self.getRelatedResources();
                     self.currentResource().resourceRelationships.subscribe(function(val) {
                         self.resourceRelationships(val);
+                    }, self)
+                    self.currentResource().paging.subscribe(function(val) {
+                        koMapping.fromJS(val, self.paginator);
                     }, self)
                 })
             }

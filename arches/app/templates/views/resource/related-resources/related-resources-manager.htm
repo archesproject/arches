@@ -14,9 +14,25 @@
         <!--ko if: graphNodeSelection().length == 2 -->
         <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
             <div>
-                <div class="rr-fdg-name"><div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'color': graphNodeSelection()[0].color}"></i><div data-bind="text: graphNodeSelection()[0].graphname"></span></div></div></div>
+                <div class="rr-fdg-name">
+                    <div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div>
+                    <span class="rr-fdg-model-name">
+                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'background-color': graphNodeSelection()[0].color}"></i>
+                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[0].graphname">
+                    </span>
+                    </div>
+                </div>
+                </div>
                 <div class="rr-fdg-edge" data-bind="text: graphNodeSelection()[0].relationship"></div>
-                <div class="rr-fdg-name"><div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'color': graphNodeSelection()[1].color}"></i><div data-bind="text: graphNodeSelection()[1].graphname"></span></div></div></div>
+                <div class="rr-fdg-name">
+                    <div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div>
+                    <span class="rr-fdg-model-name">
+                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'background-color': graphNodeSelection()[1].color}"></i>
+                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[1].graphname">
+                    </span>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
         <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().first.absY - 25) + 'px', left: (panelPosition().first.absX + 20) + 'px'}">1</div>
@@ -47,7 +63,7 @@
                             <div class="crud-card-main" style="left: 5px;">
                                 <div class="related-node-details">
                                 <a class="list-item-name" data-bind="text: name"></a>
-                                <div><i class="node-list-item-icon" data-bind="css: iconclass, style:{'color': color}"></i><a class="list-item-model-name" data-bind="text: graphname"></a></div>
+                                <div class="graph-name"><i class="resource-graph-node-icon" data-bind="css: iconclass, style:{'background-color': color}"></i><a class="list-item-model-name" data-bind="text: graphname"></a></div>
                                 </div>
                             </div>
 
@@ -55,9 +71,12 @@
                                 <span data-bind="text: loaded"></span> {% trans 'out of' %} <span data-bind="text: total"></span>{% trans 'relations loaded' %}<div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
                             </div>
 
-                            <div class="node-list-footer" data-bind="fadeVisible: selected, delay:100, fade: 250">
-                                <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i> Report</a>
-                                <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i> Edit</a>
+                            <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
+                                <div class="rr-fdg-description" data-bind="text: description"></div>
+                                <div class="node-list-footer">
+                                    <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a>
+                                    <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i>{% trans 'Edit' %}</a>
+                                </div>
                             </div>
                         </div>
 
@@ -222,10 +241,11 @@
                                 <!--/ko-->
                             </tr>
                         </thead>
-                        <tbody data-bind="dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
+                        <tbody data-bind='dataTablesForEach: {data: resourceRelationships, dataTableOptions: {
                                               jQueryUI: true,
-                                              paging: true,
-                                              dom: 'rtip',
+                                              paging: false,
+                                              dom: "rtip",
+                                              bInfo : false,
                                               columns: columnConfig,
                                               fnInitComplete: function() {
                                                 var self = this;
@@ -235,7 +255,7 @@
                                                 }, 1000);
                                                 }
                                           }
-                                      }">
+                                      }'>
                             <tr class="rr-table-row" data-bind="click: updateSelection(), css: {'unselectable': unselectable}">
                                 <td>
                                     <i data-bind="css: {'ion-checkmark-circled': selected}"></i>
@@ -266,6 +286,28 @@
                             </tr>
                         </tbody>
                     </table>
+                    <!-- Pagination -->
+                    <!-- ko if: paginator -->
+                    <div data-bind="with: paginator">
+                        <div class="text-center">
+                            <ul class="pagination">
+                                <li><a data-bind="css: {'disabled': !has_previous()}, click: $parent.newPage.bind($parent, previous_page_number())" href="#">«</a></li>
+                                <!-- ko foreach: { data: pages, as: 'page' } -->
+                                    <!-- ko if: page -->
+                                    <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page())}">
+                                        <a href="#" data-bind="text: page, attr:{'data-page':page}"></a>
+                                    </li>
+                                    <!-- /ko -->
+                                    <!-- ko ifnot: page -->
+                                    <li class="disabled"><a href="#">...</a></li>
+                                    <!-- /ko -->
+                                <!-- /ko -->
+                                <li><a data-bind="css: { 'disabled': !has_next()}, click: $parent.newPage.bind($parent, next_page_number())" href="#">»</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- End Pagination -->
                     <!--/ko -->
 
                     <!--ko if: resourceRelationships().length === 0 -->

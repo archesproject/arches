@@ -249,7 +249,7 @@ define([
 
                     .on("click", function(d) {
                         if (!d3.event.defaultPrevented) {
-                            getResourceDataForNode(d);
+                            d.loadcount(d.loadcount()+1)
                         }
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
@@ -379,12 +379,14 @@ define([
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
+                var page;
                 var rootNode = nodeMap[resourceId];
 
                 if (rootNode) {
                     if (rootNode.relationCount) {
                         load = (rootNode.relationCount.total > rootNode.relationCount.loaded && !rootNode.loading);
                         start = rootNode.relationCount.loaded;
+                        page = rootNode.loadcount();
                     }
                 }
 
@@ -392,15 +394,18 @@ define([
                     if (rootNode) {
                         rootNode.loading = true;
                     }
+
                     $.ajax({
                         url: arches.urls.related_resources + resourceId,
                         data: {
-                            start: start
+                            start: start,
+                            page: page
                         },
                         success: function(response) {
-                            var links = [],
-                                nodes = [];
-
+                            var links = [];
+                            var nodes = [];
+                            var rr = response.related_resources;
+                            var total_loaded;
                             if (isRoot) {
                                 nodeSelection.removeAll();
                                 selectedState(false);
@@ -408,39 +413,42 @@ define([
                                     id: newNodeId,
                                     entityid: resourceId,
                                     name: resourceName,
+                                    description: rr.resource_instance.displaydescription,
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
-                                    graphname: response.node_config_lookup[response.resource_instance.graph_id].name,
-                                    iconclass: response.node_config_lookup[response.resource_instance.graph_id].iconclass,
-                                    color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
+                                    graphname: rr.node_config_lookup[rr.resource_instance.graph_id].name,
+                                    iconclass: rr.node_config_lookup[rr.resource_instance.graph_id].iconclass,
+                                    color: rr.node_config_lookup[rr.resource_instance.graph_id].fillColor,
                                     relationCount: {
-                                        total: response.total,
-                                        loaded: response.resource_relationships.length
+                                        total: rr.total,
+                                        loaded: rr.resource_relationships.length
                                     }
                                 };
                                 nodes.push(rootNode);
                                 nodeMap[resourceId] = rootNode;
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
-                                rootNode.relationCount.loaded = rootNode.relationCount.loaded + response.resource_relationships.length;
+                                total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length
+                                rootNode.relationCount.loaded = total_loaded <= rr.total ? total_loaded : total_loaded - 1;
                             } else {
                                 rootNode.relationCount = {
-                                    total: response.total,
-                                    loaded: response.resource_relationships.length
+                                    total: rr.total,
+                                    loaded: rr.resource_relationships.length
                                 };
                             }
                             rootNode.loading = false;
                             updateNodeInfo(rootNode);
 
                             var getRelated = function(related_resource) {
-                                var nodeConfigLookup = response.node_config_lookup;
+                                var nodeConfigLookup = rr.node_config_lookup;
                                 if (!nodeMap[related_resource.resourceinstanceid]) {
                                     var node = {
                                         id: newNodeId,
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
+                                        description: related_resource.displaydescription,
                                         color: nodeConfigLookup[related_resource.graph_id].fillColor,
                                         iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
                                         graphname: nodeConfigLookup[related_resource.graph_id].name,
@@ -457,9 +465,9 @@ define([
                                 }
                             }
 
-                            _.each(response.related_resources, getRelated);
+                            _.each(rr.related_resources, getRelated);
 
-                            _.each(response.resource_relationships, function(resource_relationships) {
+                            _.each(rr.resource_relationships, function(resource_relationships) {
                                 var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];
                                 var targetId = nodeMap[resource_relationships.resourceinstanceidto];
                                 var linkExists = _.find(data.links, function(link) {
@@ -532,6 +540,9 @@ define([
                     if (item.selectedSubscription === undefined) {
                         item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
                         item.hovered.subscribe(updateHovered(item), this)
+                        if (item.isRoot) {
+                            item.loadcount(1)
+                        };
                         item.loadcount.subscribe(getMoreData(item), this)
                     }
                     if (item.relationCount) {
