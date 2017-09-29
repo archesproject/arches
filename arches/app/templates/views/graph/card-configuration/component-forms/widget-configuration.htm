@@ -50,8 +50,10 @@
             </div>
         </div>
 
-        <div class="node-widget-label">
-            <span class="switch switch-small arches-switch" data-bind="css: {'on': widget().node.isrequired()}, click: function (){ widget().node.isrequired( !widget().node.isrequired() ) }"><small></small></span>
+        <!-- ko if: ko.isObservable(card) -->
+        <div class="node-widget-label switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
+
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': widget().node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
 
             <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
                 {% trans "Required" %}
@@ -60,6 +62,7 @@
                 {% trans "Activate to require that data be collected for this node when a card value is edited" %}
             </span>
         </div>
+        <!-- /ko -->
 
     </div>
 
