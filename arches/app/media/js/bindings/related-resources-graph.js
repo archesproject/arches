@@ -502,7 +502,6 @@ define([
 
                             _.each(links, function(l){
                                 if (_.has(linkMap, l.source.id + '_' + l.target.id)) {
-                                    console.log('here')
                                     l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships
                                 }
                             })
