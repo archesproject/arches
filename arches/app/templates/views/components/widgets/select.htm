@@ -5,7 +5,10 @@
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
-        </label><i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        </label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
         <div class="col-xs-12">
             <input style="width:30%; display:inline-block;"
                 data-bind="select2: {

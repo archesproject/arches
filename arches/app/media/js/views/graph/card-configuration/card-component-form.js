@@ -44,6 +44,23 @@ define([
                 }
             };
 
+            this.checkIfImmutable = function() {
+                var isImmutable = false;
+                var card = self.card();
+                if (card) {
+                    isImmutable = !card.get('is_editable');
+                }
+                return isImmutable;
+            }
+
+            this.toggleRequired = function() {
+                    var nodeRequired = this.widget().node.isrequired;
+                    var cardEditable = this.card().get('is_editable');
+                    if (cardEditable === true) {
+                        nodeRequired(!nodeRequired());
+                    }
+            };
+
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);

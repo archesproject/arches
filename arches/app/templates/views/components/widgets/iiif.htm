@@ -3,7 +3,10 @@
 
 {% block form %}
 <div class="row widget-wrapper iiif-widget">
-    <label class="control-label widget-input-label" for="" data-bind="text:label"></label><i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+    <!-- ko if: node -->
+    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <!-- /ko -->
     <div class="iiif-wrapper" data-bind="css: {'expanded-iiif': expanded()}">
         <div class="relative" style="z-index:5000">
 
