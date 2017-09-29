@@ -352,6 +352,13 @@ class RelatedResourcesView(BaseManagerView):
         paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
         page = paginator.page(page)
 
+        def parse_relationshiptype_label(relationship):
+            if relationship['relationshiptype_label'].startswith('http'):
+                relationship['relationshiptype_label'] = relationship['relationshiptype_label'].rsplit('/')[-1]
+            return relationship
+
+        related_resources['resource_relationships'] = [parse_relationshiptype_label(r) for r in related_resources['resource_relationships']]
+
         ret = {}
         ret['related_resources'] = related_resources
         ret['paginator'] = {}
