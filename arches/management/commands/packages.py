@@ -373,13 +373,10 @@ class Command(BaseCommand):
         """
         # resource_remover.delete_resources(load_id)
         if not force:
-            opt = raw_input("all resources will be removed from your database. continue? y/n ")
-        else:
-            opt = "y"
-        if opt.lower().startswith("y"):
-            resource_remover.clear_resources()
-        else:
-            print "operation cancelled."
+            if not utils.get_yn_input("all resources will be removed. continue?"):
+                return
+        
+        resource_remover.clear_resources()
         return
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
