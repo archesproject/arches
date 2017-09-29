@@ -540,6 +540,9 @@ define([
                     if (item.selectedSubscription === undefined) {
                         item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
                         item.hovered.subscribe(updateHovered(item), this)
+                        if (item.isRoot) {
+                            item.loadcount(1)
+                        };
                         item.loadcount.subscribe(getMoreData(item), this)
                     }
                     if (item.relationCount) {
