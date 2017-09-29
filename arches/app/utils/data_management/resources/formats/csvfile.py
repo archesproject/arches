@@ -40,6 +40,12 @@ class ConceptLookup():
         self.add_domain_values_to_lookups()
 
     def lookup_labelid_from_label(self, label, collectionid):
+        ret = []
+        for la in label.split(','):
+            ret.append(self.lookup_label(la.strip(), collectionid))
+        return (',').join(ret)
+
+    def lookup_label(self, label, collectionid):
         ret = label
         if collectionid not in self.lookups:
             try:
@@ -54,7 +60,7 @@ class ConceptLookup():
         return ret
 
     def add_domain_values_to_lookups(self):
-        for node in Node.objects.filter(datatype='domain-value'):
+        for node in Node.objects.filter(Q(datatype='domain-value') | Q(datatype='domain-value-list')):
             domain_collection_id = str(node.nodeid)
             self.lookups[domain_collection_id] = []
             for val in node.config['options']:
@@ -251,7 +257,7 @@ class CsvReader(Reader):
                     ret = Resource.objects.filter(resourceinstanceid=resourceid)
                     # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
                     if overwrite == 'overwrite':
-                        Resource(str(ret[0].resourceinstanceid)).delete()
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
                     resourceinstanceid = resourceinstanceid
                 # If resourceid is not a UUID create one.
                 except:
@@ -268,7 +274,7 @@ class CsvReader(Reader):
                 # If a resource is returned with the give legacyid then return its archesid
                 else:
                     if overwrite == 'overwrite':
-                        Resource(str(ret[0].resourceinstanceid)).delete()
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
                     resourceinstanceid = ret[0].resourceinstanceid
 
             return resourceinstanceid
@@ -351,11 +357,11 @@ class CsvReader(Reader):
                     if datatype != '':
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
-                        if datatype in ['concept', 'domain-value']:
+                        if datatype in ['concept', 'domain-value', 'concept-list', 'domain-value-list']:
                             try:
                                 uuid.UUID(value)
                             except:
-                                if datatype == 'domain-value':
+                                if datatype in ['domain-value', 'domain-value-list']:
                                     collection_id = nodeid
                                 else:
                                     collection_id = Node.objects.get(nodeid=nodeid).config['rdmCollection']

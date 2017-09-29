@@ -967,7 +967,7 @@ class DomainDataType(BaseDomainDataType):
         errors = []
 
         try:
-            models.Node.objects.get(config__options__0__id=value)
+            models.Node.objects.filter(config__options__contains=[{"id": value}])
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
         return errors
@@ -1026,7 +1026,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for v in value:
             try:
-                models.Node.objects.get(config__options__0__id=v)
+                models.Node.objects.filter(config__options__contains=[{"id": v}])
             except:
                 errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
