@@ -757,6 +757,7 @@ define([
                                 }, self);
                             }, self)
                             data = result;
+                            self.reportData = data;
                             source.setData(data)
                             _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                                 var cacheLayer = self.map.getLayer(layerId);
@@ -1505,9 +1506,17 @@ define([
                     var mediaQueryList = window.matchMedia('print');
                     mediaQueryList.addListener(function(mql) {
                         if (mql.matches) {
-                            //beforePrint
-                        } else {
-                            //afterPrint
+                            if (self.context === 'report-header') {
+                                var geojsonFC = self.reportData;
+                            } else {
+                                var geojsonFC = self.value();
+                            }
+                            var extent = geojsonExtent(geojsonFC);
+                            var bounds = new mapboxgl.LngLatBounds(extent);
+                            self.map.resize();
+                            self.map.fitBounds(bounds, {
+                                padding: self.buffer()
+                            });
                         }
                     });
                 }
