@@ -1,8 +1,10 @@
 {% extends "views/components/widgets/base.htm" %} {% load i18n %} {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label><i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
         <div class="col-xs-12">
 
             <div class="csv-chart-menubar">
