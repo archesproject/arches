@@ -3103,16 +3103,15 @@ input.cmn-toggle-yes-no:checked+label:after {
 }
 
 .list-item-name {
-    /*color: #555;*/
     font-size: 14px;
     margin-top: -5px;
 }
 
 .list-item-model-name {
     font-size: 12px;
-    /*color: #999;
+    font-size: 12px;
+    margin-top: -1px;
     padding-left: 3px;
-    margin-top: -3px;*/
 }
 
 .node-list-details {
@@ -7598,13 +7597,6 @@ a.clear-geojson-button:hover {
     flex-direction: column;
 }
 
-.rr-fdg-name {
-    display: flex;
-    flex-direction: row;
-    padding: 5px;
-    background-color: #fff;
-}
-
 .rr-fdg-details {
     display: flex;
     flex-direction: column;
@@ -7626,9 +7618,17 @@ a.clear-geojson-button:hover {
 }
 
 .rr-fdg-name {
-    padding-right: 5px;
-    padding-top: 2px;
-    margin-left: -5px;
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+    background-color: #fff;
+}
+
+.rr-fdg-model-name {
+    display: flex;
+    flex-direction: row;
+    padding-top: 3px;
+    background-color: #fff;
 }
 
 .rr-fdg-edge {

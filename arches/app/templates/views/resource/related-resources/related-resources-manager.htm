@@ -14,9 +14,25 @@
         <!--ko if: graphNodeSelection().length == 2 -->
         <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
             <div>
-                <div class="rr-fdg-name"><div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'color': graphNodeSelection()[0].color}"></i><div data-bind="text: graphNodeSelection()[0].graphname"></span></div></div></div>
+                <div class="rr-fdg-name">
+                    <div class='rr-number'>1. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[0].name"></div>
+                    <span class="rr-fdg-model-name">
+                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'background-color': graphNodeSelection()[0].color}"></i>
+                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[0].graphname">
+                    </span>
+                    </div>
+                </div>
+                </div>
                 <div class="rr-fdg-edge" data-bind="text: graphNodeSelection()[0].relationship"></div>
-                <div class="rr-fdg-name"><div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div><span class="rr-fdg-name"><i class="node-list-item-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'color': graphNodeSelection()[1].color}"></i><div data-bind="text: graphNodeSelection()[1].graphname"></span></div></div></div>
+                <div class="rr-fdg-name">
+                    <div class='rr-number'>2. </div><div class="rr-fdg-details"><div data-bind="text: graphNodeSelection()[1].name"></div>
+                    <span class="rr-fdg-model-name">
+                        <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'background-color': graphNodeSelection()[1].color}"></i>
+                        <div class="list-item-model-name" data-bind="text: graphNodeSelection()[1].graphname">
+                    </span>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
         <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().first.absY - 25) + 'px', left: (panelPosition().first.absX + 20) + 'px'}">1</div>
