@@ -1076,7 +1076,7 @@ a.select2-search-choice-close {
     left: 60px;
     top: 25px;
     padding: 2px 2px 3px 0px;
-    color: #8ba2b9;
+    color: #395C7D;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -1168,25 +1168,25 @@ a.select2-search-choice-close {
 
 .permissions-node-row {
     background: #fff;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     padding-left: 10px;
     margin-left: -20px;
     margin-right: 10px;
-    border-left: 1px solid #f4f4f4;
-    border-right: 1px solid #f4f4f4;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 .permissions-node-row:nth-child(even) {
-    background: #fbfbfb;
+    background: #f9f9f9;
 }
 
 .permissions-node-row:first-child {
-    border-top: 1px solid #f4f4f4;
+    border-top: 1px solid #ddd;
 }
 
 .permissions-node-row:last-child {
-    border-bottom: 1px solid #f4f4f4;
+    border-bottom: 1px solid #ddd;
 }
 
 .index-selector {
@@ -1194,11 +1194,15 @@ a.select2-search-choice-close {
     margin: -20px 0px 10px -20px;
 }
 
+.permissions-title {
+    font-size: 15px;
+}
+
 .permissions-list {
     padding-top: 10px;
     padding-bottom: 15px;
     margin-bottom: 10px;
-    background: #fbfbfb;
+    background: #fff;
 }
 
 .permissions-list-divider {
@@ -3115,7 +3119,7 @@ input.cmn-toggle-yes-no:checked+label:after {
 .list-item-model-name {
     font-size: 12px;
     font-size: 12px;
-    margin-top: -1px;
+    margin-top: 1px;
     padding-left: 3px;
 }
 
@@ -3156,13 +3160,13 @@ input.cmn-toggle-yes-no:checked+label:after {
 
 .resource-graph-node-icon {
     display: block;
-    height: 15px;
-    width: 15px;
-    line-height: 15px;
-    border-radius: 15px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    border-radius: 50%;
     color: white;
     text-align: center;
-    font-size: 0.75em;
+    font-size: 0.7em;
 }
 
 .related-node-details .graph-name {
