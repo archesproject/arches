@@ -475,38 +475,33 @@ define([
                             _.each(rr.resource_relationships, function(resource_relationships) {
                                 var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];
                                 var targetId = nodeMap[resource_relationships.resourceinstanceidto];
-                                var linkExists = _.find(data.links, function(link) {
-                                    return (link.source === sourceId && link.target === targetId);
-                                });
-
                                 var relationshipSource = resource_relationships.relationshiptype_label;
                                 var relationshipTarget = resource_relationships.relationshiptype_label;
                                 if (resource_relationships.relationshiptype_label.split('/').length === 2) {
                                     relationshipSource = resource_relationships.relationshiptype_label.split('/')[0].trim();
                                     relationshipTarget = resource_relationships.relationshiptype_label.split('/')[1].trim();
                                 }
-                                if (!linkExists) {
-                                    links.push({
-                                        source: sourceId,
-                                        target: targetId,
-                                        relationshipSource: relationshipSource,
-                                        relationshipTarget: relationshipTarget,
-                                        weight: 1
-                                    });
-                                    if (!_.has(linkMap, [sourceId.id + '_' + targetId.id])) {
-                                        linkMap[sourceId.id + '_' + targetId.id] = {relationships:[]};
-                                    }
-                                    if (!_.has(linkMap, [targetId.id + '_' + sourceId.id])) {
-                                        linkMap[targetId.id + '_' + sourceId.id] = {relationships:[]};
-                                    }
-                                    if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
-                                        linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
-                                    };
-                                    if (_.contains(linkMap[targetId.id + '_' + sourceId.id]['relationships'], relationshipSource) === false) {
-                                        linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource)
-                                    };
-                                }
 
+                                links.push({
+                                    source: sourceId,
+                                    target: targetId,
+                                    relationshipSource: relationshipSource,
+                                    relationshipTarget: relationshipTarget,
+                                    weight: 1
+                                });
+
+                                if (!_.has(linkMap, [sourceId.id + '_' + targetId.id])) {
+                                    linkMap[sourceId.id + '_' + targetId.id] = {relationships:[]};
+                                }
+                                if (!_.has(linkMap, [targetId.id + '_' + sourceId.id])) {
+                                    linkMap[targetId.id + '_' + sourceId.id] = {relationships:[]};
+                                }
+                                if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
+                                    linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
+                                };
+                                if (_.contains(linkMap[targetId.id + '_' + sourceId.id]['relationships'], relationshipSource) === false) {
+                                    linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource)
+                                };
                             });
 
                             var links = _.uniq(links, function(item, key, source) {
