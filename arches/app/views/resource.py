@@ -402,8 +402,14 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
-        return JSONResponse(related_resources, indent=4)
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        ret = []
+
+        if related_resources is not None:
+            ret = self.paginate_related_resources(related_resources, page, request)
+
+        return JSONResponse(ret, indent=4)
 
     def post(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
