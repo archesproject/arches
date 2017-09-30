@@ -315,10 +315,11 @@ def paged_dropdown(request):
     page = int(request.GET.get('page', 1))
     limit = 50
     offset = (page - 1) * limit
-    
+
     results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
-    total_count = results[0][5] if len(results) > 0 else 0
-    data = [dict(zip(['id', 'conceptid', 'text', 'type', 'depth'], d)) for d in results]
+    total_count = results[0][2] if len(results) > 0 else 0
+    data = [dict(zip(['valueto','depth'], d)) for d in results]
+    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values()), depth=d['depth']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count
