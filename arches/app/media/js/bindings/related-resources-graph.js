@@ -47,7 +47,7 @@ define([
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
                             className += '-selected';
-                        } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                        } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                             className += '-neighbor';
                         }
                         return className;
@@ -69,7 +69,7 @@ define([
                             if (selectedState() === false) {
                                 nodeSelection([d1]);
                             }
-                        } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                        } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                             if (d1.selected() === false) {
                                 className += '-neighbor';
                             } else {
@@ -133,6 +133,7 @@ define([
                     nodes: force.nodes(data.nodes).nodes(),
                     links: force.links(data.links).links()
                 };
+                var linkMap = linkMap
 
                 var link = vis.selectAll("line")
                     .data(data.links);
@@ -141,6 +142,7 @@ define([
                     .attr("class", "link")
                     .on("mouseover", function(d) {
                         var hoveredNodes = []
+                        var linkMap = linkMap
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1) {
                             var matrix;
@@ -148,6 +150,7 @@ define([
                             if (d.source === d1 || d.target === d1) {
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
+                                d1.relationships = d.all_relationships
                                 matrix = this.getScreenCTM()
                                 //transform svg coords to screen coords
                                 d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e
@@ -208,7 +211,7 @@ define([
                                             n.hovered(false)
                                         }
                                     })
-                                } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                                } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     if (d1.selected() === false) {
                                         className += '-neighbor';
                                     } else {
@@ -267,7 +270,7 @@ define([
                                             n.selected(false)
                                         }
                                     })
-                                } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                                } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     className += '-neighbor';
                                 }
                                 return className;
@@ -379,7 +382,7 @@ define([
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
-                var page;
+                var page = 1;
                 var rootNode = nodeMap[resourceId];
 
                 if (rootNode) {
@@ -389,7 +392,6 @@ define([
                         page = rootNode.loadcount();
                     }
                 }
-
                 if (load) {
                     if (rootNode) {
                         rootNode.loading = true;
@@ -399,7 +401,10 @@ define([
                         url: arches.urls.related_resources + resourceId,
                         data: {
                             start: start,
-                            page: page
+                            page: page > 0 ? page : 1
+                        },
+                        error: function(e) {
+                            console.log('request failed', e)
                         },
                         success: function(response) {
                             var links = [];
@@ -473,6 +478,7 @@ define([
                                 var linkExists = _.find(data.links, function(link) {
                                     return (link.source === sourceId && link.target === targetId);
                                 });
+
                                 var relationshipSource = resource_relationships.relationshiptype_label;
                                 var relationshipTarget = resource_relationships.relationshiptype_label;
                                 if (resource_relationships.relationshiptype_label.split('/').length === 2) {
@@ -487,9 +493,20 @@ define([
                                         relationshipTarget: relationshipTarget,
                                         weight: 1
                                     });
-                                    linkMap[sourceId.id + '_' + targetId.id] = true;
+                                    if (!_.has(linkMap, [sourceId.id + '_' + targetId.id])) {
+                                        linkMap[sourceId.id + '_' + targetId.id] = {relationships:[]};
+                                    }
+                                    if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
+                                        linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
+                                    };
                                 }
                             });
+
+                            _.each(links, function(l){
+                                if (_.has(linkMap, l.source.id + '_' + l.target.id)) {
+                                    l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships
+                                }
+                            })
                             nodeList(nodeList().concat(nodes))
 
                             callback({
@@ -537,14 +554,18 @@ define([
 
             nodeList.subscribe(function(list) {
                 _.each(list, function(item) {
-                    if (item.selectedSubscription === undefined) {
-                        item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
-                        item.hovered.subscribe(updateHovered(item), this)
-                        if (item.isRoot) {
-                            item.loadcount(1)
-                        };
-                        item.loadcount.subscribe(getMoreData(item), this)
+                    if (item.selectedSubscription) {
+                        item.selectedSubscription.dispose();
+                        item.hoveredSubscription.dispose();
+                        item.loadcountSubscription.dispose();
                     }
+                    item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
+                    item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this)
+                    if (item.isRoot) {
+                        item.loadcount(1)
+                    };
+                    item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this)
+
                     if (item.relationCount) {
                         item.loaded(item.relationCount.loaded)
                         item.total(item.relationCount.total)

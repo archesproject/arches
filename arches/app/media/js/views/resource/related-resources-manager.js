@@ -41,6 +41,10 @@ define([
                 self.selectedOntologyClass() ? self.relationshipTypes(self.validproperties[self.selectedOntologyClass()]) : self.relationshipTypes(options.relationship_types.values);
             })
 
+            this.showGraph.subscribe(function(val){
+                this.graphNodeList([])
+            }, this)
+
             this.panelPosition = ko.computed(function() {
                 var res = {x:0, y:0, first:[0,0], second:[0,0]}
                 var nodes = self.graphNodeSelection()
