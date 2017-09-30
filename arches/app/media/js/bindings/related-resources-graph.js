@@ -382,7 +382,7 @@ define([
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
-                var page;
+                var page = 1;
                 var rootNode = nodeMap[resourceId];
 
                 if (rootNode) {
@@ -392,7 +392,6 @@ define([
                         page = rootNode.loadcount();
                     }
                 }
-
                 if (load) {
                     if (rootNode) {
                         rootNode.loading = true;
@@ -402,7 +401,10 @@ define([
                         url: arches.urls.related_resources + resourceId,
                         data: {
                             start: start,
-                            page: page
+                            page: page > 0 ? page : 1
+                        },
+                        error: function(e) {
+                            console.log('request failed', e)
                         },
                         success: function(response) {
                             var links = [];
@@ -552,14 +554,18 @@ define([
 
             nodeList.subscribe(function(list) {
                 _.each(list, function(item) {
-                    if (item.selectedSubscription === undefined) {
-                        item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
-                        item.hovered.subscribe(updateHovered(item), this)
-                        if (item.isRoot) {
-                            item.loadcount(1)
-                        };
-                        item.loadcount.subscribe(getMoreData(item), this)
+                    if (item.selectedSubscription) {
+                        item.selectedSubscription.dispose();
+                        item.hoveredSubscription.dispose();
+                        item.loadcountSubscription.dispose();
                     }
+                    item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
+                    item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this)
+                    if (item.isRoot) {
+                        item.loadcount(1)
+                    };
+                    item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this)
+
                     if (item.relationCount) {
                         item.loaded(item.relationCount.loaded)
                         item.total(item.relationCount.total)
