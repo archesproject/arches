@@ -60,6 +60,20 @@ define([
                 updateNodeInfo(d);
             }
 
+            var clearHover = function(d) {
+                vis.selectAll("line")
+                    .attr('class', function(l) {
+                        return 'link';
+                    });
+                vis.selectAll("circle").attr("class", function(d1) {
+                    var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
+                    if (d1.selected()) {
+                        className += '-selected';
+                    }
+                    return className;
+                });
+            }
+
             var hoverNode = function(d) {
                 vis.selectAll("circle")
                     .attr("class", function(d1) {
@@ -108,6 +122,7 @@ define([
                     if (val === true) {
                         hoverNode(item);
                     } else {
+                        clearHover(item)
                         if (selectedState() === false) {
                             nodeSelection.removeAll();
                         }
