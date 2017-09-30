@@ -496,10 +496,21 @@ define([
                                     if (!_.has(linkMap, [sourceId.id + '_' + targetId.id])) {
                                         linkMap[sourceId.id + '_' + targetId.id] = {relationships:[]};
                                     }
+                                    if (!_.has(linkMap, [targetId.id + '_' + sourceId.id])) {
+                                        linkMap[targetId.id + '_' + sourceId.id] = {relationships:[]};
+                                    }
                                     if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
                                         linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
                                     };
+                                    if (_.contains(linkMap[targetId.id + '_' + sourceId.id]['relationships'], relationshipSource) === false) {
+                                        linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource)
+                                    };
                                 }
+
+                            });
+
+                            var links = _.uniq(links, function(item, key, source) {
+                                return item.source.id + '_' + item.target.id;
                             });
 
                             _.each(links, function(l){
@@ -507,6 +518,7 @@ define([
                                     l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships
                                 }
                             })
+
                             nodeList(nodeList().concat(nodes))
 
                             callback({
