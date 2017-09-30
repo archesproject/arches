@@ -26,20 +26,20 @@
                                 <div class="">
                                     <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
                                         <li class="">
-                                            <i class="confirmation"></i> <span>{% trans "No Groups/Accounts selected" %}</span>
+                                            <i class="confirmation permissions-title"></i> <span>{% trans "No Groups/Accounts selected" %}</span>
                                         </li>
                                     </ul>
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
                                         <li class="">
-                                            <span data-bind="text: $data.name"></span>
+                                            <span class="permissions-title" data-bind="text: $data.name"></span>
                                             <div class="confirmation-permissions">{% trans "Default Permissions" %}<span data-bind="text: $data.permsLiteral"></span></div>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <!-- Nodes -->
-                                <div class="pad-lft">
-                                    <span>{% trans "Node List" %}</span>
+                                <div class="pad-lft pad-top">
+                                    <span class="permissions-title">{% trans "Node List" %}</span>
                                     <ul class="permissions-selected" data-bind="visible: selectedCards().length === 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span>{% trans "No nodes selected" %}</span>
