@@ -1145,7 +1145,7 @@ a.select2-search-choice-close {
 
 .permission-selector {
     padding-top: 0px;
-    margin: 0px 0px 10px -20px;
+    margin: 0px 0px 10px 0px;
 }
 
 .permissions-summary {
@@ -1198,6 +1198,32 @@ a.select2-search-choice-close {
     font-size: 15px;
 }
 
+.permissions-title-panel {
+    position: absolute;
+    top: 3px;
+    left: 50px;
+}
+
+.library-icon-permissions {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    width: 100%;
+}
+
+.permissions-default {
+    height: 1px;
+    color: #555;
+    font-size: 16px;
+}
+
+.permissions-account-warning {
+    padding: 4px 10px;
+    background: #ffb54a;
+    color: #fff;
+    border: 1px solid #EF9A1F;
+}
+
 .permissions-list {
     padding-top: 10px;
     padding-bottom: 15px;
@@ -1215,6 +1241,11 @@ a.select2-search-choice-close {
     line-height: 1.2;
     padding-left: 15px;
     font-size: 15px;
+}
+
+.node-list-panel {
+    margin-top: 50px;
+    padding-left: 15px;
 }
 
 .library-search {
