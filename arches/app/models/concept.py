@@ -405,10 +405,17 @@ class Concept(object):
                             ELSE 0
                             END
                         ) desc limit 1
-                    ) as valuesto
+                    ) as valuesto,
+                    (
+                        SELECT value::int
+                        FROM values
+                        WHERE conceptid=relations.conceptidto
+                        AND valuetype in ('sortorder')
+                        limit 1
+                    ) as sortorder
 
                     FROM relations
-                    ORDER BY valuesto
+                    ORDER BY sortorder, valuesto
                 ), 
 
                 children AS (
@@ -522,8 +529,6 @@ class Concept(object):
                 conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
                 columns=columns, depth_limit=depth_limit, limit_clause=limit_clause
             )
-            
-        print sql
 
         cursor = connection.cursor()
         cursor.execute(sql)
