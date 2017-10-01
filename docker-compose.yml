@@ -3,7 +3,7 @@ services:
 
     arches:
       container_name: arches
-      image: arches/arches:latest
+      image: archesproject/arches:latest
       build:
         context: .
         dockerfile: ./Dockerfile
