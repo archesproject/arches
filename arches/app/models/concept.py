@@ -1056,6 +1056,13 @@ class ConceptValue(object):
             value.concept_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
             if self.language != '':
+                # need to normalize language ids to the form xx-XX
+                lang_parts = self.language.lower().replace('_', '-').split('-')
+                try:
+                    lang_parts[1] = lang_parts[1].upper()
+                except:
+                    pass
+                self.language = '-'.join(lang_parts)
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
