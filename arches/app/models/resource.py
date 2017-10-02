@@ -281,12 +281,13 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
 
-        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
-        if related_resources:
-            for resource in related_resources['docs']:
-                relations = get_relations(resource['_id'], 0, 0)
-                resource['_source']['total_relations'] = relations['hits']['total']
-                ret['related_resources'].append(resource['_source'])
+        if len(instanceids) > 0:
+            related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
+            if related_resources:
+                for resource in related_resources['docs']:
+                    relations = get_relations(resource['_id'], 0, 0)
+                    resource['_source']['total_relations'] = relations['hits']['total']
+                    ret['related_resources'].append(resource['_source'])
         return ret
 
     def copy(self):
