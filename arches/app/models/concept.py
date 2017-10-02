@@ -1055,6 +1055,7 @@ class ConceptValue(object):
             value.value = self.value
             value.concept_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
+            
             if self.language != '':
                 # need to normalize language ids to the form xx-XX
                 lang_parts = self.language.lower().replace('_', '-').split('-')
@@ -1066,18 +1067,8 @@ class ConceptValue(object):
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
-            try:
-                if value.value != 'Resource To Resource Relationship Types':
-                    value.save()
-            except IntegrityError as e:
-                valuetype = models.DValueType()
-                valuetype.valuetype = value.valuetype_id
-                valuetype.category = 'undefined'
-                valuetype.namespace = 'arches'
-                valuetype.save()
 
-                value.save()
-
+            value.save()
             self.category = value.valuetype.category
 
     def delete(self):
