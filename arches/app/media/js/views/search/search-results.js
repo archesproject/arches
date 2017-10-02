@@ -48,12 +48,6 @@ define(['jquery',
                 }
             },
 
-            newPage: function(page, e){
-                if(page){
-                    this.page(page);
-                }
-            },
-
             showRelatedResources: function(resourceinstance) {
                 var self = this;
                 return function(resourceinstance){

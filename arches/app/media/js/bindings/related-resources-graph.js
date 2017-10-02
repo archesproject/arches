@@ -47,7 +47,7 @@ define([
                         var className = 'node-' + (d.isRoot ? 'current' : 'ancestor');
                         if (d1 === d) {
                             className += '-selected';
-                        } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                        } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                             className += '-neighbor';
                         }
                         return className;
@@ -60,6 +60,20 @@ define([
                 updateNodeInfo(d);
             }
 
+            var clearHover = function(d) {
+                vis.selectAll("line")
+                    .attr('class', function(l) {
+                        return 'link';
+                    });
+                vis.selectAll("circle").attr("class", function(d1) {
+                    var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
+                    if (d1.selected()) {
+                        className += '-selected';
+                    }
+                    return className;
+                });
+            }
+
             var hoverNode = function(d) {
                 vis.selectAll("circle")
                     .attr("class", function(d1) {
@@ -69,7 +83,7 @@ define([
                             if (selectedState() === false) {
                                 nodeSelection([d1]);
                             }
-                        } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                        } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                             if (d1.selected() === false) {
                                 className += '-neighbor';
                             } else {
@@ -108,25 +122,13 @@ define([
                     if (val === true) {
                         hoverNode(item);
                     } else {
+                        clearHover(item)
                         if (selectedState() === false) {
                             nodeSelection.removeAll();
                         }
                     }
                 }
             }
-
-            nodeList.subscribe(function(list) {
-                _.each(list, function(item) {
-                    item.selected.subscribe(updateSelected(item), this)
-                    item.hovered.subscribe(updateHovered(item), this)
-                    if (item.relationCount) {
-                        item.loaded(item.relationCount.loaded)
-                        item.total(item.relationCount.total)
-                    }
-                })
-            }, this)
-
-            nodeList([])
 
             var redraw = function() {
                 vis.attr("transform",
@@ -146,6 +148,7 @@ define([
                     nodes: force.nodes(data.nodes).nodes(),
                     links: force.links(data.links).links()
                 };
+                var linkMap = linkMap
 
                 var link = vis.selectAll("line")
                     .data(data.links);
@@ -154,21 +157,26 @@ define([
                     .attr("class", "link")
                     .on("mouseover", function(d) {
                         var hoveredNodes = []
+                        var linkMap = linkMap
                         d3.select(this).attr("class", "linkMouseover");
                         vis.selectAll("circle").attr("class", function(d1) {
+                            var matrix;
                             var className = 'node-' + (d1.isRoot ? 'current' : 'ancestor');
                             if (d.source === d1 || d.target === d1) {
                                 className += d1.selected() ? '-selected' : '-neighbor';
                                 d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
+                                d1.relationships = d.all_relationships
+                                matrix = this.getScreenCTM()
+                                //transform svg coords to screen coords
+                                d1.absX = matrix.a * d1.x + matrix.c * d1.y + matrix.e
+                                d1.absY = matrix.b * d1.x + matrix.d * d1.y + matrix.f
                                 hoveredNodes.push(d1);
                             } else if (d1.selected()) {
                                 className += '-selected';
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection(hoveredNodes)
-                        }
+                        nodeSelection(hoveredNodes)
                     })
                     .on("mouseout", function(d) {
                         d3.select(this).attr("class", "link");
@@ -179,9 +187,7 @@ define([
                             }
                             return className;
                         });
-                        if (selectedState() === false) {
-                            nodeSelection.removeAll()
-                        }
+                        nodeSelection.removeAll()
                     });
                 link.exit()
                     .remove();
@@ -220,7 +226,7 @@ define([
                                             n.hovered(false)
                                         }
                                     })
-                                } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                                } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     if (d1.selected() === false) {
                                         className += '-neighbor';
                                     } else {
@@ -261,7 +267,7 @@ define([
 
                     .on("click", function(d) {
                         if (!d3.event.defaultPrevented) {
-                            getResourceDataForNode(d);
+                            d.loadcount(d.loadcount()+1)
                         }
                         vis.selectAll("circle")
                             .attr("class", function(d1) {
@@ -279,7 +285,7 @@ define([
                                             n.selected(false)
                                         }
                                     })
-                                } else if (linkMap[d1.id + '_' + d.id] || linkMap[d.id + '_' + d1.id]) {
+                                } else if (_.has(linkMap, d1.id + '_' + d.id) || _.has(linkMap, d.id + '_' + d1.id)) {
                                     className += '-neighbor';
                                 }
                                 return className;
@@ -379,31 +385,47 @@ define([
                 }, false);
             };
 
+            var getMoreData = function(item) {
+                var item = item;
+                return function(val) {
+                    if (val) {
+                        getResourceDataForNode(item);
+                    }
+                }
+            }
+
             var getResourceData = function(resourceId, resourceName, resourceTypeId, callback, isRoot) {
                 var load = true;
                 var start = 0;
+                var page = 1;
                 var rootNode = nodeMap[resourceId];
 
                 if (rootNode) {
                     if (rootNode.relationCount) {
                         load = (rootNode.relationCount.total > rootNode.relationCount.loaded && !rootNode.loading);
                         start = rootNode.relationCount.loaded;
+                        page = rootNode.loadcount();
                     }
                 }
-
                 if (load) {
                     if (rootNode) {
                         rootNode.loading = true;
                     }
+
                     $.ajax({
                         url: arches.urls.related_resources + resourceId,
                         data: {
-                            start: start
+                            start: start,
+                            page: page > 0 ? page : 1
+                        },
+                        error: function(e) {
+                            console.log('request failed', e)
                         },
                         success: function(response) {
-                            var links = [],
-                                nodes = [];
-
+                            var links = [];
+                            var nodes = [];
+                            var rr = response.related_resources;
+                            var total_loaded;
                             if (isRoot) {
                                 nodeSelection.removeAll();
                                 selectedState(false);
@@ -411,38 +433,45 @@ define([
                                     id: newNodeId,
                                     entityid: resourceId,
                                     name: resourceName,
+                                    description: rr.resource_instance.displaydescription,
                                     entitytypeid: resourceTypeId,
                                     isRoot: true,
                                     relationType: 'Current',
-                                    color: response.node_config_lookup[response.resource_instance.graph_id].fillColor,
+                                    graphname: rr.node_config_lookup[rr.resource_instance.graph_id].name,
+                                    iconclass: rr.node_config_lookup[rr.resource_instance.graph_id].iconclass,
+                                    color: rr.node_config_lookup[rr.resource_instance.graph_id].fillColor,
                                     relationCount: {
-                                        total: response.total,
-                                        loaded: response.resource_relationships.length
+                                        total: rr.total,
+                                        loaded: rr.resource_relationships.length
                                     }
                                 };
                                 nodes.push(rootNode);
                                 nodeMap[resourceId] = rootNode;
                                 newNodeId += 1;
                             } else if (rootNode.relationCount) {
-                                rootNode.relationCount.loaded = rootNode.relationCount.loaded + response.resource_relationships.length;
+                                total_loaded = rootNode.relationCount.loaded + rr.resource_relationships.length
+                                rootNode.relationCount.loaded = total_loaded <= rr.total ? total_loaded : total_loaded - 1;
                             } else {
                                 rootNode.relationCount = {
-                                    total: response.total,
-                                    loaded: response.resource_relationships.length
+                                    total: rr.total,
+                                    loaded: rr.resource_relationships.length
                                 };
                             }
                             rootNode.loading = false;
                             updateNodeInfo(rootNode);
 
                             var getRelated = function(related_resource) {
-                                var nodeConfigLookup = response.node_config_lookup;
+                                var nodeConfigLookup = rr.node_config_lookup;
                                 if (!nodeMap[related_resource.resourceinstanceid]) {
                                     var node = {
                                         id: newNodeId,
                                         entityid: related_resource.resourceinstanceid,
                                         entitytypeid: related_resource.graph_id,
                                         name: related_resource.displayname,
+                                        description: related_resource.displaydescription,
                                         color: nodeConfigLookup[related_resource.graph_id].fillColor,
+                                        iconclass: nodeConfigLookup[related_resource.graph_id].iconclass,
+                                        graphname: nodeConfigLookup[related_resource.graph_id].name,
                                         isRoot: false,
                                         relationType: 'Ancestor',
                                         relationCount: {
@@ -456,31 +485,50 @@ define([
                                 }
                             }
 
-                            _.each(response.related_resources, getRelated);
+                            _.each(rr.related_resources, getRelated);
 
-                            _.each(response.resource_relationships, function(resource_relationships) {
+                            _.each(rr.resource_relationships, function(resource_relationships) {
                                 var sourceId = nodeMap[resource_relationships.resourceinstanceidfrom];
                                 var targetId = nodeMap[resource_relationships.resourceinstanceidto];
-                                var linkExists = _.find(data.links, function(link) {
-                                    return (link.source === sourceId && link.target === targetId);
-                                });
                                 var relationshipSource = resource_relationships.relationshiptype_label;
                                 var relationshipTarget = resource_relationships.relationshiptype_label;
                                 if (resource_relationships.relationshiptype_label.split('/').length === 2) {
                                     relationshipSource = resource_relationships.relationshiptype_label.split('/')[0].trim();
                                     relationshipTarget = resource_relationships.relationshiptype_label.split('/')[1].trim();
                                 }
-                                if (!linkExists) {
-                                    links.push({
-                                        source: sourceId,
-                                        target: targetId,
-                                        relationshipSource: relationshipSource,
-                                        relationshipTarget: relationshipTarget,
-                                        weight: 1
-                                    });
-                                    linkMap[sourceId.id + '_' + targetId.id] = true;
+
+                                links.push({
+                                    source: sourceId,
+                                    target: targetId,
+                                    relationshipSource: relationshipSource,
+                                    relationshipTarget: relationshipTarget,
+                                    weight: 1
+                                });
+
+                                if (!_.has(linkMap, [sourceId.id + '_' + targetId.id])) {
+                                    linkMap[sourceId.id + '_' + targetId.id] = {relationships:[]};
                                 }
+                                if (!_.has(linkMap, [targetId.id + '_' + sourceId.id])) {
+                                    linkMap[targetId.id + '_' + sourceId.id] = {relationships:[]};
+                                }
+                                if (_.contains(linkMap[sourceId.id + '_' + targetId.id]['relationships'], relationshipSource) === false) {
+                                    linkMap[sourceId.id + '_' + targetId.id]['relationships'].push(relationshipSource)
+                                };
+                                if (_.contains(linkMap[targetId.id + '_' + sourceId.id]['relationships'], relationshipSource) === false) {
+                                    linkMap[targetId.id + '_' + sourceId.id]['relationships'].push(relationshipSource)
+                                };
                             });
+
+                            var links = _.uniq(links, function(item, key, source) {
+                                return item.source.id + '_' + item.target.id;
+                            });
+
+                            _.each(links, function(l){
+                                if (_.has(linkMap, l.source.id + '_' + l.target.id)) {
+                                    l.all_relationships = linkMap[l.source.id + '_' + l.target.id].relationships
+                                }
+                            })
+
                             nodeList(nodeList().concat(nodes))
 
                             callback({
@@ -525,9 +573,30 @@ define([
                 svg.attr("width", $el.parent().width());
             }).trigger("resize");
 
-            $el.find('.load-more-relations-link').click(function() {
-                getResourceDataForNode(selectedNode);
-            })
+
+            nodeList.subscribe(function(list) {
+                _.each(list, function(item) {
+                    if (item.selectedSubscription) {
+                        item.selectedSubscription.dispose();
+                        item.hoveredSubscription.dispose();
+                        item.loadcountSubscription.dispose();
+                    }
+                    item.selectedSubscription = item.selected.subscribe(updateSelected(item), this)
+                    item.hoveredSubscription = item.hovered.subscribe(updateHovered(item), this)
+                    if (item.isRoot) {
+                        item.loadcount(1)
+                    };
+                    item.loadcountSubscription = item.loadcount.subscribe(getMoreData(item), this)
+
+                    if (item.relationCount) {
+                        item.loaded(item.relationCount.loaded)
+                        item.total(item.relationCount.total)
+                    }
+                })
+            }, this)
+
+            nodeList([])
+
         }
     };
 

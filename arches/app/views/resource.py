@@ -29,6 +29,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -55,12 +56,12 @@ class ResourceListView(BaseManagerView):
         return render(request, 'views/resource.htm', context)
 
 def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_concepts('00000000-0000-0000-0000-000000000005', ['member', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
     default_relationshiptype_valueid = None
     for relationship_type in resource_relationship_types:
-        if relationship_type[1] == '00000000-0000-0000-0000-000000000007':
-            default_relationshiptype_valueid = relationship_type[5]
-    relationship_type_values = {'values':[{'id':str(c[5]), 'text':str(c[3])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[2]
+    relationship_type_values = {'values':[{'id':str(c[2]), 'text':str(c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
     return relationship_type_values
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
@@ -257,6 +258,7 @@ class ResourceReportView(BaseManagerView):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         resource = Resource.objects.get(pk=resourceid)
+        displayname = resource.displayname
         resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
         related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
@@ -270,7 +272,8 @@ class ResourceReportView(BaseManagerView):
                     relationship_summary = []
                     for relationship in relationships:
                         if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
-                            relationship_summary.append(resource_relationship_type_values[relationship['relationshiptype']])
+                            rr_type = resource_relationship_type_values[relationship['relationshiptype']] if relationship['relationshiptype'] in resource_relationship_type_values else relationship['relationshiptype']
+                            relationship_summary.append(rr_type)
                     summary['resources'].append({'instance_id':rr['resourceinstanceid'],'displayname':rr['displayname'], 'relationships':relationship_summary})
 
         tiles = models.TileModel.objects.filter(resourceinstance=resource_instance)
@@ -329,6 +332,7 @@ class ResourceReportView(BaseManagerView):
             graph_name=resource_instance.graph.name,
             graph_json = JSONSerializer().serialize(graph),
             resourceid=resourceid,
+            displayname=displayname,
          )
 
         if graph.iconclass:
@@ -342,12 +346,46 @@ class ResourceReportView(BaseManagerView):
 
 @method_decorator(can_edit_resource_instance(), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
+
+    def paginate_related_resources(self, related_resources, page, request):
+        total=related_resources['total']
+        paginator, pages = get_paginator(request, related_resources, total, page, settings.RELATED_RESOURCES_PER_PAGE)
+        page = paginator.page(page)
+
+        def parse_relationshiptype_label(relationship):
+            if relationship['relationshiptype_label'].startswith('http'):
+                relationship['relationshiptype_label'] = relationship['relationshiptype_label'].rsplit('/')[-1]
+            return relationship
+
+        related_resources['resource_relationships'] = [parse_relationshiptype_label(r) for r in related_resources['resource_relationships']]
+
+        ret = {}
+        ret['related_resources'] = related_resources
+        ret['paginator'] = {}
+        ret['paginator']['current_page'] = page.number
+        ret['paginator']['has_next'] = page.has_next()
+        ret['paginator']['has_previous'] = page.has_previous()
+        ret['paginator']['has_other_pages'] = page.has_other_pages()
+        ret['paginator']['next_page_number'] = page.next_page_number() if page.has_next() else None
+        ret['paginator']['previous_page_number'] = page.previous_page_number() if page.has_previous() else None
+        ret['paginator']['start_index'] = page.start_index()
+        ret['paginator']['end_index'] = page.end_index()
+        ret['paginator']['pages'] = pages
+
+        return ret
+
     def get(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         start = request.GET.get('start', 0)
         resource = Resource.objects.get(pk=resourceid)
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
-        return JSONResponse(related_resources, indent=4)
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        ret = []
+
+        if related_resources is not None:
+            ret = self.paginate_related_resources(related_resources, page, request)
+
+        return JSONResponse(ret)
 
     def delete(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -364,8 +402,14 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
-        return JSONResponse(related_resources, indent=4)
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        ret = []
+
+        if related_resources is not None:
+            ret = self.paginate_related_resources(related_resources, page, request)
+
+        return JSONResponse(ret, indent=4)
 
     def post(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -430,5 +474,11 @@ class RelatedResourcesView(BaseManagerView):
         start = request.GET.get('start', 0)
         es.indices.refresh(index="resource_relations")
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
-        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000)
-        return JSONResponse(related_resources, indent=4)
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+        related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
+        ret = []
+
+        if related_resources is not None:
+            ret = self.paginate_related_resources(related_resources, page, request)
+
+        return JSONResponse(ret, indent=4)

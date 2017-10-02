@@ -27,40 +27,70 @@
             <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Create a New Thesaurus" %}</h4></a>
             <div class="ep-help-topic-content">
                 <p>{% blocktrans %}In the video below, a new Thesaurus is created. Once you have made a Thesaurus, you can begin creating a hierarchy of Concepts within it. Remember, the final step will be to make a new Collection and add Concepts to it (from <em>any</em> of your Thesauri).{% endblocktrans %}</p>
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/create-thesaurus.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/create-thesaurus.gif"></img></p>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/create-thesaurus.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-thesaurus.gif"></img>
+				</p>
             </div>
         </div>
         <div>
             <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Create a Top Concept" %}</h4></a>
             <div class="ep-help-topic-content">
                 <p>{% blocktrans %}The first level of organization within a Thesaurus is a set of Top Concepts. A Top Concept may be something like "Architectural Styles" and its children Concepts will be the actual styles themselves. Below, a new, empty Top Concept is added to an empty Thesaurus.{% endblocktrans %}</p>
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/create-top-concept.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/create-top-concept.gif"></img></p>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/create-top-concept.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-top-concept.gif"></img>
+				</p>
             </div>
         </div>
         <div>
             <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Create New Concepts" %}</h4></a>
             <div class="ep-help-topic-content">
                 <p>{% blocktrans %}To create a new Concept, begin by selecting the Top Concept under which it should be placed. This will bring the details about the Top Concept into the main panel. Use the Manage dropdown to "Add Child", type in a label, and select the correct language for the label.{% endblocktrans %}</p>
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/add-concepts.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-concepts.gif"></img></p>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/add-concepts.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-concepts.gif"></img>
+				</p>
             </div>
         </div>
         <div>
             <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Add an Alternate Label to a Concept" %}</h4></a>
             <div class="ep-help-topic-content">
                 <p>{% blocktrans %}To improve the searchability of your Concepts, you can add as many alternate labels to each one as you want Below, the label "Dwelling" is added to the Concept "House". The result is that anyone using "Dwelling" as a search term will be shown Resources that have the "House" Concept.{% endblocktrans %}</p>
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/add-concept-alt-label.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/add-concept-alt-label.gif"></img></p>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/add-concept-alt-label.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-concept-alt-label.gif"></img>
+				</p>
             </div>
         </div>
         <div>
             <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Example - Create a Collection" %}</h4></a>
             <div class="ep-help-topic-content">
                 <p>{% blocktrans %}Creating a Collection is very similar to creating a Thesaurus. However, you will be adding existing Concepts to a Collection (potentially from more than one Thesaurus) instead of creating new ones. Below, a new Collection is created. To go further, select the Collection, and use the "Add dropdown entry" link to add existing Concepts to this Collection. When configuring the Graph for a Branch or Resource Model, you will now be able to add this Concept Collection to a node.{% endblocktrans %}</p>
-                <span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/create-collection.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span>
-                <p><img class="reloadable-img" src="{{ STATIC_URL }}img/help/create-collection.gif"></img></p>
+				<p>
+					<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "click to view demonstration" %}</a>
+					<span class="ep-help-img-link">
+						<a href="{{ STATIC_URL }}img/help/create-collection.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+						</a>
+					</span>
+					<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-collection.gif"></img>
+				</p>
             </div>
         </div>
     </div>
