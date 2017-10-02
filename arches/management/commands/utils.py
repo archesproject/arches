@@ -12,17 +12,20 @@ def get_yn_input(msg="are you sure you want to continue?",default="Y"):
     if default == "Y":
         o = raw_input(msg+" [Y/n] ")
         if o.lower().startswith("y") or o == "":
-            return True
+            ret = True
         else:
             print "operation cancelled."
-            return False
+            ret = False
+
     if default == "N":
         o = raw_input(msg+" [y/N] ")
         if o.lower().startswith("n") or o == "":
             print "operation cancelled."
-            return False
+            ret = False
         else:
-            return True
+            ret = True
+            
+    return ret
 
 def write_to_file(fileName, contents, mode='w', encoding='utf-8', **kwargs):
     ensure_dir(fileName)
