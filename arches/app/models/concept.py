@@ -349,8 +349,19 @@ class Concept(object):
 
         if concept.nodetype == 'Collection':
             concepts_to_delete[concept.id] = concept
+            rows = Concept().get_child_collections(concept.id)
+            for row in rows:
+                if row[0] not in concepts_to_delete:
+                    concepts_to_delete[row[0]] = Concept({'id': row[0]})
+
+                concepts_to_delete[row[0]].addvalue({'id':row[2], 'conceptid':row[0], 'value':row[1]})
 
         return concepts_to_delete
+
+    def get_child_collections_hierarchically(self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None):
+        child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
+        columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
+        return self.get_child_edges(conceptid, ['member'], child_valuetypes, offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
 
     def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=''):
         child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
@@ -366,81 +377,159 @@ class Concept(object):
         data = self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
         return [dict(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d), top_concept='') for d in data]
 
-    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None, offset=None, limit=20, order_hierarchically=False, query=None):
+    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None, offset=None, limit=20, order_hierarchically=False, query=None, languageid=settings.LANGUAGE_CODE):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
-        sql = """
-            WITH RECURSIVE children AS (
-                SELECT relations.conceptidfrom, relations.conceptidto,
-                    valuefrom.value as valuefrom, valueto.value as valueto,
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
-                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
-                    valuefrom.languageid as languagefrom, valueto.languageid as languageto,
-                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
-                    {8}
-                    1 AS depth       ---|NonRecursive Part
-                    FROM relations
-                    JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
-                    JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
-                    JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
-                    JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
-                    WHERE relations.conceptidfrom = '{0}'
-                    and valuefrom.valuetype = '{3}'
-                    and valueto.valuetype in ('{2}')
-                    and ({1})
-                UNION
-                    SELECT relations.conceptidfrom, relations.conceptidto,
-                    valuefrom.value as valuefrom, valueto.value as valueto,
-                    valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
-                    valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
-                    valuefrom.languageid as languagefrom, valueto.languageid as languageto,
-                    dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
-                    {9}
-                    depth+1      ---|RecursivePart
-                    FROM relations
-                    JOIN children b ON(b.conceptidto = relations.conceptidfrom)
-                    JOIN values valuefrom ON(valuefrom.conceptid = relations.conceptidfrom)
-                    JOIN values valueto ON(valueto.conceptid = relations.conceptidto)
-                    JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
-                    JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
-                    WHERE valuefrom.valuetype = '{3}'
-                    and valueto.valuetype in ('{2}')
-                    and ({1})
-                    {5}
-            ){10}
-            SELECT {4} FROM {11}{6}{7};
-        """
-
-        if not columns:
-            columns = """
-                conceptidfrom::text, conceptidto::text,
-                valuefrom, valueto,
-                valueidfrom::text, valueidto::text,
-                valuetypefrom, valuetypeto,
-                languagefrom, languageto,
-                categoryfrom, categoryto
-            """
-        relationtypes = ' or '.join(["relations.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
+        
+        relationtypes = ' or '.join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
-        child_valuetypes = child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True)
+        child_valuetypes = ("','").join(child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True))
         limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
-        get_root_row_number = "to_char(row_number() OVER (), 'fm000000') as row," if order_hierarchically else ""
-        get_child_row_number = "row || '-' || to_char(row_number() OVER (), 'fm000000')," if order_hierarchically else ""
-        order_clause = " order by row" if order_hierarchically else ""
-        query_results = """, results as (
-            select *
-             FROM children
-             where LOWER(valueto) like '%%%s%%'
-            union
-              select c.*
-              FROM children c
-              join results r on(r.valueidfrom=c.valueidto)
-        )""" % query.lower() if query is not None else ""
-        recursive_table = "results" if query is not None else "children"
+        
+        if order_hierarchically:
+            sql = """
+                WITH RECURSIVE 
 
-        sql = sql.format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype, columns, depth_limit, order_clause, limit_clause, get_root_row_number, get_child_row_number, query_results, recursive_table)
+                rels AS(
+                    SELECT conceptidfrom, conceptidto , relationtype, 
+                    (
+                        SELECT value
+                        FROM values
+                        WHERE conceptid=relations.conceptidto
+                        AND valuetype in ('prefLabel')
+                        ORDER BY (
+                            CASE WHEN languageid = '{languageid}' THEN 10
+                            WHEN languageid like '{short_languageid}%' THEN 5
+                            ELSE 0
+                            END
+                        ) desc limit 1
+                    ) as valuesto,
+                    (
+                        SELECT value::int
+                        FROM values
+                        WHERE conceptid=relations.conceptidto
+                        AND valuetype in ('sortorder')
+                        limit 1
+                    ) as sortorder
+
+                    FROM relations
+                    ORDER BY sortorder, valuesto
+                ), 
+
+                children AS (
+                    SELECT r.conceptidfrom, r.conceptidto,
+                        to_char(row_number() OVER (), 'fm000000') as row,
+                        1 AS depth       ---|NonRecursive Part
+                        FROM rels r
+                        WHERE r.conceptidfrom = '{conceptid}'
+                        and ({relationtypes})
+                    UNION
+                        SELECT r.conceptidfrom, r.conceptidto,
+                        row || '-' || to_char(row_number() OVER (), 'fm000000'),
+                        depth+1      ---|RecursivePart
+                        FROM rels r
+                        JOIN children b ON(b.conceptidto = r.conceptidfrom)
+                        WHERE ({relationtypes})
+                        {depth_limit}
+                )
+
+                {subquery}
+
+                SELECT
+                (
+                    select row_to_json(d)
+                    FROM (
+                        SELECT * 
+                        FROM values
+                        WHERE conceptid={recursive_table}.conceptidto
+                        AND valuetype in ('prefLabel')
+                        ORDER BY (
+                            CASE WHEN languageid = '{languageid}' THEN 10
+                            WHEN languageid like '{short_languageid}%' THEN 5
+                            ELSE 0
+                            END
+                        ) desc limit 1
+                    ) d
+                ) as valueto,
+                depth, count(*) OVER() AS full_count
+               
+               FROM {recursive_table} order by row {limit_clause};
+
+            """
+ 
+            subquery = """, results as (
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                FROM children c
+                JOIN values ON(values.conceptid = c.conceptidto)
+                WHERE LOWER(values.value) like '%%%s%%' 
+                AND values.valuetype in ('prefLabel')
+                    UNION
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                FROM children c
+                JOIN results r on (r.conceptidfrom=c.conceptidto)
+            )""" % query.lower() if query is not None else ""
+            
+            recursive_table = "results" if query else "children"
+
+            sql = sql.format(
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
+                parent_valuetype=parent_valuetype, depth_limit=depth_limit, limit_clause=limit_clause, subquery=subquery, 
+                recursive_table=recursive_table, languageid=languageid, short_languageid=languageid.split('-')[0]
+            )
+
+        else:
+            sql = """
+                WITH RECURSIVE 
+                    children AS (
+                        SELECT r.conceptidfrom, r.conceptidto, r.relationtype, 1 AS depth
+                            FROM relations r
+                            WHERE r.conceptidfrom = '{conceptid}'
+                            AND ({relationtypes})
+                        UNION
+                            SELECT r.conceptidfrom, r.conceptidto, r.relationtype, depth+1
+                            FROM relations r
+                            JOIN children c ON(c.conceptidto = r.conceptidfrom)
+                            WHERE ({relationtypes})
+                            {depth_limit}
+                    ),
+                    results AS (
+                        SELECT  
+                            valuefrom.value as valuefrom, valueto.value as valueto,
+                            valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
+                            valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
+                            valuefrom.languageid as languagefrom, valueto.languageid as languageto,
+                            dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
+                            c.conceptidfrom, c.conceptidto
+                        FROM values valueto
+                            JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
+                            JOIN children c ON(c.conceptidto = valueto.conceptid)
+                            JOIN values valuefrom ON(c.conceptidfrom = valuefrom.conceptid)
+                            JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
+                        WHERE valueto.valuetype in ('{child_valuetypes}') 
+                        AND valuefrom.valuetype in ('{child_valuetypes}')
+                    )
+                    SELECT distinct {columns}
+                    FROM results {limit_clause}
+    
+            """
+
+            if not columns:
+                columns = """
+                    conceptidfrom::text, conceptidto::text,
+                    valuefrom, valueto,
+                    valueidfrom::text, valueidto::text,
+                    valuetypefrom, valuetypeto,
+                    languagefrom, languageto,
+                    categoryfrom, categoryto
+                """
+
+            sql = sql.format(
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
+                columns=columns, depth_limit=depth_limit, limit_clause=limit_clause
+            )
+
         cursor = connection.cursor()
         cursor.execute(sql)
         rows = cursor.fetchall()
