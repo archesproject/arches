@@ -25,21 +25,34 @@
                             <div class="permissions-list">
                                 <div class="">
                                     <ul class="permissions-selected" data-bind="visible: selectedIdentities().length === 0">
-                                        <li class="">
-                                            <i class="confirmation"></i> <span>{% trans "No Groups/Accounts selected" %}</span>
+                                        <li class="permissions-default">
+                                            <i class="confirmation permissions-title"></i> <span class="permissions-account-warning">{% trans "No Groups/Accounts selected" %}</span>
                                         </li>
                                     </ul>
                                     <ul class="permissions-selected" style="display:none;" data-bind="foreach: selectedIdentities, visible: selectedIdentities().length !== 0">
                                         <li class="">
-                                            <span data-bind="text: $data.name"></span>
-                                            <div class="confirmation-permissions">{% trans "Default Permissions" %}<span data-bind="text: $data.permsLiteral"></span></div>
+
+                                            <div class="library-icon-permissions" style="">
+                                                <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
+                                                    <i data-bind="attr: {class: 'fa fa-' + $data.type}" class="fa fa-group"></i>
+                                                </span>
+                                                <div class="permissions-title-panel">
+                                                    <span class="permissions-title" data-bind="text: $data.name"></span>
+                                                    <div class="confirmation-permissions">{% trans "Default Permissions" %}
+                                                        <span data-bind="text: $data.permsLiteral"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                           
                                         </li>
                                     </ul>
                                 </div>
 
                                 <!-- Nodes -->
-                                <div class="pad-lft">
-                                    <span>{% trans "Node List" %}</span>
+                                <div class="node-list-panel">
+                                    <span class="permissions-title">{% trans "Node List" %}</span>
                                     <ul class="permissions-selected" data-bind="visible: selectedCards().length === 0">
                                         <li class="">
                                             <i class="confirmation ion-ios-checkmark"></i> <span>{% trans "No nodes selected" %}</span>

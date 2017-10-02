@@ -65,6 +65,10 @@ class StringDataType(BaseDataType):
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, 'this is not a string', 'This data was not imported.')})
         return errors
 
+    def convert_value(self, tile, nodeid):
+        if tile.data[nodeid] in ['', "''"]:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile):
         document['strings'].append({'string': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 
@@ -224,6 +228,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
 
         return errors
+
+    def convert_value(self, tile, nodeid):
+        if 'features' in tile.data[nodeid]:
+            if len(tile.data[nodeid]['features']) == 0:
+                tile.data[nodeid] = None
 
     def transform_import_values(self, value, nodeid):
         arches_geojson = {}
@@ -958,7 +967,7 @@ class DomainDataType(BaseDomainDataType):
         errors = []
 
         try:
-            models.Node.objects.get(config__options__0__id=value)
+            models.Node.objects.filter(config__options__contains=[{"id": value}])
         except:
             errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(value)})
         return errors
@@ -1017,7 +1026,7 @@ class DomainListDataType(BaseDomainDataType):
 
         for v in value:
             try:
-                models.Node.objects.get(config__options__0__id=v)
+                models.Node.objects.filter(config__options__contains=[{"id": v}])
             except:
                 errors.append({'type': 'ERROR', 'message': '{0} is not a valid domain id. Please check the node this value is mapped to for a list of valid domain ids. This data was not imported.'.format(v)})
         return errors
