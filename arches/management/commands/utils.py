@@ -1,16 +1,28 @@
 import os
 import codecs
 
-def get_yn_input(msg="are you sure you want to continue?"):
+def get_yn_input(msg="are you sure you want to continue?",default="Y"):
     '''function can be passed a custom message and will use that prompt to get
-    a y/n response. will return True ONLY if the user input (forced to lower())
-    begins with 'y'. all other responses return False.'''
-    o = raw_input(msg +" y/n ")
-    if o.lower().startswith("y"):
-        return True
-    else:
-        print "operation cancelled."
-        return False
+    a y/n response. default defines what will happen if enter is hit with no
+    input.'''
+    
+    if not default in ["Y", "N"]:
+        raise Exception("function must be called with default = 'Y' or 'N'")
+        
+    if default == "Y":
+        o = raw_input(msg+" [Y/n] ")
+        if o.lower().startswith("y") or o == "":
+            return True
+        else:
+            print "operation cancelled."
+            return False
+    if default == "N":
+        o = raw_input(msg+" [y/N] ")
+        if o.lower().startswith("n") or o == "":
+            print "operation cancelled."
+            return False
+        else:
+            return True
 
 def write_to_file(fileName, contents, mode='w', encoding='utf-8', **kwargs):
     ensure_dir(fileName)
