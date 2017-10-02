@@ -11,10 +11,7 @@ from format import Writer
 from format import Reader
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
-from arches.app.models.models import Node
-from arches.app.models.models import NodeGroup
-from arches.app.models.models import ResourceXResource
-from arches.app.models.models import GraphXMapping
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, GraphXMapping
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -301,6 +298,9 @@ class CsvReader(Reader):
                 datatype_factory = DataTypeFactory()
                 concept_lookup = ConceptLookup()
                 new_concepts = {}
+                required_nodes = {}
+                for node in Node.objects.filter(isrequired=True).values_list('nodeid', 'name'):
+                    required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
                 resourceids = []
@@ -319,7 +319,7 @@ class CsvReader(Reader):
                     print '*'*80
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
                         print 'ResourceID: ' + non_contiguous_resource_id
-                    print 'ERROR: The preceding ResourceIDs are non-contiguous in yoru csv file. Please sort your csv file by ResourceID and try import again.'
+                    print 'ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again.'
                     print '*'*80
                     sys.exit()
 
@@ -395,6 +395,22 @@ class CsvReader(Reader):
                         blank_tile = None
                     # return deepcopy(blank_tile)
                     return cPickle.loads(cPickle.dumps(blank_tile, -1))
+
+                def check_required_nodes(tile, required_nodes, all_nodes):
+                    # Check that each required node in a tile is populated.
+                    errors = []
+                    if len(required_nodes) > 0:
+                        if target_tile.data != {}:
+                            for target_k, target_v in target_tile.data.iteritems():
+                                if target_k in required_nodes.keys() and target_v is None:
+                                    populated_tiles.pop(populated_tiles.index(target_tile))
+                                    errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
+                        elif target_tile.tiles != None:
+                            for tile in tiles:
+                                check_required_nodes(tile)
+                    if len(errors) > 0:
+                        self.errors += errors
+
                 resources = []
 
                 for row_number, row in enumerate(business_data):
@@ -521,6 +537,8 @@ class CsvReader(Reader):
 
                         if target_tile != None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
+                            # Check that required nodes are populated. If not remove tile from populated_tiles array.
+                            check_required_nodes(target_tile, required_nodes, all_nodes)
 
                     previous_row_resourceid = row['ResourceID']
                     legacyid = row['ResourceID']
