@@ -46,7 +46,8 @@ class AAT_Provider(Abstract_Provider):
         concepts = []    
         langs = []   
         for lang in self.allowed_languages:
-            langs.append('\"%s\"' % (lang))
+            # the AAT expects language codes to be all lower case
+            langs.append('\"%s\"' % (lang.lower()))
         for uri in uris.split(','):
             query = """
                 SELECT ?value ?type WHERE {
