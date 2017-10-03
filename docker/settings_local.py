@@ -45,3 +45,5 @@ USER_SECRET_KEY = get_optional_env_variable('DJANGO_SECRET_KEY')
 if USER_SECRET_KEY:
     # Make this unique, and don't share it with anybody.
     SECRET_KEY = USER_SECRET_KEY
+
+STATIC_ROOT = '/static_root'
