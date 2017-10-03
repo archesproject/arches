@@ -796,7 +796,6 @@ define([
                                 }, self);
                             }, self)
                             data = result;
-                            self.reportData = data;
                             source.setData(data)
                             _.each(['resource-poly' + self.graphId, 'resource-line' + self.graphId, 'resource-point' + self.graphId], function(layerId) { //clear and add resource layers so that they are on top of map
                                 var cacheLayer = self.map.getLayer(layerId);
