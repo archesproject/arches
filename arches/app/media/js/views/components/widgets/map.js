@@ -601,7 +601,7 @@ define([
                             }
                         });
                     });
-                };
+                };m
 
                 this.map.on('load', function() {
                     if (!self.configForm) {

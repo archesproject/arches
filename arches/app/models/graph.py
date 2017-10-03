@@ -175,6 +175,7 @@ class Graph(models.GraphModel):
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.config = nodeobj.get('config', None)
             node.issearchable = nodeobj.get('issearchable', True)
+            node.isrequired = nodeobj.get('isrequired', False)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -1153,7 +1154,7 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass','description'])
+                    unpermitted_node_edits = find_unpermitted_edits(db_node, self.nodes[db_node.nodeid], ['name', 'issearchable', 'ontologyclass','description', 'isrequired'])
                     if unpermitted_node_edits != None:
                         unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)

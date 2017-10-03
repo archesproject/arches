@@ -76,7 +76,6 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
-
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
@@ -104,6 +103,7 @@ class Card(models.CardModel):
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
                         node_model.config = node.get('config', None)
+                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
                         self.nodes.append(node_model)
 
             else:
@@ -120,7 +120,6 @@ class Card(models.CardModel):
         Saves an a card and it's parent ontology property back to the db
 
         """
-
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()

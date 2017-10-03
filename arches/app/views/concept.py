@@ -310,16 +310,16 @@ def dropdown(request):
 
 def paged_dropdown(request):
     conceptid = request.GET.get('conceptid')
-    query = request.GET.get('query')
+    query = request.GET.get('query', None)
+    query = None if query == '' else query
     page = int(request.GET.get('page', 1))
     limit = 50
     offset = (page - 1) * limit
-    if query == '':
-        query = None
-    columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
-    results = Concept().get_child_edges(conceptid, ['member', 'hasTopConcept'], child_valuetypes=['prefLabel'], offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
-    total_count = results[0][5] if len(results) > 0 else 0
-    data = [dict(zip(['id', 'conceptid', 'text', 'type', 'depth'], d)) for d in results]
+
+    results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
+    total_count = results[0][2] if len(results) > 0 else 0
+    data = [dict(zip(['valueto','depth'], d)) for d in results]
+    data = [dict(zip(['conceptid', 'id', 'type', 'text', 'language'], d['valueto'].values()), depth=d['depth']) for d in data]
     return JSONResponse({
         'results': data,
         'more': offset+limit < total_count

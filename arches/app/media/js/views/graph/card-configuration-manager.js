@@ -52,6 +52,7 @@ require([
             card.name = ko.observable(card.name);
         }
     });
+
     viewModel.graphCardOptions = ko.observableArray(options.concat(graphCards));
 
     viewModel.openCard = function (cardId) {

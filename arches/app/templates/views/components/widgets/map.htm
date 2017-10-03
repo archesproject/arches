@@ -3,6 +3,9 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+    <!-- ko if: node -->
+    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <!-- /ko -->
 
     <!-- ko if: mapImage() -->
     <div class="relative print-map" data-bind="css: getContextCss()">
