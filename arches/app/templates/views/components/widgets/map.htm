@@ -4,6 +4,12 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
+    <!-- ko if: mapImage() -->
+    <div class="relative print-map" data-bind="css: getContextCss()">
+        <img data-bind="attr: {src: mapImage() }">
+    </div>
+    <!-- /ko -->
+
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
