@@ -93,7 +93,7 @@ Optional Environment Variables:
 1. Set the name of your Docker image. Edit your `docker-compose.yml`:  
 	Under the 'arches' service, change:
 	```
-		image: arches/arches:latest
+		image: archesproject/arches:latest
 	```
 	into
 	```
@@ -140,7 +140,7 @@ This will be used throughout your development process and does not need to be ch
 
 7. Set up your own Docker image build. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add these lines:
 	```
-		FROM arches/arches:latest
+		FROM archesproject/arches:latest
 		COPY . ${ARCHES_ROOT}
 	```
 
