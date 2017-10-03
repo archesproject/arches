@@ -181,7 +181,7 @@ Thus, using the concepts file, the example above should be changed to look like 
 
 
 Uploading a Shapefile to Arches
--------------------------
+-------------------------------
 
 Uploading a shapefile to Arches is very similar to uploading a csv file with a few exceptions. The same rules apply to rich text, concept data, grouped data, and contiguousness. And, like csv import, shapefile import requires a mapping file.
 
@@ -202,4 +202,4 @@ To import a shapefile use the same command as csv import, simply point to your s
 Exporting Arches Data
 ---------------------
 
-More documentation coming soon... Currently all export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
+Currently all export must happen throught the command line interface. Export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
