@@ -7,6 +7,12 @@
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
 
+    <!-- ko if: mapImage() -->
+    <div class="relative print-map" data-bind="css: getContextCss()">
+        <img data-bind="attr: {src: mapImage() }">
+    </div>
+    <!-- /ko -->
+
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,

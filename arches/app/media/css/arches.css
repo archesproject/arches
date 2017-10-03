@@ -8812,6 +8812,22 @@ a.search-facet-item.disabled {
     margin-right: 0;
 }
 
+.print-map {
+    display: none;
+}
+
+.hidden-map {
+    overflow: hidden;
+    height: 0;
+    width: 0;
+    position: fixed;
+}
+
+.print-map-container {
+    width: 576px;
+    height: 360px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -9002,7 +9018,12 @@ a.search-facet-item.disabled {
     .rp-report-section {
         border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     }
-    .mapboxgl-canvas {
-        width: calc(100% - 0px) !important;
+    .mapboxgl-map {
+        display: none;
+    }
+    .print-map {
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 }
