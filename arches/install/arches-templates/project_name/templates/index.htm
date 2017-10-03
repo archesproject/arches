@@ -96,11 +96,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
                         </li>
                         {% endif %}
-<<<<<<< Updated upstream
-                        <li class="page-scroll">
-                            <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
-                        </li>
-=======
                         <li class="page-scroll" style="display: flex; flex-direction: row">
                             {% if user.username == 'anonymous' %}
                             <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
@@ -120,7 +115,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
                         </ul>
                         <!-- /ko -->
->>>>>>> Stashed changes
                     </ul>
                 </div>
             </div>
