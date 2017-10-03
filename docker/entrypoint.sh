@@ -366,6 +366,7 @@ do
 		run_migrations)
 			wait_for_db
 			run_migrations
+		;;
 		help|-h)
 			display_help
 		;;
