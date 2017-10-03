@@ -7,7 +7,7 @@ services:
       build:
         context: .
         dockerfile: ./Dockerfile
-      command: run_tests run_arches
+      command: run_arches
       volumes:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
