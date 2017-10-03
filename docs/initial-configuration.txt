@@ -10,15 +10,18 @@ Now that you have Arches installed, there are a few extra settings you must conf
 The most important settings to begin with are related to the map on the Search page. 
 
 1. Enter your Mapbox API Key.
-    By default, Arches uses a few basemap services from Mapbox, for which you need to provide a key. You can get a free key at mapbox.com, and for installations that do not expect exceptionally heavy traffic, this free key will be sufficient. Once you have obtained the key, copy it from Mapbox (it will start with ``pk.``). Go to **Map Settings --> Mapbox API** and enter key there.
+    By default, Arches uses a few basemap services from Mapbox, for which you need to provide a key. You can get a free key at mapbox.com, and for installations that do not expect exceptionally heavy traffic, this free key will be sufficient. Once you have obtained the key, copy it from Mapbox (it will start with ``pk.``). Go to **System Settings -- > Map Settings --> Mapbox API** and enter key there.
+
+    If you don't want to use MapBox, you can avoid this step by loading in a different basemap and removing all of the default MapBox layers. More about loading different basemaps in the `command line reference <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_ documentation.
+
 2. Set the default Map Zoom and Project Extent settings
-    You should also set the Project Extent (edit the size of the default polygon to contain your area of interest) and default zoom settings. It may be best to open a new tab with your Search page, make a change here in the Settings, and then refresh your Search page to preview the changes you make.
+    The Map Zoom is useful for geometry editing, but note that the Search page will automatically zoom to the extent of your search results every time they are updated. The Project Area is very important as it defines the area for your hexagon bins. It may be best to open a new tab with your Search page, make a change here in the Settings, and then refresh your Search page to preview the changes you make.
 3. Change Hexagon Bin Settings
-    Finally, you can change the size and precision of the search result hexagon bins. We recommend changing these settings in small increments, as making a small bin size with a large project area (for example) can be costly for your browser and may cause it to crash when loading the Search page.
+    Finally, you can change the size and precision of the search result hexagon bins. We recommend changing these settings in small increments, as making a *small* bin size with a *large* project area (for example) can be costly for your browser and may cause it to crash when loading the Search page.
 
 After getting the Map Settings figured out, you will probably want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
 
-All Settings
+All System Settings
 ============
 
 System Settings
@@ -26,8 +29,8 @@ System Settings
 
 *Default Application Settings*
 
-+ **Application Name** - Name of your Arches app. This name will be displayed in the browser title bar.
-+ **Default Data Import/Export User** - ____
++ **Application Name** - Name of your Arches app, to be displayed in the browser title bar and elsewhere.
++ **Default Data Import/Export User** - Name to associate with data that is imported into the system.
 
 *Web Analytics*
 
@@ -54,7 +57,7 @@ Draw a polygon representing your project's extent. These bounds will serve as th
 
 *Map Zoom*
 
-You can define the zoom behavior of your maps by specifying max/min and default values. Zoom level 0 shows the whole world (and is the minimum zoom level). Most map services support a maximum of 20 or so zoom levels.</p>
+You can define the zoom behavior of your maps by specifying max/min and default values. Zoom level 0 shows the whole world (and is the minimum zoom level). Most map services support a maximum of 20 or so zoom levels.
 
 *Search Results Grid*
 
@@ -72,8 +75,8 @@ Temporal Search Settings
 
 Arches creates a Time Wheel based on the resources in your database, to allow for quick temporal visualization and queries. A few aspects of this temporal search are defined here.
 
-+ **Color Ramp** - The color ramp for the time wheel. For further reference, check out the `d3 API reference <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md>`_.
-+ **Time wheel configuration** - Configure the time wheel here (____).
++ **Color Ramp** - Currently unused (saved for future implementation). The color ramp for the time wheel. For further reference, check out the `d3 API reference <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md>`_.
++ **Time wheel configuration** - Currently unused (saved for future implementation).
 
 Saved Searches
 ----------------
