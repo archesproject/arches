@@ -115,7 +115,9 @@ class Command(BaseCommand):
 
         parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
             help='Export grouped business data attrbiutes one or multiple csv files. By setting this flag the system will export all grouped business data to one csv file.')
-
+            
+        parser.add_argument('-y', '--yes', action='store_true', dest='yes',
+            help='used to force a yes answer to any user input "continue? y/n" prompt')
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -149,7 +151,7 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'remove_resources':
-            self.remove_resources(options['load_id'])
+            self.remove_resources(load_id=options['load_id'],force=options['yes'])
 
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
@@ -658,13 +660,17 @@ class Command(BaseCommand):
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
 
-    def remove_resources(self, load_id):
+    def remove_resources(self, load_id='', force=False):
         """
-        Runs the resource_remover command found in package_utils
-
+        Runs the resource_remover command found in data_management.resources
         """
         # resource_remover.delete_resources(load_id)
+        if not force:
+            if not utils.get_yn_input("all resources will be removed. continue?"):
+                return
+        
         resource_remover.clear_resources()
+        return
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         try:
