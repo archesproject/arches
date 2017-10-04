@@ -3162,6 +3162,7 @@ input.cmn-toggle-yes-no:checked+label:after {
     padding: 5px;
     margin-left: -5px;
     background: #fff;
+    overflow-y: hidden;
 }
 
 .rr-fdg-description {
@@ -3169,7 +3170,7 @@ input.cmn-toggle-yes-no:checked+label:after {
     line-height: 1.35;
     color: #888;
     background: #fff;
-    overflow: hidden;
+    overflow: scroll;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -5205,6 +5206,7 @@ li.aside-li.active:hover, .library-dark .tab-content {
     transition: height 0.25s;
     background: #ffffff;
     border-left: 5px solid steelblue;
+    overflow-y: hidden;
 }
 
 .library-card.relative.hovered {
