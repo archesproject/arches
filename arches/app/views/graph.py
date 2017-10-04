@@ -338,10 +338,13 @@ class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
             card = Card.objects.get(cardid=cardid)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
         except(Card.DoesNotExist):
             # assume the cardid is actually a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
-        self.graph = Graph.objects.get(graphid=card.graph_id)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
+            if self.graph.isresource == True:
+                return redirect('card_manager', graphid=cardid)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
