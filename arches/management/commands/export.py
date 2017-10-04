@@ -58,7 +58,8 @@ class Command(BaseCommand):
             for geom_type, st_type in geometry_types.iteritems():
                 cmd = 'pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}'.format(dest, geom_type, db['PASSWORD'], db['USER'], db['NAME'])
                 cmd_process = cmd.split()
-                sql = 'select * from vw_monuments where geom_type in ({0});'.format(','.join(st_type))
+                sql = 'select * from {0} where geom_type in ({1});'.format(table, ','.join(st_type))
+                print sql
                 cmd_process.append(sql)
                 subprocess.call(cmd_process)
 
