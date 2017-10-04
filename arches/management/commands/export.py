@@ -18,12 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import subprocess
-from arches.management.commands import utils
-from arches.app.models import models
-from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import IntegrityError
 from arches.app.models.system_settings import settings
-
+from arches.management.commands import utils
+from django.core.management.base import BaseCommand, CommandError
+from django.db import connection
 
 class Command(BaseCommand):
     """
@@ -48,20 +46,28 @@ class Command(BaseCommand):
             self.shapefile(dest=options['dest'], table=options['table'])
 
     def shapefile(self, dest, table):
-        if os.path.exists(dest) == False:
-            os.mkdir(dest)
-            db = settings.DATABASES['default']
-            geometry_types = {'linestring':("\'ST_MultiLineString\'", "\'ST_LineString\'"),
+        geometry_types = {
+            'linestring':("\'ST_MultiLineString\'", "\'ST_LineString\'"),
             'point': ("\'ST_Point\'", "\'ST_MultiPoint\'"),
             'polygon': ("\'ST_MultiPolygon\'", "\'ST_Polygon\'")
-            }
-            for geom_type, st_type in geometry_types.iteritems():
-                cmd = 'pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}'.format(dest, geom_type, db['PASSWORD'], db['USER'], db['NAME'])
-                cmd_process = cmd.split()
-                sql = 'select * from {0} where geom_type in ({1});'.format(table, ','.join(st_type))
-                print sql
-                cmd_process.append(sql)
-                subprocess.call(cmd_process)
+        }
 
+        if os.path.exists(dest) == False:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM {0}".format(table))
+                row = cursor.fetchall()
+                db = settings.DATABASES['default']
+                if len(row) > 0:
+                    os.mkdir(dest)
+                    for geom_type, st_type in geometry_types.iteritems():
+                        cursor.execute("SELECT count(*) FROM {0} WHERE geom_type IN ({1})".format(table, ','.join(st_type)))
+                        if cursor.fetchone()[0] > 0:
+                            cmd = 'pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}'.format(dest, geom_type, db['PASSWORD'], db['USER'], db['NAME'])
+                            cmd_process = cmd.split()
+                            sql = 'select * from {0} where geom_type in ({1});'.format(table, ','.join(st_type))
+                            cmd_process.append(sql)
+                            subprocess.call(cmd_process)
+                else:
+                    print "No records in table for export"
         else:
             print 'Cannot export data. Destination {} already exists'.format({dest})
