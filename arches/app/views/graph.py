@@ -312,6 +312,11 @@ class GraphDataView(View):
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
+        if self.graph.isresource == False:
+            card = Card.objects.get(cardid=Graph.objects.get(graphid=graphid).get_root_card().cardid)
+            cardid = card.cardid
+            return redirect('card', cardid=cardid)
+
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
@@ -333,10 +338,13 @@ class CardView(GraphBaseView):
     def get(self, request, cardid):
         try:
             card = Card.objects.get(cardid=cardid)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
         except(Card.DoesNotExist):
             # assume the cardid is actually a graph id
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
-        self.graph = Graph.objects.get(graphid=card.graph_id)
+            self.graph = Graph.objects.get(graphid=card.graph_id)
+            if self.graph.isresource == True:
+                return redirect('card_manager', graphid=cardid)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
