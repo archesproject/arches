@@ -571,7 +571,7 @@ class Concept(object):
     def get_sortkey(self, lang=settings.LANGUAGE_CODE):
         for value in self.values:
             if value.type == 'sortorder':
-                return value.value
+                return int(value.value)
 
         return self.get_preflabel(lang=lang).value
 
@@ -721,6 +721,7 @@ class Concept(object):
                 self.label = ''
                 self.labelid = ''
                 self.id = ''
+                self.sortorder = None
                 self.load_on_demand = False
                 self.children = []
 
@@ -730,10 +731,9 @@ class Concept(object):
             temp = Concept()
             for label in labels:
                 temp.addvalue(label)
-                # if label.valuetype_id == 'prefLabel':
-                #     ret.label = label.value
-                #     ret.id = label.conceptid_id
-                #     ret.labelid = label.valueid
+                if label.valuetype_id == 'sortorder':
+                    ret.sortorder = label.value
+  
             label = temp.get_preflabel(lang=lang)
             ret.label = label.value
             ret.id = label.conceptid
@@ -750,7 +750,7 @@ class Concept(object):
                     level = level + 1
                 for relation in conceptrealations:
                     ret.children.append(_findNarrowerConcept(relation.conceptto_id, depth_limit=depth_limit, level=level))
-                ret.children = sorted(ret.children, key=lambda concept: concept.label)
+                ret.children = sorted(ret.children, key=lambda concept: int(concept.sortorder) if concept.sortorder else concept.label, reverse=False)
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
