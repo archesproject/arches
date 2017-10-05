@@ -214,7 +214,7 @@ class Resource(models.ResourceInstance):
         """
 
         se = SearchEngineFactory().create()
-        related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000)
+        related_resources = self.get_related_resources(lang="en-US", start=0, limit=1000, page=0)
         for rr in related_resources['resource_relationships']:
             models.ResourceXResource.objects.get(pk=rr['resourcexid']).delete()
         query = Query(se)
@@ -228,21 +228,36 @@ class Resource(models.ResourceInstance):
         self.save_edit(edit_type='delete')
         super(Resource, self).delete()
 
-    def get_related_resources(self, lang='en-US', limit=1000, start=0):
+    def get_related_resources(self, lang='en-US', limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
+        root_nodes = models.Node.objects.filter(istopnode=True)
+        node_config_lookup = {}
+
+        for node in root_nodes:
+            graph_id = unicode(node.graph_id)
+            if node.config != None:
+                node_config_lookup[graph_id] = node.config
+                node_config_lookup[graph_id]['iconclass'] = node.graph.iconclass
+                node_config_lookup[graph_id]['name'] = node.graph.name
 
         ret = {
             'resource_instance': self,
             'resource_relationships': [],
-            'related_resources': []
+            'related_resources': [],
+            'root_node_config': models.Node.objects.filter(graph_id=self.graph.graphid).filter(istopnode=True)[0].config,
+            'node_config_lookup': node_config_lookup
         }
         se = SearchEngineFactory().create()
 
+        if page > 0:
+            limit = settings.RELATED_RESOURCES_PER_PAGE
+            start = limit*int(page-1)
+
         def get_relations(resourceinstanceid, start, limit):
-            query = Query(se, limit=limit, start=start)
+            query = Query(se, start=start, limit=limit)
             bool_filter = Bool()
             bool_filter.should(Terms(field='resourceinstanceidfrom', terms=resourceinstanceid))
             bool_filter.should(Terms(field='resourceinstanceidto', terms=resourceinstanceid))
@@ -266,13 +281,49 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             instanceids.remove(str(self.resourceinstanceid))
 
-        related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
-        if related_resources:
-            for resource in related_resources['docs']:
-                relations = get_relations(resource['_id'], 0, 0)
-                resource['_source']['total_relations'] = relations['hits']['total']
-                ret['related_resources'].append(resource['_source'])
+        if len(instanceids) > 0:
+            related_resources = se.search(index='resource', doc_type='_all', id=list(instanceids))
+            if related_resources:
+                for resource in related_resources['docs']:
+                    relations = get_relations(resource['_id'], 0, 0)
+                    resource['_source']['total_relations'] = relations['hits']['total']
+                    ret['related_resources'].append(resource['_source'])
         return ret
+
+    def copy(self):
+        """
+        Returns a copy of this resource instance includeing a copy of all tiles associated with this resource instance
+
+        """
+        # need this here to prevent a circular import error
+        from arches.app.models.tile import Tile
+
+        id_map = {}
+        new_resource = Resource()
+        new_resource.graph = self.graph
+
+        if len(self.tiles) == 0:
+            self.tiles = Tile.objects.filter(resourceinstance=self)
+
+        for tile in self.tiles:
+            new_tile = Tile()
+            new_tile.data = tile.data
+            new_tile.nodegroup = tile.nodegroup
+            new_tile.parenttile = tile.parenttile
+            new_tile.resourceinstance = new_resource
+            new_tile.sortorder = tile.sortorder
+
+            new_resource.tiles.append(new_tile)
+            id_map[tile.pk] = new_tile
+
+        for tile in new_resource.tiles:
+            if tile.parenttile:
+                tile.parenttile = id_map[tile.parenttile_id]
+
+        with transaction.atomic():
+            new_resource.save()
+
+        return new_resource
 
     def serialize(self):
         """

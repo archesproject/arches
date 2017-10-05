@@ -438,7 +438,8 @@
                 "name": "Evaluation Assignment", 
                 "nodegroup_id": "29973bd4-ab9b-11e6-84a5-026d961c88e6", 
                 "nodeid": "29973bd4-ab9b-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Supports workflow to evaluate candidacy for protection", 
             "version": ""

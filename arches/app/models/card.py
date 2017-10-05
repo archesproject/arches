@@ -76,11 +76,10 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
-
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if not (key == 'cards' or key == 'widgets' or key == 'nodes'):
+                    if key not in ('cards', 'widgets', 'nodes', 'is_editable'):
                         setattr(self, key, value)
 
                 for card in args[0]["cards"]:
@@ -104,6 +103,7 @@ class Card(models.CardModel):
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
                         node_model.config = node.get('config', None)
+                        node_model.isrequired = node.get('isrequired', node_model.isrequired)
                         self.nodes.append(node_model)
 
             else:
@@ -120,7 +120,6 @@ class Card(models.CardModel):
         Saves an a card and it's parent ontology property back to the db
 
         """
-
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
@@ -181,6 +180,7 @@ class Card(models.CardModel):
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
+        ret['is_editable'] = self.is_editable
         ret['ontologyproperty'] = self.ontologyproperty
 
         if self.graph and self.graph.ontology and self.graph.isresource:

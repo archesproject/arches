@@ -158,7 +158,8 @@
                 "name": "Temporal Search", 
                 "nodegroup_id": "4f565180-fad7-11e6-a72e-6c4008b05c4c", 
                 "nodeid": "4f565180-fad7-11e6-a72e-6c4008b05c4c", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Configuration settings for temporal searches", 
             "version": ""

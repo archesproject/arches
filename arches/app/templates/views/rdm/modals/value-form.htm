@@ -31,6 +31,7 @@
 
                                     <!-- Label Type -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
                                         <select style="width:100%;" class="select2 value-type-input" id="label-type" name="label-type" placeholder='{% trans "Label type" %}' required>
                                             {% for label in valuetype_labels %}
                                               <option value="{{label.valuetype}}">{{label.valuetype}}</option>
@@ -41,6 +42,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder='{% trans "Language" %}' required>
                                             {% for language in languages %}
                                               <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
@@ -108,6 +110,7 @@
 
                                     <!-- Note Type -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
                                         <select style="width:100%;" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required placeholder="Note type">
                                         {% for note in valuetype_notes %}
                                           <option value="{{note.valuetype}}">{{note.valuetype}}</option>
@@ -118,6 +121,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" name="note_language_dd" id="note_language_dd" required placeholder="Language">
                                         {% for language in languages %}
                                           <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
@@ -184,6 +188,7 @@
 
                                     <!-- Value Type -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
                                         <select style="width:100%;" class="select2 value value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required placeholder='{% trans "Value type" %}'>
                                         {% for related_value in valuetype_related_values %}
                                           <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
@@ -194,6 +199,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder='{% trans "Language" %}'>
                                         {% for language in languages %}
                                           <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>

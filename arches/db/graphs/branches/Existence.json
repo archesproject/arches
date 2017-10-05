@@ -287,7 +287,8 @@
                 "name": "Existence Event", 
                 "nodegroup_id": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c", 
                 "nodeid": "ec6f7e38-b1e9-11e6-b36f-6c4008b05c4c", 
-                "ontologyclass": "E5_Event"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E5_Event", 
+                "parentproperty": ""
             }, 
             "subtitle": "Beginning and End of Existence of a resource", 
             "version": ""

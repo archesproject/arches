@@ -143,7 +143,8 @@
                 "name": "Basic Search Settings", 
                 "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
                 "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                "ontologyclass": "E13_Attribute_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Default configuration for Search", 
             "version": ""

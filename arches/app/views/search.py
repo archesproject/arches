@@ -21,7 +21,6 @@ import csv
 import math
 from datetime import datetime
 from django.shortcuts import render
-from django.core.paginator import Paginator
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry, Polygon
 from django.db import connection
@@ -33,6 +32,7 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
+from arches.app.utils.pagination import get_paginator
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.date_utils import SortableDate
@@ -172,6 +172,7 @@ def search_results(request):
     dsl.include('map_popup')
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
+
     if results is not None:
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -227,22 +228,6 @@ def get_doc_type(request):
                 doc_type.add(str(resouceTypeFilter['graphid']))
 
     return list(doc_type)
-
-def get_paginator(request, results, total_count, page, count_per_page):
-    paginator = Paginator(range(total_count), count_per_page)
-    pages = [page]
-    if paginator.num_pages > 1:
-        before = range(1, page)
-        after = range(page+1, paginator.num_pages+1)
-        default_ct = 2
-        ct_before = default_ct if len(after) > default_ct else default_ct*2-len(after)
-        ct_after = default_ct if len(before) > default_ct else default_ct*2-len(before)
-        if len(before) > ct_before:
-            before = [1,None]+before[-1*(ct_before-1):]
-        if len(after) > ct_after:
-            after = after[0:ct_after-1]+[None,paginator.num_pages]
-        pages = before+pages+after
-    return paginator, pages
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
@@ -440,9 +425,8 @@ def _buffer(geojson, width=0, unit='ft'):
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
-    for row in Concept().get_child_concepts(conceptid, ['narrower'], ['prefLabel'], 'prefLabel'):
+    for row in Concept().get_child_concepts(conceptid, ['prefLabel']):
         ret.add(row[0])
-        ret.add(row[1])
     return list(ret)
 
 def export_results(request):

@@ -179,7 +179,8 @@
                 "name": "Resource Creation Event", 
                 "nodegroup_id": "b048668c-9564-11e6-b664-024f9e178154", 
                 "nodeid": "b048668c-9564-11e6-b664-024f9e178154", 
-                "ontologyclass": "E65_Creation"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E65_Creation", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes the creators, contributors, type, and date of a creation and/or update event of an information resource.", 
             "version": ""

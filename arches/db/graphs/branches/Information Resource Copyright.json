@@ -113,7 +113,8 @@
                 "name": "Copyright Description", 
                 "nodegroup_id": "08cfb2f8-963f-11e6-8a28-026d961c88e6", 
                 "nodeid": "08cfb2f8-963f-11e6-8a28-026d961c88e6", 
-                "ontologyclass": "E30_Right"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E30_Right", 
+                "parentproperty": ""
             }, 
             "subtitle": "Used to define legal privileges associated with an Information Resource.", 
             "version": ""

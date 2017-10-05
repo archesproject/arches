@@ -81,6 +81,7 @@ define([
             self.configKeys = ko.observableArray();
             self.config = {};
             self.issearchable = ko.observable(true);
+            self.isrequired = ko.observable(true);
 
             self.parse(options.source);
 
@@ -158,7 +159,8 @@ define([
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
-                    issearchable: self.issearchable
+                    issearchable: self.issearchable,
+                    isrequired: self.isrequired
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
@@ -230,6 +232,7 @@ define([
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
+            self.isrequired(source.isrequired);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -245,6 +248,15 @@ define([
         setupConfig: function(config) {
             var self = this;
             var keys = [];
+            var datatypeRecord = this.datatypelookup[this.datatype()];
+            if (datatypeRecord) {
+                var defaultConfig = datatypeRecord.defaultconfig;
+                _.each(defaultConfig, function (value, key) {
+                    if (!config.hasOwnProperty(key)) {
+                        config[key] = value;
+                    }
+                });
+            }
             _.each(config, function(configVal, configKey) {
                 if (!ko.isObservable(self.config[configKey])) {
                     self.config[configKey] = Array.isArray(configVal) ?

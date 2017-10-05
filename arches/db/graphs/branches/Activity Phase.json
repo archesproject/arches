@@ -230,7 +230,8 @@
                 "name": "Activity Phase", 
                 "nodegroup_id": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
                 "nodeid": "4ff978b8-9bd4-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E4_Period"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E4_Period", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes the time span and type of an Activity Resource", 
             "version": ""

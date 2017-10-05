@@ -207,6 +207,16 @@ class Concept(object):
             subconcept.save()
             self.add_relation(subconcept, subconcept.relationshiptype)
 
+        # if we're moving a Concept Scheme below another Concept or Concept Scheme
+        if len(self.parentconcepts) > 0 and concept.nodetype_id == 'ConceptScheme':
+            concept.nodetype_id = 'Concept'
+            concept.save()
+            self.load(concept)
+
+            for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='hasTopConcept'):
+                relation.relationtype_id = 'narrower'
+                relation.save()
+
         for relatedconcept in self.relatedconcepts:
             self.add_relation(relatedconcept, relatedconcept.relationshiptype)
 
@@ -216,7 +226,6 @@ class Concept(object):
                     for subconcept in concept.subconcepts:
                         concept.add_relation(subconcept, relatedconcept.relationshiptype)
                 child_concepts.traverse(applyRelationship)
-
 
         return concept
 
@@ -238,9 +247,21 @@ class Concept(object):
                 models.Concept.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
-            conceptrelations = models.Relation.objects.filter(relationtype__category = 'Semantic Relations', conceptfrom = parentconcept.id, conceptto = self.id)
+            relations_filter = (Q(relationtype__category = 'Semantic Relations') | Q(relationtype = 'hasTopConcept')) & Q(conceptfrom = parentconcept.id) &  Q(conceptto = self.id)
+            conceptrelations = models.Relation.objects.filter(relations_filter)
             for relation in conceptrelations:
                 relation.delete()
+
+            if models.Relation.objects.filter(relations_filter).count() == 0:
+                # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
+                concept = models.Concept.objects.get(pk=self.id)
+                concept.nodetype_id = 'ConceptScheme'
+                concept.save()
+                self.load(concept)
+
+                for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id='narrower'):
+                    relation.relationtype_id = 'hasTopConcept'
+                    relation.save()
 
         deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:
@@ -287,12 +308,6 @@ class Concept(object):
 
         """
 
-        # relation = models.Relation()
-        # relation.pk = str(uuid.uuid4())
-        # relation.conceptfrom_id = self.id
-        # relation.conceptto_id = concepttorelate.id
-        # relation.relationtype_id = relationtype
-        # relation.save()
         relation, created = models.Relation.objects.get_or_create(conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype)
         return relation
 
@@ -324,51 +339,198 @@ class Concept(object):
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly
         if concept.nodetype == 'ConceptScheme':
-            rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel', 'altLabel', 'hiddenLabel'], 'prefLabel')
+            concepts_to_delete[concept.id] = concept
+            rows = Concept().get_child_concepts(concept.id)
             for row in rows:
                 if row[0] not in concepts_to_delete:
                     concepts_to_delete[row[0]] = Concept({'id': row[0]})
 
-                if row[1] not in concepts_to_delete:
-                    concepts_to_delete[row[1]] = Concept({'id': row[1]})
-
-                concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
-                concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
+                concepts_to_delete[row[0]].addvalue({'id':row[2], 'conceptid':row[0], 'value':row[1]})
 
         if concept.nodetype == 'Collection':
             concepts_to_delete[concept.id] = concept
+            rows = Concept().get_child_collections(concept.id)
+            for row in rows:
+                if row[0] not in concepts_to_delete:
+                    concepts_to_delete[row[0]] = Concept({'id': row[0]})
+
+                concepts_to_delete[row[0]].addvalue({'id':row[2], 'conceptid':row[0], 'value':row[1]})
 
         return concepts_to_delete
 
-    def get_child_concepts(self, conceptid, relationtypes, child_valuetypes, parent_valuetype):
+    def get_child_collections_hierarchically(self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None):
+        child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
+        columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count"
+        return self.get_child_edges(conceptid, ['member'], child_valuetypes, offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns)
+
+    def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=''):
+        child_valuetypes = child_valuetypes if child_valuetypes else ['prefLabel']
+        columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
+        return self.get_child_edges(conceptid, ['member'], child_valuetypes, parent_valuetype, columns, depth_limit)
+
+    def get_child_concepts(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=''):
+        columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
+        return self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
+
+    def get_child_concepts_for_indexing(self, conceptid, child_valuetypes=None, parent_valuetype='prefLabel', depth_limit=''):
+        columns = "valueidto::text, conceptidto::text, valuetypeto, categoryto, valueto, languageto"
+        data = self.get_child_edges(conceptid, ['narrower', 'hasTopConcept'], child_valuetypes, parent_valuetype, columns, depth_limit)
+        return [dict(zip(['id', 'conceptid', 'type', 'category', 'value', 'language'], d), top_concept='') for d in data]
+
+    def get_child_edges(self, conceptid, relationtypes, child_valuetypes=None, parent_valuetype='prefLabel', columns=None, depth_limit=None, offset=None, limit=20, order_hierarchically=False, query=None, languageid=settings.LANGUAGE_CODE):
         """
-        Recursively builds a list of child concepts for a given concept based on its relationship type and valuetypes.
+        Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
+        
+        relationtypes = ' or '.join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
+        depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
+        child_valuetypes = ("','").join(child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True))
+        limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
+        
+        if order_hierarchically:
+            sql = """
+                WITH RECURSIVE 
+
+                rels AS(
+                    SELECT conceptidfrom, conceptidto , relationtype, 
+                    (
+                        SELECT value
+                        FROM values
+                        WHERE conceptid=relations.conceptidto
+                        AND valuetype in ('prefLabel')
+                        ORDER BY (
+                            CASE WHEN languageid = '{languageid}' THEN 10
+                            WHEN languageid like '{short_languageid}%' THEN 5
+                            ELSE 0
+                            END
+                        ) desc limit 1
+                    ) as valuesto,
+                    (
+                        SELECT value::int
+                        FROM values
+                        WHERE conceptid=relations.conceptidto
+                        AND valuetype in ('sortorder')
+                        limit 1
+                    ) as sortorder
+
+                    FROM relations
+                    ORDER BY sortorder, valuesto
+                ), 
+
+                children AS (
+                    SELECT r.conceptidfrom, r.conceptidto,
+                        to_char(row_number() OVER (), 'fm000000') as row,
+                        1 AS depth       ---|NonRecursive Part
+                        FROM rels r
+                        WHERE r.conceptidfrom = '{conceptid}'
+                        and ({relationtypes})
+                    UNION
+                        SELECT r.conceptidfrom, r.conceptidto,
+                        row || '-' || to_char(row_number() OVER (), 'fm000000'),
+                        depth+1      ---|RecursivePart
+                        FROM rels r
+                        JOIN children b ON(b.conceptidto = r.conceptidfrom)
+                        WHERE ({relationtypes})
+                        {depth_limit}
+                )
+
+                {subquery}
+
+                SELECT
+                (
+                    select row_to_json(d)
+                    FROM (
+                        SELECT * 
+                        FROM values
+                        WHERE conceptid={recursive_table}.conceptidto
+                        AND valuetype in ('prefLabel')
+                        ORDER BY (
+                            CASE WHEN languageid = '{languageid}' THEN 10
+                            WHEN languageid like '{short_languageid}%' THEN 5
+                            ELSE 0
+                            END
+                        ) desc limit 1
+                    ) d
+                ) as valueto,
+                depth, count(*) OVER() AS full_count
+               
+               FROM {recursive_table} order by row {limit_clause};
+
+            """
+ 
+            subquery = """, results as (
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                FROM children c
+                JOIN values ON(values.conceptid = c.conceptidto)
+                WHERE LOWER(values.value) like '%%%s%%' 
+                AND values.valuetype in ('prefLabel')
+                    UNION
+                SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
+                FROM children c
+                JOIN results r on (r.conceptidfrom=c.conceptidto)
+            )""" % query.lower() if query is not None else ""
+            
+            recursive_table = "results" if query else "children"
+
+            sql = sql.format(
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
+                parent_valuetype=parent_valuetype, depth_limit=depth_limit, limit_clause=limit_clause, subquery=subquery, 
+                recursive_table=recursive_table, languageid=languageid, short_languageid=languageid.split('-')[0]
+            )
+
+        else:
+            sql = """
+                WITH RECURSIVE 
+                    children AS (
+                        SELECT r.conceptidfrom, r.conceptidto, r.relationtype, 1 AS depth
+                            FROM relations r
+                            WHERE r.conceptidfrom = '{conceptid}'
+                            AND ({relationtypes})
+                        UNION
+                            SELECT r.conceptidfrom, r.conceptidto, r.relationtype, depth+1
+                            FROM relations r
+                            JOIN children c ON(c.conceptidto = r.conceptidfrom)
+                            WHERE ({relationtypes})
+                            {depth_limit}
+                    ),
+                    results AS (
+                        SELECT  
+                            valuefrom.value as valuefrom, valueto.value as valueto,
+                            valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
+                            valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
+                            valuefrom.languageid as languagefrom, valueto.languageid as languageto,
+                            dtypesfrom.category as categoryfrom, dtypesto.category as categoryto,
+                            c.conceptidfrom, c.conceptidto
+                        FROM values valueto
+                            JOIN d_value_types dtypesto ON(dtypesto.valuetype = valueto.valuetype)
+                            JOIN children c ON(c.conceptidto = valueto.conceptid)
+                            JOIN values valuefrom ON(c.conceptidfrom = valuefrom.conceptid)
+                            JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
+                        WHERE valueto.valuetype in ('{child_valuetypes}') 
+                        AND valuefrom.valuetype in ('{child_valuetypes}')
+                    )
+                    SELECT distinct {columns}
+                    FROM results {limit_clause}
+    
+            """
+
+            if not columns:
+                columns = """
+                    conceptidfrom::text, conceptidto::text,
+                    valuefrom, valueto,
+                    valueidfrom::text, valueidto::text,
+                    valuetypefrom, valuetypeto,
+                    languagefrom, languageto,
+                    categoryfrom, categoryto
+                """
+
+            sql = sql.format(
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
+                columns=columns, depth_limit=depth_limit, limit_clause=limit_clause
+            )
 
         cursor = connection.cursor()
-        relationtypes = ' or '.join(["d.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        sql = """WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c2.valueid, c.valueid as valueidto, c.valuetype, 1 AS depth       ---|NonRecursive Part
-                    FROM relations d
-                    JOIN values c ON(c.conceptid = d.conceptidto)
-                    JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
-                    WHERE d.conceptidfrom = '{0}'
-                    and c2.valuetype = '{3}'
-                    and c.valuetype in ('{2}')
-                    and ({1})
-                UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v2.valueid, v.valueid as valueidto, v.valuetype, depth+1      ---|RecursivePart
-                    FROM relations  d
-                    JOIN children b ON(b.conceptidto = d.conceptidfrom)
-                    JOIN values v ON(v.conceptid = d.conceptidto)
-                    JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
-                    WHERE v2.valuetype = '{3}'
-                    and v.valuetype in ('{2}')
-                    and ({1})
-            )
-            SELECT conceptidfrom::text, conceptidto::text, value, valueto, valueid::text, valueidto::text FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
-
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -409,7 +571,7 @@ class Concept(object):
     def get_sortkey(self, lang=settings.LANGUAGE_CODE):
         for value in self.values:
             if value.type == 'sortorder':
-                return value.value
+                return int(value.value)
 
         return self.get_preflabel(lang=lang).value
 
@@ -498,13 +660,42 @@ class Concept(object):
             raise Exception('Invalid value definition: %s' % (value))
 
     def index(self, scheme=None):
+        if scheme == None:
+            scheme = self.get_context()
         for value in self.values:
-            if scheme == None:
-                scheme = self.get_context()
             value.index(scheme=scheme)
 
+        if self.nodetype == 'ConceptScheme':
+            scheme = None
+
         for subconcept in self.subconcepts:
-            subconcept.index(scheme=subconcept.get_context())
+            subconcept.index(scheme=scheme)
+
+    def bulk_index(self):
+        se = SearchEngineFactory().create()
+        concept_docs = []
+
+        if self.nodetype == 'ConceptScheme':
+            concept = Concept().get(id=self.id, values=['label'])
+            concept.index()
+            for topConcept in self.get_child_concepts_for_indexing(self.id, depth_limit=1):
+                concept = Concept().get(id=topConcept['conceptid'])
+                scheme = concept.get_context()
+                topConcept['top_concept'] = scheme.id
+                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=topConcept['id'], data=topConcept))
+                for childConcept in concept.get_child_concepts_for_indexing(topConcept['conceptid']):
+                    childConcept['top_concept'] = scheme.id
+                    concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=childConcept['id'], data=childConcept))
+
+        if self.nodetype == 'Concept':
+            concept = Concept().get(id=self.id, values=['label'])
+            scheme = concept.get_context()
+            concept.index(scheme)
+            for childConcept in concept.get_child_concepts_for_indexing(self.id):
+                childConcept['top_concept'] = scheme.id
+                concept_docs.append(se.create_bulk_item(index='strings', doc_type='concept', id=childConcept['id'], data=childConcept))
+
+        se.bulk_index(concept_docs)
 
     def delete_index(self, delete_self=False):
 
@@ -519,9 +710,7 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             delete_concept_values_index(concepts_to_delete)
-
         else:
-            delete_concept_values_index({self.id: self})
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 delete_concept_values_index(concepts_to_delete)
@@ -532,6 +721,7 @@ class Concept(object):
                 self.label = ''
                 self.labelid = ''
                 self.id = ''
+                self.sortorder = None
                 self.load_on_demand = False
                 self.children = []
 
@@ -541,10 +731,9 @@ class Concept(object):
             temp = Concept()
             for label in labels:
                 temp.addvalue(label)
-                # if label.valuetype_id == 'prefLabel':
-                #     ret.label = label.value
-                #     ret.id = label.conceptid_id
-                #     ret.labelid = label.valueid
+                if label.valuetype_id == 'sortorder':
+                    ret.sortorder = label.value
+  
             label = temp.get_preflabel(lang=lang)
             ret.label = label.value
             ret.id = label.conceptid
@@ -561,7 +750,7 @@ class Concept(object):
                     level = level + 1
                 for relation in conceptrealations:
                     ret.children.append(_findNarrowerConcept(relation.conceptto_id, depth_limit=depth_limit, level=level))
-                ret.children = sorted(ret.children, key=lambda concept: concept.label)
+                ret.children = sorted(ret.children, key=lambda concept: int(concept.sortorder) if concept.sortorder else concept.label, reverse=False)
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
@@ -805,6 +994,32 @@ class Concept(object):
 
         return JSONSerializer().serializeToPython(result)['children']
 
+    def make_collection(self):
+        if len(self.values) == 0:
+            raise Exception('Need to include values when creating a collection')
+        values = JSONSerializer().serializeToPython(self.values)
+        for value in values:
+            value['id'] = ''
+        collection_concept = Concept({
+            'nodetype': 'Collection',
+            'values': values
+        })
+
+        def create_collection(conceptfrom):
+            for relation in models.Relation.objects.filter(Q(conceptfrom_id = conceptfrom.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related')):
+                conceptto = Concept(relation.conceptto)
+                if conceptfrom == self:
+                    collection_concept.add_relation(conceptto, 'member')
+                else:
+                    conceptfrom.add_relation(conceptto, 'member')
+                create_collection(conceptto)
+
+        with transaction.atomic():
+            collection_concept.save()
+            create_collection(self)
+
+        return collection_concept
+
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):
@@ -840,22 +1055,20 @@ class ConceptValue(object):
             value.value = self.value
             value.concept_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
+            
             if self.language != '':
+                # need to normalize language ids to the form xx-XX
+                lang_parts = self.language.lower().replace('_', '-').split('-')
+                try:
+                    lang_parts[1] = lang_parts[1].upper()
+                except:
+                    pass
+                self.language = '-'.join(lang_parts)
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
-            try:
-                if value.value != 'Resource To Resource Relationship Types':
-                    value.save()
-            except IntegrityError as e:
-                valuetype = models.DValueType()
-                valuetype.valuetype = value.valuetype_id
-                valuetype.category = 'undefined'
-                valuetype.namespace = 'arches'
-                valuetype.save()
 
-                value.save()
-
+            value.save()
             self.category = value.valuetype.category
 
     def delete(self):

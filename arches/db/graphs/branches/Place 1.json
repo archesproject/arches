@@ -463,7 +463,8 @@
                 "name": "Place", 
                 "nodegroup_id": "9bda3162-97cb-11e6-84a5-026d961c88e6", 
                 "nodeid": "9bda3162-97cb-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E53_Place"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E53_Place", 
+                "parentproperty": ""
             }, 
             "subtitle": "Richer Place branch for Heritage Resource and Heritage Resource Group", 
             "version": ""

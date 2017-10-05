@@ -610,7 +610,8 @@
                 "name": "Phase Type Production", 
                 "nodegroup_id": "2926c068-a06d-11e6-84a5-026d961c88e6", 
                 "nodeid": "2926c068-a06d-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E12_Production"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E12_Production", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes time span and type for the Heritage Resource", 
             "version": ""

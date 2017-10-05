@@ -104,7 +104,8 @@
                 "name": "Linguistic_Object", 
                 "nodegroup_id": "d08dd1f2-9aff-11e6-84a5-026d961c88e6", 
                 "nodeid": "d08dd1f2-9aff-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E33_Linguistic_Object"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes the language of an Information Resource", 
             "version": ""

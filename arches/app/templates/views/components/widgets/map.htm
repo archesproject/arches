@@ -3,6 +3,15 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div class="row widget-wrapper" data-bind="css: {'report-header': context==='report-header'}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+    <!-- ko if: node -->
+    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <!-- /ko -->
+
+    <!-- ko if: mapImage() -->
+    <div class="relative print-map" data-bind="css: getContextCss()">
+        <img data-bind="attr: {src: mapImage() }">
+    </div>
+    <!-- /ko -->
 
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
@@ -29,7 +38,7 @@
                     <div class="media">
                         <!-- ko if: geojsonInput() === false && xyInput.active() === false -->
                             <!-- ko if: drawMode() === undefined || drawMode() === 'simple_select' -->
-                            <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Click a feature to drag or delete. Click lines or polygons twice to edit verticies" %}</span>
+                            <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Click a feature to drag or delete. Click lines or polygons twice to edit vertices" %}</span>
                             <!-- /ko -->
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'draw_point'-->
@@ -42,7 +51,7 @@
                         <strong>{% trans "Create Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are creating lines. Click the Line tool to exit." %}</span>
                         <!-- /ko -->
                         <!-- ko if: drawMode() === 'direct_select'-->
-                        <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " verticies. Click outside the feature to exit." %}</span>
+                        <strong>{% trans "Edit Mode" %}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "You are editing " %}<span data-bind="text: selectedFeatureType"></span>{% trans " vertices. Click outside the feature to exit." %}</span>
                         <!-- /ko -->
                         <!-- ko if: geojsonInput -->
                         <strong>{% trans "Geojson Mode "%}</strong><span data-bind="visible: !minimizeNotifications()"> {% trans "Enter a GeoJSON geometry to add a feature" %}</span>
@@ -227,7 +236,7 @@
                     </div>
                 </div>
                 <div class="hover-feature-body">
-                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
+                    <div class="hover-feature" data-bind="html: popupData().map_popup"></div>
                     <div class="hover-feature-metadata">
                         {% trans "Resource ID:" %}
                         <span data-bind="text: popupData().resourceinstanceid"></span>

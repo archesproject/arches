@@ -221,7 +221,8 @@
                 "name": "Actor Type Phase Assignment", 
                 "nodegroup_id": "b3061968-a77b-11e6-84a5-026d961c88e6", 
                 "nodeid": "b3061968-a77b-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E17_Type_Assignment"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E17_Type_Assignment", 
+                "parentproperty": ""
             }, 
             "subtitle": "Describes time span and type for the Actor resource model", 
             "version": ""

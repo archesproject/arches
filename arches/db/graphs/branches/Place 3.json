@@ -321,7 +321,8 @@
                 "name": "Place", 
                 "nodegroup_id": "29289dfa-bbf4-11e6-84a5-026d961c88e6", 
                 "nodeid": "29289dfa-bbf4-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E53_Place"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E53_Place", 
+                "parentproperty": ""
             }, 
             "subtitle": "Stripped down Place branch for use in Information Resource", 
             "version": ""

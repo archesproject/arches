@@ -146,7 +146,8 @@
                 "name": "External XRef", 
                 "nodegroup_id": "8eb94348-97c5-11e6-84a5-026d961c88e6", 
                 "nodeid": "8eb94348-97c5-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E42_Identifier"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E42_Identifier", 
+                "parentproperty": ""
             }, 
             "subtitle": "Used to hold identifiers necessary to link a given resource to records in an external system", 
             "version": ""

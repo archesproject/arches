@@ -170,7 +170,8 @@
                 "name": "Component", 
                 "nodegroup_id": "fcbecfc0-a08f-11e6-84a5-026d961c88e6", 
                 "nodeid": "fcbecfc0-a08f-11e6-84a5-026d961c88e6", 
-                "ontologyclass": "E18_Physical_Thing"
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing", 
+                "parentproperty": ""
             }, 
             "subtitle": "Physical thing (such as a door or chimney) on a heritage resource", 
             "version": ""

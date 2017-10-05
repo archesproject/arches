@@ -18,10 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
 from django.utils.translation import ugettext as _
+from arches.app.models.models import DValueType
 from arches.app.models.concept import Concept, ConceptValue
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from SPARQLWrapper import SPARQLWrapper, JSON
 from abstract_provider import Abstract_Provider
+from rdflib.namespace import SKOS, DCTERMS
 
 class AAT_Provider(Abstract_Provider):
 
@@ -37,10 +40,14 @@ class AAT_Provider(Abstract_Provider):
 
         """  
 
+        default_lang = settings.LANGUAGE_CODE
+        dcterms_identifier_type = DValueType.objects.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ''), namespace = 'dcterms')
+
         concepts = []    
         langs = []   
         for lang in self.allowed_languages:
-            langs.append('\"%s\"' % (lang))
+            # the AAT expects language codes to be all lower case
+            langs.append('\"%s\"' % (lang.lower()))
         for uri in uris.split(','):
             query = """
                 SELECT ?value ?type WHERE {
@@ -66,6 +73,7 @@ class AAT_Provider(Abstract_Provider):
                         'value': result["value"]["value"],
                         'language': result["value"]["xml:lang"]
                     }) 
+                concept.addvalue({'value':uri, 'language': settings.LANGUAGE_CODE, 'type': dcterms_identifier_type.valuetype, 'category': dcterms_identifier_type.category})
                 concepts.append(concept)
             else:
                 raise Exception(_("<strong>Error in SPARQL query:</strong><br>Test this query directly by pasting the query below into the Getty's own SPARQL endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://vocab.getty.edu/sparql</a><i><pre>%s</pre></i>Query returned 0 results, please check the query for errors.  You may need to add the appropriate languages into the database for this query to work<br><br>") % (query.replace('<', '&lt').replace('>', '&gt')))

@@ -1,10 +1,10 @@
 define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
-        initialize: function(e){
+        initialize: function(options){
             var self = this;
             this.modal = this.$el.find('.modal');
-            this.title = this.modal.find('h4').text();
+            this.viewModel = options.viewModel;
 
             // test to see if select2 has already been applied to the dom
             if (! this.$el.find('.select2').attr('id')){
@@ -25,8 +25,7 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                     scheme_dd: "required"
                 },
                 submitHandler: function(form) {
-                    self.modal.find('h4').text(' ' + self.title);
-                    self.modal.find('.modal-title').addClass('loading');
+                    self.viewModel.loading(true);
                     self.model = new ConceptModel({
                         'id':self.schemedropdown.val(),
                         'nodetype': 'ConceptScheme', 
@@ -34,9 +33,8 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                     });
 
                     self.model.delete(function(){
-                        self.modal.find('h4').text(self.title);
-                        self.modal.find('.modal-title').removeClass('loading');
                         self.modal.modal('hide');
+                        self.viewModel.loading(true);
                         self.trigger('conceptSchemeDeleted');
                     }, self);
                 }

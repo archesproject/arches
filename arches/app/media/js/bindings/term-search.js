@@ -1,9 +1,10 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
     'arches',
     'select2'
-], function($, ko, arches) {
+], function($, _, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var allBindings = allBindingsAccessor();
@@ -64,12 +65,12 @@ define([
                 formatResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
-                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
+                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var formatedresult = '<span class="concept_result">' + markup.join("") + '</span>' + context;
                     return formatedresult;
                 },
                 formatSelection: function(result, container) {
-                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
+                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
                     if (result.inverted()) {
                         markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;

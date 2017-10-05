@@ -44,6 +44,15 @@ class CardModel(models.Model):
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
+    @property
+    def is_editable(self):
+        result = True
+        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
+        result = False if tiles > 0 else True
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            result = True
+        return result
+
     class Meta:
         managed = True
         db_table = 'cards'
@@ -330,8 +339,8 @@ class GraphModel(models.Model):
     def is_editable(self):
         result = True
         if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
-            result = False if len(resource_instances) > 0 else True
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
+            result = False if resource_instances > 0 else True
             if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
                 result = True
         return result
@@ -386,6 +395,7 @@ class Node(models.Model):
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column='config')
     issearchable = models.BooleanField(default=True)
+    isrequired = models.BooleanField(default=False)
 
     def get_child_nodes_and_edges(self):
         """

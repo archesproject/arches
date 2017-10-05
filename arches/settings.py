@@ -97,7 +97,7 @@ ONTOLOGY_NAMESPACES = {
     'http://www.ics.forth.gr/isl/CRMinf/': '',
     'http://www.ics.forth.gr/isl/CRMsci/': '',
 }
- 
+
 # A context to supply for use in export of resource instances in JSON-LD format
 JSON_LD_CONTEXT = {
     # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
@@ -331,6 +331,8 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+RELATED_RESOURCES_PER_PAGE = 15
+RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
@@ -398,8 +400,6 @@ TILE_CACHE_CONFIG = {
     # "access": "<access key>",
     # "secret": "<secret key>"
 }
-
-VECTOR_TILE_SIMPLIFICATION = 0.3
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 

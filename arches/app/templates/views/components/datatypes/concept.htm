@@ -11,24 +11,20 @@
 <!-- /ko -->
 
 <!-- ko if: $data.search -->
-<div class="col-sm-2">
+<div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">{% trans "Equals" %}</option>
         <option value="!">{% trans "Not" %}</option>
     </select>
 </div>
 
-<div class="col-sm-10">
+<div class="col-md-8 col-lg-9">
     <input style="width:30%; display:inline-block;"
-        data-bind="select2: {
-            select2Config: {
-                clickBubble: true,
-                data: options,
-                value: searchValue,
-                multiple: multiple,
-                placeholder: placeholder,
-                allowClear: true
+        data-bind="
+            value: value,
+            select2Query: {
+                select2Config: select2Config
             }
-        }">
+        ">
 </div>
 <!-- /ko -->

@@ -59,10 +59,6 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             var data = $(e.target).data();
             this.deletedrelationships.push(data.id);
             this.$el.find('[data-id="'+ data.id +'"]').toggle(300);
-
-            if (this.deletedrelationships.length == this.numberOfParents - 1){
-                this.$el.find('.fa-times-circle').hide(300);
-            }
         },
 
         cleanup: function() {
