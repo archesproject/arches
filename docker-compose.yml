@@ -37,9 +37,6 @@ services:
       container_name: nginx
       image: cvast/cvast-nginx:1.2.0
       restart: unless-stopped
-      build:
-        context: .
-        dockerfile: ./Dockerfile
       ports:
         - '80:80'
         - '443:443'
