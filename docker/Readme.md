@@ -196,7 +196,14 @@ Optional Environment Variables:
 ## Production vs Development
 Please note that the [docker-compose.yml](../docker-compose.yml) file provided is written for a production environment. Therefore it includes an `Nginx` container that serves as a reverse proxy (for security). Additionally, it uses a `LetsEncrypt` container to download web certificates.
 
-When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and Letsecrypt) in the `docker-compose.yml` file.
+When running Arches in production, be sure to set your domain name in the DOMAIN_NAMES variable in all appropriate services (Arches, Nginx and Letsecrypt) in the `docker-compose.yml` file. Separate your domain names by spaces if you have multiple.
+
+In order to enable https (`port 443`), scroll down to the `nginx` service in your `docker-compose.yml` and change this environment variable:  
+- NGINX_PROTOCOL=http  
+into  
+- NGINX_PROTOCOL=strict-https  
+  
+If you would like search engines such as Google to index your Arches website, set the `Nginx` variable `PUBLIC_MODE` to `true`.
 
 For development environments, the Nginx and LetsEncrypt services can be deleted or commented out from the `docker-compose.yml` file. In that case, your Arches instance will be available at `http://localhost:8000` (note the port). 
 
@@ -222,6 +229,14 @@ Point 4 is handled for you, all you need to do is set this environment variable:
 For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
 
 
+
+## Troubleshoot
+- Potentially ports `80` and/or `443` on your machine are already taken by another application. In this case, change the port number of your Nginx service in `docker-compose.yml`. Be sure to keep the second number of the `port:port` pairs unchanged:
+```
+      ports:
+        - '81:80'
+        - '444:443'
+```
 
 ## See also
 docker-compose.yml uses a number of other Docker images.
