@@ -203,7 +203,8 @@ To import a shapefile use the same command as csv import, simply point to your s
 Exporting Arches Data
 ---------------------
 
-Currently all export must happen throught the command line interface. Export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
+Currently all export must happen through the command line interface.
+Alternatively, users with database access have the option of writing a resource view, adding the view to a GIS client, and exporting data from there. Export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
 
 Resource Database Views
 ^^^^^^^^^^^^^^^^^^^^^^^
