@@ -27,6 +27,13 @@
     text-decoration: underline;
 }
 
+#container {
+    min-width: 1180px;
+    overflow-x: scroll;
+}
+
+
+
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
