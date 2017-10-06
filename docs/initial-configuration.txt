@@ -7,7 +7,7 @@ Quick Start
 
 Now that you have Arches installed, there are a few extra settings you must configure to make it fully operational. In the Arches interface, head to the **System Settings** menu.
 
-The most important settings to begin with are related to the map on the Search page. 
+The most important settings to begin with are related to the map on the Search page.
 
 1. Enter your Mapbox API Key.
     By default, Arches uses a few basemap services from Mapbox, for which you need to provide a key. You can get a free key at mapbox.com, and for installations that do not expect exceptionally heavy traffic, this free key will be sufficient. Once you have obtained the key, copy it from Mapbox (it will start with ``pk.``). Go to **System Settings -- > Map Settings --> Mapbox API** and enter key there.
@@ -22,7 +22,7 @@ The most important settings to begin with are related to the map on the Search p
 After getting the Map Settings figured out, you will probably want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
 
 All System Settings
-============
+===================
 
 System Settings
 ----------------
