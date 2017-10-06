@@ -1,0 +1,43 @@
+version: '2'
+services:
+
+    sut:
+      container_name: arches
+      build:
+        context: .
+        dockerfile: ./Dockerfile
+      command: run_tests
+      environment:
+        - PGPASSWORD=postgres
+        - PGDBNAME=arches
+        - PGHOST=db
+        - PGPORT=5432
+        - ESHOST=elasticsearch
+        - ESPORT=9200
+        - DJANGO_MODE=PROD
+        - DJANGO_DEBUG=False
+        - DOMAIN_NAMES=localhost
+        - TZ=EST
+      depends_on:
+        - db
+        - elasticsearch
+
+
+    db:
+      container_name: db
+      image: mdillon/postgis:9.6
+      ports:
+        - '5432:5432'
+      environment:
+        - POSTGRES_PASSWORD=postgres
+        - TZ=EST
+
+
+    elasticsearch:
+      container_name: elasticsearch
+      image: elasticsearch:5.2
+      ports:
+        - "9200:9200"
+        - "9300:9300"
+      environment:
+        - TZ=EST
