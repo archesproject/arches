@@ -68,7 +68,7 @@ COPY . ${ARCHES_ROOT}
 WORKDIR ${ARCHES_ROOT}
 RUN bower --allow-root install
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
-	python setup.py install &&\
+	pip install -e . --no-binary :all: &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 
 

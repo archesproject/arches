@@ -93,8 +93,6 @@ services:
         - PRODUCTION_MODE=False
         - PERSISTENT_MODE=True
         - TZ=EST
-      labels:
-        org.label-schema.group: "prod-cvast-arches-monitoring"
 
 
 volumes:
