@@ -38,17 +38,6 @@
         </div>
     </div>
     <div>
-        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>Define Required Nodes</h4></a>
-        <div class="ep-help-topic-content">
-            <p>{% blocktrans %} By defining required nodes within your Resource Model, you can enforce that specific nodes within the same nodegroup are collected concurrently. For example, you may want to disallow users from saving an Appellation without adding an Appellation Type at the same time. To do this, you would add the Define Required Nodes fuction, and configure it by selecting the Appellation and Appellation Type nodes.{% endblocktrans %}</p>
-            <div>
-                <p><a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "define required nodes - click to view" %}</a><span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/required-nodes-function.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span></p>
-                <p><img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/required-nodes-function.gif"></img></p>
-            </div>
-            <p>{% trans "You can add more than one enforcement rule to this function. Just go down the list of node groups and select any nodes that should be collected together. Remember, these rules are only enforced within nodegroups, not across the entire graph of the Resource Model." %}</p>
-        </div>
-    </div>
-    <div>
         <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Local File Upload" %}</h4></a>
         <div class="ep-help-topic-content">
             <p>{% trans "This function performs the actual file upload that must occur in order to upload a digital file, like an image, to your database. In Triggering Nodegroups you must select the nodegroup that contains the file-list node. Select multiple nodegroups if there are multiple file-upload nodes this Resource Model's graph." %}</p>
