@@ -199,7 +199,113 @@ To import a shapefile use the same command as csv import, simply point to your s
 
 **Note:** More complex geometries may encounter a ``mapping_parser_exception`` error. This error occurs when a geometry is not valid in elasticsearch. To resolve this, first make sure your geometry is valid using ArcMap, QGIS, or PostGIS. Next, you can modify the precision of your geometry to 5 decimals or you can simplify your geometry using the QGIS simplify geometry geoprocessing tool, or the PostGIS st_snaptogrid function.
 
+
 Exporting Arches Data
 ---------------------
 
 Currently all export must happen throught the command line interface. Export commands are listed in the `Wiki documentation <https://github.com/archesproject/arches/wiki/Command-Line-Reference#importexport-commands>`_.
+
+Resource Database Views
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To export to tabular formats such as shapefile, it is necessary to flatten the graph structure of your resources. One way to do this is to create a database view of your resource models. Arches does not do this automatically because there are many ways to design a flattened table depending on your needs.
+
+You can add any number of database views representing a given resource model either for export, or to connect directly to a GIS client such as QGIS or ArcGIS. When writing a view to support shapefile export be sure that your view does not violate any shapefile restrictions. For example, shapefile field names are limited to 10 characters with no special characters and text fields cannot store more than 255 characters.
+
+If you plan to use the arches `export` command to export your view as a shapefile, you also need to be sure that your view contains 2 fields: `geom` with the geometry representing your resource instance's location and `geom_type` with the postgis geometry type of your `geom` column.
+
+To write your view, you should start by getting a mapping file for your resource. You can do that by going to the Arches Designer page and then in the `manage` dropdown of your resource model select `Create Mapping File`. A zip file will be downloaded and within that file you will find your `.mapping` file. This file lists all the ids that you will need to design your view.
+
+Below is an example of a simple resource model view. If a resource instance has a tile with geojson saved to it, that tile will be represented as a record in the view along with the corresponding nodeid and tileid. A unique id (gid) is assigned to each row. If a node has more than one geometry, the geometries are combined into a multipart geometry. If a node has more than one geometry of different types, a record will be created for each type. The UUID (ab74af76-fa0e-11e6-9e3e-026d961c88e6) in the last line of this this example is the id of the view's resource model.
+
+#. When creating your own view, you will need to replace this UUID with your own resource model's id. You can find this UUID in your mapping file assigned to the property: `resource_model_id`.
+
+    .. code-block:: sql
+
+        CREATE OR REPLACE VIEW vw_monuments_simple AS
+        WITH mv AS (SELECT tileid, resourceinstanceid, nodeid, ST_Union(geom) as geom, ST_GeometryType(geom) AS geom_type
+        FROM mv_geojson_geoms
+        GROUP BY tileid, nodeid, resourceinstanceid, ST_GeometryType(geom))
+        SELECT row_number() OVER () AS gid,
+            mv.resourceinstanceid,
+            mv.tileid,
+            mv.nodeid,
+            ST_GeometryType(geom) AS geom_type,
+            geom
+        FROM mv
+        WHERE (SELECT graphid FROM resource_instances WHERE mv.resourceinstanceid = resourceinstanceid) = 'ab74af76-fa0e-11e6-9e3e-026d961c88e6'
+
+
+#. Here is a more complete example which includes columns with tile data:
+
+    .. code-block:: sql
+
+        CREATE OR REPLACE VIEW vw_monuments AS
+        WITH mv AS (select tileid, resourceinstanceid, nodeid, ST_Union(geom) AS geom, ST_GeometryType(geom) AS geom_type
+        FROM mv_geojson_geoms
+        GROUP BY tileid, nodeid, resourceinstanceid, ST_GeometryType(geom))
+        SELECT
+            row_number() over () AS gid,
+            mv.resourceinstanceid,
+            mv.tileid,
+            mv.nodeid,
+            ST_GeometryType(geom) AS geom_type,
+            name_tile.tiledata ->> '677f303d-09cc-11e7-9aa6-6c4008b05c4c' AS name,
+            (SELECT value FROM values WHERE cast(name_tile.tiledata ->> '677f39a8-09cc-11e7-834a-6c4008b05c4c' AS uuid) = valueid ) AS nametype,
+            (SELECT value FROM values WHERE cast(component.tiledata ->>'ab74b009-fa0e-11e6-9e3e-026d961c88e6' AS uuid) = valueid ) AS construction_type,
+            array_to_string((select array_agg(v.value) FROM unnest(ARRAY(SELECT jsonb_array_elements_text(component.tiledata -> 'ab74afec-fa0e-11e6-9e3e-026d961c88e6'))::uuid[]) item_id LEFT JOIN values v ON v.valueid=item_id), ',') AS const_tech,
+            (SELECT value FROM values WHERE cast(record.tiledata ->> '677f2c0f-09cc-11e7-b412-6c4008b05c4c' AS uuid) = valueid ) AS record_type,
+            geom
+        FROM mv
+        LEFT JOIN tiles name_tile
+            ON mv.resourceinstanceid = name_tile.resourceinstanceid
+            AND name_tile.tiledata->>'677f39a8-09cc-11e7-834a-6c4008b05c4c'
+            != ''
+        LEFT JOIN tiles component
+            ON name_tile.resourceinstanceid = component.resourceinstanceid
+            AND component.tiledata->>'ab74afec-fa0e-11e6-9e3e-026d961c88e6'
+            != ''
+        LEFT JOIN tiles record
+            ON name_tile.resourceinstanceid = record.resourceinstanceid
+            AND record.tiledata->>'677f2c0f-09cc-11e7-b412-6c4008b05c4c'
+            != ''
+        WHERE (SELECT graphid FROM resource_instances WHERE mv.resourceinstanceid = resourceinstanceid) = 'ab74af76-fa0e-11e6-9e3e-026d961c88e6'
+
+
+#. You will notice that for each node added as a column in the table, we perform a LEFT JOIN to the tiles table and the nodeid from which we want data. Here is an example joining to the tile containing the `record` node which has a nodeid of `677f2c0f-09cc-11e7-b412-6c4008b05c4c`.
+
+    .. code-block:: sql
+
+        LEFT JOIN tiles record
+            ON name_tile.resourceinstanceid = record.resourceinstanceid
+            AND record.tiledata->>'677f2c0f-09cc-11e7-b412-6c4008b05c4c'
+            != ''
+
+#. We can then define a field be referencing that tile:
+
+    .. code-block:: sql
+
+        (SELECT value FROM values WHERE cast(record.tiledata ->> '677f2c0f-09cc-11e7-b412-6c4008b05c4c' AS uuid) = valueid ) AS record_type
+
+
+#. How you define your fields depends largely on what the node datatype is:
+
+    A node with a string datatype:
+
+    .. code-block:: sql
+
+        name_tile.tiledata ->> '677f303d-09cc-11e7-9aa6-6c4008b05c4c' AS name
+
+
+    A node with a concept value id. The following returns the concept values label:
+
+    .. code-block:: sql
+
+        (SELECT value FROM values WHERE cast(name_tile.tiledata ->> '677f39a8-09cc-11e7-834a-6c4008b05c4c' AS uuid) = valueid ) AS nametype
+
+
+    A node with a concept-list. The following returns a concatenated string of concept value labels:
+
+    .. code-block:: sql
+
+        array_to_string((SELECT array_agg(v.value) FROM unnest(ARRAY(SELECT jsonb_array_elements_text(component.tiledata -> 'ab74afec-fa0e-11e6-9e3e-026d961c88e6'))::uuid[]) item_id LEFT JOIN values v ON v.valueid=item_id), ',') AS const_tech
