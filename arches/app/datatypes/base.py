@@ -23,7 +23,7 @@ class BaseDataType(object):
         """
         pass
 
-    def transform_import_values(self, value):
+    def transform_import_values(self, value, nodeid):
         """
         Transforms values from probably string/wkt representation to specified
         datatype in arches

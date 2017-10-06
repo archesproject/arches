@@ -1,128 +1,129 @@
 {
     "graph": [
         {
-            "subtitle": "Stores the name(s) of a resource.",
-            "mapfeaturecolor": null,
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-underline",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "f9d9b911-955d-11e6-b664-024f9e178154",
-                    "datatype": "concept",
-                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "051b5950-2c1e-49ff-af0d-dfbaa971d2fa"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Name Type"
-                },
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E41_Appellation",
-                    "nodeid": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "datatype": "string",
-                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Name"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
-            "edges": [
-                {
-                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "f9d9b912-955d-11e6-b664-024f9e178154",
-                    "domainnode_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "rangenode_id": "f9d9b911-955d-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                }
-            ],
-            "maplinewidth": null,
-            "mappointsize": null,
-            "graphid": "bbd0d023-955d-11e6-b664-024f9e178154",
-            "name": "Name",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000001",
-                    "card_id": "bbd0d025-955d-11e6-b664-024f9e178154",
-                    "label": "Name",
-                    "node_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "sortorder": 0,
-                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter name here\",\"label\":\"Name\"}",
-                    "id": "1621a11f-ac5b-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000002",
-                    "card_id": "bbd0d025-955d-11e6-b664-024f9e178154",
-                    "label": "Name Type",
-                    "node_id": "f9d9b911-955d-11e6-b664-024f9e178154",
-                    "sortorder": 1,
-                    "config": "{\"placeholder\":\"Select a name type \",\"options\":[{\"conceptid\":\"86708338-1305-459e-9cff-7ee0db2a40e4\",\"text\":\"Alternative\",\"id\":\"ecb20ae9-a457-4011-83bf-1c936e2d6b6a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"163cd597-6848-4109-a7b0-56ca98003f85\",\"text\":\"Designation Names\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"884b086e-50a0-4524-a927-4897f0c7452b\",\"text\":\"California Historic Landmark\",\"id\":\"11e60ad2-7dca-47ef-81ff-24561bc45cd6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"de9d5536-4860-4821-9419-4f66b0897c8f\",\"text\":\"California Point of Historical Interest\",\"id\":\"0ad1919d-48ed-4957-9c51-6e3ec439323d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cd4c796f-73f8-4cba-8cdc-8cc069c7bcfb\",\"text\":\"California Register of Historic Resources\",\"id\":\"3d2ef9d9-e2f1-4286-8922-1b153504e6f5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3a6db05d-6897-4021-a087-0d4989faaa06\",\"text\":\"Los Angeles Historic Cultural Monument\",\"id\":\"726d46f0-5780-422d-8116-fd25e5dd5aee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a7bc4fa3-73d2-498b-a604-ecbc0e18bf55\",\"text\":\"Los Angeles Historic Preservation Overlay Zone\",\"id\":\"26f8294c-98ff-452c-ac3f-a78eb430df93\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6821ec06-03a5-4773-8190-496d41564e70\",\"text\":\"National Historic Landmark\",\"id\":\"14dfac42-ed63-4a51-aa99-d846a0e2f9cf\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f1cece23-e8bc-4a54-93b8-2c609d915287\",\"text\":\"National Monument\",\"id\":\"53af5a29-e5e5-4893-b5a3-432b19c10440\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b800a93f-1429-4fee-a3b6-e1fa55e12c9b\",\"text\":\"National Register of Historic Places\",\"id\":\"f7aecc0c-9022-440f-a934-7c9456281fd1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"b193cf22-36fc-4024-ae66-fb1a387c6db0\",\"text\":\"Historic\",\"id\":\"7ad76f8c-ffae-4773-b415-899fbf2a6ffd\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"866e8d3b-e00a-4559-bf23-dc1812c27e1f\",\"text\":\"Primary\",\"id\":\"81dd62d2-6701-4195-b74b-8057456bba4b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Name Type\"}",
-                    "id": "1621a11e-ac5b-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
-                    "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.",
-                    "visible": true,
-                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "bbd0d025-955d-11e6-b664-024f9e178154",
-                    "helptitle": null,
-                    "instructions": "Enter the resource name and its respective type.",
-                    "active": true,
-                    "name": "Name"
+                    "active": true, 
+                    "cardid": "bbd0d025-955d-11e6-b664-024f9e178154", 
+                    "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.", 
+                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Enter the resource name and its respective type.", 
+                    "name": "Name", 
+                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "bbd0d025-955d-11e6-b664-024f9e178154", 
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter name here\",\"label\":\"Name\"}", 
+                    "id": "1621a11f-ac5b-11e6-84a5-026d961c88e6", 
+                    "label": "Name", 
+                    "node_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                }, 
+                {
+                    "card_id": "bbd0d025-955d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Select a name type \",\"options\":[{\"conceptid\":\"86708338-1305-459e-9cff-7ee0db2a40e4\",\"text\":\"Alternative\",\"id\":\"ecb20ae9-a457-4011-83bf-1c936e2d6b6a\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"163cd597-6848-4109-a7b0-56ca98003f85\",\"text\":\"Designation Names\",\"sortorder\":\"\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"884b086e-50a0-4524-a927-4897f0c7452b\",\"text\":\"California Historic Landmark\",\"id\":\"11e60ad2-7dca-47ef-81ff-24561bc45cd6\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"de9d5536-4860-4821-9419-4f66b0897c8f\",\"text\":\"California Point of Historical Interest\",\"id\":\"0ad1919d-48ed-4957-9c51-6e3ec439323d\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cd4c796f-73f8-4cba-8cdc-8cc069c7bcfb\",\"text\":\"California Register of Historic Resources\",\"id\":\"3d2ef9d9-e2f1-4286-8922-1b153504e6f5\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3a6db05d-6897-4021-a087-0d4989faaa06\",\"text\":\"Los Angeles Historic Cultural Monument\",\"id\":\"726d46f0-5780-422d-8116-fd25e5dd5aee\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a7bc4fa3-73d2-498b-a604-ecbc0e18bf55\",\"text\":\"Los Angeles Historic Preservation Overlay Zone\",\"id\":\"26f8294c-98ff-452c-ac3f-a78eb430df93\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6821ec06-03a5-4773-8190-496d41564e70\",\"text\":\"National Historic Landmark\",\"id\":\"14dfac42-ed63-4a51-aa99-d846a0e2f9cf\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f1cece23-e8bc-4a54-93b8-2c609d915287\",\"text\":\"National Monument\",\"id\":\"53af5a29-e5e5-4893-b5a3-432b19c10440\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b800a93f-1429-4fee-a3b6-e1fa55e12c9b\",\"text\":\"National Register of Historic Places\",\"id\":\"f7aecc0c-9022-440f-a934-7c9456281fd1\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"b193cf22-36fc-4024-ae66-fb1a387c6db0\",\"text\":\"Historic\",\"id\":\"7ad76f8c-ffae-4773-b415-899fbf2a6ffd\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"866e8d3b-e00a-4559-bf23-dc1812c27e1f\",\"text\":\"Primary\",\"id\":\"81dd62d2-6701-4195-b74b-8057456bba4b\",\"sortorder\":\"\",\"collector\":\"\",\"children\":[]}],\"label\":\"Name Type\"}", 
+                    "id": "1621a11e-ac5b-11e6-84a5-026d961c88e6", 
+                    "label": "Name Type", 
+                    "node_id": "f9d9b911-955d-11e6-b664-024f9e178154", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "The name of a resource.\n\nApplies to Heritage Resource, Heritage Resource Group, Activity, and Historical Event.  Actors receive their \"names\" from the Appellation branch.", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "edgeid": "f9d9b912-955d-11e6-b664-024f9e178154", 
+                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "f9d9b911-955d-11e6-b664-024f9e178154"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "bbd0d023-955d-11e6-b664-024f9e178154", 
+            "iconclass": "fa fa-underline", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": null, 
+            "maplinewidth": null, 
+            "mappointsize": null, 
+            "name": "Name", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": {
+                        "rdmCollection": "051b5950-2c1e-49ff-af0d-dfbaa971d2fa"
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Name Type", 
+                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "nodeid": "f9d9b911-955d-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "string", 
+                    "description": "", 
+                    "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Name", 
+                    "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "nodeid": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+                    "parentproperty": ""
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E41_Appellation",
-                "nodeid": "bbd0d022-955d-11e6-b664-024f9e178154",
-                "datatype": "string",
-                "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154",
-                "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154",
-                "config": null,
-                "name": "Name"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "string", 
+                "description": "", 
+                "graph_id": "bbd0d023-955d-11e6-b664-024f9e178154", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Name", 
+                "nodegroup_id": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                "nodeid": "bbd0d022-955d-11e6-b664-024f9e178154", 
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation", 
+                "parentproperty": ""
+            }, 
+            "subtitle": "Stores the name(s) of a resource.", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }

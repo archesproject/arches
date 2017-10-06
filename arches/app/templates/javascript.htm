@@ -132,15 +132,18 @@
                 root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
                 media: "{{ STATIC_URL }}",
+                rdm: "{% url 'rdm' ''%}",
                 uploadedfiles: "{{ MEDIA_URL }}",
                 concept_tree: "{% url 'concept_tree' '' %}",
                 concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_search: "{% url 'concept_search' %}",
                 concept_value: "{% url 'concept_value' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                concept_make_collection: "{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept_collections: "{% url 'export_concept_collections' %}",
                 dropdown: "{% url 'dropdown' %}",
+                paged_dropdown: "{% url 'paged_dropdown' %}",
                 get_pref_label: "{% url 'get_pref_label' %}",
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
@@ -157,6 +160,7 @@
                 form: "{% url 'form' '' %}",
                 resource: "{% url 'resource' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                resource_copy: "{% url 'resource_copy' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
@@ -204,6 +208,13 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            resourceCopySuccess: {
+                title: "{% trans 'Resource Successfully Copied.'%}"
+            },
+            resourceCopyFailed: {
+                title: "{% trans 'Resource Copy Failed...'%}",
+                text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             mapzenApiKey: '{{ map_info.mapzen_api_key }}',

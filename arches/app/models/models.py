@@ -44,6 +44,15 @@ class CardModel(models.Model):
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
+    @property
+    def is_editable(self):
+        result = True
+        tiles = TileModel.objects.filter(nodegroup=self.nodegroup).count()
+        result = False if tiles > 0 else True
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            result = True
+        return result
+
     class Meta:
         managed = True
         db_table = 'cards'
@@ -262,10 +271,23 @@ class Function(models.Model):
 
     def get_class_module(self):
         mod_path = self.modulename.replace('.py', '')
-        module = importlib.import_module('arches.app.functions.%s' % mod_path)
+        module = None
+        import_success = False
+        import_error = None
+        for function_dir in settings.FUNCTION_LOCATIONS:
+            try:
+                module = importlib.import_module(function_dir + '.%s' % mod_path)
+                import_success = True
+            except ImportError as e:
+                import_error = e
+            if module != None:
+                break
+        if import_success == False:
+            print 'Failed to import ' + mod_path
+            print import_error
+
         func = getattr(module, self.classname)
         return func
-
 
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
@@ -317,8 +339,8 @@ class GraphModel(models.Model):
     def is_editable(self):
         result = True
         if self.isresource:
-            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid)
-            result = False if len(resource_instances) > 0 else True
+            resource_instances = ResourceInstance.objects.filter(graph_id=self.graphid).count()
+            result = False if resource_instances > 0 else True
             if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
                 result = True
         return result
@@ -373,6 +395,7 @@ class Node(models.Model):
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column='config')
     issearchable = models.BooleanField(default=True)
+    isrequired = models.BooleanField(default=False)
 
     def get_child_nodes_and_edges(self):
         """
@@ -643,6 +666,47 @@ class FileValue(models.Model):
         if self.value != None:
             return self.value.name
         return ''
+
+
+# These two event listeners auto-delete files from filesystem when they are unneeded:
+# from http://stackoverflow.com/questions/16041232/django-delete-filefield
+@receiver(models.signals.post_delete, sender=FileValue)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `FileValue` object is deleted.
+    """
+    if instance.value.path:
+        try:
+            if os.path.isfile(instance.value.path):
+                os.remove(instance.value.path)
+        ## except block added to deal with S3 file deletion
+        ## see comments on 2nd answer below
+        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except:
+            storage, name = instance.value.storage, instance.value.name
+            storage.delete(name)
+
+@receiver(models.signals.pre_save, sender=FileValue)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `FileValue` object is changed.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = FileValue.objects.get(pk=instance.pk).value
+    except FileValue.DoesNotExist:
+        return False
+
+    new_file = instance.value
+    if not old_file == new_file:
+        try:
+            if os.path.isfile(old_file.value):
+                os.remove(old_file.value)
+        except Exception:
+            return False
+
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.

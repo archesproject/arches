@@ -1,399 +1,400 @@
 {
     "graph": [
         {
-            "subtitle": "Captures conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group",
-            "mapfeaturecolor": null,
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-clipboard",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "n",
-                    "legacygroupid": null,
-                    "nodegroupid": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "d03c96b1-956f-11e6-b664-024f9e178154",
-                    "datatype": "concept-list",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "0f7c3c00-8841-4ccb-82ac-3bcd045ba5ef"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Threat Type"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E38_Image",
-                    "nodeid": "097e25d7-ab98-11e6-84a5-026d961c88e6",
-                    "datatype": "file-list",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P138i_has_representation",
-                    "name": "Condition Image"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E52_Time-Span",
-                    "nodeid": "71a11f17-ab97-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P4_has_time-span",
-                    "name": "Condition Time Span "
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "56f0982f-956f-11e6-b664-024f9e178154",
-                    "datatype": "concept-list",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "faea6a7c-0834-4a96-9d5e-f4dd0276f827"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Disturbance Type"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "bf00b891-956f-11e6-b664-024f9e178154",
-                    "datatype": "concept",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": null
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Condition Type"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E62_String",
-                    "nodeid": "4a416f21-ab97-11e6-84a5-026d961c88e6",
-                    "datatype": "string",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P3_has_note",
-                    "name": "Condition Description"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E49_Time_Appellation",
-                    "nodeid": "ccc1f371-ab97-11e6-84a5-026d961c88e6",
-                    "datatype": "date",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P78_is_identified_by",
-                    "name": "Date Condition Assessed"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E13_Attribute_Assignment",
-                    "nodeid": "3200d57d-ab97-11e6-84a5-026d961c88e6",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P140i_was_attributed_by",
-                    "name": "Condition Description Assignment"
-                },
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E14_Condition_Assessment",
-                    "nodeid": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "",
-                    "name": "Condition Assessment"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "3ecd4635-956f-11e6-b664-024f9e178154",
-                    "datatype": "concept-list",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "49eac741-7640-4fe5-8ac0-e5659b4f9129"
-                    },
-                    "parentproperty": "P2_has_type",
-                    "name": "Recommendation Type"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E3_Condition_State",
-                    "nodeid": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P35_has_identified",
-                    "name": "Condition State"
-                },
-                {
-                    "is_collector": false,
-                    "description": "Represents a single node in a graph",
-                    "istopnode": false,
-                    "ontologyclass": "E89_Propositional_Object",
-                    "nodeid": "2aba031d-956f-11e6-b664-024f9e178154",
-                    "datatype": "semantic",
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "config": null,
-                    "parentproperty": "P67i_is_referred_to_by",
-                    "name": "Management Recommendation"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
-            "edges": [
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "8d8a0882-956e-11e6-b664-024f9e178154",
-                    "domainnode_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "rangenode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P35_has_identified",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "71a11f18-ab97-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "71a11f17-ab97-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P4_has_time-span",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "56f09830-956f-11e6-b664-024f9e178154",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "56f0982f-956f-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "4a416f22-ab97-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "3200d57d-ab97-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "4a416f21-ab97-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P3_has_note",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "ccc1f372-ab97-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "71a11f17-ab97-11e6-84a5-026d961c88e6",
-                    "rangenode_id": "ccc1f371-ab97-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P78_is_identified_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "3200d57e-ab97-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "3200d57d-ab97-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P140i_was_attributed_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "097e25d8-ab98-11e6-84a5-026d961c88e6",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "097e25d7-ab98-11e6-84a5-026d961c88e6",
-                    "ontologyproperty": "P138i_has_representation",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "d03c96b2-956f-11e6-b664-024f9e178154",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "d03c96b1-956f-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "2aba031e-956f-11e6-b664-024f9e178154",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "2aba031d-956f-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P67i_is_referred_to_by",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "bf00b892-956f-11e6-b664-024f9e178154",
-                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154",
-                    "rangenode_id": "bf00b891-956f-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                },
-                {
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "name": null,
-                    "edgeid": "3ecd4636-956f-11e6-b664-024f9e178154",
-                    "domainnode_id": "2aba031d-956f-11e6-b664-024f9e178154",
-                    "rangenode_id": "3ecd4635-956f-11e6-b664-024f9e178154",
-                    "ontologyproperty": "P2_has_type",
-                    "description": null
-                }
-            ],
-            "maplinewidth": null,
-            "mappointsize": null,
-            "graphid": "e817b2a9-956d-11e6-b664-024f9e178154",
-            "name": "Condition Assessment",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000004",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Date Condition Assessed",
-                    "node_id": "ccc1f371-ab97-11e6-84a5-026d961c88e6",
-                    "sortorder": 0,
-                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Date Condition Assessed\"}",
-                    "id": "4312a30e-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000019",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Images or Documents",
-                    "node_id": "097e25d7-ab98-11e6-84a5-026d961c88e6",
-                    "sortorder": 2,
-                    "config": "{\"maxFilesize\":\"200\",\"acceptedFiles\":\"\",\"label\":\"Images or Documents\"}",
-                    "id": "4312a30d-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000012",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Recommendations",
-                    "node_id": "3ecd4635-956f-11e6-b664-024f9e178154",
-                    "sortorder": 6,
-                    "config": "{\"placeholder\":\"Choose as many or as few recommendations as are relevant to this assessment.\",\"options\":[{\"conceptid\":\"88975b48-71d5-4c78-9c64-3687123dbc28\",\"text\":\"archaeological intervention\",\"id\":\"305040c0-a87b-42bd-875f-ee13a95f7890\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"a3157c46-7c4f-4de3-a355-11d68d6788e6\",\"text\":\"archaeological survey\",\"id\":\"6d52b780-1091-4b14-b5b2-796f1068bb2a\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6d912f16-890e-4176-98db-95b99284e639\",\"text\":\"excavation\",\"id\":\"b44cf8f0-0558-4f90-83fa-1e216320df26\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e0fa5826-6ddd-404b-b409-32a22475ea54\",\"text\":\"salvage recording\",\"id\":\"1ac24a75-7ea5-4dbf-9a95-dc4e2d612cf9\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"22d7b0cc-fc6e-47da-82a9-664b2875f94b\",\"text\":\"heritage assessment\",\"id\":\"fb224913-b29e-4aee-9a29-5e5e5e6d4fe7\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[{\"conceptid\":\"7a742a3f-fe28-4b33-8adf-5630e09358b9\",\"text\":\"aerial photograph interpretation\",\"id\":\"50faa45c-d5f2-4fad-ba3f-b2d9005004ed\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"63404be1-f395-4cd8-b448-e2c8a796331a\",\"text\":\"desk based assessment\",\"id\":\"68b09c5c-59ac-460b-8a0a-8467bf92dc36\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"96d1444f-2203-43b0-b7ec-40ce0f004574\",\"text\":\"environmental impact assessment\",\"id\":\"d4b35ecb-16cd-4d42-9bed-fe2c94e75c3e\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7bce9ef8-5801-4291-a407-a7823326b2ee\",\"text\":\"historic landscape characterisation\",\"id\":\"d5edc2b2-4736-4cd3-9568-08beeb8420ab\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0fbc093b-e558-465e-9bfe-9aaee4a879ee\",\"text\":\"in-depth condition assessment\",\"id\":\"a5696559-4ca3-444a-9233-8d9a5edc7c23\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"e87f8cf5-b3ec-43bf-b296-960959a6edaa\",\"text\":\"remote sensing\",\"id\":\"f9bdbc6a-e219-46cb-9eb9-9d7ac6e7855d\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"64d21cb1-444b-4b3b-990d-cbf7c5a03e50\",\"text\":\"management intervention\",\"id\":\"2c29727d-b17c-4311-9d8c-ffa125a90ab2\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[{\"conceptid\":\"0bdcd50f-a701-439f-a455-9fe8c1c596e4\",\"text\":\"conservation intervention\",\"id\":\"a9f9afe9-5333-45b3-85fc-53205266223e\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eab3dba2-19ab-4d20-81cc-cd9bfca00cc0\",\"text\":\"reburial\",\"id\":\"df81de3c-4cd5-45a9-a083-f8f2c7ec1c3e\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"63234c3f-4674-4518-85de-73b84694c6d9\",\"text\":\"fencing\",\"id\":\"792b7faa-8cc0-446e-9b9c-3dad85822013\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1e0afd30-d5a1-42e0-a02f-3754df3418d6\",\"text\":\"fire mitigation\",\"id\":\"3889503a-2524-4edd-920c-f1ac7d4675cd\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7022ec05-d669-49be-a000-27a717923023\",\"text\":\"designation\",\"id\":\"e4649da0-95d0-4638-8f14-53f781900943\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"6c1ea4a0-fa6c-4bd3-815a-f57239680abb\",\"text\":\"field survey\",\"id\":\"de6d7318-929b-4a7a-9e17-69035e16b48a\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[{\"conceptid\":\"dc1873f7-49c5-42a2-9863-6a950cd6f3d4\",\"text\":\"architectural survey\",\"id\":\"e6db97a7-a719-4dc6-82dc-fd4aa42e2881\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9b46acbe-50d1-4870-bb46-55981d2178cd\",\"text\":\"measured survey\",\"id\":\"57396bb2-b47b-4f53-a2e7-e7d936b55696\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4764910d-3d9e-45bc-a390-147d58b400c7\",\"text\":\"photographic recording\",\"id\":\"93de3278-3a37-455c-8216-ff939f87cf27\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2b1660dd-b47e-479a-95ae-9e656418acb2\",\"text\":\"topographic survey\",\"id\":\"98aa7952-8775-49c1-b5ce-8ad53d99f3a9\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Recommendations\"}",
-                    "id": "4312a30b-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000005",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Condition Description",
-                    "node_id": "4a416f21-ab97-11e6-84a5-026d961c88e6",
-                    "sortorder": 3,
-                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Condition Description\"}",
-                    "id": "4312a30a-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000012",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Threats",
-                    "node_id": "d03c96b1-956f-11e6-b664-024f9e178154",
-                    "sortorder": 4,
-                    "config": "{\"placeholder\":\"Threats are potential future disturbances.  Choose as many or as few threats are you can identify in this assessment.\",\"options\":[{\"conceptid\":\"6fcc5949-bffc-46f8-93eb-c1f93fc2ef89\",\"text\":\"meteorological\",\"id\":\"3ef4850d-292d-41c7-9c44-bc2376d979ee\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"9935c53c-dac4-4e1a-b4a7-a425b777a48b\",\"text\":\"storm\",\"id\":\"51684806-5519-46ef-92e1-b04c8167c975\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f906108c-b848-4eea-8f7f-0294b4aeb174\",\"text\":\"fire induced by lightning\",\"id\":\"c58a80fe-49b7-45ee-81b6-9cb574c10c7b\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"0e132db9-a8e9-4998-bbfd-ee696d6c2c97\",\"text\":\"biological\",\"id\":\"e33709ec-bc10-45d4-9080-515a337d826d\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[{\"conceptid\":\"76b1670c-2eff-40bb-a0c5-a83f4c7331a1\",\"text\":\"pest infestation\",\"id\":\"73c3928a-c12b-4552-833c-3ae40b70fe25\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"728e6ada-189a-466c-b5f6-725366036b5d\",\"text\":\"plant growth\",\"id\":\"4fe7b71e-068d-4a7b-bb98-8bcac148da66\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"f2440185-a80e-4ced-8b34-53789882ae3f\",\"text\":\"human-induced\",\"id\":\"26f0ead7-3243-40d0-af5e-c7c8c4c5e4cd\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[{\"conceptid\":\"8e662c34-bf7f-4471-9693-63d4bc7715b3\",\"text\":\"fire\",\"id\":\"061adf90-03f6-4a49-b647-100c4f590898\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ec543f7c-1470-4f73-b702-35dbc78a55cc\",\"text\":\"explosion\",\"id\":\"74a1e963-60fe-4b7d-8d99-42a51fffb4c1\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c8303ac1-508c-4cc1-adf6-dba6dc621842\",\"text\":\"pollution\",\"id\":\"4efb3606-bf24-40c4-8761-0f7b14ed0fa9\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"05bf6c79-b08e-4b4b-82df-f40c3436cd6d\",\"text\":\"violence and conflict\",\"id\":\"8153e584-886c-4e57-a79b-b1ff13a2f369\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f064f439-5b81-4db4-879a-62a3dac35c0c\",\"text\":\"looting/theft\",\"id\":\"5f8357e8-a0e2-4e9f-bd3e-8931218a3ba2\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5acbf219-dec2-42ce-a6fa-4da7c4590f4a\",\"text\":\"vandalism\",\"id\":\"69d53378-1179-49c5-9188-c318850808ae\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"41bc559e-8c0e-4036-aec0-c57d6380d7fb\",\"text\":\"infrastructure failure\",\"id\":\"cf9635be-b655-47f2-b74c-31f806d9062d\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bb6939ab-57a9-4c4e-94b2-a0d24895890e\",\"text\":\"agriculture\",\"id\":\"ee67684f-f413-44b5-af99-a746ec93658e\",\"sortorder\":\"23\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"61541316-b2e2-4c1e-be6c-9ae2501c71fb\",\"text\":\"mining\",\"id\":\"1176e6a0-1d9b-4653-b733-cd5eb7759c0d\",\"sortorder\":\"24\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"56dcb2d4-0be1-475e-ad09-2fbe4496ea68\",\"text\":\"construction\",\"id\":\"7b474f48-036e-491a-b322-ba52bb33b77a\",\"sortorder\":\"25\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6f046e96-5995-4015-acb9-ebabeac6e4e8\",\"text\":\"inappropriate use\",\"id\":\"09d58c58-7a27-4ff1-b6d1-0c9f3723e298\",\"sortorder\":\"26\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ed6bfcc4-1f2c-4cce-94ba-b304225c279b\",\"text\":\"lack of maintenance\",\"id\":\"23de2ea6-2e66-4f07-9cbb-7a5492da05e2\",\"sortorder\":\"27\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"380ec64b-2e69-41da-afb9-48ab90caa2d9\",\"text\":\"climate change\",\"id\":\"b7d1f3fc-3ccf-43a5-98e2-f81e6c5ec528\",\"sortorder\":\"28\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9167de08-93e7-4080-ac71-2fbe7e6841de\",\"text\":\"hydrological\",\"id\":\"4e44ac6e-98ae-4bc5-96de-fe03ef87a7a9\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[{\"conceptid\":\"0a0156cc-98fe-4f16-867b-55dfb2dacf9f\",\"text\":\"flood\",\"id\":\"ef34616d-c9d1-4fdc-b787-827d31784025\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1bdcc469-7f36-4de9-8a6f-802451119dc9\",\"text\":\"tsunami\",\"id\":\"c3a47bbe-d2e7-4030-a6a7-62dad44e4dc7\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"fa6d7f18-f3bf-4bef-86d3-90a1cd13a7df\",\"text\":\"geological\",\"id\":\"429d8ca0-7b98-41ea-8452-d9cde03969e5\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[{\"conceptid\":\"247a6447-9235-4265-8a5e-a6a77a11bcd2\",\"text\":\"mass movement\",\"id\":\"809b66b1-014a-42d4-9a38-e2f1f58738de\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"aaae19f4-7164-442e-a3ec-b1562614214a\",\"text\":\"erosion\",\"id\":\"4b7d04ef-be4c-4c59-8d98-e5470a8cfa8b\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a1370bda-8706-4a80-abc5-412db82a8dd3\",\"text\":\"volcanic\",\"id\":\"c7e98c6a-22ef-4024-9021-913c80746e26\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"55bc684d-1888-4e78-952a-c417e6418921\",\"text\":\"seismic\",\"id\":\"9c35a534-8245-4c87-a511-90b13cbda8f6\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Threats\"}",
-                    "id": "4312a30f-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000012",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Disturbances",
-                    "node_id": "56f0982f-956f-11e6-b664-024f9e178154",
-                    "sortorder": 5,
-                    "config": "{\"placeholder\":\"Choose as many or as few disturbances as are relevant to this assessment.\",\"options\":[{\"conceptid\":\"46aff001-3c08-4594-aa83-83ffdac5a655\",\"text\":\"meteorological\",\"id\":\"1fed9701-826b-4307-bd10-4ec63d6e5cda\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"544ec937-13e3-4994-bdc5-fdcd6bf06279\",\"text\":\"storm\",\"id\":\"8eec3bc8-958f-4ed4-9855-d07af708b263\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cc68a4b0-636e-48e0-be8c-140eb1f54bf7\",\"text\":\"fire induced by lightning\",\"id\":\"d370f3ab-0797-429c-9858-66d60bc66075\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"9c82a674-ecfb-43a1-bf75-aa03b76e583f\",\"text\":\"biological\",\"id\":\"3faa99ac-4d1d-4e97-abff-b561dbc863d2\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[{\"conceptid\":\"330f950f-72d6-4659-b661-7c87f52b7de1\",\"text\":\"pest infestation\",\"id\":\"5b282deb-5f56-4745-894c-5cdaad712628\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ffe3693c-a037-4778-9410-a8b05e185778\",\"text\":\"plant growth\",\"id\":\"9b07b311-d62f-4a50-81a5-19479d61fe5f\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"0ff63bf4-3130-4a2c-be8e-c1d5948576d7\",\"text\":\"human-induced\",\"id\":\"149b6f47-ed55-4862-8264-4915106b24f3\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[{\"conceptid\":\"963c1c77-2cbc-4b8d-9f58-6da04c45e9c5\",\"text\":\"fire\",\"id\":\"5d66180e-91a3-4440-8864-7a863ebdcf4c\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cfcde299-e99b-49fe-8766-653cf2343338\",\"text\":\"explosion\",\"id\":\"ea8b9180-67f7-4fe7-956c-aca0560e7d7e\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1b671d35-1742-4213-a012-51c511f395d9\",\"text\":\"pollution\",\"id\":\"383af24d-ab74-45e5-a78b-efa60849c5a4\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d80c0f5b-40d4-40d2-8825-9b71a3ccbbab\",\"text\":\"violence and conflict\",\"id\":\"760b4781-d1a6-42c6-8d32-568e0a8aff74\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5d30fb29-00cc-4e5d-a08b-cf7fc6fe1480\",\"text\":\"looting/theft\",\"id\":\"af817166-615a-440c-9447-50e94502b410\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bbd387fa-f649-44c9-80d4-3441bf262b0b\",\"text\":\"vandalism\",\"id\":\"680ff8aa-9bec-4b33-bb6e-59137948af72\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d070d967-c62c-4da7-9de7-a5052b24b575\",\"text\":\"infrastructure failure\",\"id\":\"f1cc4602-894b-474d-89b6-8b67966cc3a5\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb267f56-abe1-4693-af3d-a1c031db0a78\",\"text\":\"agriculture\",\"id\":\"9d1b6e8b-4f7e-449e-8815-d9cdd5639e26\",\"sortorder\":\"23\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"17c5dc2b-f47f-44a9-9725-28bb33252daa\",\"text\":\"mining\",\"id\":\"e51c13b8-767c-44d0-b458-86f85fcc61a0\",\"sortorder\":\"24\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9e705c53-b6d5-4e0d-9f2a-f27ca121efde\",\"text\":\"construction\",\"id\":\"e1b51147-4de0-44ed-9dc7-bc9c63c902ed\",\"sortorder\":\"25\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ad073c4a-2bc0-4d40-bb5e-002c945c08f6\",\"text\":\"inappropriate use\",\"id\":\"ee4f40ac-a7f0-420a-9800-e2c0777b5ee3\",\"sortorder\":\"26\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fab93209-6488-4e54-9cdc-250d6933d2c6\",\"text\":\"lack of maintenance\",\"id\":\"331cfd47-782d-4aea-b0bc-97eaba1aa875\",\"sortorder\":\"27\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"8440dd1e-cdbf-4197-a1f3-bd69c3a0df34\",\"text\":\"climate change\",\"id\":\"b2eaf961-ccb4-40a9-997d-792f6ccc5aca\",\"sortorder\":\"28\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ca49301c-5219-4527-9738-ca038580e89f\",\"text\":\"hydrological\",\"id\":\"4e849891-d667-4163-a594-04226e443a04\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[{\"conceptid\":\"98d5654e-3acf-4b0e-abba-5dbe9efeb40e\",\"text\":\"flood\",\"id\":\"5f34df21-b0e4-4b3f-92b9-d5dddf0256a2\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5440dd24-d7b3-4789-aa19-581547435cd3\",\"text\":\"tsunami\",\"id\":\"17199483-e13b-495b-a436-adde83e420dc\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"24b7e168-28a5-4b7d-bead-e00b105b85f0\",\"text\":\"geological\",\"id\":\"a266ea1b-55d2-473b-b745-79f3cf7067da\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[{\"conceptid\":\"e4825a3d-390c-4e8a-a904-9784f5f686c6\",\"text\":\"mass movement\",\"id\":\"cdc758df-37dd-49f1-adc6-fdb460af04fa\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7579b1f0-2891-462f-804e-150efca73f50\",\"text\":\"erosion\",\"id\":\"0096f678-6ed7-4096-b36c-5a201da98a97\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"10a4cdf6-140c-4e32-8c16-6381e0480bc1\",\"text\":\"volcanic\",\"id\":\"f1ea98c1-c7d8-4ed5-93ee-04508a5b3e1a\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"12c5bc16-04e1-4773-9e1d-27219a77eb8b\",\"text\":\"seismic\",\"id\":\"2b7da5c3-6815-42a1-907d-462c23347bbc\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Disturbances\"}",
-                    "id": "4312a310-be4c-11e6-84a5-026d961c88e6"
-                },
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000009",
-                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "label": "Condition",
-                    "node_id": "bf00b891-956f-11e6-b664-024f9e178154",
-                    "sortorder": 1,
-                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"16a462cb-cf4c-4959-8991-8d46c041dd6c\",\"text\":\"good\",\"id\":\"5c459cec-0e3f-4f5f-99e5-e4608530508b\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"863baf30-f9c1-4762-a1fc-57d400294bb4\",\"text\":\"fair\",\"id\":\"44dbe54e-0bf2-4ee9-9ae1-ad7ddd0a53a6\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3bcf52dc-f8c8-4cb3-9240-44abb7d11c94\",\"text\":\"poor\",\"id\":\"4e4e7fbf-d0f6-4f86-8005-b1b52de0aa14\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b33f47c0-f0db-4c79-bc71-deae8813e2ce\",\"text\":\"very bad\",\"id\":\"6df218a4-1056-4c7d-8519-b013a80384c4\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]}],\"label\":\"Condition\"}",
-                    "id": "4312a30c-be4c-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                    "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.",
-                    "visible": true,
-                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "e817b2ab-956d-11e6-b664-024f9e178154",
-                    "helptitle": null,
-                    "instructions": "One assessment of condition at a particular point in time. ",
-                    "active": true,
-                    "name": "Condition Assessment"
+                    "active": true, 
+                    "cardid": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "One assessment of condition at a particular point in time. ", 
+                    "name": "Condition Assessment", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"maxDate\":false,\"viewMode\":\"days\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"Date Condition Assessed\"}", 
+                    "id": "4312a30e-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Date Condition Assessed", 
+                    "node_id": "ccc1f371-ab97-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000004"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"maxFilesize\":\"200\",\"acceptedFiles\":\"\",\"label\":\"Images or Documents\"}", 
+                    "id": "4312a30d-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Images or Documents", 
+                    "node_id": "097e25d7-ab98-11e6-84a5-026d961c88e6", 
+                    "sortorder": 2, 
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Choose as many or as few recommendations as are relevant to this assessment.\",\"options\":[{\"conceptid\":\"88975b48-71d5-4c78-9c64-3687123dbc28\",\"text\":\"archaeological intervention\",\"id\":\"305040c0-a87b-42bd-875f-ee13a95f7890\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"a3157c46-7c4f-4de3-a355-11d68d6788e6\",\"text\":\"archaeological survey\",\"id\":\"6d52b780-1091-4b14-b5b2-796f1068bb2a\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6d912f16-890e-4176-98db-95b99284e639\",\"text\":\"excavation\",\"id\":\"b44cf8f0-0558-4f90-83fa-1e216320df26\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e0fa5826-6ddd-404b-b409-32a22475ea54\",\"text\":\"salvage recording\",\"id\":\"1ac24a75-7ea5-4dbf-9a95-dc4e2d612cf9\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"22d7b0cc-fc6e-47da-82a9-664b2875f94b\",\"text\":\"heritage assessment\",\"id\":\"fb224913-b29e-4aee-9a29-5e5e5e6d4fe7\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[{\"conceptid\":\"7a742a3f-fe28-4b33-8adf-5630e09358b9\",\"text\":\"aerial photograph interpretation\",\"id\":\"50faa45c-d5f2-4fad-ba3f-b2d9005004ed\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"63404be1-f395-4cd8-b448-e2c8a796331a\",\"text\":\"desk based assessment\",\"id\":\"68b09c5c-59ac-460b-8a0a-8467bf92dc36\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"96d1444f-2203-43b0-b7ec-40ce0f004574\",\"text\":\"environmental impact assessment\",\"id\":\"d4b35ecb-16cd-4d42-9bed-fe2c94e75c3e\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7bce9ef8-5801-4291-a407-a7823326b2ee\",\"text\":\"historic landscape characterisation\",\"id\":\"d5edc2b2-4736-4cd3-9568-08beeb8420ab\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"0fbc093b-e558-465e-9bfe-9aaee4a879ee\",\"text\":\"in-depth condition assessment\",\"id\":\"a5696559-4ca3-444a-9233-8d9a5edc7c23\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"e87f8cf5-b3ec-43bf-b296-960959a6edaa\",\"text\":\"remote sensing\",\"id\":\"f9bdbc6a-e219-46cb-9eb9-9d7ac6e7855d\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"64d21cb1-444b-4b3b-990d-cbf7c5a03e50\",\"text\":\"management intervention\",\"id\":\"2c29727d-b17c-4311-9d8c-ffa125a90ab2\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[{\"conceptid\":\"0bdcd50f-a701-439f-a455-9fe8c1c596e4\",\"text\":\"conservation intervention\",\"id\":\"a9f9afe9-5333-45b3-85fc-53205266223e\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eab3dba2-19ab-4d20-81cc-cd9bfca00cc0\",\"text\":\"reburial\",\"id\":\"df81de3c-4cd5-45a9-a083-f8f2c7ec1c3e\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"63234c3f-4674-4518-85de-73b84694c6d9\",\"text\":\"fencing\",\"id\":\"792b7faa-8cc0-446e-9b9c-3dad85822013\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1e0afd30-d5a1-42e0-a02f-3754df3418d6\",\"text\":\"fire mitigation\",\"id\":\"3889503a-2524-4edd-920c-f1ac7d4675cd\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7022ec05-d669-49be-a000-27a717923023\",\"text\":\"designation\",\"id\":\"e4649da0-95d0-4638-8f14-53f781900943\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"6c1ea4a0-fa6c-4bd3-815a-f57239680abb\",\"text\":\"field survey\",\"id\":\"de6d7318-929b-4a7a-9e17-69035e16b48a\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[{\"conceptid\":\"dc1873f7-49c5-42a2-9863-6a950cd6f3d4\",\"text\":\"architectural survey\",\"id\":\"e6db97a7-a719-4dc6-82dc-fd4aa42e2881\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9b46acbe-50d1-4870-bb46-55981d2178cd\",\"text\":\"measured survey\",\"id\":\"57396bb2-b47b-4f53-a2e7-e7d936b55696\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"4764910d-3d9e-45bc-a390-147d58b400c7\",\"text\":\"photographic recording\",\"id\":\"93de3278-3a37-455c-8216-ff939f87cf27\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"2b1660dd-b47e-479a-95ae-9e656418acb2\",\"text\":\"topographic survey\",\"id\":\"98aa7952-8775-49c1-b5ce-8ad53d99f3a9\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Recommendations\"}", 
+                    "id": "4312a30b-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Recommendations", 
+                    "node_id": "3ecd4635-956f-11e6-b664-024f9e178154", 
+                    "sortorder": 6, 
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"width\":\"100%\",\"placeholder\":\"Enter text\",\"maxLength\":null,\"label\":\"Condition Description\"}", 
+                    "id": "4312a30a-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Condition Description", 
+                    "node_id": "4a416f21-ab97-11e6-84a5-026d961c88e6", 
+                    "sortorder": 3, 
+                    "widget_id": "10000000-0000-0000-0000-000000000005"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Threats are potential future disturbances.  Choose as many or as few threats are you can identify in this assessment.\",\"options\":[{\"conceptid\":\"6fcc5949-bffc-46f8-93eb-c1f93fc2ef89\",\"text\":\"meteorological\",\"id\":\"3ef4850d-292d-41c7-9c44-bc2376d979ee\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"9935c53c-dac4-4e1a-b4a7-a425b777a48b\",\"text\":\"storm\",\"id\":\"51684806-5519-46ef-92e1-b04c8167c975\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f906108c-b848-4eea-8f7f-0294b4aeb174\",\"text\":\"fire induced by lightning\",\"id\":\"c58a80fe-49b7-45ee-81b6-9cb574c10c7b\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"0e132db9-a8e9-4998-bbfd-ee696d6c2c97\",\"text\":\"biological\",\"id\":\"e33709ec-bc10-45d4-9080-515a337d826d\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[{\"conceptid\":\"76b1670c-2eff-40bb-a0c5-a83f4c7331a1\",\"text\":\"pest infestation\",\"id\":\"73c3928a-c12b-4552-833c-3ae40b70fe25\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"728e6ada-189a-466c-b5f6-725366036b5d\",\"text\":\"plant growth\",\"id\":\"4fe7b71e-068d-4a7b-bb98-8bcac148da66\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"f2440185-a80e-4ced-8b34-53789882ae3f\",\"text\":\"human-induced\",\"id\":\"26f0ead7-3243-40d0-af5e-c7c8c4c5e4cd\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[{\"conceptid\":\"8e662c34-bf7f-4471-9693-63d4bc7715b3\",\"text\":\"fire\",\"id\":\"061adf90-03f6-4a49-b647-100c4f590898\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ec543f7c-1470-4f73-b702-35dbc78a55cc\",\"text\":\"explosion\",\"id\":\"74a1e963-60fe-4b7d-8d99-42a51fffb4c1\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"c8303ac1-508c-4cc1-adf6-dba6dc621842\",\"text\":\"pollution\",\"id\":\"4efb3606-bf24-40c4-8761-0f7b14ed0fa9\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"05bf6c79-b08e-4b4b-82df-f40c3436cd6d\",\"text\":\"violence and conflict\",\"id\":\"8153e584-886c-4e57-a79b-b1ff13a2f369\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"f064f439-5b81-4db4-879a-62a3dac35c0c\",\"text\":\"looting/theft\",\"id\":\"5f8357e8-a0e2-4e9f-bd3e-8931218a3ba2\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5acbf219-dec2-42ce-a6fa-4da7c4590f4a\",\"text\":\"vandalism\",\"id\":\"69d53378-1179-49c5-9188-c318850808ae\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"41bc559e-8c0e-4036-aec0-c57d6380d7fb\",\"text\":\"infrastructure failure\",\"id\":\"cf9635be-b655-47f2-b74c-31f806d9062d\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bb6939ab-57a9-4c4e-94b2-a0d24895890e\",\"text\":\"agriculture\",\"id\":\"ee67684f-f413-44b5-af99-a746ec93658e\",\"sortorder\":\"23\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"61541316-b2e2-4c1e-be6c-9ae2501c71fb\",\"text\":\"mining\",\"id\":\"1176e6a0-1d9b-4653-b733-cd5eb7759c0d\",\"sortorder\":\"24\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"56dcb2d4-0be1-475e-ad09-2fbe4496ea68\",\"text\":\"construction\",\"id\":\"7b474f48-036e-491a-b322-ba52bb33b77a\",\"sortorder\":\"25\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6f046e96-5995-4015-acb9-ebabeac6e4e8\",\"text\":\"inappropriate use\",\"id\":\"09d58c58-7a27-4ff1-b6d1-0c9f3723e298\",\"sortorder\":\"26\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ed6bfcc4-1f2c-4cce-94ba-b304225c279b\",\"text\":\"lack of maintenance\",\"id\":\"23de2ea6-2e66-4f07-9cbb-7a5492da05e2\",\"sortorder\":\"27\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"380ec64b-2e69-41da-afb9-48ab90caa2d9\",\"text\":\"climate change\",\"id\":\"b7d1f3fc-3ccf-43a5-98e2-f81e6c5ec528\",\"sortorder\":\"28\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9167de08-93e7-4080-ac71-2fbe7e6841de\",\"text\":\"hydrological\",\"id\":\"4e44ac6e-98ae-4bc5-96de-fe03ef87a7a9\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[{\"conceptid\":\"0a0156cc-98fe-4f16-867b-55dfb2dacf9f\",\"text\":\"flood\",\"id\":\"ef34616d-c9d1-4fdc-b787-827d31784025\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1bdcc469-7f36-4de9-8a6f-802451119dc9\",\"text\":\"tsunami\",\"id\":\"c3a47bbe-d2e7-4030-a6a7-62dad44e4dc7\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"fa6d7f18-f3bf-4bef-86d3-90a1cd13a7df\",\"text\":\"geological\",\"id\":\"429d8ca0-7b98-41ea-8452-d9cde03969e5\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[{\"conceptid\":\"247a6447-9235-4265-8a5e-a6a77a11bcd2\",\"text\":\"mass movement\",\"id\":\"809b66b1-014a-42d4-9a38-e2f1f58738de\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"aaae19f4-7164-442e-a3ec-b1562614214a\",\"text\":\"erosion\",\"id\":\"4b7d04ef-be4c-4c59-8d98-e5470a8cfa8b\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a1370bda-8706-4a80-abc5-412db82a8dd3\",\"text\":\"volcanic\",\"id\":\"c7e98c6a-22ef-4024-9021-913c80746e26\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"55bc684d-1888-4e78-952a-c417e6418921\",\"text\":\"seismic\",\"id\":\"9c35a534-8245-4c87-a511-90b13cbda8f6\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Threats\"}", 
+                    "id": "4312a30f-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Threats", 
+                    "node_id": "d03c96b1-956f-11e6-b664-024f9e178154", 
+                    "sortorder": 4, 
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Choose as many or as few disturbances as are relevant to this assessment.\",\"options\":[{\"conceptid\":\"46aff001-3c08-4594-aa83-83ffdac5a655\",\"text\":\"meteorological\",\"id\":\"1fed9701-826b-4307-bd10-4ec63d6e5cda\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[{\"conceptid\":\"544ec937-13e3-4994-bdc5-fdcd6bf06279\",\"text\":\"storm\",\"id\":\"8eec3bc8-958f-4ed4-9855-d07af708b263\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cc68a4b0-636e-48e0-be8c-140eb1f54bf7\",\"text\":\"fire induced by lightning\",\"id\":\"d370f3ab-0797-429c-9858-66d60bc66075\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"9c82a674-ecfb-43a1-bf75-aa03b76e583f\",\"text\":\"biological\",\"id\":\"3faa99ac-4d1d-4e97-abff-b561dbc863d2\",\"sortorder\":\"12\",\"collector\":\"\",\"children\":[{\"conceptid\":\"330f950f-72d6-4659-b661-7c87f52b7de1\",\"text\":\"pest infestation\",\"id\":\"5b282deb-5f56-4745-894c-5cdaad712628\",\"sortorder\":\"13\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ffe3693c-a037-4778-9410-a8b05e185778\",\"text\":\"plant growth\",\"id\":\"9b07b311-d62f-4a50-81a5-19479d61fe5f\",\"sortorder\":\"14\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"0ff63bf4-3130-4a2c-be8e-c1d5948576d7\",\"text\":\"human-induced\",\"id\":\"149b6f47-ed55-4862-8264-4915106b24f3\",\"sortorder\":\"15\",\"collector\":\"\",\"children\":[{\"conceptid\":\"963c1c77-2cbc-4b8d-9f58-6da04c45e9c5\",\"text\":\"fire\",\"id\":\"5d66180e-91a3-4440-8864-7a863ebdcf4c\",\"sortorder\":\"16\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"cfcde299-e99b-49fe-8766-653cf2343338\",\"text\":\"explosion\",\"id\":\"ea8b9180-67f7-4fe7-956c-aca0560e7d7e\",\"sortorder\":\"17\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"1b671d35-1742-4213-a012-51c511f395d9\",\"text\":\"pollution\",\"id\":\"383af24d-ab74-45e5-a78b-efa60849c5a4\",\"sortorder\":\"18\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d80c0f5b-40d4-40d2-8825-9b71a3ccbbab\",\"text\":\"violence and conflict\",\"id\":\"760b4781-d1a6-42c6-8d32-568e0a8aff74\",\"sortorder\":\"19\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5d30fb29-00cc-4e5d-a08b-cf7fc6fe1480\",\"text\":\"looting/theft\",\"id\":\"af817166-615a-440c-9447-50e94502b410\",\"sortorder\":\"20\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"bbd387fa-f649-44c9-80d4-3441bf262b0b\",\"text\":\"vandalism\",\"id\":\"680ff8aa-9bec-4b33-bb6e-59137948af72\",\"sortorder\":\"21\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"d070d967-c62c-4da7-9de7-a5052b24b575\",\"text\":\"infrastructure failure\",\"id\":\"f1cc4602-894b-474d-89b6-8b67966cc3a5\",\"sortorder\":\"22\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"eb267f56-abe1-4693-af3d-a1c031db0a78\",\"text\":\"agriculture\",\"id\":\"9d1b6e8b-4f7e-449e-8815-d9cdd5639e26\",\"sortorder\":\"23\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"17c5dc2b-f47f-44a9-9725-28bb33252daa\",\"text\":\"mining\",\"id\":\"e51c13b8-767c-44d0-b458-86f85fcc61a0\",\"sortorder\":\"24\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"9e705c53-b6d5-4e0d-9f2a-f27ca121efde\",\"text\":\"construction\",\"id\":\"e1b51147-4de0-44ed-9dc7-bc9c63c902ed\",\"sortorder\":\"25\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ad073c4a-2bc0-4d40-bb5e-002c945c08f6\",\"text\":\"inappropriate use\",\"id\":\"ee4f40ac-a7f0-420a-9800-e2c0777b5ee3\",\"sortorder\":\"26\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"fab93209-6488-4e54-9cdc-250d6933d2c6\",\"text\":\"lack of maintenance\",\"id\":\"331cfd47-782d-4aea-b0bc-97eaba1aa875\",\"sortorder\":\"27\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"8440dd1e-cdbf-4197-a1f3-bd69c3a0df34\",\"text\":\"climate change\",\"id\":\"b2eaf961-ccb4-40a9-997d-792f6ccc5aca\",\"sortorder\":\"28\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"ca49301c-5219-4527-9738-ca038580e89f\",\"text\":\"hydrological\",\"id\":\"4e849891-d667-4163-a594-04226e443a04\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[{\"conceptid\":\"98d5654e-3acf-4b0e-abba-5dbe9efeb40e\",\"text\":\"flood\",\"id\":\"5f34df21-b0e4-4b3f-92b9-d5dddf0256a2\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5440dd24-d7b3-4789-aa19-581547435cd3\",\"text\":\"tsunami\",\"id\":\"17199483-e13b-495b-a436-adde83e420dc\",\"sortorder\":\"6\",\"collector\":\"\",\"children\":[]}]},{\"conceptid\":\"24b7e168-28a5-4b7d-bead-e00b105b85f0\",\"text\":\"geological\",\"id\":\"a266ea1b-55d2-473b-b745-79f3cf7067da\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[{\"conceptid\":\"e4825a3d-390c-4e8a-a904-9784f5f686c6\",\"text\":\"mass movement\",\"id\":\"cdc758df-37dd-49f1-adc6-fdb460af04fa\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"7579b1f0-2891-462f-804e-150efca73f50\",\"text\":\"erosion\",\"id\":\"0096f678-6ed7-4096-b36c-5a201da98a97\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"10a4cdf6-140c-4e32-8c16-6381e0480bc1\",\"text\":\"volcanic\",\"id\":\"f1ea98c1-c7d8-4ed5-93ee-04508a5b3e1a\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"12c5bc16-04e1-4773-9e1d-27219a77eb8b\",\"text\":\"seismic\",\"id\":\"2b7da5c3-6815-42a1-907d-462c23347bbc\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Disturbances\"}", 
+                    "id": "4312a310-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Disturbances", 
+                    "node_id": "56f0982f-956f-11e6-b664-024f9e178154", 
+                    "sortorder": 5, 
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                }, 
+                {
+                    "card_id": "e817b2ab-956d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"16a462cb-cf4c-4959-8991-8d46c041dd6c\",\"text\":\"good\",\"id\":\"5c459cec-0e3f-4f5f-99e5-e4608530508b\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"863baf30-f9c1-4762-a1fc-57d400294bb4\",\"text\":\"fair\",\"id\":\"44dbe54e-0bf2-4ee9-9ae1-ad7ddd0a53a6\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3bcf52dc-f8c8-4cb3-9240-44abb7d11c94\",\"text\":\"poor\",\"id\":\"4e4e7fbf-d0f6-4f86-8005-b1b52de0aa14\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"b33f47c0-f0db-4c79-bc71-deae8813e2ce\",\"text\":\"very bad\",\"id\":\"6df218a4-1056-4c7d-8519-b013a80384c4\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]}],\"label\":\"Condition\"}", 
+                    "id": "4312a30c-be4c-11e6-84a5-026d961c88e6", 
+                    "label": "Condition", 
+                    "node_id": "bf00b891-956f-11e6-b664-024f9e178154", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000009"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Describes the conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group. Additional information may include a management recommendation, a condition image, the data the condition was assessed and a description of the condition.", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "edgeid": "8d8a0882-956e-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P35_has_identified", 
+                    "rangenode_id": "8d8a0881-956e-11e6-b664-024f9e178154"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "71a11f18-ab97-11e6-84a5-026d961c88e6", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span", 
+                    "rangenode_id": "71a11f17-ab97-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "56f09830-956f-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "56f0982f-956f-11e6-b664-024f9e178154"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "3200d57d-ab97-11e6-84a5-026d961c88e6", 
+                    "edgeid": "4a416f22-ab97-11e6-84a5-026d961c88e6", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note", 
+                    "rangenode_id": "4a416f21-ab97-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "71a11f17-ab97-11e6-84a5-026d961c88e6", 
+                    "edgeid": "ccc1f372-ab97-11e6-84a5-026d961c88e6", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by", 
+                    "rangenode_id": "ccc1f371-ab97-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "3200d57e-ab97-11e6-84a5-026d961c88e6", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by", 
+                    "rangenode_id": "3200d57d-ab97-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "097e25d8-ab98-11e6-84a5-026d961c88e6", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P138i_has_representation", 
+                    "rangenode_id": "097e25d7-ab98-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "d03c96b2-956f-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "d03c96b1-956f-11e6-b664-024f9e178154"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "2aba031e-956f-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by", 
+                    "rangenode_id": "2aba031d-956f-11e6-b664-024f9e178154"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "edgeid": "bf00b892-956f-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "bf00b891-956f-11e6-b664-024f9e178154"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "2aba031d-956f-11e6-b664-024f9e178154", 
+                    "edgeid": "3ecd4636-956f-11e6-b664-024f9e178154", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "3ecd4635-956f-11e6-b664-024f9e178154"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "e817b2a9-956d-11e6-b664-024f9e178154", 
+            "iconclass": "fa fa-clipboard", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": null, 
+            "maplinewidth": null, 
+            "mappointsize": null, 
+            "name": "Condition Assessment", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": {
+                        "rdmCollection": "0f7c3c00-8841-4ccb-82ac-3bcd045ba5ef"
+                    }, 
+                    "datatype": "concept-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Threat Type", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "d03c96b1-956f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "file-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition Image", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "097e25d7-ab98-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E38_Image", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P138i_has_representation"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition Time Span ", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "71a11f17-ab97-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "faea6a7c-0834-4a96-9d5e-f4dd0276f827"
+                    }, 
+                    "datatype": "concept-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Disturbance Type", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "56f0982f-956f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": null
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition Type", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "bf00b891-956f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "string", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition Description", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "4a416f21-ab97-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E62_String", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "date", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Date Condition Assessed", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "ccc1f371-ab97-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition Description Assignment", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "3200d57d-ab97-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Condition Assessment", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E14_Condition_Assessment", 
+                    "parentproperty": ""
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": "49eac741-7640-4fe5-8ac0-e5659b4f9129"
+                    }, 
+                    "datatype": "concept-list", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Recommendation Type", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "3ecd4635-956f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Condition State", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "8d8a0881-956e-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P35_has_identified"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                    "is_collector": false, 
+                    "istopnode": false, 
+                    "name": "Management Recommendation", 
+                    "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                    "nodeid": "2aba031d-956f-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E89_Propositional_Object", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E14_Condition_Assessment",
-                "nodeid": "e817b2a8-956d-11e6-b664-024f9e178154",
-                "datatype": "semantic",
-                "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154",
-                "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154",
-                "config": null,
-                "name": "Condition Assessment"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                "config": null, 
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "e817b2a9-956d-11e6-b664-024f9e178154", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Condition Assessment", 
+                "nodegroup_id": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                "nodeid": "e817b2a8-956d-11e6-b664-024f9e178154", 
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E14_Condition_Assessment", 
+                "parentproperty": ""
+            }, 
+            "subtitle": "Captures conditions, threats, and disturbances affecting a Heritage Resource or Heritage Resource Group", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }

@@ -73,6 +73,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans "Icons" %}
                                 </a>
                             </li>
+                            <!--ko if: graph.isresource() -->
+                            <li id="xx-map-style-group">
+                                <a id="xx-map-style" data-toggle="tab" href="#map-style-card" class="card-tab-title" aria-expanded="true">
+                                    {% trans "Appearance" %}
+                                </a>
+                            </li>
+                           <!--/ko-->
                             <li id="xx-desc-group">
                                 <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
                                     {% trans "Description" %}
@@ -159,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'source', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
+                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '100%', search_contains: true}"></select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -233,6 +240,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card -->
+                            <div id="map-style-card" class="tab-pane fade">
+                                <div class="panel-body card-panel-body">
+                                    <div class="card-content">
+
+                                        <!-- Card Level Alert -->
+                                        <div id="map-style-card-alert" class="panel install-card-alert"></div>
+
+                                        <!-- Card Instruction -->
+                                        <p id="install-instructions" class="content-instructions">
+                                            <span data-bind="if: graph.isresource()">
+                                                {% trans "Define this resource's color when displayed in the search results chart" %}
+                                            </span>
+                                            <span data-bind="if: !graph.isresource()">
+                                              {% trans "Define this resource's color when displayed in the search results chart" %}
+                                            </span>
+                                        </p>
+
+                                        <!-- Form -->
+                                        <div class="col-xs-12 col-sm-6" style="padding-bottom: 10px;">
+
+                                            <div class="row widget-container">
+                                                <div class="form-group">
+                                                  <div class="relative">
+                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                  </div>
+                                                  <div class="colorpicker-component input-group">
+                                                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: rootNodeColor, format:'rgba'}">
+                                                    <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: rootNodeColor}"></i></span>
+                                                  </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -366,7 +411,8 @@ define('graph-settings-data', [], function () {
         node: {{node_json}},
         ontologies: {{ontologies}},
         ontologyClasses: {{ontology_classes}},
-        resources: {{resource_data}}
+        resources: {{resource_data}},
+        ontology_namespaces: {{ontology_namespaces}}
     };
 });
 {% endautoescape %}</script>

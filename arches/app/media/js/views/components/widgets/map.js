@@ -80,6 +80,7 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
+            this.mapImage = ko.observable(null);
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
                 return {
@@ -565,8 +566,46 @@ define([
                 this.draw = draw;
                 this.map.addControl(draw);
 
+                var devicePixelRatio = window.devicePixelRatio;
+                var generatePrintMap = function() {
+                    Object.defineProperty(window, 'devicePixelRatio', {
+                        get: function() {
+                            return 3.125;
+                        }
+                    });
+
+                    var hidden = document.createElement('div');
+                    var container = document.createElement('div');
+                    hidden.className = 'hidden-map';
+                    document.body.appendChild(hidden);
+                    container.className = 'print-map-container';
+                    hidden.appendChild(container);
+
+                    var printMap = new mapboxgl.Map({
+                        container: container,
+                        center: self.map.getCenter(),
+                        zoom: self.map.getZoom(),
+                        style: self.map.getStyle(),
+                        bearing: self.map.getBearing(),
+                        pitch: self.map.getPitch(),
+                        interactive: false,
+                        attributionControl: false
+                    });
+                    printMap.once('load', function() {
+                        self.mapImage(printMap.getCanvas().toDataURL());
+                        printMap.remove();
+                        hidden.parentNode.removeChild(hidden);
+                        Object.defineProperty(window, 'devicePixelRatio', {
+                            get: function() {
+                                return devicePixelRatio;
+                            }
+                        });
+                    });
+                };
+
                 this.map.on('load', function() {
                     if (!self.configForm) {
+                        map.on('moveend', _.throttle(generatePrintMap, 3000));
                         var zoomToGeoJSON = function(data, fly) {
                             var method = fly ? 'flyTo' : 'jumpTo';
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
@@ -1079,7 +1118,7 @@ define([
                 };
 
                 this.updateConfigs = function() {
-                    if (this.form === null && this.context !== 'report-header') {
+                    if (!this.form) {
                         var mapCenter = this.getCenter()
                         var zoom = self.map.getZoom()
                         if (self.zoom() !== zoom) {

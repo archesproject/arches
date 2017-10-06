@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['operation'] == 'register':
-            self.register(source_dir=options['fn_source'])
+            self.register(source=options['fn_source'])
 
         if options['operation'] == 'unregister':
             self.unregister(fn_name=options['fn_name'])
@@ -55,21 +55,21 @@ class Command(BaseCommand):
 
         """
 
-    def register(self, source_dir):
+    def register(self, source):
         """
         Inserts a function into the arches db
 
         """
 
         import imp
-        fn_config = imp.load_source('', source_dir)
+        fn_config = imp.load_source('', source)
         details = fn_config.details
         fn = models.Function(
             name = details['name'],
             functiontype = details['type'],
             description = details['description'],
             defaultconfig = details['defaultconfig'],
-            modulename = os.path.basename(source_dir),
+            modulename = os.path.basename(source),
             classname = details['classname'],
             component = details['component']
         )

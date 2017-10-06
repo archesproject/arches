@@ -30,6 +30,7 @@ define([
             self.mapSource = options.mapSource;
             self.loading = options.loading;
             self.permissions = options.permissions;
+            self.ontology_namespaces = options.ontology_namespaces || {};
             if (options.url) {
                 self.url = options.url;
             }
@@ -80,6 +81,7 @@ define([
             self.configKeys = ko.observableArray();
             self.config = {};
             self.issearchable = ko.observable(true);
+            self.isrequired = ko.observable(true);
 
             self.parse(options.source);
 
@@ -157,7 +159,8 @@ define([
                     ontologyclass: self.ontologyclass,
                     parentproperty: self.parentproperty,
                     config: config,
-                    issearchable: self.issearchable
+                    issearchable: self.issearchable,
+                    isrequired: self.isrequired
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
@@ -175,6 +178,44 @@ define([
                     self.getValidNodesEdges();
                 }
             })
+
+            self.ontologyclass_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.ontologyclass());
+            });
+            self.parentproperty_friendlyname = ko.computed(function() {
+                return self.getFriendlyOntolgyName(self.parentproperty());
+            });
+        },
+
+        /**
+         * Gets the name for an ontology uri that is more user friendly
+         * by using a namespace if possible
+         * "http://www.cidoc-crm.org/cidoc-crm/E1_Entity" could become "E1_Entity"
+         * @memberof NodeModel.prototype
+         * @param {string} ontologyname - the ontology URI to get the friendly name for
+         */
+        getFriendlyOntolgyName: function(ontologyname){
+            if(!!ontologyname){
+                var uri = _.chain(this.ontology_namespaces)
+                .keys()
+                .find(function(namespace){
+                    return ontologyname.indexOf(namespace) !== -1;
+                })
+                .value();
+
+                if(!!uri){
+                    namespace = this.ontology_namespaces[uri];
+                    if(!!namespace){
+                        return ontologyname.replace(uri, namespace + ":")
+                    }else{
+                        return ontologyname.replace(uri, '');
+                    }
+                }else{
+                    return ontologyname
+                }
+            }else{
+                return '';
+            }
         },
 
         /**
@@ -191,6 +232,7 @@ define([
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
             self.issearchable(source.issearchable);
+            self.isrequired(source.isrequired);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -206,6 +248,15 @@ define([
         setupConfig: function(config) {
             var self = this;
             var keys = [];
+            var datatypeRecord = this.datatypelookup[this.datatype()];
+            if (datatypeRecord) {
+                var defaultConfig = datatypeRecord.defaultconfig;
+                _.each(defaultConfig, function (value, key) {
+                    if (!config.hasOwnProperty(key)) {
+                        config[key] = value;
+                    }
+                });
+            }
             _.each(config, function(configVal, configKey) {
                 if (!ko.isObservable(self.config[configKey])) {
                     self.config[configKey] = Array.isArray(configVal) ?

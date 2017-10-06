@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <skos:Collection rdf:about="http://www.archesproject.org/05659706-08a2-4342-87b9-98919ecdd8d0">
+    <skos:member>
+      <skos:Concept rdf:about="http://www.archesproject.org/89ff530a-f350-44f0-ac88-bdd8904eb57e"/>
+    </skos:member>
+    <skos:prefLabel xml:lang="en-US">{"id": "dadaeee5-57ef-409d-a6cf-98d332fdada8", "value": "Concept Label Import Test"}</skos:prefLabel>
+    <skos:member>
+      <skos:Concept rdf:about="http://www.archesproject.org/6490ac87-ac80-41d7-a135-1119b4cd912d"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://www.archesproject.org/0fc72a30-2ead-4afd-9e7a-a5067d2cc5c8"/>
+    </skos:member>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://www.archesproject.org/00000000-0000-0000-0000-000000000005">
+    <skos:prefLabel xml:lang="en-US">{"id": "d8c622f6-e786-11e6-905a-475a5eee86f5", "value": "Resource To Resource Relationship Types"}</skos:prefLabel>
+    <skos:member>
+      <skos:Concept rdf:about="http://www.archesproject.org/00000000-0000-0000-0000-000000000007"/>
+    </skos:member>
+  </skos:Collection>
+</rdf:RDF>

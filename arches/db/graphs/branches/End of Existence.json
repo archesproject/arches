@@ -1,167 +1,168 @@
 {
-  "graph": [
-    {
-      "subtitle": "Describes the type and time span of the end of a resource's existence.",
-      "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
-      "isresource": false,
-      "forms_x_cards": [],
-      "reports": [],
-      "iconclass": "fa fa-arrow-down",
-      "functions": [],
-      "nodegroups": [
+    "graph": [
         {
-          "cardinality": "n",
-          "legacygroupid": null,
-          "nodegroupid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "parentnodegroup_id": null
+            "author": " GCI", 
+            "cards": [
+                {
+                    "active": true, 
+                    "cardid": "b3993f5b-97d2-11e6-84a5-026d961c88e6", 
+                    "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": "Please enter the date of the end of existence for the resource.", 
+                    "name": "End of Existence", 
+                    "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "sortorder": null, 
+                    "visible": true
+                }
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6", 
+                    "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"End of Existence Type\"}", 
+                    "id": "595dcf13-ad22-11e6-84a5-026d961c88e6", 
+                    "label": "End of Existence Type", 
+                    "node_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6", 
+                    "sortorder": 1, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }, 
+                {
+                    "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6", 
+                    "config": "{\"maxDate\":false,\"viewMode\":\"months\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"End Date of Existence\"}", 
+                    "id": "595dcf12-ad22-11e6-84a5-026d961c88e6", 
+                    "label": "End Date of Existence", 
+                    "node_id": "158c01fb-97d3-11e6-84a5-026d961c88e6", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000004"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "ff813525-97d2-11e6-84a5-026d961c88e6", 
+                    "edgeid": "158c01fc-97d3-11e6-84a5-026d961c88e6", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by", 
+                    "rangenode_id": "158c01fb-97d3-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "edgeid": "ff813526-97d2-11e6-84a5-026d961c88e6", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span", 
+                    "rangenode_id": "ff813525-97d2-11e6-84a5-026d961c88e6"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "edgeid": "eff93ff4-97d2-11e6-84a5-026d961c88e6", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type", 
+                    "rangenode_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6"
+                }
+            ], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+            "iconclass": "fa fa-arrow-down", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)", 
+            "maplinewidth": 1, 
+            "mappointsize": 4, 
+            "name": "End of Existence", 
+            "nodegroups": [
+                {
+                    "cardinality": "n", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "istopnode": true, 
+                    "name": "End of Existence", 
+                    "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E64_End_of_Existence", 
+                    "parentproperty": ""
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "date", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "istopnode": false, 
+                    "name": "End Date of Existence", 
+                    "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "nodeid": "158c01fb-97d3-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E49_Time_Appellation", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P78_is_identified_by"
+                }, 
+                {
+                    "config": {
+                        "rdmCollection": null
+                    }, 
+                    "datatype": "concept", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "istopnode": false, 
+                    "name": "End of Existence Type", 
+                    "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "nodeid": "eff93ff3-97d2-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"
+                }, 
+                {
+                    "config": null, 
+                    "datatype": "semantic", 
+                    "description": "Represents a single node in a graph", 
+                    "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                    "istopnode": false, 
+                    "name": "End of Existence Time Span", 
+                    "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                    "nodeid": "ff813525-97d2-11e6-84a5-026d961c88e6", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span"
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
+            "root": {
+                "config": null, 
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6", 
+                "istopnode": true, 
+                "name": "End of Existence", 
+                "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6", 
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E64_End_of_Existence", 
+                "parentproperty": ""
+            }, 
+            "subtitle": "Describes the type and time span of the end of a resource's existence.", 
+            "version": ""
         }
-      ],
-      "author": " GCI",
-      "deploymentfile": null,
-      "forms": [],
-      "version": "",
-      "nodes": [
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E64_End_of_Existence",
-          "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "datatype": "semantic",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "",
-          "name": "End of Existence"
-        },
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E49_Time_Appellation",
-          "nodeid": "158c01fb-97d3-11e6-84a5-026d961c88e6",
-          "datatype": "date",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "P78_is_identified_by",
-          "name": "End Date of Existence"
-        },
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E55_Type",
-          "nodeid": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
-          "datatype": "concept",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": {
-            "rdmCollection": null
-          },
-          "parentproperty": "P2_has_type",
-          "name": "End of Existence Type"
-        },
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E52_Time-Span",
-          "nodeid": "ff813525-97d2-11e6-84a5-026d961c88e6",
-          "datatype": "semantic",
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "config": null,
-          "parentproperty": "P4_has_time-span",
-          "name": "End of Existence Time Span"
-        }
-      ],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
-      "edges": [
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "name": null,
-          "edgeid": "158c01fc-97d3-11e6-84a5-026d961c88e6",
-          "domainnode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
-          "rangenode_id": "158c01fb-97d3-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P78_is_identified_by",
-          "description": null
-        },
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "name": null,
-          "edgeid": "ff813526-97d2-11e6-84a5-026d961c88e6",
-          "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "rangenode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P4_has_time-span",
-          "description": null
-        },
-        {
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "name": null,
-          "edgeid": "eff93ff4-97d2-11e6-84a5-026d961c88e6",
-          "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "rangenode_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
-          "ontologyproperty": "P2_has_type",
-          "description": null
-        }
-      ],
-      "maplinewidth": 1,
-      "mappointsize": 4,
-      "graphid": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-      "name": "End of Existence",
-      "cards_x_nodes_x_widgets": [
-        {
-          "widget_id": "10000000-0000-0000-0000-000000000002",
-          "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
-          "label": "End of Existence Type",
-          "node_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
-          "sortorder": 1,
-          "config": "{\"placeholder\":\"Select type\",\"options\":[],\"label\":\"End of Existence Type\"}",
-          "id": "595dcf13-ad22-11e6-84a5-026d961c88e6"
-        },
-        {
-          "widget_id": "10000000-0000-0000-0000-000000000004",
-          "card_id": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
-          "label": "End Date of Existence",
-          "node_id": "158c01fb-97d3-11e6-84a5-026d961c88e6",
-          "sortorder": 0,
-          "config": "{\"maxDate\":false,\"viewMode\":\"months\",\"dateFormat\":\"YYYY-MM-DD\",\"placeholder\":\"Enter date\",\"minDate\":false,\"label\":\"End Date of Existence\"}",
-          "id": "595dcf12-ad22-11e6-84a5-026d961c88e6"
-        }
-      ],
-      "cards": [
-        {
-          "helpenabled": false,
-          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-          "description": "Describes the type and time span of the end of a resource's existence.\n\nRelates to the Actor E39 Resource Model via P93i",
-          "visible": true,
-          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-          "helptext": null,
-          "sortorder": null,
-          "cardid": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
-          "helptitle": null,
-          "instructions": "Please enter the date of the end of existence for the resource.",
-          "active": true,
-          "name": "End of Existence"
-        }
-      ],
-      "root": {
-        "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
-        "description": "",
-        "istopnode": true,
-        "ontologyclass": "E64_End_of_Existence",
-        "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-        "datatype": "semantic",
-        "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
-        "config": null,
-        "name": "End of Existence"
-      },
-      "isactive": true,
-      "deploymentdate": null
+    ], 
+    "metadata": {
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "67a5208 2016-12-07 11:12:11 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
-  ],
-  "metadata": {
-    "git hash": "67a5208 2016-12-07 11:12:11 -0800",
-    "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-    "os version": "4.4.0-45-generic",
-    "os": "Linux"
-  }
 }

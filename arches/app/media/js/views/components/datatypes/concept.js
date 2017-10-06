@@ -1,4 +1,4 @@
-define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko, ConceptWidgetViewModel) {
+define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko, ConceptSelectViewModel) {
     var name = 'concept-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -15,7 +15,7 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                 if (!ko.isObservable(this.node.config.rdmCollection)) {
                     this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
                 }
-                ConceptWidgetViewModel.apply(this, [params]);
+                ConceptSelectViewModel.apply(this, [params]);
                 this.filterValue = ko.computed(function () {
                     return {
                         op: self.op(),
@@ -27,7 +27,15 @@ define(['arches', 'knockout', 'viewmodels/concept-widget'], function (arches, ko
                     params.filterValue(val);
                 });
             } else {
-                this.isEditable = params.graph ? params.graph.get('is_editable') : true;
+                this.isEditable = true;
+                if (params.graph) {
+                    var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                    if (cards.length) {
+                        this.isEditable = cards[0].is_editable
+                    }
+                } else if (params.widget) {
+                    this.isEditable = params.widget.card.get('is_editable')
+                }
                 this.topConcept = params.config.rdmCollection;
                 this.conceptCollections = arches.conceptCollections;
                 this.conceptCollections.unshift({

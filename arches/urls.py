@@ -37,17 +37,20 @@ uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 urlpatterns = [
     url(r'^$', main.index, name='root'),
     url(r'^index.htm', main.index, name='home'),
+    url(r'^auth/password$', main.change_password, name='change_password'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
+    url(r'^concepts/(?P<conceptid>%s)/make_collection/$' % uuid_regex, concept.make_collection, name="make_collection"),
     url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , concept.concept, name="concept"),
     url(r'^concepts/tree/(?P<mode>.*)', concept.concept_tree, name="concept_tree"),
     url(r'^concepts/search$', concept.search, name="concept_search"),
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
     url(r'^concepts/dropdown', concept.dropdown, name="dropdown"),
+    url(r'^concepts/paged_dropdown', concept.paged_dropdown, name="paged_dropdown"),
     url(r'^concepts/export/(?P<conceptid>%s)$' % uuid_regex , concept.export, name="export_concept"),
     url(r'^concepts/export/collections', concept.export_collections, name="export_concept_collections"),
     url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
@@ -87,6 +90,7 @@ urlpatterns = [
     url(r'^graph/permissions$', PermissionDataView.as_view(), name='permission_data'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/(?P<resourceid>%s)/copy$' % uuid_regex, ResourceEditorView.as_view(action='copy'), name='resource_copy'),
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
     url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),
@@ -109,7 +113,6 @@ urlpatterns = [
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
-
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

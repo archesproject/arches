@@ -146,7 +146,8 @@ def create_mapping_configuration_file(graphid, data_dir=None):
             def get_values(concept, values):
                 for subconcept in concept.subconcepts:
                     for value in subconcept.values:
-                        values[value.id] = value.value
+                        if value.type == 'prefLabel':
+                            values[value.id] = value.value
                     get_values(subconcept, values)
                 return values
 

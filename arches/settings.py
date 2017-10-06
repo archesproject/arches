@@ -59,6 +59,18 @@ PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = 'arches/logs/resource_import.log'
 
+RESOURCE_FORMATERS = {
+    'csv': 'arches.app.utils.data_management.resources.formats.csvfile.CsvWriter',
+    'json': 'arches.app.utils.data_management.resources.formats.archesjson.JsonWriter',
+    'xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'pretty-xml': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'json-ld': 'arches.app.utils.data_management.resources.formats.rdffile.JsonLdWriter',
+    'n3': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'nt': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'trix': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter',
+    'rdfa': 'arches.app.utils.data_management.resources.formats.rdffile.RdfWriter'
+}
+
 ONTOLOGY_PATH = os.path.join(ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
 ONTOLOGY_BASE = 'cidoc_crm_v6.2.xml'
 ONTOLOGY_BASE_VERSION = '6.2'
@@ -72,6 +84,54 @@ ONTOLOGY_EXT = [
     'CRMinf_v0.7.rdfs.xml',
     'arches_crm_enhancements.xml'
 ]
+
+# Set the ontolgoy namespace prefixes to use in the UI, set the namespace to '' omit a prefix
+# Users can also override existing namespaces as well if you like
+ONTOLOGY_NAMESPACES = {
+    #'http://my_namespace_here/': 'some_ns',
+    #'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'RDF' <-- note the all caps
+    'http://www.cidoc-crm.org/cidoc-crm/': '',
+    'http://www.ics.forth.gr/isl/CRMarchaeo/': '',
+    'http://www.ics.forth.gr/isl/CRMdig/': '',
+    'http://www.ics.forth.gr/isl/CRMgeo/': '',
+    'http://www.ics.forth.gr/isl/CRMinf/': '',
+    'http://www.ics.forth.gr/isl/CRMsci/': '',
+}
+
+# A context to supply for use in export of resource instances in JSON-LD format
+JSON_LD_CONTEXT = {
+    # "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+    # "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    # "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    # "dc": "http://purl.org/dc/elements/1.1/",
+    # "dcterms": "http://purl.org/dc/terms/",
+    # "schema": "http://schema.org/",
+    # "skos": "http://www.w3.org/2004/02/skos/core#",
+    # "foaf": "http://xmlns.com/foaf/0.1/",
+    # "xsd": "http://www.w3.org/2001/XMLSchema#",
+    # "pi": "http://linked.art/ns/prov/",
+    # "aat": "http://vocab.getty.edu/aat/",
+    # "ulan": "http://vocab.getty.edu/ulan/",
+    # "tgn": "http://vocab.getty.edu/tgn/",
+    # "id": "@id",
+    # "type": "@type",
+    # "Period": "crm:E4_Period",
+    # "Event": "crm:E5_Event",
+    # "Activity": "crm:E7_Activity",
+    # "identified_by": {
+    #     "@id": "crm:P1_is_identified_by",
+    #     "@type": "@id",
+    #     "@container": "@set"
+    # },
+    # "identifies": {
+    #     "@id": "crm:P1i_identifies",
+    #     "@type": "@id"
+    # }
+}
+
+# This is the namespace to use for export of data (for RDF/XML for example)
+# Ideally this should point to the url where you host your site
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
 
 PREFERRED_COORDINATE_SYSTEMS = (
     {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
@@ -254,6 +314,10 @@ LOGIN_URL = 'auth'
 
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 
+BULK_IMPORT_BATCH_SIZE = 2000
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -267,6 +331,8 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, 'logs')
 
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
+RELATED_RESOURCES_PER_PAGE = 15
+RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
@@ -309,6 +375,7 @@ BUSINESS_DATA_FILES = (
 )
 
 DATATYPE_LOCATIONS = ['arches.app.datatypes',]
+FUNCTION_LOCATIONS = ['arches.app.functions',]
 # If you are manually managing your resource tile cache, you may want to "seed"
 # the cache (or prerender some tiles) for low zoom levels.  You can do this by
 # running:
@@ -333,8 +400,6 @@ TILE_CACHE_CONFIG = {
     # "access": "<access key>",
     # "secret": "<secret key>"
 }
-
-VECTOR_TILE_SIMPLIFICATION = 0.3
 
 MAPBOX_API_KEY = '' # Put your Mapbox key here!
 
@@ -382,10 +447,6 @@ HEX_BIN_SIZE = 100
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator
 # high precision binning may result in performance issues.
 HEX_BIN_PRECISION = 4
-
-BULK_IMPORT_BATCH_SIZE = 2000
-
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

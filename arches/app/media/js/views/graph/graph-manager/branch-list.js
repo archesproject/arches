@@ -50,18 +50,33 @@ define([
                 return false;
             });
 
-            var updateList = function(){
-                if(this.selectedNode()){
-                    _.each(this.items(), function(branch){
-                        branch.filtered(true);
-                        if(this.graphModel.canAppend(branch.graphModel)){
-                            branch.filtered(false);
-                        }
-                    }, this);
+
+            valueListener.subscribe(function(){
+                if (!!this.selectedNode()){
+                    this.filter_function();
                 }
-            }
-            valueListener.subscribe(updateList, this);
-            updateList.call(this);
+            }, this);
+
+            // need to call this on init so that branches that can't be appended get filtered out initially
+            this.filter_function();
+        },
+
+        /**
+        * Callback function called every time a user types into the filter input box
+        * @memberof ListView.prototype
+        */
+        filter_function: function(){
+            var filter = this.filter().toLowerCase();
+            this.items().forEach(function(item){
+                var name = typeof item.name === 'string' ? item.name : item.name();
+                if (!item.filtered) {
+                    item.filtered = ko.observable();
+                }
+                item.filtered(true);
+                if(name.toLowerCase().indexOf(filter) !== -1 && this.graphModel.canAppend(item.graphModel)){
+                    item.filtered(false);
+                }
+            }, this);
         },
 
         /**

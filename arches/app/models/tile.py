@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid, importlib
 import datetime
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
@@ -113,6 +115,7 @@ class Tile(models.TileModel):
         request = kwargs.pop('request', None)
         index = kwargs.pop('index', True)
         self.__preSave(request)
+        missing_nodes = []
         if self.data != {}:
             old_model = models.TileModel.objects.filter(pk=self.tileid)
             old_data = old_model[0].data if len(old_model) > 0 else None
@@ -124,8 +127,15 @@ class Tile(models.TileModel):
             self.save_edit(user=user, edit_type=edit_type, old_value=old_data, new_value=self.data)
             for nodeid, value in self.data.iteritems():
                 datatype_factory = DataTypeFactory()
-                datatype = datatype_factory.get_instance(models.Node.objects.get(nodeid=nodeid).datatype)
+                node = models.Node.objects.get(nodeid=nodeid)
+                datatype = datatype_factory.get_instance(node.datatype)
                 datatype.convert_value(self, nodeid)
+                if self.data[nodeid] == None and node.isrequired == True:
+                    missing_nodes.append(node.name)
+
+        if missing_nodes != []:
+            message = _('This card requires values for the following:')
+            raise ValidationError(message, (', ').join(missing_nodes))
 
         super(Tile, self).save(*args, **kwargs)
         if index and unicode(self.resourceinstance.graph_id) != unicode(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):

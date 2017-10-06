@@ -25,9 +25,12 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.db import transaction
 from arches.app.models import models
+
+from arches.app.models.system_settings import settings
 # from rdflib import *  
 from rdflib import Graph, RDF, RDFS
 from rdflib.resource import Resource   
+from rdflib.namespace import Namespace, NamespaceManager
 
 class Command(BaseCommand):
     """
@@ -123,6 +126,7 @@ class Command(BaseCommand):
 
         if data_source is not None and version is not None:
             self.graph = Graph()
+            self.namespace_manager = NamespaceManager(self.graph)
             self.subclass_cache = {}
             
             with transaction.atomic():
@@ -172,33 +176,30 @@ class Command(BaseCommand):
             for s,p,domain_class in self.graph.triples((ontology_property, RDFS.domain, None)):
                 domain_class = Resource(self.graph, domain_class)
                 for domain_subclass in domain_class.transitive_subjects(RDFS.subClassOf):
-                    if self.extract_friendly_name(domain_subclass.identifier) not in ret:
-                        ret[self.extract_friendly_name(domain_subclass.identifier)] = {'down':[], 'up':[]}
+                    if domain_subclass.identifier not in ret:
+                        ret[domain_subclass.identifier] = {'down':[], 'up':[]}
                     for s,p,range_class in self.graph.triples((ontology_property, RDFS.range, None)):
-                        ret[self.extract_friendly_name(domain_subclass.identifier)]['down'].append({
-                            'ontology_property':self.extract_friendly_name(ontology_property),
+                        ret[domain_subclass.identifier]['down'].append({
+                            'ontology_property':ontology_property,
                             'ontology_classes':self.get_subclasses(range_class)
                         })
 
             for s,p,range_class in self.graph.triples((ontology_property, RDFS.range, None)):
                 range_class = Resource(self.graph, range_class)
                 for range_subclass in range_class.transitive_subjects(RDFS.subClassOf):
-                    if self.extract_friendly_name(range_subclass.identifier) not in ret:
-                        ret[self.extract_friendly_name(range_subclass.identifier)] = {'down':[], 'up':[]}
+                    if range_subclass.identifier not in ret:
+                        ret[range_subclass.identifier] = {'down':[], 'up':[]}
                     for s,p,o in self.graph.triples((ontology_property, RDFS.domain, None)):
-                        ret[self.extract_friendly_name(range_subclass.identifier)]['up'].append({
-                            'ontology_property':self.extract_friendly_name(ontology_property),
+                        ret[range_subclass.identifier]['up'].append({
+                            'ontology_property':ontology_property,
                             'ontology_classes':self.get_subclasses(o)
                         })
         return ret
 
-    def extract_friendly_name(self, uri):
-        return str(uri).split('/')[-1]
-
     def get_subclasses(self, ontology_class):
         if ontology_class not in self.subclass_cache:
             ontology_class_resource = Resource(self.graph, ontology_class)
-            self.subclass_cache[ontology_class] = [self.extract_friendly_name(subclass.identifier) for subclass in ontology_class_resource.transitive_subjects(RDFS.subClassOf)]
+            self.subclass_cache[ontology_class] = [subclass.identifier for subclass in ontology_class_resource.transitive_subjects(RDFS.subClassOf)]
         return self.subclass_cache[ontology_class]
 
     def get_relative_path(self, data_source):
@@ -209,7 +210,7 @@ class Command(BaseCommand):
 
         ret = None
         try:
-            if models.get_ontology_storage_system().location in data_source:
+            if models.get_ontology_storage_system().location in os.path.abspath(data_source):
                 ret = '.%s' % os.path.abspath(data_source).replace(models.get_ontology_storage_system().location,'')
             else:
                 ret ='./%s' % os.path.split(data_source)[1]

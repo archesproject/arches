@@ -28,14 +28,14 @@
 <!-- /ko -->
 
 <!-- ko if: $data.search -->
-<div class="col-sm-2">
+<div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">{% trans "Equals" %}</option>
         <option value="!">{% trans "Not" %}</option>
     </select>
 </div>
 
-<div class="col-sm-10">
+<div class="col-md-8 col-lg-9">
     <select  type="" placeholder="{% trans " Value " %}" class="form-control library-search" data-bind="options: options, optionsText: 'text', optionsValue: 'id', value: searchValue, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 <!-- /ko -->

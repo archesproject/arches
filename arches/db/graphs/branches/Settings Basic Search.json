@@ -1,14 +1,67 @@
 {
     "graph": [
         {
-            "subtitle": "Default configuration for Search", 
-            "functions_x_graphs": [], 
-            "mapfeaturecolor": "#FF0000", 
-            "isresource": false, 
+            "author": " ", 
+            "cards": [
+                {
+                    "active": true, 
+                    "cardid": "f4b2da05-fad7-11e6-8cb0-6c4008b05c4c", 
+                    "description": "Configuration settings for search returns", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": null, 
+                    "name": "Settings Basic Search", 
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "sortorder": null, 
+                    "visible": true
+                }
+            ], 
+            "cards_x_nodes_x_widgets": [], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Configuration settings for search returns", 
+            "edges": [
+                {
+                    "description": null, 
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "edgeid": "afe4d44c-fad8-11e6-804f-6c4008b05c4c", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by", 
+                    "rangenode_id": "afe4d1f5-fad8-11e6-92df-6c4008b05c4c"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "edgeid": "554e4807-fad8-11e6-9824-6c4008b05c4c", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by", 
+                    "rangenode_id": "554e4647-fad8-11e6-991e-6c4008b05c4c"
+                }, 
+                {
+                    "description": null, 
+                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "edgeid": "73dac9ae-fad8-11e6-95ba-6c4008b05c4c", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "name": null, 
+                    "ontologyproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by", 
+                    "rangenode_id": "73dac791-fad8-11e6-af5f-6c4008b05c4c"
+                }
+            ], 
+            "forms": [], 
             "forms_x_cards": [], 
-            "relatable_resource_model_ids": [], 
-            "reports": [], 
+            "functions_x_graphs": [], 
+            "graphid": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
             "iconclass": "fa fa-dashboard", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": "#FF0000", 
+            "maplinewidth": 1, 
+            "mappointsize": 3, 
+            "name": "Settings Basic Search", 
             "nodegroups": [
                 {
                     "cardinality": "1", 
@@ -17,142 +70,90 @@
                     "parentnodegroup_id": null
                 }
             ], 
-            "author": " ", 
-            "deploymentfile": null, 
-            "forms": [], 
-            "version": "", 
             "nodes": [
                 {
-                    "is_collector": false, 
+                    "config": null, 
+                    "datatype": "number", 
                     "description": "Represents a single node in a graph", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "is_collector": false, 
+                    "issearchable": true, 
                     "istopnode": false, 
-                    "ontologyclass": "E13_Attribute_Assignment", 
+                    "name": "MaxExportResults", 
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
                     "nodeid": "afe4d1f5-fad8-11e6-92df-6c4008b05c4c", 
-                    "datatype": "number", 
-                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "issearchable": true, 
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "config": null, 
-                    "parentproperty": "P140i_was_attributed_by", 
-                    "name": "MaxExportResults"
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
                 }, 
                 {
-                    "is_collector": false, 
+                    "config": null, 
+                    "datatype": "number", 
                     "description": "Represents a single node in a graph", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "is_collector": false, 
+                    "issearchable": true, 
                     "istopnode": false, 
-                    "ontologyclass": "E13_Attribute_Assignment", 
+                    "name": "MaxResultsPerPage", 
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
                     "nodeid": "554e4647-fad8-11e6-991e-6c4008b05c4c", 
-                    "datatype": "number", 
-                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "issearchable": true, 
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "config": null, 
-                    "parentproperty": "P140i_was_attributed_by", 
-                    "name": "MaxResultsPerPage"
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
                 }, 
                 {
-                    "is_collector": false, 
+                    "config": null, 
+                    "datatype": "number", 
                     "description": "Represents a single node in a graph", 
-                    "istopnode": false, 
-                    "ontologyclass": "E13_Attribute_Assignment", 
-                    "nodeid": "73dac791-fad8-11e6-af5f-6c4008b05c4c", 
-                    "datatype": "number", 
-                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "issearchable": true, 
                     "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "config": null, 
-                    "parentproperty": "P140i_was_attributed_by", 
-                    "name": "MaxDropdownResults"
+                    "is_collector": false, 
+                    "issearchable": true, 
+                    "istopnode": false, 
+                    "name": "MaxDropdownResults", 
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "nodeid": "73dac791-fad8-11e6-af5f-6c4008b05c4c", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": "http://www.cidoc-crm.org/cidoc-crm/P140i_was_attributed_by"
                 }, 
                 {
-                    "is_collector": true, 
-                    "description": "", 
-                    "istopnode": true, 
-                    "ontologyclass": "E13_Attribute_Assignment", 
-                    "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "datatype": "semantic", 
-                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "issearchable": true, 
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
                     "config": null, 
-                    "parentproperty": "", 
-                    "name": "Basic Search Settings"
+                    "datatype": "semantic", 
+                    "description": "", 
+                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                    "is_collector": true, 
+                    "issearchable": true, 
+                    "istopnode": true, 
+                    "name": "Basic Search Settings", 
+                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                    "parentproperty": ""
                 }
             ], 
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
-            "description": "Configuration settings for search returns", 
+            "relatable_resource_model_ids": [], 
+            "reports": [], 
             "resource_2_resource_constraints": [], 
-            "edges": [
-                {
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "name": null, 
-                    "edgeid": "afe4d44c-fad8-11e6-804f-6c4008b05c4c", 
-                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "rangenode_id": "afe4d1f5-fad8-11e6-92df-6c4008b05c4c", 
-                    "ontologyproperty": "P140i_was_attributed_by", 
-                    "description": null
-                }, 
-                {
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "name": null, 
-                    "edgeid": "554e4807-fad8-11e6-9824-6c4008b05c4c", 
-                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "rangenode_id": "554e4647-fad8-11e6-991e-6c4008b05c4c", 
-                    "ontologyproperty": "P140i_was_attributed_by", 
-                    "description": null
-                }, 
-                {
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "name": null, 
-                    "edgeid": "73dac9ae-fad8-11e6-95ba-6c4008b05c4c", 
-                    "domainnode_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "rangenode_id": "73dac791-fad8-11e6-af5f-6c4008b05c4c", 
-                    "ontologyproperty": "P140i_was_attributed_by", 
-                    "description": null
-                }
-            ], 
-            "maplinewidth": 1, 
-            "mappointsize": 3, 
-            "graphid": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-            "name": "Settings Basic Search", 
-            "cards_x_nodes_x_widgets": [], 
-            "cards": [
-                {
-                    "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
-                    "helpenabled": false, 
-                    "description": "Configuration settings for search returns", 
-                    "visible": true, 
-                    "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                    "helptext": null, 
-                    "sortorder": null, 
-                    "cardid": "f4b2da05-fad7-11e6-8cb0-6c4008b05c4c", 
-                    "helptitle": null, 
-                    "instructions": null, 
-                    "active": true, 
-                    "name": "Settings Basic Search"
-                }
-            ], 
             "root": {
-                "is_collector": true, 
-                "description": "", 
-                "istopnode": true, 
-                "ontologyclass": "E13_Attribute_Assignment", 
-                "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                "datatype": "semantic", 
-                "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
-                "issearchable": true, 
-                "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
                 "config": null, 
-                "name": "Basic Search Settings"
+                "datatype": "semantic", 
+                "description": "", 
+                "graph_id": "f4b26223-fad7-11e6-957d-6c4008b05c4c", 
+                "is_collector": true, 
+                "issearchable": true, 
+                "istopnode": true, 
+                "name": "Basic Search Settings", 
+                "nodegroup_id": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                "nodeid": "f4b25f66-fad7-11e6-95bc-6c4008b05c4c", 
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E13_Attribute_Assignment", 
+                "parentproperty": ""
             }, 
-            "isactive": true, 
-            "deploymentdate": null
+            "subtitle": "Default configuration for Search", 
+            "version": ""
         }
     ], 
     "metadata": {
-        "git hash": "e47385b 2017-05-24 15:27:08 -0700", 
         "db": "PostgreSQL 9.6.1 on x86_64-apple-darwin16.1.0, compiled by Apple LLVM version 8.0.0 (clang-800.0.42.1), 64-bit", 
-        "os version": "16.4.0", 
-        "os": "Darwin"
+        "git hash": "e47385b 2017-05-24 15:27:08 -0700", 
+        "os": "Darwin", 
+        "os version": "16.4.0"
     }
 }

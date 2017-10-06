@@ -34,8 +34,8 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                     });
 
                     self.modal.on('hidden.bs.modal', function (e) {
-                        collection.save(function() {
-                            self.trigger('collectionAdded');
+                        collection.save(function(response, status) {
+                            self.trigger('collectionAdded', response.responseJSON);
                         }, self);
                     })
                     self.modal.modal('hide');

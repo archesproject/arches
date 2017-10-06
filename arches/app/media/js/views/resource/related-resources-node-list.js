@@ -1,7 +1,8 @@
 define([
     'knockout',
-    'views/list'
-], function(ko, ListView) {
+    'views/list',
+    'arches'
+], function(ko, ListView, arches) {
     var RelatedResourcesNodeList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -31,11 +32,17 @@ define([
                 if (!item.selected) {
                     item.selected = ko.observable(false);
                 }
+                if (!item.hovered) {
+                    item.hovered = ko.observable(false);
+                }
                 if (!item.total) {
                     item.total = ko.observable(minimumRelations);
                 }
                 if (!item.loaded) {
                     item.loaded = ko.observable(minimumRelations);
+                }
+                if (!item.loadcount) {
+                    item.loadcount = ko.observable(0);
                 }
             }
             this.items.subscribe(function (items) {
@@ -46,6 +53,26 @@ define([
                 this.filter.subscribe(this.filter_function, this, 'change');
                 this.filter_function();
             }
+            this.scrollContainerSelector = '.related-resources-nodes'
+            this.selectNode = function(e) {
+                _.each(self.selectedItems(), function(item) {
+                    if (this.entityid != item.entityid) {
+                        item.selected(false)
+                    }
+                }, this);
+                e.selected(!e.selected())
+            };
+
+            this.hoverNode = function(e) {
+                if (e.hovered() === false) {
+                    e.hovered(true)
+                } else {
+                    e.hovered(false)
+                }
+            };
+
+            this.reportURL = arches.urls.resource_report;
+            this.editURL = arches.urls.resource_editor;
 
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){

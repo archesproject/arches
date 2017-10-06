@@ -1,98 +1,99 @@
 {
     "graph": [
         {
-            "subtitle": "Stores the classification of Resource Types",
-            "mapfeaturecolor": null,
-            "isresource": false,
-            "forms_x_cards": [],
-            "reports": [],
-            "iconclass": "fa fa-tags",
-            "functions": [],
-            "nodegroups": [
-                {
-                    "cardinality": "1",
-                    "legacygroupid": null,
-                    "nodegroupid": "95931698-957d-11e6-b664-024f9e178154",
-                    "parentnodegroup_id": null
-                }
-            ],
-            "author": " GCI",
-            "deploymentfile": null,
-            "forms": [],
-            "version": "",
-            "nodes": [
-                {
-                    "is_collector": true,
-                    "description": "",
-                    "istopnode": true,
-                    "ontologyclass": "E55_Type",
-                    "nodeid": "95931698-957d-11e6-b664-024f9e178154",
-                    "datatype": "concept",
-                    "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154",
-                    "graph_id": "95931699-957d-11e6-b664-024f9e178154",
-                    "config": {
-                        "rdmCollection": "30f563eb-2393-46ba-a7f9-906f5d4aae01"
-                    },
-                    "parentproperty": "",
-                    "name": "Resource Type Classification"
-                }
-            ],
-            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage",
-            "edges": [],
-            "maplinewidth": null,
-            "mappointsize": null,
-            "graphid": "95931699-957d-11e6-b664-024f9e178154",
-            "name": "Resource Type Classification",
-            "cards_x_nodes_x_widgets": [
-                {
-                    "widget_id": "10000000-0000-0000-0000-000000000002",
-                    "card_id": "9593169b-957d-11e6-b664-024f9e178154",
-                    "label": "Resource Type Classification",
-                    "node_id": "95931698-957d-11e6-b664-024f9e178154",
-                    "sortorder": 0,
-                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"5db4ab60-0936-4841-b164-d4b55be9ddb5\",\"text\":\"Building\",\"id\":\"e675887c-23e3-4c60-9036-c7c864b4272f\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"033220d0-79fe-4742-8c0e-e83266d843b1\",\"text\":\"Structure\",\"id\":\"3cf28c22-7271-4bd8-a7da-6e6c45ca4c13\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3f700bb6-a858-41e0-bb48-67a0308d2997\",\"text\":\"Object\",\"id\":\"5d3a1585-0a65-4a4c-85dc-f894fa17ec0d\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"68a6772d-c431-42fa-8772-e76a14992139\",\"text\":\"Site\",\"id\":\"e4699732-efee-46c0-87e1-3f0a930a43db\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"258e6aeb-ff2b-4f18-8c82-0b593b3112ed\",\"text\":\"District\",\"id\":\"acfee644-090f-4ed6-8424-df82f3560807\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5d787426-4110-4b4f-8c9e-60be8d701013\",\"text\":\"District Element\",\"sortorder\":\"6\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"4abd862f-43be-4783-9dd0-92e0d6ee516b\",\"text\":\"District Potential Contributor\",\"id\":\"7cd6cd34-b423-40d2-bb40-d68879b116dc\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e52e931a-797e-4833-8f07-bf24c546271e\",\"text\":\"Planning District\",\"id\":\"eb7a8bec-2a12-4f5b-a11f-9c200954fb10\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"789ab887-b19e-4252-8e74-60e85c284b5c\",\"text\":\"District Contributor\",\"id\":\"c3d9af83-4af1-4554-b9e9-09fb59ca03a6\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a5486051-7c1d-446c-923f-270937443b2c\",\"text\":\"District Non-Contributor\",\"id\":\"8dfdaa13-5073-4ee8-894c-01a68c08dff0\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6db901b2-2e82-4c5b-8aae-05231b938c20\",\"text\":\"District Altered Contributor\",\"id\":\"e0229b20-46f2-44a8-9a89-85015e953d89\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Resource Type Classification\"}",
-                    "id": "a18c7136-dcf1-11e6-84a5-026d961c88e6"
-                }
-            ],
+            "author": " GCI", 
             "cards": [
                 {
-                    "helpenabled": false,
-                    "graph_id": "95931699-957d-11e6-b664-024f9e178154",
-                    "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage",
-                    "visible": true,
-                    "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154",
-                    "helptext": null,
-                    "sortorder": null,
-                    "cardid": "9593169b-957d-11e6-b664-024f9e178154",
-                    "helptitle": null,
-                    "instructions": null,
-                    "active": true,
-                    "name": "Resource Type Classification"
+                    "active": true, 
+                    "cardid": "9593169b-957d-11e6-b664-024f9e178154", 
+                    "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage", 
+                    "graph_id": "95931699-957d-11e6-b664-024f9e178154", 
+                    "helpenabled": false, 
+                    "helptext": null, 
+                    "helptitle": null, 
+                    "instructions": null, 
+                    "name": "Resource Type Classification", 
+                    "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154", 
+                    "sortorder": null, 
+                    "visible": true
                 }
-            ],
+            ], 
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "9593169b-957d-11e6-b664-024f9e178154", 
+                    "config": "{\"placeholder\":\"Select an option\",\"options\":[{\"conceptid\":\"5db4ab60-0936-4841-b164-d4b55be9ddb5\",\"text\":\"Building\",\"id\":\"e675887c-23e3-4c60-9036-c7c864b4272f\",\"sortorder\":\"1\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"033220d0-79fe-4742-8c0e-e83266d843b1\",\"text\":\"Structure\",\"id\":\"3cf28c22-7271-4bd8-a7da-6e6c45ca4c13\",\"sortorder\":\"2\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"3f700bb6-a858-41e0-bb48-67a0308d2997\",\"text\":\"Object\",\"id\":\"5d3a1585-0a65-4a4c-85dc-f894fa17ec0d\",\"sortorder\":\"3\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"68a6772d-c431-42fa-8772-e76a14992139\",\"text\":\"Site\",\"id\":\"e4699732-efee-46c0-87e1-3f0a930a43db\",\"sortorder\":\"4\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"258e6aeb-ff2b-4f18-8c82-0b593b3112ed\",\"text\":\"District\",\"id\":\"acfee644-090f-4ed6-8424-df82f3560807\",\"sortorder\":\"5\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"5d787426-4110-4b4f-8c9e-60be8d701013\",\"text\":\"District Element\",\"sortorder\":\"6\",\"collector\":\"collector\",\"children\":[{\"conceptid\":\"4abd862f-43be-4783-9dd0-92e0d6ee516b\",\"text\":\"District Potential Contributor\",\"id\":\"7cd6cd34-b423-40d2-bb40-d68879b116dc\",\"sortorder\":\"10\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"e52e931a-797e-4833-8f07-bf24c546271e\",\"text\":\"Planning District\",\"id\":\"eb7a8bec-2a12-4f5b-a11f-9c200954fb10\",\"sortorder\":\"11\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"789ab887-b19e-4252-8e74-60e85c284b5c\",\"text\":\"District Contributor\",\"id\":\"c3d9af83-4af1-4554-b9e9-09fb59ca03a6\",\"sortorder\":\"7\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"a5486051-7c1d-446c-923f-270937443b2c\",\"text\":\"District Non-Contributor\",\"id\":\"8dfdaa13-5073-4ee8-894c-01a68c08dff0\",\"sortorder\":\"8\",\"collector\":\"\",\"children\":[]},{\"conceptid\":\"6db901b2-2e82-4c5b-8aae-05231b938c20\",\"text\":\"District Altered Contributor\",\"id\":\"e0229b20-46f2-44a8-9a89-85015e953d89\",\"sortorder\":\"9\",\"collector\":\"\",\"children\":[]}]}],\"label\":\"Resource Type Classification\"}", 
+                    "id": "a18c7136-dcf1-11e6-84a5-026d961c88e6", 
+                    "label": "Resource Type Classification", 
+                    "node_id": "95931698-957d-11e6-b664-024f9e178154", 
+                    "sortorder": 0, 
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                }
+            ], 
+            "deploymentdate": null, 
+            "deploymentfile": null, 
+            "description": "Describes the type of resource. \n\nApplies to: Heritage Group, Heritage", 
+            "edges": [], 
+            "forms": [], 
+            "forms_x_cards": [], 
+            "functions": [], 
+            "graphid": "95931699-957d-11e6-b664-024f9e178154", 
+            "iconclass": "fa fa-tags", 
+            "isactive": true, 
+            "isresource": false, 
+            "mapfeaturecolor": null, 
+            "maplinewidth": null, 
+            "mappointsize": null, 
+            "name": "Resource Type Classification", 
+            "nodegroups": [
+                {
+                    "cardinality": "1", 
+                    "legacygroupid": null, 
+                    "nodegroupid": "95931698-957d-11e6-b664-024f9e178154", 
+                    "parentnodegroup_id": null
+                }
+            ], 
+            "nodes": [
+                {
+                    "config": {
+                        "rdmCollection": "30f563eb-2393-46ba-a7f9-906f5d4aae01"
+                    }, 
+                    "datatype": "concept", 
+                    "description": "", 
+                    "graph_id": "95931699-957d-11e6-b664-024f9e178154", 
+                    "is_collector": true, 
+                    "istopnode": true, 
+                    "name": "Resource Type Classification", 
+                    "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154", 
+                    "nodeid": "95931698-957d-11e6-b664-024f9e178154", 
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                    "parentproperty": ""
+                }
+            ], 
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd", 
+            "reports": [], 
             "root": {
-                "is_collector": true,
-                "description": "",
-                "istopnode": true,
-                "ontologyclass": "E55_Type",
-                "nodeid": "95931698-957d-11e6-b664-024f9e178154",
-                "datatype": "concept",
-                "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154",
-                "graph_id": "95931699-957d-11e6-b664-024f9e178154",
                 "config": {
                     "rdmCollection": "30f563eb-2393-46ba-a7f9-906f5d4aae01"
-                },
-                "name": "Resource Type Classification"
-            },
-            "isactive": true,
-            "deploymentdate": null
+                }, 
+                "datatype": "concept", 
+                "description": "", 
+                "graph_id": "95931699-957d-11e6-b664-024f9e178154", 
+                "is_collector": true, 
+                "istopnode": true, 
+                "name": "Resource Type Classification", 
+                "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154", 
+                "nodeid": "95931698-957d-11e6-b664-024f9e178154", 
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E55_Type", 
+                "parentproperty": ""
+            }, 
+            "subtitle": "Stores the classification of Resource Types", 
+            "version": ""
         }
-    ],
+    ], 
     "metadata": {
-        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800",
-        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit",
-        "os version": "4.4.0-45-generic",
-        "os": "Linux"
+        "db": "PostgreSQL 9.6.0 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 5.3.1-14ubuntu2) 5.3.1 20160413, 64-bit", 
+        "git hash": "ff93bd9 2017-01-24 10:17:51 -0800", 
+        "os": "Linux", 
+        "os version": "4.4.0-45-generic"
     }
 }
