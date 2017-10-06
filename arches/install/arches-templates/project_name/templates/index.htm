@@ -96,28 +96,25 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
                         </li>
                         {% endif %}
-                        <li class="page-scroll">
+                        <li class="page-scroll" style="display: flex; flex-direction: row">
+                            {% if user.username == 'anonymous' %}
                             <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
-                                {% if user.username == 'anonymous' %}
                                 {% trans "Login" %}
-                                {% else %}
-                                {% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
                             </a>
-                            <div class="dropdown">
-                                <a class="btn btn-default dropdown-toggle" type="button" id="auth-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    Dropdown
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="auth-options">
-                                    <li><a href="#">Action</a></li>
-                                    <li><a href="#">Another action</a></li>
-                                    <li><a href="#">Something else here</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#">Separated link</a></li>
-                                </ul>
-                            </div>
-                        </li>
+                            {% else %}
+                            <a id="auth-link">
+                                {% trans "Welcome" %} {{ user.username }}
+                            </a>
+                            <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){console.log('stuff'); showAuthMenu(!showAuthMenu())}"></span>
 
+                            {% endif %}
+                        </li>
+                        <!-- ko if: showAuthMenu -->
+                        <ul class="auth-options">
+                            <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">Logout</a></li>
+                            <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
+                        </ul>
+                        <!-- /ko -->
                     </ul>
                 </div>
             </div>
