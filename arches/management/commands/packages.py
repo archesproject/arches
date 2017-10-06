@@ -115,7 +115,7 @@ class Command(BaseCommand):
 
         parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
             help='Export grouped business data attrbiutes one or multiple csv files. By setting this flag the system will export all grouped business data to one csv file.')
-            
+
         parser.add_argument('-y', '--yes', action='store_true', dest='yes',
             help='used to force a yes answer to any user input "continue? y/n" prompt')
 
@@ -252,7 +252,7 @@ class Command(BaseCommand):
         def load_system_settings():
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
-                response = raw_input('Overwrite current system settings with package settings? (T/F): ')
+                response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
                 if response.lower() in ('t', 'true', 'y', 'yes'):
                     update_system_settings = True
                     print 'Using package system settings'
@@ -668,7 +668,7 @@ class Command(BaseCommand):
         if not force:
             if not utils.get_yn_input("all resources will be removed. continue?"):
                 return
-        
+
         resource_remover.clear_resources()
         return
 
