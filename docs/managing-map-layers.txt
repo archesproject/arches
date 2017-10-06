@@ -2,74 +2,160 @@
 Managing Map Layers
 ###################
 
-Arches allows a great deal of customization for the layers on the search map. You'll be able to configure these layers in the **Map Layer Manager**.
+Different Types of Layers
+-------------------------
 
-Three categories of Map Layers will appear on your map: **Resource Layers** (the contents of your database), **Basemaps** (static background layers), and **Overlays** (custom data layers from outside your database). To configure a layer, first select its category in the top bar, and then choose it from the list at left.
+Arches allows a great deal of customization for the layers on the search map. The contents of the following section will be useful when using the **Map Layer Manager** to customize your layers.
 
 Resource Layers
----------------
+```````````````
 
 Resource Layers display the resource layers in your database. One Resource Layer is created for each node with a geospatial datatype (for example, ``geojson-feature-collection``). You are able to customize the appearance and visibility of each Resource Layer in the following ways.
 
-Service Styling
-```````````````
+**Styling**
 
 Define the way features will look on the map. The example map has demonstration features that give you a preview of the changes you make. You can choose to use Advanced Editing to create a more nuanced style. Note that changes made in **Advanced Editing** will not be reflected if you switch back to basic editing. For styling reference, checkout the MapBox Style Specification.
 
-Settings
-`````````
+**Clustering**
 
-You can change the name of this overlay if desired; by default it will use the name of its Resource Model. You make also set the layer to be added to the search map by default, or choose a custom icon for it.
-
-Clustering
-``````````
-
-Arches uses "clustering" to better display resources at low zoom levels (zoomed out). You are able to control the clustering settings for each layer individually.
+Arches uses "clustering" to better display resources at low zoom levels (zoomed out). You are able to control the clustering settings for each resource layer individually.
 
 * Cluster Distance - distance (in pixels) within which resources will be clustered
 * Cluster Max Zoom - zoom level after which clustering will stop being used
 * Cluster Min Points - minimum number of points needed to create a cluster
 
-Caching
+**Caching**
+
+Caching tiles will improve the speed of map rendering by storing tiles locally as they are creating. This eliminates the need for new tile generation when viewing a portion of the map that has already been viewed. However, caching is not a simple matter, and it is disabled by default. Caching is only advisable if you know what you are doing.
+
+Basemaps and Overlays
+`````````````````````
+
+A Basemap will always be present in your map. Arches comes with a few default basemaps, but advanced users are able to add more (see below).
+
+Overlays are the best way to incorporate map layers from external sources. On the search map, a user is able to activate as many overlays as desired simultaneously. Users can also change the transparency of overlays. Note that Search Results and Search Markers are automatically added to the search map as overlays, and can be customized separately. New overlays can be added in the same manner as new basemaps (see below).
+
+Styling
 ```````
 
-Caching tiles will improve the speed of map rendering. However, caching is not a simple matter, and it is disabled by default. Caching is only advisable if you know what you are doing.
-
-Permissions
-```````````
-
-This tab shows the permissions for the nodegroup whose geometry is displayed in this Resource Layer. Permissions are defined in the Graph Designer.
-
-Basemaps
---------
-
-A Basemap will always be present in your map. Arches comes with a few default basemaps, but advanced users are able to add more. Once added, there are few ways to configure each basemap.
-
-Service Styling
-```````````````
-
-Define a style for this basemap. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the `MapBox Style Specification <https://www.mapbox.com/mapbox-gl-js/style-spec/#layers>`_.
+Note that depending on the type of layer, there are different styling options. For styling reference, checkout the `MapBox Style Specification <https://www.mapbox.com/mapbox-gl-js/style-spec/#layers>`_.
 
 Settings
 ````````
 
-* Layer name - enter a name to identify this basemap
-* Default search map - choose this layer to be the default basemap
-* Layer icon - associate an icon with this layer
+* Layer name - Enter a name to identify this basemap.
+* Default search map - For basemaps, you can designate one to be the default. For overlays, you can choose whether a layer appears on the in the search map by default. Note that in the search map itself you can change the order of overlays.
+* Layer icon - Associate an icon with this layer
 
-Overlays
---------
+Adding New Map Layers
+---------------------
 
-Overlays allow you to incorporate map layers from external sources. Note that Search Results and Search Markets are treated as overlays, and can be customize separately. New overlays can be added with a little behind-the-scenes work. Once added, there are few ways to configure each overlay.
+An Arches admin can add new layers to the map by registering them through the command line interface. A newly registered layer can be designated as either a basemap or an overlay. However, because the treatment of basemaps and overlays differs only in the front-end of the app, consider the following documentation to apply equally to both.
 
-Service Styling
-```````````````
+New map layers can come from many different geospatial sources -- from shapefiles to GeoTIFFs to external Web Map Services to reconfigurations of the actual resource data stored within Arches.
 
-Define a style for this overlay. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the `MapBox Style Specification <https://www.mapbox.com/mapbox-gl-js/style-spec/#layers>`_.
+New map layers can be created with two general definitions, as MapBox layers or tileserver layers, each with its own wide range of options.
 
-Settings
-````````
+For working examples, please see our `arches4-geo-examples <https://github.com/legiongis/arches4-geo-examples>`_ repo.
 
-* Layer name - enter a name to identify this overlay
-* Default search map - choose whether this overlay should be shown in the search map by default. Note that in the search map itself you can change the order of the layers.
-* Layer icon - associate an icon with this layer
+MapBox Layers
+`````````````
+
+``python manage.py packages -o add_mapbox_layer -j /path/to/mapbox_style.json -n "New MapBox Layer"``
+
+Arches allows you to make direct references to styles or layers that have been previously defined in `MapBox Studio <https://www.mapbox.com/studio/>`_. You can make entirely new basemap renderings, save them in your MapBox account, then download the style definition and use it here. Read more about `MapBox Styles <https://www.mapbox.com/help/studio-manual-styles/>`_.
+
+Additionally, you can take a MapBox JSON file and place any mapbox.js layer definition in the ``layers`` section, as long as you define its source in the ``sources`` section.
+
+.. note:: One thing to be aware of when trying to cascade a WMS through a MapBox layer is that mapbox.js is `much pickier <https://github.com/mapbox/mapbox-gl-js/issues/2171>`_ about CORS than other js mapping libraries like Leaflet. To use an external WMS or tileset, you may be better off using a tileserver layer as described below.
+
+Tileserver Layers
+``````````````````
+
+``python manage.py packages -o add_tileserver_layer -t /path/to/tileserver_config.json -n "New Tileserver Layer"``
+
+Arches comes with an embedded tileserver called `TileStache <http://tilestache.org/>`_, which allows Arches to generate tiles internally from many different data sources. In fact, this tileserver is what creates layers from your database resources that are visible on the map.
+
+To add a new tileserver layer, you need a .json file that contains a TileStache-compliant layer definition. Within this file, you can use any of the many different data `provider classes <http://tilestache.org/doc/#layers>`_ from Tilestache. The .json file that you load into Arches for a tileserver layer should have three sections::
+
+    {
+        "type" : This value should be "raster" or "vector".
+        "layers" : This is a mapbox.js layer definition which defines the style of the layer and links the source name with the layer name.
+        "config" : This is the tileserver configuration that will be used by TileStache. Refer to TileStache docs and place the entire "provider" section into this "config" section.
+    }
+        
+Here's a full example of a tilestache file that makes a layer from data in PostGIS (a table called "rivers")::
+
+    {
+        "type": "vector",
+        "layers": [{
+            "id": "rivers",
+            "type": "line",
+            "source": "rivers",
+            "source-layer": "rivers",
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-width": 2,
+                "line-color": "rgb(37, 58, 241)"
+            }
+        }],
+        "config": {
+            "provider": {
+                "class": "TileStache.Goodies.VecTiles:Provider",
+                "kwargs": {
+                    "dbinfo": {
+                        "host": "localhost",
+                        "user": "postgres",
+                        "password": "postgis",
+                        "database": "arches",
+                        "port": "5432"
+                    },
+                    "simplify": 0.5,
+                    "queries": [
+                        "select gid as __id__, name, st_asgeojson(geom) as geojson, st_transform(geom, 900913) as __geometry__ from rivers"
+                    ]
+                }
+            },
+            "allowed origin": "*",
+            "compress": true,
+            "write cache": false
+        }
+    }
+    
+Tileserver Mapnik Layers
+````````````````````````
+
+``python manage.py packages -o add_tileserver_layer -m /path/to/mapnik_config.xml -n "New Mapnik Tileserver Layer"``
+
+Mapnik is the provider that TileStache uses to serve rasters, and is very commonly used in Arches. Arches allows you to upload a Mapnik XML file to configure a new tileserver layer, instead of creating the full JSON file. This is the **easiest way to make layers from GeoTiffs and shapefiles**. A basic example of a Mapnik XML file is shown below (it points to a geotiff named ``hillshade.tif``). For more about creating these XML files, see the `Mapnik XML reference <https://github.com/mapnik/mapnik/wiki/XMLConfigReference>`_::
+
+    <Map background-color="transparent">
+        <Layer name="Hillshade">
+            <StyleName>raster</StyleName>
+            <Datasource>
+                <Parameter name="type">gdal</Parameter>
+                <Parameter name="file">hillshade.tif</Parameter>
+                <Parameter name="nodata">0</Parameter>
+            </Datasource>
+        </Layer>
+        <Style name="raster">
+            <Rule name="rule 1">
+                <RasterSymbolizer opacity=".7" scaling="bilinear" mode="normal" />
+            </Rule>
+        </Style>
+    </Map>
+
+
+Making Selectable Vector Layers
+-------------------------------
+
+In Arches, it's possible to add a vector layer whose features may be "selectable". This is especially useful during drawing operations. For example, a building footprint dataset could be added as a selectable vector layer, and while creating new building resources you would select and "transfer" these geometries from the overlay to the new Arches resource.
+
+1. First, the data source for the layer may be geojson or vector tiles. This could be a tile server layer serving vector features from PostGIS, for example.
+2. Add a property to your vector features called "geojson".
+3. Populate this property with either the entire geojson geometry for the feature, or a url that will return a json response containing the entire geojson geometry for the feature. This is necessary to handle the fact that certain geometries may extend across multiple vector tiles.
+4. Add the overlay as you would any tileserver layer (see above).
+
+You will now be able to add this layer to the map and select its features by clicking on them.
