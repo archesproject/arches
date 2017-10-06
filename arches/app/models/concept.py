@@ -392,44 +392,72 @@ class Concept(object):
             sql = """
                 WITH RECURSIVE 
 
-                rels AS(
-                    SELECT conceptidfrom, conceptidto , relationtype, 
+                 ordered_relationships AS (
                     (
-                        SELECT value
-                        FROM values
-                        WHERE conceptid=relations.conceptidto
-                        AND valuetype in ('prefLabel')
-                        ORDER BY (
-                            CASE WHEN languageid = '{languageid}' THEN 10
-                            WHEN languageid like '{short_languageid}%' THEN 5
-                            ELSE 0
-                            END
-                        ) desc limit 1
-                    ) as valuesto,
+                        SELECT r.conceptidfrom, r.conceptidto, r.relationtype, (
+                            SELECT value
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('prefLabel')
+                            ORDER BY (
+                                CASE WHEN languageid = '{languageid}' THEN 10
+                                WHEN languageid like '{short_languageid}%' THEN 5
+                                ELSE 0
+                                END
+                            ) desc limit 1
+                        ) as valuesto,
+                        (
+                            SELECT value::int
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('sortorder')
+                            limit 1
+                        ) as sortorder
+                        FROM relations r
+                        WHERE r.conceptidfrom = '{conceptid}'
+                        and ({relationtypes})
+                        ORDER BY sortorder, valuesto
+                    )
+                    UNION
                     (
-                        SELECT value::int
-                        FROM values
-                        WHERE conceptid=relations.conceptidto
-                        AND valuetype in ('sortorder')
-                        limit 1
-                    ) as sortorder
-
-                    FROM relations
-                    ORDER BY sortorder, valuesto
-                ), 
+                        SELECT r.conceptidfrom, r.conceptidto, r.relationtype,(
+                            SELECT value
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('prefLabel')
+                            ORDER BY (
+                                CASE WHEN languageid = '{languageid}' THEN 10
+                                WHEN languageid like '{short_languageid}%' THEN 5
+                                ELSE 0
+                                END
+                            ) desc limit 1
+                        ) as valuesto,
+                        (
+                            SELECT value::int
+                            FROM values
+                            WHERE conceptid=r.conceptidto
+                            AND valuetype in ('sortorder')
+                            limit 1
+                        ) as sortorder
+                        FROM relations r
+                        JOIN ordered_relationships b ON(b.conceptidto = r.conceptidfrom)
+                        WHERE ({relationtypes})
+                        ORDER BY sortorder, valuesto
+                    ) 
+                ),
 
                 children AS (
                     SELECT r.conceptidfrom, r.conceptidto,
                         to_char(row_number() OVER (), 'fm000000') as row,
                         1 AS depth       ---|NonRecursive Part
-                        FROM rels r
+                        FROM ordered_relationships r
                         WHERE r.conceptidfrom = '{conceptid}'
                         and ({relationtypes})
                     UNION
                         SELECT r.conceptidfrom, r.conceptidto,
                         row || '-' || to_char(row_number() OVER (), 'fm000000'),
                         depth+1      ---|RecursivePart
-                        FROM rels r
+                        FROM ordered_relationships r
                         JOIN children b ON(b.conceptidto = r.conceptidfrom)
                         WHERE ({relationtypes})
                         {depth_limit}

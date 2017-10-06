@@ -27,6 +27,13 @@
     text-decoration: underline;
 }
 
+#container {
+    min-width: 1180px;
+    overflow-x: scroll;
+}
+
+
+
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -1068,6 +1075,7 @@ a.select2-search-choice-close {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 13px;
+    height:36px;
 }
 
 .crud-card-subtitle {
@@ -1081,6 +1089,7 @@ a.select2-search-choice-close {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 19px;
 }
 
 .related-resources-nodes .crud-card-subtitle {
@@ -3163,6 +3172,7 @@ input.cmn-toggle-yes-no:checked+label:after {
     margin-left: -5px;
     background: #fff;
     overflow-y: hidden;
+    height: 108px;
 }
 
 .rr-fdg-description {
@@ -3175,6 +3185,7 @@ input.cmn-toggle-yes-no:checked+label:after {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
+    height: 70px;
 }
 
 .node-list-footer {
@@ -3211,6 +3222,7 @@ input.cmn-toggle-yes-no:checked+label:after {
     color: steelblue;
     font-weight: 500;
     padding-right: 10px;
+    height: 38px;
 }
 
 .node-list-footer a i {

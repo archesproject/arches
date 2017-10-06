@@ -103,3 +103,5 @@ volumes:
     postgres-log:
     elasticsearch-data:
     elasticsearch-config:
+    elasticsearch-data:
+    elasticsearch-config:
