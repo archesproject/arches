@@ -47,7 +47,7 @@ RUN pip install virtualenv==15.1.0 &&\
 	. ENV/bin/activate &&\
 	pip install -U pip \
 	setuptools &&\
-	pip install requests ptvsd
+	pip install requests
 
 
 ## Install Postgresql client
