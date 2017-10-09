@@ -51,6 +51,7 @@ RUN pip install virtualenv==15.1.0 &&\
 
 
 ## Install Postgresql client
+RUN apt-mark hold libpq-dev
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
