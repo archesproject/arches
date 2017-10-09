@@ -102,7 +102,6 @@ setup_arches() {
 		fi
 	fi
 
-	setup_elasticsearch
 }
 
 
@@ -154,10 +153,6 @@ install_bower_components() {
 	echo ""
 	cd_bower_folder
 	bower --allow-root install
-}
-
-setup_elasticsearch() {
-	python manage.py es index_database
 }
 
 
