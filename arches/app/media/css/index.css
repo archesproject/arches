@@ -2,6 +2,10 @@
     margin-top: 17px;
 }
 
+div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
+    margin-right: 40px;
+}
+
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;
