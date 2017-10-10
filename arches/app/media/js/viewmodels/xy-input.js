@@ -14,6 +14,7 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
         this.projBounds = arches.hexBinBounds;
         this.defaultProjection = _.findWhere(arches.preferredCoordinateSystems, {default: true}).proj4
         this.defaultProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
+        this.startProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
         this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
         this.x = ko.observable();
         this.y = ko.observable();
@@ -40,7 +41,11 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
             return res;
         })
 
-        this.srid.subscribe(function(val){
+        this.transformCoords = function(val){
+            if (!(self.x() && self.y())) {
+                self.x(self.defaultCoords[0]);
+                self.y(self.defaultCoords[1]);
+            };
             if (self.x() && self.y()) {
                 var projectedVals;
                 if (self.srid() === '4326') {
@@ -54,7 +59,9 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
                 self.y(projectedVals[1])
                 self.defaultProjection = self.srid();
             }
-        })
+        }
+
+        this.srid.subscribe(this.transformCoords)
 
         this.clearCoordinates = function() {
             self.x(null);
@@ -110,6 +117,8 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
                 self.updateSelectedPoint();
             }
         });
+
+        this.transformCoords()
     };
 
     return XYInputViewModel;
