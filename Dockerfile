@@ -54,8 +54,7 @@ RUN pip install virtualenv==15.1.0 &&\
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
-	apt-get install -y postgresql-client-9.6 \
-    postgresql-client-common=173
+	apt-get install -y postgresql-client-9.6
 
 
 ## Clean up obsolete folders and packages
