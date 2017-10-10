@@ -600,6 +600,7 @@ define([
                                 return devicePixelRatio;
                             }
                         });
+                        self.map.resize();
                     });
                 };
 
