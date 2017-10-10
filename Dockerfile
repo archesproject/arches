@@ -69,7 +69,7 @@ WORKDIR ${ARCHES_ROOT}
 RUN bower --allow-root install
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -e . --no-binary :all: &&\
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements_docker.txt &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 
 
