@@ -14,7 +14,6 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
         this.projBounds = arches.hexBinBounds;
         this.defaultProjection = _.findWhere(arches.preferredCoordinateSystems, {default: true}).proj4
         this.defaultProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
-        this.startProjection ? this.srid = ko.observable(this.defaultProjection) : this.srid('4326');
         this.defaultCoords = (this.srid() === '4326') ? [arches.mapDefaultX, arches.mapDefaultY] : proj4(this.srid(), [arches.mapDefaultX, arches.mapDefaultY]);
         this.x = ko.observable();
         this.y = ko.observable();
@@ -64,8 +63,9 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
         this.srid.subscribe(this.transformCoords)
 
         this.clearCoordinates = function() {
-            self.x(null);
-            self.y(null);
+            self.srid('4326')
+            self.x(arches.mapDefaultX);
+            self.y(arches.mapDefaultY);
             self.boundsWarning(false);
         }
 
