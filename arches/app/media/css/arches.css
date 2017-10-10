@@ -6697,8 +6697,8 @@ div.row.widget-wrapper.report-header:hover {
     height: auto;
 }
 
-.map-search-container div .map-widget-panel {
-    height: 100vh;
+.map-search-container, .map-search-container div .map-widget-panel {
+    height: calc(100vh - 110px);
 }
 
 .map-widget-panel.map-panel-inactive {
@@ -6718,12 +6718,6 @@ div.row.widget-wrapper.report-header:hover {
     color: #444;
 }
 
-
-/*.visible {
-  opacity: 1.0;
-  visibility: visible;
-}*/
-
 .map-crud-container {
     top: 0px;
     height: 500px;
@@ -6732,11 +6726,8 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-search-container {
-    top: 3px;
-    height: 100vh;
     background: #fbfbfb;
 }
-
 
 .map-report-header-container {
     height: 500px;
