@@ -1,0 +1,23 @@
+Django==1.9.2
+psycopg2==2.7.3.1
+elasticsearch>=5.0.0,<6.0.0
+xlrd==0.9.4
+Pillow==3.1.0
+rdflib==4.2.2
+rdflib-jsonld==0.4.0
+unicodecsv==0.14.1
+PyYAML==3.12
+pyshp==1.2.3
+networkx==1.11
+django-guardian==1.4.9
+TileStache==1.51.6
+Shapely==1.6.1
+python-memcached==1.58
+mapbox-vector-tile==0.5.0
+mapnik==0.1
+flexidate==1.0
+SPARQLWrapper==1.8.0
+
+# Leave the following line commented so that pip install will ignore this
+# The installer uses the following line to download the proper version of ES
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.zip

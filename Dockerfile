@@ -51,7 +51,7 @@ RUN pip install virtualenv==15.1.0 &&\
 
 
 ## Install Postgresql client
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
 	apt-get install -y postgresql-client-9.6
@@ -69,7 +69,7 @@ WORKDIR ${ARCHES_ROOT}
 RUN bower --allow-root install
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -e . --no-binary :all: &&\
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements_docker.txt &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 
 

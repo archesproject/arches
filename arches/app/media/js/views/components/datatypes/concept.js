@@ -15,6 +15,7 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                 if (!ko.isObservable(this.node.config.rdmCollection)) {
                     this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
                 }
+                params.value = this.searchValue;
                 ConceptSelectViewModel.apply(this, [params]);
                 this.filterValue = ko.computed(function () {
                     return {
