@@ -2,7 +2,6 @@ version: '2'
 services:
 
     sut:
-      container_name: arches
       build:
         context: .
         dockerfile: ./Dockerfile
@@ -31,6 +30,7 @@ services:
       environment:
         - POSTGRES_PASSWORD=postgres
         - TZ=EST
+
 
 
     elasticsearch:
