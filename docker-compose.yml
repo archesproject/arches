@@ -42,6 +42,8 @@ services:
         - '443:443'
       volumes:
         - arches-static:/www/static
+        - letsencrypt_acme_challenge:/var/www
+        - letsencrypt:/etc/letsencrypt
       environment:
         - NGINX_PROXY_MODE=local
         - NGINX_PROTOCOL=http
@@ -83,11 +85,12 @@ services:
       container_name: letsencrypt
       image: cvast/cvast-letsencrypt:1.1
       volumes:
-        - ./web/wwwroot:/var/www
-        - ./letsencrypt:/etc/letsencrypt
-        - ./web/logs/letsencrypt:/var/log/letsencrypt
+        - letsencrypt_acme_challenge:/var/www
+        - letsencrypt:/etc/letsencrypt
+        - letsencrypt-log:/var/log/letsencrypt
       command: get_certificate
       environment:
+        - MODE=regular
         - LETSENCRYPT_EMAIL=info@example.com
         - DOMAIN_NAMES=localhost
         - PRODUCTION_MODE=False
@@ -103,3 +106,6 @@ volumes:
     postgres-log:
     elasticsearch-data:
     elasticsearch-config:
+    letsencrypt:
+    letsencrypt-log:
+    letsencrypt_acme_challenge:
