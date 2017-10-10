@@ -32,6 +32,7 @@ services:
         - TZ=EST
 
 
+
     elasticsearch:
       container_name: elasticsearch
       image: elasticsearch:5.2
