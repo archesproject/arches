@@ -6826,18 +6826,12 @@ div.row.widget-wrapper.report-header:hover {
     z-index: 10;
 }
 
-
-
-/*.map-widget-tool {
-    padding-top: 5px;
-    font-size: 17px;
-    height: 50px;
-    width: 50px;
-    color: #fff;
-    vertical-align: middle;
-    display: table-cell;
-    border-right: 1px solid rgba(0, 0, 0, 1);
-}*/
+#mainnav-container {
+    z-index: 15;
+}
+#navbar{
+    z-index: 16;
+}
 
 .map-widget-icon {
     color: rgba(255, 255, 255, 1);
