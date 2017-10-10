@@ -14,14 +14,14 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 
 
-def get_tileserver_config(request, layer_id):
+def get_tileserver_config(layer_id, request=None):
     database = settings.DATABASES['default']
     datatype_factory = DataTypeFactory()
 
     try:
         node = models.Node.objects.get(pk=layer_id)
         datatype = datatype_factory.get_instance(node.datatype)
-        if request.user.has_perm('read_nodegroup', node.nodegroup): 
+        if request == None or request.user.has_perm('read_nodegroup', node.nodegroup):
             layer_config = datatype.get_layer_config(node)
         else:
             layer_config = datatype.get_layer_config(None)
@@ -42,7 +42,7 @@ def get_tileserver_config(request, layer_id):
 def handle_request(request):
     path_info = request.path.replace('/tileserver/', '')
     layer_id = path_info.split('/')[0]
-    config_dict = get_tileserver_config(request, layer_id)
+    config_dict = get_tileserver_config(layer_id, request=request)
     config = TileStache.Config.buildConfiguration(config_dict)
     query_string = ""
     script_name = ""
