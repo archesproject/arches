@@ -14,7 +14,7 @@
     }
 }
 
-@media (max-width: 968px) {
+@media (max-width: 1000px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         padding-left: 12px;
         margin-top: 14px;
@@ -22,7 +22,7 @@
 }
 
 
-@media (max-width: 968px) {
+@media (max-width: 1000px) {
     ul .auth-options {
         position: inherit;
         float:left;
@@ -33,7 +33,7 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1000px) {
     ul .auth-options {
         position: inherit;
         float:right;
