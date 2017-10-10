@@ -606,7 +606,9 @@ define([
 
                 this.map.on('load', function() {
                     if (!self.configForm) {
-                        map.on('moveend', _.throttle(generatePrintMap, 3000));
+                        if (self.context === 'report-header') {
+                            map.on('moveend', _.throttle(generatePrintMap, 3000));
+                        }
                         var zoomToGeoJSON = function(data, fly) {
                             var method = fly ? 'flyTo' : 'jumpTo';
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
