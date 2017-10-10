@@ -25,7 +25,7 @@ RUN apt-get update -y &&\
 		python-software-properties \
 		dos2unix \
 		curl \
-		libpq-dev=9.5.9-0ubuntu0.16.04 \
+		libpq-dev \
 		libgeos-3.5.0 \
 		openjdk-8-jre-headless \
 		git-all \
@@ -51,11 +51,11 @@ RUN pip install virtualenv==15.1.0 &&\
 
 
 ## Install Postgresql client
-RUN apt-mark hold libpq-dev
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" >> /etc/apt/sources.list.d/pgdg.list &&\
 	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
 	apt-get update -y &&\
-	apt-get install -y postgresql-client-9.6
+	apt-get install -y postgresql-client-9.6 \
+    postgresql-client-common=173
 
 
 ## Clean up obsolete folders and packages
