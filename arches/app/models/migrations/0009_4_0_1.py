@@ -7,7 +7,7 @@ import uuid
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def forwards_func(apps, schema_editor):
-    
+
     FunctionXGraph = apps.get_model("models", "FunctionXGraph")
     Node = apps.get_model("models", "Node")
     required_node_configs = FunctionXGraph.objects.filter(function_id = '60000000-0000-0000-0000-000000000002')
@@ -34,6 +34,8 @@ def reverse_func(apps, schema_editor):
         if str(node.nodegroup_id) not in graphs[str(node.graph_id)]:
             graphs[str(node.graph_id)][str(node.nodegroup_id)] = []
         graphs[str(node.graph_id)][str(node.nodegroup_id)].append(str(node.pk))
+        node.isrequired = False
+        node.save()
 
     for graph_id, required_nodes in graphs.iteritems():
         function_config = {
