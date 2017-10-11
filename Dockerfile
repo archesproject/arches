@@ -62,16 +62,24 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN rm -rf /tmp/*
 
 
-# Install the Arches application
-COPY . ${ARCHES_ROOT}
-
+# From here, run commands from ARCHES_ROOT
 WORKDIR ${ARCHES_ROOT}
+
+# Install Bower components
+ADD ./bower.json ${ARCHES_ROOT}/bower.json
 RUN bower --allow-root install
-RUN . ${WEB_ROOT}/ENV/bin/activate &&\
-	pip install -e . --no-binary :all: &&\
+
+# Install pip requirements
+ADD ./arches/install/requirements_docker.txt ${ARCHES_ROOT}/arches/install/requirements_docker.txt
+ADD ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_docker.txt &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 
+# Install the Arches application
+COPY . ${ARCHES_ROOT}
+RUN . ${WEB_ROOT}/ENV/bin/activate &&\
+	pip install -e . --no-binary :all:
 
 # Add Docker-related files
 COPY docker/entrypoint.sh ${DOCKER_DIR}/entrypoint.sh
