@@ -366,7 +366,8 @@ do
 			display_help
 		;;
 		*)
-			exec "$@"
+			"$@"
+			exit 0
 		;;
 	esac
 	shift # next argument or value
