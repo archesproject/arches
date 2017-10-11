@@ -610,6 +610,11 @@ class Command(BaseCommand):
         self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
         self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
 
+        local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
+
+        if local_settings_available == True:
+            self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
+
 
     def setup_indexes(self):
         management.call_command('es', operation='setup_indexes')
