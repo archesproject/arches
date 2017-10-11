@@ -16,9 +16,20 @@ display_help() {
 
 
 CUSTOM_SCRIPT_FOLDER=${CUSTOM_SCRIPT_FOLDER:-/docker/entrypoint}
-APP_FOLDER=${ARCHES_ROOT}/${ARCHES_PROJECT}
-BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+if [[ -z ${ARCHES_PROJECT} ]]; then
+	APP_FOLDER=${ARCHES_ROOT}
+	BOWER_JSON_FOLDER=${ARCHES_ROOT}
+else
+	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
+	BOWER_JSON_FOLDER=${APP_FOLDER}/${ARCHES_PROJECT}
+fi
+
 DJANGO_PORT=${DJANGO_PORT:-8000}
+
+cd_web_root() {
+	cd ${WEB_ROOT}
+	echo "Current work directory: ${ARCHES_ROOT}"
+}
 
 cd_arches_root() {
 	cd ${ARCHES_ROOT}
@@ -161,7 +172,6 @@ install_bower_components() {
 #### Misc
 
 init_arches_projects() {
-	cd_arches_root
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
@@ -170,7 +180,8 @@ init_arches_projects() {
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
 			echo ""
 
-			mkdir ${ARCHES_PROJECT}
+			cd_web_root
+			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
 			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 

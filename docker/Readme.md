@@ -72,7 +72,7 @@ This will be used throughout your development process and does not need to be ch
 	Add this line under the `volumes` node:
 	```
 		volumes:
-			- ./<your project name>:/web_root/arches/<your project name>
+			- ./<your project name>:/web_root/<your project name>
 	```
 	*Note: <your project name> must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
 	
