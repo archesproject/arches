@@ -170,6 +170,8 @@ init_arches_projects() {
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
 			echo ""
 
+			mkdir ${ARCHES_PROJECT}
+
 			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 
 			exit_code=$?
@@ -223,10 +225,8 @@ import_reference_data() {
 
 copy_settings_local() {
 	# The settings_local.py in ${ARCHES_ROOT}/arches/ gets ignored if running manage.py from a custom Arches project instead of Arches core app
-	if [[ ! -f ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py ]]; then
-		echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py..."
-		cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
-	fi
+	echo "Copying ${ARCHES_ROOT}/arches/settings_local.py to ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py..."
+	cp ${ARCHES_ROOT}/arches/settings_local.py ${APP_FOLDER}/${ARCHES_PROJECT}/settings_local.py
 }
 
 # Alllows users to add scripts that are run on startup (after this entrypoint)

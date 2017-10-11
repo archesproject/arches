@@ -74,7 +74,7 @@ This will be used throughout your development process and does not need to be ch
 		volumes:
 			- ./<your project name>:/web_root/arches/<your project name>
 	```
-	*Note: Must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
+	*Note: <your project name> must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
 	
 	This will allow for instant code editing without rebuilding your Docker image.  
 
@@ -91,7 +91,7 @@ This will be used throughout your development process and does not need to be ch
 	```
 	    - POSTGRES_PASSWORD=<your chosen Postgres password>
 	```
-	*Note: Project name must be the same as PGPASSWORD in step 5.*
+	*Note: Password must be the same as PGPASSWORD in step 5.*
 
 	***Warning: do not check your `docker-compose-local.yml` in to source control, as it now contains passwords.***
 
