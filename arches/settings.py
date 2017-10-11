@@ -134,7 +134,7 @@ JSON_LD_CONTEXT = {
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = 'http://localhost/'
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},
+    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True}, #Required
 )
 
 ADMINS = (
