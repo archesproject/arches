@@ -170,6 +170,8 @@ init_arches_projects() {
 			echo "----- Creating '${ARCHES_PROJECT}'... -----"
 			echo ""
 
+			mkdir ${ARCHES_PROJECT}
+
 			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 
 			exit_code=$?
