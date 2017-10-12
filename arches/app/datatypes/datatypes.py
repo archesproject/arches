@@ -767,10 +767,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                      "source-layer": "%(nodeid)s",
                      "layout": {
                          "text-field": "{total}",
-                         "text-font": [
-                             "DIN Offc Pro Medium",
-                             "Arial Unicode MS Bold"
-                         ],
                          "text-size": 10
                      },
                      "paint": {
