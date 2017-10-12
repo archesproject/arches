@@ -158,11 +158,11 @@ define('resource-edit-history-data', [], function () {
     return {
         edits: {{edits}},
         cards: {{cards}},
-        resource_type: '{{resource_type}}',
-        iconclass: '{{iconclass}}',
-        resourceid: '{{resourceid}}',
-        displayname: '{{displayname}}',
-        description: '{{resource_description}}'
+        resource_type: '{{resource_type | escapejs}}',
+        iconclass: '{{iconclass | escapejs}}',
+        resourceid: '{{resourceid | escapejs}}',
+        displayname: '{{displayname | escapejs}}',
+        description: '{{resource_description | escapejs}}'
     };
 });
 {% endautoescape %}</script>
