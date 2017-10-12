@@ -21,15 +21,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block title %}
 {{ block.super }}
-{% trans "Graphs" %}
+{% trans "Account Settings" %}
 {% endblock title %}
 
 
 {% block main_content %}
-<div id="" class="boxed">
+<div>
 
     <!-- Main Editor -->
-    <div id="current-resource-panel" class="responsive-content" style="">
+    <div>
 
         <!-- Title Bar -->
         <div id="" class="relative fade in" style="display: block;">
@@ -46,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="profile-report relative">
 
                 <!-- Profile Top Panel Image -->
-                <img class="widget-bg img-responsive" src="img/bg-img/profile_background.png" alt="Image">
+                <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
 
                 <div class="">
                     <div class="profile-full-name">
@@ -282,8 +282,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="download-buttons-panel" class="">
                             <span class="hidden-xs">You haven't registered a device yet.</span>  Download the App:
                             <div class="">
-                                <a class="download-app" href=""><img class="apple_app_store_icon" src="./img/app_stores/apple.png" alt="ios"></a>
-                                <a class="download-app" href=""><img class="android_app_store_icon" src="./img/app_stores/google.png" alt="android"></a>
+                                <a class="download-app" href=""><img class="apple_app_store_icon" src="{{ STATIC_URL }}img/user/apple.png" alt="ios"></a>
+                                <a class="download-app" href=""><img class="android_app_store_icon" src="{{ STATIC_URL }}img/user/google.png" alt="android"></a>
                             </div>
                         </div>
 
@@ -384,86 +384,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!--Project Details-->
-                                        <div id="project-details" class="project-panel-body" style="display: none;">
 
-                                            <div id="card-preview-crud" class="panel-body card-body fade in" style="padding: 0px; margin: 0px;">
-                                                <div id="cards" class="tab-base card-content-container outline" style="margin: 0px; margin-top: 0px;">
-
-                                                    <!--Nav Tabs-->
-                                                    <ul class="nav nav-tabs card-nav-container" style="">
-                                                        <li id="summary-group" class="active">
-                                                            <a id="summary-tab" data-toggle="tab" href="#summary-card" class="card-tab-title" aria-expanded="true">
-                                                                Summary
-                                                            </a>
-                                                        </li>
-                                                        <li id="card-group" class="">
-                                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false">
-                                                                Location
-                                                            </a>
-                                                        </li>
-                                                        <li id="icon-group" class="">
-                                                            <a id="map-tab" data-toggle="tab" href="#models-card" class="card-tab-title" aria-expanded="false">
-                                                                Models
-                                                            </a>
-                                                        </li>
-                                                        <li id="status-group" class="">
-                                                            <a id="map-tab" data-toggle="tab" href="#group-card" class="card-tab-title" aria-expanded="false">
-                                                                People
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-
-                                                    <!--Tabs Content-->
-                                                    <div class="tab-content card-content-tab" style="margin-left: 0px;">
-
-                                                        <!-- Summary Card -->
-                                                        <div id="summary-card" class="tab-pane fade active in" style="">
-                                                            <div class="panel-body card-panel-body project-card-body">
-                                                                <div id="" class="card-content">
-
-                                                                    Summary
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Map Card -->
-                                                        <div id="location-card" class="tab-pane fade">
-                                                            <div class="panel-body card-panel-body" style="">
-                                                                <div id="" class="card-content">
-                                                                    <div class="project-map">
-                                                                        <img class="img-responsive" style="    position: absolute; top: 42px; left: 0; height: 539px;px;" src=img/arches/project_map.png alt="Image">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Models Card -->
-                                                        <div id="models-card" class="tab-pane fade">
-                                                            <div class="panel-body card-panel-body">
-                                                                <div id="" class="card-content">
-
-                                                                    Models/cards in project
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Groups Card -->
-                                                        <div id="group-card" class="tab-pane fade">
-                                                            <div class="panel-body card-panel-body" style="">
-                                                                <div id="" class="card-content" style="">
-
-                                                                    Groups, People in project
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <!-- Project -->

@@ -20,13 +20,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.views.generic import TemplateView
+from arches.app.views.base import BaseManagerView
+from django.shortcuts import render
+from django.utils.translation import ugettext as _
 
 class UserManagerView(BaseManagerView):
 
     def get(self, request):
         context = self.get_context_data(
-            test='test',
+            main_script='views/user-profile-manager',
         )
+
+        context['nav']['icon'] = "fa fa-user"
+        context['nav']['title'] = _("Profile Manager")
+        context['nav']['login'] = True
+        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+
 
         return render(request, 'views/user-profile-manager.htm', context)
