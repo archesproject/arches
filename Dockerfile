@@ -70,10 +70,10 @@ ADD ./bower.json ${ARCHES_ROOT}/bower.json
 RUN bower --allow-root install
 
 # Install pip requirements
-ADD ./arches/install/requirements_docker.txt ${ARCHES_ROOT}/arches/install/requirements_docker.txt
+ADD ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt
 ADD ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements_docker.txt &&\
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 
 # Install the Arches application
