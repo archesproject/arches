@@ -31,6 +31,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
+from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -344,7 +345,7 @@ class ResourceReportView(BaseManagerView):
 
         return render(request, 'views/resource/report.htm', context)
 
-@method_decorator(can_edit_resource_instance(), name='dispatch')
+@method_decorator(can_read_resource_instance(), name='dispatch')
 class RelatedResourcesView(BaseManagerView):
 
     def paginate_related_resources(self, related_resources, page, request):
