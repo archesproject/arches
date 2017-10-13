@@ -285,6 +285,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
+                                        <!-- Profile Manager -->
+                                        <li{% if "user-profile-manager" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'user_profile_manager' %}" data-bind="click: navigate.bind(this, '{% url 'user_profile_manager' %}') ">
+                                                <i class="fa fa-user"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Profile Manager" %}</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
