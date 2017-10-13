@@ -4070,6 +4070,297 @@ ul.jqtree_common li.jqtree-folder {
     padding-top: 4px;
 }
 
+
+
+
+#container #profile-table td {
+	border-top: 1px solid rgba(0,0,0,0.0);
+}
+
+.profile-table-body {
+	float: left;
+}
+
+.profile-summary-page {
+	padding-top: 50px;
+	width: 100%;
+	background: #fff;
+}
+
+.profile-report {
+	height: 250px;
+	background: #f2f2f2;
+	width: 100%;
+	padding: 40px 150px 0px 150px;
+	border-bottom: 1px solid #ccc;
+}
+
+.profile-report-table {
+	position: absolute;
+	height: 130px;
+	width: 100%;
+	left: 110px;
+	padding-bottom: 10px;
+}
+
+
+.profile-table-divider {
+	position: absolute;
+    display: table-cell;
+    height: 70px;
+    margin-top: 35px;
+    width: 1px;
+    padding-left: 0px;
+    padding-right: 0px;
+    border-left: 1px solid #ccc;
+}
+
+.mar-lft.profile-table-divider {
+	border-left-width: 0px;
+}
+
+.profile-list {
+	width: 100%;
+	padding: 40px 100px 50px 100px;
+	min-height: 170px;
+	border-bottom: 1px solid #ccc;
+}
+
+.profile-list.edit-mode {
+	padding: 0px 50px;
+	margin-top: -10px;
+	border-bottom: none;
+}
+
+.profile-image {
+	height: 120px;
+	width: 120px;
+}
+
+.profile-sections {
+	padding: 0px 0px;
+}
+
+.profile-projects {
+	height: 100vh;
+}
+
+.profile-table-cell {
+	padding: 20px;
+	width: 350px;
+	position: relative;
+	top: 25px;
+}
+
+.btn-profile {
+	width: 60px;
+}
+
+.profile-full-name {
+	position: absolute;
+	color: #fff;
+	font-size: 2.6em;
+	top: 140px;
+	left: 100px;
+}
+
+.profile-e-mail {
+	position: absolute;
+	color: #fff;
+	font-size: 16px;
+	top: 180px;
+	left: 100px;
+	color: #aaa;
+	font-weight: 500;
+}
+
+.profile-table-cell-title {
+	font-size: 1.5em;
+	margin-top: 8px;
+	margin-left: 10px;
+}
+
+.profile-table-time {
+	font-size: 15px;
+}
+
+.profile-table-cell-label {
+	font-size: 14px;
+	color: #888;
+	font-weight: 500;
+	margin-left: 10px;
+}
+
+.profile-update {
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 0px;
+	color: steelblue;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.profile-header {
+	font-size: 21px;
+}
+
+.profile-image-region {
+	position: absolute;
+	top: 20px;
+	left: 30px;
+}
+
+.profile-form-region {
+	position: absolute;
+	top: 20px;
+	left: 300px;
+	width: calc(100% - 350px);
+}
+
+.profile-form-body {
+	position: relative;
+	padding: 20px;
+	min-height: 400px;
+}
+
+.profile-form-footer {
+	height: 50px;
+}
+
+.profile-form-message {
+	font-size: 13px;
+	font-weight: 600;
+	margin-top: 3px;
+	margin-left: 20px;
+}
+
+.profile-image-size {
+	height: 200px;
+	width: 200px;
+}
+
+.account-summary {
+	margin-top: -30px;
+	height: 200px;
+	background: #a1f1f1;
+}
+
+.profile-label-shim {
+	margin-top: -5px;
+	color: #777;
+}
+
+.btn-profile-password {
+	background: #fff;
+	border-width: 0px;
+	margin-top: -20px;
+	margin-left: -12px;
+	color: #579ddb;
+}
+
+.account-edit-btn {
+	position: absolute;
+	top: 0px;
+	right: 60px;
+}
+
+.account-tips {
+	margin-top: 10px;
+	font-size: 13px;
+	color: #777;
+}
+
+.account-input {
+	max-width: 300px;
+}
+
+.account-label {
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.btn-profile-password:hover {
+	background: #fff;
+	color: #579ddb;
+}
+
+.btn-profile-password:focus {
+	background: #fff;
+	color: #579ddb;
+}
+
+.btn-profile-password.btn-default:active {
+	background-color: #fff;
+    border-width: 0px;
+    color: #579ddb;
+}
+
+.btn-profile-password.btn:not(.disabled):not(:disabled):active, .btn:not(.disabled):not(:disabled).active {
+	box-shadow: none;
+}
+
+.password-rules {
+	font-size: 14px;
+	color: #555;
+}
+
+.password-rule {
+	color: #888;
+	font-size: 13px;
+	padding-left: 5px;
+	padding-bottom: 3px;
+}
+
+.device-summary {
+	font-size: 13px;
+	margin-bottom: -5px;
+}
+
+.device-listing {
+	float: left;
+	margin-top: -20px;
+	padding-left: 0px;
+}
+
+.device-listing li:not(:first-child) {
+	margin-left: 20px;
+}
+
+.device-list-item {
+	display: inline-block;
+	padding: 10px;
+}
+
+.project-search-widget {
+	position: absolute;
+	top: -45px;
+	width: 350px;
+}
+
+.profile-default-message-panel {
+	text-align: center;
+	padding-top: 10px;
+	padding-bottom: 20px;
+	font-size: 17px;
+	color: #888;
+}
+
+.apple_app_store_icon {
+	height: 50px;
+	padding-top: 10px;
+}
+
+.android_app_store_icon {
+	height: 58px;
+	margin-top: 11px;
+}
+
+
+
+
+
+
+
 .profile-summary-container {
     position: absolute;
     top: 0;
