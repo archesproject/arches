@@ -249,7 +249,7 @@ define([
             var self = this;
             var keys = [];
             var datatypeRecord = this.datatypelookup[this.datatype()];
-            if (datatypeRecord) {
+            if (datatypeRecord && datatypeRecord.defaultconfig && config) {
                 var defaultConfig = datatypeRecord.defaultconfig;
                 _.each(defaultConfig, function (value, key) {
                     if (!config.hasOwnProperty(key)) {

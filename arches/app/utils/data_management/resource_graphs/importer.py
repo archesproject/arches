@@ -95,8 +95,8 @@ def import_graph(graphs, overwrite_graphs=True):
                             graph.save()
                             reporter.update_graphs_saved()
                         else:
-                            overwrite_input = raw_input('Overwrite {0} (T/F) ? '.format(graph.name))
-                            if overwrite_input.lower() in ('t', 'true'):
+                            overwrite_input = raw_input('Overwrite {0} (Y/N) ? '.format(graph.name))
+                            if overwrite_input.lower() in ('t', 'true', 'y', 'yes'):
                                 graph.save()
                             else:
                                 raise GraphImportException('{0} - already exists. Skipping import.'.format(graph.name))

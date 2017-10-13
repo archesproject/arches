@@ -7,6 +7,12 @@
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
 
+    <!-- ko if: mapImage() -->
+    <div class="relative print-map" data-bind="css: getContextCss()">
+        <img data-bind="attr: {src: mapImage() }">
+    </div>
+    <!-- /ko -->
+
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
@@ -132,7 +138,7 @@
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
                                     <div class="tool-header">{% trans 'Create a point' %}</div>
-                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}, css:{'enabled': xyInput.x() || xyInput.y() }"><span>{% trans 'clear' %}</span></a>
+                                    <a class="clear-geojson-button" disabled data-bind="click: function(){xyInput.clearCoordinates()}, css:{'enabled': xyInput.x() || xyInput.y() }"><span>{% trans 'reset' %}</span></a>
                                         <label for="input-easting">{% trans "Easting" %}</label>
                                         <input id="input-easting" type="number" data-bind="textInput: xyInput.x, attr: {placeholder: 'Easting'}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
                                         <label class="mar-top" for="input-northing">{% trans "Northing" %}</label>
@@ -230,7 +236,7 @@
                     </div>
                 </div>
                 <div class="hover-feature-body">
-                    <div class="hover-feature" data-bind="text: popupData().map_popup"></div>
+                    <div class="hover-feature" data-bind="html: popupData().map_popup"></div>
                     <div class="hover-feature-metadata">
                         {% trans "Resource ID:" %}
                         <span data-bind="text: popupData().resourceinstanceid"></span>

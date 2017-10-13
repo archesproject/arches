@@ -34,31 +34,38 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
             var res = [undefined, undefined];
             (self.x() && self.y()) ? self.validCoords(true) : self.validCoords(false);
             if (self.validCoords()) {
-                res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([self.x(), self.y()]);
+                res = ( srcProj === '4326') ? [Number(self.x()), Number(self.y())] : proj4(srcProj).inverse([Number(self.x()), Number(self.y())]);
                 self.boundsWarning((!turf.inside(turf.point(res), turf.bboxPolygon(self.projBounds)) && self.active() === true));
             }
             return res;
         })
 
-        this.srid.subscribe(function(val){
+        this.transformCoords = function(val){
+            if (!(self.x() && self.y())) {
+                self.x(self.defaultCoords[0]);
+                self.y(self.defaultCoords[1]);
+            };
             if (self.x() && self.y()) {
                 var projectedVals;
                 if (self.srid() === '4326') {
-                    projectedVals = proj4(self.defaultProjection).inverse([self.x(), self.y()]);
+                    projectedVals = proj4(self.defaultProjection).inverse([Number(self.x()), Number(self.y())]);
                 } else if (self.defaultProjection === '4326') {
-                    projectedVals = proj4(self.srid(), [self.x(), self.y()])
+                    projectedVals = proj4(self.srid(), [Number(self.x()), Number(self.y())])
                 } else {
-                    projectedVals = proj4(self.defaultProjection, self.srid(), [self.x(), self.y()])
+                    projectedVals = proj4(self.defaultProjection, self.srid(), [Number(self.x()), Number(self.y())])
                 }
                 self.x(projectedVals[0])
                 self.y(projectedVals[1])
                 self.defaultProjection = self.srid();
             }
-        })
+        }
+
+        this.srid.subscribe(this.transformCoords)
 
         this.clearCoordinates = function() {
-            self.x(null);
-            self.y(null);
+            self.srid('4326')
+            self.x(arches.mapDefaultX);
+            self.y(arches.mapDefaultY);
             self.boundsWarning(false);
         }
 
@@ -110,6 +117,8 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
                 self.updateSelectedPoint();
             }
         });
+
+        this.transformCoords()
     };
 
     return XYInputViewModel;

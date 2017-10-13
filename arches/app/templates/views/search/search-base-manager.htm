@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load template_tags %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
 
     <!-- Title Block -->
@@ -28,10 +29,12 @@
                     <i class="fa fa-check-circle-o"></i>
                     <p>{% trans 'Advanced' %}</p>
                 </button>
+                {% if user|can_edit_resource_instance %}
                 <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}">
                     <i class="fa fa-code-fork"></i>
                     <p>{% trans 'Related' %}</p>
                 </button>
+                {% endif %}
             </div>
         </div>
     </div>

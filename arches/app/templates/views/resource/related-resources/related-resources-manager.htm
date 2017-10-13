@@ -74,7 +74,7 @@
                             </div>
 
                             <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
-                                <div class="rr-fdg-description" data-bind="text: description"></div>
+                                <div class="rr-fdg-description" data-bind="html: description"></div>
                                 <div class="node-list-footer">
                                     <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a>
                                     <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i>{% trans 'Edit' %}</a>
