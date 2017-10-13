@@ -1,0 +1,604 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Account Settings" %}
+{% endblock title %}
+
+
+{% block main_content %}
+<div>
+
+    <!-- Main Editor -->
+    <div>
+
+        <!-- Title Bar -->
+        <div id="" class="relative fade in" style="display: block;">
+
+            <!-- Title Block -->
+            <div class="report-toolbar">
+                <h4 class="report-toolbar-title">My Account </h4>
+            </div>
+        </div>
+
+        <!-- Profile Summary -->
+        <div class="profile-summary-page">
+
+            <div class="profile-report relative">
+
+                <!-- Profile Top Panel Image -->
+                <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
+
+                <div class="">
+                    <div class="profile-full-name">
+                        Alison Dalgity
+                    </div>
+                    <div class="profile-e-mail">
+                        Arches account name
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Profile Sections -->
+            <div class="profile-sections">
+
+                <!-- My Account Info -->
+                <section id="" class="profile-list">
+                    <div class="account-wrapper">
+                        <div class="row relative">
+
+                            <!-- Section Title -->
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    Account
+                                </div>
+                            </div>
+
+                            <!-- Section Content -->
+                            <div class="col-sm-9">
+
+                                <!-- Account Information Report Panel -->
+                                <div id="account-report" class="">
+                                    <!-- User Name, Password -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="relative">
+                                                <h4 class="text-main" style="font-weight: 500;">adalgity@getty.edu</h4>
+                                                <p class="profile-label-shim">User name</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Password -->
+                                        <div class="col-sm-5">
+                                            <h4 class="text-main">********</h4>
+
+                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover"
+                                            data-toggle="popover" data-container="body"
+                                            data-placement="bottom"
+                                            data-original-title="Change Password"
+                                            data-content='
+                                                <div class="form-group">
+                                                    <input type="password" placeholder="new password" id="" class="form-control input-lg">
+                                                    <input type="password" placeholder="confirm password" id="" class="form-control input-lg mar-top">
+                                                </div>
+                                                <div class="password-rules">
+                                                    Your password must have:
+                                                    <ul class="list-unstyled">
+                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> 8 or more characters</li>
+                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 number</li>
+                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 capital letter</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="mar-top mar-btm pull-right">
+                                                    <button class="btn btn-danger">Cancel</button>
+                                                    <button class="btn btn-primary">Change Password</button>
+                                                </div>'>Change password</button>
+                                        </div>
+
+                                        <!-- Btn -->
+                                        <div class="col-sm-2">
+                                            <div id="account-edit-btn" class="">
+                                                <button class="btn btn-primary btn-active-purple btn-profile">Edit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Recovery email -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="relative">
+                                                <h4 class="text-main" style="font-weight: 500;">adalgity@getty.edu</h4>
+                                                <p class="profile-label-shim">Contact email</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Recovery phone -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="relative">
+                                                <h4 class="text-main" style="font-weight: 500;">No phone number provided</h4>
+                                                <p class="profile-label-shim">Phone</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Account CRUD Panel -->
+                                <div id="account-crud" class="" style="display: none;">
+                                    <!-- User Name, Password -->
+                                    <div class="row">
+                                        <!-- User Name -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">Arches user name</label>
+                                                <input type="text" class="form-control input-lg account-input" placeholder="Fist name" value="adalgity@getty.edu">
+                                            </div>
+                                        </div>
+
+                                        <!-- Password -->
+                                        <div class="col-sm-5">
+                                            <p class="account-tips">
+                                                This is the unique email or name that you use to log on to Arches.
+                                            </p>
+                                        </div>
+
+                                        <!-- Btn -->
+                                        <div class="col-sm-2">
+                                            <div id="account-edit-btn" class="">
+                                                <div id="account-edit-done-btn" class="" style="display: none;">
+                                                    <button class="btn btn-primary btn-active-purple btn-profile mar-btm">Save</button>
+                                                    <button class="btn btn-danger btn-active-dark btn-profile mar-btm">Canel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr style="border-color: #eee;">
+
+                                    <!-- Account First Name -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">First name</label>
+                                                <input type="text" class="form-control input-lg account-input" placeholder="Fist name" value="Alison">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <p class="account-tips">
+                                                Arches uses your name and phone number to make it easier for other users to find and work with you.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Account Last Name -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">Last name</label>
+                                                <input type="text" class="form-control input-lg account-input" placeholder="Last name" value="Dalgity">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">Phone Number (optional)</label>
+                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr style="border-color: #eee;">
+
+                                    <!-- Contact Email -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">Contact Email</label>
+                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" value="adalgity@getty.edu">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <p class="account-tips">
+                                                Arches uses your e-maill to alert you to projects and tasks assigned to you.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <hr style="border-color: #eee;">
+
+                                    <!-- Password, again -->
+                                    <div class="row">
+                                        <!-- Names -->
+                                        <div class="col-sm-5">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">Password</label>
+                                                <input type="password" class="form-control input-lg account-input" placeholder="" value="123456">
+                                                <label class="control-label  account-label mar-top">Repeat Password</label>
+                                                <input type="password" class="form-control input-lg account-input" placeholder="" value="123456">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <div class="account-tips">
+                                                Your password must have:
+                                                <ul class="list-unstyled">
+                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> 8 or more characters</li>
+                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 number</li>
+                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 capital letter</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+
+                <!-- My Devices -->
+                <div class="profile-list">
+                    <div class="profile-header">
+                        My Devices
+                    </div>
+
+                    <!-- No Device Registered Yet -->
+                    <div class="profile-default-message-panel">
+
+                        <!-- Download panel -->
+                        <div id="download-buttons-panel" class="">
+                            <span class="hidden-xs">You haven't registered a device yet.</span>  Download the App:
+                            <div class="">
+                                <a class="download-app" href=""><img class="apple_app_store_icon" src="{{ STATIC_URL }}img/user/apple.png" alt="ios"></a>
+                                <a class="download-app" href=""><img class="android_app_store_icon" src="{{ STATIC_URL }}img/user/google.png" alt="android"></a>
+                            </div>
+                        </div>
+
+                        <!-- Devices Panel -->
+                        <div id="devices-panel" class="" style="display: none;">
+                            <div class="row">
+                                <div class="col-sm-9 col-sm-offset-3">
+                                    <!-- Device Listing -->
+                                    <ul class="device-listing">
+                                        <li class="device-list-item">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>Alison's iPhone 8</dt>
+                                                </dl>
+                                            </div>
+                                            <img src="img/arches/devices/smart_phone.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>December 18, 2017</dt>
+                                                    <dd class="profile-label-shim">9:18:52</dd>
+                                                    <dd class="profile-label-shim">Last login</dd>
+                                                </dl>
+                                            </div>
+                                        </li>
+
+                                        <li class="device-list-item">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>Getty iPad #14</dt>
+                                                </dl>
+                                            </div>
+                                            <img src="img/arches/devices/tablet.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                                            <div class="">
+                                                <dl class="device-summary">
+                                                    <dt>November 9, 2017</dt>
+                                                    <dd class="profile-label-shim">17:45:12</dd>
+                                                    <dd class="profile-label-shim">Last login</dd>
+                                                </dl>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <!-- My Projects -->
+                <div class="profile-list profile-projects">
+                    <div class="profile-header">
+                        My Projects
+                    </div>
+
+                    <!-- No Project Invitations Yet -->
+                    <div id="default-mobile-projects" class="profile-default-message-panel">
+                        Sorry, but you haven't been invited to a project yet...
+                    </div>
+
+                    <!-- Project Invitations List -->
+                    <div id="mobile-projects-list" class="profile-default-message-panel" style="display: none;">
+                        <div class="row">
+
+                            <!-- Find a project -->
+                            <div class="col-sm-9 col-sm-offset-3 relative">
+                                <div class="project-search-widget">
+                                    <input type="text" class="form-control input-lg" placeholder="find a project...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Projects List -->
+                        <div id="" class="row">
+                            <div class="col-sm-9 col-sm-offset-3 mar-top">
+                                <div class="">
+
+                                    <!-- Project -->
+                                    <div id="sample-project" class="project-panel">
+
+                                        <!--Project heading-->
+                                        <div class="project-panel-header">
+                                            <div class="">
+                                                <div class="project-status active">Active</div>
+                                            </div>
+                                            <h3 class="project-panel-title">Excelsior Post-Loma Prieta Damage Assessment</h3>
+
+                                            <div class="">
+                                                <ul class="project-metadata">
+                                                    <li class="project-metadata-item">
+                                                        September 19, 2017 to September 30, 2017
+                                                    </li>
+                                                </ul>
+                                                <div class="project-details">
+                                                    <a id="view-project-details-btn" href="" class="text-primary text-semibold">View Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <!-- Project -->
+                                    <div class="project-panel expired">
+
+                                        <!--Project heading-->
+                                        <div class="project-panel-header">
+                                            <div class="">
+                                                <div class="project-status">Inactive</div>
+                                            </div>
+                                            <h3 class="project-panel-title">Marina Architecture Survey</h3>
+
+                                            <div class="">
+                                                <ul class="project-metadata">
+                                                    <li class="project-metadata-item">
+                                                        February 18, 2017 to June 30, 2017
+                                                    </li>
+                                                </ul>
+                                                <div class="project-details">
+                                                    <a href="" class="text-primary text-semibold"> View Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--Project Details-->
+                                        <div id="project-details" class="project-panel-body" style="display: none;">
+                                            <p>Lorem ipsum dolor sit amet.</p>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- Editor Content -->
+
+    </div>
+    <!--END  Main Editor -->
+
+
+
+    <!--MAIN NAVIGATION-->
+    <nav id="mainnav-container" class="arches-background">
+        <div id="mainnav">
+
+            <!--Shortcut buttons-->
+            <div id="mainnav-shortcut" class="hidden">
+                <ul class="list-unstyled">
+                    <li class="col-xs-4" data-content="Home">
+                        <a class="shortcut-grid" href="#">
+                            <i class="fa fa-home"></i>
+                        </a>
+                    </li>
+                    <li class="col-xs-4" data-content="Dashboard">
+                        <a class="shortcut-grid" href="#">
+                            <i class="fa fa-tachometer"></i>
+                        </a>
+                    </li>
+                    <li class="col-xs-4" data-content="Add New Resource">
+                        <a class="shortcut-grid" href="#">
+                            <i class="fa fa-building-o"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!--End shortcut buttons-->
+
+
+            <!--Menu-->
+            <div id="mainnav-menu-wrap">
+                <div class="nano arches-header-shim">
+                    <div class="nano-content">
+                        <ul id="mainnav-menu" class="list-group">
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-tachometer"></i>
+                                    <span class="menu-title">
+                                        <strong>Dashboard</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li class="active-link">
+                                <a href="#">
+                                    <i class="fa fa-building-o"></i>
+                                    <span class="menu-title">
+                                        <strong>Resource Manager</strong>
+                                    </span>
+                                </a>
+                                <!-- Submenu -->
+                                <ul class="collapse in" aria-expanded="true">
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-general.html"><i class="fa fa-university arches-menu-icon"></i> New Archaeological Resource</a></li>
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-components.html"><i class="fa fa-building-o arches-menu-icon"></i> New Architectural Resource</a></li>
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-validation.html"><i class="fa fa-tasks arches-menu-icon"></i> New Activity</a></li>
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-calendar arches-menu-icon"></i> New Historic Event</a></li>
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-group arches-menu-icon"></i> New Agent</a></li>
+                                    <li class="link-submenu-item"><a class="link-submenu" href="forms-wizard.html"><i class="fa fa-file-o arches-menu-icon"></i> New Information Resource</a></li>
+                                </ul>
+                            </li>
+
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="ti-alarm-clock"></i>
+                                    <span class="menu-title">
+                                        <strong>System Settings</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-bookmark"></i>
+                                    <span class="menu-title">
+                                        <strong>Resource Designer</strong>
+                                    </span>
+                                </a>
+
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-server"></i>
+                                    <span class="menu-title">
+                                        <strong>Map Server Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="menu-title">
+                                        <strong>Field Project Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-cloud-upload"></i>
+                                    <span class="menu-title">
+                                        <strong>Import/Export Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-user-md"></i>
+                                    <span class="menu-title">
+                                        <strong>Profile Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li class="list-divider-dark"></li>
+
+                            <!-- Tools -->
+                            <li class="list-header">Modules</li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-align-left"></i>
+                                    <span class="menu-title">
+                                        RDM
+
+                                    </span>
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <!--End menu-->
+
+        </div>
+    </nav>
+    <!--END MAIN NAVIGATION-->
+
+    <!--ASIDE-->
+</div>
+
+<!-- SCROLL TOP BUTTON -->
+<button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+
+
+
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('profile-manager-data', [], function () {
+    return {
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
