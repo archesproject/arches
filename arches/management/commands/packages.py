@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
 import urllib, uuid, glob
+from datetime import datetime
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
@@ -249,7 +250,7 @@ class Command(BaseCommand):
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
 
-        def load_system_settings():
+        def load_system_settings(download_dir):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
                 response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
@@ -266,7 +267,7 @@ class Command(BaseCommand):
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
 
-        def load_resource_to_resource_constraints():
+        def load_resource_to_resource_constraints(download_dir):
             config_paths = glob.glob(os.path.join(download_dir, '*', 'package_config.json'))
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
@@ -277,7 +278,7 @@ class Command(BaseCommand):
                         resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
                     )
 
-        def load_resource_views():
+        def load_resource_views(download_dir):
             resource_views = glob.glob(os.path.join(download_dir, '*', 'business_data','resource_views', '*.sql'))
             try:
                 with connection.cursor() as cursor:
@@ -289,14 +290,13 @@ class Command(BaseCommand):
                 print e
                 print 'Could not connect to db'
 
-        def load_graphs():
+        def load_graphs(download_dir):
             branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
             resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
-            # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             self.import_graphs(branches, overwrite_graphs=False)
             self.import_graphs(resource_models, overwrite_graphs=False)
 
-        def load_concepts(overwrite, stage):
+        def load_concepts(download_dir, overwrite, stage):
             concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
             collection_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'collections', '*.xml'))
 
@@ -329,7 +329,7 @@ class Command(BaseCommand):
 
                 self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
-        def load_map_layers():
+        def load_map_layers(download_dir):
             basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
             overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
             load_mapbox_styles(basemap_styles, True)
@@ -340,7 +340,7 @@ class Command(BaseCommand):
             load_tile_server_layers(tile_server_basemaps, True)
             load_tile_server_layers(tile_server_overlays, False)
 
-        def load_business_data():
+        def load_business_data(download_dir):
             business_data = []
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
             business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
@@ -363,7 +363,7 @@ class Command(BaseCommand):
             for f in uploaded_files:
                 shutil.copy(f, dest_files_dir)
 
-        def load_extensions(ext_type, cmd):
+        def load_extensions(download_dir, ext_type, cmd):
             extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
             root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
             component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
@@ -390,62 +390,66 @@ class Command(BaseCommand):
                     shutil.copy(module, module_dir)
                     management.call_command(cmd, 'register', source=module)
 
-        def load_widgets():
-            load_extensions('widgets', 'widget')
+        def load_widgets(download_dir):
+            load_extensions(download_dir,'widgets', 'widget')
 
-        def load_functions():
-            load_extensions('functions', 'fn')
+        def load_functions(download_dir):
+            load_extensions(download_dir,'functions', 'fn')
 
-        def load_datatypes():
-            load_extensions('datatypes', 'datatype')
+        def load_datatypes(download_dir):
+            load_extensions(download_dir,'datatypes', 'datatype')
 
-        try:
-            urllib.urlopen(source)
-            remote = True
-        except:
-            remote = False
+        def handle_source(source):
 
-        if os.path.exists(source) or remote == True:
+            if os.path.isdir(source):
+                return source
+                
+            source_dir = os.path.join(os.getcwd(),'temp_' + datetime.now().strftime('%y%m%d_%H%M%S'))
+            os.mkdir(source_dir)
+            
+            if source.endswith(".zip") and os.path.isfile(source):
+                unzip_file(source, source_dir)
+                return source_dir
+            
+            try:
+                urllib.urlopen(source)
+                zip_file = os.path.join(source_dir,"source_data.zip")
+                urllib.urlretrieve(source, zip_file)
+                unzip_file(zip_file, source_dir)
+                return source_dir
+            except:
+                pass
+            
+            return False
+            
+        source_dir = handle_source(source)
+        if not source_dir:
+            raise Exception("this is an invalid package source")
 
-            if remote == True:
-                download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
-                if os.path.exists(download_dir) == False:
-                    os.mkdir(download_dir)
-                    zip_file = os.path.join(download_dir, 'source_data.zip')
-                    urllib.urlretrieve(source, zip_file)
-            else:
-                download_dir = os.path.dirname(source)
-                zip_file = source
+        if setup_db != False:
+            if setup_db.lower() in ('t', 'true', 'y', 'yes'):
+                self.setup_db(settings.PACKAGE_NAME)
 
-            unzip_file(zip_file, download_dir)
-
-            if setup_db != False:
-                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                    self.setup_db(settings.PACKAGE_NAME)
-
-            print 'loading system settings'
-            load_system_settings()
-            print 'loading widgets'
-            load_widgets()
-            print 'loading functions'
-            load_functions()
-            print 'loading datatypes'
-            load_datatypes()
-            print 'loading concepts'
-            load_concepts(overwrite_concepts, stage_concepts)
-            print 'loading resource models and branches'
-            load_graphs()
-            print 'loading resource to resource constraints'
-            load_resource_to_resource_constraints()
-            print 'loading map layers'
-            load_map_layers()
-            print 'loading business data - resource instances and relationships'
-            load_business_data()
-            print 'loading resource views'
-            load_resource_views()
-
-        else:
-            print "A path to a local or remote zipfile is required"
+        print 'loading system settings'
+        load_system_settings(source_dir)
+        print 'loading widgets'
+        load_widgets(source_dir)
+        print 'loading functions'
+        load_functions(source_dir)
+        print 'loading datatypes'
+        load_datatypes(source_dir)
+        print 'loading concepts'
+        load_concepts(source_dir, overwrite_concepts, stage_concepts)
+        print 'loading resource models and branches'
+        load_graphs(source_dir)
+        print 'loading resource to resource constraints'
+        load_resource_to_resource_constraints(source_dir)
+        print 'loading map layers'
+        load_map_layers(source_dir)
+        print 'loading business data - resource instances and relationships'
+        load_business_data(source_dir)
+        print 'loading resource views'
+        load_resource_views(source_dir)
 
     def update_project_templates(self):
         """
