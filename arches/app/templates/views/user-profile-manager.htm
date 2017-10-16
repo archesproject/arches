@@ -50,10 +50,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="">
                     <div class="profile-full-name">
-                        Alison Dalgity
+                        {{user.first_name}}
                     </div>
                     <div class="profile-e-mail">
-                        Arches account name
+                        {{user.username}}
                     </div>
                 </div>
 
@@ -85,8 +85,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="relative">
-                                                <h4 class="text-main" style="font-weight: 500;">adalgity@getty.edu</h4>
-                                                <p class="profile-label-shim">User name</p>
+                                                <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
+                                                <p class="profile-label-shim">{% trans 'User name' %}</p>
                                             </div>
                                         </div>
 
@@ -114,13 +114,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="mar-top mar-btm pull-right">
                                                     <button class="btn btn-danger">Cancel</button>
                                                     <button class="btn btn-primary">Change Password</button>
-                                                </div>'>Change password</button>
+                                                </div>'>{% trans 'Change password' %}</button>
                                         </div>
 
                                         <!-- Btn -->
                                         <div class="col-sm-2">
                                             <div id="account-edit-btn" class="">
-                                                <button class="btn btn-primary btn-active-purple btn-profile">Edit</button>
+                                                <button class="btn btn-primary btn-active-purple btn-profile">{% trans 'Edit' %}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -130,8 +130,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="relative">
-                                                <h4 class="text-main" style="font-weight: 500;">adalgity@getty.edu</h4>
-                                                <p class="profile-label-shim">Contact email</p>
+                                                <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                                <p class="profile-label-shim">{% trans 'Contact email' %}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -141,8 +141,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="relative">
-                                                <h4 class="text-main" style="font-weight: 500;">No phone number provided</h4>
-                                                <p class="profile-label-shim">Phone</p>
+                                                <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                                <p class="profile-label-shim">{% trans 'Phone' %}</p>
                                             </div>
                                         </div>
                                     </div>

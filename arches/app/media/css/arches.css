@@ -4087,6 +4087,10 @@ ul.jqtree_common li.jqtree-folder {
 	background: #fff;
 }
 
+.profile-summary-page .img-responsive {
+	max-height: 249px;
+}
+
 .profile-report {
 	height: 250px;
 	background: #f2f2f2;

@@ -36,5 +36,4 @@ class UserManagerView(BaseManagerView):
         context['nav']['login'] = True
         context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
 
-
         return render(request, 'views/user-profile-manager.htm', context)

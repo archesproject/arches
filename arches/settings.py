@@ -328,7 +328,7 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 ###   RUN TIME CONFIGURABLE SETTINGS   ###
 ##########################################
 
-
+PHONE_REGEX = r'^\+\d{8,15}$'
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15

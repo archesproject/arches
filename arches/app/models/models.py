@@ -18,10 +18,14 @@ import datetime
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q, Max
+from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.core.validators import RegexValidator
+from django.db.models import Q, Max
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+
+
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -796,6 +800,7 @@ class TileserverLayer(models.Model):
         managed = True
         db_table = 'tileserver_layers'
 
+
 class GraphXMapping(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     graph = models.ForeignKey('GraphModel', db_column='graphid')
@@ -816,3 +821,11 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = 'iiif_manifests'
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # phone_regex = RegexValidator(regex=settings.PHONE_REGEX, message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."))
+    phone = models.CharField(max_length=16, blank=True)
+    class Meta:
+        db_table = 'user_profile'
