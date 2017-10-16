@@ -2,6 +2,12 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 class SpecialCharacterValidator:
+    """
+    Password validator to ensure that passwords contain one or more in a list
+    of characters
+
+    """
+
     def __init__(self, special_characters=('!','@','#','$','%','^','&','*',')','(')):
         self.special_characters = special_characters
 
@@ -21,6 +27,10 @@ class SpecialCharacterValidator:
 
 
 class HasNumericCharacterValidator:
+    """
+    Password validator to ensure that passwords contain number
+
+    """
 
     def validate(self, password, user=None):
         res = filter(lambda x: x.isdigit() == True, password)
@@ -37,6 +47,11 @@ class HasNumericCharacterValidator:
 
 
 class HasUpperAndLowerCaseValidator:
+    """
+    Password validator to ensure that passwords contain both upper and lower
+    characters
+
+    """
 
     def validate(self, password, user=None):
         res = filter(lambda x: x.isupper() == True, password)
