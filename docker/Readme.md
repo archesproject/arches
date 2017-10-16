@@ -98,7 +98,7 @@ This will be used throughout your development process and does not need to be ch
 7. Set up your own Docker image build. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add these lines:
 	```
 		FROM archesproject/arches:latest
-		COPY . ${ARCHES_ROOT}
+		COPY . ${WEB_ROOT}
 	```
 
 8. Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  

@@ -28,7 +28,7 @@ DJANGO_PORT=${DJANGO_PORT:-8000}
 
 cd_web_root() {
 	cd ${WEB_ROOT}
-	echo "Current work directory: ${ARCHES_ROOT}"
+	echo "Current work directory: ${WEB_ROOT}"
 }
 
 cd_arches_root() {
