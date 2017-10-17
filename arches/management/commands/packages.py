@@ -37,6 +37,7 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.formats.format import MissingGraphException
 from arches.app.utils.data_management.resources.formats.csvfile import MissingConfigException
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
@@ -52,7 +53,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -164,6 +165,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_graphs':
             self.import_graphs(options['source'])
+
+        if options['operation'] == 'export_graphs':
+            self.export_graphs(options['dest_dir'], options['graphs'])
 
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
@@ -803,6 +807,17 @@ class Command(BaseCommand):
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
 
+    def export_graphs(self, data_dest='', graphs=''):
+        """
+        Exports graphs to arches.json.
+
+        """
+
+        graphs = graphs.split(',')
+        for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)['graph']:
+            graph_name = graph['name'].replace('/', '-')
+            with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
+                f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
         resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)

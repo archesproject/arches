@@ -90,7 +90,7 @@ def get_graphs_for_export(graphids=None):
     graphs['graph'] = []
     if graphids == None or graphids[0] == 'all' or graphids == ['']:
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
-    elif graphids[0] == 'resources':
+    elif graphids[0] == 'resource_models':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
     elif graphids[0] == 'branches':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
