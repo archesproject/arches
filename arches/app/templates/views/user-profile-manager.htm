@@ -36,7 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Title Block -->
             <div class="report-toolbar">
-                <h4 class="report-toolbar-title">My Account </h4>
+                <h4 class="report-toolbar-title">{% trans 'My Account' %}</h4>
             </div>
         </div>
 
@@ -71,7 +71,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    Account
+                                    {% trans 'Account' %}
                                 </div>
                             </div>
 
@@ -94,27 +94,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="col-sm-5">
                                             <h4 class="text-main">********</h4>
 
-                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover"
-                                            data-toggle="popover" data-container="body"
-                                            data-placement="bottom"
-                                            data-original-title="Change Password"
-                                            data-content='
-                                                <div class="form-group">
-                                                    <input type="password" placeholder="new password" id="" class="form-control input-lg">
-                                                    <input type="password" placeholder="confirm password" id="" class="form-control input-lg mar-top">
+                                            <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
+                                            {% trans 'Change password' %}</button>
+                                                <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                                    {% include 'change_password_sm.htm' %}
                                                 </div>
-                                                <div class="password-rules">
-                                                    Your password must have:
-                                                    <ul class="list-unstyled">
-                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> 8 or more characters</li>
-                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 number</li>
-                                                        <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 capital letter</li>
-                                                    </ul>
-                                                </div>
-                                                <div class="mar-top mar-btm pull-right">
-                                                    <button class="btn btn-danger">Cancel</button>
-                                                    <button class="btn btn-primary">Change Password</button>
-                                                </div>'>{% trans 'Change password' %}</button>
                                         </div>
 
                                         <!-- Btn -->
