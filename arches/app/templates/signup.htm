@@ -53,6 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
                         {% endfor %}
 
+                        {% if showform %}
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-compose"></i></div>
@@ -92,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input type="password" class="form-control input-lg" placeholder="New Password" name='password1'>
+                                    <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
                             </div>
                             {% if form.password1.errors %}
                             {% for error in form.password1.errors %}
@@ -104,7 +105,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input type="password" class="form-control input-lg" placeholder="Confirm New Password" name='password2'>
+                                    <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
                             </div>
                             {% if form.password2.errors %}
                             {% for error in form.password2.errors %}
@@ -112,24 +113,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% endfor %}
                             {% endif %}
                         </div>
+                        {% endif %}
 
                         <div class="form-group">
-                        <div class="row">
-                            <div class="col-xs-8">
-                                <div class="text-right">
-                                    <button class="btn btn-success text-uppercase" type="submit">{% trans "Signup" %}</button>
-                                </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <a class="btn btn-danger text-uppercase" href="{% url 'home' %}">{% trans "Exit" %}</a>
+                            <div class="text-right">
+                                <a class="btn btn-link" href="{% url 'home' %}" style="color:#C93011;">{% trans "Exit" %}</a>
+                                <button class="btn btn-success text-uppercase" type="submit">{% trans "Signup" %}</button>
                             </div>
                         </div>
-                        </div>
 
-
-                        <script type="text/javascript">
-                            document.getElementById("id_old_password").focus();
-                        </script>
                     </div>
                 </form>
             </div>

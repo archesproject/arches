@@ -101,6 +101,7 @@ def signup(request):
         'lastname': '',
         'email': ''
     }
+    showform = True
 
     if request.method == 'POST':
         postdata = request.POST.copy()
@@ -138,13 +139,16 @@ def signup(request):
             # if user is not None and user.is_active:
             #     login(request, user)
             messages.success(request, _('An email has been sent with a link'))
+            showform = False
+
             #return redirect('signup')
     else:
         form = ArchesUserCreationForm()
 
     return render(request, 'signup.htm', {
         'form': form,
-        'postdata': postdata
+        'postdata': postdata,
+        'showform': showform
     })
 
 def confirm_signup(request):
