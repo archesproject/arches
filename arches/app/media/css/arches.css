@@ -407,6 +407,10 @@ input[type="checkbox"] {
     overflow-y: hidden;
 }
 
+.scroll-y-auto {
+    overflow-y: auto;
+}
+
 .tab-base .nav-tabs>li:not(.active)>a:hover {
     border-top: 1px solid #eee;
     border-right: 1px solid #eee;
@@ -3359,10 +3363,21 @@ input.cmn-toggle-yes-no:checked+label:after {
 .change-password-form.popover {
     display: block;
     margin-top: 65px;
+    font-size: 14px;
+    width: 250px;
+    border: 1px solid rgba(0,0,0,.2);
 }
 
+.change-password-form .panel-body {
+    padding: 20px 15px;
+}
 
-.popover
+.change-password-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width:100%;
+}
 
 .img-login {
     background-image: url(../img/backgrounds/easter_island_night.jpg);
@@ -4085,7 +4100,6 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-summary-page {
-	padding-top: 50px;
 	width: 100%;
 	background: #fff;
 }
@@ -4160,7 +4174,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .btn-profile {
-	width: 60px;
+	width: 65px;
 }
 
 .profile-full-name {
@@ -6439,7 +6453,6 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .report-toolbar {
-    position: fixed;
     top: 50px;
     width: calc(100% - 50px);
     height: 50px;
