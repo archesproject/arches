@@ -1,5 +1,6 @@
 import csv
 import os
+import sys
 import json
 import uuid
 import csv
@@ -95,7 +96,14 @@ def get_graphs_for_export(graphids=None):
     elif graphids[0] == 'branches':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID))
     else:
-        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
+        try:
+            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
+        except:
+            # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
+            print '*'*80
+            print '"{0}" contains/is not a valid graphid or option for this command.'.format(','.join(graphids))
+            print '*'*80
+            sys.exit()
 
     for resource_graph in resource_graph_query:
         function_ids = []

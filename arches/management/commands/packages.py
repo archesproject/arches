@@ -812,12 +812,17 @@ class Command(BaseCommand):
         Exports graphs to arches.json.
 
         """
-
-        graphs = graphs.split(',')
-        for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)['graph']:
-            graph_name = graph['name'].replace('/', '-')
-            with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
-                f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
+        if data_dest != '':
+            graphs = [graph.strip() for graph in graphs.split(',')]
+            for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)['graph']:
+                graph_name = graph['name'].replace('/', '-')
+                with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
+                    f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
+        else:
+            print '*'*80
+            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+            print '*'*80
+            sys.exit()
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
         resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
