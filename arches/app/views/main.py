@@ -18,7 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import base64
 import hashlib
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from django import forms
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -94,9 +95,7 @@ def change_password(request):
 
 @never_cache
 def signup(request):
-    
-    # import ipdb
-    # ipdb.set_trace()
+
     postdata = {
         'first_name': '',
         'last_name': '',
@@ -107,18 +106,19 @@ def signup(request):
     if request.method == 'POST':
         postdata = request.POST.copy()
         postdata['username'] = postdata['email']
+        postdate['ts'] = int(time.time())
         form = ArchesUserCreationForm(postdata)
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
-            form.cleaned_data['date'] = datetime.now()
             userinfo = JSONSerializer().serialize(form.cleaned_data)
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({'link':encrypted_userinfo})
 
             context = {
+                'host': request.get_host(),
                 'link':request.build_absolute_uri(reverse('confirm_signup') + '?' + url_encrypted_userinfo,),
                 'greeting': _('Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login.'),
-                'closing': _('This link expires in 24 hours.  If you can\'t get to it, don\'t worry, you can always try again with the same email address.'),
+                'closing': _('This link expires in 24 hours.  If you can\'t get to it before then, don\'t worry, you can always try again with the same email address.'),
             }
 
             html_content = render_to_string('email/signup_link.htm', context) # ...
@@ -143,23 +143,36 @@ def signup(request):
 def confirm_signup(request):
     if request.method == 'GET':
         link = request.GET.get('link', None)
-
         AES = AESCipher(settings.SECRET_KEY)
         userinfo = JSONDeserializer().deserialize(AES.decrypt(link))
-        #userinfo['username'] = userinfo['email']
-
         form = ArchesUserCreationForm(userinfo)
-        if form.is_valid():
-            user = form.save()
-            user = authenticate(username=user.username, password=str(userinfo['password1']))
-            if user is not None and user.is_active:
-                login(request, user)
+        if datetime.fromtimestamp(userinfo['ts']) + timedelta(days=1) >= datetime.fromtimestamp(int(time.time())):
+            if form.is_valid():
+                user = form.save()
+                # user = authenticate(username=user.username, password=str(userinfo['password1']))
+                # if user is not None and user.is_active:
+                #     login(request, user)
 
-            return redirect('home')
+                return redirect('auth')
+            else:
+                try:
+                    for error in form.errors.as_data()['username']:
+                        if error.code == 'unique':
+                            return redirect('auth')
+                            # form.add_error('email', forms.ValidationError(
+                            #     _('This email address had already been regisitered with the system.  ?'),
+                            #     code='unique',
+                            # ))
+                except:
+                    pass
         else:
-            return render(request, 'signup.htm', {
-                'form': ArchesUserCreationForm()
-            })
+            form.errors['ts'] = [_('The signup link has expired, please re-enter a new password and try again.  Thanks!')]
+
+        return render(request, 'signup.htm', {
+            'form': form,
+            'showform': True,
+            'postdata': userinfo
+        })
 
 class ArchesUserCreationForm(UserCreationForm):
     """
@@ -167,77 +180,15 @@ class ArchesUserCreationForm(UserCreationForm):
     password.
     """
 
-    # error_messages = {
-    #     'password_mismatch': _("The two password fields didn't match."),
-    # }
-
-    # username = forms.CharField(
-    #     _('username'),
-    #     max_length=30,
-    #     unique=True,
-    #     help_text=_('Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-    #     validators=[
-    #         validators.RegexValidator(
-    #             r'^[\w.@+-]+$',
-    #             _('Enter a valid username. This value may contain only '
-    #               'letters, numbers ' 'and @/./+/-/_ characters.')
-    #         ),
-    #     ],
-    #     error_messages={
-    #         'unique': _("A user with that username already exists."),
-    #     },
-    # )
-
     username = None
     first_name = forms.CharField()
     last_name = forms.CharField()
-    email = forms.EmailField(
-        #unique=True,
-        # error_messages={
-        #     'unique': _("This email address is already regisitered with the system."),
-        # },
-    )
-  # fields=[
-  #               ('password', models.CharField(max_length=128, verbose_name='password')),
-  #               ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-  #               ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-  #               ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=30, unique=True, validators=[django.core.validators.RegexValidator('^[\\w.@+-]+$', 'Enter a valid username. This value may contain only letters, numbers and @/./+/-/_ characters.')], verbose_name='username')),
-  #               ('first_name', models.CharField(blank=True, max_length=30, verbose_name='first name')),
-  #               ('last_name', models.CharField(blank=True, max_length=30, verbose_name='last name')),
-  #               ('email', models.EmailField(blank=True, max_length=254, verbose_name='email address')),
-  #               ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
-  #               ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
-  #               ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-  #               ('custom_id', models.AutoField(primary_key=True, serialize=False)),
-  #               ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
-  #               ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
-  #           ],
+    email = forms.EmailField()
+    ts = forms.IntegerField(required=False)
 
     class Meta:
         model = User
-        fields = ('email','username','first_name','last_name')
-
-  
-
-
-    # def clean_password2(self):
-    #     password1 = self.cleaned_data.get('password1")
-    #     password2 = self.cleaned_data.get("password2")
-    #     if password1 and password2 and password1 != password2:
-    #         raise forms.ValidationError(
-    #             self.error_messages['password_mismatch'],
-    #             code='password_mismatch',
-    #         )
-    #     self.instance.username = self.cleaned_data.get('username')
-    #     password_validation.validate_password(self.cleaned_data.get('password2'), self.instance)
-    #     return password2
-
-    # def save(self, commit=True):
-    #     user = super(UserCreationForm, self).save(commit=False)
-    #     user.set_password(self.cleaned_data["password1"])
-    #     if commit:
-    #         user.save()
-    #     return user
+        fields = ('email','username','first_name','last_name', 'ts')
 
 class AESCipher(object):
 
