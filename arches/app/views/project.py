@@ -15,16 +15,22 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
+from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from arches.app.views.base import BaseManagerView
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
+from arches.app.models import models
+from arches.app.views.base import BaseManagerView
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class ProjectManagerView(BaseManagerView):
     def get(self, request):
+        projects = models.MobileProject.objects.order_by('name')
         context = self.get_context_data(
+            projects=JSONSerializer().serialize(projects),
             main_script='views/project-manager',
         )
 
@@ -33,3 +39,15 @@ class ProjectManagerView(BaseManagerView):
         context['nav']['help'] = (_('Mobile Project Manager'),'help/project-manager-help.htm')
 
         return render(request, 'views/project-manager.htm', context)
+
+    def post(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        if data['id'] is None:
+            project = models.MobileProject()
+        else:
+            project = models.MobileProject.objects.get(pk=data['id'])
+        project.name = data['name']
+        project.active = data['active']
+        with transaction.atomic():
+            project.save()
+        return JSONResponse({'success':True, 'project': project})

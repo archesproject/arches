@@ -9081,6 +9081,11 @@ a.search-facet-item.disabled {
     margin-right: 0;
 }
 
+.library-panel-search-bar {
+    position: absolute;
+    left: 10px;
+}
+
 .print-map {
     display: none;
 }
@@ -9105,6 +9110,26 @@ a.search-facet-item.disabled {
 
 .project-panel-header.edit-mode {
     height: 80px;
+}
+
+.mobile-project-manager-editor div.title-block-title {
+    width: 255px;
+    height:86px;
+}
+.mobile-project-manager-editor .library-card:first-child {
+    margin-top: -5px;
+}
+.mobile-project-manager-editor .library-card {
+    margin-left: -5px;
+}
+
+.mobile-project-manager-editor .card-nav-container {
+    margin-bottom: 0;
+}
+
+.mobile-project-manager-editor .layer-list {
+    background: transparent;
+    border-top: 0px;
 }
 
 .mpm-project-card {

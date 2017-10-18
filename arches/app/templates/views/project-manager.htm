@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="left-column-container panel ep-card-tools-panel" style="flex: 0 0 270px;">
 
             <!-- Title Block -->
-            <div class="title-block-title" style="width: 255px;">
+            <div class="title-block-title">
                 <div class="layer-list">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
@@ -46,64 +46,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                 </div>
-
-                <!-- Group/Account Filter -->
-                <div class="list-filter relative hidden">
-                    <input type="text" class="form-control" style="" placeholder="Find a function...">
-                    <!-- Clear Filter -->
-                    <span class="clear-node-search"><i class="fa fa-times-circle"></i></span>
-                </div>
-
-                <!-- Toolbar -->
-                <div class="href-toolbar">
-                    <a id="show-functions" class="href-button" href="#" style="background: #579ddb;">Sort by name</a>
-                </div>
             </div>
 
 
 
             <!-- Project Listing Panel-->
-            <div id="user-grid" class="grid" style="position: relative; height: 0px; margin-left: -7px;">
+            <div id="user-grid" class="grid" style="position: relative; height: 0px; margin-left: -7px; display:none;" data-bind="visible: true">
 
-                <!-- Default Message -->
+                <!-- ko if: projects().length ===  0 -->
                 <div id="default-message-panel" class="left-column-message" style="">
-                    You haven't saved any projects.
+                    {% trans "You haven't saved any projects." %}
                     <p class="default-message">
-                        Use the form to set up a project, then save your edits, and you're done!
+                        {% trans "Use the form to set up a project, then save your edits, and you're done!" %}
                     </p>
                 </div>
+                <!-- /ko -->
 
-                <!-- Project List -->
-                <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected hidden" style="width: 270px;">
-
-                    <!-- Project -->
-                    <div class="library-card selected selected-card" data-bind="" style="width: 270px; margin-top: -5px;">
+                <!-- ko if: projects().length >  0 -->
+                <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected" style="width: 270px;">
+                    <!-- ko foreach: projects -->
+                    <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: $parent.selectedProject" style="width: 270px;">
                         <div class="mpm-project-card">
-                            <a class="mpm-project-name" data-bind="">Project Name</a>
+                            <a class="mpm-project-name" data-bind="text: name"></a>
                         </div>
-                        <div class="mpm-project-status">
-                            Active
-                        </div>
+                        <div class="mpm-project-status" data-bind="text: active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                         <div class="mpm-project-subtitle" data-bind="">adaligty@getty.edu</div>
                     </div>
-
-                    <!-- Project -->
-                    <div class="library-card inactive" data-bind="" style="width: 270px;">
-                        <div class="mpm-project-card ">
-                            <a class="mpm-project-name" data-bind="">A Really, Really, Really Long Project Name</a>
-                        </div>
-                        <div class="mpm-project-status">
-                            Inactive
-                        </div>
-                        <div class="mpm-project-subtitle" data-bind="">randerson@fargeo.com</div>
-                    </div>
-
+                    <!-- /ko -->
                 </div>
+                <!-- /ko -->
             </div>
         </div>
 
 
-        <!-- Project Header -->
         <div id="" class="card-form-preview-container library-container">
             <div class="">
 
@@ -111,16 +86,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="relative library-header" style="height: 55px;">
 
                     <!-- Add Project -->
-                    <div class="library-panel-search-bar" style="padding-top: 10px;">
-                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="">New Project</button>
+                    <div class="library-panel-search-bar">
+                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
 
                     </div>
                 </div>
 
-                <!-- Function Grid Container -->
-                <div id="page-content" class="library-grid" style="">
+                <div id="page-content" class="library-grid" style="display:none;" data-bind="visible: true">
 
-                    <!-- Project -->
+                    <!-- ko if: selectedProject() -->
                     <div id="sample-project" class="project-panel">
 
                         <!--Project heading-->
@@ -128,7 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="">
                                 <div class="project-status active">Active</div>
                             </div>
-                            <h3 class="project-panel-title">New Project Name</h3>
+                            <h3 class="project-panel-title" data-bind="text: selectedProject().name"></h3>
 
                             <div class="">
                                 <ul class="project-metadata">
@@ -136,9 +110,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         September 19, 2017 to September 30, 2017
                                     </li>
                                 </ul>
-                                <div class="project-details">
-                                    <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="">Save Edits</button>
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="">Discard Edits</button>
+                                <div class="project-details" data-bind="if: selectedProject().dirty">
+                                    <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject">Save Edits</button>
+                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits">Discard Edits</button>
                                 </div>
                             </div>
                         </div>
@@ -203,7 +177,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
                                                                                     <label class="control-label account-label">Project name</label>
-                                                                                    <input type="text" class="form-control input-lg account-input" placeholder="" value="">
+                                                                                    <input type="text" class="form-control input-lg account-input" data-bind="value: selectedProject().name, valueUpdate: 'keyup'">
                                                                                 </div>
                                                                             </div>
 
@@ -272,506 +246,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Map Card -->
                                         <div id="location-card" class="tab-pane fade">
-                                            <div class="panel-body card-panel-body" style="">
-                                                <div id="" class="card-content">
-                                                    <div class="project-map">
-                                                        <img class="img-responsive" style="    position: absolute; top: 42px; left: 0; height: 539px;px;" src="img/arches/project_map.png" alt="Image">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            Location....
                                         </div>
 
                                         <!-- Models Card -->
                                         <div id="models-card" class="tab-pane fade">
-                                            <div class="panel-body card-panel-body">
-
-                                                <div id="" class="mpm-card-content" style="">
-                                                    <div class="flex relative">
-
-                                                        <!-- Group/Account List -->
-                                                        <div class="mpm-left-panel" style="">
-
-                                                            <!-- Title -->
-                                                            <div class="title-block-fixed" style="padding-bottom: 10px;">
-                                                                <h4 class="title-block-title">Resources</h4>
-
-                                                                <div class="list-filter" style="margin: 0px 5px;" data-bind="">
-                                                                    <input type="text" class="form-control" style="" placeholder="Find a model" data-bind="">
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Model Panel -->
-                                                            <div id="" class="library-card library-card-entry library-card-wide selected" style="width: 250px;">
-
-                                                                <!-- Resource -->
-                                                                <div class="library-card selected selected-card" data-bind="" style="margin-top: -4px; margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                                            <i class="fa fa-university" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">Assets</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Model subtitle goes here</div>
-                                                                </div>
-
-                                                                <!-- Resource -->
-                                                                <div class="library-card" data-bind="" style="margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                                            <i class="fa fa-calendar" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">Activities</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Model subtitle goes here</div>
-                                                                </div>
-
-                                                                <!-- Resource -->
-                                                                <div class="library-card" data-bind="" style="margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                                            <i class="fa fa-refresh" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">Events</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Model subtitle goes here</div>
-                                                                </div>
-
-                                                                <!-- Resource -->
-                                                                <div class="library-card" data-bind="" style="margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                                            <i class="fa fa-university" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">Information Objects</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Model subtitle goes here</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Resource Summary Panel -->
-                                                        <div class="mpm-right-panel">
-                                                            <div class="relative">
-
-                                                                <!-- Selected Model Header -->
-                                                                <div class="row">
-                                                                    <div class="col-xs-12 col-sm-5 col-md-3" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                                            <i class="fa fa-university" data-bind=""></i>
-                                                                                        </span>
-                                                                        <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind="">Assets</a>
-                                                                        </div>
-                                                                        <div class="mpm-group-subtitle" data-bind="">Model subtitle goes here</div>
-                                                                    </div>
-                                                                </div>
-
-
-                                                                <!-- Cards for selected resource -->
-                                                                <div class="mpm-account-detail-panel">
-
-                                                                    <!-- Resource Cards -->
-                                                                    <div id="resource-cards" class="list-group">
-                                                                        <!-- Title/Filter/Pagination -->
-                                                                        <div class="relative mpm-item-listing-header-panel">
-                                                                            <h4 class="mpm-item-listing-header">Data Entry Forms</h4>
-                                                                            <div class="project-search-widget mpm-item-listing">
-                                                                                <input type="text" class="form-control input-lg" placeholder="find a form...">
-                                                                            </div>
-                                                                        </div>
-
-
-                                                                        <!-- Card -->
-                                                                        <a href="#" class="list-group-item get-project-detail">
-                                                                            <h4 class="mpm-user-name">Modification Event<span class="mdm-user-status pull-right">Remove</span></h4>
-                                                                            <p class="mpm-user-subtitle">Fields: Modification Type, Modification Date, Modification Description</p>
-                                                                        </a>
-
-                                                                        <!-- Card -->
-                                                                        <a href="#" class="list-group-item get-project-detail">
-                                                                            <h4 class="mpm-user-name">Location<span class="mdm-user-status pull-right">Add</span></h4>
-                                                                            <p class="mpm-user-subtitle">Fields: Mapped Coordinates, Address, Address Type, Administrative Area, Parcel Identifier</p>
-                                                                        </a>
-                                                                    </div>
-
-                                                                    <!-- Card Detail -->
-                                                                    <div id="card-detail" class="panel hidden" style="box-shadow: none;">
-                                                                        <div class="panel-heading">
-                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">Modification Event</a><span class="mdm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
-                                                                        </div>
-
-                                                                        <!-- Details -->
-                                                                        <div class="mpm-user-summary">
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Modification Type
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Node type: Concept
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Collection: Modification_Type
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Required: yes
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Modification Date
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Node type: Date
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Required: yes
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Modification Description
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Node type: String
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Required: no
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Edit Privileges
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Resource Editors, Crowdsourcers, Guests
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            Models...
                                         </div>
 
                                         <!-- Groups Card -->
                                         <div id="group-card" class="tab-pane fade">
-                                            <div class="panel-body card-panel-body" style="">
-                                                <div id="" class="mpm-card-content" style="">
-                                                    <div class="flex relative">
-
-                                                        <!-- Group/Account List -->
-                                                        <div class="mpm-left-panel" style="">
-
-                                                            <!-- Title -->
-                                                            <div class="title-block-fixed" style="padding-bottom: 10px;">
-                                                                <h4 class="title-block-title">Groups/Accounts</h4>
-
-                                                                <div class="list-filter" style="margin: 0px 5px;" data-bind="">
-                                                                    <input type="text" class="form-control" style="" placeholder="Find user or group" data-bind="">
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Group/Account Panel -->
-                                                            <div id="" class="library-card library-card-entry library-card-wide selected" style="width: 250px;">
-
-                                                                <!-- Project -->
-                                                                <div class="library-card selected selected-card" data-bind="" style="margin-top: -4px; margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
-                                                                                            <i class="fa fa-group" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">Crowdsourcer</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Project Member</div>
-                                                                </div>
-
-                                                                <!-- Project -->
-                                                                <div class="library-card" data-bind="" style="margin-left: -5px; width: 250px;">
-                                                                    <div class="library-icon" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-success">
-                                                                                            <i class="fa fa-user" data-bind=""></i>
-                                                                                        </span>
-                                                                    </div>
-                                                                    <div class="crud-card-main">
-                                                                        <a class="listitem_name" data-bind="">adalgity@getty.edu</a>
-                                                                    </div>
-                                                                    <div class="crud-card-subtitle" data-bind="">Not Invited</div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-
-                                                        <div class="mpm-right-panel">
-
-                                                            <div class="relative">
-
-                                                                <div class="row">
-                                                                    <div class="col-xs-12 col-sm-5 col-md-3" style="" data-bind="">
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
-                                                                                            <i class="fa fa-group" data-bind=""></i>
-                                                                                        </span>
-                                                                        <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind="">Crowdsourcer</a>
-                                                                        </div>
-                                                                        <div class="mpm-group-subtitle" data-bind="">Arches Group</div>
-                                                                    </div>
-                                                                    <div class="col-sm-6" style="" data-bind="">
-                                                                        <div class="box-inline">
-                                                                            <p class="" style="margin-bottom: 0px;">Add this group to project</p>
-
-                                                                            <!--Switchery : Unchecked-->
-                                                                            <!--===================================================-->
-                                                                            <input id="demo-sw-unchecked" class="js-switch-smal" type="checkbox" style="margin-top: -5px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                            <!--===================================================-->
-
-                                                                        </div>
-
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Users in this Account -->
-                                                                <div class="mpm-account-detail-panel">
-
-                                                                    <!-- User Listing -->
-                                                                    <div id="user-cards" class="list-group">
-                                                                        <!-- Title/Filter/Pagination -->
-                                                                        <div class="relative mpm-item-listing-header-panel">
-                                                                            <h4 class="mpm-item-listing-header">Accounts in this group</h4>
-                                                                            <div class="project-search-widget mpm-item-listing">
-                                                                                <input type="text" class="form-control input-lg" placeholder="find a user...">
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">adalgity@getty.edu<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 13 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
-
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">randerson@fargeo.com<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 45 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
-
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">dmyers@getty.edu<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 15 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
-
-                                                                    </div>
-
-                                                                    <!-- User Detail -->
-                                                                    <div id="user-detail" class="panel hidden" style="box-shadow: none;">
-                                                                        <div class="panel-heading">
-                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">adalgity@getty.edu</a><span class="mdm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
-                                                                        </div>
-
-                                                                        <!-- User Detail -->
-                                                                        <div class="mpm-user-summary">
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    User Information
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Name: Alison Dalgity
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Email: <a hre="">adalgity@getty.edu</a>
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Group Membership: Admins, Editors, RDM Administrators, Mobile Project Manager
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Contributions
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Edits: 0
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        Devices (2)
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Name: Alison's iPhone (last login: September 17, 2017)
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                Name: Getty iPad #12345 (last login: September 2, 2017)
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Security
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Remove project data from from user's device on next login?
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        <!--Switchery : Unchecked-->
-                                                                                        <!--===================================================-->
-                                                                                        <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small"
-                                                                                         style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                                        <!--===================================================-->
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            Groups....
                                         </div>
 
                                         <!-- Activation Card -->
                                         <div id="activation-card" class="tab-pane fade">
-                                            <div class="panel-body card-panel-body" style="">
-                                                <div id="" class="card-content" style="">
-
-                                                    <!-- Project Summary Panel -->
-                                                    <div class="mpm-activation-panel">
-                                                        <!-- Activate Project -->
-                                                        <div class="row pad-btm">
-                                                            <!-- Activate Switch -->
-                                                            <div class="col-sm-5 col-md-3">
-
-                                                                <div class="box-inline">
-                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">Activate Project</p>
-
-                                                                    <!--Switchery : Unchecked-->
-                                                                    <!--===================================================-->
-                                                                    <input id="activate-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
-                                                                    <!--===================================================-->
-
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Help Message-->
-                                                            <div class="col-sm-6 col-md-9">
-                                                                <p class="account-tips" style="margin-top: 20px;">
-                                                                    By activating the project you will send users an email with the information needed to begin data editing activitites.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Project Settings -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Project Summary
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Number of edits: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Contributors: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Offline Basemap: Streets-Grey
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-
-                                                        <!-- User Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Groups/Users
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Groups (2)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Editors, Crowdsourcers
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Users (6)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>,
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-
-                                                        <!-- Model/Card Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Models and Data Entry Cards
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Assets (3 data entry cards)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Name, Modification Event, Condition Assessment
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Investigation Activities (3 data entry cards)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Name, Event Location, Activity Type
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
+                                            Manage....
                                         </div>
                                     </div>
                                 </div>
@@ -779,9 +269,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <div id="project-footer" class="project-footer" style="">
-                            Footer
+
                         </div>
                     </div>
+                    <!-- /ko -->
 
 
                 </div>
@@ -797,7 +288,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {{block.super}}
     <script>
         {% autoescape off %}define('project-manager-data', [], function() {
-            return {};
+            return {
+                projects: {{projects}}
+            };
         });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}
