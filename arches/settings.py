@@ -455,19 +455,7 @@ HEX_BIN_PRECISION = 4
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 9,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
     },
     {
         'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
@@ -480,6 +468,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'OPTIONS': {
+            'min_length': 9,
+        }
     },
 ]
 
