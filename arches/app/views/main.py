@@ -106,7 +106,7 @@ def signup(request):
     if request.method == 'POST':
         postdata = request.POST.copy()
         postdata['username'] = postdata['email']
-        postdate['ts'] = int(time.time())
+        postdata['ts'] = int(time.time())
         form = ArchesUserCreationForm(postdata)
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
@@ -131,6 +131,16 @@ def signup(request):
 
             messages.success(request, _('An email has been sent to %s with a link to actiivate your account' % form.cleaned_data['email']))
             showform = False
+        else:
+            try:
+                for error in form.errors.as_data()['username']:
+                    if error.code == 'unique':
+                        form.add_error('email', forms.ValidationError(
+                            _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
+                            code='unique',
+                        ))
+            except:
+                pass
     else:
         form = ArchesUserCreationForm()
 
@@ -149,24 +159,16 @@ def confirm_signup(request):
         if datetime.fromtimestamp(userinfo['ts']) + timedelta(days=1) >= datetime.fromtimestamp(int(time.time())):
             if form.is_valid():
                 user = form.save()
-                # user = authenticate(username=user.username, password=str(userinfo['password1']))
-                # if user is not None and user.is_active:
-                #     login(request, user)
-
                 return redirect('auth')
             else:
                 try:
                     for error in form.errors.as_data()['username']:
                         if error.code == 'unique':
                             return redirect('auth')
-                            # form.add_error('email', forms.ValidationError(
-                            #     _('This email address had already been regisitered with the system.  ?'),
-                            #     code='unique',
-                            # ))
                 except:
                     pass
         else:
-            form.errors['ts'] = [_('The signup link has expired, please re-enter a new password and try again.  Thanks!')]
+            form.errors['ts'] = [_('The signup link has expired, please try signing up again.  Thanks!')]
 
         return render(request, 'signup.htm', {
             'form': form,
