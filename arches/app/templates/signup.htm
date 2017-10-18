@@ -57,10 +57,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="First Name" name='firstname' autofocus value='{{postdata.firstname}}'>
+                                    <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
                             </div>
-                            {% if form.firstname.errors %}
-                            {% for error in form.firstname.errors %}
+                            {% if form.first_name.errors %}
+                            {% for error in form.first_name.errors %}
                                 <div style="color:darkred">{{ error|escape }}</div>
                             {% endfor %}
                             {% endif %}
@@ -69,10 +69,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="Last Name" name='lastname'>
+                                    <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name'>
                             </div>
-                            {% if form.lastname.errors %}
-                            {% for error in form.lastname.errors %}
+                            {% if form.last_name.errors %}
+                            {% for error in form.last_name.errors %}
                                 <div style="color:darkred">{{ error|escape }}</div>
                             {% endfor %}
                             {% endif %}
@@ -118,7 +118,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="text-right">
                                 <a class="btn btn-link" href="{% url 'home' %}" style="color:#C93011;">{% trans "Exit" %}</a>
+                                {% if showform %}
                                 <button class="btn btn-success text-uppercase" type="submit">{% trans "Signup" %}</button>
+                                {% endif %}
                             </div>
                         </div>
 

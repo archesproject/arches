@@ -95,53 +95,42 @@ def change_password(request):
 @never_cache
 def signup(request):
     
-    import ipdb
+    # import ipdb
+    # ipdb.set_trace()
     postdata = {
-        'firstname': '',
-        'lastname': '',
+        'first_name': '',
+        'last_name': '',
         'email': ''
     }
     showform = True
 
     if request.method == 'POST':
         postdata = request.POST.copy()
-        #postdata['username'] = postdata['email']
-        form = ArchesUserCreationForm(request.POST)
+        postdata['username'] = postdata['email']
+        form = ArchesUserCreationForm(postdata)
         if form.is_valid():
-            
-            obj = AESCipher(settings.SECRET_KEY)
-            message = JSONSerializer().serialize({'email': form.cleaned_data['email'], 'password': form.cleaned_data['password1'], 'date': datetime.now()})
-            ciphertext = obj.encrypt(message)
-            ciphertext = urlencode({'query':ciphertext})
-            print 'ciphertext'
-            print ciphertext
+            AES = AESCipher(settings.SECRET_KEY)
+            form.cleaned_data['date'] = datetime.now()
+            userinfo = JSONSerializer().serialize(form.cleaned_data)
+            encrypted_userinfo = AES.encrypt(userinfo)
+            url_encrypted_userinfo = urlencode({'link':encrypted_userinfo})
 
+            context = {
+                'link':request.build_absolute_uri(reverse('confirm_signup') + '?' + url_encrypted_userinfo,),
+                'greeting': _('Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login.'),
+                'closing': _('This link expires in 24 hours.  If you can\'t get to it, don\'t worry, you can always try again with the same email address.'),
+            }
 
-
-            html_content = render_to_string('email/signup_link.htm', {'url':reverse('confirm_signup') + '?link=' + ciphertext}) # ...
+            html_content = render_to_string('email/signup_link.htm', context) # ...
             text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', ['apeters@fargeo.com'])
+            msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', [form.cleaned_data['email']])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            # obj2 = AES.new('This is a key123', AES.MODE_CBC, 'This is an IV456')
-            # obj2.decrypt(ciphertext)
-            # send_mail(
-            #     'Subject here',
-            #     ciphertext,
-            #     'from@example.com',
-            #     ['apeters@fargeo.com'],
-            #     fail_silently=False,
-            # )
-            #user = form.save()
-            # user = authenticate(username=user.username, password=str(form.cleaned_data['password1']))
-            # if user is not None and user.is_active:
-            #     login(request, user)
-            messages.success(request, _('An email has been sent with a link'))
-            showform = False
 
-            #return redirect('signup')
+            messages.success(request, _('An email has been sent to %s with a link to actiivate your account' % form.cleaned_data['email']))
+            showform = False
     else:
         form = ArchesUserCreationForm()
 
@@ -153,25 +142,24 @@ def signup(request):
 
 def confirm_signup(request):
     if request.method == 'GET':
-        link_text = request.GET.get('link', None)
-        #link_text = base64.b64decode(link_text)
-        obj = ARC4.new('This is a key123')
-        obj = AESCipher(settings.SECRET_KEY)
-        message = obj.decrypt(link_text)
-        #message = JSONDeserializer().deserialize({"username": form.cleaned_data['username'], "password": form.cleaned_data['password1'], "date": "lakd"})
-       
-        #user = form.save()
-        # import ipdb
-        # ipdb.set_trace()
-        # user = authenticate(username=user.username, password=str(form.cleaned_data['password1']))
-        # if user is not None and user.is_active:
-        #     login(request, user)
-        print message
-        #return redirect('home')
+        link = request.GET.get('link', None)
 
-    return render(request, 'signup.htm', {
-        'form': ArchesUserCreationForm()
-    })
+        AES = AESCipher(settings.SECRET_KEY)
+        userinfo = JSONDeserializer().deserialize(AES.decrypt(link))
+        #userinfo['username'] = userinfo['email']
+
+        form = ArchesUserCreationForm(userinfo)
+        if form.is_valid():
+            user = form.save()
+            user = authenticate(username=user.username, password=str(userinfo['password1']))
+            if user is not None and user.is_active:
+                login(request, user)
+
+            return redirect('home')
+        else:
+            return render(request, 'signup.htm', {
+                'form': ArchesUserCreationForm()
+            })
 
 class ArchesUserCreationForm(UserCreationForm):
     """
@@ -183,19 +171,57 @@ class ArchesUserCreationForm(UserCreationForm):
     #     'password_mismatch': _("The two password fields didn't match."),
     # }
 
-    firstname = forms.CharField()
-    lastname = forms.CharField()
-    email = forms.EmailField()
+    # username = forms.CharField(
+    #     _('username'),
+    #     max_length=30,
+    #     unique=True,
+    #     help_text=_('Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+    #     validators=[
+    #         validators.RegexValidator(
+    #             r'^[\w.@+-]+$',
+    #             _('Enter a valid username. This value may contain only '
+    #               'letters, numbers ' 'and @/./+/-/_ characters.')
+    #         ),
+    #     ],
+    #     error_messages={
+    #         'unique': _("A user with that username already exists."),
+    #     },
+    # )
+
+    username = None
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField(
+        #unique=True,
+        # error_messages={
+        #     'unique': _("This email address is already regisitered with the system."),
+        # },
+    )
+  # fields=[
+  #               ('password', models.CharField(max_length=128, verbose_name='password')),
+  #               ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
+  #               ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+  #               ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=30, unique=True, validators=[django.core.validators.RegexValidator('^[\\w.@+-]+$', 'Enter a valid username. This value may contain only letters, numbers and @/./+/-/_ characters.')], verbose_name='username')),
+  #               ('first_name', models.CharField(blank=True, max_length=30, verbose_name='first name')),
+  #               ('last_name', models.CharField(blank=True, max_length=30, verbose_name='last name')),
+  #               ('email', models.EmailField(blank=True, max_length=254, verbose_name='email address')),
+  #               ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+  #               ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
+  #               ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
+  #               ('custom_id', models.AutoField(primary_key=True, serialize=False)),
+  #               ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
+  #               ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
+  #           ],
 
     class Meta:
         model = User
-        fields = ("email",)
+        fields = ('email','username','first_name','last_name')
 
   
 
 
     # def clean_password2(self):
-    #     password1 = self.cleaned_data.get("password1")
+    #     password1 = self.cleaned_data.get('password1")
     #     password2 = self.cleaned_data.get("password2")
     #     if password1 and password2 and password1 != password2:
     #         raise forms.ValidationError(
