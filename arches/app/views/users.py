@@ -69,6 +69,8 @@ class UserManagerView(BaseManagerView):
         user.first_name = request.POST.get('firstname')
         user.last_name = request.POST.get('lastname')
         user.email = request.POST.get('email')
+        if models.UserProfile.objects.filter(user=user).count() == 0:
+            models.UserProfile.objects.create(user=user)
         user.userprofile.phone = request.POST.get('phone')
         user.userprofile.save()
         user.save()
