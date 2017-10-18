@@ -3368,6 +3368,18 @@ input.cmn-toggle-yes-no:checked+label:after {
     border: 1px solid rgba(0,0,0,.2);
 }
 
+.change-password-form .error-message  {
+    font-size: 11px;
+    color: #880000;
+    padding: 2px;
+}
+
+.change-password-form .error-message-container  {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
 .change-password-form .panel-body {
     padding: 20px 15px;
 }

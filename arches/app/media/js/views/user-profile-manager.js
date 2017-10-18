@@ -19,6 +19,10 @@ define([
                 this.showEditUserForm(!this.showEditUserForm())
             };
 
+            self.viewModel.validationErrors = ko.observableArray()
+            self.viewModel.invalidPassword = ko.observable()
+            self.viewModel.mismatchedPasswords = ko.observable()
+
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',
                 new_password: '',
@@ -32,7 +36,9 @@ define([
                     method: "POST",
                     data: payload,
                 }).done(function(data){
-                    console.log(data);
+                    self.viewModel.invalidPassword(data.invalid_password);
+                    self.viewModel.mismatchedPasswords(data.mismatched);
+                    self.viewModel.validationErrors(data.password_validations);
                 }).fail(function(err){
                     console.log(err);
                 });
