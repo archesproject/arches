@@ -472,7 +472,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
         'OPTIONS': {
-            'special_characters': ('!','@','#','$','%','^','&','*',')','('),
+            'special_characters': ('!','@','#'),
         }
     },
     {

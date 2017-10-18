@@ -8,7 +8,7 @@ class SpecialCharacterValidator:
 
     """
 
-    def __init__(self, special_characters=('!','@','#','$','%','^','&','*',')','(')):
+    def __init__(self, special_characters=('!','@','#')):
         self.special_characters = special_characters
 
     def validate(self, password, user=None):
