@@ -33,7 +33,6 @@
 }
 
 
-
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
@@ -93,7 +92,6 @@
     padding: 0;
 }
 
-
 .one-page-header .navbar-nav>li>a:before {
     content: "";
 }
@@ -143,6 +141,7 @@
     color: #5f5f5f;
     border-width: 0;
 }
+
 .card-grid-item .panel-footer .disabled {
     color: #ccc;
 }
@@ -151,7 +150,7 @@
     background-color: #fafafa;
 }
 
-.card-locked div div > .library-card-panel-title {
+.card-locked div div>.library-card-panel-title {
     color: #888;
 }
 
@@ -235,7 +234,6 @@
 .outline.open-container {
     border: 1px solid #3b8dd5;
 }
-
 
 .card-nav-container {
     background: #f4f4f4;
@@ -1079,7 +1077,7 @@ a.select2-search-choice-close {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 13px;
-    height:36px;
+    height: 36px;
 }
 
 .crud-card-subtitle {
@@ -2577,16 +2575,16 @@ ul .collapse li:last-of-type {
 }
 
 .eh-timeline-time {
-	max-width: 150px;
-	margin-top: 7px;
+    max-width: 150px;
+    margin-top: 7px;
 }
 
 .eh-timeline-stat {
-	width: 140px;
+    width: 140px;
 }
 
 .eh-timeline-label {
-	margin-left: 150px;
+    margin-left: 150px;
 }
 
 .panel .eh-timeline-label:after {
@@ -2594,12 +2592,12 @@ ul .collapse li:last-of-type {
 }
 
 .eh-timeline-header {
-	padding-left: 20px;
+    padding-left: 20px;
 }
 
 .eh-timeline {
-	margin-left: 20px;
-	padding-right: 25px;
+    margin-left: 20px;
+    padding-right: 25px;
 }
 
 .eh_resource_descriptors {
@@ -2624,11 +2622,11 @@ ul .collapse li:last-of-type {
 }
 
 .panel .timeline, .panel .timeline-time .eh-timeline-time {
-	background: #ebeef0;
+    background: #ebeef0;
 }
 
 .panel .eh-timeline-time {
-	background: #ebeef0;
+    background: #ebeef0;
 }
 
 .panel .eh-timeline-label {
@@ -2642,34 +2640,34 @@ ul .collapse li:last-of-type {
 }
 
 .eh-timeline:before {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .eh-timeline:after {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .eh-editor {
-	padding-top: 15px;
-	font-size: 12px;
-	color: #888;
+    padding-top: 15px;
+    font-size: 12px;
+    color: #888;
 }
 
 .eh-footer {
-	padding: 10px;
-	margin: 20px -10px -10px -10px;
+    padding: 10px;
+    margin: 20px -10px -10px -10px;
     background: #f8f8f8;
     border-top: 1px solid #ddd;
 }
 
 .eh-edit-title {
-	font-size: 14px;
-	font-weight: 600;
-	color: #666;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
 }
 
 .eh-node-group {
-	padding-left: 10px;
+    padding-left: 10px;
 }
 
 .tile-data-list {
@@ -2721,7 +2719,6 @@ ul .collapse li:last-of-type {
 .related-resources-editor-container .content-panel {
     height: calc(100vh - 100px);
 }
-
 
 .edit-panel {
     position: absolute;
@@ -3629,7 +3626,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     /* The currently selected node */
     stroke: #115fa5;
     stroke-width: 5px;
-    stroke-dasharray: 5,1;
+    stroke-dasharray: 5, 1;
     fill: #dcecfa;
     opacity: 1.0;
     cursor: pointer;
@@ -4123,15 +4120,12 @@ ul.jqtree_common li.jqtree-folder {
     padding-top: 4px;
 }
 
-
-
-
 #container #profile-table td {
-	border-top: 1px solid rgba(0,0,0,0.0);
+    border-top: 1px solid rgba(0, 0, 0, 0.0);
 }
 
 .profile-table-body {
-	float: left;
+    float: left;
 }
 
 .profile-summary-page {
@@ -4144,24 +4138,23 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-	height: 250px;
-	background: #f2f2f2;
-	width: 100%;
-	padding: 40px 150px 0px 150px;
-	border-bottom: 1px solid #ccc;
+    height: 250px;
+    background: #f2f2f2;
+    width: 100%;
+    padding: 40px 150px 0px 150px;
+    border-bottom: 1px solid #ccc;
 }
 
 .profile-report-table {
-	position: absolute;
-	height: 130px;
-	width: 100%;
-	left: 110px;
-	padding-bottom: 10px;
+    position: absolute;
+    height: 130px;
+    width: 100%;
+    left: 110px;
+    padding-bottom: 10px;
 }
 
-
 .profile-table-divider {
-	position: absolute;
+    position: absolute;
     display: table-cell;
     height: 70px;
     margin-top: 35px;
@@ -4172,40 +4165,40 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .mar-lft.profile-table-divider {
-	border-left-width: 0px;
+    border-left-width: 0px;
 }
 
 .profile-list {
-	width: 100%;
-	padding: 40px 100px 50px 100px;
-	min-height: 170px;
-	border-bottom: 1px solid #ccc;
+    width: 100%;
+    padding: 40px 100px 50px 100px;
+    min-height: 170px;
+    border-bottom: 1px solid #ccc;
 }
 
 .profile-list.edit-mode {
-	padding: 0px 50px;
-	margin-top: -10px;
-	border-bottom: none;
+    padding: 0px 50px;
+    margin-top: -10px;
+    border-bottom: none;
 }
 
 .profile-image {
-	height: 120px;
-	width: 120px;
+    height: 120px;
+    width: 120px;
 }
 
 .profile-sections {
-	padding: 0px 0px;
+    padding: 0px 0px;
 }
 
 .profile-projects {
-	height: 100vh;
+    height: 100vh;
 }
 
 .profile-table-cell {
-	padding: 20px;
-	width: 350px;
-	position: relative;
-	top: 25px;
+    padding: 20px;
+    width: 350px;
+    position: relative;
+    top: 25px;
 }
 
 .btn-profile {
@@ -4213,158 +4206,158 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-full-name {
-	position: absolute;
-	color: #fff;
-	font-size: 2.6em;
-	top: 140px;
-	left: 100px;
+    position: absolute;
+    color: #fff;
+    font-size: 2.6em;
+    top: 140px;
+    left: 100px;
 }
 
 .profile-e-mail {
-	position: absolute;
-	color: #fff;
-	font-size: 16px;
-	top: 180px;
-	left: 100px;
-	color: #aaa;
-	font-weight: 500;
+    position: absolute;
+    color: #fff;
+    font-size: 16px;
+    top: 180px;
+    left: 100px;
+    color: #aaa;
+    font-weight: 500;
 }
 
 .profile-table-cell-title {
-	font-size: 1.5em;
-	margin-top: 8px;
-	margin-left: 10px;
+    font-size: 1.5em;
+    margin-top: 8px;
+    margin-left: 10px;
 }
 
 .profile-table-time {
-	font-size: 15px;
+    font-size: 15px;
 }
 
 .profile-table-cell-label {
-	font-size: 14px;
-	color: #888;
-	font-weight: 500;
-	margin-left: 10px;
+    font-size: 14px;
+    color: #888;
+    font-weight: 500;
+    margin-left: 10px;
 }
 
 .profile-update {
-	padding-right: 10px;
-	padding-left: 10px;
-	padding-top: 0px;
-	color: steelblue;
-	font-weight: 600;
-	font-size: 13px;
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 0px;
+    color: steelblue;
+    font-weight: 600;
+    font-size: 13px;
 }
 
 .profile-header {
-	font-size: 21px;
+    font-size: 21px;
 }
 
 .profile-image-region {
-	position: absolute;
-	top: 20px;
-	left: 30px;
+    position: absolute;
+    top: 20px;
+    left: 30px;
 }
 
 .profile-form-region {
-	position: absolute;
-	top: 20px;
-	left: 300px;
-	width: calc(100% - 350px);
+    position: absolute;
+    top: 20px;
+    left: 300px;
+    width: calc(100% - 350px);
 }
 
 .profile-form-body {
-	position: relative;
-	padding: 20px;
-	min-height: 400px;
+    position: relative;
+    padding: 20px;
+    min-height: 400px;
 }
 
 .profile-form-footer {
-	height: 50px;
+    height: 50px;
 }
 
 .profile-form-message {
-	font-size: 13px;
-	font-weight: 600;
-	margin-top: 3px;
-	margin-left: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 3px;
+    margin-left: 20px;
 }
 
 .profile-image-size {
-	height: 200px;
-	width: 200px;
+    height: 200px;
+    width: 200px;
 }
 
 .account-summary {
-	margin-top: -30px;
-	height: 200px;
-	background: #a1f1f1;
+    margin-top: -30px;
+    height: 200px;
+    background: #a1f1f1;
 }
 
 .profile-label-shim {
-	margin-top: -5px;
-	color: #777;
+    margin-top: -5px;
+    color: #777;
 }
 
 .btn-profile-password {
-	background: #fff;
-	border-width: 0px;
-	margin-top: -20px;
-	margin-left: -12px;
-	color: #579ddb;
+    background: #fff;
+    border-width: 0px;
+    margin-top: -20px;
+    margin-left: -12px;
+    color: #579ddb;
 }
 
 .account-edit-btn {
-	position: absolute;
-	top: 0px;
-	right: 60px;
+    position: absolute;
+    top: 0px;
+    right: 60px;
 }
 
 .account-tips {
-	margin-top: 10px;
-	font-size: 13px;
-	color: #777;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #777;
 }
 
 .account-input {
-	max-width: 300px;
+    max-width: 300px;
 }
 
 .account-label {
-	font-size: 14px;
-	font-weight: 500;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .btn-profile-password:hover {
-	background: #fff;
-	color: #579ddb;
+    background: #fff;
+    color: #579ddb;
 }
 
 .btn-profile-password:focus {
-	background: #fff;
-	color: #579ddb;
+    background: #fff;
+    color: #579ddb;
 }
 
 .btn-profile-password.btn-default:active {
-	background-color: #fff;
+    background-color: #fff;
     border-width: 0px;
     color: #579ddb;
 }
 
 .btn-profile-password.btn:not(.disabled):not(:disabled):active, .btn:not(.disabled):not(:disabled).active {
-	box-shadow: none;
+    box-shadow: none;
 }
 
 .password-rules {
-	font-size: 14px;
-	color: #555;
+    font-size: 14px;
+    color: #555;
 }
 
 .password-rule {
-	color: #888;
-	font-size: 13px;
-	padding-left: 5px;
-	padding-bottom: 3px;
+    color: #888;
+    font-size: 13px;
+    padding-left: 5px;
+    padding-bottom: 3px;
 }
 
 .password-rule span {
@@ -4372,54 +4365,48 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .device-summary {
-	font-size: 13px;
-	margin-bottom: -5px;
+    font-size: 13px;
+    margin-bottom: -5px;
 }
 
 .device-listing {
-	float: left;
-	margin-top: -20px;
-	padding-left: 0px;
+    float: left;
+    margin-top: -20px;
+    padding-left: 0px;
 }
 
 .device-listing li:not(:first-child) {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .device-list-item {
-	display: inline-block;
-	padding: 10px;
+    display: inline-block;
+    padding: 10px;
 }
 
 .project-search-widget {
-	position: absolute;
-	top: -45px;
-	width: 350px;
+    position: absolute;
+    top: -45px;
+    width: 350px;
 }
 
 .profile-default-message-panel {
-	text-align: center;
-	padding-top: 10px;
-	padding-bottom: 20px;
-	font-size: 17px;
-	color: #888;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-size: 17px;
+    color: #888;
 }
 
 .apple_app_store_icon {
-	height: 50px;
-	padding-top: 10px;
+    height: 50px;
+    padding-top: 10px;
 }
 
 .android_app_store_icon {
-	height: 58px;
-	margin-top: 11px;
+    height: 58px;
+    margin-top: 11px;
 }
-
-
-
-
-
-
 
 .profile-summary-container {
     position: absolute;
@@ -4900,8 +4887,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .ep-help-img-link {
-    float:right;
-    font-weight:600;
+    float: right;
+    font-weight: 600;
 }
 
 .ep-card-preview {
@@ -4985,7 +4972,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     top: 10px;
 }
 
-.card-tree-list a:hover .expando{
+.card-tree-list a:hover .expando {
     display: block;
 }
 
@@ -5139,7 +5126,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     left: 390px;
 }
 
-.title-block-fixed + .grid {
+.title-block-fixed+.grid {
     margin-top: 73px;
 }
 
@@ -5315,7 +5302,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .new-card.disabled #add-card {
-   cursor: default;
+    cursor: default;
 }
 
 .project-grid-item.disabled:hover {
@@ -5565,7 +5552,8 @@ li.aside-li.active:hover, .library-dark .tab-content {
 
 .library-card.relative.selected {
     height: 180px;
-    -webkit-transition: height 0.25s; /* Safari */
+    -webkit-transition: height 0.25s;
+    /* Safari */
     transition: height 0.25s;
     background: #ffffff;
     border-left: 5px solid steelblue;
@@ -5578,7 +5566,8 @@ li.aside-li.active:hover, .library-dark .tab-content {
 }
 
 .library-card.relative {
-    -webkit-transition: height 0.25s; /* Safari */
+    -webkit-transition: height 0.25s;
+    /* Safari */
     transition: height 0.25s;
 }
 
@@ -5901,7 +5890,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 
 .switch-panel {
-    padding:5px
+    padding: 5px
 }
 
 .switch-panel.disabled {
@@ -6141,9 +6130,9 @@ div.row.widget-wrapper {
 }
 
 a.mega-dropdown-toggle.disabled {
-   pointer-events: none;
-   cursor: default;
-   color: #aaa;
+    pointer-events: none;
+    cursor: default;
+    color: #aaa;
 }
 
 .relation-properties-button {
@@ -6700,8 +6689,6 @@ div.row.widget-wrapper.report-header:hover {
     z-index: 1100;
 }
 
-
-
 #overlay-grid {
     margin-left: 10px;
     margin-right: 0px;
@@ -6929,7 +6916,6 @@ div.row.widget-wrapper.report-header:hover {
     left: 0px;
 }
 
-
 .geocode-container-shim {
     margin-right: 265px;
 }
@@ -7032,7 +7018,6 @@ div.row.widget-wrapper.report-header:hover {
     border-left: 1px solid #999;
     right: 11px;
 }
-
 
 .iiif-wrapper .map-widget-panel {
     background-color: rgba(143, 143, 143, 0.2);
@@ -7179,7 +7164,8 @@ div.row.widget-wrapper.report-header:hover {
 #mainnav-container {
     z-index: 15;
 }
-#navbar{
+
+#navbar {
     z-index: 16;
 }
 
@@ -7511,7 +7497,7 @@ a#close-map-tools.map-widget-icon:hover {
 
 a.clear-geojson-button {
     background-image: none;
-    position:absolute;
+    position: absolute;
     top: 7px;
     right: 15px;
     font-size: 12px;
@@ -7540,7 +7526,6 @@ a.clear-geojson-button:hover {
     cursor: pointer;
 }
 
-
 .map-json-tool-item-icon {
     position: absolute;
     top: 0px;
@@ -7563,7 +7548,6 @@ a.clear-geojson-button:hover {
     overflow: scroll;
     text-overflow: ellipsis;
 }
-
 
 .map-widget-tool:nth-child(1) {
     padding-left: 0px;
@@ -7613,7 +7597,6 @@ a.clear-geojson-button:hover {
     z-index: 10;
     margin-bottom: -10px;
 }
-
 
 .map-overlay-item-tools-panel .noUi-base {
     background: #489EED;
@@ -7776,6 +7759,7 @@ a.clear-geojson-button:hover {
 .iiif-widget-panel-title {
     width: 297px;
 }
+
 
 /* Hide "Full Screen" button for map tools widget in card manager */
 
@@ -7968,7 +7952,7 @@ a.clear-geojson-button:hover {
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     background-color: rgb(249, 249, 249);
     opacity: 0.9;
 }
@@ -7980,7 +7964,7 @@ a.clear-geojson-button:hover {
     padding: 0px;
     border: solid 1px #999;
     border-radius: 2px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     background-color: rgb(249, 249, 249);
     display: flex;
     flex-direction: column;
@@ -8186,11 +8170,9 @@ a.clear-geojson-button:hover {
     cursor: pointer;
 }
 
-
-
 .search-query {
     padding-top: 10px;
-padding-tom: 10px;
+    padding-tom: 10px;
     margin-top: -20px;
     margin-left: 20px;
     margin-right: 20px;
@@ -8254,12 +8236,9 @@ a.search-query-link-captions:focus {
     transition: all .5s;
 }
 
-
-
 .search-results-panel-closed {
     left: 10px;
 }
-
 
 .search-listing-icon {
     transform: translate(0, -2px);
@@ -8964,7 +8943,7 @@ table.table.dataTable {
     color: #666;
 }
 
-a .search-type-link{
+a .search-type-link {
     height: 50px;
     width: 50px;
 }
@@ -9161,6 +9140,11 @@ a.search-facet-item.disabled {
     margin-right: 0;
 }
 
+.library-panel-search-bar {
+    position: absolute;
+    left: 10px;
+}
+
 .print-map {
     display: none;
 }
@@ -9175,6 +9159,304 @@ a.search-facet-item.disabled {
 .print-map-container {
     width: 576px;
     height: 360px;
+}
+
+.default-message {
+    font-size: 13px;
+    padding-top: 5px;
+    color: #777;
+}
+
+.project-panel-header.edit-mode {
+    height: 80px;
+}
+
+.mobile-project-manager-editor div.title-block-title {
+    width: 255px;
+    height:86px;
+}
+
+.mobile-project-manager-editor .library-card:first-child {
+    margin-top: -5px;
+}
+
+.mobile-project-manager-editor .library-card {
+    margin-left: -5px;
+}
+
+.mobile-project-manager-editor .clear-node-search {
+    top: 37px;
+}
+
+.mobile-project-manager-editor .card-nav-container {
+    margin-bottom: 0;
+}
+
+.mobile-project-manager-editor .layer-list {
+    background: transparent;
+    border-top: 0px;
+}
+
+.mpm-project-card {
+    width: 200px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.mpm-project-name {
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+}
+
+.mpm-project-subtitle {
+    width: 220px;
+    position: absolute;
+    left: 10px;
+    top: 28px;
+    padding: 2px 2px 3px 0px;
+    color: #8ba2b9;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mpm-card-content {
+    margin-top: -54px;
+    margin-left: -35px;
+}
+
+.mpm-left-panel {
+    -ms-flex: 0 0 250px;
+    -webkit-flex: 0 0 250px;
+    flex: 0 0 250px;
+    height: 540px;
+    background: #fcfcfc;
+    border-right: 1px solid #ddd;
+}
+
+.mpm-right-panel {
+    position: absolute;
+    top: 15px;
+    left: 270px;
+    width: calc(100% - 250px);
+    height: 550px;
+    padding: 10px;
+}
+
+.mpm-account-detail-panel {
+    margin: 20px 0px;
+}
+
+.mpm-group-name {
+    width: 400px;
+    position: absolute;
+    left: 55px;
+    top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.mpm-group-subtitle {
+    width: 400px;
+    position: absolute;
+    left: 55px;
+    top: 18px;
+    padding: 2px 2px 3px 0px;
+    color: #8ba2b9;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mpm-user-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #156AB7;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.mpm-user-subtitle {
+    color: #777;
+    font-size: 13px;
+}
+
+.mpm-project-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 12px;
+}
+
+.mpm-user-status {
+    color: #fff;
+    background: #3acaa1;
+    border: 1px solid #42cca5;
+    padding: 4px 10px;
+    margin-top: -4px;
+    font-size: 13px;
+    width: 75px;
+    text-align: center;
+}
+
+.mpm-user-status.add {
+    background: #f4f4f4;
+    color: #454545;
+    border: 1px solid #ddd;
+}
+
+.library-card.inactive {
+    background: #f7f7f7;
+}
+
+.mpm-item-listing-header-panel {
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+.mpm-item-listing-header {
+    color: #454545;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.project-search-widget.mpm-item-listing {
+    top: 0px;
+    right: 0px;
+}
+
+.mpm-user-summary {
+    padding: 10px;
+}
+
+.mpm-model-detail-panel {
+    padding-left: 10px;
+}
+
+.mpm-node-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #454545;
+}
+
+.mpm-node-detail-metadata {
+    list-style: none;
+}
+
+.mpm-activation-panel {
+    margin-top: -30px;
+    padding: 20px 40px;
+}
+
+.mpm-summary-panel {
+    margin-top: 10px;
+    margin-left: -10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px solid #eee;
+}
+.project-panel {
+	width: 100%;
+	border: 1px solid #3b8dd5;
+	margin-bottom: 10px;
+}
+
+.project-panel.expired {
+	background: #fcfcfc;
+	border: 1px solid #ddd;
+}
+
+.project-panel-header {
+	position: relative;
+    height: 76px;
+    padding-left: 10px;
+    color: #2b425b;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.project-panel.expired > .project-panel-header {
+	color: #888;
+}
+
+.project-panel-title {
+	font-size: 19px;
+	float: left;
+	font-weight: 500;
+	padding-left: 10px;
+	margin-top: 12px;
+	width: 500px;
+	height: 22px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.project-status {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 70px;
+	font-size: 13px;
+	color: #777;
+	padding: 3px;
+	font-style: italic;
+	background: #ddd;
+}
+
+.project-status.active {
+	background: #8bc34a;
+	color: #fff;
+}
+
+.project-metadata {
+	position: absolute;
+    top: 35px;
+    right: 5px;
+    list-style: none;
+    font-size: 14px;
+}
+
+.project-metadata-item {
+	display: inline-block;
+    padding: 6px 10px 10px 10px;
+    color: #758697;
+}
+
+.project-details {
+	position: absolute;
+	top: 40px;
+	left: 20px;
+	font-size: 14px;
+}
+
+.card-panel-body {
+	height: 500px;
+}
+
+.project-map {
+	height: 500px;
+}
+
+.project-footer {
+	height: 60px;
+	padding: 20px;
+	background: #f4f4f4;
+	font-size: 14px;
 }
 
 @keyframes loader {
@@ -9321,17 +9603,7 @@ a.search-facet-item.disabled {
 }
 
 @media print {
-    header,
-    nav,
-    footer,
-    button,
-    aside,
-    .print-btn,
-    .ep-tools,
-    .geocode-container,
-    .geometry-tools-container,
-    .geometry-editing-notifications,
-    #map-widget-container > .map-widget-container {
+    header, nav, footer, button, aside, .print-btn, .ep-tools, .geocode-container, .geometry-tools-container, .geometry-editing-notifications, #map-widget-container>.map-widget-container {
         display: none;
     }
     #content-container {
@@ -9348,7 +9620,7 @@ a.search-facet-item.disabled {
     dd {
         margin-left: 2px;
     }
-    a[href]:after{
+    a[href]:after {
         content: none;
     }
     .dl-horizontal dd {
