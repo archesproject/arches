@@ -93,7 +93,7 @@ def change_password(request):
                 user.save()
                 authenticated_user = authenticate(username=user.username, password=new_password)
                 login(request, authenticated_user)
-                messages['success'] = _('Successfully updated')
+                messages['success'] = _('Password successfully updated')
 
         except Exception as err:
             print err

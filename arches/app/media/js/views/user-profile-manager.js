@@ -12,16 +12,25 @@ define([
             var self = this;
             self.viewModel.showChangePasswordForm = ko.observable(false);
             self.viewModel.showEditUserForm = ko.observable(false);
+
+            self.viewModel.validationErrors = ko.observableArray()
+            self.viewModel.invalidPassword = ko.observable()
+            self.viewModel.mismatchedPasswords = ko.observable()
+            self.viewModel.changePasswordSuccess = ko.observable()
+
             self.viewModel.toggleChangePasswordForm = function(val){
                 this.showChangePasswordForm(!this.showChangePasswordForm())
+                if (this.showChangePasswordForm()) {
+                    self.viewModel.validationErrors([])
+                    self.viewModel.invalidPassword('')
+                    self.viewModel.mismatchedPasswords('')
+                    self.viewModel.changePasswordSuccess('')
+                }
             };
             self.viewModel.toggleEditUserForm = function(val){
                 this.showEditUserForm(!this.showEditUserForm())
             };
 
-            self.viewModel.validationErrors = ko.observableArray()
-            self.viewModel.invalidPassword = ko.observable()
-            self.viewModel.mismatchedPasswords = ko.observable()
 
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',
@@ -39,6 +48,11 @@ define([
                     self.viewModel.invalidPassword(data.invalid_password);
                     self.viewModel.mismatchedPasswords(data.mismatched);
                     self.viewModel.validationErrors(data.password_validations);
+                    if (data.success) {
+                        self.viewModel.changePasswordSuccess(data.success);
+                        self.viewModel.toggleChangePasswordForm();
+                    }
+
                 }).fail(function(err){
                     console.log(err);
                 });

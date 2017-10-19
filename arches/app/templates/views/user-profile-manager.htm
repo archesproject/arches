@@ -79,7 +79,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <h4 class="text-main">********</h4>
                                             <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
                                             {% trans 'Change password' %}</button>
+                                            <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                             <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                                <div class="arrow" style="left: 50%;"></div>
                                                 {% include 'change_password_sm.htm' %}
                                             </div>
                                         </div>
