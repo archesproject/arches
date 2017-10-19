@@ -20,6 +20,36 @@ import os
 #)
 
 
+
+#AUTH_PASSWORD_VALIDATORS = [
+#    {
+#        "NAME": "arches.app.utils.password_validation.NumericPasswordValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator", 
+#        "OPTIONS": {
+#            "special_characters": [
+#                "!", 
+#                "@", 
+#                "#"
+#            ]
+#        }
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator"
+#    }, 
+#    {
+#        "NAME": "arches.app.utils.password_validation.MinLengthValidator", 
+#        "OPTIONS": {
+#            "min_length": 9
+#        }
+#    }
+#]
+
+
 #COPYRIGHT_TEXT = 'All Rights Reserved.'
 
 #COPYRIGHT_YEAR = '2016'
