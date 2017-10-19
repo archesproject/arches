@@ -25,6 +25,7 @@ from django.db.models import Q, Max
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 
 
@@ -304,7 +305,6 @@ class FunctionXGraph(models.Model):
         managed = True
         db_table = 'functions_x_graphs'
         unique_together = ('function', 'graph',)
-
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -824,7 +824,6 @@ class IIIFManifest(models.Model):
         db_table = 'iiif_manifests'
 
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
@@ -839,6 +838,8 @@ class MobileProject(models.Model):
     active = models.BooleanField(default=False)
     createdby = models.ForeignKey(User, related_name='createdby')
     lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
+    users = models.ManyToManyField(to=User, through='MobileProjectXUser')
+    groups = models.ManyToManyField(to=Group, through='MobileProjectXGroup')
 
     def __unicode__(self):
         return self.name
@@ -846,3 +847,25 @@ class MobileProject(models.Model):
     class Meta:
         managed = True
         db_table = 'mobile_projects'
+
+
+class MobileProjectXUser(models.Model):
+    mobile_project_x_user_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_projects_x_users'
+        unique_together = ('mobile_project', 'user',)
+
+
+class MobileProjectXGroup(models.Model):
+    mobile_project_x_group_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_projects_x_groups'
+        unique_together = ('mobile_project', 'group',)
