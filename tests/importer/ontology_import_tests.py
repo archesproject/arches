@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-from shutil import copyfile
 from operator import itemgetter, attrgetter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
@@ -32,9 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class OntologyModelTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        # don't know why we have to do this after upgrading to django 1.11.6 but we now have to copy the file to the final location before loading it with the load_ontology command
-        copyfile(os.path.join(test_settings.ONTOLOGY_FIXTURES, 'cidoc_crm_v6.2.test.xml'), os.path.join(test_settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm_v6.2.test.xml'))
-        management.call_command('load_ontology', source=os.path.join(test_settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm_v6.2.test.xml'), 
+        management.call_command('load_ontology', source=os.path.join(test_settings.ONTOLOGY_FIXTURES, 'cidoc_crm_v6.2.test.xml'), 
             version='6.2', id='11111111-0000-0000-0000-000000000000', extensions=None)
         
     @classmethod
