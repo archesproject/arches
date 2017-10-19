@@ -181,17 +181,17 @@ class ResourceLoader(object):
         self.resources = []
         self.se = SearchEngineFactory().create()
 
-    option_list = BaseCommand.option_list + (
-        make_option('--source',
-            action='store',
-            dest='source',
-            default='',
-            help='.arches file containing resource records'),
-         make_option('--format',
-            action='store_true',
-            default='arches',
-            help='format extension that you would like to load: arches or shp'),
-        )
+    # option_list = BaseCommand.option_list + (
+    #     make_option('--source',
+    #         action='store',
+    #         dest='source',
+    #         default='',
+    #         help='.arches file containing resource records'),
+    #      make_option('--format',
+    #         action='store_true',
+    #         default='arches',
+    #         help='format extension that you would like to load: arches or shp'),
+    #     )
 
     def load(self, source):
         file_name, file_format = os.path.splitext(source)
