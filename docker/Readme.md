@@ -98,7 +98,7 @@ This will be used throughout your development process and does not need to be ch
 7. Set up your own Docker image build. Create a new file in the root of your project called '`Dockerfile`' (no file extension) and add these lines:
 	```
 		FROM archesproject/arches:latest
-		COPY . ${ARCHES_ROOT}
+		COPY . ${WEB_ROOT}
 	```
 
 8. Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  
@@ -119,7 +119,14 @@ This will be used throughout your development process and does not need to be ch
   *If you did not skip step 4 (mounting a volume), you will now have new files and folders on your development machine (under `./<your project name>`).  
   This is your very own Arches app. This is where you will change or edit code to adapt Arches to your needs.*
 
-10. Build the latest version of your Docker image using:
+10. Optimize your Docker build. Open your Dockerfile and edit the `COPY` command, so that only your Arches project gets copied to the image, instead of the complete root folder:
+
+	```
+		COPY ./<your project name> ${WEB_ROOT}
+	```
+	*Note: `your project name` must be the same as the value set in `ARCHES_PROJECT` in step 2.*  
+	
+11. Build the latest version of your Docker image using:
 	```
 		docker-compose -f .\docker-compose-local.yml build
 	```

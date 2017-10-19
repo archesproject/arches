@@ -74,7 +74,8 @@ ADD ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements
 ADD ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
-	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt &&\
+	pip install 'gunicorn==19.7.1'
 
 # Install the Arches application
 COPY . ${ARCHES_ROOT}
