@@ -3375,6 +3375,14 @@ input.cmn-toggle-yes-no:checked+label:after {
 	top: 50px;
 }
 
+.profile-toolbar {
+    top: 50px;
+    width: 100%;
+    height: 50px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
 .change-password-form .error-message  {
     font-size: 11px;
     color: #880000;

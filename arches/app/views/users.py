@@ -37,7 +37,7 @@ class UserManagerView(BaseManagerView):
         context['nav']['icon'] = "fa fa-user"
         context['nav']['title'] = _("Profile Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+        context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
         context['validation_help'] = validation.password_validators_help_texts()
         return render(request, 'views/user-profile-manager.htm', context)
 
@@ -49,7 +49,7 @@ class UserManagerView(BaseManagerView):
         context['nav']['icon'] = "fa fa-user"
         context['nav']['title'] = _("Profile Manager")
         context['nav']['login'] = True
-        context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+        context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
         context['validation_help'] = validation.password_validators_help_texts()
 
         user = models.User.objects.get(pk=request.user.id)
