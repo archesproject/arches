@@ -9116,11 +9116,17 @@ a.search-facet-item.disabled {
     width: 255px;
     height:86px;
 }
+
 .mobile-project-manager-editor .library-card:first-child {
     margin-top: -5px;
 }
+
 .mobile-project-manager-editor .library-card {
     margin-left: -5px;
+}
+
+.mobile-project-manager-editor .clear-node-search {
+    top: 37px;
 }
 
 .mobile-project-manager-editor .card-nav-container {

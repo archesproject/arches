@@ -22,6 +22,7 @@ from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -823,6 +824,8 @@ class MobileProject(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     active = models.BooleanField(default=False)
+    createdby = models.ForeignKey(User, related_name='createdby')
+    lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
 
     def __unicode__(self):
         return self.name

@@ -24,13 +24,25 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.views.base import BaseManagerView
+from django.contrib.auth.models import User, Group
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class ProjectManagerView(BaseManagerView):
     def get(self, request):
         projects = models.MobileProject.objects.order_by('name')
+        identities = []
+        for group in Group.objects.all():
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
+        for user in User.objects.filter():
+            groups = []
+            default_perms = []
+            for group in user.groups.all():
+                groups.append(group.name)
+                default_perms = default_perms + list(group.permissions.all())
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser})
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
+            identities=JSONSerializer().serialize(identities),
             main_script='views/project-manager',
         )
 
@@ -44,10 +56,12 @@ class ProjectManagerView(BaseManagerView):
         data = JSONDeserializer().deserialize(request.body)
         if data['id'] is None:
             project = models.MobileProject()
+            project.createdby = self.request.user
         else:
             project = models.MobileProject.objects.get(pk=data['id'])
         project.name = data['name']
         project.active = data['active']
+        project.lasteditedby = self.request.user
         with transaction.atomic():
             project.save()
         return JSONResponse({'success':True, 'project': project})

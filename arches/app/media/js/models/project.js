@@ -9,9 +9,24 @@ define([
 
         initialize: function(options) {
             var self = this;
+            self.identities = options.identities || [];
             self._project = ko.observable('{}');
             self.name = ko.observable('');
             self.active = ko.observable(false);
+            self.createdby = ko.observable(null);
+            self.lasteditedby = ko.observable(null);
+            var getUserName = function(id) {
+                var user = _.find(self.identities, function(i) {
+                    return i.type === 'user' && i.id === id;
+                });
+                return user ? user.name : '';
+            };
+            self.createdbyName = ko.computed(function () {
+                return getUserName(self.createdby());
+            });
+            self.lasteditedbyName = ko.computed(function () {
+                return getUserName(self.lasteditedby());
+            });
 
             self.parse(options.source);
 
@@ -34,6 +49,8 @@ define([
             self._project(JSON.stringify(source));
             self.name(source.name);
             self.active(source.active);
+            self.createdby(source.createdby_id);
+            self.lasteditedby(source.lasteditedby_id);
 
             self.set('id', source.id);
         },
@@ -55,6 +72,8 @@ define([
                 }
                 if (status==='success') {
                     self.set('id', request.responseJSON.project.id);
+                    self.createdby(request.responseJSON.project.createdby_id);
+                    self.lasteditedby(request.responseJSON.project.lasteditedby_id);
                     this._project(this.json());
                 };
             };

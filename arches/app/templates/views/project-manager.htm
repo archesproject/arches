@@ -39,10 +39,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
                         <h4 class="title-block-title">Projects</h4>
-                        <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="">
+                        <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind=""><i class="fa fa-times-circle"></i></span>
+                        <span class="clear-node-search" data-bind="visible: projectFilter().length > 0, click: function() { projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
 
                 </div>
@@ -64,13 +64,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- ko if: projects().length >  0 -->
                 <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected" style="width: 270px;">
-                    <!-- ko foreach: projects -->
+                    <!-- ko foreach: filteredProjects() -->
                     <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: $parent.selectedProject" style="width: 270px;">
                         <div class="mpm-project-card">
-                            <a class="mpm-project-name" data-bind="text: name"></a>
+                            <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></a>
                         </div>
                         <div class="mpm-project-status" data-bind="text: active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
-                        <div class="mpm-project-subtitle" data-bind="">adaligty@getty.edu</div>
+                        <div class="mpm-project-subtitle" data-bind="text: createdbyName"></div>
                     </div>
                     <!-- /ko -->
                 </div>
@@ -100,14 +100,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--Project heading-->
                         <div class="project-panel-header edit-mode">
                             <div class="">
-                                <div class="project-status active">Active</div>
+                                <div class="project-status" data-bind="css: selectedProject().active() ? 'active' : 'inactive', text: selectedProject().active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                             </div>
-                            <h3 class="project-panel-title" data-bind="text: selectedProject().name"></h3>
+                            <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Project" %}' : selectedProject().name()"></h3>
 
                             <div class="">
                                 <ul class="project-metadata">
                                     <li class="project-metadata-item">
-                                        September 19, 2017 to September 30, 2017
+                                        PROJECT DATE RANGE HERE...
                                     </li>
                                 </ul>
                                 <div class="project-details" data-bind="if: selectedProject().dirty">
@@ -191,48 +191,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <hr style="border-color: #eee;">
 
-                                                                        <!-- Account First Name -->
-                                                                        <div class="row">
-                                                                            <!-- Names -->
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">Project start</label>
-                                                                                    <input type="text" class="form-control input-lg account-input" placeholder="" value="">
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-sm-6">
-                                                                                <p class="account-tips">
-                                                                                    The project start and end dates are used to limit when people can add or edit Arches data.
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <!-- Account Last Name -->
-                                                                        <div class="row">
-                                                                            <!-- Names -->
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">Project end</label>
-                                                                                    <input type="text" class="form-control input-lg account-input" placeholder="" value="">
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <hr style="border-color: #eee;">
-
-                                                                        <!-- Contact Email -->
-                                                                        <div class="row">
-                                                                            <!-- Names -->
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">Description</label>
-                                                                                    <div>
-                                                                                        Full width text editor goes here
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                        </div>
                                                                     </div>
 
                                                                 </div>
@@ -289,7 +247,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script>
         {% autoescape off %}define('project-manager-data', [], function() {
             return {
-                projects: {{projects}}
+                projects: {{projects}},
+                identities: {{identities}}
             };
         });{% endautoescape %}
     </script>
