@@ -112,7 +112,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- ko if: showAuthMenu -->
                         <ul class="auth-options">
                             <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
-                            <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
+                            <li><a href="{% url 'user_profile_manager' %}">{% trans 'User Profile' %}</a></li>
                         </ul>
                         <!-- /ko -->
                     </ul>

@@ -328,7 +328,7 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 ###   RUN TIME CONFIGURABLE SETTINGS   ###
 ##########################################
 
-
+PHONE_REGEX = r'^\+\d{8,15}$'
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15
@@ -455,24 +455,12 @@ HEX_BIN_PRECISION = 4
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 9,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
     },
     {
         'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
         'OPTIONS': {
-            'special_characters': ('!','@','#','$','%','^','&','*',')','('),
+            'special_characters': ('!','@','#'),
         }
     },
     {
@@ -480,6 +468,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'OPTIONS': {
+            'min_length': 9,
+        }
     },
 ]
 

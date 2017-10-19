@@ -405,6 +405,10 @@ input[type="checkbox"] {
     overflow-y: hidden;
 }
 
+.scroll-y-auto {
+    overflow-y: auto;
+}
+
 .tab-base .nav-tabs>li:not(.active)>a:hover {
     border-top: 1px solid #eee;
     border-right: 1px solid #eee;
@@ -3353,9 +3357,58 @@ input.cmn-toggle-yes-no:checked+label:after {
     font-weight: 300;
 }
 
-.change-password-form .success {
-    color: steelblue;
-    padding: 5px;
+.change-password-form.popover {
+    display: block;
+    margin-top: 65px;
+    font-size: 14px;
+    width: 250px;
+    border: 1px solid rgba(0,0,0,.2);
+}
+
+.change-password-form .panel {
+    margin-bottom: 0px;
+}
+
+.profile-summary-page .password-success {
+	color: green;
+	position: absolute;
+	top: 50px;
+}
+
+.change-password-form .error-message  {
+    font-size: 11px;
+    color: #880000;
+    padding: 2px;
+}
+
+.change-password-form .error-message-container  {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.change-password-form .panel-body {
+    padding: 20px 15px;
+}
+
+.change-password-form .panel-heading {
+    text-align: left;
+    position: relative;
+    padding-top: 10px;
+    height: 40px;
+    background-color: #f5f6f7;
+    color: #5c7174;
+    padding-left: 15px;
+    line-height: 1.1;
+    border-bottom: solid 0.5px #babebf;
+    font-weight: 300;
+}
+
+.change-password-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width:100%;
 }
 
 .img-login {
@@ -4076,9 +4129,12 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-summary-page {
-    padding-top: 50px;
-    width: 100%;
-    background: #fff;
+	width: 100%;
+	background: #fff;
+}
+
+.profile-summary-page .img-responsive {
+	max-height: 249px;
 }
 
 .profile-report {
@@ -4146,7 +4202,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .btn-profile {
-    width: 60px;
+	width: 65px;
 }
 
 .profile-full-name {
@@ -4302,6 +4358,10 @@ ul.jqtree_common li.jqtree-folder {
     font-size: 13px;
     padding-left: 5px;
     padding-bottom: 3px;
+}
+
+.password-rule span {
+	padding-left: 3px;
 }
 
 .device-summary {
@@ -6421,7 +6481,6 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .report-toolbar {
-    position: fixed;
     top: 50px;
     width: calc(100% - 50px);
     height: 50px;

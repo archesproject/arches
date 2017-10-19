@@ -14,6 +14,17 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='UserProfile',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('phone', models.CharField(blank=True, max_length=16)),
+                ('user', models.OneToOneField(on_delete=CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'db_table': 'user_profile',
+            },
+        ),
+        migrations.CreateModel(
             name='MobileProject',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),

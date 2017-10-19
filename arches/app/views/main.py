@@ -16,17 +16,19 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.shortcuts import render, redirect
-from django.views.decorators.cache import never_cache
-from django.contrib.auth import authenticate, login, logout
-from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 from arches.app.models.system_settings import settings
-
-
+from arches.app.utils.JSONResponse import JSONResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+import django.contrib.auth.password_validation as validation
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.shortcuts import render, redirect
+from django.utils.translation import ugettext as _
+from django.views.decorators.cache import never_cache
 
 
 def index(request):
@@ -68,20 +70,37 @@ def auth(request):
                 'next': next
             })
 
-@never_cache
+@login_required
 def change_password(request):
+    messages = {'invalid_password': None, 'password_validations': None, 'success': None, 'other': None, 'mismatched':None}
+    user = request.user
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, _('Your password has been updated'))
-            return redirect('change_password')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.htm', {
-        'form': form
-    })
+        try:
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            new_password2 = request.POST.get('new_password2')
+            if user.check_password(old_password) == False:
+                messages['invalid_password'] = _("Invalid password")
+            if new_password != new_password2:
+                messages['mismatched'] = _("New password and confirmation must match")
+            try:
+                validation.validate_password(new_password, user)
+            except ValidationError as val_err:
+                messages['password_validations'] = val_err.messages
+
+            if messages["invalid_password"] == None and messages["password_validations"] == None and messages["mismatched"] == None:
+                user.set_password(new_password)
+                user.save()
+                authenticated_user = authenticate(username=user.username, password=new_password)
+                login(request, authenticated_user)
+                messages['success'] = _('Password successfully updated')
+
+        except Exception as err:
+            print err
+            messages['other'] = err
+
+    return JSONResponse(messages)
+
 
 def search(request):
     return render(request, 'views/search.htm')
