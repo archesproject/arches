@@ -208,9 +208,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="account-tips">
                                                 Your password must have:
                                                 <ul class="list-unstyled">
-                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> 8 or more characters</li>
-                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 number</li>
-                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i> At least 1 capital letter</li>
+                                                    {% for message in validation_help %}
+                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i>{{ message }}</li>
+                                                    {% endfor %}
                                                 </ul>
                                             </div>
                                         </div>

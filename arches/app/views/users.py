@@ -22,13 +22,14 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.base import BaseManagerView
 from django.core.exceptions import ValidationError
+import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 
 class UserManagerView(BaseManagerView):
 
     def get(self, request):
-        print 'loading request'
+
         context = self.get_context_data(
             main_script='views/user-profile-manager',
         )
@@ -37,9 +38,8 @@ class UserManagerView(BaseManagerView):
         context['nav']['title'] = _("Profile Manager")
         context['nav']['login'] = True
         context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
-
+        context['validation_help'] = validation.password_validators_help_texts()
         return render(request, 'views/user-profile-manager.htm', context)
-
 
     def post(self, request):
 
@@ -50,6 +50,7 @@ class UserManagerView(BaseManagerView):
         context['nav']['title'] = _("Profile Manager")
         context['nav']['login'] = True
         context['nav']['help'] = (_('Creating Resources'),'help/resource-editor-landing-help.htm')
+        context['validation_help'] = validation.password_validators_help_texts()
 
         user = models.User.objects.get(pk=request.user.id)
         if user.username != request.POST.get('username'):
