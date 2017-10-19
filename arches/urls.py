@@ -24,7 +24,7 @@ from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView
 from arches.app.views.concept import RDMView
-from arches.app.views.users import UserManagerView
+from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.project import ProjectManagerView
