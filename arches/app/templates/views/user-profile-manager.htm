@@ -193,30 +193,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </p>
                                         </div>
                                     </div>
-                                    <hr style="border-color: #eee;">
-
-                                    <!-- Password, again -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Password' %}</label>
-                                                <input type="password" class="form-control input-lg account-input" placeholder="" value="123456">
-                                                <label class="control-label  account-label mar-top">{% trans 'Repeat Password' %}</label>
-                                                <input type="password" class="form-control input-lg account-input" placeholder="" value="123456">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                            <div class="account-tips">
-                                                Your password must have:
-                                                <ul class="list-unstyled">
-                                                    {% for message in validation_help %}
-                                                    <li class="password-rule"><i class="ion-checkmark-circled"></i>{{ message }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </form>
                                 <!-- /ko -->
                             </div>
