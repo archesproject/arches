@@ -164,7 +164,10 @@ class Command(BaseCommand):
             # usually store them then leave it there and just save a reference to it
             path = self.get_relative_path(data_source)
         else:
-            path = File(open(data_source))
+            # need to add the name argument for this to work like it used too
+            # see: https://code.djangoproject.com/ticket/26644
+            # and this: https://github.com/django/django/commit/914c72be2abb1c6dd860cb9279beaa66409ae1b2#diff-d6396b594a8f63ee1e12a9278e1999edL57
+            path = File(open(data_source), name=filename)
 
         ontology, created = models.Ontology.objects.get_or_create(path=path, parentontology=parentontology, defaults={'version': version, 'name': name, 'path': path, 'pk': id})
 

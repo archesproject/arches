@@ -213,8 +213,10 @@ class Migration(migrations.Migration):
                     }'
                 );
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig) VALUES ('10000000-0000-0000-0000-000000000020', 'csv-chart-widget', 'views/components/widgets/csv-chart', 'csv-chart-json', '{"acceptedFiles": "", "maxFilesize": "200"}');
-            INSERT INTO d_data_types VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
-            INSERT INTO d_data_types VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/components/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
+            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) 
+                VALUES ('csv-chart-json', 'fa fa-line-chart', 'datatypes.py', 'CSVChartJsonDataType', null, null, null, FALSE, '10000000-0000-0000-0000-000000000020');
+            INSERT INTO d_data_types(datatype, iconclass, modulename, classname, defaultconfig, configcomponent, configname, isgeometric, defaultwidget) 
+                VALUES ('iiif-drawing', 'fa fa-file-code-o', 'datatypes.py', 'IIIFDrawingDataType', '{"rdmCollection": null}', 'views/components/datatypes/concept', 'concept-datatype-config', FALSE, '10000000-0000-0000-0000-000000000022');
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('datatypes.py', 'DomainListDataType') WHERE datatype = 'domain-value-list';
             """,

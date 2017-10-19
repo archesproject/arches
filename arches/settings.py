@@ -328,7 +328,7 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 ###   RUN TIME CONFIGURABLE SETTINGS   ###
 ##########################################
 
-
+PHONE_REGEX = r'^\+\d{8,15}$'
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 RELATED_RESOURCES_PER_PAGE = 15
@@ -452,6 +452,30 @@ HEX_BIN_PRECISION = 4
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
+        'OPTIONS': {
+            'special_characters': ('!','@','#'),
+        }
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'OPTIONS': {
+            'min_length': 9,
+        }
+    },
+]
 
 try:
     from settings_local import *

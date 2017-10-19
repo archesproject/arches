@@ -28,13 +28,16 @@ from django.utils.http import urlencode
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+import django.contrib.auth.password_validation as validation
 from arches.app.models.system_settings import settings
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from Crypto.Cipher import AES
 from Crypto import Random
@@ -78,20 +81,37 @@ def auth(request):
                 'next': next
             })
 
-@never_cache
+@login_required
 def change_password(request):
+    messages = {'invalid_password': None, 'password_validations': None, 'success': None, 'other': None, 'mismatched':None}
+    user = request.user
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, _('Your password has been updated'))
-            return redirect('change_password')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.htm', {
-        'form': form
-    })
+        try:
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            new_password2 = request.POST.get('new_password2')
+            if user.check_password(old_password) == False:
+                messages['invalid_password'] = _("Invalid password")
+            if new_password != new_password2:
+                messages['mismatched'] = _("New password and confirmation must match")
+            try:
+                validation.validate_password(new_password, user)
+            except ValidationError as val_err:
+                messages['password_validations'] = val_err.messages
+
+            if messages["invalid_password"] == None and messages["password_validations"] == None and messages["mismatched"] == None:
+                user.set_password(new_password)
+                user.save()
+                authenticated_user = authenticate(username=user.username, password=new_password)
+                login(request, authenticated_user)
+                messages['success'] = _('Password successfully updated')
+
+        except Exception as err:
+            print err
+            messages['other'] = err
+
+    return JSONResponse(messages)
+
 
 @never_cache
 def signup(request):

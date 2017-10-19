@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.conf.urls.i18n import patterns
 from arches.app.views import concept, main, map, search, graph, tileserver
 from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
@@ -27,6 +26,7 @@ from arches.app.views.concept import RDMView
 from arches.app.views.users import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
+from arches.app.views.project import ProjectManagerView
 from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -117,6 +117,7 @@ urlpatterns = [
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
     url(r'^user/*', UserManagerView.as_view(), name="user_profile_manager"),
+    url(r'^project_manager/*', ProjectManagerView.as_view(), name="project_manager"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 import os, sys, subprocess, shutil, csv, json
 import urllib, uuid, glob
+from datetime import datetime
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
@@ -37,6 +38,7 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.formats.format import MissingGraphException
 from arches.app.utils.data_management.resources.formats.csvfile import MissingConfigException
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs import exporter as ResourceGraphExporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
@@ -52,7 +54,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -165,6 +167,9 @@ class Command(BaseCommand):
         if options['operation'] == 'import_graphs':
             self.import_graphs(options['source'])
 
+        if options['operation'] == 'export_graphs':
+            self.export_graphs(options['dest_dir'], options['graphs'])
+
         if options['operation'] == 'import_business_data':
             self.import_business_data(options['source'], options['config_file'], options['overwrite'], options['bulk_load'])
 
@@ -249,7 +254,7 @@ class Command(BaseCommand):
 
     def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
 
-        def load_system_settings():
+        def load_system_settings(package_dir):
             update_system_settings = True
             if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
                 response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
@@ -260,14 +265,14 @@ class Command(BaseCommand):
                     update_system_settings = False
 
             if update_system_settings == True:
-                if len(glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))) > 0:
-                    system_settings = glob.glob(os.path.join(download_dir, '*', 'system_settings', 'System_Settings.json'))[0]
+                if len(glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))) > 0:
+                    system_settings = glob.glob(os.path.join(package_dir, 'system_settings', 'System_Settings.json'))[0]
                     shutil.copy(system_settings, settings.SYSTEM_SETTINGS_LOCAL_PATH)
                     self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
 
 
-        def load_resource_to_resource_constraints():
-            config_paths = glob.glob(os.path.join(download_dir, '*', 'package_config.json'))
+        def load_resource_to_resource_constraints(package_dir):
+            config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs['permitted_resource_relationships']:
@@ -277,8 +282,8 @@ class Command(BaseCommand):
                         resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
                     )
 
-        def load_resource_views():
-            resource_views = glob.glob(os.path.join(download_dir, '*', 'business_data','resource_views', '*.sql'))
+        def load_resource_views(package_dir):
+            resource_views = glob.glob(os.path.join(package_dir, 'business_data','resource_views', '*.sql'))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
@@ -289,16 +294,16 @@ class Command(BaseCommand):
                 print e
                 print 'Could not connect to db'
 
-        def load_graphs():
-            branches = glob.glob(os.path.join(download_dir, '*', 'graphs', 'branches'))[0]
-            resource_models = glob.glob(os.path.join(download_dir, '*', 'graphs', 'resource_models'))[0]
+        def load_graphs(package_dir):
+            branches = glob.glob(os.path.join(package_dir, 'graphs', 'branches'))[0]
+            resource_models = glob.glob(os.path.join(package_dir, 'graphs', 'resource_models'))[0]
             # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
             self.import_graphs(branches, overwrite_graphs=False)
             self.import_graphs(resource_models, overwrite_graphs=False)
 
-        def load_concepts(overwrite, stage):
-            concept_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'concepts', '*.xml'))
-            collection_data = glob.glob(os.path.join(download_dir, '*', 'reference_data', 'collections', '*.xml'))
+        def load_concepts(package_dir, overwrite, stage):
+            concept_data = glob.glob(os.path.join(package_dir, 'reference_data', 'concepts', '*.xml'))
+            collection_data = glob.glob(os.path.join(package_dir, 'reference_data', 'collections', '*.xml'))
 
             for path in concept_data:
                 self.import_reference_data(path, overwrite, stage)
@@ -329,22 +334,22 @@ class Command(BaseCommand):
 
                 self.add_tileserver_layer(meta['name'], path, meta['icon'], basemap)
 
-        def load_map_layers():
-            basemap_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
-            overlay_styles = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
+        def load_map_layers(package_dir):
+            basemap_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
+            overlay_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-            tile_server_basemaps = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'basemaps', '*', '*.xml'))
-            tile_server_overlays = glob.glob(os.path.join(download_dir, '*', 'map_layers', 'tile_server', 'overlays', '*', '*.xml'))
+            tile_server_basemaps = glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'basemaps', '*', '*.xml'))
+            tile_server_overlays = glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'overlays', '*', '*.xml'))
             load_tile_server_layers(tile_server_basemaps, True)
             load_tile_server_layers(tile_server_overlays, False)
 
-        def load_business_data():
+        def load_business_data(package_dir):
             business_data = []
-            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.json'))
-            business_data += glob.glob(os.path.join(download_dir, '*', 'business_data','*.csv'))
-            relations = glob.glob(os.path.join(download_dir, '*', 'business_data', 'relations', '*.relations'))
+            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.json'))
+            business_data += glob.glob(os.path.join(package_dir, 'business_data','*.csv'))
+            relations = glob.glob(os.path.join(package_dir, 'business_data', 'relations', '*.relations'))
 
             for path in business_data:
                 if path.endswith('csv'):
@@ -356,15 +361,15 @@ class Command(BaseCommand):
             for relation in relations:
                 self.import_business_data_relations(relation)
 
-            uploaded_files = glob.glob(os.path.join(download_dir, '*', 'business_data','files','*'))
+            uploaded_files = glob.glob(os.path.join(package_dir, 'business_data','files','*'))
             dest_files_dir = os.path.join(settings.MEDIA_ROOT, 'uploadedfiles')
             if os.path.exists(dest_files_dir) == False:
                 os.makedirs(dest_files_dir)
             for f in uploaded_files:
                 shutil.copy(f, dest_files_dir)
 
-        def load_extensions(ext_type, cmd):
-            extensions = glob.glob(os.path.join(download_dir, '*', 'extensions', ext_type, '*'))
+        def load_extensions(package_dir, ext_type, cmd):
+            extensions = glob.glob(os.path.join(package_dir, 'extensions', ext_type, '*'))
             root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
             component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(root, ext_type)
@@ -390,62 +395,71 @@ class Command(BaseCommand):
                     shutil.copy(module, module_dir)
                     management.call_command(cmd, 'register', source=module)
 
-        def load_widgets():
-            load_extensions('widgets', 'widget')
+        def load_widgets(package_dir):
+            load_extensions(package_dir, 'widgets', 'widget')
 
-        def load_functions():
-            load_extensions('functions', 'fn')
+        def load_functions(package_dir):
+            load_extensions(package_dir, 'functions', 'fn')
 
-        def load_datatypes():
-            load_extensions('datatypes', 'datatype')
+        def load_datatypes(package_dir):
+            load_extensions(package_dir, 'datatypes', 'datatype')
 
-        try:
-            urllib.urlopen(source)
-            remote = True
-        except:
-            remote = False
+        def handle_source(source):
 
-        if os.path.exists(source) or remote == True:
+            if os.path.isdir(source):
+                return source
+            
+            package_dir = False
+            
+            unzip_into_dir = os.path.join(os.getcwd(),'_pkg_' + datetime.now().strftime('%y%m%d_%H%M%S'))
+            os.mkdir(unzip_into_dir)
+            
+            if source.endswith(".zip") and os.path.isfile(source):
+                unzip_file(source, unzip_into_dir)
+            
+            try:
+                zip_file = os.path.join(unzip_into_dir,"source_data.zip")
+                urllib.urlretrieve(source, zip_file)
+                unzip_file(zip_file, unzip_into_dir)
+            except:
+                pass
+            
+            for i in os.listdir(unzip_into_dir):
+                full_path = os.path.join(unzip_into_dir,i)
+                if os.path.isdir(full_path):
+                    package_dir = full_path
+                    break
+            
+            return package_dir
+            
+        package_location = handle_source(source)
+        if not package_location:
+            raise Exception("this is an invalid package source")
 
-            if remote == True:
-                download_dir = os.path.join(os.getcwd(),'temp_' + str(uuid.uuid4()))
-                if os.path.exists(download_dir) == False:
-                    os.mkdir(download_dir)
-                    zip_file = os.path.join(download_dir, 'source_data.zip')
-                    urllib.urlretrieve(source, zip_file)
-            else:
-                download_dir = os.path.dirname(source)
-                zip_file = source
+        if setup_db != False:
+            if setup_db.lower() in ('t', 'true', 'y', 'yes'):
+                self.setup_db(settings.PACKAGE_NAME)
 
-            unzip_file(zip_file, download_dir)
-
-            if setup_db != False:
-                if setup_db.lower() in ('t', 'true', 'y', 'yes'):
-                    self.setup_db(settings.PACKAGE_NAME)
-
-            print 'loading system settings'
-            load_system_settings()
-            print 'loading widgets'
-            load_widgets()
-            print 'loading functions'
-            load_functions()
-            print 'loading datatypes'
-            load_datatypes()
-            print 'loading concepts'
-            load_concepts(overwrite_concepts, stage_concepts)
-            print 'loading resource models and branches'
-            load_graphs()
-            print 'loading resource to resource constraints'
-            load_resource_to_resource_constraints()
-            print 'loading map layers'
-            load_map_layers()
-            print 'loading business data - resource instances and relationships'
-            load_business_data()
-            print 'loading resource views'
-            load_resource_views()
-
-        else:
-            print "A path to a local or remote zipfile is required"
+        print 'loading system settings'
+        load_system_settings(package_location)
+        print 'loading widgets'
+        load_widgets(package_location)
+        print 'loading functions'
+        load_functions(package_location)
+        print 'loading datatypes'
+        load_datatypes(package_location)
+        print 'loading concepts'
+        load_concepts(package_location, overwrite_concepts, stage_concepts)
+        print 'loading resource models and branches'
+        load_graphs(package_location)
+        print 'loading resource to resource constraints'
+        load_resource_to_resource_constraints(package_location)
+        print 'loading map layers'
+        load_map_layers(package_location)
+        print 'loading business data - resource instances and relationships'
+        load_business_data(package_location)
+        print 'loading resource views'
+        load_resource_views(package_location)
 
     def update_project_templates(self):
         """
@@ -509,7 +523,8 @@ class Command(BaseCommand):
             'WSGI_APPLICATION',
             'LOGGING',
             'LOGIN_URL',
-            'SYSTEM_SETTINGS_LOCAL_PATH'
+            'SYSTEM_SETTINGS_LOCAL_PATH',
+            'AUTH_PASSWORD_VALIDATORS'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
@@ -802,6 +817,22 @@ class Command(BaseCommand):
                         archesfile = JSONDeserializer().deserialize(f)
                         ResourceGraphImporter(archesfile['graph'], overwrite_graphs)
 
+    def export_graphs(self, data_dest='', graphs=''):
+        """
+        Exports graphs to arches.json.
+
+        """
+        if data_dest != '':
+            graphs = [graph.strip() for graph in graphs.split(',')]
+            for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)['graph']:
+                graph_name = graph['name'].replace('/', '-')
+                with open(os.path.join(data_dest, graph_name + '.json'), 'wb') as f:
+                    f.write(JSONSerializer().serialize({'graph': [graph]}, indent=4))
+        else:
+            print '*'*80
+            print 'No destination directory specified. Please rerun this command with the \'-d\' parameter populated.'
+            print '*'*80
+            sys.exit()
 
     def save_system_settings(self, data_dest=settings.SYSTEM_SETTINGS_LOCAL_PATH, file_format='json', config_file=None, graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID, single_file=False):
         resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)

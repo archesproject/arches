@@ -140,6 +140,7 @@
                 concept_value: "{% url 'concept_value' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_make_collection: "{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                change_password: "{% url 'change_password' %}",
                 export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept_collections: "{% url 'export_concept_collections' %}",
                 dropdown: "{% url 'dropdown' %}",
@@ -184,7 +185,8 @@
                 report_manager: function(graphid){return "{% url 'report_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)}
+                permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                project: "{% url 'project_manager' %}"
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",

@@ -5,12 +5,11 @@ define([
     'knockout-mapping',
     'arches',
     'views/resource/related-resources-node-list',
-    'view-data',
     'bindings/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList, viewData) {
+], function($, Backbone, ko, koMapping, arches, RelatedResourcesNodeList) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this;
@@ -32,7 +31,6 @@ define([
                 items: self.graphNodeList
             });
             this.useSemanticRelationships = arches.useSemanticRelationships;
-            this.graphs = _.indexBy(viewData.createableResources, 'graphid');
             this.selectedOntologyClass = ko.observable();
             this.resourceRelationships = ko.observableArray();
             this.paginator = koMapping.fromJS({});
@@ -155,7 +153,7 @@ define([
                                 }
                             }
                             relationship['resource'] = res.length > 0 ? res[0] : "";
-                            relationship.iconclass = viewModel.graphs[relationship.resource.graph_id].iconclass
+                            relationship.iconclass = viewModel.graphNameLookup[relationship.resource.graph_id].icon
                             relationshipsWithResource.push(relationship)
                         }, this)
                         var sorted = _(relationshipsWithResource).chain()

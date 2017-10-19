@@ -29,7 +29,7 @@
                     <i class="fa fa-check-circle-o"></i>
                     <p>{% trans 'Advanced' %}</p>
                 </button>
-                {% if user|can_edit_resource_instance %}
+                {% if user|can_read_resource_instance %}
                 <button class="btn search-type-btn relative" data-bind="css: {'active': selectedTab() === relatedResourcesManager}, click: function(){selectedTab(relatedResourcesManager)}">
                     <i class="fa fa-code-fork"></i>
                     <p>{% trans 'Related' %}</p>
