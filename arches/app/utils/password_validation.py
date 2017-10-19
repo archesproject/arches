@@ -10,7 +10,7 @@ class MinLengthValidator(MinimumLengthValidator):
 
     def get_help_text(self):
         return _(
-            "Be longer than {0}".format(self.min_length)
+            "Be longer than {0} characters".format(self.min_length)
         )
 
 class NumericPasswordValidator(NumericPasswordValidator):
