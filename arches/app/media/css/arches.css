@@ -3153,7 +3153,7 @@ input.cmn-toggle-yes-no:checked+label:after {
 }
 
 .list-grid {
-    position: relative; 
+    position: relative;
     height: 0px;
 }
 
@@ -7867,12 +7867,8 @@ a.clear-geojson-button:hover {
     background: #f8f8f8;
 }
 
-.mobile-project-manager-editor .identies-list .clear-node-search {
+.mobile-project-manager-editor .identities-list .clear-node-search {
     top: 6px
-}
-
-.identies-list .grid {
-    height: auto;
 }
 
 /* End Function Manager Page */
@@ -9263,6 +9259,19 @@ a.search-facet-item.disabled {
     background: #fcfcfc;
     border-right: 1px solid #ddd;
 }
+
+.identities-list .mpm-left-panel {
+    background-color: #f0f0f0;
+    width: 200px;
+    padding: 0px 7px 7px 7px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.identities-list .title-block-fixed {
+    top: 0px;
+}
+
 
 .mpm-right-panel {
     position: absolute;
