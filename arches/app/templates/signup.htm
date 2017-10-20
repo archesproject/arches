@@ -54,11 +54,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </p>
                         {% endif %}
 
-                        {% for message in messages %}
-                        <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
-                        {% endfor %}
+                        {{ confirmation_message | safe }}
 
                         {% if showform %}
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
+                            </div>
+                            {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
                         <div class="form-group">
                             <div class="input-group">
                                     <div class="input-group-addon"><i class="ion-compose"></i></div>

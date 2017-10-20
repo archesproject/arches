@@ -16,11 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import base64
-import hashlib
 import time
 from datetime import datetime, timedelta
-from django import forms
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
@@ -32,14 +29,13 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth.password_validation as validation
 from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.forms import ArchesUserCreationForm
+from arches.app.utils.crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from Crypto.Cipher import AES
-from Crypto import Random
 
 def index(request):
     return render(request, 'index.htm', {
@@ -131,7 +127,6 @@ def signup(request):
 
     if request.method == 'POST':
         postdata = request.POST.copy()
-        postdata['username'] = postdata['email']
         postdata['ts'] = int(time.time())
         form = ArchesUserCreationForm(postdata)
         if form.is_valid():
@@ -153,20 +148,10 @@ def signup(request):
             # create the email, and attach the HTML version as well.
             msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', [form.cleaned_data['email']])
             msg.attach_alternative(html_content, "text/html")
-            #msg.send()
+            msg.send()
 
             confirmation_message = _('An email has been sent to <br><strong>%s</strong><br> with a link to activate your account' % form.cleaned_data['email'])
             showform = False
-        else:
-            try:
-                for error in form.errors.as_data()['username']:
-                    if error.code == 'unique':
-                        form.add_error('email', forms.ValidationError(
-                            _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
-                            code='unique',
-                        ))
-            except:
-                pass
     else:
         form = ArchesUserCreationForm()
 
@@ -202,47 +187,6 @@ def confirm_signup(request):
             'showform': True,
             'postdata': userinfo
         })
-
-class ArchesUserCreationForm(UserCreationForm):
-    """
-    A form that creates a user, with no privileges, from the given username and
-    password.
-    """
-
-    username = None
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
-    ts = forms.IntegerField(required=False)
-
-    class Meta:
-        model = User
-        fields = ('email','username','first_name','last_name', 'ts')
-
-class AESCipher(object):
-
-    def __init__(self, key): 
-        self.bs = AES.block_size
-        self.key = hashlib.sha256(key.encode()).digest()
-
-    def encrypt(self, raw):
-        raw = self._pad(raw)
-        iv = Random.new().read(AES.block_size)
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return base64.b64encode(iv + cipher.encrypt(raw))
-
-    def decrypt(self, enc):
-        enc = base64.b64decode(enc)
-        iv = enc[:AES.block_size]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
-
-    def _pad(self, s):
-        return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)
-
-    @staticmethod
-    def _unpad(s):
-        return s[:-ord(s[len(s)-1:])]
 
 def search(request):
     return render(request, 'views/search.htm')
