@@ -5,13 +5,14 @@ define([
     'knockout-mapping',
     'arches',
     'views/base-manager',
-], function($, _, ko, koMapping, arches, BaseManagerView) {
+    'profile-manager-data',
+], function($, _, ko, koMapping, arches, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
             self.viewModel.showChangePasswordForm = ko.observable(false);
-            self.viewModel.showEditUserForm = ko.observable(false);
+            self.viewModel.showEditUserForm = ko.observable(!!data.error_count);
 
             self.viewModel.validationErrors = ko.observableArray()
             self.viewModel.invalidPassword = ko.observable()

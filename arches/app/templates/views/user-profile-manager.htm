@@ -54,6 +54,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Account Info -->
                 <section id="" class="profile-list">
                     <div class="account-wrapper">
+                        
+                   
+                        <p class="errornote">
+                            {% for error in errors %}
+                                <div style="color:darkred">{{ error.message|escape }}</div>
+                            {% endfor %}
+                        </p>
 
                         <div class="row relative">
 
@@ -120,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
 
@@ -527,7 +534,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {{ block.super }}
 <script>{% autoescape off %}
     define('profile-manager-data', [], function() {
-        return {};
+        return {
+            'error_count': {{errors|length}}
+        }
     });
 {% endautoescape %}</script>
 

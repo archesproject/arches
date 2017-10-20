@@ -22,6 +22,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.base import BaseManagerView
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
@@ -46,35 +47,34 @@ class UserManagerView(BaseManagerView):
         context = self.get_context_data(
             main_script='views/user-profile-manager',
         )
-        context['nav']['icon'] = "fa fa-user"
-        context['nav']['title'] = _("Profile Manager")
+        context['errors'] = []
+        context['nav']['icon'] = 'fa fa-user'
+        context['nav']['title'] = _('Profile Manager')
         context['nav']['login'] = True
         context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
         context['validation_help'] = validation.password_validators_help_texts()
 
         user = models.User.objects.get(pk=request.user.id)
-        if user.username != request.POST.get('username'):
-            in_use = models.User.objects.filter(username = request.POST.get('username')).count() > 0
-            if in_use == True:
-                try:
-                    raise ValidationError(
-                        _("The username, '{0}' is already in use".format(request.POST.get('username'))),
-                        code='name in use',
-                    )
-                except ValidationError as e:
-                    context["error"] = e[0]
-                    print context["error"]
-                    return render(request, 'views/user-profile-manager.htm', context)
+        try:
+            validate_email(request.POST.get('email'))
+        except ValidationError as e:
+            context['errors'].append(e)
 
-        user.username = request.POST.get('username')
-        user.first_name = request.POST.get('firstname')
-        user.last_name = request.POST.get('lastname')
-        user.email = request.POST.get('email')
-        if models.UserProfile.objects.filter(user=user).count() == 0:
-            models.UserProfile.objects.create(user=user)
-        user.userprofile.phone = request.POST.get('phone')
-        user.userprofile.save()
-        user.save()
-        request.user = user
+        try:
+            validate_email(request.POST.get('email'))
+        except ValidationError as e:
+            context['errors'].append(e)
+
+        if len(context['errors']) == 0:
+            #user.username = request.POST.get('username')
+            user.first_name = request.POST.get('firstname')
+            user.last_name = request.POST.get('lastname')
+            user.email = request.POST.get('email')
+            if models.UserProfile.objects.filter(user=user).count() == 0:
+                models.UserProfile.objects.create(user=user)
+            user.userprofile.phone = request.POST.get('phone')
+            user.userprofile.save()
+            user.save()
+            request.user = user
 
         return render(request, 'views/user-profile-manager.htm', context)
