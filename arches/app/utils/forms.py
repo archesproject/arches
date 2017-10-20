@@ -17,9 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django import forms
+from django.db import transaction
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from arches.app.models import models
 
 class ArchesUserCreationForm(UserCreationForm):
     """
@@ -30,7 +32,6 @@ class ArchesUserCreationForm(UserCreationForm):
     first_name = forms.CharField()
     last_name = forms.CharField()
     email = forms.EmailField()
-    phone = forms.CharField(required=False)
     ts = forms.IntegerField(required=False)
 
     class Meta:
@@ -39,11 +40,43 @@ class ArchesUserCreationForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super(ArchesUserCreationForm, self).clean()
-        try:
-            userobj = User.objects.get(email=cleaned_data['email'])
+        if User.objects.filter(email=cleaned_data['email']).count() > 0:
             self.add_error('email', forms.ValidationError(
                 _('This email address has already been regisitered with the system. If you forgot your password, click the "exit" link below and go to the login page to reset your password.'),
                 code='unique',
             ))
-        except:
-            pass
+
+class ArchesUserProfileForm(ArchesUserCreationForm):
+    """
+    A form that creates a user, with no privileges, from the given username and
+    password.
+    """
+
+    id = forms.IntegerField()
+    username = forms.CharField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+    phone = forms.CharField(required=False)
+    password1 = forms.CharField(required=False)
+    password2 = forms.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ('email','username','first_name','last_name', 'id')
+
+    def clean(self):
+        pass
+
+    def save(self):
+        user = User.objects.get(username=self.instance.username)
+        with transaction.atomic():
+            user.first_name = self.cleaned_data['first_name']
+            user.last_name = self.cleaned_data['last_name']
+            user.email = self.cleaned_data['email']
+            if models.UserProfile.objects.filter(user=user).count() == 0:
+                models.UserProfile.objects.create(user=user)
+            user.userprofile.phone = self.cleaned_data['phone']
+            user.userprofile.save()
+            user.save()
+        return user
