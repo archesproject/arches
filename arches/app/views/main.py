@@ -30,7 +30,6 @@ from django.views.decorators.cache import never_cache
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
-from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -59,6 +58,12 @@ def auth(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+        if user is None:
+            try:
+                userobj = User.objects.get(email=username)
+                user = authenticate(username=userobj.username, password=password)
+            except:
+                auth_attempt_success = False
         if user is not None and user.is_active:
             login(request, user)
             user.password = ''
@@ -122,6 +127,7 @@ def signup(request):
         'email': ''
     }
     showform = True
+    confirmation_message = ''
 
     if request.method == 'POST':
         postdata = request.POST.copy()
@@ -134,22 +140,22 @@ def signup(request):
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({'link':encrypted_userinfo})
 
-            context = {
+            email_context = {
                 'host': request.get_host(),
                 'link':request.build_absolute_uri(reverse('confirm_signup') + '?' + url_encrypted_userinfo,),
                 'greeting': _('Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login.'),
                 'closing': _('This link expires in 24 hours.  If you can\'t get to it before then, don\'t worry, you can always try again with the same email address.'),
             }
 
-            html_content = render_to_string('email/signup_link.htm', context) # ...
+            html_content = render_to_string('email/signup_link.htm', email_context) # ...
             text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
             msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', [form.cleaned_data['email']])
             msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            #msg.send()
 
-            messages.success(request, _('An email has been sent to %s with a link to actiivate your account' % form.cleaned_data['email']))
+            confirmation_message = _('An email has been sent to <br><strong>%s</strong><br> with a link to activate your account' % form.cleaned_data['email'])
             showform = False
         else:
             try:
@@ -167,7 +173,8 @@ def signup(request):
     return render(request, 'signup.htm', {
         'form': form,
         'postdata': postdata,
-        'showform': showform
+        'showform': showform,
+        'confirmation_message': confirmation_message
     })
 
 def confirm_signup(request):
