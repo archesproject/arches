@@ -16,20 +16,26 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import time
+from datetime import datetime, timedelta
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.utils.translation import ugettext as _
+from django.utils.http import urlencode
+from django.shortcuts import render, redirect
+from django.views.decorators.cache import never_cache
+from django.core.urlresolvers import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+import django.contrib.auth.password_validation as validation
 from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
-import django.contrib.auth.password_validation as validation
-from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.shortcuts import render, redirect
-from django.utils.translation import ugettext as _
-from django.views.decorators.cache import never_cache
-
+from arches.app.utils.forms import ArchesUserCreationForm
+from arches.app.utils.crypto import AESCipher
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def index(request):
     return render(request, 'index.htm', {
@@ -48,6 +54,12 @@ def auth(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+        if user is None:
+            try:
+                userobj = User.objects.get(email=username)
+                user = authenticate(username=userobj.username, password=password)
+            except:
+                auth_attempt_success = False
         if user is not None and user.is_active:
             login(request, user)
             user.password = ''
@@ -101,6 +113,80 @@ def change_password(request):
 
     return JSONResponse(messages)
 
+
+@never_cache
+def signup(request):
+
+    postdata = {
+        'first_name': '',
+        'last_name': '',
+        'email': ''
+    }
+    showform = True
+    confirmation_message = ''
+
+    if request.method == 'POST':
+        postdata = request.POST.copy()
+        postdata['ts'] = int(time.time())
+        form = ArchesUserCreationForm(postdata)
+        if form.is_valid():
+            AES = AESCipher(settings.SECRET_KEY)
+            userinfo = JSONSerializer().serialize(form.cleaned_data)
+            encrypted_userinfo = AES.encrypt(userinfo)
+            url_encrypted_userinfo = urlencode({'link':encrypted_userinfo})
+
+            email_context = {
+                'host': request.get_host(),
+                'link':request.build_absolute_uri(reverse('confirm_signup') + '?' + url_encrypted_userinfo,),
+                'greeting': _('Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login.'),
+                'closing': _('This link expires in 24 hours.  If you can\'t get to it before then, don\'t worry, you can always try again with the same email address.'),
+            }
+
+            html_content = render_to_string('email/signup_link.htm', email_context) # ...
+            text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
+
+            # create the email, and attach the HTML version as well.
+            msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', [form.cleaned_data['email']])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            confirmation_message = _('An email has been sent to <br><strong>%s</strong><br> with a link to activate your account' % form.cleaned_data['email'])
+            showform = False
+    else:
+        form = ArchesUserCreationForm()
+
+    return render(request, 'signup.htm', {
+        'form': form,
+        'postdata': postdata,
+        'showform': showform,
+        'confirmation_message': confirmation_message
+    })
+
+def confirm_signup(request):
+    if request.method == 'GET':
+        link = request.GET.get('link', None)
+        AES = AESCipher(settings.SECRET_KEY)
+        userinfo = JSONDeserializer().deserialize(AES.decrypt(link))
+        form = ArchesUserCreationForm(userinfo)
+        if datetime.fromtimestamp(userinfo['ts']) + timedelta(days=1) >= datetime.fromtimestamp(int(time.time())):
+            if form.is_valid():
+                user = form.save()
+                return redirect('auth')
+            else:
+                try:
+                    for error in form.errors.as_data()['username']:
+                        if error.code == 'unique':
+                            return redirect('auth')
+                except:
+                    pass
+        else:
+            form.errors['ts'] = [_('The signup link has expired, please try signing up again.  Thanks!')]
+
+        return render(request, 'signup.htm', {
+            'form': form,
+            'showform': True,
+            'postdata': userinfo
+        })
 
 def search(request):
     return render(request, 'views/search.htm')

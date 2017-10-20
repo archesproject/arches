@@ -104,7 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% if user.username == 'anonymous' %}
                                 <h5 class="hidden-xs">{% trans "Login" %}</h5>
                                 {% else %}
-                                <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.username }}</h5>
+                                <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
                                 {% endif %}
                             </div>
                         </a>
