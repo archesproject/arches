@@ -3152,6 +3152,11 @@ input.cmn-toggle-yes-no:checked+label:after {
     margin-bottom: -10px;
 }
 
+.list-grid {
+    position: relative; 
+    height: 0px;
+}
+
 .list-item-name {
     font-size: 14px;
     margin-top: -5px;
@@ -7861,6 +7866,13 @@ a.clear-geojson-button:hover {
     background: #f8f8f8;
 }
 
+.mobile-project-manager-editor .identies-list .clear-node-search {
+    top: 6px
+}
+
+.identies-list .grid {
+    height: auto;
+}
 
 /* End Function Manager Page */
 

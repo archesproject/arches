@@ -141,7 +141,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </a>
                                         </li>
                                         <li id="status-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#group-card" class="card-tab-title" aria-expanded="false">
+                                            <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
                                                                 People
                                                             </a>
                                         </li>
@@ -213,8 +213,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Groups Card -->
-                                        <div id="group-card" class="tab-pane fade">
-                                            Groups....
+                                        <div id="identities-card" class="identies-list tab-pane fade">
+                                            <div class="flex">
+                                                <div class="left-column-container" data-bind="with:identityList">
+                                                    {% include 'views/graph/project-manager/identity-list.htm' %}
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <!-- Activation Card -->

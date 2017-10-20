@@ -15,6 +15,8 @@ define([
             self.active = ko.observable(false);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
+            self.users = ko.observableArray();
+            self.groups = ko.observableArray();
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
                     return i.type === 'user' && i.id === id;
@@ -51,6 +53,8 @@ define([
             self.active(source.active);
             self.createdby(source.createdby_id);
             self.lasteditedby(source.lasteditedby_id);
+            self.groups(source.groups);
+            self.users(source.users);
 
             self.set('id', source.id);
         },
@@ -74,6 +78,8 @@ define([
                     self.set('id', request.responseJSON.project.id);
                     self.createdby(request.responseJSON.project.createdby_id);
                     self.lasteditedby(request.responseJSON.project.lasteditedby_id);
+                    self.groups(request.responseJSON.project.groups);
+                    self.users(request.responseJSON.project.users);
                     this._project(this.json());
                 };
             };

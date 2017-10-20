@@ -2,10 +2,11 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
+    'views/graph/permission-manager/identity-list',
     'models/project',
     'project-manager-data',
     'arches'
-], function(_, ko, BaseManagerView, ProjectModel, data, arches) {
+], function(_, ko, BaseManagerView, IdentityList, ProjectModel, data, arches) {
     var projects = ko.observableArray(
         data.projects.map(function (project) {
             return new ProjectModel({
@@ -14,6 +15,9 @@ define([
             });
         })
     );
+    var identityList = new IdentityList({
+        items: ko.observableArray(data.identities)
+    });
     var projectFilter = ko.observable('');
     var filteredProjects = ko.computed(function () {
         var filter = projectFilter();
@@ -34,6 +38,7 @@ define([
             projectFilter: projectFilter,
             selectedProject: selectedProject,
             filteredProjects: filteredProjects,
+            identityList: identityList,
             saveProject: function () {
                 loading(true);
                 var addProject = !selectedProject().get('id');
