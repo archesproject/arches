@@ -5920,6 +5920,7 @@ div.row.widget-wrapper {
     margin: 0;
     margin-right: 10px;
     padding: 5px 5px 15px 5px;
+    position: relative;
 }
 
 .input-group .form-control {
