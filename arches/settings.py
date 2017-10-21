@@ -324,6 +324,31 @@ BULK_IMPORT_BATCH_SIZE = 2000
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
+        'OPTIONS': {
+            'special_characters': ('!','@','#'),
+        }
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'OPTIONS': {
+            'min_length': 9,
+        }
+    },
+]
+
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -458,30 +483,6 @@ HEX_BIN_PRECISION = 4
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
-
-# AUTH_PASSWORD_VALIDATORS = [
-#     {
-#         'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
-#     },
-#     {
-#         'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
-#         'OPTIONS': {
-#             'special_characters': ('!','@','#'),
-#         }
-#     },
-#     {
-#         'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
-#     },
-#     {
-#         'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
-#     },
-#     {
-#         'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
-#         'OPTIONS': {
-#             'min_length': 9,
-#         }
-#     },
-# ]
 
 try:
     from settings_local import *
