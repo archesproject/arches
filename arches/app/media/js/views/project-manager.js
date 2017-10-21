@@ -64,7 +64,7 @@ define([
                             active: false,
                             id: null
                         },
-                        identities: self.IdentityList
+                        identities: identityList
                     }));
                 }
             }

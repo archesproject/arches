@@ -241,7 +241,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <p class="" style="margin-bottom: 0px;">Add this group to project</p>
 
                                                                             <div class="toggle-container">
-                                                                                <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: selectedProject().toggleIdentity()"><small></small></span>
+                                                                                <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
                                                                                         <div class="arches-toggle-sm" data-bind="text:label"></div>
                                                                                             <div style="margin-top: -17px;"></div>
