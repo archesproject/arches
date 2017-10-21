@@ -29,8 +29,12 @@ define([
             return project.name().toLowerCase().indexOf(filter) > 0;
         });
     });
+
     var loading = ko.observable(false);
     var selectedProject = ko.observable(null);
+    selectedProject.subscribe(function(val){
+        if (val) {val.update();}
+    });
     var pageView = new BaseManagerView({
         viewModel: {
             loading: loading,

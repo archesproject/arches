@@ -111,6 +111,10 @@ define([
 
         toJSON: function() {
             return JSON.parse(this.json());
+        },
+
+        update: function() {
+            this.identities.clearSelection();
         }
     });
 });
