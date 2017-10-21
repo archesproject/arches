@@ -214,8 +214,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <div id="identities-card" class="identities-list tab-pane fade">
 
-                                            <div class="card-panel-body" style="">
-                                                <div id="" style="">
+                                            <div>
+                                                <div>
                                                     <div class="flex relative">
 
                                                         <div class="mpm-left-panel" style="" data-bind="with:identityList">
@@ -232,7 +232,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                                                             <i class="fa fa-group" data-bind=""></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind="">Crowdsourcer</a>
+                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle" data-bind="">Arches Group</div>
                                                                     </div>
@@ -240,17 +240,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="box-inline">
                                                                             <p class="" style="margin-bottom: 0px;">Add this group to project</p>
 
-                                                                            <!--Switchery : Unchecked-->
-                                                                            <!--===================================================-->
                                                                             <div class="toggle-container">
-                                                                                <span class="switch switch-small" data-bind="css: {'on': false}, click: function(e){console.log(e);}"><small></small></span>
+                                                                                <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: selectedProject().toggleIdentity()"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
                                                                                         <div class="arches-toggle-sm" data-bind="text:label"></div>
                                                                                             <div style="margin-top: -17px;"></div>
                                                                                         </div>
                                                                                 <span class="arches-toggle-subtitle" data-bind="text: 'testing'"></span>
                                                                             </div>
-                                                                            <!--===================================================-->
 
                                                                         </div>
 

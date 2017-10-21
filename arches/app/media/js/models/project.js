@@ -18,7 +18,7 @@ define([
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
             var getUserName = function(id) {
-                var user = _.find(self.identities, function(i) {
+                var user = _.find(self.identities.items(), function(i) {
                     return i.type === 'user' && i.id === id;
                 });
                 return user ? user.name : '';
@@ -29,6 +29,23 @@ define([
             self.lasteditedbyName = ko.computed(function () {
                 return getUserName(self.lasteditedby());
             });
+            self.hasIdentity = function(){
+                var identity =  self.identities.selected();
+                var inUsers = _.contains(self.users(), identity.id)
+                var inGroups = _.contains(self.groups(), identity.id)
+                return inUsers || inGroups
+            };
+            self.toggleIdentity = function() {
+                var identity =  self.identities.selected();
+                if (identity) {
+                    var identities = identity.type === 'user' ? self.users : self.groups;
+                    if (self.hasIdentity()) {
+                        identities.remove(identity.id)
+                    } else {
+                        identities.push(identity.id)
+                    };
+                }
+            };
 
             self.parse(options.source);
 
@@ -36,7 +53,9 @@ define([
                 var jsObj = ko.toJS({
                     name: self.name,
                     active: self.active,
-                    id: self.get('id')
+                    id: self.get('id'),
+                    groups: self.groups,
+                    users: self.users,
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });

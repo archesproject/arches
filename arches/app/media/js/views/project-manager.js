@@ -7,17 +7,17 @@ define([
     'project-manager-data',
     'arches'
 ], function(_, ko, BaseManagerView, IdentityList, ProjectModel, data, arches) {
+    var identityList = new IdentityList({
+        items: ko.observableArray(data.identities)
+    });
     var projects = ko.observableArray(
         data.projects.map(function (project) {
             return new ProjectModel({
                 source: project,
-                identities: data.identities
+                identities: identityList
             });
         })
     );
-    var identityList = new IdentityList({
-        items: ko.observableArray(data.identities)
-    });
     var projectFilter = ko.observable('');
     var filteredProjects = ko.computed(function () {
         var filter = projectFilter();
@@ -64,7 +64,7 @@ define([
                             active: false,
                             id: null
                         },
-                        identities: data.identities
+                        identities: self.IdentityList
                     }));
                 }
             }

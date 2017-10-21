@@ -22,6 +22,11 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
             this.items = options.items;
+            var self = this;
+            this.selected = ko.computed(function(){
+                var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
+                return res;
+            })
         }
 
     });
