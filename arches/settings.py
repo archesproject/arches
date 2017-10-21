@@ -24,7 +24,6 @@ import inspect
 ###          STATIC SETTINGS          ###
 #########################################
 
-
 MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, gets you extra dependencies)
 DEBUG = True
 INTERNAL_IPS = ('127.0.0.1',)
@@ -141,6 +140,13 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  <-- Only need to uncomment this for testing without an actual email server
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'xxxx@xxx.com'
+# EMAIL_HOST_PASSWORD = 'xxxxxxx'
+# EMAIL_PORT = 587
 
 POSTGIS_VERSION = (2, 0, 0)
 
@@ -453,29 +459,29 @@ HEX_BIN_PRECISION = 4
 ##########################################
 
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
-        'OPTIONS': {
-            'special_characters': ('!','@','#'),
-        }
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
-        'OPTIONS': {
-            'min_length': 9,
-        }
-    },
-]
+# AUTH_PASSWORD_VALIDATORS = [
+#     {
+#         'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
+#     },
+#     {
+#         'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
+#         'OPTIONS': {
+#             'special_characters': ('!','@','#'),
+#         }
+#     },
+#     {
+#         'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
+#     },
+#     {
+#         'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+#     },
+#     {
+#         'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+#         'OPTIONS': {
+#             'min_length': 9,
+#         }
+#     },
+# ]
 
 try:
     from settings_local import *
