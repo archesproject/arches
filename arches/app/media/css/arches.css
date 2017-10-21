@@ -994,9 +994,18 @@ a.select2-search-choice-close {
     background-color: #fbfbfb;
 }
 
+.selected div .listitem_name {
+    font-weight: 600;
+}
+
+.selected div .name {
+    font-weight: 600;
+}
+
 .library-card.selected.selected-card {
     background: #fff;
     border-left: 5px solid steelblue;
+    cursor: default;
 }
 
 .library-card:hover {
@@ -5382,11 +5391,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     cursor: default;
 }
 
+.card-tree-list a.cc-link.active:hover {
+    cursor: pointer;
+}
+
 .cc-link.active {
     color: #666;
     font-weight: 600;
     background: #fff;
-    border: 1px solid #ddd;
 }
 
 .node-name {
