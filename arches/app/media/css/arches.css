@@ -232,7 +232,7 @@
 }
 
 .outline.open-container {
-    border: 1px solid #3b8dd5;
+    border: 1px solid #bbb;
 }
 
 .card-nav-container {
@@ -1089,13 +1089,17 @@ a.select2-search-choice-close {
     height: 36px;
 }
 
+.crud-card-main a {
+    color: #1E6FB7;
+}
+
 .crud-card-subtitle {
     width: 200px;
     position: absolute;
     left: 60px;
-    top: 25px;
+    top: 27px;
     padding: 2px 2px 3px 0px;
-    color: #395C7D;
+    color: #888;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -5020,10 +5024,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .ep-card-crud-container {
     margin: 10px;
+} 
+
+.arches-form-container {
+    border: 1px solid #3b8dd5;
 }
 
-.ep-card-crud-container div.panel {
-    border: 0px solid #ddd;
+.ep-card-crud-container > div.panel {
+    border: 1px solid #3b8dd5;
 }
 
 .dz-cancel {
