@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %} {% load staticfiles %} {% load i18n %} {% block loading_mask %} {% endblock loading_mask %} {% block body %}
 
-<div id="container" class="cls-container">
+<div class="cls-container">
 
     <!-- BACKGROUND IMAGE -->
     <!--===================================================-->
@@ -128,6 +128,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% endfor %}
                             {% endif %}
                         </div>
+
+                        <div class="password-rules mar-top text-left">
+                            {% trans 'Your password must:' %}
+                            <ul class="list-unstyled">
+                                {% for message in validation_help %}
+                                <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
                         {% endif %}
 
                         <div class="form-group">
