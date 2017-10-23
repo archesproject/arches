@@ -141,7 +141,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </a>
                                         </li>
                                         <li id="status-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#group-card" class="card-tab-title" aria-expanded="false">
+                                            <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
                                                                 People
                                                             </a>
                                         </li>
@@ -212,9 +212,143 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             Models...
                                         </div>
 
-                                        <!-- Groups Card -->
-                                        <div id="group-card" class="tab-pane fade">
-                                            Groups....
+                                        <div id="identities-card" class="identities-list tab-pane fade">
+
+                                            <div>
+                                                <div>
+                                                    <div class="flex relative">
+
+                                                        <div class="mpm-left-panel" style="" data-bind="with:identityList">
+                                                            {% include 'views/graph/project-manager/identity-list.htm' %}
+                                                        </div>
+
+                                                        <div class="mpm-right-panel">
+
+                                                            <div class="relative">
+
+                                                                <div class="row">
+                                                                    <div class="col-xs-12 col-sm-5 col-md-3" style="" data-bind="">
+                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
+                                                                                                                            <i class="fa fa-group" data-bind=""></i>
+                                                                                                                        </span>
+                                                                        <div class="mpm-group-name">
+                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                        </div>
+                                                                        <div class="mpm-group-subtitle" data-bind="">Arches Group</div>
+                                                                    </div>
+                                                                    <div class="col-sm-6" style="" data-bind="">
+                                                                        <div class="box-inline">
+                                                                            <p class="" style="margin-bottom: 0px;">Add this group to project</p>
+
+                                                                            <div class="toggle-container">
+                                                                                <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
+                                                                                        <div style="display:flex; flex-direction:row;">
+                                                                                        <div class="arches-toggle-sm"></div>
+                                                                                            <div style="margin-top: -17px;"></div>
+                                                                                        </div>
+                                                                                <span class="arches-toggle-subtitle"></span>
+                                                                            </div>
+
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Users in this Account -->
+                                                                <div class="mpm-account-detail-panel">
+
+                                                                    <!-- User Listing -->
+                                                                    <div id="user-cards" class="list-group">
+                                                                        <!-- Title/Filter/Pagination -->
+                                                                        <div class="relative mpm-item-listing-header-panel">
+                                                                            <h4 class="mpm-item-listing-header">Accounts in this group</h4>
+                                                                            <div class="project-search-widget mpm-item-listing">
+                                                                                <input class="form-control input-lg" placeholder="find a user..." type="text">
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- ko foreach: selectedProject().groupUsers() -->
+                                                                            <a href="#" class="list-group-item get-user-detail">
+                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'><span class="mdm-user-status pull-right">Approved</span></h4>
+                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                            </a>
+                                                                        <!-- /ko -->
+
+                                                                    </div>
+
+                                                                    <!-- User Detail -->
+                                                                    <div id="user-detail" class="panel hidden" style="box-shadow: none;">
+                                                                        <div class="panel-heading">
+                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">adalgity@getty.edu</a><span class="mdm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
+                                                                        </div>
+
+                                                                        <!-- User Detail -->
+                                                                        <div class="mpm-user-summary">
+                                                                            <div class="mpm-model-detail-panel">
+                                                                                <div class="mpm-node-name">
+                                                                                    User Information
+                                                                                </div>
+                                                                                <ul class="mpm-node-detail-metadata">
+                                                                                    <li class="">
+                                                                                        Name: Alison Dalgity
+                                                                                    </li>
+                                                                                    <li class="">
+                                                                                        Email: <a hre="">adalgity@getty.edu</a>
+                                                                                    </li>
+                                                                                    <li class="">
+                                                                                        Group Membership: Admins, Editors, RDM Administrators, Mobile Project Manager
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+
+                                                                            <div class="mpm-model-detail-panel">
+                                                                                <div class="mpm-node-name">
+                                                                                    Contributions
+                                                                                </div>
+                                                                                <ul class="mpm-node-detail-metadata">
+                                                                                    <li class="">
+                                                                                        Edits: 0
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        Devices (2)
+                                                                                        <ul class="mpm-node-detail-metadata">
+                                                                                            <li class="">
+                                                                                                Name: Alison's iPhone (last login: September 17, 2017)
+                                                                                            </li>
+                                                                                            <li class="">
+                                                                                                Name: Getty iPad #12345 (last login: September 2, 2017)
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+
+                                                                            <div class="mpm-model-detail-panel">
+                                                                                <div class="mpm-node-name">
+                                                                                    Security
+                                                                                </div>
+                                                                                <ul class="mpm-node-detail-metadata">
+                                                                                    <li class="">
+                                                                                        Remove project data from from user's device on next login?
+                                                                                    </li>
+                                                                                    <li class="">
+                                                                                        <!--Switchery : Unchecked-->
+                                                                                        <!--===================================================-->
+                                                                                        <input id="wipe-project" class="js-switch-small" style="margin-top: 0px; display: none;" data-switchery="true" type="checkbox"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s ease 0s, box-shadow 0.4s ease 0s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s ease 0s;"></small></span>
+                                                                                        <!--===================================================-->
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <!-- Activation Card -->

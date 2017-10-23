@@ -2,15 +2,19 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
+    'views/graph/project-manager/identity-list',
     'models/project',
     'project-manager-data',
     'arches'
-], function(_, ko, BaseManagerView, ProjectModel, data, arches) {
+], function(_, ko, BaseManagerView, IdentityList, ProjectModel, data, arches) {
+    var identityList = new IdentityList({
+        items: ko.observableArray(data.identities)
+    });
     var projects = ko.observableArray(
         data.projects.map(function (project) {
             return new ProjectModel({
                 source: project,
-                identities: data.identities
+                identities: identityList
             });
         })
     );
@@ -25,8 +29,12 @@ define([
             return project.name().toLowerCase().indexOf(filter) > 0;
         });
     });
+
     var loading = ko.observable(false);
     var selectedProject = ko.observable(null);
+    selectedProject.subscribe(function(val){
+        if (val) {val.update();}
+    });
     var pageView = new BaseManagerView({
         viewModel: {
             loading: loading,
@@ -34,6 +42,7 @@ define([
             projectFilter: projectFilter,
             selectedProject: selectedProject,
             filteredProjects: filteredProjects,
+            identityList: identityList,
             saveProject: function () {
                 loading(true);
                 var addProject = !selectedProject().get('id');
@@ -59,7 +68,7 @@ define([
                             active: false,
                             id: null
                         },
-                        identities: data.identities
+                        identities: identityList
                     }));
                 }
             }

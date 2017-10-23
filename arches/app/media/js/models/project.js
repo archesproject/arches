@@ -15,18 +15,53 @@ define([
             self.active = ko.observable(false);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
+            self.users = ko.observableArray();
+            self.groups = ko.observableArray();
+            self.identityMembers = ko.observableArray()
+
             var getUserName = function(id) {
-                var user = _.find(self.identities, function(i) {
+                var user = _.find(self.identities.items(), function(i) {
                     return i.type === 'user' && i.id === id;
                 });
                 return user ? user.name : '';
             };
+
             self.createdbyName = ko.computed(function () {
                 return getUserName(self.createdby());
             });
+
             self.lasteditedbyName = ko.computed(function () {
                 return getUserName(self.lasteditedby());
             });
+
+            self.groupUsers = ko.computed(function () {
+                var groupUsers = _.map(self.identities.groupUsers(), function(gu) {
+                    gu['approved'] = _.some(self.groups(), function(g){
+                        return _.contains(gu.groups, g)
+                    })
+                    return gu;
+                })
+                return groupUsers;
+            });
+
+            self.hasIdentity = function(){
+                var identity =  self.identities.selected();
+                var inUsers = _.contains(self.users(), identity.id)
+                var inGroups = _.contains(self.groups(), identity.id)
+                return inUsers || inGroups
+            };
+
+            self.toggleIdentity = function() {
+                var identity =  self.identities.selected();
+                if (identity) {
+                    var identities = identity.type === 'user' ? self.users : self.groups;
+                    if (self.hasIdentity()) {
+                        identities.remove(identity.id)
+                    } else {
+                        identities.push(identity.id)
+                    };
+                }
+            };
 
             self.parse(options.source);
 
@@ -34,7 +69,9 @@ define([
                 var jsObj = ko.toJS({
                     name: self.name,
                     active: self.active,
-                    id: self.get('id')
+                    id: self.get('id'),
+                    groups: self.groups,
+                    users: self.users,
                 })
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -51,6 +88,8 @@ define([
             self.active(source.active);
             self.createdby(source.createdby_id);
             self.lasteditedby(source.lasteditedby_id);
+            self.groups(source.groups);
+            self.users(source.users);
 
             self.set('id', source.id);
         },
@@ -74,6 +113,8 @@ define([
                     self.set('id', request.responseJSON.project.id);
                     self.createdby(request.responseJSON.project.createdby_id);
                     self.lasteditedby(request.responseJSON.project.lasteditedby_id);
+                    self.groups(request.responseJSON.project.groups);
+                    self.users(request.responseJSON.project.users);
                     this._project(this.json());
                 };
             };
@@ -86,6 +127,10 @@ define([
 
         toJSON: function() {
             return JSON.parse(this.json());
+        },
+
+        update: function() {
+            this.identities.clearSelection();
         }
     });
 });

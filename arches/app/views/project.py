@@ -52,6 +52,23 @@ class ProjectManagerView(BaseManagerView):
 
         return render(request, 'views/project-manager.htm', context)
 
+    def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileProjectXUser):
+        project_identity_ids = set([u.id for u in related_identities])
+        identities_to_remove = project_identity_ids - set(data[identity_type])
+        identities_to_add = set(data[identity_type]) - project_identity_ids
+
+        for identity in identities_to_add:
+            if identity_type == 'users':
+                xmodel.objects.create(user=identity_model.objects.get(id=identity), mobile_project=project)
+            else:
+                xmodel.objects.create(group=identity_model.objects.get(id=identity), mobile_project=project)
+
+        for identity in identities_to_remove:
+            if identity_type == 'users':
+                xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_project=project).delete()
+            else:
+                xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_project=project).delete()
+
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         if data['id'] is None:
@@ -59,12 +76,16 @@ class ProjectManagerView(BaseManagerView):
             project.createdby = self.request.user
         else:
             project = models.MobileProject.objects.get(pk=data['id'])
+            self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
+            self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
+
         if project.active != data['active']:
             # notify users in the project that the state of the project has changed
             notify_project_users(project)
         project.name = data['name']
         project.active = data['active']
         project.lasteditedby = self.request.user
+
         with transaction.atomic():
             project.save()
         return JSONResponse({'success':True, 'project': project})
