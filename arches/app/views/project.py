@@ -59,9 +59,16 @@ class ProjectManagerView(BaseManagerView):
             project.createdby = self.request.user
         else:
             project = models.MobileProject.objects.get(pk=data['id'])
+        if project.active != data['active']:
+            # notify users in the project that the state of the project has changed
+            notify_project_users(project)
         project.name = data['name']
         project.active = data['active']
         project.lasteditedby = self.request.user
         with transaction.atomic():
             project.save()
         return JSONResponse({'success':True, 'project': project})
+
+
+def notify_project_users(project, msg=None):
+    pass

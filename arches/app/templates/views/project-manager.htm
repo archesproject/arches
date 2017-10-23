@@ -218,8 +218,117 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Activation Card -->
-                                        <div id="activation-card" class="tab-pane fade">
-                                            Manage....
+                                        <div id="activation-card" class="tab-pane fade"> 
+                                            <div class="panel-body card-panel-body" style="">
+                                                <div id="" class="card-content" style="">
+
+                                                    <!-- Project Summary Panel -->
+                                                    <div class="mpm-activation-panel">
+                                                        <!-- Activate Project -->
+                                                        <div class="row pad-btm">
+                                                            <!-- Activate Switch -->
+                                                            <div class="col-sm-5 col-md-3">
+                                                                
+                                                                <div class="box-inline">
+                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">Activate Project</p>
+
+                                                                    <div class="toggle-container">
+                                                                        <span class="switch switch-small" data-bind="css: {'on': selectedProject().active()}, click: function(){
+                                                                            selectedProject().active(!selectedProject().active());
+                                                                        }"><small></small></span>
+                                                                    </div>
+
+                                                                </div>  
+                                                            </div>
+
+                                                            <!-- Help Message-->
+                                                            <div class="col-sm-6 col-md-9">
+                                                                <p class="account-tips" style="margin-top: 20px;">
+                                                                    By activating the project you will send users an email with the information needed to begin data editing activitites.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Project Settings -->
+                                                        <div class="mpm-summary-panel">
+                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                Project Summary
+                                                            </p>
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li class="">
+                                                                    Number of edits: 0
+                                                                </li>
+                                                                <li class="">
+                                                                    Contributors: 0
+                                                                </li>
+                                                                <li class="">
+                                                                    Offline Basemap: Streets-Grey
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+                                                        <!-- User Summary -->
+                                                        <div class="mpm-summary-panel">
+                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                Groups/Users
+                                                            </p>
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li class="">
+                                                                    Groups (2)
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="">
+                                                                            Editors, Crowdsourcers
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li class="">
+                                                                    Users (6)
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="">
+                                                                            <a href="">adalgity@getty.edu</a>, 
+                                                                            <a href="">randerson@fargeo.com</a>,
+                                                                            <a href="">pcarlisle@historicengland.org</a>,
+                                                                            <a href="">adalgity@getty.edu</a>, 
+                                                                            <a href="">randerson@fargeo.com</a>,
+                                                                            <a href="">pcarlisle@historicengland.org</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+                                                        <!-- Model/Card Summary -->
+                                                        <div class="mpm-summary-panel">
+                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                Models and Data Entry Cards
+                                                            </p>
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li class="">
+                                                                    Assets (3 data entry cards)
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="">
+                                                                            Name, Modification Event, Condition Assessment
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li class="">
+                                                                    Investigation Activities (3 data entry cards)
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="">
+                                                                            Name, Event Location, Activity Type
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
