@@ -159,7 +159,8 @@ def signup(request):
         'form': form,
         'postdata': postdata,
         'showform': showform,
-        'confirmation_message': confirmation_message
+        'confirmation_message': confirmation_message,
+        'validation_help': validation.password_validators_help_texts()
     })
 
 def confirm_signup(request):
@@ -185,7 +186,8 @@ def confirm_signup(request):
         return render(request, 'signup.htm', {
             'form': form,
             'showform': True,
-            'postdata': userinfo
+            'postdata': userinfo,
+            'validation_help': validation.password_validators_help_texts()
         })
 
 def search(request):

@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 import django.contrib.auth.password_validation as validation
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
+from arches.app.models.system_settings import settings
 
 class UserManagerView(BaseManagerView):
 
@@ -57,6 +58,12 @@ class UserManagerView(BaseManagerView):
         form = ArchesUserProfileForm(user_info)
         if form.is_valid():
             user = form.save()
+            try:
+                admin_info = settings.ADMINS[0][1] if settings.ADMINS else ''
+                message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
+                user.email_user(_('You\'re Arches Profile Has Changed'), message)
+            except:
+                pass
             request.user = user
         context['form'] = form
 

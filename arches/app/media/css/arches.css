@@ -28,7 +28,7 @@
 }
 
 #container {
-    min-width: 1180px;
+    /*min-width: 768px;*/
     overflow-x: scroll;
 }
 
@@ -118,6 +118,7 @@
 .brand-title {
     display: block;
     line-height: 48px;
+    font-size: 20px;
 }
 
 #mainnav-container {

@@ -524,7 +524,13 @@ class Command(BaseCommand):
             'LOGGING',
             'LOGIN_URL',
             'SYSTEM_SETTINGS_LOCAL_PATH',
-            'AUTH_PASSWORD_VALIDATORS'
+            'AUTH_PASSWORD_VALIDATORS',
+            'EMAIL_BACKEND',
+            'EMAIL_USE_TLS',
+            'EMAIL_HOST',
+            'EMAIL_HOST_USER',
+            'EMAIL_HOST_PASSWORD',
+            'EMAIL_PORT'
             ]
 
         with open('arches/install/arches-templates/project_name/settings_local.py-tpl', 'w') as f:
