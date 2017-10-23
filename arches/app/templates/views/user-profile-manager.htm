@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Account Info -->
                 <section id="" class="profile-list">
                     <div class="account-wrapper">
+                        
 
                         <div class="row relative">
 
@@ -120,7 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
 
@@ -144,7 +145,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="firstname" value="{{ user.first_name }}">
+                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                                {% if form.first_name.errors %}
+                                                {% for error in form.first_name.errors %}
+                                                    <div style="color:darkred">{{ error|escape }}</div>
+                                                {% endfor %}
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
@@ -160,7 +166,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="lastname" value="{{ user.last_name }}">
+                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                                {% if form.last_name.errors %}
+                                                {% for error in form.last_name.errors %}
+                                                    <div style="color:darkred">{{ error|escape }}</div>
+                                                {% endfor %}
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -185,6 +196,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Contact Email' %}</label>
                                                 <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                                {% if form.email.errors %}
+                                                {% for error in form.email.errors %}
+                                                    <div style="color:darkred">{{ error|escape }}</div>
+                                                {% endfor %}
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
@@ -527,7 +543,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {{ block.super }}
 <script>{% autoescape off %}
     define('profile-manager-data', [], function() {
-        return {};
+        return {
+            'error_count': {{form.errors|length}}
+        }
     });
 {% endautoescape %}</script>
 

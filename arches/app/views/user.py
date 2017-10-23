@@ -16,18 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
-from arches.app.models import models
-from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.base import BaseManagerView
-from arches.app.utils.JSONResponse import JSONResponse
-from django.views.generic import View
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
+from django.views.generic import View
+from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.views.base import BaseManagerView
+from arches.app.utils.forms import ArchesUserProfileForm
+from arches.app.utils.JSONResponse import JSONResponse
 
 class UserManagerView(BaseManagerView):
 
@@ -49,36 +49,29 @@ class UserManagerView(BaseManagerView):
         context = self.get_context_data(
             main_script='views/user-profile-manager',
         )
-        context['nav']['icon'] = "fa fa-user"
-        context['nav']['title'] = _("Profile Manager")
+        context['errors'] = []
+        context['nav']['icon'] = 'fa fa-user'
+        context['nav']['title'] = _('Profile Manager')
         context['nav']['login'] = True
         context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
         context['validation_help'] = validation.password_validators_help_texts()
 
-        user = models.User.objects.get(pk=request.user.id)
-        if user.username != request.POST.get('username'):
-            in_use = models.User.objects.filter(username = request.POST.get('username')).count() > 0
-            if in_use == True:
-                try:
-                    raise ValidationError(
-                        _("The username, '{0}' is already in use".format(request.POST.get('username'))),
-                        code='name in use',
-                    )
-                except ValidationError as e:
-                    context["error"] = e[0]
-                    print context["error"]
-                    return render(request, 'views/user-profile-manager.htm', context)
 
-        user.username = request.POST.get('username')
-        user.first_name = request.POST.get('firstname')
-        user.last_name = request.POST.get('lastname')
-        user.email = request.POST.get('email')
-        if models.UserProfile.objects.filter(user=user).count() == 0:
-            models.UserProfile.objects.create(user=user)
-        user.userprofile.phone = request.POST.get('phone')
-        user.userprofile.save()
-        user.save()
-        request.user = user
+        user_info = request.POST.copy()
+        user_info['id'] = request.user.id
+        user_info['username'] = request.user.username
+
+        form = ArchesUserProfileForm(user_info)
+        if form.is_valid():
+            user = form.save()
+            try:
+                admin_info = settings.ADMINS[0][1] if settings.ADMINS else ''
+                message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
+                user.email_user(_('You\'re Arches Profile Has Changed'), message)
+            except:
+                pass
+            request.user = user
+        context['form'] = form
 
         return render(request, 'views/user-profile-manager.htm', context)
 

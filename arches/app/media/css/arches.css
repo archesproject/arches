@@ -28,7 +28,7 @@
 }
 
 #container {
-    min-width: 1180px;
+    /*min-width: 768px;*/
     overflow-x: scroll;
 }
 
@@ -118,6 +118,7 @@
 .brand-title {
     display: block;
     line-height: 48px;
+    font-size: 20px;
 }
 
 #mainnav-container {
@@ -232,7 +233,7 @@
 }
 
 .outline.open-container {
-    border: 1px solid #3b8dd5;
+    border: 1px solid #bbb;
 }
 
 .card-nav-container {
@@ -961,9 +962,8 @@ a.select2-search-choice-close {
     color: #666;
     border-bottom: 1px solid #ddd;
     /*border-right: 1px solid #e9e9e9;*/
-    background: #fbfbfb;
+    background: #f8f8f8;
     border-left: 5px solid #fdfdfd;
-    opacity: .825;
 }
 
 .related-resources-nodes .library-card {
@@ -994,9 +994,18 @@ a.select2-search-choice-close {
     background-color: #fbfbfb;
 }
 
+.selected div .listitem_name {
+    font-weight: 600;
+}
+
+.selected div .name {
+    font-weight: 600;
+}
+
 .library-card.selected.selected-card {
     background: #fff;
     border-left: 5px solid steelblue;
+    cursor: default;
 }
 
 .library-card:hover {
@@ -1034,13 +1043,17 @@ a.select2-search-choice-close {
     font-size: 12px;
 }
 
+.library-card-main a {
+    color: #1E6FB7;
+}
+
 .library-card-subtitle {
     text-transform: capitalize;
     width: 135px;
     position: absolute;
     left: 55px;
     top: 25px;
-    color: #8ba2b9;
+    color: #888;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -1080,13 +1093,17 @@ a.select2-search-choice-close {
     height: 36px;
 }
 
+.crud-card-main a {
+    color: #1E6FB7;
+}
+
 .crud-card-subtitle {
     width: 200px;
     position: absolute;
     left: 60px;
-    top: 25px;
+    top: 27px;
     padding: 2px 2px 3px 0px;
-    color: #395C7D;
+    color: #888;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -1382,7 +1399,8 @@ a.select2-search-choice-close {
 }
 
 .node .node-filtered {
-    fill: #f4f4f4;
+    fill: #f0f0f0;
+    stroke: #bbb;
 }
 
 .graph-node-text {
@@ -5016,10 +5034,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .ep-card-crud-container {
     margin: 10px;
+} 
+
+.arches-form-container {
+    border: 1px solid #3b8dd5;
 }
 
-.ep-card-crud-container div.panel {
-    border: 0px solid #ddd;
+.ep-card-crud-container > div.panel {
+    border: 1px solid #3b8dd5;
 }
 
 .dz-cancel {
@@ -5387,17 +5409,21 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     cursor: default;
 }
 
+.card-tree-list a.cc-link.active:hover {
+    cursor: pointer;
+}
+
 .cc-link.active {
     color: #666;
     font-weight: 600;
     background: #fff;
-    border: 1px solid #ddd;
 }
 
 .node-name {
     display: block;
     margin-top: -40px;
     font-size: 13px;
+    color: #1E6FB7;
 }
 
 .node-name-report {
@@ -5406,7 +5432,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-subname {
     font-size: 11px;
-    color: #999;
+    color: #888;
 }
 
 .node-permissions {
@@ -9475,7 +9501,8 @@ a.search-facet-item.disabled {
 }
 
 .card-panel-body {
-	height: 500px;
+	/*height: 500px;
+    overflow-y: scroll;*/
 }
 
 .project-map {

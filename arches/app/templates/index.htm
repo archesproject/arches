@@ -103,7 +103,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             </a>
                             {% else %}
                             <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
-                                {% trans "Welcome" %} {{ user.username }}
+                                {% trans "Welcome" %} {{ user.first_name|default:user.username }}
                             </a>
                             <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
 
