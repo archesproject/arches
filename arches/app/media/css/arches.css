@@ -3170,6 +3170,11 @@ input.cmn-toggle-yes-no:checked+label:after {
     margin-bottom: -10px;
 }
 
+.list-grid {
+    position: relative;
+    height: 0px;
+}
+
 .list-item-name {
     font-size: 14px;
     margin-top: -5px;
@@ -7888,6 +7893,9 @@ a.clear-geojson-button:hover {
     background: #f8f8f8;
 }
 
+.mobile-project-manager-editor .identities-list .clear-node-search {
+    top: 6px
+}
 
 /* End Function Manager Page */
 
@@ -9277,6 +9285,19 @@ a.search-facet-item.disabled {
     background: #fcfcfc;
     border-right: 1px solid #ddd;
 }
+
+.identities-list .mpm-left-panel {
+    background-color: #f0f0f0;
+    width: 200px;
+    padding: 0px 7px 7px 7px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.identities-list .title-block-fixed {
+    top: 0px;
+}
+
 
 .mpm-right-panel {
     position: absolute;

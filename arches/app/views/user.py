@@ -16,12 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User, Group
+import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
-import django.contrib.auth.password_validation as validation
+from django.views.generic import View
+from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
-from arches.app.models.system_settings import settings
+from arches.app.utils.JSONResponse import JSONResponse
 
 class UserManagerView(BaseManagerView):
 
@@ -54,7 +60,7 @@ class UserManagerView(BaseManagerView):
         user_info = request.POST.copy()
         user_info['id'] = request.user.id
         user_info['username'] = request.user.username
-        
+
         form = ArchesUserProfileForm(user_info)
         if form.is_valid():
             user = form.save()
@@ -68,3 +74,20 @@ class UserManagerView(BaseManagerView):
         context['form'] = form
 
         return render(request, 'views/user-profile-manager.htm', context)
+
+class GroupUsers(View):
+
+    def post(self, request):
+        res = {}
+        users = []
+        identity_type = request.POST.get('type')
+        identity_id = request.POST.get('id')
+        if identity_type == 'group':
+            group = Group.objects.get(id=identity_id)
+            users = group.user_set.all()
+        else:
+            users = User.objects.filter(id=identity_id)
+
+        if len(users) > 0:
+            res = [{'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': user.last_login, 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+        return JSONResponse(res)
