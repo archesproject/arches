@@ -53,7 +53,10 @@ def map_info(request):
 
 def app_settings(request):
     return {
-        'VERSION': __version__,
-        'APP_NAME': settings.APP_NAME,
-        'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID
+        'app_settings':{
+            'VERSION': __version__,
+            'APP_NAME': settings.APP_NAME,
+            'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID,
+            'USE_SEMANTIC_RESOURCE_RELATIONSHIPS': settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS
+        }
     }
