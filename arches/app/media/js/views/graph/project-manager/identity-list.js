@@ -1,7 +1,8 @@
 define([
     'knockout',
+    'arches',
     'views/list'
-], function(ko, ListView) {
+], function(ko, arches, ListView) {
     var IdentityList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -21,10 +22,29 @@ define([
         */
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
-            this.items = options.items;
             var self = this;
+            this.items = options.items;
+            this.groupUsers = ko.observableArray()
+            this.getGroupUsers = function(identity) {
+                $.ajax({
+                    url: arches.urls.group_users,
+                    data: {type: identity.type, id: identity.id},
+                    type: 'json',
+                    method: 'POST'
+                }).done(function(data) {
+                    console.log(data)
+                    self.groupUsers(data)
+                }).fail(function(err) {
+                    console.log('could not get users');
+                    console.log(err);
+                })
+            };
+
             this.selected = ko.computed(function(){
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
+                if (res != '') {
+                    self.getGroupUsers(res);
+                }
                 return res;
             })
         }

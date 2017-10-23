@@ -23,7 +23,7 @@ from arches.app.views.admin import ReIndexResources
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView, PermissionManagerView, PermissionDataView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView, RelatedResourcesView, ResourceDescriptors, ResourceEditLogView
 from arches.app.views.concept import RDMView
-from arches.app.views.user import UserManagerView
+from arches.app.views.user import UserManagerView, GroupUsers
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.project import ProjectManagerView
@@ -114,7 +114,8 @@ urlpatterns = [
     url(r'^tileserver/*', tileserver.handle_request, name="tileserver"),
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
-    url(r'^user/*', UserManagerView.as_view(), name="user_profile_manager"),
+    url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
+    url(r'^user/groups/*', GroupUsers.as_view(), name="group_users"),
     url(r'^project_manager/*', ProjectManagerView.as_view(), name="project_manager"),
 
     # Uncomment the admin/doc line below to enable admin documentation:

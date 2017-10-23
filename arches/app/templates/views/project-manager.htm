@@ -243,11 +243,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <div class="toggle-container">
                                                                                 <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
-                                                                                        <div class="arches-toggle-sm" data-bind="text:label"></div>
+                                                                                        <div class="arches-toggle-sm"></div>
                                                                                             <div style="margin-top: -17px;"></div>
                                                                                         </div>
-                                                                                <span class="arches-toggle-subtitle" data-bind="text: 'testing'"></span>
+                                                                                <span class="arches-toggle-subtitle"></span>
                                                                             </div>
+
 
                                                                         </div>
 
@@ -267,23 +268,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             </div>
                                                                         </div>
 
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">adalgity@getty.edu<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 13 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
-
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">randerson@fargeo.com<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 45 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
-
-                                                                        <!-- User Account -->
-                                                                        <a href="#" class="list-group-item get-user-detail">
-                                                                            <h4 class="mpm-user-name">dmyers@getty.edu<span class="mdm-user-status pull-right">Approved</span></h4>
-                                                                            <p class="mpm-user-subtitle">Activity: 15 edits<span class="pull-right">Last login: November 25, 2017</span></p>
-                                                                        </a>
+                                                                        <!-- ko foreach: selectedProject().groupUsers() -->
+                                                                            <a href="#" class="list-group-item get-user-detail">
+                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'><span class="mdm-user-status pull-right">Approved</span></h4>
+                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                            </a>
+                                                                        <!-- /ko -->
 
                                                                     </div>
 
