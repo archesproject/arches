@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
 <!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
 
-{% if debug %}
+{% if USE_LIVERELOAD %}
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
 {% endif %}
 

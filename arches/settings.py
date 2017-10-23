@@ -348,6 +348,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+USE_LIVERELOAD = False
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
 
 #######################################
 ###       END STATIC SETTINGS       ###
@@ -368,8 +370,6 @@ SEARCH_DROPDOWN_LENGTH = 100
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
-
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
 
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
