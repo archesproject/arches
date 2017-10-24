@@ -77,7 +77,6 @@ def auth(request):
             return redirect('auth')
         else:
             return render(request, 'login.htm', {
-                'app_name': settings.APP_NAME,
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next
             })
