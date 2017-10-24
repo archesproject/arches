@@ -227,19 +227,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="relative">
 
                                                                 <div class="row">
-                                                                    <div class="col-xs-12 col-sm-5 col-md-3" style="" data-bind="">
+                                                                    <div class="col-xs-12 col-sm-5 col-md-6">
+                                                                        <!-- ko if: selectedProject().identities.selected().type === 'group' -->
                                                                         <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
-                                                                                                                            <i class="fa fa-group" data-bind=""></i>
+                                                                                                                            <i class="fa fa-group"></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
                                                                             <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
                                                                         </div>
-                                                                        <div class="mpm-group-subtitle" data-bind="">Arches Group</div>
+                                                                        <div class="mpm-group-subtitle">{% trans 'Arches Group' %} </div>
+                                                                        <!-- /ko -->
+                                                                        <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint">
+                                                                                                                            <i class="fa fa-user"></i>
+                                                                                                                        </span>
+                                                                        <div class="mpm-group-name">
+                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                        </div>
+                                                                        <div class="mpm-group-subtitle" data-bind="">{% trans 'Arches User' %}</div>
+                                                                        <!-- /ko -->
                                                                     </div>
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                         <div class="box-inline">
-                                                                            <p class="" style="margin-bottom: 0px;">Add this group to project</p>
-
+                                                                            <!-- ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                            <p class="" style="margin-bottom: 0px;">{% trans 'Add this group to project' %}</p>
+                                                                            <!-- /ko -->
+                                                                            <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                            <p class="" style="margin-bottom: 0px;">{% trans 'Add this user to project' %}</p>
+                                                                            <!-- /ko -->
                                                                             <div class="toggle-container">
                                                                                 <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
@@ -263,7 +278,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <!-- Title/Filter/Pagination -->
                                                                         <!--ko if: selectedProject().identities.selected().type === 'group' -->
                                                                         <div class="relative mpm-item-listing-header-panel">
-                                                                            <h4 class="mpm-item-listing-header">Accounts in this group</h4>
+                                                                            <h4 class="mpm-item-listing-header">{% trans 'Accounts in this group' %}</h4>
                                                                             <div class="project-search-widget mpm-item-listing">
                                                                                 <input class="form-control input-lg" placeholder="find a user..." type="text">
                                                                             </div>
@@ -274,9 +289,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <a href="#" class="list-group-item get-user-detail">
                                                                                 <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 -->
+                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 || _.contains($root.selectedProject().users(), $data.id)-->
                                                                                     <div>
-                                                                                        <span>Approved</span>
+                                                                                        <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
                                                                                 <!--/ko-->

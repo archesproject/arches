@@ -57,12 +57,35 @@ define([
                     var identities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
                         identities.remove(identity.id);
-                        identity.approved(false);
+                        if (identity.type === 'user') {
+                            var usersAcceptedGroups = _.intersection(identity.group_ids, self.groups());
+                            if (usersAcceptedGroups.length > 0) {
+                                console.log('User still accepted via:', usersAcceptedGroups)
+                            } else {
+                                identity.approved(false);
+                            };
+                        } else {
+                            identity.approved(false);
+                            _.chain(self.identities.items()).filter(function(id) {
+                                return id.type === 'user'
+                            }).each(function(user) {
+                                if (_.contains(self.users(), user.id) === false && _.intersection(user.group_ids, self.groups()).length === 0) {
+                                    user.approved(false);
+                                }
+                            })
+                        } ;
                     } else {
                         identities.push(identity.id);
                         identity.approved(true);
+                        _.chain(self.identities.items()).filter(function(id) {
+                            return id.type === 'user'
+                        }).each(function(user) {
+                            if (_.intersection(user.group_ids, self.groups()).length > 0) {
+                                user.approved(true);
+                            }
+                        })
                     };
-                }
+                };
             };
 
             self.parse(options.source);
@@ -137,7 +160,9 @@ define([
             var users = ko.unwrap(this.users)
             _.each(this.identities.items(), function(item) {
                 item.approved(false);
-                if ( (item.type === 'group' && _.contains(groups, item.id)) || (item.type === 'user' && _.contains(users, item.id)) ) {
+                if ((item.type === 'group' && _.contains(groups, item.id)) ||
+                    (item.type === 'user' && _.contains(users, item.id)) ||
+                    (item.type === 'user' && _.intersection(item.group_ids, groups).length)) {
                     item.approved(true);
                 }
             })

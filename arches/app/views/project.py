@@ -35,11 +35,13 @@ class ProjectManagerView(BaseManagerView):
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
+            group_ids = []
             default_perms = []
             for group in user.groups.all():
                 groups.append(group.name)
+                group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser})
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids})
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
