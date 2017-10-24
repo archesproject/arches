@@ -89,5 +89,5 @@ class GroupUsers(View):
             users = User.objects.filter(id=identity_id)
 
         if len(users) > 0:
-            res = [{'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': user.last_login, 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': user.last_login, 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
         return JSONResponse(res)
