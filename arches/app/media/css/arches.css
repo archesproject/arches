@@ -5034,7 +5034,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .ep-card-crud-container {
     margin: 10px;
-} 
+}
 
 .arches-form-container {
     border: 1px solid #3b8dd5;
@@ -9292,6 +9292,30 @@ a.search-facet-item.disabled {
     padding: 0px 7px 7px 7px;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.identities-list .mpm-left-panel .project-status {
+    background-color: inherit;
+    position: absolute;
+    color: #ccc;
+    width: auto;
+    top: 25px;
+    left: 53px;
+    font-style: inherit;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.identities-list .mpm-left-panel .user .library-card-main {
+    top: 5px;
+}
+
+.identities-list .mpm-left-panel .project-status.invited {
+    color: #64bd63;
+}
+
+.identities-list .mpm-left-panel .user .project-status {
+    top: 33px;
 }
 
 .identities-list .title-block-fixed {

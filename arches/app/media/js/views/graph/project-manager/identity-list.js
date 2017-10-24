@@ -24,6 +24,9 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
             var self = this;
             this.items = options.items;
+            _.each(this.items(), function(item){
+                item.approved = ko.observable(false);
+            })
             this.groupUsers = ko.observableArray()
             this.getGroupUsers = function(identity) {
                 $.ajax({

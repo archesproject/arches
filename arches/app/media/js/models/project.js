@@ -56,9 +56,11 @@ define([
                 if (identity) {
                     var identities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
-                        identities.remove(identity.id)
+                        identities.remove(identity.id);
+                        identity.approved(false);
                     } else {
-                        identities.push(identity.id)
+                        identities.push(identity.id);
+                        identity.approved(true);
                     };
                 }
             };
@@ -131,6 +133,14 @@ define([
 
         update: function() {
             this.identities.clearSelection();
+            var groups = ko.unwrap(this.groups)
+            var users = ko.unwrap(this.users)
+            _.each(this.identities.items(), function(item) {
+                item.approved(false);
+                if ( (item.type === 'group' && _.contains(groups, item.id)) || (item.type === 'user' && _.contains(users, item.id)) ) {
+                    item.approved(true);
+                }
+            })
         }
     });
 });
