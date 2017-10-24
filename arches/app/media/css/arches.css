@@ -3550,7 +3550,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .node-current {
-    stroke: #b3b3b3;
+    stroke: #454545;
     stroke-width: 2px;
     fill: #dcecfa;
     opacity: 1.;
@@ -3586,7 +3586,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .node-ancestor {
     /* Nodes that are unselected or not highlighted as neighbors during mousover */
-    stroke: #b3b3b3;
+    stroke: #454545;
     fill: #dcecfa;
     opacity: 1.;
     stroke-width: 1px;
@@ -6559,7 +6559,7 @@ a.mega-dropdown-toggle.disabled {
     font-weight: 500;
     margin-top: 0px;
     width: 400px;
-    padding: 14px 0 5px 45px;
+    padding: 14px 0 5px 25px;
     color: #555;
 }
 
