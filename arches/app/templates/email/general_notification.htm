@@ -36,7 +36,9 @@
 
 <p>{{greeting}}</p>
 
-<a class="btn" href="{{link}}">Signup for Arches</a>
+{% if link != "" %}
+<a class="btn" href="{{link}}">{{button_text}}</a>
+{% endif %}
 
 <p>{{closing}}</p>
 
