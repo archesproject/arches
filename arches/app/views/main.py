@@ -135,18 +135,19 @@ def signup(request):
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({'link':encrypted_userinfo})
 
+            admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
             email_context = {
-                'host': request.get_host(),
+                'button_text': _('Signup for Arches'),
                 'link':request.build_absolute_uri(reverse('confirm_signup') + '?' + url_encrypted_userinfo,),
                 'greeting': _('Thanks for your interest in Arches. Click on link below to confirm your email address! Use your email address to login.'),
                 'closing': _('This link expires in 24 hours.  If you can\'t get to it before then, don\'t worry, you can always try again with the same email address.'),
             }
 
-            html_content = render_to_string('email/signup_link.htm', email_context) # ...
+            html_content = render_to_string('email/general_notification.htm', email_context) # ...
             text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, 'from@example.com', [form.cleaned_data['email']])
+            msg = EmailMultiAlternatives(_('Welcome to Arches!'), text_content, admin_email, [form.cleaned_data['email']])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
