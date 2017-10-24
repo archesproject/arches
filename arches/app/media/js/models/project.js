@@ -17,7 +17,6 @@ define([
             self.lasteditedby = ko.observable(null);
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
-            self.identityMembers = ko.observableArray()
 
             var getUserName = function(id) {
                 var user = _.find(self.identities.items(), function(i) {
@@ -32,16 +31,6 @@ define([
 
             self.lasteditedbyName = ko.computed(function () {
                 return getUserName(self.lasteditedby());
-            });
-
-            self.groupUsers = ko.computed(function () {
-                var groupUsers = _.map(self.identities.groupUsers(), function(gu) {
-                    gu['approved'] = _.some(self.groups(), function(g){
-                        return _.contains(gu.groups, g)
-                    })
-                    return gu;
-                })
-                return groupUsers;
             });
 
             self.hasIdentity = function(){

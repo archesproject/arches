@@ -261,16 +261,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <!-- User Listing -->
                                                                     <div id="user-cards" class="list-group">
                                                                         <!-- Title/Filter/Pagination -->
+                                                                        <!--ko if: selectedProject().identities.selected().type === 'group' -->
                                                                         <div class="relative mpm-item-listing-header-panel">
                                                                             <h4 class="mpm-item-listing-header">Accounts in this group</h4>
                                                                             <div class="project-search-widget mpm-item-listing">
                                                                                 <input class="form-control input-lg" placeholder="find a user..." type="text">
                                                                             </div>
                                                                         </div>
+                                                                        <!--/ko-->
 
-                                                                        <!-- ko foreach: selectedProject().groupUsers() -->
+                                                                        <!-- ko foreach: selectedProject().identities.groupUsers() -->
                                                                             <a href="#" class="list-group-item get-user-detail">
-                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'><span class="mdm-user-status pull-right">Approved</span></h4>
+                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
+                                                                                <!--ko if: $data.groups-->
+                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 -->
+                                                                                    <div>
+                                                                                        <span>Approved</span>
+                                                                                    </div>
+                                                                                    <!--/ko-->
+                                                                                <!--/ko-->
                                                                                 <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
                                                                             </a>
                                                                         <!-- /ko -->

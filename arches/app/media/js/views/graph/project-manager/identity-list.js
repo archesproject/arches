@@ -32,10 +32,8 @@ define([
                     type: 'json',
                     method: 'POST'
                 }).done(function(data) {
-                    console.log(data)
                     self.groupUsers(data)
                 }).fail(function(err) {
-                    console.log('could not get users');
                     console.log(err);
                 })
             };
