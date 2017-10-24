@@ -24,6 +24,9 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
             var self = this;
             this.items = options.items;
+            _.each(this.items(), function(item){
+                item.approved = ko.observable(false);
+            })
             this.groupUsers = ko.observableArray()
             this.getGroupUsers = function(identity) {
                 $.ajax({
@@ -32,10 +35,8 @@ define([
                     type: 'json',
                     method: 'POST'
                 }).done(function(data) {
-                    console.log(data)
                     self.groupUsers(data)
                 }).fail(function(err) {
-                    console.log('could not get users');
                     console.log(err);
                 })
             };

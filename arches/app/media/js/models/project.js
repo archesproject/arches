@@ -17,7 +17,6 @@ define([
             self.lasteditedby = ko.observable(null);
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
-            self.identityMembers = ko.observableArray()
 
             var getUserName = function(id) {
                 var user = _.find(self.identities.items(), function(i) {
@@ -34,20 +33,21 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
-            self.groupUsers = ko.computed(function () {
-                var groupUsers = _.map(self.identities.groupUsers(), function(gu) {
-                    gu['approved'] = _.some(self.groups(), function(g){
-                        return _.contains(gu.groups, g)
-                    })
-                    return gu;
-                })
-                return groupUsers;
-            });
-
             self.hasIdentity = function(){
+                var inGroups = false;
+                var inUsers = false;
                 var identity =  self.identities.selected();
-                var inUsers = _.contains(self.users(), identity.id)
-                var inGroups = _.contains(self.groups(), identity.id)
+                if (identity.type === 'user') {
+                    var inUsers = _.contains(self.users(), identity.id)
+                    //Check if user belongs to an approved group
+                    _.each(self.identities.groupUsers(), function(groupUser){
+                        if (identity.id === groupUser.id) {
+                            inGroups = _.intersection(self.groups(), groupUser.groups).length > 0
+                        };
+                    })
+                } else {
+                    var inGroups = _.contains(self.groups(), identity.id)
+                }
                 return inUsers || inGroups
             };
 
@@ -56,11 +56,36 @@ define([
                 if (identity) {
                     var identities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
-                        identities.remove(identity.id)
+                        identities.remove(identity.id);
+                        if (identity.type === 'user') {
+                            var usersAcceptedGroups = _.intersection(identity.group_ids, self.groups());
+                            if (usersAcceptedGroups.length > 0) {
+                                console.log('User still accepted via:', usersAcceptedGroups)
+                            } else {
+                                identity.approved(false);
+                            };
+                        } else {
+                            identity.approved(false);
+                            _.chain(self.identities.items()).filter(function(id) {
+                                return id.type === 'user'
+                            }).each(function(user) {
+                                if (_.contains(self.users(), user.id) === false && _.intersection(user.group_ids, self.groups()).length === 0) {
+                                    user.approved(false);
+                                }
+                            })
+                        } ;
                     } else {
-                        identities.push(identity.id)
+                        identities.push(identity.id);
+                        identity.approved(true);
+                        _.chain(self.identities.items()).filter(function(id) {
+                            return id.type === 'user'
+                        }).each(function(user) {
+                            if (_.intersection(user.group_ids, self.groups()).length > 0) {
+                                user.approved(true);
+                            }
+                        })
                     };
-                }
+                };
             };
 
             self.parse(options.source);
@@ -131,6 +156,16 @@ define([
 
         update: function() {
             this.identities.clearSelection();
+            var groups = ko.unwrap(this.groups)
+            var users = ko.unwrap(this.users)
+            _.each(this.identities.items(), function(item) {
+                item.approved(false);
+                if ((item.type === 'group' && _.contains(groups, item.id)) ||
+                    (item.type === 'user' && _.contains(users, item.id)) ||
+                    (item.type === 'user' && _.intersection(item.group_ids, groups).length)) {
+                    item.approved(true);
+                }
+            })
         }
     });
 });
