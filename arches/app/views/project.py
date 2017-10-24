@@ -17,12 +17,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 from django.db import transaction
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
+from arches.app.models.system_settings import settings
 from arches.app.views.base import BaseManagerView
 from django.contrib.auth.models import User, Group
 
@@ -81,6 +86,12 @@ class ProjectManagerView(BaseManagerView):
             self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
             self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
 
+        if project.active != data['active']:
+            # notify users in the project that the state of the project has changed
+            if data['active']:
+                self.notify_project_start(request, project)
+            else:
+                self.notify_project_end(request, project)
         project.name = data['name']
         project.active = data['active']
         project.lasteditedby = self.request.user
@@ -88,3 +99,48 @@ class ProjectManagerView(BaseManagerView):
         with transaction.atomic():
             project.save()
         return JSONResponse({'success':True, 'project': project})
+
+
+    def get_project_users(self, project):
+        users = set(project.users.all())
+        
+        for group in project.groups.all():
+            users |= set(group.user_set.all())
+
+        return users
+
+    def notify_project_start(self, request, project):
+        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
+        email_context = {
+            'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
+            'link':request.build_absolute_uri(reverse('home')),
+            'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Project.  Please take a moment to review the project description and project start and end dates.'),
+            'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
+        }
+
+        html_content = render_to_string('email/general_notification.htm', email_context)
+        text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
+
+        # create the email, and attach the HTML version as well.
+        for user in self.get_project_users(project):
+            msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Project!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            
+    def notify_project_end(self, request, project):
+        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
+        email_context = {
+            'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
+            'link':request.build_absolute_uri(reverse('home')),
+            'greeting': _('Hi!  The Mobile Project you were part of has ended or is temporarily suspended.  Please permform a final sync of your local dataset as soon as possible.'),
+            'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
+        }
+
+        html_content = render_to_string('email/general_notification.htm', email_context)
+        text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
+
+        # create the email, and attach the HTML version as well.
+        for user in self.get_project_users(project):
+            msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Project that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()

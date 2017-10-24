@@ -66,7 +66,7 @@ class SystemSettings(LazySettings):
             return super(SystemSettings, self).__getattr__(name)
         except:
             self.update_from_db()
-            return getattr(self, name)
+            return super(SystemSettings, self).__getattr__(name) #getattr(self, name, True)
 
     def update_from_db(self, **kwargs):
         """
