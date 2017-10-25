@@ -10,6 +10,9 @@ define([
         initialize: function(options) {
             var self = this;
             self.identities = options.identities || [];
+            if (this.identities.items().length) {
+                this.identities.items()[0].selected(true)
+            }
             self._project = ko.observable('{}');
             self.name = ko.observable('');
             self.active = ko.observable(false);
@@ -169,6 +172,7 @@ define([
 
         update: function() {
             this.identities.clearSelection();
+            this.identities.items()[0].selected(true)
             var groups = ko.unwrap(this.groups)
             var users = ko.unwrap(this.users)
             _.each(this.identities.items(), function(item) {
