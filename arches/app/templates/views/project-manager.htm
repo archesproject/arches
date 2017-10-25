@@ -448,25 +448,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </p>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Groups (2)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Editors, Crowdsourcers
+                                                                    Groups (<span data-bind="text: selectedProject().groupNames().length"></span>)
+                                                                    <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().groupNames">
+                                                                        <li class="" data-bind="text: $data">
+                                                                            
                                                                         </li>
                                                                     </ul>
                                                                 </li>
                                                             </ul>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Users (6)
+                                                                    Users (<span data-bind="text: selectedProject().userNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>,
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>
+                                                                        <li class="" data-bind="text: selectedProject().userNames().join(', ')">
+                                                                            
                                                                         </li>
                                                                     </ul>
                                                                 </li>

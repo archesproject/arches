@@ -36,6 +36,22 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+            self.userNames = ko.computed(function(){
+                names = [];
+                _.each(self.users(), function(userid){
+                    names.push(self.identities.findIdentity(userid, 'user').name);
+                }, this);
+                return names;
+            })
+
+            self.groupNames = ko.computed(function(){
+                names = [];
+                _.each(self.groups(), function(userid){
+                    names.push(self.identities.findIdentity(userid, 'group').name);
+                }, this);
+                return names;
+            })
+
             self.userFilter = ko.observable('');
 
             self.filteredUsers = ko.computed(function () {
