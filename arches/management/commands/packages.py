@@ -785,7 +785,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isabs(path):
                 if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, 'r'))
+                    relations = csv.DictReader(open(path, 'rU'))
                     RelationImporter().import_relations(relations)
                 else:
                     print '*'*80
