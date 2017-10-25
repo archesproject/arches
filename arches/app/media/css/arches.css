@@ -9314,6 +9314,14 @@ a.search-facet-item.disabled {
     color: #64bd63;
 }
 
+.mobile-project-manager-editor .identities-list .library-card {
+    margin-left:0;
+}
+
+.mobile-project-manager-editor .tab-content {
+    padding:1px;
+}
+
 .identities-list .mpm-left-panel .user .project-status {
     top: 33px;
 }
@@ -9330,6 +9338,10 @@ a.search-facet-item.disabled {
     width: calc(100% - 250px);
     height: 550px;
     padding: 10px;
+}
+
+.mpm-right-panel .list-group.user-cards {
+    padding-right: 35px;
 }
 
 .mpm-account-detail-panel {
