@@ -280,12 +280,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="relative mpm-item-listing-header-panel">
                                                                             <h4 class="mpm-item-listing-header">{% trans 'Accounts in this group' %}</h4>
                                                                             <div class="project-search-widget mpm-item-listing">
-                                                                                <input class="form-control input-lg" placeholder="find a user..." type="text">
+                                                                                <input class="form-control input-lg" placeholder="find a user..." type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                             </div>
                                                                         </div>
                                                                         <!--/ko-->
 
-                                                                        <!-- ko foreach: selectedProject().identities.groupUsers() -->
+                                                                        <!-- ko foreach: selectedProject().filteredUsers() -->
                                                                             <a href="#" class="list-group-item get-user-detail">
                                                                                 <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
