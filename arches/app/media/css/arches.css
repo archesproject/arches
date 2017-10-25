@@ -9306,13 +9306,18 @@ a.search-facet-item.disabled {
     font-weight: 600;
 }
 
-.identities-list .mpm-left-panel .user .library-card-main {
+.identities-list .mpm-left-panel .library-card-main.user {
     top: 5px;
 }
 
 .identities-list .mpm-left-panel .project-status.invited {
     color: #64bd63;
 }
+
+.identities-list .mpm-left-panel .project-status.user {
+    top: 33px;
+}
+
 
 .mobile-project-manager-editor .identities-list .library-card {
     margin-left:0;
