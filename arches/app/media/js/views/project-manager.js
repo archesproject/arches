@@ -2,7 +2,7 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
-    'views/graph/project-manager/identity-list',
+    'views/project-manager/identity-list',
     'models/project',
     'project-manager-data',
     'arches'
