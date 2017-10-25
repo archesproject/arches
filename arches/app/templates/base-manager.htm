@@ -295,6 +295,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         {% endif %}
 
                                         <!-- Profile Manager -->
+                                        {% if user.is_authenticated and request.user.username != 'anonymous' %}
                                         <li{% if "user-profile-manager" in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'user_profile_manager' %}" data-bind="click: navigate.bind(this, '{% url 'user_profile_manager' %}') ">
                                                 <i class="fa fa-user"></i>
@@ -303,6 +304,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                         </li>
+                                        {% endif %}
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>

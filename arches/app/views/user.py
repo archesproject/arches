@@ -20,11 +20,13 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.decorators import group_required
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.JSONResponse import JSONResponse
@@ -33,48 +35,51 @@ class UserManagerView(BaseManagerView):
 
     def get(self, request):
 
-        context = self.get_context_data(
-            main_script='views/user-profile-manager',
-        )
+        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+            context = self.get_context_data(
+                main_script='views/user-profile-manager',
+            )
 
-        context['nav']['icon'] = "fa fa-user"
-        context['nav']['title'] = _("Profile Manager")
-        context['nav']['login'] = True
-        context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
-        context['validation_help'] = validation.password_validators_help_texts()
-        return render(request, 'views/user-profile-manager.htm', context)
+            context['nav']['icon'] = "fa fa-user"
+            context['nav']['title'] = _("Profile Manager")
+            context['nav']['login'] = True
+            context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
+            context['validation_help'] = validation.password_validators_help_texts()
+            return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
 
-        context = self.get_context_data(
-            main_script='views/user-profile-manager',
-        )
-        context['errors'] = []
-        context['nav']['icon'] = 'fa fa-user'
-        context['nav']['title'] = _('Profile Manager')
-        context['nav']['login'] = True
-        context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
-        context['validation_help'] = validation.password_validators_help_texts()
+        if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+            context = self.get_context_data(
+                main_script='views/user-profile-manager',
+            )
+            context['errors'] = []
+            context['nav']['icon'] = 'fa fa-user'
+            context['nav']['title'] = _('Profile Manager')
+            context['nav']['login'] = True
+            context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
+            context['validation_help'] = validation.password_validators_help_texts()
 
 
-        user_info = request.POST.copy()
-        user_info['id'] = request.user.id
-        user_info['username'] = request.user.username
+            user_info = request.POST.copy()
+            user_info['id'] = request.user.id
+            user_info['username'] = request.user.username
 
-        form = ArchesUserProfileForm(user_info)
-        if form.is_valid():
-            user = form.save()
-            try:
-                admin_info = settings.ADMINS[0][1] if settings.ADMINS else ''
-                message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
-                user.email_user(_('You\'re Arches Profile Has Changed'), message)
-            except:
-                pass
-            request.user = user
-        context['form'] = form
+            form = ArchesUserProfileForm(user_info)
+            if form.is_valid():
+                user = form.save()
+                try:
+                    admin_info = settings.ADMINS[0][1] if settings.ADMINS else ''
+                    message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
+                    user.email_user(_('You\'re Arches Profile Has Changed'), message)
+                except:
+                    pass
+                request.user = user
+            context['form'] = form
 
-        return render(request, 'views/user-profile-manager.htm', context)
+            return render(request, 'views/user-profile-manager.htm', context)
 
+@method_decorator(group_required('Application Administrator'), name='dispatch')
 class GroupUsers(View):
 
     def post(self, request):
