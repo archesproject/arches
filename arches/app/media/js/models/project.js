@@ -33,6 +33,19 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+            self.userFilter = ko.observable('');
+
+            self.filteredUsers = ko.computed(function () {
+                var filter = self.userFilter();
+                var list = self.identities.groupUsers();
+                if (filter.length === 0) {
+                    return list;
+                }
+                return _.filter(list, function(user) {
+                    if (user.username.startsWith(filter)) {return user}
+                });
+            });
+
             self.hasIdentity = function(){
                 var inGroups = false;
                 var inUsers = false;
@@ -60,7 +73,7 @@ define([
                         if (identity.type === 'user') {
                             var usersAcceptedGroups = _.intersection(identity.group_ids, self.groups());
                             if (usersAcceptedGroups.length > 0) {
-                                console.log('User still accepted via:', usersAcceptedGroups)
+                                console.log('User still accepted via:', usersAcceptedGroups) //TODO Indicate to user approved groups a user belongs to
                             } else {
                                 identity.approved(false);
                             };
