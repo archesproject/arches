@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
@@ -94,5 +95,5 @@ class GroupUsers(View):
             users = User.objects.filter(id=identity_id)
 
         if len(users) > 0:
-            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': user.last_login, 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': datetime.strftime(user.last_login, '%Y-%m-%d %H:%M'), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
         return JSONResponse(res)
