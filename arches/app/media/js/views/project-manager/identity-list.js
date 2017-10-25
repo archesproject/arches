@@ -48,6 +48,12 @@ define([
                 }
                 return res;
             })
+        },
+
+        findIdentity: function(id, type){
+            return _.find(this.items(), function(identity){
+                return identity.id === id && identity.type === type;
+            });
         }
 
     });
