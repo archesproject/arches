@@ -36,18 +36,22 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
-            self.userNames = ko.computed(function(){
+            self.approvedUserNames = ko.computed(function(){
                 names = [];
-                _.each(self.users(), function(userid){
-                    names.push(self.identities.findIdentity(userid, 'user').name);
+                _.each(self.identities.items(), function(identity){
+                    if(identity.type === 'user' && identity.approved()){
+                        names.push(identity.name);
+                    }
                 }, this);
                 return names;
             })
 
-            self.groupNames = ko.computed(function(){
+            self.approvedGroupNames = ko.computed(function(){
                 names = [];
-                _.each(self.groups(), function(userid){
-                    names.push(self.identities.findIdentity(userid, 'group').name);
+                _.each(self.identities.items(), function(identity){
+                    if(identity.type === 'group' && identity.approved()){
+                        names.push(identity.name);
+                    }
                 }, this);
                 return names;
             })
