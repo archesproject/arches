@@ -22,10 +22,10 @@
             <div class="user-groups" data-bind="text: $data.groups"></div>
         </div>
         <!-- ko if: $data.approved() -->
-        <div class="project-status invited" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Invited' %}</div>
+        <div class="project-status invited" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Approved' %}</div>
         <!-- /ko -->
         <!-- ko ifnot: $data.approved() -->
-        <div class="project-status" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Not Invited' %}</div>
+        <div class="project-status" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Not Approved' %}</div>
         <!-- /ko -->
     </div>
 
