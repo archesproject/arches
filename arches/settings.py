@@ -326,22 +326,22 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
     },
     {
-        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
+        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
         'OPTIONS': {
-            'special_characters': ('!','@','#'),
+            'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
         }
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
     },
     {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
         'OPTIONS': {
             'min_length': 9,
         }
@@ -442,7 +442,7 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-# If True users can make edits to graphs that are locked
+# If True, users can make edits to graphs that are locked
 # (generally because they have resource intances saved against them)
 # Changing this setting to True and making graph modifications may result in
 # disagreement between your Resource Models and Resource Instances potentially
