@@ -9386,6 +9386,15 @@ a.search-facet-item.disabled {
     margin-bottom: 5px;
 }
 
+.mpm-user-name.mpm-user-title {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
