@@ -1,0 +1,50 @@
+########################
+Additional Configuration
+########################
+
+Password Validators
+===================
+
+By default, Arches requires that passwords meet the following criteria:
+
+- Have at least one numeric and one alphabetic character
+- Contain at least one special character
+- Have a minimum length of 9 characters
+- Have at least one upper and one lower case character
+
+Admins can change these requirements by configuring the `AUTH_PASSWORD_VALIDATORS`:code: setting in their projects **settings_local.py** file. Below is the default validator setting:
+
+.. code-block:: python
+
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+        },
+        {
+            'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+            'OPTIONS': {
+                'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
+            }
+        },
+        {
+            'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+        },
+        {
+            'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+        },
+        {
+            'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+            'OPTIONS': {
+                'min_length': 9,
+            }
+        },
+    ]
+
+To **remove a password validator** in Arches, you can simply remove a validator from the list of `AUTH_PASSWORD_VALIDATORS`:code:.
+
+To modify the list of **required special characters**, simply edit the list of characters in the `special_characters`:code: option in the `SpecialCharacterValidator` validator.
+
+To change the **minimum length of a password**, change the `min_length`:code: property in the `MinLengthValidator`:code: validator.
+
+Advanced users can override or add new validators by creating their own validation classes as explained in Django's password validation documentation.
+[https://docs.djangoproject.com/en/1.11/topics/auth/passwords/#module-django.contrib.auth.password_validation]
