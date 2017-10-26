@@ -71,12 +71,6 @@ define([
                 var identity =  self.identities.selected();
                 if (identity.type === 'user') {
                     var inUsers = _.contains(self.users(), identity.id)
-                    //Check if user belongs to an approved group
-                    _.each(self.identities.groupUsers(), function(groupUser){
-                        if (identity.id === groupUser.id) {
-                            inGroups = _.intersection(self.groups(), groupUser.groups).length > 0
-                        };
-                    })
                 } else {
                     var inGroups = _.contains(self.groups(), identity.id)
                 }

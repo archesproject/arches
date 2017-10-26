@@ -312,11 +312,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                     <!--/ko-->
                                                                                 <!--/ko-->
                                                                             </div>
-                                                                                <p class="mpm-user-subtitle">{% trans 'Activity: 0 edits' %} <span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                                <p class="mpm-user-subtitle">{% trans 'Activity: 0 edits' %} <span class="pull-right">Last Login: </span><span class="pull-right" data-bind="text: $data.last_login"></span></p>
                                                                             </a>
                                                                         <!-- /ko -->
 
-                                                                        <div class="mpm-user-subtitle get-user-detail users-groups">{% trans 'Belongs to the following approved groups:' %}
+                                                                        <!--ko if: _.filter(selectedProject().identities.usersGroups(), function(u){return u.approved()}).length > 0 -->
+                                                                        <div class="mpm-user-subtitle get-user-detail users-groups">{% trans 'User is approved for this project as a member of the following groups:' %}
                                                                             <ul>
                                                                                 <!-- ko foreach: selectedProject().identities.usersGroups() -->
                                                                                 <!-- ko if: $data.approved -->
@@ -327,6 +328,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <!--/ko -->
                                                                             </ul>
                                                                         </div>
+                                                                        <!--/ko-->
 
 
                                                                         <!--/ko-->
@@ -470,7 +472,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     Groups (<span data-bind="text: selectedProject().groupNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().groupNames">
                                                                         <li class="" data-bind="text: $data">
-                                                                            
+
                                                                         </li>
                                                                     </ul>
                                                                 </li>
@@ -480,7 +482,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     Users (<span data-bind="text: selectedProject().userNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
                                                                         <li class="" data-bind="text: selectedProject().userNames().join(', ')">
-                                                                            
+
                                                                         </li>
                                                                     </ul>
                                                                 </li>
