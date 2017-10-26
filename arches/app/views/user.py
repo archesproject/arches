@@ -94,6 +94,14 @@ class GroupUsers(View):
         else:
             users = User.objects.filter(id=identity_id)
 
+        def get_last_login(date):
+            result = _("Not yet logged in")
+            try:
+                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+            except TypeError as e:
+                print e
+            return result
+
         if len(users) > 0:
-            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': datetime.strftime(user.last_login, '%Y-%m-%d %H:%M'), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
         return JSONResponse(res)
