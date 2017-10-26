@@ -28,6 +28,7 @@ define([
                 item.approved = ko.observable(false);
             })
             this.groupUsers = ko.observableArray()
+            this.usersGroups = ko.observableArray()
             this.getGroupUsers = function(identity) {
                 $.ajax({
                     url: arches.urls.group_users,
@@ -36,6 +37,12 @@ define([
                     method: 'POST'
                 }).done(function(data) {
                     self.groupUsers(data)
+                    var usersGroups = _.filter(self.items(), function(item){
+                        if (item.type === 'group' && _.contains(self.selected().group_ids, item.id)) {
+                            return item
+                        }
+                    })
+                    self.usersGroups(usersGroups);
                 }).fail(function(err) {
                     console.log(err);
                 })

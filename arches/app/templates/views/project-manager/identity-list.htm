@@ -13,11 +13,22 @@
                 <i data-bind="attr: {class: 'fa fa-' + $data.type}"></i>
             </span>
         </div>
-        <div class="library-card-main" style="">
+
+
+        <div class="library-card-main" style="" data-bind="css: {'user': $data.type ==='user' }">
             <a class="name">
                 <div data-bind="text: $data.name"></div>
-                <div class="user-groups" data-bind="text: $data.groups"></div>
             </a>
+            <div class="user-groups" data-bind="text: $data.groups"></div>
         </div>
+        <!-- ko if: $data.approved() -->
+        <div class="project-status invited" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Invited' %}</div>
+        <!-- /ko -->
+        <!-- ko ifnot: $data.approved() -->
+        <div class="project-status" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Not Invited' %}</div>
+        <!-- /ko -->
     </div>
+
+
+
 {% endblock %}

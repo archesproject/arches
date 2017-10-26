@@ -286,34 +286,53 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <!-- ko foreach: selectedProject().filteredUsers() -->
                                                                             <a href="#" class="list-group-item get-user-detail">
-                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
+                                                                                <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 || _.contains($root.selectedProject().users(), $data.id)-->
-                                                                                    <div>
+                                                                                    <!--ko if: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
+                                                                                    <div class='mdm-user-status pull-right'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
                                                                                 <!--/ko-->
-                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                            </div>
+                                                                                <p class="mpm-user-subtitle">{% trans 'Activity: 0 edits' %} <span class="pull-right" data-bind="text:$data.last_login"></span></p>
                                                                             </a>
                                                                         <!-- /ko -->
                                                                         <!--/ko-->
 
                                                                         <!--ko if: selectedProject().identities.selected().type === 'user' -->
                                                                         <!-- ko foreach: selectedProject().identities.groupUsers() -->
-                                                                            <a href="#" class="list-group-item get-user-detail">
-                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
+                                                                        <a href="#" class="get-user-detail">
+                                                                            <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 || _.contains($root.selectedProject().users(), $data.id)-->
-                                                                                    <div>
+                                                                                    <!--ko if: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
+                                                                                    <div class='mdm-user-status pull-right'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
                                                                                 <!--/ko-->
-                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                            </div>
+                                                                                <p class="mpm-user-subtitle">{% trans 'Activity: 0 edits' %} <span class="pull-right" data-bind="text:$data.last_login"></span></p>
                                                                             </a>
                                                                         <!-- /ko -->
+
+                                                                        <div class="mpm-user-subtitle get-user-detail users-groups">{% trans 'Belongs to the following approved groups:' %}
+                                                                            <ul>
+                                                                                <!-- ko foreach: selectedProject().identities.usersGroups() -->
+                                                                                <!-- ko if: $data.approved -->
+                                                                                <li>
+                                                                                    <span class='mpm-user-subtitle' data-bind="text:$data.name"></span>
+                                                                                </li>
+                                                                                <!--/ko -->
+                                                                                <!--/ko -->
+                                                                            </ul>
+                                                                        </div>
+
+
                                                                         <!--/ko-->
+
+
+
 
                                                                     </div>
 
