@@ -9398,7 +9398,35 @@ a.search-facet-item.disabled {
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 10px;
 }
+
+.mpm-user-groups {
+    color: #777;
+    font-weight: 600;
+    font-size: 14px;
+    padding-top:12px;
+}
+
+.mpm-user-groups ul {
+    list-style-type: none;
+}
+
+.mpm-user-groups li {
+    font-weight: 400;
+    font-size: 13px;
+    margin-left: -40px;
+    padding-top: 3px;
+}
+
+.mpm-user-subtitle .last-login {
+    padding-left: 5px;
+}
+
+
 
 .mpm-project-status {
     position: absolute;
@@ -9408,14 +9436,17 @@ a.search-facet-item.disabled {
 }
 
 .mpm-user-status {
-    color: #fff;
-    background: #3acaa1;
-    border: 1px solid #42cca5;
+    color: #ccc;
     padding: 4px 10px;
     margin-top: -4px;
-    font-size: 13px;
-    width: 75px;
-    text-align: center;
+    font-size: 14px;
+    width: 115px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.mpm-user-name .mpm-user-status.invited {
+    color: #64bd63;
 }
 
 .mpm-user-status.add {
