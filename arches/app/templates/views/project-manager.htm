@@ -467,8 +467,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </p>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Groups (<span data-bind="text: selectedProject().groupNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().groupNames">
+                                                                    Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
+                                                                    <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().approvedGroupNames">
                                                                         <li class="" data-bind="text: $data">
                                                                             
                                                                         </li>
@@ -477,9 +477,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </ul>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Users (<span data-bind="text: selectedProject().userNames().length"></span>)
+                                                                    Users (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
-                                                                        <li class="" data-bind="text: selectedProject().userNames().join(', ')">
+                                                                        <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
                                                                             
                                                                         </li>
                                                                     </ul>
