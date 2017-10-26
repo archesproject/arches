@@ -36,7 +36,7 @@ class SpecialCharacterValidator:
         res = set(password) & set(self.special_characters)
         if len(res) == 0:
             raise ValidationError(
-                _("Your password must contain at least one of the following special character"),
+                _("Your password must contain at least one special character"),
                 code='missing special characters',
                 params={'special_characters': self.special_characters},
             )
