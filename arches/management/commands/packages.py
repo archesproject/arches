@@ -408,30 +408,31 @@ class Command(BaseCommand):
 
             if os.path.isdir(source):
                 return source
-            
+
             package_dir = False
-            
+
             unzip_into_dir = os.path.join(os.getcwd(),'_pkg_' + datetime.now().strftime('%y%m%d_%H%M%S'))
             os.mkdir(unzip_into_dir)
-            
+
             if source.endswith(".zip") and os.path.isfile(source):
                 unzip_file(source, unzip_into_dir)
-            
+
             try:
                 zip_file = os.path.join(unzip_into_dir,"source_data.zip")
                 urllib.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
             except:
                 pass
-            
-            for i in os.listdir(unzip_into_dir):
-                full_path = os.path.join(unzip_into_dir,i)
-                if os.path.isdir(full_path):
-                    package_dir = full_path
-                    break
-            
+
+            for path in os.listdir(unzip_into_dir):
+                if os.path.basename(path) != '__MACOSX':
+                    full_path = os.path.join(unzip_into_dir,path)
+                    if os.path.isdir(full_path):
+                        package_dir = full_path
+                        break
+
             return package_dir
-            
+
         package_location = handle_source(source)
         if not package_location:
             raise Exception("this is an invalid package source")
