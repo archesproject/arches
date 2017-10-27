@@ -242,7 +242,7 @@ class CsvReader(Reader):
             print '%s resources processed' % str(save_count)
 
 
-    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
+    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False):
         # errors = businessDataValidator(self.business_data)
 
         def process_resourceid(resourceid, overwrite):
@@ -297,6 +297,7 @@ class CsvReader(Reader):
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
                 concept_lookup = ConceptLookup()
+                concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
                 for node in Node.objects.filter(isrequired=True).values_list('nodeid', 'name'):
@@ -315,6 +316,25 @@ class CsvReader(Reader):
                         resourceids.append(row['ResourceID'])
                     previous_row_for_validation = row['ResourceID']
 
+                    if create_concepts == True:
+                        for node in mapping['nodes']:
+                            if node['data_type'] in ['concept', 'concept-list'] and node['file_field_name'] in row.keys():
+
+                                # make all concept values imported into a list for consistent processing
+                                concept = []
+                                for con in row[node['file_field_name']].split(','):
+                                    concept.append(con.strip())
+
+                                # check if collection is in concepts_to_create, add collection to concepts_to_create if it's not and add first child concept
+                                if node['arches_nodeid'] not in concepts_to_create:
+                                    concepts_to_create[node['arches_nodeid']] = {}
+                                    for concept_value in concept:
+                                        concepts_to_create[node['arches_nodeid']][str(uuid.uuid4())] = concept_value
+                                # if collection in concepts to create then add child concept to collection
+                                elif row[node['file_field_name']] not in concepts_to_create[node['arches_nodeid']].values():
+                                    for concept_value in concept:
+                                        concepts_to_create[node['arches_nodeid']][str(uuid.uuid4())] = concept_value
+
                 if len(non_contiguous_resource_ids) > 0:
                     print '*'*80
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
@@ -322,6 +342,49 @@ class CsvReader(Reader):
                     print 'ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again.'
                     print '*'*80
                     sys.exit()
+
+                def create_reference_data(new_concepts):
+                    candidates = Concept().get(id='00000000-0000-0000-0000-000000000006')
+                    for arches_nodeid, concepts in new_concepts.iteritems():
+                        collectionid = str(uuid.uuid4())
+                        topconceptid = str(uuid.uuid4())
+                        node = Node.objects.get(nodeid=arches_nodeid)
+
+                        # create collection
+                        collection = Concept({
+                            'id': collectionid,
+                            'legacyoid': node.name + '_import',
+                            'nodetype': 'Collection'
+                        })
+                        collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+
+                        node.config['rdmCollection'] = collectionid
+                        node.save()
+                        collection.save()
+
+                        # create top concept in candidate scheme
+                        topconcept = Concept({
+                            'id': topconceptid,
+                            'legacyoid': node.name,
+                            'nodetype': 'Concept'
+                        })
+                        topconcept.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                        topconcept.save()
+                        candidates.add_relation(topconcept, 'narrower')
+
+                        for conceptid, value in concepts.iteritems():
+                            concept = Concept({
+                                'id': conceptid,
+                                'legacyoid': value,
+                                'nodetype': 'Concept'
+                            })
+                            concept.addvalue({'id': str(uuid.uuid4()), 'value': value, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                            collection.add_relation(concept, 'member')
+                            topconcept.add_relation(concept, 'narrower')
+                            concept.save()
+
+                if create_concepts == True:
+                    create_reference_data(concepts_to_create)
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:

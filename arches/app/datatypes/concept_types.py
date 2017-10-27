@@ -70,8 +70,7 @@ class ConceptDataType(BaseConceptDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = value.strip()
-        return ret
+        return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
         if 'concept_export_value_type' in kwargs:
@@ -114,11 +113,7 @@ class ConceptListDataType(BaseConceptDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = []
-        concept = ConceptDataType()
-        for val in [v.strip() for v in value.split(',')]:
-            ret.append(concept.transform_import_values(val, nodeid))
-        return ret
+        return [v.strip() for v in value.split(',')]
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
