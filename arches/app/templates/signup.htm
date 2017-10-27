@@ -138,6 +138,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </ul>
                         </div>
 
+                        {% if enable_captcha %}
+                        <div class="form-group">
+                        {{form.captcha}}
+                        </div>
+                        {% endif %}
+
                         {% endif %}
 
                         <div class="form-group">
