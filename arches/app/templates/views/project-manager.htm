@@ -306,25 +306,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <!--/ko-->
 
                                                                         <!--ko if: selectedProject().identities.selected().type === 'user' -->
-                                                                        <!-- ko foreach: selectedProject().identities.groupUsers() -->
                                                                         <a href="#" class="get-user-detail">
-                                                                            <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
-                                                                                <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
-                                                                                    <div class='mpm-user-status invited pull-right'>
+                                                                            <div class="mpm-user-title mpm-user-name">
+                                                                                    <!--ko if: selectedProject().identities.selected().approved() -->
+                                                                                    <div class='mpm-user-status invited user'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
-                                                                                    <!--ko ifnot: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
-                                                                                    <div class='mpm-user-status pull-right'>
+                                                                                    <!--ko ifnot: selectedProject().identities.selected().approved() -->
+                                                                                    <div class='mpm-user-status user pull-right'>
                                                                                         <span>{% trans 'Not Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
-                                                                                <!--/ko-->
                                                                             </div>
-                                                                                <div class="mpm-user-subtitle"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: $data.last_login"></span></div></div>
+                                                                                <div class="mpm-user-subtitle user"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: selectedProject().identities.groupUsers()[0].last_login"></span></div></div>
                                                                             </a>
-                                                                        <!-- /ko -->
 
                                                                         <!--ko if: _.filter(selectedProject().identities.usersGroups(), function(u){return u.approved()}).length > 0 -->
                                                                         <div class="mpm-user-groups">{% trans 'Belongs to the following approved groups:' %}
