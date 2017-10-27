@@ -15,6 +15,7 @@ services:
 #        - ARCHES_PROJECT=development_project
         - INSTALL_DEFAULT_GRAPHS=True
         - INSTALL_DEFAULT_CONCEPTS=True
+        - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
         - PGHOST=db
