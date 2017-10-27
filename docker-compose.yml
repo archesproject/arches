@@ -12,6 +12,7 @@ services:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
       environment:
+#        - ARCHES_PROJECT=development_project
         - INSTALL_DEFAULT_GRAPHS=True
         - INSTALL_DEFAULT_CONCEPTS=True
         - PGPASSWORD=postgres
@@ -22,7 +23,7 @@ services:
         - ESPORT=9200
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
-        - DJANGO_NORELOAD=False
+        - DJANGO_RELOAD=False
         - DOMAIN_NAMES=localhost
         - TZ=EST
       ports:

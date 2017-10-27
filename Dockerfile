@@ -77,6 +77,9 @@ RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt &&\
 	pip install 'gunicorn==19.7.1'
 
+# Ensure that a new version of Arches invalidates the cache so it rebuilds
+ADD ./arches/__init__.py /tmp/
+
 # Install the Arches application
 COPY . ${ARCHES_ROOT}
 RUN . ${WEB_ROOT}/ENV/bin/activate &&\
