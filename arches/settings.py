@@ -141,7 +141,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  <-- Only need to uncomment this for testing without an actual email server
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'xxxx@xxx.com'
@@ -279,6 +279,7 @@ INSTALLED_APPS = (
     'arches.app.models',
     'arches.management',
     'guardian',
+    'captcha'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -350,6 +351,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 USE_LIVERELOAD = False
 LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+ENABLE_CAPTCHA = True
+# RECAPTCHA_PUBLIC_KEY = ''
+# RECAPTCHA_PRIVATE_KEY = ''
+# RECAPTCHA_USE_SSL = False
+NOCAPTCHA = True
+# RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
 
 #######################################
 ###       END STATIC SETTINGS       ###

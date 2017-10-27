@@ -37,6 +37,7 @@ from arches.app.utils.forms import ArchesUserCreationForm
 from arches.app.utils.crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+
 def index(request):
     return render(request, 'index.htm', {
         'main_script': 'index',
@@ -127,7 +128,7 @@ def signup(request):
     if request.method == 'POST':
         postdata = request.POST.copy()
         postdata['ts'] = int(time.time())
-        form = ArchesUserCreationForm(postdata)
+        form = ArchesUserCreationForm(postdata, enable_captcha=settings.ENABLE_CAPTCHA)
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
             userinfo = JSONSerializer().serialize(form.cleaned_data)
@@ -153,9 +154,10 @@ def signup(request):
             confirmation_message = _('An email has been sent to <br><strong>%s</strong><br> with a link to activate your account' % form.cleaned_data['email'])
             showform = False
     else:
-        form = ArchesUserCreationForm()
+        form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
 
     return render(request, 'signup.htm', {
+        'enable_captcha': settings.ENABLE_CAPTCHA,
         'form': form,
         'postdata': postdata,
         'showform': showform,

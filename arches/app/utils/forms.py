@@ -22,12 +22,21 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from arches.app.models import models
+from captcha.fields import ReCaptchaField
 
 class ArchesUserCreationForm(UserCreationForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
     """
+
+    def __init__(self, *args, **kwargs):
+        self.enable_captcha = kwargs.pop('enable_captcha', False)
+        super(ArchesUserCreationForm, self).__init__(*args, **kwargs)
+        if self.enable_captcha:
+            self.fields['captcha'] = ReCaptchaField(attrs={
+                'theme' : 'clean',
+            })
 
     first_name = forms.CharField()
     last_name = forms.CharField()
