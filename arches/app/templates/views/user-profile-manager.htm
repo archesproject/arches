@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Account Info -->
                 <section id="" class="profile-list">
                     <div class="account-wrapper">
-                        
+
 
                         <div class="row relative">
 
@@ -544,7 +544,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
     define('profile-manager-data', [], function() {
         return {
-            'error_count': {{form.errors|length}}
+            'error_count': {{form.errors|length}},
+            'user_projects': {{user_projects}}
         }
     });
 {% endautoescape %}</script>

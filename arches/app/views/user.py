@@ -41,11 +41,20 @@ class UserManagerView(BaseManagerView):
                 main_script='views/user-profile-manager',
             )
 
+            user = request.user
+            user_projects = [pxu.mobile_project for pxu in models.MobileProjectXUser.objects.filter(user=user)]
+            user_projects_by_group = [pxu_x_group.mobile_project for pxu_x_group in models.MobileProjectXGroup.objects.filter(group__in=user.groups.all())]
+
+            for gp in user_projects_by_group:
+                 if gp not in user_projects:
+                     user_projects.append(gp)
+
             context['nav']['icon'] = "fa fa-user"
             context['nav']['title'] = _("Profile Manager")
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
+            context['user_projects'] = JSONSerializer().serialize(user_projects)
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
