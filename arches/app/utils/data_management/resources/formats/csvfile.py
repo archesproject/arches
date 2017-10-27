@@ -321,9 +321,7 @@ class CsvReader(Reader):
                             if node['data_type'] in ['concept', 'concept-list'] and node['file_field_name'] in row.keys():
 
                                 # make all concept values imported into a list for consistent processing
-                                concept = []
-                                for con in row[node['file_field_name']].split(','):
-                                    concept.append(con.strip())
+                                concept = [con.strip() for con in row[node['file_field_name']].split(',')]
 
                                 # check if collection is in concepts_to_create, add collection to concepts_to_create if it's not and add first child concept
                                 if node['arches_nodeid'] not in concepts_to_create:
