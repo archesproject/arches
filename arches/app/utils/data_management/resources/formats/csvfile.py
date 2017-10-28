@@ -296,7 +296,6 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
-                concept_lookup = ConceptLookup()
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
@@ -318,7 +317,7 @@ class CsvReader(Reader):
 
                     if create_concepts == True:
                         for node in mapping['nodes']:
-                            if node['data_type'] in ['concept', 'concept-list'] and node['file_field_name'] in row.keys():
+                            if node['data_type'] in ['concept', 'concept-list', 'domain-value', 'domain-value-list'] and node['file_field_name'] in row.keys():
 
                                 # make all concept values imported into a list for consistent processing
                                 concept = [con.strip() for con in row[node['file_field_name']].split(',')]
@@ -348,41 +347,57 @@ class CsvReader(Reader):
                         topconceptid = str(uuid.uuid4())
                         node = Node.objects.get(nodeid=arches_nodeid)
 
-                        # create collection
-                        collection = Concept({
-                            'id': collectionid,
-                            'legacyoid': node.name + '_import',
-                            'nodetype': 'Collection'
-                        })
-                        collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                        # if node.datatype is concept or concept-list create concepts and collections
+                        if node.datatype in ['concept', 'concept-list']:
+                            # create collection
+                            collection = Concept({
+                                'id': collectionid,
+                                'legacyoid': node.name + '_import',
+                                'nodetype': 'Collection'
+                            })
+                            collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                            node.config['rdmCollection'] = collectionid
+                            node.save()
+                            collection.save()
 
-                        node.config['rdmCollection'] = collectionid
-                        node.save()
-                        collection.save()
-
-                        # create top concept in candidate scheme
-                        topconcept = Concept({
-                            'id': topconceptid,
-                            'legacyoid': node.name,
-                            'nodetype': 'Concept'
-                        })
-                        topconcept.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
-                        topconcept.save()
-                        candidates.add_relation(topconcept, 'narrower')
-
-                        for conceptid, value in concepts.iteritems():
-                            concept = Concept({
-                                'id': conceptid,
-                                'legacyoid': value,
+                            # create top concept in candidate scheme
+                            topconcept = Concept({
+                                'id': topconceptid,
+                                'legacyoid': node.name,
                                 'nodetype': 'Concept'
                             })
-                            concept.addvalue({'id': str(uuid.uuid4()), 'value': value, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
-                            collection.add_relation(concept, 'member')
-                            topconcept.add_relation(concept, 'narrower')
-                            concept.save()
+                            topconcept.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                            topconcept.save()
+                            candidates.add_relation(topconcept, 'narrower')
+
+                            # create child concepts and relate to topconcept and collection accordingly
+                            for conceptid, value in concepts.iteritems():
+                                concept = Concept({
+                                    'id': conceptid,
+                                    'legacyoid': value,
+                                    'nodetype': 'Concept'
+                                })
+                                concept.addvalue({'id': str(uuid.uuid4()), 'value': value, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                collection.add_relation(concept, 'member')
+                                topconcept.add_relation(concept, 'narrower')
+                                concept.save()
+
+                        #if node.datatype is domain or domain-list create options array in node.config
+                        elif node.datatype in ['domain-value', 'domain-value-list']:
+                            if node.config['options'] == []:
+                                for domainid, value in new_concepts[arches_nodeid].iteritems():
+                                    domainvalue = {
+                                        "text": value,
+                                        "selected": False,
+                                        "id": domainid
+                                    }
+                                    node.config['options'].append(domainvalue)
+                            node.save()
 
                 if create_concepts == True:
                     create_reference_data(concepts_to_create)
+                # if concepts are created on import concept_lookup must be instatiated afterward
+                concept_lookup = ConceptLookup()
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:
