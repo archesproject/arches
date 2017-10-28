@@ -288,12 +288,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <a href="#" class="list-group-item get-user-detail">
                                                                                 <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
+                                                                                    <!--ko if: _.contains($parent.selectedProject().users(), $data.id) -->
                                                                                     <div class='mpm-user-status invited pull-right'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
-                                                                                    <!--ko ifnot: _.intersection($parent.selectedProject().groups(), $data.groups).length > 0 || _.contains($parent.selectedProject().users(), $data.id)-->
+                                                                                    <!--ko ifnot: _.contains($parent.selectedProject().users(), $data.id) -->
                                                                                     <div class='mpm-user-status pull-right'>
                                                                                         <span>{% trans 'Not Approved' %}</span>
                                                                                     </div>
