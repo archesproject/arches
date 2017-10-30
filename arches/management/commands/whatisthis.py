@@ -1,9 +1,12 @@
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-import psycopg2
+# 
+import django.apps
+# import psycopg2
+import arches
 import json
 import uuid
+import time
 
 class Command(BaseCommand):
 
@@ -22,60 +25,31 @@ class Command(BaseCommand):
         try:
             val = uuid.UUID(in_uuid, version=4)
         except:
-            print "  -- invalid uuid"
-            return
-    
-        db = settings.DATABASES['default']
-        db_conn = "dbname = {} user = {} host = {} password = {}".format(
-            db['NAME'],db['USER'],db['HOST'],db['PASSWORD'])
-        conn = psycopg2.connect(db_conn)
-        cur = conn.cursor()
+            print "  -- this is not a vali uuid"
+            return False
         
-        sql = '''
-        SELECT tc.table_name, kc.column_name
-            FROM  
-                information_schema.table_constraints tc,  
-                information_schema.key_column_usage kc,
-                information_schema.columns c
-            WHERE 
-                kc.table_name = tc.table_name and kc.table_schema = tc.table_schema
-                AND kc.constraint_name = tc.constraint_name
-                AND kc.table_name = c.table_name and kc.table_schema = c.table_schema
-                AND c.data_type = 'uuid'
-                AND tc.constraint_type = 'PRIMARY KEY' 
-            GROUP BY tc.table_name, kc.column_name
-            ORDER BY table_name;
-        '''
+        # start1 = time.time()
         
-        cur.execute(sql)
-        result = cur.fetchall()
-       
-        match = False
-        for table,column in result:
-            sql = '''SELECT * FROM {} WHERE {} = '{}';'''.format(table,column,in_uuid)
-            cur.execute(sql)
-            result = cur.fetchall()
-            if len(result) > 0:
-                sql2 = '''
-                    SELECT COLUMN_NAME
-                        FROM INFORMATION_SCHEMA.COLUMNS
-                        WHERE TABLE_NAME='{}';
-                    '''.format(table)
-                cur.execute(sql2)
-                col_names = cur.fetchall()
-                match = True
-                break
+        ## search all models and see if the UUID matches an existing object
+        neo = False
+        for m in django.apps.apps.get_models():
+            if m._meta.pk.get_internal_type() == "UUIDField":
+                ob = m.objects.filter(pk=in_uuid)
+                if len(ob) == 1:
+                    neo = ob[0]
+                    break
         
-        if not match:
-            print "  -- this uuid could not be found in your database"
-            return
+        ## return False if nothing was found
+        if not neo:
+            print "  -- this uuid doesn't match any objects in your database"
+            return False
         
-        info = {}
-        info['table name']=table
-        for i, col in enumerate(col_names):
-            info[col[0]] = str(result[0][i])
+        print "this is a", neo
         
-        print json.dumps(info, indent=2)
+        for k,v in vars(neo).iteritems():
+            print k
+            print " ",v
         
-        return info
+        # print round(time.time()-start1,2)
         
+        return neo
