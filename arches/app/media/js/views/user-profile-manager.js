@@ -4,9 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'viewmodels/project-manager',
     'views/base-manager',
     'profile-manager-data',
-], function($, _, ko, koMapping, arches, BaseManagerView, data) {
+], function($, _, ko, koMapping, arches, ProjectManagerViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options){
@@ -31,7 +32,7 @@ define([
             self.viewModel.toggleEditUserForm = function(val){
                 this.showEditUserForm(!this.showEditUserForm())
             };
-
+            self.projectManagerViewModel = new ProjectManagerViewModel(data);
 
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',

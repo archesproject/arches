@@ -291,12 +291,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- No Project Invitations Yet -->
-                    <div id="default-mobile-projects" class="profile-default-message-panel">
+                    <!-- <div id="default-mobile-projects" class="profile-default-message-panel">
                         Sorry, but you haven't been invited to a project yet...
-                    </div>
+                    </div> -->
 
                     <!-- Project Invitations List -->
-                    <div id="mobile-projects-list" class="profile-default-message-panel" style="display: none;">
+                    <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
 
                             <!-- Find a project -->
@@ -312,11 +312,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
 
-                                    <!-- Project -->
                                     <div id="sample-project" class="project-panel">
 
-                                        <!--Project heading-->
-                                        <div class="project-panel-header">
+                                        <!-- <div class="project-panel-header">
                                             <div class="">
                                                 <div class="project-status active">Active</div>
                                             </div>
@@ -332,15 +330,84 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <a id="view-project-details-btn" href="" class="text-primary text-semibold">View Details</a>
                                                 </div>
                                             </div>
+
+                                            <div class="mpm-summary-panel">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    Project Summary
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Number of edits: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Contributors: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Offline Basemap: Streets-Grey
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="mpm-summary-panel">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    Groups/Users
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Groups (<span data-bind="text: 3"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: ['one', 'two', 'three']">
+                                                            <li class="" data-bind="text: $data">
+
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Users (<span data-bind="text: 3"></span>)
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li class="" data-bind="text: 'test'">
+
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="mpm-summary-panel">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    Models and Data Entry Cards
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Assets (3 data entry cards)
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li class="">
+                                                                Name, Modification Event, Condition Assessment
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Investigation Activities (3 data entry cards)
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li class="">
+                                                                Name, Event Location, Activity Type
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+
                                         </div>
 
 
                                     </div>
 
-                                    <!-- Project -->
                                     <div class="project-panel expired">
 
-                                        <!--Project heading-->
                                         <div class="project-panel-header">
                                             <div class="">
                                                 <div class="project-status">Inactive</div>
@@ -359,11 +426,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!--Project Details-->
-                                        <div id="project-details" class="project-panel-body" style="display: none;">
+
+                                        <div id="project-details" class="project-panel-body">
                                             <p>Lorem ipsum dolor sit amet.</p>
                                         </div>
-                                    </div>
+                                    </div> -->
 
 
                                 </div>
@@ -545,7 +612,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     define('profile-manager-data', [], function() {
         return {
             'error_count': {{form.errors|length}},
-            'user_projects': {{user_projects}}
+            'projects': {{user_projects}},
+            'identities': {{identities}}
         }
     });
 {% endautoescape %}</script>
