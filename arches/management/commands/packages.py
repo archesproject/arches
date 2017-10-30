@@ -136,9 +136,9 @@ class Command(BaseCommand):
             self.install(package_name)
 
         if options['operation'] == 'setup_db':
+            # self.delete_indexes()
+            # self.setup_indexes()
             self.setup_db(package_name)
-            self.delete_indexes()
-            self.setup_indexes()
 
         if options['operation'] == 'setup_indexes':
             self.setup_indexes()
@@ -630,7 +630,9 @@ class Command(BaseCommand):
 
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
+        self.delete_indexes()
         management.call_command('migrate')
+        #self.setup_indexes()
 
         self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
         self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)

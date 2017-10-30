@@ -9404,6 +9404,10 @@ a.search-facet-item.disabled {
     padding: 0px 10px;
 }
 
+.mpm-user-subtitle.user {
+    padding: 0px;
+}
+
 .mpm-user-groups {
     color: #777;
     font-weight: 600;
@@ -9443,6 +9447,11 @@ a.search-facet-item.disabled {
     width: 115px;
     font-weight: 600;
     text-align: right;
+}
+
+.mpm-user-status.user {
+    padding: 4px 0px;
+    text-align: left;
 }
 
 .mpm-user-name .mpm-user-status.invited {

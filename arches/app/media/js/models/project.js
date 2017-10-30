@@ -70,15 +70,12 @@ define([
             });
 
             self.hasIdentity = function(){
-                var inGroups = false;
-                var inUsers = false;
+                var approved = false;
                 var identity =  self.identities.selected();
-                if (identity.type === 'user') {
-                    var inUsers = _.contains(self.users(), identity.id)
-                } else {
-                    var inGroups = _.contains(self.groups(), identity.id)
+                if (identity) {
+                    approved = identity.approved()
                 }
-                return inUsers || inGroups
+                return approved
             };
 
             self.toggleIdentity = function() {
@@ -88,19 +85,15 @@ define([
                     if (self.hasIdentity()) {
                         identities.remove(identity.id);
                         if (identity.type === 'user') {
-                            var usersAcceptedGroups = _.intersection(identity.group_ids, self.groups());
-                            if (usersAcceptedGroups.length > 0) {
-                                console.log('User still accepted via:', usersAcceptedGroups) //TODO Indicate to user approved groups a user belongs to
-                            } else {
-                                identity.approved(false);
-                            };
+                            identity.approved(false);
                         } else {
                             identity.approved(false);
                             _.chain(self.identities.items()).filter(function(id) {
                                 return id.type === 'user'
                             }).each(function(user) {
-                                if (_.contains(self.users(), user.id) === false && _.intersection(user.group_ids, self.groups()).length === 0) {
+                                if (_.intersection(user.group_ids, self.groups()).length === 0) {// user does not belong to any accepted groups
                                     user.approved(false);
+                                    self.users.remove(user.id);
                                 }
                             })
                         } ;
@@ -112,6 +105,7 @@ define([
                         }).each(function(user) {
                             if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                 user.approved(true);
+                                self.users.push(user.id);
                             }
                         })
                     };

@@ -46,5 +46,4 @@ To modify the list of **required special characters**, simply edit the list of c
 
 To change the **minimum length of a password**, change the `min_length`:code: property in the `MinLengthValidator`:code: validator.
 
-Advanced users can override or add new validators by creating their own validation classes as explained in Django's password validation documentation.
-[https://docs.djangoproject.com/en/1.11/topics/auth/passwords/#module-django.contrib.auth.password_validation]
+Advanced users can override or add new validators by creating their own validation classes as explained in `Django's password validation documentation <https://docs.djangoproject.com/en/1.11/topics/auth/passwords/#module-django.contrib.auth.password_validation/>`_.

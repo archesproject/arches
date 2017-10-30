@@ -7,6 +7,7 @@ services:
         dockerfile: ./Dockerfile
       command: run_tests
       environment:
+        - PGUSERNAME=postgres
         - PGPASSWORD=postgres
         - PGDBNAME=arches
         - PGHOST=db

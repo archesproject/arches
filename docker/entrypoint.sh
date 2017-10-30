@@ -283,11 +283,12 @@ run_django_server() {
 	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
 	cd_app_folder
-	if [[ ${DJANGO_NORELOAD} == "True" ]]; then
-	    echo "Running Django with options --noreload --nothreading."
-		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
-	else
+	if [[ ${DJANGO_RELOAD} == "True" ]]; then
+	    echo "Running Django with livereload."
 		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+	else
+        echo "Running Django with options --noreload --nothreading."
+		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
 	fi
 }
 
@@ -297,7 +298,12 @@ run_gunicorn_server() {
 	echo ""
 	echo "----- *** RUNNING GUNICORN PRODUCTION SERVER *** -----"
 	echo ""
-	gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+	cd_app_folder
+    if [[ ! -z ${ARCHES_PROJECT} ]]; then
+        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT} --pythonpath ${ARCHES_PROJECT}
+	else
+        gunicorn arches.wsgi:application -w 2 -b :${DJANGO_PORT}
+    fi
 }
 
 
