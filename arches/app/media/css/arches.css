@@ -7912,17 +7912,21 @@ a.clear-geojson-button:hover {
 .category-title {
     font-weight: normal;
     font-size: 15px;
-    padding-right: 10px;
+    padding: 9px 15px;
     color: #999;
     display: inline-block;
 }
 
 .category-title.active {
     color: #123;
+    background: #ddd;
+    cursor: default;
 }
 
-.category-title:hover {
+.category-title:not(.active):hover{
     cursor: pointer;
+    background: #ececec;
+}
 }
 
 .carousel, .carousel .item {
