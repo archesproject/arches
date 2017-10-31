@@ -20,6 +20,7 @@ define([
             self.lasteditedby = ko.observable(null);
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
+            self.showDetails = ko.observable(false);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities.items(), function(i) {
@@ -112,6 +113,10 @@ define([
                 };
             };
 
+            self.toggleShowDetails = function(){
+                self.showDetails(!self.showDetails())
+            }
+
             self.parse(options.source);
 
             self.json = ko.computed(function() {
@@ -179,6 +184,7 @@ define([
         },
 
         update: function() {
+            console.log('test')
             this.identities.clearSelection();
             this.identities.items()[0].selected(true)
             var groups = ko.unwrap(this.groups)

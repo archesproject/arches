@@ -7,6 +7,7 @@ define([
     'viewmodels/project-manager',
     'views/base-manager',
     'profile-manager-data',
+    'bindings/slide-toggle'
 ], function($, _, ko, koMapping, arches, ProjectManagerViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
@@ -32,7 +33,8 @@ define([
             self.viewModel.toggleEditUserForm = function(val){
                 this.showEditUserForm(!this.showEditUserForm())
             };
-            self.projectManagerViewModel = new ProjectManagerViewModel(data);
+
+            self.viewModel.projectManager = new ProjectManagerViewModel(data);
 
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',

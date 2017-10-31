@@ -9514,10 +9514,19 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
 }
+
+.profile-mpm-panel {
+    margin-left: -10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
 .project-panel {
 	width: 100%;
 	border: 1px solid #3b8dd5;
-	margin-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-panel.expired {

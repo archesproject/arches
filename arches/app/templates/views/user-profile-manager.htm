@@ -290,11 +290,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         My Projects
                     </div>
 
-                    <!-- No Project Invitations Yet -->
-                    <!-- <div id="default-mobile-projects" class="profile-default-message-panel">
+                    <!--ko ifnot: projectManager.projects().length -->
+                    <div id="default-mobile-projects" class="profile-default-message-panel">
                         Sorry, but you haven't been invited to a project yet...
-                    </div> -->
+                    </div>
+                    <!--/ko-->
 
+                    <!--ko if: projectManager.projects().length -->
                     <!-- Project Invitations List -->
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
@@ -311,10 +313,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
+                                    <!--ko foreach: projectManager.projects() -->
+                                    <div class="project-panel">
 
-                                    <div id="sample-project" class="project-panel">
-
-                                        <!-- <div class="project-panel-header">
+                                        <div class="project-panel-header">
                                             <div class="">
                                                 <div class="project-status active">Active</div>
                                             </div>
@@ -327,11 +329,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </li>
                                                 </ul>
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" href="" class="text-primary text-semibold">View Details</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails()}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <div class="mpm-summary-panel">
+                                        <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'">
+                                            <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     Project Summary
                                                 </p>
@@ -348,7 +352,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                             </div>
 
-                                            <div class="mpm-summary-panel">
+                                            <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     Groups/Users
                                                 </p>
@@ -374,7 +378,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                             </div>
 
-                                            <div class="mpm-summary-panel">
+                                            <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     Models and Data Entry Cards
                                                 </p>
@@ -400,45 +404,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                             </div>
 
-
                                         </div>
-
-
-                                    </div>
-
-                                    <div class="project-panel expired">
-
-                                        <div class="project-panel-header">
-                                            <div class="">
-                                                <div class="project-status">Inactive</div>
-                                            </div>
-                                            <h3 class="project-panel-title">Marina Architecture Survey</h3>
-
-                                            <div class="">
-                                                <ul class="project-metadata">
-                                                    <li class="project-metadata-item">
-                                                        February 18, 2017 to June 30, 2017
-                                                    </li>
-                                                </ul>
-                                                <div class="project-details">
-                                                    <a href="" class="text-primary text-semibold"> View Details</a>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <div id="project-details" class="project-panel-body">
-                                            <p>Lorem ipsum dolor sit amet.</p>
-                                        </div>
-                                    </div> -->
-
 
                                 </div>
+                                <!--/ko-->
                             </div>
                         </div>
                     </div>
 
                 </div>
+                <!--/ko-->
             </div>
 
         </div>

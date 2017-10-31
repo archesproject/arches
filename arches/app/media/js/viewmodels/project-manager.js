@@ -43,6 +43,7 @@ define([
         this.selectedProject = ko.observable(null);
 
         this.selectedProject.subscribe(function(val){
+            console.log(val)
             if (val) {val.update();}
         });
 
