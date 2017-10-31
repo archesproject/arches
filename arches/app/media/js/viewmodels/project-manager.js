@@ -35,7 +35,7 @@ define([
                 return list;
             }
             return _.filter(list, function(project) {
-                return project.name().toLowerCase().indexOf(filter) > 0;
+                return project.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
             });
         });
 

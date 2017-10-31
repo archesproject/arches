@@ -304,7 +304,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a project -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control input-lg" placeholder="find a project...">
+                                    <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -313,7 +314,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
-                                    <!--ko foreach: projectManager.projects() -->
+                                    <!--ko foreach: projectManager.filteredProjects() -->
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
