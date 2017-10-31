@@ -53,10 +53,6 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = ''
 
-# test settings for elasticsearch prefix work
-SEARCH_BACKEND = 'arches.app.search.search_prefix.SearchEngine'
-ELASTICSEARCH_INDEX_PREFIX = 'yeah'
-
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
