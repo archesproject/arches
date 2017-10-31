@@ -36,6 +36,14 @@ class UserManagerView(BaseManagerView):
 
     def get(self, request):
 
+        def get_last_login(date):
+            result = _("Not yet logged in")
+            try:
+                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+            except TypeError as e:
+                print e
+            return result
+
         if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
             context = self.get_context_data(
                 main_script='views/user-profile-manager',
@@ -43,7 +51,10 @@ class UserManagerView(BaseManagerView):
 
             identities = []
             for group in Group.objects.all():
-                identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
+                users = group.user_set.all()
+                if len(users) > 0:
+                    groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+                identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
             for user in User.objects.filter():
                 groups = []
                 group_ids = []
@@ -102,29 +113,3 @@ class UserManagerView(BaseManagerView):
             context['form'] = form
 
             return render(request, 'views/user-profile-manager.htm', context)
-
-@method_decorator(group_required('Application Administrator'), name='dispatch')
-class GroupUsers(View):
-
-    def post(self, request):
-        res = {}
-        users = []
-        identity_type = request.POST.get('type')
-        identity_id = request.POST.get('id')
-        if identity_type == 'group':
-            group = Group.objects.get(id=identity_id)
-            users = group.user_set.all()
-        else:
-            users = User.objects.filter(id=identity_id)
-
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
-
-        if len(users) > 0:
-            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
-        return JSONResponse(res)

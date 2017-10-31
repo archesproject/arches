@@ -23,7 +23,7 @@ define([
             params.projects.map(function (project) {
                 return new ProjectModel({
                     source: project,
-                    identities: self.identityList
+                    identities: params.identities
                 });
             })
         );
@@ -43,7 +43,9 @@ define([
         this.selectedProject = ko.observable(null);
 
         this.selectedProject.subscribe(function(val){
-            console.log(val)
+            self.identityList.items(val.identities)
+            self.identityList.clearSelection();
+            self.identityList.items()[0].selected(true);
             if (val) {val.update();}
         });
 

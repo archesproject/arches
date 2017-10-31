@@ -10,9 +10,6 @@ define([
         initialize: function(options) {
             var self = this;
             self.identities = options.identities || [];
-            if (this.identities.items().length) {
-                this.identities.items()[0].selected(true)
-            }
             self._project = ko.observable('{}');
             self.name = ko.observable('');
             self.active = ko.observable(false);
@@ -23,7 +20,7 @@ define([
             self.showDetails = ko.observable(false);
 
             var getUserName = function(id) {
-                var user = _.find(self.identities.items(), function(i) {
+                var user = _.find(self.identities, function(i) {
                     return i.type === 'user' && i.id === id;
                 });
                 return user ? user.name : '';
@@ -32,11 +29,10 @@ define([
             self.setIdentityApproval = function(){
                 var groups = ko.unwrap(this.groups)
                 var users = ko.unwrap(this.users)
-                _.each(this.identities.items(), function(item) {
+                _.each(this.identities, function(item) {
                     item.approved(false);
                     if ((item.type === 'group' && _.contains(groups, item.id)) ||
-                        (item.type === 'user' && _.contains(users, item.id)) ||
-                        (item.type === 'user' && _.intersection(item.group_ids, groups).length)) {
+                        (item.type === 'user' && _.contains(users, item.id))) {
                         item.approved(true);
                     }
                 })
@@ -50,9 +46,17 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+
+            self.selectedIdentity = ko.computed(function () {
+                var selected = _.filter(self.identities, function(identity){
+                    return ko.unwrap(identity.selected);
+                });
+                return selected.length > 0 ? selected[0] : undefined;
+            });
+
             self.approvedUserNames = ko.computed(function(){
                 names = [];
-                _.each(self.identities.items(), function(identity){
+                _.each(self.identities, function(identity){
                     if(identity.type === 'user' && identity.approved()){
                         names.push(identity.name);
                     }
@@ -62,7 +66,7 @@ define([
 
             self.approvedGroupNames = ko.computed(function(){
                 names = [];
-                _.each(self.identities.items(), function(identity){
+                _.each(self.identities, function(identity){
                     if(identity.type === 'group' && identity.approved()){
                         names.push(identity.name);
                     }
@@ -74,9 +78,15 @@ define([
 
             self.filteredUsers = ko.computed(function () {
                 var filter = self.userFilter();
-                var list = self.identities.groupUsers();
-                if (filter.length === 0) {
-                    return list;
+                var selected = _.filter(self.identities, function(identity){
+                    return ko.unwrap(identity.selected);
+                });
+                var list = []
+                if (selected.length === 1) {
+                    list = selected[0].users;
+                    if (filter.length === 0) {
+                        return list;
+                    }
                 }
                 return _.filter(list, function(user) {
                     if (user.username.startsWith(filter)) {return user}
@@ -85,7 +95,7 @@ define([
 
             self.hasIdentity = function(){
                 var approved = false;
-                var identity =  self.identities.selected();
+                var identity =  self.selectedIdentity();
                 if (identity) {
                     approved = identity.approved()
                 }
@@ -93,7 +103,7 @@ define([
             };
 
             self.toggleIdentity = function() {
-                var identity =  self.identities.selected();
+                var identity =  self.selectedIdentity();
                 if (identity) {
                     var identities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
@@ -102,7 +112,7 @@ define([
                             identity.approved(false);
                         } else {
                             identity.approved(false);
-                            _.chain(self.identities.items()).filter(function(id) {
+                            _.chain(self.identities).filter(function(id) {
                                 return id.type === 'user'
                             }).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) {// user does not belong to any accepted groups
@@ -114,7 +124,7 @@ define([
                     } else {
                         identities.push(identity.id);
                         identity.approved(true);
-                        _.chain(self.identities.items()).filter(function(id) {
+                        _.chain(self.identities).filter(function(id) {
                             return id.type === 'user'
                         }).each(function(user) {
                             if (_.intersection(user.group_ids, self.groups()).length > 0) {
@@ -127,6 +137,7 @@ define([
             };
 
             self.toggleShowDetails = function(){
+                self.setIdentityApproval();
                 self.showDetails(!self.showDetails())
             }
 
@@ -197,8 +208,6 @@ define([
         },
 
         update: function() {
-            this.identities.clearSelection();
-            this.identities.items()[0].selected(true);
             this.setIdentityApproval();
         }
     });

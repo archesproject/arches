@@ -355,11 +355,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    Groups/Users
+                                                    {% trans 'Groups/Users' %}
                                                 </p>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        Groups (<span data-bind="text: $data.approvedGroupNames().length"></span>)
+                                                        {% trans 'Groups' %} (<span data-bind="text: $data.approvedGroupNames().length"></span>)
                                                         <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedGroupNames">
                                                             <li class="" data-bind="text: $data">
 
@@ -369,7 +369,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        Users (<span data-bind="text: $data.approvedUserNames().length"></span>)
+                                                        {% trans 'Users' %} (<span data-bind="text: $data.approvedUserNames().length"></span>)
                                                         <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedUserNames">
                                                             <li class="" data-bind="text: $data">
 
