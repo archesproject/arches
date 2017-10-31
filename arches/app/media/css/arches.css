@@ -5884,8 +5884,9 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     line-height: 35px;
 }
 
-.resource-tools a.resource-grid-title:hover {
+.resource-tools a.resource-grid-title:not(.active):hover {
     color: #666;
+    background: #ececec;
 }
 
 .resource-tools a.resource-grid-title.active:hover {
