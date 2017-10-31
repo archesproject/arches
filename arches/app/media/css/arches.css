@@ -5879,9 +5879,13 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .resource-tools a.resource-grid-title {
     color: #999;
     margin-top: 6px;
-    margin-left: 10px;
+    margin-left: 3px;
     padding: 3px 20px 6px 20px;
     line-height: 35px;
+}
+
+.resource-tools a.resource-grid-title:first-of-type {
+    margin-left: 10px;
 }
 
 .resource-tools a.resource-grid-title:not(.active):hover {
