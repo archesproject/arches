@@ -29,6 +29,19 @@ define([
                 return user ? user.name : '';
             };
 
+            self.setIdentityApproval = function(){
+                var groups = ko.unwrap(this.groups)
+                var users = ko.unwrap(this.users)
+                _.each(this.identities.items(), function(item) {
+                    item.approved(false);
+                    if ((item.type === 'group' && _.contains(groups, item.id)) ||
+                        (item.type === 'user' && _.contains(users, item.id)) ||
+                        (item.type === 'user' && _.intersection(item.group_ids, groups).length)) {
+                        item.approved(true);
+                    }
+                })
+            };
+
             self.createdbyName = ko.computed(function () {
                 return getUserName(self.createdby());
             });
@@ -118,6 +131,7 @@ define([
             }
 
             self.parse(options.source);
+            self.setIdentityApproval();
 
             self.json = ko.computed(function() {
                 var jsObj = ko.toJS({
@@ -144,7 +158,6 @@ define([
             self.lasteditedby(source.lasteditedby_id);
             self.groups(source.groups);
             self.users(source.users);
-
             self.set('id', source.id);
         },
 
@@ -184,19 +197,9 @@ define([
         },
 
         update: function() {
-            console.log('test')
             this.identities.clearSelection();
-            this.identities.items()[0].selected(true)
-            var groups = ko.unwrap(this.groups)
-            var users = ko.unwrap(this.users)
-            _.each(this.identities.items(), function(item) {
-                item.approved(false);
-                if ((item.type === 'group' && _.contains(groups, item.id)) ||
-                    (item.type === 'user' && _.contains(users, item.id)) ||
-                    (item.type === 'user' && _.intersection(item.group_ids, groups).length)) {
-                    item.approved(true);
-                }
-            })
+            this.identities.items()[0].selected(true);
+            this.setIdentityApproval();
         }
     });
 });

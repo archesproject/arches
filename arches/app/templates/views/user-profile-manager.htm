@@ -226,7 +226,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- No Device Registered Yet -->
-                    <div class="profile-default-message-panel">
+                    <div class="">
 
                         <!-- Download panel -->
                         <div id="download-buttons-panel" class="">
@@ -319,9 +319,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <div class="project-panel-header">
                                             <div class="">
-                                                <div class="project-status active">Active</div>
+                                                <div class="project-status" data-bind="text: $data.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: $data.active()}"></div>
                                             </div>
-                                            <h3 class="project-panel-title">Excelsior Post-Loma Prieta Damage Assessment</h3>
+                                            <h3 class="project-panel-title" data-bind="text: $data.name"></h3>
 
                                             <div class="">
                                                 <ul class="project-metadata">
@@ -359,8 +359,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </p>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        Groups (<span data-bind="text: 3"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: ['one', 'two', 'three']">
+                                                        Groups (<span data-bind="text: $data.approvedGroupNames().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedGroupNames">
                                                             <li class="" data-bind="text: $data">
 
                                                             </li>
@@ -369,9 +369,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </ul>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        Users (<span data-bind="text: 3"></span>)
-                                                        <ul class="mpm-node-detail-metadata">
-                                                            <li class="" data-bind="text: 'test'">
+                                                        Users (<span data-bind="text: $data.approvedUserNames().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedUserNames">
+                                                            <li class="" data-bind="text: $data">
 
                                                             </li>
                                                         </ul>

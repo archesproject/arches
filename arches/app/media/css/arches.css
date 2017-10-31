@@ -9516,9 +9516,12 @@ a.search-facet-item.disabled {
 }
 
 .profile-mpm-panel {
-    margin-left: -10px;
+    margin-left: 20px;
     margin-top: 10px;
     padding-bottom: 10px;
+    text-align: justify;
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 13px;
 }
 
 .project-panel {
