@@ -10,11 +10,11 @@ define([
 
     viewModel = new ProjectManagerViewModel(data);
 
-    viewModel.saveProject = function () {
+    viewModel.saveProject = function() {
         var self = this;
         this.loading(true);
         var addProject = !this.selectedProject().get('id');
-        this.selectedProject().save(function () {
+        this.selectedProject().save(function() {
             if (addProject) {
                 self.projects.push(self.selectedProject());
             }
@@ -22,7 +22,7 @@ define([
         });
     }
 
-    viewModel.discardEdits = function () {
+    viewModel.discardEdits = function() {
         if (!this.selectedProject().get('id')) {
             this.selectedProject(null)
         } else {
@@ -30,7 +30,7 @@ define([
         }
     }
 
-    viewModel.newProject = function () {
+    viewModel.newProject = function() {
         if (!this.selectedProject() || !this.selectedProject().dirty()) {
             this.selectedProject(new ProjectModel({
                 source: {

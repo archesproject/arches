@@ -26,7 +26,7 @@ define([
                 return user ? user.name : '';
             };
 
-            self.setIdentityApproval = function(){
+            self.setIdentityApproval = function() {
                 var groups = ko.unwrap(this.groups)
                 var users = ko.unwrap(this.users)
                 _.each(this.identities, function(item) {
@@ -38,36 +38,36 @@ define([
                 })
             };
 
-            self.createdbyName = ko.computed(function () {
+            self.createdbyName = ko.computed(function() {
                 return getUserName(self.createdby());
             });
 
-            self.lasteditedbyName = ko.computed(function () {
+            self.lasteditedbyName = ko.computed(function() {
                 return getUserName(self.lasteditedby());
             });
 
 
-            self.selectedIdentity = ko.computed(function () {
-                var selected = _.filter(self.identities, function(identity){
+            self.selectedIdentity = ko.computed(function() {
+                var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
                 return selected.length > 0 ? selected[0] : undefined;
             });
 
-            self.approvedUserNames = ko.computed(function(){
+            self.approvedUserNames = ko.computed(function() {
                 names = [];
-                _.each(self.identities, function(identity){
-                    if(identity.type === 'user' && identity.approved()){
+                _.each(self.identities, function(identity) {
+                    if (identity.type === 'user' && identity.approved()) {
                         names.push(identity.name);
                     }
                 }, this);
                 return names;
             })
 
-            self.approvedGroupNames = ko.computed(function(){
+            self.approvedGroupNames = ko.computed(function() {
                 names = [];
-                _.each(self.identities, function(identity){
-                    if(identity.type === 'group' && identity.approved()){
+                _.each(self.identities, function(identity) {
+                    if (identity.type === 'group' && identity.approved()) {
                         names.push(identity.name);
                     }
                 }, this);
@@ -76,9 +76,9 @@ define([
 
             self.userFilter = ko.observable('');
 
-            self.filteredUsers = ko.computed(function () {
+            self.filteredUsers = ko.computed(function() {
                 var filter = self.userFilter();
-                var selected = _.filter(self.identities, function(identity){
+                var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
                 var list = []
@@ -89,13 +89,15 @@ define([
                     }
                 }
                 return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {return user}
+                    if (user.username.startsWith(filter)) {
+                        return user
+                    }
                 });
             });
 
-            self.hasIdentity = function(){
+            self.hasIdentity = function() {
                 var approved = false;
-                var identity =  self.selectedIdentity();
+                var identity = self.selectedIdentity();
                 if (identity) {
                     approved = identity.approved()
                 }
@@ -103,7 +105,7 @@ define([
             };
 
             self.toggleIdentity = function() {
-                var identity =  self.selectedIdentity();
+                var identity = self.selectedIdentity();
                 if (identity) {
                     var identities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
@@ -115,12 +117,12 @@ define([
                             _.chain(self.identities).filter(function(id) {
                                 return id.type === 'user'
                             }).each(function(user) {
-                                if (_.intersection(user.group_ids, self.groups()).length === 0) {// user does not belong to any accepted groups
+                                if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
                                     self.users.remove(user.id);
                                 }
                             })
-                        } ;
+                        };
                     } else {
                         identities.push(identity.id);
                         identity.approved(true);
@@ -136,7 +138,7 @@ define([
                 };
             };
 
-            self.toggleShowDetails = function(){
+            self.toggleShowDetails = function() {
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails())
             }
@@ -176,18 +178,18 @@ define([
             this.parse(JSON.parse(this._project()), self);
         },
 
-        _getURL: function(method){
+        _getURL: function(method) {
             return this.url;
         },
 
-        save: function (userCallback, scope) {
+        save: function(userCallback, scope) {
             var self = this;
             var method = "POST";
-            var callback = function (request, status, model) {
+            var callback = function(request, status, model) {
                 if (typeof userCallback === 'function') {
                     userCallback.call(this, request, status, model);
                 }
-                if (status==='success') {
+                if (status === 'success') {
                     self.set('id', request.responseJSON.project.id);
                     self.createdby(request.responseJSON.project.createdby_id);
                     self.lasteditedby(request.responseJSON.project.lasteditedby_id);
