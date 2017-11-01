@@ -29,7 +29,6 @@ define([
                     }
 
                     value.subscribe(function (newValue) {
-                        console.log(newValue);
                         if (_.isObject(newValue)) {
                           newValue = moment(newValue).format(options['format']);
                         }
@@ -53,7 +52,6 @@ define([
                                 delete options[key];
                             }
                         });
-                        console.log(options);
                         if (picker) {
                             picker.options(options);
                             picker.date(allBindingsAccessor().value());

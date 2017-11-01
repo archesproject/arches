@@ -5,7 +5,8 @@ define([
     'viewmodels/project-manager',
     'models/project',
     'project-manager-data',
-    'arches'
+    'arches',
+    'bindings/datepicker'
 ], function(_, ko, BaseManagerView, ProjectManagerViewModel, ProjectModel, data, arches) {
     var viewModel = new ProjectManagerViewModel(data);
 
