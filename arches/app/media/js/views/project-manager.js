@@ -38,7 +38,7 @@ define([
                     active: false,
                     id: null
                 },
-                identities: this.identityList
+                identities: data.identities
             }));
         }
     }
