@@ -40,7 +40,7 @@ class UserManagerView(BaseManagerView):
         try:
             result = datetime.strftime(date, '%Y-%m-%d %H:%M')
         except TypeError as e:
-            print e
+            pass
         return result
 
     def get_user_details(self, user):
@@ -58,7 +58,7 @@ class UserManagerView(BaseManagerView):
                 groups.append(group.name)
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids})
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
         user_projects = [pxu.mobile_project for pxu in models.MobileProjectXUser.objects.filter(user=user)]
         user_projects_by_group = [pxu_x_group.mobile_project for pxu_x_group in models.MobileProjectXGroup.objects.filter(group__in=user.groups.all())]
@@ -108,6 +108,8 @@ class UserManagerView(BaseManagerView):
             user_info = request.POST.copy()
             user_info['id'] = request.user.id
             user_info['username'] = request.user.username
+            user_info['password1'] = request.user.password
+            user_info['password2'] = request.user.password
 
             form = ArchesUserProfileForm(user_info)
 
