@@ -1,7 +1,6 @@
 define([
     'underscore',
     'knockout',
-    'moment',
     'views/base-manager',
     'viewmodels/project-manager',
     'models/project',
