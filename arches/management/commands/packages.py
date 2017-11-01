@@ -45,6 +45,7 @@ from arches.app.utils.skos import SKOSReader
 from arches.app.views.tileserver import seed_resource_cache
 from arches.management.commands import utils
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
+from arches.app.search.mappings import prepare_term_index, prepare_resource_relations_index
 
 class Command(BaseCommand):
     """
@@ -133,8 +134,6 @@ class Command(BaseCommand):
             self.install(package_name)
 
         if options['operation'] == 'setup_db':
-            # self.delete_indexes()
-            # self.setup_indexes()
             self.setup_db(package_name)
 
         if options['operation'] == 'setup_indexes':
@@ -628,8 +627,9 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
         self.delete_indexes()
+        prepare_term_index(create=True)
+        prepare_resource_relations_index(create=True)
         management.call_command('migrate')
-        #self.setup_indexes()
 
         self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
         self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
