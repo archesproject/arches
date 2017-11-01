@@ -5,10 +5,10 @@ define([
     'viewmodels/project-manager',
     'models/project',
     'project-manager-data',
-    'arches'
+    'arches',
+    'bindings/datepicker'
 ], function(_, ko, BaseManagerView, ProjectManagerViewModel, ProjectModel, data, arches) {
-
-    viewModel = new ProjectManagerViewModel(data);
+    var viewModel = new ProjectManagerViewModel(data);
 
     viewModel.saveProject = function() {
         var self = this;
@@ -36,6 +36,9 @@ define([
                 source: {
                     name: '',
                     active: false,
+                    description: '',
+                    startdate: null,
+                    enddate: null,
                     id: null
                 },
                 identities: data.identities

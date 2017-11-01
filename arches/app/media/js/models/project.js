@@ -12,6 +12,9 @@ define([
             self.identities = options.identities || [];
             self._project = ko.observable('{}');
             self.name = ko.observable('');
+            self.description = ko.observable('');
+            self.startdate = ko.observable(null);
+            self.enddate = ko.observable(null);
             self.active = ko.observable(false);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
@@ -149,11 +152,14 @@ define([
             self.json = ko.computed(function() {
                 var jsObj = ko.toJS({
                     name: self.name,
+                    description: self.description,
+                    startdate: self.startdate,
+                    enddate: self.enddate,
                     active: self.active,
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
-                })
+                });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
 
@@ -166,6 +172,9 @@ define([
             var self = this;
             self._project(JSON.stringify(source));
             self.name(source.name);
+            self.description(source.description);
+            self.startdate(source.startdate);
+            self.enddate(source.enddate);
             self.active(source.active);
             self.createdby(source.createdby_id);
             self.lasteditedby(source.lasteditedby_id);

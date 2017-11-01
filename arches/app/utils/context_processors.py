@@ -25,7 +25,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 def livereload(request):
     return {
-        'livereload_port': settings.LIVERELOAD_PORT
+        'livereload_port': settings.LIVERELOAD_PORT,
+        'use_livereload': settings.USE_LIVERELOAD
     }
 
 
