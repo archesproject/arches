@@ -1,12 +1,14 @@
 define([
     'underscore',
     'knockout',
+    'moment',
     'views/base-manager',
     'views/project-manager/identity-list',
     'models/project',
     'project-manager-data',
-    'arches'
-], function(_, ko, BaseManagerView, IdentityList, ProjectModel, data, arches) {
+    'arches',
+    'bindings/datepicker'
+], function(_, ko, moment, BaseManagerView, IdentityList, ProjectModel, data, arches) {
     var identityList = new IdentityList({
         items: ko.observableArray(data.identities)
     });
@@ -35,9 +37,11 @@ define([
     selectedProject.subscribe(function(val){
         if (val) {val.update();}
     });
+    var dateFormat = 'YYYY-MM-DD';
     var pageView = new BaseManagerView({
         viewModel: {
             loading: loading,
+            dateFormat: dateFormat,
             projects: projects,
             projectFilter: projectFilter,
             selectedProject: selectedProject,
@@ -66,6 +70,9 @@ define([
                         source: {
                             name: '',
                             active: false,
+                            description: '',
+                            startdate: null,
+                            enddate: null,
                             id: null
                         },
                         identities: identityList

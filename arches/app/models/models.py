@@ -834,12 +834,15 @@ class UserProfile(models.Model):
 
 class MobileProject(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
+    name = models.TextField(null=True)
     active = models.BooleanField(default=False)
     createdby = models.ForeignKey(User, related_name='createdby')
     lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
     users = models.ManyToManyField(to=User, through='MobileProjectXUser')
     groups = models.ManyToManyField(to=Group, through='MobileProjectXGroup')
+    startdate = models.DateField(blank=True, null=True)
+    enddate = models.DateField(blank=True, null=True)
+    description = models.TextField(null=True)
 
     def __unicode__(self):
         return self.name

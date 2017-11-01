@@ -93,6 +93,11 @@ class ProjectManagerView(BaseManagerView):
             else:
                 self.notify_project_end(request, project)
         project.name = data['name']
+        project.description = data['description']
+        if data['startdate'] != '':
+            project.startdate = data['startdate']
+        if data['enddate'] != '':
+            project.enddate = data['enddate']
         project.active = data['active']
         project.lasteditedby = self.request.user
 
@@ -103,7 +108,7 @@ class ProjectManagerView(BaseManagerView):
 
     def get_project_users(self, project):
         users = set(project.users.all())
-        
+
         for group in project.groups.all():
             users |= set(group.user_set.all())
 
@@ -126,7 +131,7 @@ class ProjectManagerView(BaseManagerView):
             msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Project!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            
+
     def notify_project_end(self, request, project):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {

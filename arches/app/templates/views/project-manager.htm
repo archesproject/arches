@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- ko if: projects().length >  0 -->
                 <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected" style="width: 270px;">
                     <!-- ko foreach: filteredProjects() -->
-                    <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: $parent.selectedProject" style="width: 270px;">
+                    <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: function (p) { $parent.selectedProject(null);$parent.selectedProject(p); }" style="width: 270px;">
                         <div class="mpm-project-card">
                             <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></a>
                         </div>
@@ -107,7 +107,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="">
                                 <ul class="project-metadata">
                                     <li class="project-metadata-item">
-                                        PROJECT DATE RANGE HERE...
+                                        <span data-bind="text: selectedProject().startdate() || '?'"></span>
+                                        to
+                                        <span data-bind="text: selectedProject().enddate() || '?'"></span>
                                     </li>
                                 </ul>
                                 <div class="project-details" data-bind="if: selectedProject().dirty">
@@ -169,11 +171,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <!-- Section Content -->
                                                                 <div class="col-sm-12">
 
-                                                                    <!-- Account CRUD Panel -->
                                                                     <div id="account-crud" class="" style="">
-                                                                        <!-- User Name, Password -->
                                                                         <div class="row">
-                                                                            <!-- User Name -->
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
                                                                                     <label class="control-label account-label">Project name</label>
@@ -181,7 +180,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 </div>
                                                                             </div>
 
-                                                                            <!-- Password -->
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
                                                                                     Pick a concise name that makes it easy for people to find your project
@@ -191,8 +189,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <hr style="border-color: #eee;">
 
-                                                                    </div>
+                                                                        <div class="row">
+                                                                            <div class="col-sm-5">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Project start</label>
+                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-6">
+                                                                                <p class="account-tips">
+                                                                                    The project start and end dates are used to limit when people can add or edit Arches data.
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
 
+                                                                        <div class="row">
+                                                                            <div class="col-sm-5">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Project end</label>
+                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <hr style="border-color: #eee;">
+
+                                                                        <div class="row">
+                                                                            <div class="col-sm-12">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Description</label>
+                                                                                    <div>
+                                                                                        <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: selectedProject().description, valueUpdate: 'keyup'"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
