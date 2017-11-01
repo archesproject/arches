@@ -40,7 +40,7 @@ define([
                     enddate: null,
                     id: null
                 },
-                identities: this.identityList
+                identities: data.identities
             }));
         }
     }
