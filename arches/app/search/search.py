@@ -27,7 +27,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class SearchEngine(object):
 
-    def __init__(self):
+    def __init__(self, prefix=settings.ELASTICSEARCH_PREFIX):
         #
         serializer = JSONSerializer()
         serializer.mimetype = 'application/json'
@@ -35,6 +35,22 @@ class SearchEngine(object):
         serializer.loads = JSONDeserializer().deserialize
         self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
         self.logger = logging.getLogger(__name__)
+        self.prefix = prefix.lower()
+
+    def _add_prefix(self, *args, **kwargs):
+        if args:
+            index = args[0].strip()
+        else:
+            index = kwargs.get('index', '').strip()
+        if index is None or index == '':
+            raise NotImplementedError("Elasticsearch index not specified.")
+
+        prefix = '%s_' % self.prefix.strip() if self.prefix and self.prefix.strip() != '' else ''
+        index = '%s%s' % (prefix, index)
+        if args:
+            return index
+        else:
+            return dict(kwargs, index=index)
 
     def delete(self, **kwargs):
         """
@@ -44,6 +60,7 @@ class SearchEngine(object):
 
         """
 
+        kwargs = self._add_prefix(**kwargs)
         body = kwargs.pop('body', None)
         if body != None:
             try:
@@ -70,9 +87,9 @@ class SearchEngine(object):
 
         """
 
-        index = kwargs.get('index', '').strip()
-        print 'deleting index : %s' % index
-        return self.es.indices.delete(index=index, ignore=[400, 404])
+        kwargs = self._add_prefix(**kwargs)
+        print 'deleting index : %s' % kwargs.get('index')
+        return self.es.indices.delete(ignore=[400, 404], **kwargs)
 
     def search(self, **kwargs):
         """
@@ -82,13 +99,10 @@ class SearchEngine(object):
 
         """
 
+        kwargs = self._add_prefix(**kwargs)
         body = kwargs.get('body', None)
-        index = kwargs.get('index', None)
         id = kwargs.get('id', None)
-
-        if index is None:
-            raise NotImplementedError("You must specify an 'index' in your call to search")
-
+        
         if id:
             if isinstance(id, list):
                 kwargs.setdefault('body', {'ids': kwargs.pop('id')})
@@ -111,6 +125,7 @@ class SearchEngine(object):
 
         """
 
+        index = self._add_prefix(index)
         if not body:
             if fieldtype == 'geo_shape':
                 body =  {
@@ -137,6 +152,7 @@ class SearchEngine(object):
         print 'creating index : %s/%s' % (index, doc_type)
 
     def create_index(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
         self.es.indices.create(**kwargs)
         print 'creating index : %s' % kwargs.get('index', '')
 
@@ -151,6 +167,7 @@ class SearchEngine(object):
 
         """
 
+        index = self._add_prefix(index)
         if not isinstance(body, list):
             body = [body]
 
@@ -174,7 +191,7 @@ class SearchEngine(object):
     def create_bulk_item(self, op_type='index', index=None, doc_type=None, id=None, data=None):
         return {
             '_op_type': op_type,
-            '_index': index,
+            '_index': self._add_prefix(index),
             '_type': doc_type,
             '_id': id,
             '_source': data
@@ -198,7 +215,7 @@ class SearchEngine(object):
             def add(self, op_type='index', index=None, doc_type=None, id=None, data=None):
                 doc = {
                     '_op_type': op_type,
-                    '_index': index,
+                    '_index': outer_self._add_prefix(index),
                     '_type': doc_type,
                     '_id': id,
                     '_source': data

@@ -26,7 +26,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': get_env_variable('PGDBNAME'),
-        'USER': 'postgres',
+        'USER': get_env_variable('PGUSERNAME'),
         'PASSWORD': get_env_variable('PGPASSWORD'),
         'HOST': get_env_variable('PGHOST'),
         'PORT': get_env_variable('PGPORT'),

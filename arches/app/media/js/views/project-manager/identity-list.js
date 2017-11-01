@@ -27,25 +27,9 @@ define([
             _.each(this.items(), function(item){
                 item.approved = ko.observable(false);
             })
-            this.groupUsers = ko.observableArray()
-            this.getGroupUsers = function(identity) {
-                $.ajax({
-                    url: arches.urls.group_users,
-                    data: {type: identity.type, id: identity.id},
-                    type: 'json',
-                    method: 'POST'
-                }).done(function(data) {
-                    self.groupUsers(data)
-                }).fail(function(err) {
-                    console.log(err);
-                })
-            };
-
+            this.usersGroups = ko.observableArray()
             this.selected = ko.computed(function(){
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
-                if (res != '') {
-                    self.getGroupUsers(res);
-                }
                 return res;
             })
         }

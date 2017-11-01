@@ -4,12 +4,14 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'viewmodels/project-manager',
     'views/base-manager',
     'profile-manager-data',
-], function($, _, ko, koMapping, arches, BaseManagerView, data) {
+    'bindings/slide-toggle'
+], function($, _, ko, koMapping, arches, ProjectManagerViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
-        initialize: function(options){
+        initialize: function(options) {
             var self = this;
             self.viewModel.showChangePasswordForm = ko.observable(false);
             self.viewModel.showEditUserForm = ko.observable(!!data.error_count);
@@ -19,7 +21,7 @@ define([
             self.viewModel.mismatchedPasswords = ko.observable()
             self.viewModel.changePasswordSuccess = ko.observable()
 
-            self.viewModel.toggleChangePasswordForm = function(val){
+            self.viewModel.toggleChangePasswordForm = function(val) {
                 this.showChangePasswordForm(!this.showChangePasswordForm())
                 if (this.showChangePasswordForm()) {
                     self.viewModel.validationErrors([])
@@ -28,10 +30,11 @@ define([
                     self.viewModel.changePasswordSuccess('')
                 }
             };
-            self.viewModel.toggleEditUserForm = function(val){
+            self.viewModel.toggleEditUserForm = function(val) {
                 this.showEditUserForm(!this.showEditUserForm())
             };
 
+            self.viewModel.projectManager = new ProjectManagerViewModel(data);
 
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',
@@ -39,13 +42,13 @@ define([
                 new_password2: ''
             });
 
-            self.viewModel.changePassword = function(){
+            self.viewModel.changePassword = function() {
                 var payload = koMapping.toJS(self.viewModel.credentials)
                 $.ajax({
                     url: arches.urls.change_password,
                     method: "POST",
                     data: payload,
-                }).done(function(data){
+                }).done(function(data) {
                     self.viewModel.invalidPassword(data.invalid_password);
                     self.viewModel.mismatchedPasswords(data.mismatched);
                     self.viewModel.validationErrors(data.password_validations);
@@ -54,7 +57,7 @@ define([
                         self.viewModel.toggleChangePasswordForm();
                     }
 
-                }).fail(function(err){
+                }).fail(function(err) {
                     console.log(err);
                 });
             }

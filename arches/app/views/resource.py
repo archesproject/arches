@@ -239,7 +239,6 @@ class ResourceData(View):
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
         if resourceid is not None:
-            es = Elasticsearch()
             se = SearchEngineFactory().create()
             document = se.search(index='resource', doc_type='_all', id=resourceid)
             resource = Resource.objects.get(pk=resourceid)
@@ -390,7 +389,6 @@ class RelatedResourcesView(BaseManagerView):
 
     def delete(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        es = Elasticsearch()
         se = SearchEngineFactory().create()
         req = dict(request.GET)
         ids_to_delete = req['resourcexids[]']
@@ -401,7 +399,7 @@ class RelatedResourcesView(BaseManagerView):
             except:
                 print 'resource relation does not exist'
         start = request.GET.get('start', 0)
-        es.indices.refresh(index="resource_relations")
+        se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)
@@ -414,7 +412,6 @@ class RelatedResourcesView(BaseManagerView):
 
     def post(self, request, resourceid=None):
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-        es = Elasticsearch()
         se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationship_type = res['relationship_properties[relationship_type]'][0]
@@ -473,7 +470,7 @@ class RelatedResourcesView(BaseManagerView):
             rr.save()
 
         start = request.GET.get('start', 0)
-        es.indices.refresh(index="resource_relations")
+        se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page)

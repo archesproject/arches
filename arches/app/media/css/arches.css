@@ -5872,14 +5872,25 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 
 .resource-tools a.resource-grid-title.active {
     color: #333;
+    background: #ddd;
+
 }
 
 .resource-tools a.resource-grid-title {
     color: #999;
+    margin-top: 6px;
+    margin-left: 3px;
+    padding: 3px 20px 6px 20px;
+    line-height: 35px;
 }
 
-.resource-tools a.resource-grid-title:hover {
+.resource-tools a.resource-grid-title:first-of-type {
+    margin-left: 10px;
+}
+
+.resource-tools a.resource-grid-title:not(.active):hover {
     color: #666;
+    background: #ececec;
 }
 
 .resource-tools a.resource-grid-title.active:hover {
@@ -7912,17 +7923,21 @@ a.clear-geojson-button:hover {
 .category-title {
     font-weight: normal;
     font-size: 15px;
-    padding-right: 10px;
+    padding: 9px 15px;
     color: #999;
     display: inline-block;
 }
 
 .category-title.active {
     color: #123;
+    background: #ddd;
+    cursor: default;
 }
 
-.category-title:hover {
+.category-title:not(.active):hover{
     cursor: pointer;
+    background: #ececec;
+}
 }
 
 .carousel, .carousel .item {
@@ -9306,12 +9321,25 @@ a.search-facet-item.disabled {
     font-weight: 600;
 }
 
-.identities-list .mpm-left-panel .user .library-card-main {
+.identities-list .mpm-left-panel .library-card-main.user {
     top: 5px;
 }
 
 .identities-list .mpm-left-panel .project-status.invited {
     color: #64bd63;
+}
+
+.identities-list .mpm-left-panel .project-status.user {
+    top: 33px;
+}
+
+
+.mobile-project-manager-editor .identities-list .library-card {
+    margin-left:0;
+}
+
+.mobile-project-manager-editor .tab-content {
+    padding:1px;
 }
 
 .identities-list .mpm-left-panel .user .project-status {
@@ -9330,6 +9358,10 @@ a.search-facet-item.disabled {
     width: calc(100% - 250px);
     height: 550px;
     padding: 10px;
+}
+
+.mpm-right-panel .list-group.user-cards {
+    padding-right: 35px;
 }
 
 .mpm-account-detail-panel {
@@ -9369,10 +9401,51 @@ a.search-facet-item.disabled {
     margin-bottom: 5px;
 }
 
+.mpm-user-name.mpm-user-title {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 10px;
 }
+
+.mpm-user-subtitle.user {
+    padding: 0px;
+}
+
+.mpm-user-groups {
+    color: #777;
+    font-weight: 600;
+    font-size: 14px;
+    padding-top:12px;
+}
+
+.mpm-user-groups ul {
+    list-style-type: none;
+}
+
+.mpm-user-groups li {
+    font-weight: 400;
+    font-size: 13px;
+    margin-left: -40px;
+    padding-top: 3px;
+}
+
+.mpm-user-subtitle .last-login {
+    padding-left: 5px;
+}
+
+
 
 .mpm-project-status {
     position: absolute;
@@ -9382,14 +9455,22 @@ a.search-facet-item.disabled {
 }
 
 .mpm-user-status {
-    color: #fff;
-    background: #3acaa1;
-    border: 1px solid #42cca5;
+    color: #ccc;
     padding: 4px 10px;
     margin-top: -4px;
-    font-size: 13px;
-    width: 75px;
-    text-align: center;
+    font-size: 14px;
+    width: 115px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.mpm-user-status.user {
+    padding: 4px 0px;
+    text-align: left;
+}
+
+.mpm-user-name .mpm-user-status.invited {
+    color: #64bd63;
 }
 
 .mpm-user-status.add {
@@ -9448,10 +9529,22 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
 }
+
+.profile-mpm-panel {
+    margin-left: 20px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    text-align: justify;
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 13px;
+}
+
 .project-panel {
 	width: 100%;
 	border: 1px solid #3b8dd5;
-	margin-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-panel.expired {

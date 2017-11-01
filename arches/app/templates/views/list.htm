@@ -29,16 +29,11 @@
 
     <!-- Card -->
     <!-- ko foreach: $data.items -->
-        <div class="library-card" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected, 'user': type ==='user' }">
-            <!-- ko if: approved() -->
-                <div class="project-status invited"> {% trans 'Invited' %}</div>
-            <!-- /ko -->
-            <!-- ko ifnot: approved() -->
-            <div class="project-status"> {% trans 'Not Invited' %}</div>
-            <!-- /ko -->
+        <div class="library-card" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
             {% block listitem %}{% endblock %}
         </div>
     <!-- /ko -->
+
 
 </div>
 {% endblock list_wrapper %}

@@ -133,9 +133,9 @@ class Command(BaseCommand):
             self.install(package_name)
 
         if options['operation'] == 'setup_db':
+            # self.delete_indexes()
+            # self.setup_indexes()
             self.setup_db(package_name)
-            self.delete_indexes()
-            self.setup_indexes()
 
         if options['operation'] == 'setup_indexes':
             self.setup_indexes()
@@ -408,30 +408,31 @@ class Command(BaseCommand):
 
             if os.path.isdir(source):
                 return source
-            
+
             package_dir = False
-            
+
             unzip_into_dir = os.path.join(os.getcwd(),'_pkg_' + datetime.now().strftime('%y%m%d_%H%M%S'))
             os.mkdir(unzip_into_dir)
-            
+
             if source.endswith(".zip") and os.path.isfile(source):
                 unzip_file(source, unzip_into_dir)
-            
+
             try:
                 zip_file = os.path.join(unzip_into_dir,"source_data.zip")
                 urllib.urlretrieve(source, zip_file)
                 unzip_file(zip_file, unzip_into_dir)
             except:
                 pass
-            
-            for i in os.listdir(unzip_into_dir):
-                full_path = os.path.join(unzip_into_dir,i)
-                if os.path.isdir(full_path):
-                    package_dir = full_path
-                    break
-            
+
+            for path in os.listdir(unzip_into_dir):
+                if os.path.basename(path) != '__MACOSX':
+                    full_path = os.path.join(unzip_into_dir,path)
+                    if os.path.isdir(full_path):
+                        package_dir = full_path
+                        break
+
             return package_dir
-            
+
         package_location = handle_source(source)
         if not package_location:
             raise Exception("this is an invalid package source")
@@ -626,7 +627,9 @@ class Command(BaseCommand):
 
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
+        self.delete_indexes()
         management.call_command('migrate')
+        #self.setup_indexes()
 
         self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
         self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
@@ -785,7 +788,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isabs(path):
                 if os.path.isfile(os.path.join(path)):
-                    relations = csv.DictReader(open(path, 'r'))
+                    relations = csv.DictReader(open(path, 'rU'))
                     RelationImporter().import_relations(relations)
                 else:
                     print '*'*80

@@ -148,7 +148,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </a>
                                         </li>
                                         <li id="activation-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#activation-card" class="card-tab-title" aria-expanded="false">
+                                            <a id="project-summary-tab" data-toggle="tab" href="#project-summary-card" class="card-tab-title" aria-expanded="false">
                                                                 Manage Project
                                                             </a>
                                         </li>
@@ -262,31 +262,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                 <div class="row">
                                                                     <div class="col-xs-12 col-sm-5 col-md-6">
-                                                                        <!-- ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                        <!-- ko if: identityList.selected().type === 'group' -->
                                                                         <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
                                                                                                                             <i class="fa fa-group"></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle">{% trans 'Arches Group' %} </div>
                                                                         <!-- /ko -->
-                                                                        <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                        <!-- ko if: identityList.selected().type === 'user' -->
                                                                         <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint">
                                                                                                                             <i class="fa fa-user"></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle" data-bind="">{% trans 'Arches User' %}</div>
                                                                         <!-- /ko -->
                                                                     </div>
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                         <div class="box-inline">
-                                                                            <!-- ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                            <!-- ko if: identityList.selected().type === 'group' -->
                                                                             <p class="" style="margin-bottom: 0px;">{% trans 'Add this group to project' %}</p>
                                                                             <!-- /ko -->
-                                                                            <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                            <!-- ko if: identityList.selected().type === 'user' -->
                                                                             <p class="" style="margin-bottom: 0px;">{% trans 'Add this user to project' %}</p>
                                                                             <!-- /ko -->
                                                                             <div class="toggle-container">
@@ -308,9 +308,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <div class="mpm-account-detail-panel">
 
                                                                     <!-- User Listing -->
-                                                                    <div id="user-cards" class="list-group">
+                                                                    <div id="user-cards" class="list-group user-cards">
                                                                         <!-- Title/Filter/Pagination -->
-                                                                        <!--ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                        <!--ko if: identityList.selected().type === 'group' -->
                                                                         <div class="relative mpm-item-listing-header-panel">
                                                                             <h4 class="mpm-item-listing-header">{% trans 'Accounts in this group' %}</h4>
                                                                             <div class="project-search-widget mpm-item-listing">
@@ -320,41 +320,129 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <!-- ko foreach: selectedProject().filteredUsers() -->
                                                                             <a href="#" class="list-group-item get-user-detail">
-                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
+                                                                                <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username, click: function(val){console.log(val)}'></h4>
                                                                                 <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 || _.contains($root.selectedProject().users(), $data.id)-->
-                                                                                    <div>
+                                                                                    <!--ko if: _.contains($parent.selectedProject().users(), $data.id) -->
+                                                                                    <div class='mpm-user-status invited pull-right'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
+                                                                                    <!--ko ifnot: _.contains($parent.selectedProject().users(), $data.id) -->
+                                                                                    <div class='mpm-user-status pull-right'>
+                                                                                        <span>{% trans 'Not Approved' %}</span>
+                                                                                    </div>
+                                                                                    <!--/ko-->
                                                                                 <!--/ko-->
-                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                            </div>
+                                                                                <div class="mpm-user-subtitle"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: $data.last_login"></span></div></div>
                                                                             </a>
                                                                         <!-- /ko -->
                                                                         <!--/ko-->
 
-                                                                        <!--ko if: selectedProject().identities.selected().type === 'user' -->
-                                                                        <!-- ko foreach: selectedProject().identities.groupUsers() -->
-                                                                            <a href="#" class="list-group-item get-user-detail">
-                                                                                <h4 class="mpm-user-name" data-bind='text: $data.username'></h4>
-                                                                                <!--ko if: $data.groups-->
-                                                                                    <!--ko if: _.intersection($root.selectedProject().groups(), $data.groups).length > 0 || _.contains($root.selectedProject().users(), $data.id)-->
-                                                                                    <div>
+                                                                        <!--ko if: identityList.selected().type === 'user' -->
+                                                                        <a href="#" class="get-user-detail">
+                                                                            <div class="mpm-user-title mpm-user-name">
+                                                                                    <!--ko if: identityList.selected().approved() -->
+                                                                                    <div class='mpm-user-status invited user'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
-                                                                                <!--/ko-->
-                                                                                <p class="mpm-user-subtitle">Activity: 13x edits<span class="pull-right" data-bind="text:$data.last_login"></span></p>
+                                                                                    <!--ko ifnot: identityList.selected().approved() -->
+                                                                                    <div class='mpm-user-status user pull-right'>
+                                                                                        <span>{% trans 'Not Approved' %}</span>
+                                                                                    </div>
+                                                                                    <!--/ko-->
+                                                                            </div>
+                                                                                <div class="mpm-user-subtitle user">
+                                                                                    <div class="mpm-user-summary">
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                User Information
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    <span>Name:
+                                                                                                        <span class="last-login" data-bind="text: identityList.selected().first_name"></span>
+                                                                                                        <span class="last-login" data-bind="text: identityList.selected().last_name"></span>
+                                                                                                    </span>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    Email: <a href="" data-bind="text: identityList.selected().email"></a>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    Group Membership: Admins, Editors, RDM Administrators, Mobile Project Manager
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                Contributions
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    Edits: 0
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    Devices (1)
+                                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                                        <li class="">
+                                                                                                            <span>Name: iPhone (last login:<span class="last-login" data-bind="text: identityList.selected().last_login"></span>)</span>
+                                                                                                        </li>
+                                                                                                    </ul>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                Security
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    Remove project data from from user's device on next login?
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    <!--Switchery : Unchecked-->
+                                                                                                    <!--===================================================-->
+                                                                                                    <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
+                                                                                                    <!--===================================================-->
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div>
+
+                                                                                </div>
+                                                                            </div>
                                                                             </a>
-                                                                        <!-- /ko -->
+
+                                                                        <!--ko if: _.filter(identityList.usersGroups(), function(u){return u.approved()}).length > 0 -->
+                                                                        <div class="mpm-user-groups">{% trans 'Belongs to the following approved groups:' %}
+                                                                            <ul class="user-group-list">
+                                                                                <!-- ko foreach: identityList.usersGroups() -->
+                                                                                <!-- ko if: $data.approved -->
+                                                                                <li>
+                                                                                    <span class='mpm-user-subtitle' data-bind="text:$data.name"></span>
+                                                                                </li>
+                                                                                <!--/ko -->
+                                                                                <!--/ko -->
+                                                                            </ul>
+                                                                        </div>
                                                                         <!--/ko-->
+
+
+                                                                        <!--/ko-->
+
+
+
 
                                                                     </div>
 
                                                                     <!-- User Detail -->
                                                                     <div id="user-detail" class="panel hidden" style="box-shadow: none;">
                                                                         <div class="panel-heading">
-                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">adalgity@getty.edu</a><span class="mdm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
+                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">adalgity@getty.edu</a><span class="mpm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
                                                                         </div>
 
                                                                         <!-- User Detail -->
@@ -425,8 +513,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!-- Activation Card -->
-                                        <div id="activation-card" class="tab-pane fade">
+                                        <!-- Summary Card -->
+                                        <div id="project-summary-card" class="tab-pane fade">
                                             <div class="panel-body card-panel-body" style="">
                                                 <div id="" class="card-content" style="">
 
@@ -482,25 +570,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </p>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Groups (2)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Editors, Crowdsourcers
+                                                                    Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
+                                                                    <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().approvedGroupNames">
+                                                                        <li class="" data-bind="text: $data">
+
                                                                         </li>
                                                                     </ul>
                                                                 </li>
                                                             </ul>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Users (6)
+                                                                    Users (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>,
-                                                                            <a href="">adalgity@getty.edu</a>,
-                                                                            <a href="">randerson@fargeo.com</a>,
-                                                                            <a href="">pcarlisle@historicengland.org</a>
+                                                                        <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
+
                                                                         </li>
                                                                     </ul>
                                                                 </li>

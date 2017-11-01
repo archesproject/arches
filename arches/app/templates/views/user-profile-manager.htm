@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Account Info -->
                 <section id="" class="profile-list">
                     <div class="account-wrapper">
-                        
+
 
                         <div class="row relative">
 
@@ -226,7 +226,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- No Device Registered Yet -->
-                    <div class="profile-default-message-panel">
+                    <div class="">
 
                         <!-- Download panel -->
                         <div id="download-buttons-panel" class="">
@@ -290,19 +290,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         My Projects
                     </div>
 
-                    <!-- No Project Invitations Yet -->
+                    <!--ko ifnot: projectManager.projects().length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
                         Sorry, but you haven't been invited to a project yet...
                     </div>
+                    <!--/ko-->
 
+                    <!--ko if: projectManager.projects().length -->
                     <!-- Project Invitations List -->
-                    <div id="mobile-projects-list" class="profile-default-message-panel" style="display: none;">
+                    <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
 
                             <!-- Find a project -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control input-lg" placeholder="find a project...">
+                                    <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -311,16 +314,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
+                                    <!--ko foreach: projectManager.filteredProjects() -->
+                                    <div class="project-panel">
 
-                                    <!-- Project -->
-                                    <div id="sample-project" class="project-panel">
-
-                                        <!--Project heading-->
                                         <div class="project-panel-header">
                                             <div class="">
-                                                <div class="project-status active">Active</div>
+                                                <div class="project-status" data-bind="text: $data.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: $data.active()}"></div>
                                             </div>
-                                            <h3 class="project-panel-title">Excelsior Post-Loma Prieta Damage Assessment</h3>
+                                            <h3 class="project-panel-title" data-bind="text: $data.name"></h3>
 
                                             <div class="">
                                                 <ul class="project-metadata">
@@ -329,49 +330,91 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </li>
                                                 </ul>
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" href="" class="text-primary text-semibold">View Details</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails()}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
 
-
-                                    </div>
-
-                                    <!-- Project -->
-                                    <div class="project-panel expired">
-
-                                        <!--Project heading-->
-                                        <div class="project-panel-header">
+                                        <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'">
                                             <div class="">
-                                                <div class="project-status">Inactive</div>
-                                            </div>
-                                            <h3 class="project-panel-title">Marina Architecture Survey</h3>
-
-                                            <div class="">
-                                                <ul class="project-metadata">
-                                                    <li class="project-metadata-item">
-                                                        February 18, 2017 to June 30, 2017
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    Project Summary
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Number of edits: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Contributors: 0
+                                                    </li>
+                                                    <li class="">
+                                                        Offline Basemap: Streets-Grey
                                                     </li>
                                                 </ul>
-                                                <div class="project-details">
-                                                    <a href="" class="text-primary text-semibold"> View Details</a>
-                                                </div>
                                             </div>
-                                        </div>
 
-                                        <!--Project Details-->
-                                        <div id="project-details" class="project-panel-body" style="display: none;">
-                                            <p>Lorem ipsum dolor sit amet.</p>
-                                        </div>
-                                    </div>
+                                            <div class="">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Groups/Users' %}
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        {% trans 'Groups' %} (<span data-bind="text: $data.approvedGroupNames().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedGroupNames">
+                                                            <li class="" data-bind="text: $data">
 
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        {% trans 'Users' %} (<span data-bind="text: $data.approvedUserNames().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedUserNames">
+                                                            <li class="" data-bind="text: $data">
+
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="">
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    Models and Data Entry Cards
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Assets (3 data entry cards)
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li class="">
+                                                                Name, Modification Event, Condition Assessment
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="">
+                                                        Investigation Activities (3 data entry cards)
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li class="">
+                                                                Name, Event Location, Activity Type
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                        </div>
 
                                 </div>
+                                <!--/ko-->
                             </div>
                         </div>
                     </div>
 
                 </div>
+                <!--/ko-->
             </div>
 
         </div>
@@ -544,7 +587,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
     define('profile-manager-data', [], function() {
         return {
-            'error_count': {{form.errors|length}}
+            'error_count': {{form.errors|length}},
+            'projects': {{user_projects}},
+            'identities': {{identities}}
         }
     });
 {% endautoescape %}</script>

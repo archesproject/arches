@@ -23,6 +23,7 @@ Arches v4 Documentation
     ontologies-in-arches
     rdm
     create-package
+    additional-configuration
 
 .. toctree::
     :caption: Tutorials

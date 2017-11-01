@@ -43,7 +43,6 @@ DATABASES = {
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
-
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
@@ -51,6 +50,8 @@ ELASTICSEARCH_HOSTS = [
     {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
 ]
 ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
+# a prefix to append to all elasticsearch indexes, note: must be lower case
+ELASTICSEARCH_PREFIX = ''
 
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -141,7 +142,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  <-- Only need to uncomment this for testing without an actual email server
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'xxxx@xxx.com'
@@ -279,6 +280,7 @@ INSTALLED_APPS = (
     'arches.app.models',
     'arches.management',
     'guardian',
+    'captcha'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -326,22 +328,22 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Ar
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
     },
     {
-        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
+        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
         'OPTIONS': {
-            'special_characters': ('!','@','#'),
+            'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
         }
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
     },
     {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
         'OPTIONS': {
             'min_length': 9,
         }
@@ -350,6 +352,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 USE_LIVERELOAD = False
 LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+ENABLE_CAPTCHA = True
+# RECAPTCHA_PUBLIC_KEY = ''
+# RECAPTCHA_PRIVATE_KEY = ''
+# RECAPTCHA_USE_SSL = False
+NOCAPTCHA = True
+# RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
 
 #######################################
 ###       END STATIC SETTINGS       ###
@@ -442,7 +451,7 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-# If True users can make edits to graphs that are locked
+# If True, users can make edits to graphs that are locked
 # (generally because they have resource intances saved against them)
 # Changing this setting to True and making graph modifications may result in
 # disagreement between your Resource Models and Resource Instances potentially
