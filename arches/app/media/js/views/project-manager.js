@@ -7,8 +7,7 @@ define([
     'project-manager-data',
     'arches'
 ], function(_, ko, BaseManagerView, ProjectManagerViewModel, ProjectModel, data, arches) {
-
-    viewModel = new ProjectManagerViewModel(data);
+    var viewModel = new ProjectManagerViewModel(data);
 
     viewModel.saveProject = function() {
         var self = this;
