@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.views.concept import Concept
 
 def prepare_term_index(create=False):
     """
@@ -252,8 +251,6 @@ def prepare_resource_relations_index(create=False):
     if create:
         se = SearchEngineFactory().create()
         se.create_index(index='resource_relations', body=index_settings, ignore=400)
-        concept = Concept('00000000-0000-0000-0000-000000000007')
-        concept.index()
 
     return index_settings
 
