@@ -43,7 +43,6 @@ define([
         this.selectedProject = ko.observable(null);
 
         this.selectedProject.subscribe(function(val){
-            self.identityList.items(val.identities)
             self.identityList.clearSelection();
             self.identityList.items()[0].selected(true);
             if (val) {val.update();}
