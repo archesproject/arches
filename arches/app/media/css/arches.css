@@ -9529,10 +9529,22 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
 }
+
+.profile-mpm-panel {
+    margin-left: 20px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    text-align: justify;
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 13px;
+}
+
 .project-panel {
 	width: 100%;
 	border: 1px solid #3b8dd5;
-	margin-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-panel.expired {

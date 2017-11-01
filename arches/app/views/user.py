@@ -34,6 +34,41 @@ from arches.app.utils.JSONResponse import JSONResponse
 
 class UserManagerView(BaseManagerView):
 
+
+    def get_last_login(self, date):
+        result = _("Not yet logged in")
+        try:
+            result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+        except TypeError as e:
+            pass
+        return result
+
+    def get_user_details(self, user):
+        identities = []
+        for group in Group.objects.all():
+            users = group.user_set.all()
+            if len(users) > 0:
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': self.get_last_login(user.last_login), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
+        for user in User.objects.filter():
+            groups = []
+            group_ids = []
+            default_perms = []
+            for group in user.groups.all():
+                groups.append(group.name)
+                group_ids.append(group.id)
+                default_perms = default_perms + list(group.permissions.all())
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
+
+        user_projects = [pxu.mobile_project for pxu in models.MobileProjectXUser.objects.filter(user=user)]
+        user_projects_by_group = [pxu_x_group.mobile_project for pxu_x_group in models.MobileProjectXGroup.objects.filter(group__in=user.groups.all())]
+
+        for gp in user_projects_by_group:
+             if gp not in user_projects:
+                 user_projects.append(gp)
+
+        return {'identities': identities, 'user_projects': user_projects}
+
     def get(self, request):
 
         if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
@@ -41,25 +76,23 @@ class UserManagerView(BaseManagerView):
                 main_script='views/user-profile-manager',
             )
 
-            user = request.user
-            user_projects = [pxu.mobile_project for pxu in models.MobileProjectXUser.objects.filter(user=user)]
-            user_projects_by_group = [pxu_x_group.mobile_project for pxu_x_group in models.MobileProjectXGroup.objects.filter(group__in=user.groups.all())]
-
-            for gp in user_projects_by_group:
-                 if gp not in user_projects:
-                     user_projects.append(gp)
+            user_details = self.get_user_details(request.user)
 
             context['nav']['icon'] = "fa fa-user"
             context['nav']['title'] = _("Profile Manager")
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-            context['user_projects'] = JSONSerializer().serialize(user_projects)
+            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
+            context['identities'] = JSONSerializer().serialize(user_details['identities'])
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
 
         if self.request.user.is_authenticated() and self.request.user.username != 'anonymous':
+
+            user_details = self.get_user_details(request.user)
+
             context = self.get_context_data(
                 main_script='views/user-profile-manager',
             )
@@ -69,48 +102,26 @@ class UserManagerView(BaseManagerView):
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-
+            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
+            context['identities'] = JSONSerializer().serialize(user_details['identities'])
 
             user_info = request.POST.copy()
             user_info['id'] = request.user.id
             user_info['username'] = request.user.username
+            user_info['password1'] = request.user.password
+            user_info['password2'] = request.user.password
 
             form = ArchesUserProfileForm(user_info)
+
             if form.is_valid():
                 user = form.save()
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else ''
                     message = _('Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s.' % (admin_info))
                     user.email_user(_('You\'re Arches Profile Has Changed'), message)
-                except:
-                    pass
+                except Exception as e:
+                    print e
                 request.user = user
             context['form'] = form
 
             return render(request, 'views/user-profile-manager.htm', context)
-
-@method_decorator(group_required('Application Administrator'), name='dispatch')
-class GroupUsers(View):
-
-    def post(self, request):
-        res = {}
-        users = []
-        identity_type = request.POST.get('type')
-        identity_id = request.POST.get('id')
-        if identity_type == 'group':
-            group = Group.objects.get(id=identity_id)
-            users = group.user_set.all()
-        else:
-            users = User.objects.filter(id=identity_id)
-
-        def get_last_login(date):
-            result = _("Not yet logged in")
-            try:
-                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
-            except TypeError as e:
-                print e
-            return result
-
-        if len(users) > 0:
-            res = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [group.id for group in user.groups.all()] } for user in users]
-        return JSONResponse(res)

@@ -30,7 +30,7 @@
     }, css: getContextCss()">
 
         <!--ko if: drawFeaturesOnMap() || geojsonInput() === true || xyInput.active() === true ||  drawMode() === 'draw_point' || drawMode() === 'draw_polygon' || drawMode() === 'draw_line_string' -->
-        <!--ko if: context !== 'search-filter' -->
+        <!--ko ifnot: _.contains(['search-filter', 'report-header'], context) -->
         <div class="geometry-editing-notifications" data-bind= "css: {'notifications-minimized': minimizeNotifications}">
             <div class="alert-wrap in animated jellyIn">
                 <div class="alert alert-warning relative" role="alert">
