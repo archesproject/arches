@@ -88,7 +88,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Add Project -->
                     <div class="library-panel-search-bar">
                         <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
-
+                        <!--ko if: selectedProject()-->
+                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteProject">{% trans "Delete Project" %}</button>
+                        <!--/ko-->
                     </div>
                 </div>
 
@@ -129,27 +131,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <ul class="nav nav-tabs card-nav-container" style="">
                                         <li id="summary-group" class="active">
                                             <a id="summary-tab" data-toggle="tab" href="#summary-card" class="card-tab-title" aria-expanded="true">
-                                                                Basic Settings
+                                                                {% trans 'Basic Settings' %}
                                                             </a>
                                         </li>
                                         <li id="card-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false">
-                                                                Location
+                                                                {% trans 'Location' %}
                                                             </a>
                                         </li>
                                         <li id="icon-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#models-card" class="card-tab-title" aria-expanded="false">
-                                                                Resources
+                                                                {% trans 'Resources' %}
                                                             </a>
                                         </li>
                                         <li id="status-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
-                                                                People
+                                                                {% trans 'People' %}
                                                             </a>
                                         </li>
                                         <li id="activation-group" class="">
                                             <a id="project-summary-tab" data-toggle="tab" href="#project-summary-card" class="card-tab-title" aria-expanded="false">
-                                                                Manage Project
+                                                                {% trans 'Activate Project' %}
                                                             </a>
                                         </li>
                                     </ul>
@@ -290,12 +292,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <p class="" style="margin-bottom: 0px;">{% trans 'Add this user to project' %}</p>
                                                                             <!-- /ko -->
                                                                             <div class="toggle-container">
+
                                                                                 <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
                                                                                         <div class="arches-toggle-sm"></div>
                                                                                             <div style="margin-top: -17px;"></div>
                                                                                         </div>
                                                                                 <span class="arches-toggle-subtitle"></span>
+
                                                                             </div>
 
 
