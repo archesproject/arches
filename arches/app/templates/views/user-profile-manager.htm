@@ -314,14 +314,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
-                                    <!--ko foreach: projectManager.filteredProjects() -->
+                                    <!--ko foreach: {data: projectManager.filteredProjects(), as: 'project'} -->
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
                                             <div class="">
-                                                <div class="project-status" data-bind="text: $data.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: $data.active()}"></div>
+                                                <div class="project-status" data-bind="text:project.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: project.active()}"></div>
                                             </div>
-                                            <h3 class="project-panel-title" data-bind="text: $data.name"></h3>
+                                            <h3 class="project-panel-title" data-bind="text: project.name"></h3>
 
                                             <div class="">
                                                 <ul class="project-metadata">
@@ -335,7 +335,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'">
+                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': project.showDetails}">
+                                        <!-- <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'"> -->
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     Project Summary
@@ -359,21 +360,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </p>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        {% trans 'Groups' %} (<span data-bind="text: $data.approvedGroupNames().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedGroupNames">
-                                                            <li class="" data-bind="text: $data">
 
-                                                            </li>
+                                                        {% trans 'Groups' %} (<span data-bind="text: project.groups().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(project.identities, function(id){return (id.type === 'group' && _.contains(project.groups(), id.id))})">
+                                                            <li class="" data-bind="text: $data.name"></li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
-                                                        {% trans 'Users' %} (<span data-bind="text: $data.approvedUserNames().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: $data.approvedUserNames">
-                                                            <li class="" data-bind="text: $data">
-
-                                                            </li>
+                                                        {% trans 'Users' %} (<span data-bind="text: project.users().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(project.identities, function(id){return (id.type === 'user' && _.contains(project.users(), id.id))})">
+                                                            <li class="" data-bind="text: $data.name"></li>
                                                         </ul>
                                                     </li>
                                                 </ul>

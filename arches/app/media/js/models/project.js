@@ -41,6 +41,16 @@ define([
                 })
             };
 
+            _.each(this.identities, function(item) {
+                if (item.type === 'group') {
+                    _.each(item.users, function(user){
+                        if (!user.expanded) {
+                            user.expanded = ko.observable(false);
+                        }
+                    })
+                }
+            })
+
             self.createdbyName = ko.computed(function() {
                 return getUserName(self.createdby());
             });

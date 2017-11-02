@@ -9360,6 +9360,15 @@ a.search-facet-item.disabled {
     padding: 10px;
 }
 
+.mpm-group-users {
+    height: 375px;
+    overflow-y: scroll;
+    margin-top: 1px;
+    border-top: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+}
+
 .mpm-right-panel .list-group.user-cards {
     padding-right: 35px;
 }
@@ -9410,6 +9419,17 @@ a.search-facet-item.disabled {
     margin-bottom: 0px;
 }
 
+.list-group-item .mpm-user-summary {
+    height: 0;
+    transition: height 600ms ease-out;
+    overflow: hidden;
+    padding: 0;
+}
+
+.list-group-item .mpm-user-summary.expanded {
+    height: 280px;
+}
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
@@ -9421,6 +9441,7 @@ a.search-facet-item.disabled {
 
 .mpm-user-subtitle.user {
     padding: 0px;
+    justify-content: left;
 }
 
 .mpm-user-groups {
@@ -9532,11 +9553,16 @@ a.search-facet-item.disabled {
 
 .profile-mpm-panel {
     margin-left: 20px;
-    margin-top: 10px;
-    padding-bottom: 10px;
     text-align: justify;
+    overflow: hidden;
     font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
     font-size: 13px;
+    height: 0;
+    transition: height 600ms ease-out;
+}
+
+.profile-mpm-panel.show-details {
+    height: 400px;
 }
 
 .project-panel {

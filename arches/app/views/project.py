@@ -52,7 +52,7 @@ class ProjectManagerView(BaseManagerView):
         for group in Group.objects.all():
             users = group.user_set.all()
             if len(users) > 0:
-                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()] } for user in users]
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()]) } for user in users]
             identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
@@ -62,7 +62,7 @@ class ProjectManagerView(BaseManagerView):
                 groups.append(group.name)
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})            
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
