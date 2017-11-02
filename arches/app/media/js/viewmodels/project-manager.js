@@ -13,8 +13,8 @@ define([
     * @param  {string} params - a configuration object
     */
     var ProjectManagerViewModel = function(params) {
-
         var self = this;
+        this.dateFormat = 'YYYY-MM-DD';
 
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)

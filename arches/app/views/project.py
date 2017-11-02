@@ -109,6 +109,11 @@ class ProjectManagerView(BaseManagerView):
             else:
                 self.notify_project_end(request, project)
         project.name = data['name']
+        project.description = data['description']
+        if data['startdate'] != '':
+            project.startdate = data['startdate']
+        if data['enddate'] != '':
+            project.enddate = data['enddate']
         project.active = data['active']
         project.lasteditedby = self.request.user
 
