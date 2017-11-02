@@ -21,6 +21,7 @@ from django.db import transaction
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponseNotFound
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
@@ -74,6 +75,21 @@ class ProjectManagerView(BaseManagerView):
         context['nav']['help'] = (_('Mobile Project Manager'),'help/project-manager-help.htm')
 
         return render(request, 'views/project-manager.htm', context)
+
+    def delete(self, request):
+
+        project_id = None
+        try:
+            project_id = JSONDeserializer().deserialize(request.body)['id']
+        except Exception as e:
+            print e
+
+        if project_id is not None:
+            ret = models.MobileProject.objects.get(pk=project_id)
+            ret.delete()
+            return JSONResponse(ret)
+
+        return HttpResponseNotFound()
 
     def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileProjectXUser):
         project_identity_ids = set([u.id for u in related_identities])
