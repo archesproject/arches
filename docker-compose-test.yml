@@ -12,7 +12,6 @@ services:
         - PGDBNAME=arches
         - PGHOST=db
         - PGPORT=5432
-        - ELASTICSEARCH_PREFIX=tests
         - ESHOST=elasticsearch
         - ESPORT=9200
         - DJANGO_MODE=PROD
