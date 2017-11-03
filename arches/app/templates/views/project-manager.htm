@@ -114,9 +114,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <span data-bind="text: selectedProject().enddate() || '?'"></span>
                                     </li>
                                 </ul>
-                                <div class="project-details" data-bind="if: selectedProject().dirty">
-                                    <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject">Save Edits</button>
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits">Discard Edits</button>
+                                <div class="project-details">
+                                    <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
+                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}></button>
                                 </div>
                             </div>
                         </div>
