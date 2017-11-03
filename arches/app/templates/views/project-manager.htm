@@ -177,14 +177,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">Project name</label>
+                                                                                    <label class="control-label account-label">{% trans 'Project name' %}</label>
                                                                                     <input type="text" class="form-control input-lg account-input" data-bind="value: selectedProject().name, valueUpdate: 'keyup'">
                                                                                 </div>
                                                                             </div>
 
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
-                                                                                    Pick a concise name that makes it easy for people to find your project
+                                                                                    {% trans 'Pick a concise name that makes it easy for people to find your project' %}
                                                                                 </p>
                                                                             </div>
                                                                         </div>
@@ -194,13 +194,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">Project start</label>
+                                                                                    <label class="control-label account-label">{% trans 'Project start date' %}</label>
                                                                                     <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
-                                                                                    The project start and end dates are used to limit when people can add or edit Arches data.
+                                                                                    {% trans 'The project start and end dates are used to limit when people can add or edit Arches data.' %}
                                                                                 </p>
                                                                             </div>
                                                                         </div>
@@ -208,7 +208,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">Project end</label>
+                                                                                    <label class="control-label account-label">{% trans 'Project end' %}</label>
                                                                                     <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
                                                                                 </div>
                                                                             </div>
@@ -219,7 +219,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-12">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">Description</label>
+                                                                                    <label class="control-label account-label">{% trans 'Description' %}</label>
                                                                                     <div>
                                                                                         <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: selectedProject().description, valueUpdate: 'keyup'"></textarea>
                                                                                     </div>
@@ -493,80 +493,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             </ul>
                                                                         </div>
                                                                         <!--/ko-->
-
-
                                                                         <!--/ko-->
 
 
-
-
                                                                     </div>
 
-                                                                    <!-- User Detail -->
-                                                                    <div id="user-detail" class="panel hidden" style="box-shadow: none;">
-                                                                        <div class="panel-heading">
-                                                                            <h3 class="panel-title"><i class="fa fa-arrow-circle-o-left"></i> <a href="" class="">adalgity@getty.edu</a><span class="mpm-user-status pull-right" style="font-size: 13px;">Remove</span></h3>
-                                                                        </div>
-
-                                                                        <!-- User Detail -->
-                                                                        <div class="mpm-user-summary">
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    User Information
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Name: Alison Dalgity
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Email: <a hre="">adalgity@getty.edu</a>
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        Group Membership: Admins, Editors, RDM Administrators, Mobile Project Manager
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Contributions
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Edits: 0
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        Devices (2)
-                                                                                        <ul class="mpm-node-detail-metadata">
-                                                                                            <li class="">
-                                                                                                Name: Alison's iPhone (last login: September 17, 2017)
-                                                                                            </li>
-                                                                                            <li class="">
-                                                                                                Name: Getty iPad #12345 (last login: September 2, 2017)
-                                                                                            </li>
-                                                                                        </ul>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-
-                                                                            <div class="mpm-model-detail-panel">
-                                                                                <div class="mpm-node-name">
-                                                                                    Security
-                                                                                </div>
-                                                                                <ul class="mpm-node-detail-metadata">
-                                                                                    <li class="">
-                                                                                        Remove project data from from user's device on next login?
-                                                                                    </li>
-                                                                                    <li class="">
-                                                                                        <!--Switchery : Unchecked-->
-                                                                                        <!--===================================================-->
-                                                                                        <input id="wipe-project" class="js-switch-small" style="margin-top: 0px; display: none;" data-switchery="true" type="checkbox"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s ease 0s, box-shadow 0.4s ease 0s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s ease 0s;"></small></span>
-                                                                                        <!--===================================================-->
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
