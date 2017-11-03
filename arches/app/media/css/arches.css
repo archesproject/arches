@@ -5872,14 +5872,25 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 
 .resource-tools a.resource-grid-title.active {
     color: #333;
+    background: #ddd;
+
 }
 
 .resource-tools a.resource-grid-title {
     color: #999;
+    margin-top: 6px;
+    margin-left: 3px;
+    padding: 3px 20px 6px 20px;
+    line-height: 35px;
 }
 
-.resource-tools a.resource-grid-title:hover {
+.resource-tools a.resource-grid-title:first-of-type {
+    margin-left: 10px;
+}
+
+.resource-tools a.resource-grid-title:not(.active):hover {
     color: #666;
+    background: #ececec;
 }
 
 .resource-tools a.resource-grid-title.active:hover {
@@ -7912,17 +7923,21 @@ a.clear-geojson-button:hover {
 .category-title {
     font-weight: normal;
     font-size: 15px;
-    padding-right: 10px;
+    padding: 9px 15px;
     color: #999;
     display: inline-block;
 }
 
 .category-title.active {
     color: #123;
+    background: #ddd;
+    cursor: default;
 }
 
-.category-title:hover {
+.category-title:not(.active):hover{
     cursor: pointer;
+    background: #ececec;
+}
 }
 
 .carousel, .carousel .item {
@@ -9345,6 +9360,15 @@ a.search-facet-item.disabled {
     padding: 10px;
 }
 
+.mpm-group-users {
+    height: 375px;
+    overflow-y: scroll;
+    margin-top: 1px;
+    border-top: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+}
+
 .mpm-right-panel .list-group.user-cards {
     padding-right: 35px;
 }
@@ -9395,6 +9419,17 @@ a.search-facet-item.disabled {
     margin-bottom: 0px;
 }
 
+.list-group-item .mpm-user-summary {
+    height: 0;
+    transition: height 600ms ease-out;
+    overflow: hidden;
+    padding: 0;
+}
+
+.list-group-item .mpm-user-summary.expanded {
+    height: 280px;
+}
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
@@ -9406,6 +9441,7 @@ a.search-facet-item.disabled {
 
 .mpm-user-subtitle.user {
     padding: 0px;
+    justify-content: left;
 }
 
 .mpm-user-groups {
@@ -9514,10 +9550,27 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
 }
+
+.profile-mpm-panel {
+    margin-left: 20px;
+    text-align: justify;
+    overflow: hidden;
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    height: 0;
+    transition: height 600ms ease-out;
+}
+
+.profile-mpm-panel.show-details {
+    height: 400px;
+}
+
 .project-panel {
 	width: 100%;
 	border: 1px solid #3b8dd5;
-	margin-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-panel.expired {

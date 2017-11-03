@@ -15,10 +15,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
+
+from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponseNotFound
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
@@ -33,11 +36,25 @@ from django.contrib.auth.models import User, Group
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class ProjectManagerView(BaseManagerView):
+
+
     def get(self, request):
+
+        def get_last_login(date):
+            result = _("Not yet logged in")
+            try:
+                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+            except TypeError as e:
+                print e
+            return result
+
         projects = models.MobileProject.objects.order_by('name')
         identities = []
         for group in Group.objects.all():
-            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'default_permissions': group.permissions.all()})
+            users = group.user_set.all()
+            if len(users) > 0:
+                groupUsers = [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email, 'last_login': get_last_login(user.last_login), 'username': user.username, 'groups': [g.id for g in user.groups.all()], 'group_names': ', '.join([g.name for g in user.groups.all()]) } for user in users]
+            identities.append({'name': group.name, 'type': 'group', 'id': group.pk, 'users': groupUsers, 'default_permissions': group.permissions.all()})
         for user in User.objects.filter():
             groups = []
             group_ids = []
@@ -46,7 +63,7 @@ class ProjectManagerView(BaseManagerView):
                 groups.append(group.name)
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
-            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids})
+            identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
@@ -58,6 +75,21 @@ class ProjectManagerView(BaseManagerView):
         context['nav']['help'] = (_('Mobile Project Manager'),'help/project-manager-help.htm')
 
         return render(request, 'views/project-manager.htm', context)
+
+    def delete(self, request):
+
+        project_id = None
+        try:
+            project_id = JSONDeserializer().deserialize(request.body)['id']
+        except Exception as e:
+            print e
+
+        if project_id is not None:
+            ret = models.MobileProject.objects.get(pk=project_id)
+            ret.delete()
+            return JSONResponse(ret)
+
+        return HttpResponseNotFound()
 
     def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileProjectXUser):
         project_identity_ids = set([u.id for u in related_identities])
@@ -93,6 +125,11 @@ class ProjectManagerView(BaseManagerView):
             else:
                 self.notify_project_end(request, project)
         project.name = data['name']
+        project.description = data['description']
+        if data['startdate'] != '':
+            project.startdate = data['startdate']
+        if data['enddate'] != '':
+            project.enddate = data['enddate']
         project.active = data['active']
         project.lasteditedby = self.request.user
 
@@ -103,7 +140,7 @@ class ProjectManagerView(BaseManagerView):
 
     def get_project_users(self, project):
         users = set(project.users.all())
-        
+
         for group in project.groups.all():
             users |= set(group.user_set.all())
 
@@ -126,7 +163,7 @@ class ProjectManagerView(BaseManagerView):
             msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Project!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            
+
     def notify_project_end(self, request, project):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {

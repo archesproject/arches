@@ -1107,7 +1107,6 @@ class ResourceInstanceDataType(BaseDataType):
 
     def get_resource_names(self, nodevalue):
         resource_names = set([])
-        es = Elasticsearch()
         se = SearchEngineFactory().create()
         id_list = self.get_id_list(nodevalue)
         for resourceid in id_list:

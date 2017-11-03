@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- ko if: projects().length >  0 -->
                 <div id="project-listing-panel" class="library-card library-card-entry library-card-wide selected" style="width: 270px;">
                     <!-- ko foreach: filteredProjects() -->
-                    <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: $parent.selectedProject" style="width: 270px;">
+                    <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: function (p) { $parent.selectedProject(null);$parent.selectedProject(p); }" style="width: 270px;">
                         <div class="mpm-project-card">
                             <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></a>
                         </div>
@@ -88,7 +88,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Add Project -->
                     <div class="library-panel-search-bar">
                         <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
-
+                        <!--ko if: selectedProject()-->
+                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteProject">{% trans "Delete Project" %}</button>
+                        <!--/ko-->
                     </div>
                 </div>
 
@@ -107,7 +109,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="">
                                 <ul class="project-metadata">
                                     <li class="project-metadata-item">
-                                        PROJECT DATE RANGE HERE...
+                                        <span data-bind="text: selectedProject().startdate() || '?'"></span>
+                                        to
+                                        <span data-bind="text: selectedProject().enddate() || '?'"></span>
                                     </li>
                                 </ul>
                                 <div class="project-details" data-bind="if: selectedProject().dirty">
@@ -127,27 +131,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <ul class="nav nav-tabs card-nav-container" style="">
                                         <li id="summary-group" class="active">
                                             <a id="summary-tab" data-toggle="tab" href="#summary-card" class="card-tab-title" aria-expanded="true">
-                                                                Basic Settings
+                                                                {% trans 'Basic Settings' %}
                                                             </a>
                                         </li>
                                         <li id="card-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false">
-                                                                Location
+                                                                {% trans 'Location' %}
                                                             </a>
                                         </li>
                                         <li id="icon-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#models-card" class="card-tab-title" aria-expanded="false">
-                                                                Resources
+                                                                {% trans 'Resources' %}
                                                             </a>
                                         </li>
                                         <li id="status-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
-                                                                People
+                                                                {% trans 'People' %}
                                                             </a>
                                         </li>
                                         <li id="activation-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#activation-card" class="card-tab-title" aria-expanded="false">
-                                                                Manage Project
+                                            <a id="project-summary-tab" data-toggle="tab" href="#project-summary-card" class="card-tab-title" aria-expanded="false">
+                                                                {% trans 'Activate Project' %}
                                                             </a>
                                         </li>
                                     </ul>
@@ -169,11 +173,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <!-- Section Content -->
                                                                 <div class="col-sm-12">
 
-                                                                    <!-- Account CRUD Panel -->
                                                                     <div id="account-crud" class="" style="">
-                                                                        <!-- User Name, Password -->
                                                                         <div class="row">
-                                                                            <!-- User Name -->
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
                                                                                     <label class="control-label account-label">Project name</label>
@@ -181,7 +182,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 </div>
                                                                             </div>
 
-                                                                            <!-- Password -->
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
                                                                                     Pick a concise name that makes it easy for people to find your project
@@ -191,8 +191,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                         <hr style="border-color: #eee;">
 
-                                                                    </div>
+                                                                        <div class="row">
+                                                                            <div class="col-sm-5">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Project start</label>
+                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-6">
+                                                                                <p class="account-tips">
+                                                                                    The project start and end dates are used to limit when people can add or edit Arches data.
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
 
+                                                                        <div class="row">
+                                                                            <div class="col-sm-5">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Project end</label>
+                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <hr style="border-color: #eee;">
+
+                                                                        <div class="row">
+                                                                            <div class="col-sm-12">
+                                                                                <div class="form-group">
+                                                                                    <label class="control-label account-label">Description</label>
+                                                                                    <div>
+                                                                                        <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: selectedProject().description, valueUpdate: 'keyup'"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -228,40 +264,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                 <div class="row">
                                                                     <div class="col-xs-12 col-sm-5 col-md-6">
-                                                                        <!-- ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                        <!-- ko if: identityList.selected().type === 'group' -->
                                                                         <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
                                                                                                                             <i class="fa fa-group"></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle">{% trans 'Arches Group' %} </div>
                                                                         <!-- /ko -->
-                                                                        <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                        <!-- ko if: identityList.selected().type === 'user' -->
                                                                         <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint">
                                                                                                                             <i class="fa fa-user"></i>
                                                                                                                         </span>
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind='text:selectedProject().identities.selected().name'></a>
+                                                                            <a class="listitem_name" data-bind='text:identityList.selected().name'></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle" data-bind="">{% trans 'Arches User' %}</div>
                                                                         <!-- /ko -->
                                                                     </div>
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                         <div class="box-inline">
-                                                                            <!-- ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                            <!-- ko if: identityList.selected().type === 'group' -->
                                                                             <p class="" style="margin-bottom: 0px;">{% trans 'Add this group to project' %}</p>
                                                                             <!-- /ko -->
-                                                                            <!-- ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                            <!-- ko if: identityList.selected().type === 'user' -->
                                                                             <p class="" style="margin-bottom: 0px;">{% trans 'Add this user to project' %}</p>
                                                                             <!-- /ko -->
                                                                             <div class="toggle-container">
+
                                                                                 <span class="switch switch-small" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small></span>
                                                                                         <div style="display:flex; flex-direction:row;">
                                                                                         <div class="arches-toggle-sm"></div>
                                                                                             <div style="margin-top: -17px;"></div>
                                                                                         </div>
                                                                                 <span class="arches-toggle-subtitle"></span>
+
                                                                             </div>
 
 
@@ -276,16 +314,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <!-- User Listing -->
                                                                     <div id="user-cards" class="list-group user-cards">
                                                                         <!-- Title/Filter/Pagination -->
-                                                                        <!--ko if: selectedProject().identities.selected().type === 'group' -->
+                                                                        <!--ko if: identityList.selected().type === 'group' -->
                                                                         <div class="relative mpm-item-listing-header-panel">
                                                                             <h4 class="mpm-item-listing-header">{% trans 'Accounts in this group' %}</h4>
                                                                             <div class="project-search-widget mpm-item-listing">
                                                                                 <input class="form-control input-lg" placeholder="find a user..." type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                             </div>
                                                                         </div>
-
+                                                                        <div class='mpm-group-users'>
                                                                         <!-- ko foreach: selectedProject().filteredUsers() -->
-                                                                            <a href="#" class="list-group-item get-user-detail">
+                                                                            <div href="#" class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
                                                                                 <div class="mpm-user-title mpm-user-name"><h4 data-bind='text: $data.username'></h4>
                                                                                 <!--ko if: $data.groups-->
                                                                                     <!--ko if: _.contains($parent.selectedProject().users(), $data.id) -->
@@ -301,31 +339,151 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <!--/ko-->
                                                                             </div>
                                                                                 <div class="mpm-user-subtitle"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: $data.last_login"></span></div></div>
-                                                                            </a>
-                                                                        <!-- /ko -->
-                                                                        <!--/ko-->
+                                                                                <div class="mpm-user-summary" data-bind="css: {'expanded': $data.expanded()}">
+                                                                                    <div class="mpm-model-detail-panel">
+                                                                                        <div class="mpm-node-name">
+                                                                                            {% trans 'User Information' %}
+                                                                                        </div>
+                                                                                        <ul class="mpm-node-detail-metadata">
+                                                                                            <li class="">
+                                                                                                <span>{% trans 'Name:' %}
+                                                                                                    <span class="last-login" data-bind="text: $data.first_name"></span>
+                                                                                                    <span class="last-login" data-bind="text: $data.last_name"></span>
+                                                                                                </span>
+                                                                                            </li>
+                                                                                            <li class="">
+                                                                                                {% trans 'Email:' %} <a href="" data-bind="text: $data.email"></a>
+                                                                                            </li>
+                                                                                            <li class="">
+                                                                                                {% trans 'Groups:' %}
+                                                                                                <span class="last-login" data-bind="text: $data.group_names"></span>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
 
-                                                                        <!--ko if: selectedProject().identities.selected().type === 'user' -->
+                                                                                    <div class="mpm-model-detail-panel">
+                                                                                        <div class="mpm-node-name">
+                                                                                            Contributions
+                                                                                        </div>
+                                                                                        <ul class="mpm-node-detail-metadata">
+                                                                                            <li class="">
+                                                                                                Edits: 0
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                Devices (1)
+                                                                                                <ul class="mpm-node-detail-metadata">
+                                                                                                    <li class="">
+                                                                                                        <span>Name: iPhone (last login:<span class="last-login" data-bind="text: $data.last_login"></span>)</span>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+
+                                                                                    <div class="mpm-model-detail-panel">
+                                                                                        <div class="mpm-node-name">
+                                                                                            Security
+                                                                                        </div>
+                                                                                        <ul class="mpm-node-detail-metadata">
+                                                                                            <li class="">
+                                                                                                Remove project data from from user's device on next login?
+                                                                                            </li>
+                                                                                            <li class="">
+                                                                                                <!--Switchery : Unchecked-->
+                                                                                                <!--===================================================-->
+                                                                                                <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
+                                                                                                <!--===================================================-->
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        <!-- /ko -->
+                                                                    </div>
+                                                                        <!--/ko-->
+                                                                        <!--ko if: identityList.selected().type === 'user' -->
                                                                         <a href="#" class="get-user-detail">
                                                                             <div class="mpm-user-title mpm-user-name">
-                                                                                    <!--ko if: selectedProject().identities.selected().approved() -->
+                                                                                    <!--ko if: identityList.selected().approved() -->
                                                                                     <div class='mpm-user-status invited user'>
                                                                                         <span>{% trans 'Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
-                                                                                    <!--ko ifnot: selectedProject().identities.selected().approved() -->
+                                                                                    <!--ko ifnot: identityList.selected().approved() -->
                                                                                     <div class='mpm-user-status user pull-right'>
                                                                                         <span>{% trans 'Not Approved' %}</span>
                                                                                     </div>
                                                                                     <!--/ko-->
                                                                             </div>
-                                                                                <div class="mpm-user-subtitle user"><p>{% trans 'Activity: 0 edits' %}</p><div><span>{% trans 'Last Login:' %}</span><span class="last-login" data-bind="text: selectedProject().identities.groupUsers()[0].last_login"></span></div></div>
+                                                                                <div class="mpm-user-subtitle user">
+                                                                                    <div class="mpm-user-summary">
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                {% trans 'User Information' %}
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    <span>{% trans 'Name:' %}
+                                                                                                        <span class="last-login" data-bind="text: identityList.selected().first_name"></span>
+                                                                                                        <span class="last-login" data-bind="text: identityList.selected().last_name"></span>
+                                                                                                    </span>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    {% trans 'Email:' %} <a href="" data-bind="text: identityList.selected().email"></a>
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    {% trans 'Groups:' %}
+                                                                                                    <span class="last-login" data-bind="text: identityList.selected().groups"></span>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                Contributions
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    Edits: 0
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    Devices (1)
+                                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                                        <li class="">
+                                                                                                            <span>Name: iPhone (last login:<span class="last-login" data-bind="text: identityList.selected().last_login"></span>)</span>
+                                                                                                        </li>
+                                                                                                    </ul>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                        <div class="mpm-model-detail-panel">
+                                                                                            <div class="mpm-node-name">
+                                                                                                Security
+                                                                                            </div>
+                                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                                <li class="">
+                                                                                                    Remove project data from from user's device on next login?
+                                                                                                </li>
+                                                                                                <li class="">
+                                                                                                    <!--Switchery : Unchecked-->
+                                                                                                    <!--===================================================-->
+                                                                                                    <input id="wipe-project" class="js-switch-small" type="checkbox" style="margin-top: 0px; display: none;" data-switchery="true"><span class="switchery switchery-small" style="box-shadow: rgb(223, 223, 223) 0px 0px 0px 0px inset; border-color: rgb(223, 223, 223); background-color: rgb(255, 255, 255); transition: border 0.4s, box-shadow 0.4s;"><small style="left: 0px; background-color: rgb(255, 255, 255); transition: left 0.2s;"></small></span>
+                                                                                                    <!--===================================================-->
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div>
+
+                                                                                </div>
+                                                                            </div>
                                                                             </a>
 
-                                                                        <!--ko if: _.filter(selectedProject().identities.usersGroups(), function(u){return u.approved()}).length > 0 -->
+                                                                        <!--ko if: _.filter(identityList.usersGroups(), function(u){return u.approved()}).length > 0 -->
                                                                         <div class="mpm-user-groups">{% trans 'Belongs to the following approved groups:' %}
                                                                             <ul class="user-group-list">
-                                                                                <!-- ko foreach: selectedProject().identities.usersGroups() -->
+                                                                                <!-- ko foreach: identityList.usersGroups() -->
                                                                                 <!-- ko if: $data.approved -->
                                                                                 <li>
                                                                                     <span class='mpm-user-subtitle' data-bind="text:$data.name"></span>
@@ -418,8 +576,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!-- Activation Card -->
-                                        <div id="activation-card" class="tab-pane fade">
+                                        <!-- Summary Card -->
+                                        <div id="project-summary-card" class="tab-pane fade">
                                             <div class="panel-body card-panel-body" style="">
                                                 <div id="" class="card-content" style="">
 
@@ -529,10 +687,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div id="project-footer" class="project-footer" style="">
-
                         </div>
                     </div>
                     <!-- /ko -->

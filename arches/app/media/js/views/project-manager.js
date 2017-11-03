@@ -2,77 +2,69 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
-    'views/project-manager/identity-list',
+    'viewmodels/project-manager',
+    'viewmodels/alert',
     'models/project',
     'project-manager-data',
-    'arches'
-], function(_, ko, BaseManagerView, IdentityList, ProjectModel, data, arches) {
-    var identityList = new IdentityList({
-        items: ko.observableArray(data.identities)
-    });
-    var projects = ko.observableArray(
-        data.projects.map(function (project) {
-            return new ProjectModel({
-                source: project,
-                identities: identityList
-            });
-        })
-    );
-    var projectFilter = ko.observable('');
-    var filteredProjects = ko.computed(function () {
-        var filter = projectFilter();
-        var list = projects();
-        if (filter.length === 0) {
-            return list;
-        }
-        return _.filter(list, function(project) {
-            return project.name().toLowerCase().indexOf(filter) > 0;
-        });
-    });
+    'arches',
+    'bindings/datepicker'
+], function(_, ko, BaseManagerView, ProjectManagerViewModel, AlertViewModel, ProjectModel, data, arches) {
+    var viewModel = new ProjectManagerViewModel(data);
 
-    var loading = ko.observable(false);
-    var selectedProject = ko.observable(null);
-    selectedProject.subscribe(function(val){
-        if (val) {val.update();}
-    });
-    var pageView = new BaseManagerView({
-        viewModel: {
-            loading: loading,
-            projects: projects,
-            projectFilter: projectFilter,
-            selectedProject: selectedProject,
-            filteredProjects: filteredProjects,
-            identityList: identityList,
-            saveProject: function () {
-                loading(true);
-                var addProject = !selectedProject().get('id');
-                selectedProject().save(function () {
-                    if (addProject) {
-                        projects.push(selectedProject());
-                    }
-                    loading(false);
-                });
-            },
-            discardEdits: function () {
-                if (!selectedProject().get('id')) {
-                    selectedProject(null)
-                } else {
-                    selectedProject().reset();
-                }
-            },
-            newProject: function () {
-                if (!selectedProject() || !selectedProject().dirty()) {
-                    selectedProject(new ProjectModel({
-                        source: {
-                            name: '',
-                            active: false,
-                            id: null
-                        },
-                        identities: identityList
-                    }));
-                }
+    viewModel.saveProject = function() {
+        var self = this;
+        this.loading(true);
+        var addProject = !this.selectedProject().get('id');
+        this.selectedProject().save(function() {
+            if (addProject) {
+                self.projects.push(self.selectedProject());
             }
+            self.loading(false);
+        });
+    }
+
+    viewModel.discardEdits = function() {
+        if (!this.selectedProject().get('id')) {
+            this.selectedProject(null)
+        } else {
+            this.selectedProject().reset();
         }
+    }
+
+    viewModel.newProject = function() {
+        if (!this.selectedProject() || !this.selectedProject().dirty()) {
+            this.selectedProject(new ProjectModel({
+                source: {
+                    name: '',
+                    active: false,
+                    description: '',
+                    startdate: null,
+                    enddate: null,
+                    id: null
+                },
+                identities: data.identities
+            }));
+        }
+    }
+
+    viewModel.deleteProject = function(){
+        var self = this;
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmProjectDelete.title, arches.confirmProjectDelete.text, function() {
+            return;
+        }, function(a){
+            self.loading(true)
+            if (self.selectedProject()) {
+                self.selectedProject().delete(function(){
+                    self.loading(false);
+                    self.projects.remove(self.selectedProject());
+                    self.selectedProject(undefined)
+                });
+            };
+        }));
+    }
+
+    var pageView = new BaseManagerView({
+        viewModel: viewModel
     });
 
     return pageView;

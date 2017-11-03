@@ -174,6 +174,7 @@ Your docker-compose.yml file expects the following Environment Variables:
     -> **Used to fill the database with the default graphs that come with Arches**  
 - `INSTALL_DEFAULT_CONCEPTS` = True | False  
     -> **Used to fill the database with the default concepts that come with Arches**
+- `PGUSERNAME` = *Postgresql database username*
 - `PGPASSWORD` = *Postgresql database password*
 - `PGDBNAME` = *Postgresql database name*
 - `PGHOST` = *Postgresql database host address*

@@ -64,12 +64,13 @@ init_arches() {
 		setup_arches
 	fi
 
-	init_arches_projects
+	init_arches_project
 }
 
 
+# Setup Postgresql and Elasticsearch
 setup_arches() {
-	# Setup Postgresql and Elasticsearch (this deletes your existing database)
+	cd_arches_root
 
 	echo "" && echo ""
 	echo "*** Initializing database ***"
@@ -113,6 +114,7 @@ setup_arches() {
 		fi
 	fi
 
+	run_migrations
 }
 
 
@@ -152,6 +154,7 @@ set_dev_mode() {
 	echo ""
 	echo "----- SETTING DEV MODE -----"
 	echo ""
+	cd_arches_root
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
@@ -171,7 +174,7 @@ install_bower_components() {
 
 #### Misc
 
-init_arches_projects() {
+init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
@@ -310,13 +313,12 @@ run_gunicorn_server() {
 
 #### Main commands 
 run_arches() {
-
+	
 	init_arches
 	install_bower_components
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
-		run_migrations
 	fi
 
 	run_custom_scripts
@@ -326,11 +328,7 @@ run_arches() {
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 		collect_static
 		run_gunicorn_server
-	fi
-
-	
-
-	
+	fi	
 }
 
 
