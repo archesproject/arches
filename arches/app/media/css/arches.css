@@ -9564,6 +9564,7 @@ a.search-facet-item.disabled {
 
 .mpm-node-detail-metadata {
     list-style: none;
+    color: #777;
 }
 
 .mpm-activation-panel {
@@ -9577,6 +9578,8 @@ a.search-facet-item.disabled {
     padding-top: 10px;
     padding-bottom: 10px;
     border-top: 1px solid #eee;
+    height: 135px;
+    overflow-y: scroll;
 }
 
 .profile-mpm-panel {
@@ -9642,7 +9645,12 @@ a.search-facet-item.disabled {
 	color: #777;
 	padding: 3px;
 	font-style: italic;
+    text-align: center;
 	background: #ddd;
+}
+
+.library-card .project-status {
+    text-align: left;
 }
 
 .project-status.active {

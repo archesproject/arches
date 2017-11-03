@@ -144,6 +144,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 {% trans 'Resources' %}
                                                             </a>
                                         </li>
+                                        <li id="icon-group" class="">
+                                            <a id="map-tab" data-toggle="tab" href="#data-card" class="card-tab-title" aria-expanded="false">
+                                                                {% trans 'Data' %}
+                                                            </a>
+                                        </li>
                                         <li id="status-group" class="">
                                             <a id="map-tab" data-toggle="tab" href="#identities-card" class="card-tab-title" aria-expanded="false">
                                                                 {% trans 'People' %}
@@ -248,6 +253,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             Models...
                                         </div>
 
+                                        <!-- Data Card -->
+                                        <div id="data-card" class="mpm-card tab-pane fade">
+                                            Data...
+                                        </div>
+
                                         <div id="identities-card" class="identities-list mpm-card tab-pane fade">
 
                                             <div>
@@ -322,7 +332,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <div class="project-search-widget mpm-item-listing">
                                                                                 <input class="form-control input-lg" placeholder="find a user..." type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                             </div>
-
                                                                         </div>
                                                                         <div class='mpm-group-users'>
                                                                         <!-- ko foreach: selectedProject().filteredUsers() -->
@@ -637,8 +646,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
                                                                     Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata" data-bind="foreach: selectedProject().approvedGroupNames">
-                                                                        <li class="" data-bind="text: $data">
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
 
                                                                         </li>
                                                                     </ul>
