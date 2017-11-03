@@ -66,19 +66,19 @@ RUN rm -rf /tmp/*
 WORKDIR ${ARCHES_ROOT}
 
 # Install Bower components
-ADD ./bower.json ${ARCHES_ROOT}/bower.json
+COPY ./bower.json ${ARCHES_ROOT}/bower.json
 RUN bower --allow-root install
 
 # Install pip requirements
-ADD ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt
-ADD ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
+COPY ./arches/install/requirements.txt ${ARCHES_ROOT}/arches/install/requirements.txt
+COPY ./arches/install/requirements_dev.txt ${ARCHES_ROOT}/arches/install/requirements_dev.txt
 RUN	. ${WEB_ROOT}/ENV/bin/activate &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements.txt &&\
 	pip install -r ${ARCHES_ROOT}/arches/install/requirements_dev.txt &&\
 	pip install 'gunicorn==19.7.1'
 
 # Ensure that a new version of Arches invalidates the cache so it rebuilds
-ADD ./arches/__init__.py /tmp/
+COPY ./arches/__init__.py /tmp/
 
 # Install the Arches application
 COPY . ${ARCHES_ROOT}
