@@ -25,7 +25,7 @@
 
 4.  Edit the [docker-compose.yml](../docker-compose.yml) file locally, filling in the appropriate variables, including project, PGPASSWORD and TZ.
 
-5.  Download the latest Docker images of Arches, PostGIS, ElasticSearch, and NGINX. Navigate to the folder you placed [docker-compose.yml](../docker-compose.yml) in and type:  
+5.  To download the latest Docker images of Arches, PostGIS, ElasticSearch, and NGINX, navigate to the folder you placed [docker-compose.yml](../docker-compose.yml) in and run the following command:  
   `docker-compose pull`
 
 6.  Run Arches:  
@@ -230,20 +230,15 @@ This will be used throughout your development process and does not need to be ch
 
 *Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.* 
 
-### Useful environment variables
--   APP_FOLDER = The folder in your custom Arches app where your manage.py file lives. This can be useful when writing deployment scripts. `/your_project_root/<your_project_name>`
--   DJANGO_REMOTE_DEBUG = Set this to "True" if you are planning to use a remote debugger. It will turn off Live Reload and run Django in one thread, as opposed to running in multiple threads.
-
 ### Arches Core Development
-As described in point 3 and 4 of the `Setting up` section above, for development environments it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
+To develop on Arches Core, it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
-The same can be done when developing the core Arches project itself, with some slight adjustments:
+1.  In your Arches Root Directory, create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
 
-1.  Create a copy of [docker-compose.yml](../docker-compose.yml) called `docker-compose-local.yml`.  
 2.  Add these lines to `docker-compose-local.yml` under the `arches` container under `volumes`:  
 ```
 	- ./:/web_root/arches/  
-	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py
+	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
     - ../<insert_project_name>:/web_root/<insert_project_name>	
 ```
 3.  Build your Docker containers using:  
@@ -253,5 +248,7 @@ The same can be done when developing the core Arches project itself, with some s
 	`docker-compose -f .\docker-compose-local.yml up`  
 
 This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
+
+Any time you change Arches Dependancies, you will need to re-build your Docker Container. The `docker-compose -f .\docker-compose-local.yml build` command will re-build the container for you based upon the `Dockerfile`. If your new or updated dependency does not install correctly, you may need to build without cache: `docker-compose -f .\docker-compose-local.yml build --no-cache`
 
 The volume commands at *point 2* also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables. **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
