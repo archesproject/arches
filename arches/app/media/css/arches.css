@@ -9287,6 +9287,10 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
+.mpm-card {
+    min-height: 550px;
+}
+
 .mpm-card-content {
     margin-top: -54px;
     margin-left: -35px;
@@ -9296,9 +9300,14 @@ a.search-facet-item.disabled {
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
-    height: 540px;
+    height: 550px;
+    margin-left: -2px;
     background: #fcfcfc;
     border-right: 1px solid #ddd;
+}
+
+#identities-card .library-card:not(.selected-card) {
+    border-left: 5px solid #f8f8f8;
 }
 
 .identities-list .mpm-left-panel {
@@ -9361,12 +9370,16 @@ a.search-facet-item.disabled {
 }
 
 .mpm-group-users {
-    height: 375px;
+    height: 390px;
     overflow-y: scroll;
-    margin-top: 1px;
+    margin-top: 5px;
     border-top: solid;
     border-width: 0.25px;
     border-color: #eee;
+}
+
+.get-user-detail:hover {
+    background: #f8f8f8;
 }
 
 .mpm-right-panel .list-group.user-cards {
@@ -9402,7 +9415,7 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
-.mpm-user-name {
+.mpm-user-name h4 {
     font-size: 15px;
     font-weight: 500;
     color: #156AB7;
@@ -9415,8 +9428,11 @@ a.search-facet-item.disabled {
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;
-    margin-top: 0px;
-    margin-bottom: 0px;
+}
+
+.mpm-toggle-container {
+    width: 400px;
+    display: flex;
 }
 
 .list-group-item .mpm-user-summary {
@@ -9436,7 +9452,8 @@ a.search-facet-item.disabled {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 0px 10px;
+    padding: 0px 10px 0px 0px;
+    margin-top: -3px;
 }
 
 .mpm-user-subtitle.user {
@@ -9510,9 +9527,20 @@ a.search-facet-item.disabled {
 }
 
 .mpm-item-listing-header {
+    padding-left: 10px;
+    margin-top: 0px;
     color: #454545;
     font-size: 15px;
     font-weight: 500;
+}
+
+.mpm-account-switch {
+    margin-top: 20px;
+}
+
+.mpm-account-switch-text {
+    padding-left: 40px;
+    margin-top: -17px;
 }
 
 .project-search-widget.mpm-item-listing {
