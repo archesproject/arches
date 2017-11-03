@@ -244,8 +244,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Models Card -->
-                                        <div id="models-card" class="tab-pane fade">
-                                            Models...
+                                        <div id="models-card" class="identities-list tab-pane fade">
+                                            <div>
+                                                <div>
+                                                    <div class="flex relative">
+
+                                                        <div class="mpm-left-panel" style="" data-bind="with:resourceList">
+                                                            {% include 'views/list.htm' %}
+                                                        </div>
+
+                                                        <div class="mpm-right-panel">
+
+                                                            <div class="relative">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div id="identities-card" class="identities-list tab-pane fade">
@@ -638,6 +654,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}define('project-manager-data', [], function() {
             return {
                 projects: {{projects}},
+                resources: {{resources}},
                 identities: {{identities}}
             };
         });{% endautoescape %}

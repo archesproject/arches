@@ -64,9 +64,13 @@ class ProjectManagerView(BaseManagerView):
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
+
+        resources = models.GraphModel.objects.filter(isresource=True)
+
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
+            resources=JSONSerializer().serialize(resources),
             main_script='views/project-manager',
         )
 

@@ -2,8 +2,9 @@ define([
     'underscore',
     'knockout',
     'views/project-manager/identity-list',
+    'views/list',
     'models/project'
-], function(_, ko, IdentityList, ProjectModel) {
+], function(_, ko, IdentityList, ListView, ProjectModel) {
     /**
     * A base viewmodel for project management
     *
@@ -19,6 +20,11 @@ define([
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
+
+        this.resourceList = new ListView({
+            items: ko.observableArray(params.resources)
+        });
+
         this.projects = ko.observableArray(
             params.projects.map(function (project) {
                 return new ProjectModel({
