@@ -1,5 +1,21 @@
 # Arches in Docker
 
+*   [Quick start](#quick-start)
+    *   [Parameter overview](#parameter-overview)
+    *   [Commands](#commands)
+    *   [Running Docker in Production](#running-docker-in-production)
+    *   [Troubleshoot](#troubleshoot)
+*   [Additional Information](#additional-information)
+    *   [Initialize](#initialize)
+    *   [Settings](#settings)
+    *   [Connect to your container](#connect-to-your-container)
+    *   [Custom scripts on startup](#custom-scripts-on-startup)
+    *   [Remote Debugging](#remote-debugging)
+    *   [Housekeeping](#housekeeping)
+    *   [Setting up your own Arches project](#setting-up-your-own-arches-project)
+    *   [Useful environment variables](#useful-environment-variables)
+    *   [Arches Core Development](#arches-core-development)
+
 ## Quick start
 1.  Install [Docker](https://www.docker.com/get-docker) on your Machine.  
 
@@ -95,7 +111,7 @@ Potentially ports `80` and/or `443` on your machine are already taken by another
 
 ## Additional Information
 
-## Initialize
+### Initialize
 **On first run** Arches needs to initialize the PostgreSQL database and ElasticSearch.
 
 For your convenience, this initialization is done when you first run Arches.
@@ -104,13 +120,13 @@ For your convenience, this initialization is done when you first run Arches.
 The initialization can be forced using the `setup_arches` command.  
 **Be aware that this command deletes any existing database with the name set in the PGDBNAME environment variable.**
 
-## Settings
+### Settings
 In order to make this Docker image portable, it is using environment variables.  
 This is done through a settings_local.py file, which is copied into your new custom Arches project.  
 
 This settings_local.py complements the default settings.py and overrides settings with the same name.  
 
-## Connect to your container
+### Connect to your container
 The general command to enter your running container from the command line is:  
 `docker exec -it <container id> bash`  
 To get the container id:  
@@ -118,7 +134,7 @@ To get the container id:
 
 For more information, see the [```docker exec``` command documentation](https://docs.docker.com/engine/reference/commandline/exec/)
 
-## Custom scripts on startup
+### Custom scripts on startup
 On startup, you can run custom scripts before Arches is started up (called an entrypoint).
 Any script placed in /docker/entrypoint in the Docker container is ran after the default actions, such as database initialization and the creation of a new custom Arches app.
 
@@ -128,18 +144,18 @@ You can mount your custom scripts into the container, e.g.:
         - ./docker/entrypoint/script.sh:/docker/entrypoint/script.sh
 ```
 
-## Remote Debugging
+### Remote Debugging
 In order to enable remote debugging, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb) for Visual Studio (Code).  
 Point 4 is handled for you, all you need to do is set this environment variable:
 -   DJANGO_REMOTE_DEBUG=True
 
 For remote debugging Pycharm, see [this tutorial](https://gist.github.com/veuncent/1e7fcfe891883dfc52516443a008cfcb.)
 
-## Housekeeping
+### Housekeeping
 A cleanup script is provided in the official Arches repository: [docker/cleanup.ps1](docker/cleanup.ps1).
 This can be run on any OS and removes old Docker containers, unused images, etc.
 
-## Setting up your own Arches project
+### Setting up your own Arches project
 1.  Set the name of your Docker image. Edit your `docker-compose.yml`:  
 	Under the 'arches' service, change:  
 	`image: archesproject/arches:latest`  
@@ -214,11 +230,11 @@ This will be used throughout your development process and does not need to be ch
 
 *Note 2: with the tool `docker-compose` you can easilly orchestrate all required apps (in this case Arches, Postgres and Elasticsearch) on one server. This is mostly useful for development environments, as well as production setups with only one host server. The `docker-compose` program must be run from the root of your project folder.* 
 
-## Useful environment variables
+### Useful environment variables
 -   APP_FOLDER = The folder in your custom Arches app where your manage.py file lives. This can be useful when writing deployment scripts. `/your_project_root/<your_project_name>`
 -   DJANGO_REMOTE_DEBUG = Set this to "True" if you are planning to use a remote debugger. It will turn off Live Reload and run Django in one thread, as opposed to running in multiple threads.
 
-## Arches Core Development
+### Arches Core Development
 As described in point 3 and 4 of the `Setting up` section above, for development environments it is advisable to mount your source code into the container for instant code editing without rebuilding your Docker image.  
 
 The same can be done when developing the core Arches project itself, with some slight adjustments:
