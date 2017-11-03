@@ -126,7 +126,7 @@ class BusinessDataImporter(object):
             else:
                 print path + ' is not a valid path'
 
-    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False):
+    def import_business_data(self, file_format=None, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         reader = None
         start = time()
         cursor = connection.cursor()
@@ -144,7 +144,7 @@ class BusinessDataImporter(object):
             elif file_format == 'csv' or file_format == 'shp' or file_format == 'zip':
                 if mapping != None:
                     reader = CsvReader()
-                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk, create_concepts=create_concepts)
+                    reader.import_business_data(business_data=business_data, mapping=mapping, overwrite=overwrite, bulk=bulk, create_concepts=create_concepts, create_collections=create_collections)
                 else:
                     print '*'*80
                     print 'ERROR: No mapping file detected. Please indicate one with the \'-c\' paramater or place one in the same directory as your business data.'

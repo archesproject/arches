@@ -760,11 +760,27 @@ class Command(BaseCommand):
         if isinstance(data_source, basestring):
             data_source = [data_source]
 
+        update_system_settings = True
+        if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
+            response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
+            if response.lower() in ('t', 'true', 'y', 'yes'):
+                update_system_settings = True
+                print 'Using package system settings'
+            else:
+                update_system_settings = False
+
+        create_collections = False
+        if create_concepts:
+            response = raw_input('Create new concept collections or add to existing? (create/add): ')
+            if response.lower() in ('create'):
+                create_collections = True
+                print 'Creating new collections'
+
         if data_source != ():
             for path in data_source:
                 if os.path.isabs(path):
                     if os.path.isfile(os.path.join(path)):
-                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts)
+                        BusinessDataImporter(path, config_file).import_business_data(overwrite=overwrite, bulk=bulk_load, create_concepts=create_concepts, create_collections=create_collections)
                     else:
                         print '*'*80
                         print 'No file found at indicated location: {0}'.format(path)
