@@ -1,0 +1,25 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Resources" %}{% endblock %}
+
+{% block search_placeholder %}{% trans "Find resource" %}{% endblock %}
+
+{% block listitem %}
+    <div data-bind="attr:{'title': $data.groups}">
+        <div class="library-icon" style="">
+            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple">
+                <i data-bind="attr: {class: $data.iconclass}"></i>
+            </span>
+        </div>
+
+
+        <div class="library-card-main" style="">
+            <a class="name">
+                <div data-bind="text: $data.name"></div>
+            </a>
+            <div class="user-groups" data-bind="text: $data.subtitle"></div>
+        </div>
+    </div>
+{% endblock %}

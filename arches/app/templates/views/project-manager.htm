@@ -255,12 +255,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="flex relative">
 
                                                         <div class="mpm-left-panel" style="" data-bind="with:resourceList">
-                                                            {% include 'views/list.htm' %}
+                                                            {% include 'views/project-manager/resource-list.htm' %}
                                                         </div>
 
                                                         <div class="mpm-right-panel">
 
                                                             <div class="relative">
+
+                                                                <div class="row">
+                                                                    <!-- ko if: resourceList.selectedItems().length > 0 -->
+                                                                    <div class="col-xs-12 col-sm-5 col-md-3">
+                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
+                                                                            <i class="fa fa-group" data-bind="css: resourceList.selectedItems()[0].iconclass"></i>
+                                                                        </span>
+                                                                        <div class="mpm-group-name">
+                                                                            <a class="listitem_name" data-bind="text:resourceList.selectedItems()[0].name"></a>
+                                                                        </div>
+                                                                        <div class="mpm-group-subtitle" data-bind='text:resourceList.selectedItems()[0].subtitle'></div>
+                                                                    </div>
+                                                                    <!--/ko-->
+                                                                    <div class="col-sm-6" style="" data-bind="">
+                                                                    </div>
+                                                                </div>
+
                                                             </div>
                                                         </div>
 
