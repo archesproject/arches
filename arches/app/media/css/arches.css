@@ -2566,6 +2566,10 @@ ul .collapse li:last-of-type {
     top: 22px;
 }
 
+.report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
+    margin-top: 0px;
+}
+
 .resource-grid-meta-container {
     position: absolute;
     right: 15px;
