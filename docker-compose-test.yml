@@ -17,22 +17,19 @@ services:
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
         - DOMAIN_NAMES=localhost
-        - TZ=EST
+        - TZ=PST
       depends_on:
         - db
         - elasticsearch
 
-
     db:
       container_name: db
-      image: mdillon/postgis:9.6
+      image: mdillon/postgis:9.6-alpine
       ports:
         - '5432:5432'
       environment:
         - POSTGRES_PASSWORD=postgres
-        - TZ=EST
-
-
+        - TZ=PST
 
     elasticsearch:
       container_name: elasticsearch
@@ -41,4 +38,4 @@ services:
         - "9200:9200"
         - "9300:9300"
       environment:
-        - TZ=EST
+        - TZ=PST

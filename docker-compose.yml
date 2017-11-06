@@ -12,7 +12,7 @@ services:
         - arches-log:/arches/arches/logs
         - arches-static:/static_root
       environment:
-#        - ARCHES_PROJECT=development_project
+        # - ARCHES_PROJECT=insert_project_name
         - INSTALL_DEFAULT_GRAPHS=True
         - INSTALL_DEFAULT_CONCEPTS=True
         - PGUSERNAME=postgres
@@ -22,17 +22,17 @@ services:
         - PGPORT=5432
         - ESHOST=elasticsearch
         - ESPORT=9200
+        # - ELASTICSEARCH_PREFIX=insert_project_name
         - DJANGO_MODE=PROD
         - DJANGO_DEBUG=False
-        - DJANGO_RELOAD=False
+        # - DJANGO_REMOTE_DEBUG=False
         - DOMAIN_NAMES=localhost
-        - TZ=EST
+        - TZ=PST
       ports:
         - '8000:8000'
       depends_on:
         - db
         - elasticsearch
-
 
     nginx:
       container_name: nginx
@@ -52,14 +52,13 @@ services:
         - LOCAL_PROXY_PORT=8000
         - DOMAIN_NAMES=localhost
         - PUBLIC_MODE=False
-        - TZ=EST
+        - TZ=PST
       depends_on:
         - arches
 
-
     db:
       container_name: db
-      image: mdillon/postgis:9.6
+      image: mdillon/postgis:9.6-alpine
       volumes:
           - postgres-data:/var/lib/postgresql/data
           - postgres-log:/var/log/postgresql
@@ -67,8 +66,7 @@ services:
         - '5432:5432'
       environment:
         - POSTGRES_PASSWORD=postgres
-        - TZ=EST
-
+        - TZ=PST
 
     elasticsearch:
       container_name: elasticsearch
@@ -79,8 +77,7 @@ services:
         - "9200:9200"
         - "9300:9300"
       environment:
-        - TZ=EST
-
+        - TZ=PST
 
     letsencrypt:
       container_name: letsencrypt
@@ -96,8 +93,7 @@ services:
         - DOMAIN_NAMES=localhost
         - PRODUCTION_MODE=False
         - PERSISTENT_MODE=True
-        - TZ=EST
-
+        - TZ=PST
 
 volumes:
     arches-log:
