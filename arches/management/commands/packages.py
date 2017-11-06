@@ -777,6 +777,7 @@ class Command(BaseCommand):
                 print 'Creating new collections . . .'
             elif create_concepts == 'append':
                 print 'Appending to existing collections . . .'
+            create_concepts = True
 
         if data_source != ():
             for path in data_source:
