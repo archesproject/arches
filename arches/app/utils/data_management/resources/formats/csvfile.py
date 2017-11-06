@@ -350,25 +350,27 @@ class CsvReader(Reader):
 
                         # if node.datatype is concept or concept-list create concepts and collections
                         if node.datatype in ['concept', 'concept-list']:
-                            # create collection if create_collections is true, otherwise append to collection already assigned to node
+                            # create collection if create_collections = create, otherwise append to collection already assigned to node
                             if create_collections == True:
+                                collection_legacyoid = node.name + '_' + str(node.graph_id) + '_import'
                                 # check to see that there is not already a collection for this node
                                 if node.config['rdmCollection'] != None:
-                                    errors.append({'type': 'WARNING', 'message': 'A collection already exists for the {0} node.'.format(node.name)})
+                                    errors.append({'type': 'WARNING', 'message': 'A collection already exists for the {0} node. Use the add option to add concepts to this collection.'.format(node.name)})
                                     if len(errors) > 0:
                                         self.errors += errors
                                     collection = None
                                 else:
                                     # if there is no collection assigned to this node, create one and assign it to the node
                                     try:
-                                        collection = Concept().get(legacyoid=node.name + '_' + str(node.graph_id) + '_import')
+                                        # check to see that a collection with this legacyid does not already exist
+                                        collection = Concept().get(legacyoid=collection_legacyoid)
                                         errors.append({'type': 'WARNING', 'message': 'A collection with the legacyid {0} already exists.'.format(node.name + '_' + str(node.graph_id) + '_import')})
                                         if len(errors) > 0:
                                             self.errors += errors
                                     except:
                                         collection = Concept({
                                             'id': collectionid,
-                                            'legacyoid': node.name + '_' + str(node.graph_id) + '_import',
+                                            'legacyoid': collection_legacyoid,
                                             'nodetype': 'Collection'
                                         })
                                         collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
@@ -376,28 +378,29 @@ class CsvReader(Reader):
                                         node.save()
                                         collection.save()
                             else:
-                                # if create collection is false check that there is a collection associated with node, get the collection from the node, and check that it is empty
+                                # if create collection = add check that there is a collection associated with node, if no collection associated with node create a collection and associated with the node
                                 try:
-                                    collection = Concept().get(id=node.config['rdmCollection'], include_subconcepts=True, semantic=False)
-                                    if collection.hassubconcepts:
-                                        errors.append({'type': 'WARNING', 'message': 'The collection assigned to {0} node is not empty. You may only add to empty collections'.format(node.name)})
-                                        if len(errors) > 0:
-                                            self.errors += errors
-                                        collection = None
+                                    collection = Concept().get(id=node.config['rdmCollection'])
                                 except:
-                                    errors.append({'type': 'WARNING', 'message': 'No collection assigned to {0} node.'.format(node.name)})
-                                    if len(errors) > 0:
-                                        self.errors += errors
-                                    collection = None
+                                    collection = Concept({
+                                        'id': collectionid,
+                                        'legacyoid': node.name + '_' + str(node.graph_id) + '_import',
+                                        'nodetype': 'Collection'
+                                    })
+                                    collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                    node.config['rdmCollection'] = collectionid
+                                    node.save()
+                                    collection.save()
 
                             if collection != None:
+                                topconcept_legacyoid = node.name + '_' + str(node.graph_id)
                                 # Check if top concept already exists, if not create it and add to candidates scheme
                                 try:
-                                    topconcept = Concept().get(legacyoid=node.name + '_' + str(node.graph_id))
+                                    topconcept = Concept().get(legacyoid=topconcept_legacyoid)
                                 except:
                                     topconcept = Concept({
                                         'id': topconceptid,
-                                        'legacyoid': node.name + '_' + str(node.graph_id),
+                                        'legacyoid': topconcept_legacyoid,
                                         'nodetype': 'Concept'
                                     })
                                     topconcept.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
@@ -406,13 +409,15 @@ class CsvReader(Reader):
 
                                 # create child concepts and relate to top concept and collection accordingly
                                 for conceptid, value in concepts.iteritems():
+                                    concept_legacyoid = value + '_' + node.name + '_' + str(node.graph_id)
                                     # check if concept already exists, if not create and add to topconcept and collection
                                     try:
-                                        concept = Concept().get(legacyoid=value + '_' + node.name + '_' + str(node.graph_id))
+                                        conceptid = [concept for concept in topconcept.get_child_concepts(topconcept.id) if concept[1] == value][0][0]
+                                        concept = Concept().get(id=conceptid)
                                     except:
                                         concept = Concept({
                                             'id': conceptid,
-                                            'legacyoid': value + '_' + node.name + '_' + str(node.graph_id),
+                                            'legacyoid': concept_legacyoid,
                                             'nodetype': 'Concept'
                                         })
                                         concept.addvalue({'id': str(uuid.uuid4()), 'value': value, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
@@ -422,15 +427,16 @@ class CsvReader(Reader):
 
                         #if node.datatype is domain or domain-list create options array in node.config
                         elif node.datatype in ['domain-value', 'domain-value-list']:
-                            if node.config['options'] == []:
-                                for domainid, value in new_concepts[arches_nodeid].iteritems():
+                            for domainid, value in new_concepts[arches_nodeid].iteritems():
+                                # check if value already exists in domain
+                                if value not in [t['text'] for t in node.config['options']]:
                                     domainvalue = {
                                         "text": value,
                                         "selected": False,
                                         "id": domainid
                                     }
                                     node.config['options'].append(domainvalue)
-                                node.save()
+                                    node.save()
 
                 if create_concepts == True:
                     create_reference_data(concepts_to_create, create_collections)

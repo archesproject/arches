@@ -116,7 +116,7 @@ class Command(BaseCommand):
         parser.add_argument('-bulk', '--bulk_load', action='store_true', dest='bulk_load',
             help='Bulk load values into the database.  By setting this flag the system will bypass any PreSave functions attached to the resource.')
 
-        parser.add_argument('-create_concepts', '--create_concepts', action='store_true', dest='create_concepts',
+        parser.add_argument('-create_concepts', '--create_concepts', action='store', dest='create_concepts',
             help='Create concepts from your business data on import. When setting this flag the system will pull the unique values from columns indicated as concepts and load them into candidates and collections.')
 
         parser.add_argument('-single_file', '--single_file', action='store_true', dest='single_file',
@@ -771,10 +771,12 @@ class Command(BaseCommand):
 
         create_collections = False
         if create_concepts:
-            response = raw_input('Create new concept collections or add to existing? (create/add): ')
-            if response.lower() in ('create'):
+            create_concepts = str(create_concepts).lower()
+            if create_concepts == 'create':
                 create_collections = True
-                print 'Creating new collections'
+                print 'Creating new collections . . .'
+            elif create_concepts == 'append':
+                print 'Appending to existing collections . . .'
 
         if data_source != ():
             for path in data_source:
