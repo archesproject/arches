@@ -2,11 +2,11 @@
 
 HELP_TEXT="
 
-Arguments:  
-	run_arches: Default. Run the Arches server  
-	run_tests: Run unit tests  
-	setup_arches: Delete any existing Arches database and set up a fresh one  
-	-h or help: Display help text  
+Arguments:
+	run_arches: Default. Run the Arches server
+	run_tests: Run unit tests
+	setup_arches: Delete any existing Arches database and set up a fresh one
+	-h or help: Display help text
 "
 
 display_help() {
@@ -53,7 +53,7 @@ activate_virtualenv() {
 
 
 
-#### Install 
+#### Install
 
 init_arches() {
 	if db_exists; then
@@ -286,11 +286,11 @@ run_django_server() {
 	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
 	cd_app_folder
-	if [[ ${DJANGO_RELOAD} == "True" ]]; then
+	if [[ ${DJANGO_REMOTE_DEBUG} != "True" ]]; then
 	    echo "Running Django with livereload."
 		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
 	else
-        echo "Running Django with options --noreload --nothreading."
+        echo "Running Django with options --noreload --nothreading for remote debugging."
 		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
 	fi
 }
@@ -311,9 +311,9 @@ run_gunicorn_server() {
 
 
 
-#### Main commands 
+#### Main commands
 run_arches() {
-	
+
 	init_arches
 	install_bower_components
 
@@ -328,7 +328,7 @@ run_arches() {
 	elif [[ "${DJANGO_MODE}" == "PROD" ]]; then
 		collect_static
 		run_gunicorn_server
-	fi	
+	fi
 }
 
 
@@ -398,4 +398,3 @@ do
 	esac
 	shift # next argument or value
 done
-
