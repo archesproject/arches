@@ -30,6 +30,7 @@ define([
                 _.each(item.cards(), function(card){
                     card.approved = ko.observable(false);
                     card.expanded = ko.observable(false);
+                    card.widgetlabels = _.map(card.widgets, function(w) {return w.label}).join(', ');
                 })
             })
 
