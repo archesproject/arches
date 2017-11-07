@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseNotFound
@@ -30,9 +31,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
+from arches.app.models.card import Card
 from arches.app.models.system_settings import settings
 from arches.app.views.base import BaseManagerView
-from django.contrib.auth.models import User, Group
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class ProjectManagerView(BaseManagerView):
@@ -64,9 +65,22 @@ class ProjectManagerView(BaseManagerView):
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
+
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resources = []
+
+        for graph in graphs:
+            # cards = models.CardModel.objects.filter(graph=graph)
+            # cards[0].cardxnodexwidget_set.all()
+            # cards[0].cardxnodexwidget_set.all()[0]
+            # cards[0].cardxnodexwidget_set.all()[0].widget
+            # cards[0].cardxnodexwidget_set.all()[0].node
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]})
+
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
+            resources=JSONSerializer().serialize(resources),
             main_script='views/project-manager',
         )
 

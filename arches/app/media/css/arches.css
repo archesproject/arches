@@ -2566,6 +2566,10 @@ ul .collapse li:last-of-type {
     top: 22px;
 }
 
+.report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
+    margin-top: 0px;
+}
+
 .resource-grid-meta-container {
     position: absolute;
     right: 15px;
@@ -9446,6 +9450,7 @@ a.search-facet-item.disabled {
     height: 280px;
 }
 
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
@@ -9460,6 +9465,16 @@ a.search-facet-item.disabled {
     padding: 0px;
     justify-content: left;
 }
+
+.mpm-user-subtitle.resource {
+    padding: 0px;
+    justify-content: left;
+}
+
+.mpm-widget-labels {
+    padding-left: 5px;
+}
+
 
 .mpm-user-groups {
     color: #777;
