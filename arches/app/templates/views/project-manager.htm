@@ -263,20 +263,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="relative">
 
                                                                 <div class="row">
-                                                                    <!-- ko if: resourceList.selectedItems().length > 0 -->
+                                                                    <!--ko if: resourceList.selected() -->
+                                                                    <!-- ko if: resourceList.selected().cards().length > 0 -->
                                                                     <div class="col-xs-12 col-sm-5 col-md-3">
-                                                                        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-purple">
-                                                                            <i class="fa fa-group" data-bind="css: resourceList.selectedItems()[0].iconclass"></i>
+
+                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
+                                                                            <span>
+                                                                                <i data-bind="css: (resourceList.selected().iconclass || 'fa fa-question')"></i>
+                                                                            </span>
                                                                         </span>
+
+
                                                                         <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind="text:resourceList.selectedItems()[0].name"></a>
+                                                                            <a class="listitem_name" data-bind="text:resourceList.selected().name"></a>
                                                                         </div>
-                                                                        <div class="mpm-group-subtitle" data-bind='text:resourceList.selectedItems()[0].subtitle'></div>
+                                                                        <div class="mpm-group-subtitle" data-bind='text:resourceList.selected().subtitle'></div>
                                                                     </div>
+                                                                    <!--/ko-->
                                                                     <!--/ko-->
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                     </div>
                                                                 </div>
+
+
+                                                                <!--ko if: resourceList.selected() -->
+                                                                 <!--ko if: resourceList.selected().cards().length > 0 -->
+                                                                <div class="list-group user-cards">
+                                                                    <div class="mpm-group-users">
+                                                                    <div data-bind="sortable: resourceList.selected().cards" class="ko_container ui-sortable">
+                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
+                                                                            <div class="mpm-user-title mpm-user-name">
+                                                                                <h4 data-bind='text: $data.name'></h4>
+                                                                                <div class='mpm-user-status pull-right'>
+                                                                                    <span>{% trans 'Add' %}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                </div>
+                                                                <!--/ko-->
+                                                                <!--/ko-->
 
                                                             </div>
                                                         </div>

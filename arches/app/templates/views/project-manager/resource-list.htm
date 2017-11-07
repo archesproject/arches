@@ -9,11 +9,13 @@
 {% block listitem %}
     <div data-bind="attr:{'title': $data.groups}">
         <div class="library-icon" style="">
-            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple">
-                <i data-bind="attr: {class: $data.iconclass}"></i>
-            </span>
         </div>
 
+        <div class="library-icon" style="" data-bind="">
+            <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
+                <i data-bind="css: ($data.iconclass || 'fa fa-question')"></i>
+            </span>
+        </div>
 
         <div class="library-card-main" style="">
             <a class="name">

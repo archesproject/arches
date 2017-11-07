@@ -21,6 +21,7 @@ define([
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
             self.showDetails = ko.observable(false);
+            self.resourceCards = ko.observableArray();
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
