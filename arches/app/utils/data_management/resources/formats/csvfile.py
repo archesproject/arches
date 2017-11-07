@@ -36,25 +36,25 @@ class ConceptLookup():
         self.create = create
         self.add_domain_values_to_lookups()
 
-    def lookup_labelid_from_label(self, label, collectionid):
-        ret = []
-        for la in label.split(','):
-            ret.append(self.lookup_label(la.strip(), collectionid))
-        return (',').join(ret)
-
     def lookup_label(self, label, collectionid):
         ret = label
-        if collectionid not in self.lookups:
-            try:
-                self.lookups[collectionid] = Concept().get_child_collections(collectionid)
-                ret = self.lookup_labelid_from_label(label, collectionid)
-            except:
-                return label
-        else:
-            for concept in self.lookups[collectionid]:
-                if label == concept[1]:
-                    ret = concept[2]
+        collection_values = self.lookups[collectionid]
+        for concept in collection_values:
+            if label == concept[1]:
+                ret = concept[2]
         return ret
+
+    def lookup_labelid_from_label(self, value, collectionid):
+        ret = []
+        for val in csv.reader([value], delimiter=',', quotechar='"'):
+            for v in val:
+                v = v.strip()
+                try:
+                    ret.append(self.new_lookup_label(v, collectionid))
+                except:
+                    self.lookups[collectionid] = Concept().get_child_collections(collectionid)
+                    ret.append(self.lookup_label(v, collectionid))
+        return (',').join(ret)
 
     def add_domain_values_to_lookups(self):
         for node in Node.objects.filter(Q(datatype='domain-value') | Q(datatype='domain-value-list')):
@@ -319,8 +319,11 @@ class CsvReader(Reader):
                         for node in mapping['nodes']:
                             if node['data_type'] in ['concept', 'concept-list', 'domain-value', 'domain-value-list'] and node['file_field_name'] in row.keys():
 
-                                # make all concept values imported into a list for consistent processing
-                                concept = [con.strip() for con in row[node['file_field_name']].split(',')]
+                                # print row[node['file_field_name']]
+                                concept = []
+                                for val in csv.reader([row[node['file_field_name']]], delimiter=',', quotechar='"'):
+                                    concept.append(val)
+                                concept = concept[0]
 
                                 # check if collection is in concepts_to_create, add collection to concepts_to_create if it's not and add first child concept
                                 if node['arches_nodeid'] not in concepts_to_create:
