@@ -31,6 +31,11 @@ class Migration(migrations.Migration):
             name='cards',
             field=models.ManyToManyField(through='models.MobileProjectXCard', to='models.CardModel'),
         ),
+        migrations.AddField(
+            model_name='mobileprojectxcard',
+            name='sortorder',
+            field=models.IntegerField(default=0),
+        ),
         migrations.AlterUniqueTogether(
             name='mobileprojectxcard',
             unique_together=set([('mobile_project', 'card')]),

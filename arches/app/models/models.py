@@ -878,6 +878,7 @@ class MobileProjectXCard(models.Model):
     mobile_project_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
     mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+    sortorder = models.IntegerField(default=0)
 
     class Meta:
         managed = True

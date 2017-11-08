@@ -153,8 +153,8 @@ define([
             };
 
             self.toggleResourceCard = function(val) {
-                var hasCard = _.contains(self.cards(), val);
-                hasCard ? self.cards.remove(val) : self.cards.push(val);
+                var hasCard = _.contains(self.cards(), val.cardid);
+                hasCard ? self.cards.remove(val.cardid) : self.cards.push(val.cardid);
             }
 
             self.toggleShowDetails = function() {

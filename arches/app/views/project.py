@@ -124,6 +124,7 @@ class ProjectManagerView(BaseManagerView):
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
+
         if data['id'] is None:
             project = models.MobileProject()
             project.createdby = self.request.user
@@ -131,6 +132,21 @@ class ProjectManagerView(BaseManagerView):
             project = models.MobileProject.objects.get(pk=data['id'])
             self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
             self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
+
+            project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
+
+            form_card_ids = set(data['cards'])
+            cards_to_remove = project_card_ids - form_card_ids
+            cards_to_add = form_card_ids - project_card_ids
+
+            print 'adding', cards_to_add
+            for card_id in cards_to_add:
+                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project)
+
+            print 'removing', cards_to_remove
+            for card_id in cards_to_remove:
+                models.MobileProjectXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project).delete()
+
 
         if project.active != data['active']:
             # notify users in the project that the state of the project has changed
@@ -147,9 +163,16 @@ class ProjectManagerView(BaseManagerView):
         project.active = data['active']
         project.lasteditedby = self.request.user
 
+
         with transaction.atomic():
             project.save()
-        return JSONResponse({'success':True, 'project': project})
+
+        bb = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+        ordered_ids = [unicode(mpc.card.cardid) for mpc in bb]
+        project_dict = project.__dict__
+        project_dict['cards'] = ordered_ids
+
+        return JSONResponse({'success':True, 'project': project_dict})
 
 
     def get_project_users(self, project):
