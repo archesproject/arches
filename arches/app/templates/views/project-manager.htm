@@ -294,10 +294,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
-                                                                                <div class='mpm-user-status pull-right'>
-                                                                                    <span>{% trans 'Add' %}</span>
+                                                                                <div class='mpm-user-status pull-right' data-bind="click: function(val){val.approved(!val.approved()); $parent.selectedProject().toggleResourceCard($data)}, css: {'invited': $data.approved}">
+                                                                                    <span data-bind="text: $data.approved() ? 'Remove' : 'Add'"></span>
                                                                                 </div>
                                                                             </div>
+                                                                            <!--ko if: $data.container !== '' -->
+                                                                            <div class="mpm-user-subtitle resource"><span>{% trans 'Container:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.container"></span></div>
+                                                                            <!--/ko-->
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
                                                                         </div>
                                                                     </div>
@@ -640,7 +643,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
                                                                         <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
-
                                                                         </li>
                                                                     </ul>
                                                                 </li>

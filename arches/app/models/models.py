@@ -840,6 +840,7 @@ class MobileProject(models.Model):
     lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
     users = models.ManyToManyField(to=User, through='MobileProjectXUser')
     groups = models.ManyToManyField(to=Group, through='MobileProjectXGroup')
+    cards = models.ManyToManyField(to=CardModel, through='MobileProjectXCard')
     startdate = models.DateField(blank=True, null=True)
     enddate = models.DateField(blank=True, null=True)
     description = models.TextField(null=True)
@@ -872,3 +873,13 @@ class MobileProjectXGroup(models.Model):
         managed = True
         db_table = 'mobile_projects_x_groups'
         unique_together = ('mobile_project', 'group',)
+
+class MobileProjectXCard(models.Model):
+    mobile_project_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
+    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'mobile_projects_x_cards'
+        unique_together = ('mobile_project', 'card',)

@@ -21,7 +21,7 @@ define([
             self.users = ko.observableArray();
             self.groups = ko.observableArray();
             self.showDetails = ko.observable(false);
-            self.resourceCards = ko.observableArray();
+            self.cards = ko.observableArray();
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
@@ -152,6 +152,11 @@ define([
                 };
             };
 
+            self.toggleResourceCard = function(val) {
+                var hasCard = _.contains(self.cards(), val);
+                hasCard ? self.cards.remove(val) : self.cards.push(val);
+            }
+
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails())
@@ -170,6 +175,7 @@ define([
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
+                    cards: self.cards
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -191,6 +197,7 @@ define([
             self.lasteditedby(source.lasteditedby_id);
             self.groups(source.groups);
             self.users(source.users);
+            self.cards(source.cards);
             self.set('id', source.id);
         },
 
@@ -215,6 +222,7 @@ define([
                     self.lasteditedby(request.responseJSON.project.lasteditedby_id);
                     self.groups(request.responseJSON.project.groups);
                     self.users(request.responseJSON.project.users);
+                    self.cards(request.responseJSON.project.cards);
                     this._project(this.json());
                 };
             };
