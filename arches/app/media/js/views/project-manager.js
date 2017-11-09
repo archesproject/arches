@@ -63,6 +63,12 @@ define([
         }));
     }
 
+    if (viewModel.projects().length === 0) {
+        viewModel.newProject()
+    } else {
+        viewModel.selectedProject(viewModel.projects()[0])
+    }
+
     var pageView = new BaseManagerView({
         viewModel: viewModel
     });
