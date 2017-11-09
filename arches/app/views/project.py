@@ -171,6 +171,8 @@ class ProjectManagerView(BaseManagerView):
         ordered_ids = [unicode(mpc.card.cardid) for mpc in bb]
         project_dict = project.__dict__
         project_dict['cards'] = ordered_ids
+        project_dict['users'] = [u.id for u in project.users.all()]
+        project_dict['groups'] = [g.id for g in project.users.all()]
 
         return JSONResponse({'success':True, 'project': project_dict})
 

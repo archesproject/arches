@@ -42,12 +42,17 @@ define([
                 }, self)
             }, self)
 
-            this.resetCards = function(){
+            this.resetCards = function(cards){
                 _.each(this.items(), function(item){
                     _.each(item.cards(), function(card){
-                        card.approved(false);
+                        if (_.contains(cards, card.cardid)) {
+                            card.approved(true);
+                        } else {
+                            card.approved(false);
+                        }
                     });
                 })
+
             }
 
             this.selected = ko.computed(function(){

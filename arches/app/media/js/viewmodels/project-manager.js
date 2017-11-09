@@ -64,6 +64,7 @@ define([
                 });
             })
         );
+
         this.projectFilter = ko.observable('');
         this.filteredProjects = ko.computed(function () {
             var filter = self.projectFilter();
@@ -85,7 +86,7 @@ define([
                 self.identityList.items()[0].selected(true);
                 self.resourceList.clearSelection();
                 self.resourceList.items()[0].selected(true);
-                self.resourceList.resetCards();
+                self.resourceList.resetCards(val.cards());
                 val.update();
             }
         });

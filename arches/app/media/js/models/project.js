@@ -18,10 +18,10 @@ define([
             self.active = ko.observable(false);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
-            self.users = ko.observableArray();
-            self.groups = ko.observableArray();
+            self.users = ko.observableArray([]);
+            self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
-            self.cards = ko.observableArray();
+            self.cards = ko.observableArray([]);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {

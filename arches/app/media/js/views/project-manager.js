@@ -40,7 +40,10 @@ define([
                     description: '',
                     startdate: null,
                     enddate: null,
-                    id: null
+                    id: null,
+                    cards: [],
+                    users: [],
+                    groups: []
                 },
                 identities: data.identities
             }));
