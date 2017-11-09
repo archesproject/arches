@@ -239,7 +239,7 @@ To develop on Arches Core, it is advisable to mount your source code into the co
 ```
 	- ./:/web_root/arches/  
 	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
-    - ../<insert_project_name>:/web_root/<insert_project_name>	
+	- ../<insert_project_name>:/web_root/<insert_project_name>	
 ```
 3.  Build your Docker containers using:  
 	`docker-compose -f .\docker-compose-local.yml build`  
