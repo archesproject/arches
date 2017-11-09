@@ -134,16 +134,19 @@ class ProjectManagerView(BaseManagerView):
             self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
 
             project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
-
             form_card_ids = set(data['cards'])
             cards_to_remove = project_card_ids - form_card_ids
             cards_to_add = form_card_ids - project_card_ids
+            cards_to_update = project_card_ids & form_card_ids
 
-            print 'adding', cards_to_add
             for card_id in cards_to_add:
-                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project)
+                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project, sortorder=data['cards'].index(card_id))
 
-            print 'removing', cards_to_remove
+            for card_id in cards_to_update:
+                mobile_project_card = models.MobileProjectXCard.objects.filter(mobile_project=project).get(card=models.CardModel.objects.get(cardid=card_id))
+                mobile_project_card.sortorder=data['cards'].index(card_id)
+                mobile_project_card.save()
+
             for card_id in cards_to_remove:
                 models.MobileProjectXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project).delete()
 
@@ -163,12 +166,11 @@ class ProjectManagerView(BaseManagerView):
         project.active = data['active']
         project.lasteditedby = self.request.user
 
-
         with transaction.atomic():
             project.save()
 
-        bb = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
-        ordered_ids = [unicode(mpc.card.cardid) for mpc in bb]
+        ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+        ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
         project_dict = project.__dict__
         project_dict['cards'] = ordered_ids
         project_dict['users'] = [u.id for u in project.users.all()]
