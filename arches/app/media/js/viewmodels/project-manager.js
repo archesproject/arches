@@ -84,6 +84,7 @@ define([
                 self.identityList.clearSelection();
                 self.identityList.items()[0].selected(true);
                 self.resourceList.clearSelection();
+                self.resourceList.items()[0].selected(true);
                 self.resourceList.resetCards();
                 val.update();
             }
