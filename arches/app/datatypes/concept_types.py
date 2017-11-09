@@ -63,9 +63,15 @@ class ConceptDataType(BaseConceptDataType):
     def validate(self, value, source=''):
         errors = []
         try:
+            uuid.UUID(value)
+        except ValueError:
+            message = "This is an invalid concept prefLabel, or an incomplete UUID"
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+            return errors
+        try:
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
-            message = "Not a valid domain value"
+            message = "This UUID does not correspond to a valid domain value"
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
@@ -104,19 +110,10 @@ class ConceptDataType(BaseConceptDataType):
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, source=''):
         errors = []
+        validate_concept = ConceptDataType().validate
         for v in value:
             val = v.strip()
-            try:
-                uuid.UUID(val)
-            except ValueError:
-                message = "This is an invalid concept prefLabel, or an incomplete UUID"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
-                continue
-            try:
-                models.Value.objects.get(pk=val)
-            except ObjectDoesNotExist:
-                message = "This UUID does not correspond to a valid domain value"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
+            errors += validate_concept(val)
         return errors
 
     def transform_import_values(self, value, nodeid):
