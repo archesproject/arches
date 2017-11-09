@@ -1,4 +1,5 @@
 import uuid
+import csv
 from arches.app.models import models
 from arches.app.models import concept
 from arches.app.datatypes.base import BaseDataType
@@ -113,7 +114,11 @@ class ConceptListDataType(BaseConceptDataType):
         return errors
 
     def transform_import_values(self, value, nodeid):
-        return [v.strip() for v in value.split(',')]
+        ret =[]
+        for val in csv.reader([value], delimiter=',', quotechar='"'):
+            for v in val:
+                ret.append(v.strip())
+        return ret
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []

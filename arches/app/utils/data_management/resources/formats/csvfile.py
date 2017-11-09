@@ -54,7 +54,11 @@ class ConceptLookup():
                 except:
                     self.lookups[collectionid] = Concept().get_child_collections(collectionid)
                     ret.append(self.lookup_label(v, collectionid))
-        return (',').join(ret)
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(ret)
+        for v in [output.getvalue()]:
+            return v.strip('\r\n')
 
     def add_domain_values_to_lookups(self):
         for node in Node.objects.filter(Q(datatype='domain-value') | Q(datatype='domain-value-list')):
@@ -494,7 +498,7 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
+                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
                             value = None
                             self.errors += errors
