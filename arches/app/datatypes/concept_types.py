@@ -107,9 +107,15 @@ class ConceptListDataType(BaseConceptDataType):
         for v in value:
             val = v.strip()
             try:
+                uuid.UUID(val)
+            except ValueError:
+                message = "This is an invalid concept prefLabel, or an incomplete UUID"
+                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
+                continue
+            try:
                 models.Value.objects.get(pk=val)
             except ObjectDoesNotExist:
-                message = "Not a valid domain value"
+                message = "This UUID does not correspond to a valid domain value"
                 errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
         return errors
 
