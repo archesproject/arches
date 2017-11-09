@@ -9419,6 +9419,24 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
+.mpm-card-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.mpm-card-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 35px;
+    padding-top: 10px;
+}
+
+.mpm-card-filter {
+    width: 300px;
+}
+
 .mpm-user-name h4 {
     font-size: 15px;
     font-weight: 500;

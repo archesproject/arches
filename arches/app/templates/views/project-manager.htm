@@ -116,7 +116,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </ul>
                                 <div class="project-details">
                                     <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}></button>
+                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                                 </div>
                             </div>
                         </div>
@@ -264,7 +264,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                                 <div class="row">
                                                                     <!--ko if: resourceList.selected() -->
-                                                                    <!-- ko if: resourceList.selected().cards().length > 0 -->
                                                                     <div class="col-xs-12 col-sm-5 col-md-3">
 
                                                                         <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
@@ -273,24 +272,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             </span>
                                                                         </span>
 
-
                                                                         <div class="mpm-group-name">
                                                                             <a class="listitem_name" data-bind="text:resourceList.selected().name"></a>
                                                                         </div>
                                                                         <div class="mpm-group-subtitle" data-bind='text:resourceList.selected().subtitle'></div>
                                                                     </div>
                                                                     <!--/ko-->
-                                                                    <!--/ko-->
                                                                     <div class="col-sm-6" style="" data-bind="">
                                                                     </div>
                                                                 </div>
 
 
+
+
                                                                 <!--ko if: resourceList.selected() -->
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
+                                                                 <div class="mpm-card-toolbar">
+                                                                     <h4 class="mpm-item-listing-header">{% trans 'Data Entry Forms' %}</h4>
+                                                                     <div class="mpm-card-filter">
+                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
+                                                                     </div>
+                                                                 </div>
                                                                 <div class="list-group user-cards">
                                                                     <div class="mpm-group-users">
-                                                                    <div data-bind="sortable: resourceList.selected().cards" class="ko_container ui-sortable">
+                                                                        <div class="mpm-card-container">
+                                                                    <div data-bind="sortable: resourceList.selected().filteredCards" class="ko_container ui-sortable">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
@@ -304,6 +310,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
                                                                         </div>
                                                                     </div>
+                                                                </div>
                                                                 </div>
                                                                 </div>
                                                                 <!--/ko-->
@@ -394,7 +401,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             </div>
 
                                                                             <div class="project-search-widget mpm-item-listing">
-                                                                                <input class="form-control input-lg" placeholder="find a user in this group..." type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
+                                                                                <input class="form-control input-lg" placeholder="{% trans 'find a user in this group...' %}"  type="text" data-bind="value: selectedProject().userFilter, valueUpdate: 'keyup'">
                                                                             </div>
                                                                         </div>
                                                                         <div class='mpm-group-users'>

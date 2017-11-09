@@ -24,6 +24,7 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
             var self = this;
             this.items = options.items;
+            this.cardFilter = ko.observable('');
 
             _.each(this.items(), function(item){
                 item.cards = item.cardsflat;
@@ -40,7 +41,22 @@ define([
                         card.widgetlabels = card.name;
                     };
                 }, self)
+
+                item.filteredCards = ko.computed(function () {
+                    var filter = self.cardFilter();
+                    var list = item.cards();
+                    if (filter.length === 0) {
+                        return list;
+                    }
+                    return _.filter(list, function(card) {
+                        return card.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+                    });
+                });
+
             }, self)
+
+
+
 
             this.resetCards = function(cards){
                 _.each(this.items(), function(item){
