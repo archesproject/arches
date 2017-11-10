@@ -3,6 +3,7 @@ import csv
 from arches.app.models import models
 from arches.app.models import concept
 from arches.app.datatypes.base import BaseDataType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
 from arches.app.utils.date_utils import SortableDate
@@ -115,12 +116,12 @@ class ConceptDataType(BaseConceptDataType):
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, source=''):
         errors = []
-        
+
         ## iterate list of values and use the concept validation on each one
-        validate_concept = ConceptDataType().validate
+        validate_concept = DataTypeFactory().get_instance('concept')
         for v in value:
             val = v.strip()
-            errors += validate_concept(val)
+            errors += validate_concept.validate(val)
         return errors
 
     def transform_import_values(self, value, nodeid):
