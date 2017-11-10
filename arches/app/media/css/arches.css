@@ -9570,6 +9570,7 @@ a.search-facet-item.disabled {
     top: 12px;
     right: 12px;
     font-size: 12px;
+    color: #999;
 }
 
 .mpm-user-status {
