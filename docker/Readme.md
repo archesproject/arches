@@ -238,18 +238,22 @@ To develop on Arches Core, ensure you are not already running PostgreSQL and it 
 
 2.  Set your Project Variables of `ARCHES_PROJECT`, `PGDBNAME`, and `ELASTICSEARCH_PREFIX` to be the same Project Name.
 
-3.  Add these lines to `docker-compose-local.yml` under the `arches` container under `volumes`:  
+3.  Adjust the `image` for the `arches` container to be:  
+    `image: archesproject/arches:master`
+
+
+4.  Add these lines to `docker-compose-local.yml` under the `arches` container under `volumes`:  
 ```
 	- ./:/web_root/arches/  
 	- ./docker/settings_local.py:/web_root/arches/arches/settings_local.py  
 	- ../<insert_project_name>:/web_root/<insert_project_name>	
 ```
-4.  Build your Docker containers using:  
+5.  Build your Docker containers using:  
 	`docker-compose -f .\docker-compose-local.yml build`  
     
-5.  Ensure any other instances of PostgreSQL, ElasticSearch and Arches are turned off, to ensure your ports do not clash.
+6.  Ensure any other instances of PostgreSQL, ElasticSearch and Arches are turned off, to ensure your ports do not clash.
 
-5.  Run your Docker containers using:  
+7.  Run your Docker containers using:  
 	`docker-compose -f .\docker-compose-local.yml up`  
 
 This will mount the root Arches folder into your container. This allows you to edit code on your development machine, which is directly linked to the code in your Docker container.  
@@ -257,6 +261,8 @@ This will mount the root Arches folder into your container. This allows you to e
 Any time you change Arches Dependancies, you will need to re-build your Docker Container. The `docker-compose -f .\docker-compose-local.yml build` command will re-build the container for you based upon the `Dockerfile`. If your new or updated dependency does not install correctly, you may need to build without cache: `docker-compose -f .\docker-compose-local.yml build --no-cache`
 
 The volume commands at *point 2* also mounts a settings_local.py into the container. This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables. **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
+
+Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
 ### Arches Core Development Troubleshoot
 Errors during setting up the Arches container for Development that you may encounter:
