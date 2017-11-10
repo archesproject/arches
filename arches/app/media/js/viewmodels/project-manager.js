@@ -25,29 +25,26 @@ define([
         _.each(params.resources, function(r){
             r.cardsflat = ko.observableArray()
             var addedCardIds = [];
-            _.each(r.cards, function(card){
+
+            _.each(r.cards, function(card) {
                 if (card.cards.length > 0) {
-                    _.each(card.cards, function(subcard){
-                        if (_.contains(addedCardIds, card.cardid) === false) {
-                                subcard.container = card.name;
-                                r.cardsflat.push(subcard)
-                                addedCardIds.push(subcard.cardid)
-                        } else {
-                            _.each(r.cardsflat(), function(cc){
-                                if (cc.cardid === subcard.cardid) {
-                                    cc.container = card.name
-                                }
-                            });
-                        }
+                    _.each(card.cards, function(subcard) {
+                        subcard.container = card.name;
+                        r.cardsflat.push(subcard)
+                        addedCardIds.push(subcard.cardid)
                     })
-                } else {
-                    card.container = '';
-                    if (_.contains(addedCardIds, card.cardid) === false) {
-                        addedCardIds.push(card.cardid)
-                        r.cardsflat.push(card)
-                    }
                 }
-            })
+            });
+
+            _.each(r.cards, function(card) {
+                if (_.contains(addedCardIds, card.cardid) === false) {
+                    card.container = '';
+                    addedCardIds.push(card.cardid)
+                    r.cardsflat.push(card)
+                }
+            });
+
+
         })
 
         this.resourceList = new ResourceList({
