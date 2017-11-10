@@ -29,7 +29,7 @@ define([
             _.each(r.cards, function(card) {
                 if (card.cards.length > 0) {
                     _.each(card.cards, function(subcard) {
-                        subcard.container = card.name;
+                        subcard.name = card.name + ' - ' + subcard.name;
                         r.cardsflat.push(subcard)
                         addedCardIds.push(subcard.cardid)
                     })
@@ -38,7 +38,6 @@ define([
 
             _.each(r.cards, function(card) {
                 if (_.contains(addedCardIds, card.cardid) === false) {
-                    card.container = '';
                     addedCardIds.push(card.cardid)
                     r.cardsflat.push(card)
                 }
