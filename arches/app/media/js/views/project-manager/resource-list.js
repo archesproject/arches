@@ -61,12 +61,16 @@ define([
 
                 });
 
-
-
             this.resetCards = function(cards){
                 _.each(this.items(), function(item){
-                    item.cards().sort(function(a,b){
-                        return cards.indexOf(a.cardid) < cards.indexOf(b.cardid) ? -1 : 1;
+                    item.cards.sort(function(a,b){
+                        var inProjectCards = _.contains(cards, a.cardid) || _.contains(cards, b.cardid);
+                        if (inProjectCards) {
+                            res = cards.indexOf(a.cardid) < cards.indexOf(b.cardid) ? -1 : 1
+                        } else {
+                            res = a.name < b.name ? -1 : 1;
+                        }
+                        return res;
                     });
                     _.each(item.cards(), function(card){
                         if (_.contains(cards, card.cardid)) {
