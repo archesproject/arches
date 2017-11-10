@@ -49,7 +49,6 @@ class ProjectManagerView(BaseManagerView):
                 print e
             return result
 
-        projects = models.MobileProject.objects.order_by('name')
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
@@ -68,6 +67,17 @@ class ProjectManagerView(BaseManagerView):
 
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
+
+        projects = []
+
+        for project in models.MobileProject.objects.order_by('name'):
+            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+            ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            project_dict = project.__dict__
+            project_dict['cards'] = ordered_ids
+            project_dict['users'] = [u.id for u in project.users.all()]
+            project_dict['groups'] = [g.id for g in project.users.all()]
+            projects.append(project_dict)
 
         for graph in graphs:
             # cards = models.CardModel.objects.filter(graph=graph)

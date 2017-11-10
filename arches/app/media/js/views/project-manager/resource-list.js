@@ -62,8 +62,12 @@ define([
                 });
 
 
+
             this.resetCards = function(cards){
                 _.each(this.items(), function(item){
+                    item.cards().sort(function(a,b){
+                        return cards.indexOf(a.cardid) < cards.indexOf(b.cardid) ? -1 : 1;
+                    });
                     _.each(item.cards(), function(card){
                         if (_.contains(cards, card.cardid)) {
                             card.approved(true);
