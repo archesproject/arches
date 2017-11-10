@@ -299,7 +299,7 @@ class CsvReader(Reader):
                 concept_lookup = ConceptLookup()
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(isrequired=True).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(isrequired=True,graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
