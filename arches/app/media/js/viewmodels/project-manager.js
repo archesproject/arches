@@ -24,15 +24,28 @@ define([
 
         _.each(params.resources, function(r){
             r.cardsflat = ko.observableArray()
+            var addedCardIds = [];
             _.each(r.cards, function(card){
                 if (card.cards.length > 0) {
                     _.each(card.cards, function(subcard){
-                        subcard.container = card.name;
-                        r.cardsflat.push(subcard)
+                        if (_.contains(addedCardIds, card.cardid) === false) {
+                                subcard.container = card.name;
+                                r.cardsflat.push(subcard)
+                                addedCardIds.push(subcard.cardid)
+                        } else {
+                            _.each(r.cardsflat(), function(cc){
+                                if (cc.cardid === subcard.cardid) {
+                                    cc.container = card.name
+                                }
+                            });
+                        }
                     })
                 } else {
                     card.container = '';
-                    r.cardsflat.push(card)
+                    if (_.contains(addedCardIds, card.cardid) === false) {
+                        addedCardIds.push(card.cardid)
+                        r.cardsflat.push(card)
+                    }
                 }
             })
         })
