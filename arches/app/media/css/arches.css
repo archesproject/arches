@@ -9317,7 +9317,12 @@ a.search-facet-item.disabled {
 
 .mpm-card-list-items {
     overflow-y: auto;
-    height: 350px;
+    height: 385px;
+}
+
+.mpm-card-list-items .ko_container {
+    min-height: 100%;
+    background-color: #f9f9f9;
 }
 
 .mpm-card-list-header {
@@ -9452,7 +9457,7 @@ a.search-facet-item.disabled {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    height: 390px;
+    height: 430px;
     overflow-y: hidden;
     margin-top: 5px;
     margin-right: 35px;
@@ -9489,6 +9494,14 @@ a.search-facet-item.disabled {
 .mpm-toggle-container {
     width: 400px;
     display: flex;
+}
+
+.library-card-main.mpm-resource-list {
+    top: 7px;
+}
+
+.library-card-main.mpm-resource-list .added {
+    color: #64bd63;
 }
 
 .list-group-item .mpm-user-summary {

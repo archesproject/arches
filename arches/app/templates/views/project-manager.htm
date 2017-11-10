@@ -299,9 +299,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === false)">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
-                                                                                <div class='mpm-user-status pull-right' data-bind="click: function(val){val.approved(!val.approved()); $parent.selectedProject().toggleResourceCard($data)}, css: {'invited': $data.approved}">
-                                                                                    <span data-bind="text: $data.approved() ? 'Remove' : 'Add'"></span>
-                                                                                </div>
                                                                             </div>
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
                                                                         </div>
@@ -311,13 +308,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <div class="mpm-card-list approved">
                                                                     <div class="mpm-card-list-header">{% trans 'Added to Project' %}</div>
                                                                     <div class="mpm-card-list-items">
-                                                                    <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved}" class="ko_container ui-sortable">
+                                                                    <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved}" class="ko_container ui-sortable" style="min-height:100%">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === true)">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
-                                                                                <div class='mpm-user-status pull-right' data-bind="click: function(val){val.approved(!val.approved()); $parent.selectedProject().toggleResourceCard($data)}, css: {'invited': $data.approved}">
-                                                                                    <span data-bind="text: $data.approved() ? 'Remove' : 'Add'"></span>
-                                                                                </div>
                                                                             </div>
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
                                                                         </div>
@@ -730,7 +724,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {{block.super}}
     <script>
         {% autoescape off %}define('project-manager-data', [], function() {
-            console.log({{projects}})
             return {
                 projects: {{projects}},
                 resources: {{resources}},

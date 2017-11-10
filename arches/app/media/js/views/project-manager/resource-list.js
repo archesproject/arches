@@ -43,6 +43,10 @@ define([
                     };
                 }, self)
 
+                item.added = ko.computed(function(){
+                    return _.filter(item.cards(), function(card){return card.approved()}).length > 0;
+                })
+
                 self.cardFilter.subscribe(function (val) {
                     if (item.selected()) {
                         _.each(item.cards(), function(card) {
