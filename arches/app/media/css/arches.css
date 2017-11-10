@@ -9300,6 +9300,34 @@ a.search-facet-item.disabled {
     margin-left: -35px;
 }
 
+.mpm-card-list {
+    min-height: 400px;
+    min-width: 200px;
+    max-width: 1125px;
+    width: 50%;
+}
+
+.mpm-card-list.available {
+    padding-right: 5px;
+}
+
+.mpm-card-list.approved {
+    padding-left: 5px;
+}
+
+.mpm-card-list-items {
+    overflow-y: auto;
+    height: 350px;
+}
+
+.mpm-card-list-header {
+    padding: 10px;
+    border-style: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+    background-color: #f8f8f8;
+}
+
 .mpm-left-panel {
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
@@ -9420,8 +9448,14 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-container {
+    position: absolute;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 390px;
+    overflow-y: hidden;
+    margin-top: 5px;
+    margin-right: 35px;
 }
 
 .mpm-card-toolbar {

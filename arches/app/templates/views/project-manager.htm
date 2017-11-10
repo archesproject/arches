@@ -278,8 +278,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="mpm-group-subtitle" data-bind='text:resourceList.selected().subtitle'></div>
                                                                     </div>
                                                                     <!--/ko-->
-                                                                    <div class="col-sm-6" style="" data-bind="">
-                                                                    </div>
                                                                 </div>
 
 
@@ -293,11 +291,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                          <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
                                                                      </div>
                                                                  </div>
-                                                                <div class="list-group user-cards">
-                                                                    <div class="mpm-group-users">
-                                                                        <div class="mpm-card-container">
-                                                                    <div data-bind="sortable: resourceList.selected().filteredCards" class="ko_container ui-sortable">
-                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }">
+                                                                <div class="mpm-card-container">
+                                                                    <div class="mpm-card-list available">
+                                                                    <div class="mpm-card-list-header">{% trans 'Available to Add' %}</div>
+                                                                    <div class="mpm-card-list-items">
+                                                                    <div data-bind="sortable: {data:resourceList.selected().cards, afterMove: selectedProject().updateUnapproved}" class="ko_container ui-sortable">
+                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === false)">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
                                                                                 <div class='mpm-user-status pull-right' data-bind="click: function(val){val.approved(!val.approved()); $parent.selectedProject().toggleResourceCard($data)}, css: {'invited': $data.approved}">
@@ -311,7 +310,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                </div>
+                                                                    </div>
+                                                                    <div class="mpm-card-list approved">
+                                                                    <div class="mpm-card-list-header">{% trans 'Added to Project' %}</div>
+                                                                    <div class="mpm-card-list-items">
+                                                                    <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved}" class="ko_container ui-sortable">
+                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === true)">
+                                                                            <div class="mpm-user-title mpm-user-name">
+                                                                                <h4 data-bind='text: $data.name'></h4>
+                                                                                <div class='mpm-user-status pull-right' data-bind="click: function(val){val.approved(!val.approved()); $parent.selectedProject().toggleResourceCard($data)}, css: {'invited': $data.approved}">
+                                                                                    <span data-bind="text: $data.approved() ? 'Remove' : 'Add'"></span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--ko if: $data.container !== '' -->
+                                                                            <div class="mpm-user-subtitle resource"><span>{% trans 'Container:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.container"></span></div>
+                                                                            <!--/ko-->
+                                                                            <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    </div>
+                                                                    </div>
                                                                 </div>
                                                                 <!--/ko-->
                                                                 <!--/ko-->

@@ -152,6 +152,28 @@ define([
                 };
             };
 
+
+            self.updateCards = function(val) {
+                var approvedCards = _.chain(val.targetParent())
+                .filter(function(card){
+                    if (card.approved()) {
+                        return card.cardid
+                    }
+                })
+                .pluck('cardid').value()
+                self.cards(approvedCards)
+            }
+
+            self.updateApproved = function(val){
+                val.item.approved(true);
+                self.updateCards(val)
+            };;
+
+            self.updateUnapproved = function(val){
+                val.item.approved(false);
+                self.updateCards(val)
+            };
+
             self.toggleResourceCard = function(val) {
                 var hasCard = _.contains(self.cards(), val.cardid);
                 hasCard ? self.cards.remove(val.cardid) : self.cards.push(val.cardid);

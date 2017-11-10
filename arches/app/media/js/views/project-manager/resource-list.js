@@ -30,6 +30,7 @@ define([
                 item.cards = item.cardsflat;
                 _.each(item.cards(), function(card){
                     card.approved = ko.observable(false);
+                    card.filtered = ko.observable(false);
                     card.approved.subscribe(function(val){
                         var item = item;
                     }, self)
@@ -42,20 +43,23 @@ define([
                     };
                 }, self)
 
-                item.filteredCards = ko.computed(function () {
-                    var filter = self.cardFilter();
-                    var list = item.cards();
-                    if (filter.length === 0) {
-                        return list;
+                self.cardFilter.subscribe(function (val) {
+                    if (item.selected()) {
+                        _.each(item.cards(), function(card) {
+                            if (val === '') {
+                                card.filtered(false)
+                            } else {
+                                if (card.name.toLowerCase().indexOf(val.toLowerCase()) >= 0) {
+                                    card.filtered(false);
+                                } else {
+                                    card.filtered(true);
+                                };
+                            };
+                        });
                     }
-                    return _.filter(list, function(card) {
-                        return card.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
                     });
+
                 });
-
-            }, self)
-
-
 
 
             this.resetCards = function(cards){
