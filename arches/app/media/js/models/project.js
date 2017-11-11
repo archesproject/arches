@@ -174,11 +174,6 @@ define([
                 self.updateCards(val)
             };
 
-            self.toggleResourceCard = function(val) {
-                var hasCard = _.contains(self.cards(), val.cardid);
-                hasCard ? self.cards.remove(val.cardid) : self.cards.push(val.cardid);
-            }
-
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails())
