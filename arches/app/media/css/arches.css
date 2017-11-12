@@ -5125,6 +5125,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     flex: 1;
     background: #ebeef0;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .branch-panel {
@@ -6709,7 +6710,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-container-expanded {
-    top: 10px;
+    top: 6px;
     right: 10px;
     background: rgba(17, 17, 17, 0.21);
     opacity: .9;
@@ -7360,7 +7361,7 @@ a#close-map-tools.map-widget-icon:hover {
     top: 50px;
     left: 0px;
     height: 50px;
-    width: 250px;
+    width: 290px;
     padding: 12px 7px 7px 17px;
     font-size: 17px;
     color: #888;
@@ -7371,7 +7372,11 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .overlay-tool-icon {
-    padding-right: 7px;
+    padding-right: 3px;
+}
+
+.overlay-tool-group {
+    float: right;
 }
 
 .map-overlay-name {
