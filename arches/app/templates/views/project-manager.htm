@@ -301,6 +301,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <h4 data-bind='text: $data.name'></h4>
                                                                             </div>
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
+
+                                                                            <div class="mpm-user-summary" data-bind="css: {'expanded': $data.expanded()}">
+                                                                                <!-- ko foreach: { data:$data.nodes, as: 'node'} -->
+                                                                                <!--ko if: node.datatype != 'semantic' -->
+                                                                                <div class="mpm-model-detail-panel">
+                                                                                    <div class="mpm-node-name" data-bind="text:node.name"></div>
+                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                        <li class=""><span>{% trans 'Type: ' %}</span><span data-bind="text:node.datatype"></span></li>
+                                                                                        <li class=""><span>{% trans 'Required: ' %}</span><span data-bind="text: node.isrequired ? 'Yes' : 'No'"></span></li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                                <!--/ko-->
+                                                                                <!--/ko-->
+                                                                            </div>
+
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -314,6 +329,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <h4 data-bind='text: $data.name'></h4>
                                                                             </div>
                                                                             <p class="mpm-user-subtitle resource"><span>{% trans 'Fields:' %}</span><span class="mpm-widget-labels" data-bind="text: $data.widgetlabels"></span></p>
+
+
+                                                                            <div class="mpm-user-summary" data-bind="css: {'expanded': $data.expanded()}">
+                                                                                <!-- ko foreach: { data:$data.nodes, as: 'node'} -->
+                                                                                <!--ko if: node.datatype != 'semantic' -->
+                                                                                <div class="mpm-model-detail-panel">
+                                                                                    <div class="mpm-node-name" data-bind="text:node.name"></div>
+                                                                                    <ul class="mpm-node-detail-metadata">
+                                                                                        <li class=""><span>{% trans 'Type: ' %}</span><span data-bind="text:node.datatype"></span></li>
+                                                                                        <li class=""><span>{% trans 'Required: ' %}</span><span data-bind="text: node.isrequired ? 'Yes' : 'No'"></span></li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                                <!--/ko-->
+                                                                                <!--/ko-->
+                                                                            </div>
+
+
                                                                         </div>
                                                                     </div>
                                                                     </div>
