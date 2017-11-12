@@ -37,7 +37,7 @@ define([
             });
 
             _.each(r.cards, function(card) {
-                if (_.contains(addedCardIds, card.cardid) === false) {
+                if (_.contains(addedCardIds, card.cardid) === false && card.cards.length == 0) {
                     addedCardIds.push(card.cardid)
                     r.cardsflat.push(card)
                 }
