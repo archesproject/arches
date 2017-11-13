@@ -120,3 +120,17 @@ class mappedCSVFileImportTests(ArchesTestCase):
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)
+
+    def test_required_node_import(self):
+        og_tile_count = TileModel.objects.count()
+        BusinessDataImporter('tests/fixtures/data/csv/required_node_import.csv').import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 0)
+
+    def test_required_child_node_import(self):
+        og_tile_count = TileModel.objects.count()
+        BusinessDataImporter('tests/fixtures/data/csv/required_child_node_import.csv').import_business_data()
+        new_tile_count = TileModel.objects.count()
+        tile_difference = new_tile_count - og_tile_count
+        self.assertEqual(tile_difference, 0)
