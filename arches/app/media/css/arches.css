@@ -9305,6 +9305,39 @@ a.search-facet-item.disabled {
     margin-left: -35px;
 }
 
+.mpm-card-list {
+    min-height: 400px;
+    min-width: 200px;
+    max-width: 1125px;
+    width: 50%;
+}
+
+.mpm-card-list.available {
+    padding-right: 5px;
+}
+
+.mpm-card-list.approved {
+    padding-left: 5px;
+}
+
+.mpm-card-list-items {
+    overflow-y: auto;
+    height: 385px;
+}
+
+.mpm-card-list-items .ko_container {
+    min-height: 100%;
+    background-color: #f9f9f9;
+}
+
+.mpm-card-list-header {
+    padding: 10px;
+    border-style: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+    background-color: #f8f8f8;
+}
+
 .mpm-left-panel {
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
@@ -9424,6 +9457,30 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
+.mpm-card-container {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 430px;
+    overflow-y: hidden;
+    margin-top: 5px;
+    margin-right: 35px;
+}
+
+.mpm-card-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 35px;
+    padding-top: 10px;
+}
+
+.mpm-card-filter {
+    width: 300px;
+}
+
 .mpm-user-name h4 {
     font-size: 15px;
     font-weight: 500;
@@ -9442,6 +9499,14 @@ a.search-facet-item.disabled {
 .mpm-toggle-container {
     width: 400px;
     display: flex;
+}
+
+.library-card-main.mpm-resource-list {
+    top: 7px;
+}
+
+.library-card-main.mpm-resource-list .added {
+    color: #64bd63;
 }
 
 .list-group-item .mpm-user-summary {
@@ -9510,6 +9575,7 @@ a.search-facet-item.disabled {
     top: 12px;
     right: 12px;
     font-size: 12px;
+    color: #999;
 }
 
 .mpm-user-status {

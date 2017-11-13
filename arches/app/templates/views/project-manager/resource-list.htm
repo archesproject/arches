@@ -17,11 +17,12 @@
             </span>
         </div>
 
-        <div class="library-card-main" style="">
+        <div class="library-card-main mpm-resource-list">
             <a class="name">
                 <div data-bind="text: $data.name"></div>
             </a>
             <div class="user-groups" data-bind="text: $data.subtitle"></div>
+            <div class="user-groups" data-bind="text: $data.added() ? 'Added' : 'Not added', css: {'added': $data.added}"></div>
         </div>
     </div>
 {% endblock %}

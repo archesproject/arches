@@ -247,7 +247,7 @@
                             }
 
                             //call cancel on the correct list, so KO can take care of DOM manipulation
-                            if (sourceParent) {
+                            if (sourceParent && !sortable.addToSelf) {
                                 $(sourceParent === targetParent ? this : ui.sender || this).sortable("cancel");
                             }
                             //for a draggable item just remove the element

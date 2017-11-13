@@ -22,6 +22,30 @@ define([
             items: ko.observableArray(params.identities)
         });
 
+        _.each(params.resources, function(r){
+            r.cardsflat = ko.observableArray()
+            var addedCardIds = [];
+
+            _.each(r.cards, function(card) {
+                if (card.cards.length > 0) {
+                    _.each(card.cards, function(subcard) {
+                        subcard.name = card.name + ' - ' + subcard.name;
+                        r.cardsflat.push(subcard)
+                        addedCardIds.push(subcard.cardid)
+                    })
+                }
+            });
+
+            _.each(r.cards, function(card) {
+                if (_.contains(addedCardIds, card.cardid) === false && card.cards.length == 0) {
+                    addedCardIds.push(card.cardid)
+                    r.cardsflat.push(card)
+                }
+            });
+
+
+        })
+
         this.resourceList = new ResourceList({
             items: ko.observableArray(params.resources)
         });
@@ -34,6 +58,7 @@ define([
                 });
             })
         );
+
         this.projectFilter = ko.observable('');
         this.filteredProjects = ko.computed(function () {
             var filter = self.projectFilter();
@@ -53,6 +78,9 @@ define([
             if (val) {
                 self.identityList.clearSelection();
                 self.identityList.items()[0].selected(true);
+                self.resourceList.clearSelection();
+                self.resourceList.items()[0].selected(true);
+                self.resourceList.resetCards(val.cards());
                 val.update();
             }
         });

@@ -49,7 +49,6 @@ class ProjectManagerView(BaseManagerView):
                 print e
             return result
 
-        projects = models.MobileProject.objects.order_by('name')
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
@@ -68,6 +67,17 @@ class ProjectManagerView(BaseManagerView):
 
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
+
+        projects = []
+
+        for project in models.MobileProject.objects.order_by('name'):
+            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+            ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            project_dict = project.__dict__
+            project_dict['cards'] = ordered_ids
+            project_dict['users'] = [u.id for u in project.users.all()]
+            project_dict['groups'] = [g.id for g in project.users.all()]
+            projects.append(project_dict)
 
         for graph in graphs:
             # cards = models.CardModel.objects.filter(graph=graph)
@@ -124,6 +134,7 @@ class ProjectManagerView(BaseManagerView):
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
+
         if data['id'] is None:
             project = models.MobileProject()
             project.createdby = self.request.user
@@ -131,6 +142,24 @@ class ProjectManagerView(BaseManagerView):
             project = models.MobileProject.objects.get(pk=data['id'])
             self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
             self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
+
+            project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
+            form_card_ids = set(data['cards'])
+            cards_to_remove = project_card_ids - form_card_ids
+            cards_to_add = form_card_ids - project_card_ids
+            cards_to_update = project_card_ids & form_card_ids
+
+            for card_id in cards_to_add:
+                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project, sortorder=data['cards'].index(card_id))
+
+            for card_id in cards_to_update:
+                mobile_project_card = models.MobileProjectXCard.objects.filter(mobile_project=project).get(card=models.CardModel.objects.get(cardid=card_id))
+                mobile_project_card.sortorder=data['cards'].index(card_id)
+                mobile_project_card.save()
+
+            for card_id in cards_to_remove:
+                models.MobileProjectXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project).delete()
+
 
         if project.active != data['active']:
             # notify users in the project that the state of the project has changed
@@ -149,7 +178,15 @@ class ProjectManagerView(BaseManagerView):
 
         with transaction.atomic():
             project.save()
-        return JSONResponse({'success':True, 'project': project})
+
+        ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+        ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+        project_dict = project.__dict__
+        project_dict['cards'] = ordered_ids
+        project_dict['users'] = [u.id for u in project.users.all()]
+        project_dict['groups'] = [g.id for g in project.users.all()]
+
+        return JSONResponse({'success':True, 'project': project_dict})
 
 
     def get_project_users(self, project):

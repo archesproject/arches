@@ -40,7 +40,10 @@ define([
                     description: '',
                     startdate: null,
                     enddate: null,
-                    id: null
+                    id: null,
+                    cards: [],
+                    users: [],
+                    groups: []
                 },
                 identities: data.identities
             }));
@@ -62,6 +65,15 @@ define([
             };
         }));
     }
+
+
+    if (viewModel.projects().length === 0) {
+        viewModel.newProject()
+    } else {
+        viewModel.selectedProject(viewModel.projects()[0])
+    }
+
+    viewModel.resourceList.items()[0].selected(true)
 
     var pageView = new BaseManagerView({
         viewModel: viewModel
