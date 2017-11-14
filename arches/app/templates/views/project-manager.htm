@@ -707,29 +707,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!-- Model/Card Summary -->
                                                         <div class="mpm-summary-panel">
                                                             <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Models and Data Entry Cards
+                                                                {% trans 'Models and Data Entry Cards' %}
                                                             </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Assets (3 data entry cards)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Name, Modification Event, Condition Assessment
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Investigation Activities (3 data entry cards)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            Name, Event Location, Activity Type
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
+                                                            <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
+                                                                <!--ko if: resource.added() === true -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
+                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <!--ko if: card.approved -->
+                                                                            <li data-bind="text: card.name"></li>
+                                                                            <!--/ko-->
+                                                                        </ul>
+                                                                        <!--/ko-->
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                            <!--/ko-->
                                                         </div>
+
                                                     </div>
 
                                                 </div>
