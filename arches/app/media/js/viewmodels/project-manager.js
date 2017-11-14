@@ -1,11 +1,12 @@
 define([
+    'arches',
     'underscore',
     'knockout',
     'views/project-manager/identity-list',
     'views/project-manager/resource-list',
     'models/project',
     'bindings/sortable'
-], function(_, ko, IdentityList, ResourceList, ProjectModel) {
+], function(arches, _, ko, IdentityList, ResourceList, ProjectModel) {
     /**
     * A base viewmodel for project management
     *
@@ -22,10 +23,8 @@ define([
             items: ko.observableArray(params.identities)
         });
 
-        _.each(params.resources, function(r){
-            r.cardsflat = ko.observableArray()
+        this.flattenCards = function(r) {
             var addedCardIds = [];
-
             _.each(r.cards, function(card) {
                 if (card.cards.length > 0) {
                     _.each(card.cards, function(subcard) {
@@ -35,20 +34,43 @@ define([
                     })
                 }
             });
-
             _.each(r.cards, function(card) {
                 if (_.contains(addedCardIds, card.cardid) === false && card.cards.length == 0) {
                     addedCardIds.push(card.cardid)
                     r.cardsflat.push(card)
                 }
             });
+        }
 
-
-        })
+        _.each(params.resources, function(r){
+            r.cardsflat = ko.observableArray();
+            self.flattenCards(r);
+        });
 
         this.resourceList = new ResourceList({
             items: ko.observableArray(params.resources)
         });
+
+        this.resourceList.selected.subscribe(function(val){
+            var flatten = function(scope) {
+                return function(data){
+                    var self = scope;
+                    self.resourceList.initCards(data.cards)
+                    self.resourceList.selected().cards(data.cards)
+                    self.flattenCards(self.resourceList.selected())
+                }
+            }
+
+            if (val) {
+                if (ko.unwrap(val.cards).length === 0) {
+                    $.ajax({
+                        url: arches.urls.resource_cards.replace('//', '/' + val.id + '/')
+                    })
+                    .done(flatten(self))
+                    .fail(function(data){console.log('card request failed', data)})
+                }
+            }
+        }, self);
 
         this.projects = ko.observableArray(
             params.projects.map(function (project) {

@@ -236,6 +236,16 @@ class ResourceData(View):
         return HttpResponseNotFound()
 
 
+@method_decorator(can_read_resource_instance(), name='dispatch')
+class ResourceCards(View):
+    def get(self, request, resourceid=None):
+        cards = []
+        if resourceid != None:
+            graph = models.GraphModel.objects.get(graphid=resourceid)
+            cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+        return JSONResponse({'success':True, 'cards': cards})
+
+
 class ResourceDescriptors(View):
     def get(self, request, resourceid=None):
         if resourceid is not None:

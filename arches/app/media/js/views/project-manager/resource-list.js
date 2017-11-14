@@ -26,9 +26,8 @@ define([
             this.items = options.items;
             this.cardFilter = ko.observable('');
 
-            _.each(this.items(), function(item){
-                item.cards = item.cardsflat;
-                _.each(item.cards(), function(card){
+            this.initCards = function(cards){
+                _.each(cards, function(card){
                     card.approved = ko.observable(false);
                     card.filtered = ko.observable(false);
                     card.approved.subscribe(function(val){
@@ -42,7 +41,11 @@ define([
                         card.widgetlabels = card.name;
                     };
                 }, self)
+            }
 
+            _.each(this.items(), function(item){
+                item.cards = item.cardsflat;
+                self.initCards(item.cards())
                 item.added = ko.computed(function(){
                     return _.filter(item.cards(), function(card){return card.approved()}).length > 0;
                 })
