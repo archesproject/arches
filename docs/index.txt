@@ -12,6 +12,7 @@ Arches v4 Documentation
     :caption: User Documentation
     :maxdepth: 2
 
+    requirements-and-dependencies
     installation
     initial-configuration
     managing-map-layers
