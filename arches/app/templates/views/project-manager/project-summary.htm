@@ -49,24 +49,28 @@
     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
         Models and Data Entry Cards
     </p>
-    <ul class="mpm-node-detail-metadata">
-        <li class="">
-            Assets (3 data entry cards)
-            <ul class="mpm-node-detail-metadata">
-                <li class="">
-                    Name, Modification Event, Condition Assessment
-                </li>
-            </ul>
-        </li>
-    </ul>
-    <ul class="mpm-node-detail-metadata">
-        <li class="">
-            Investigation Activities (3 data entry cards)
-            <ul class="mpm-node-detail-metadata">
-                <li class="">
-                    Name, Event Location, Activity Type
-                </li>
-            </ul>
-        </li>
-    </ul>
+    <!--ko foreach: resourceList.items(), as resource -->
+        <!--ko if: resource.approved() == true -->
+        <ul class="mpm-node-detail-metadata">
+            <li class="">
+                Assets!! (3 data entry cards)
+                <ul class="mpm-node-detail-metadata">
+                    <li class="">
+                        Name, Modification Event, Condition Assessment
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul class="mpm-node-detail-metadata">
+            <li class="">
+                Investigation Activities (3 data entry cards)
+                <ul class="mpm-node-detail-metadata">
+                    <li class="">
+                        Name, Event Location, Activity Type
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <!--/ko-->
+    <!--/ko-->
 </div>
