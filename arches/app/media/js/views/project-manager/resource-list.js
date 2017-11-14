@@ -46,9 +46,14 @@ define([
             _.each(this.items(), function(item){
                 item.cards = item.cardsflat;
                 self.initCards(item.cards())
+
                 item.added = ko.computed(function(){
                     return _.filter(item.cards(), function(card){return card.approved()}).length > 0;
-                })
+                });
+
+                item.cardcount = ko.computed(function(){
+                    return _.filter(item.cards(), function(card){return card.approved()}).length;
+                });
 
                 self.cardFilter.subscribe(function (val) {
                     if (item.selected()) {
