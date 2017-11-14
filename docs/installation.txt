@@ -2,47 +2,6 @@
 Installation
 ############
 
-System Requirements
-===================
-
-Arches works on Linux, Windows, or macOS, but some of its dependencies may be more difficult to install on certain operating systems. Most enterprise-level installations of Arches have been created on Linux servers.
-
-To begin development or make a test installation of Arches, you will need the following:
-
-+ **2gb disk space**
-	+ 1.5gb for all dependencies and 600mb for Arches.
-	+ In production, the amount of disk space you need will depend on the number of resources in your database, specifically uploaded images or media files.
-
-+ **4gb memory (RAM)**
-	+ This recommendation is calculated by the fact that ElasticSearch requires 2gb to run, and as per `ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
-	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
-	+ In production, you may want to increase your memory, and allow ElasticSearch to use more than its default.
-
-----------------
-
-*Please note that Arches 4.0.0 release is only fully supported in Chrome.*
-
-Dependencies
-============
-
-* **PostgreSQL 9.6 with PostGIS 2.3** The easiest way to install this on OS X is `Postgres.app <http://postgresapp.com>`_. For Windows, use the `EnterpriseDB installers <https://www.postgresql.org/download/windows/>`_, and use Stack Builder (included) to get PostGIS.
-* **GDAL** and **GEOS** GDAL Version > 1.11.5. On Windows, use the `OSgeo4W installer <https://trac.osgeo.org/osgeo4w/>`_, and choose to install the GDAL package.
-* **Python 2.7.x** Installation instructions: https://www.python.org/downloads/. We recommend 2.7.12, and on Windows you must choose 32-bit or 64-bit Python depending on your operating system architecture.
-* **pip** If you are using Python < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. In Python 2.7.9 and later, pip is included by default. For good measure, you may as well upgrade pip right away with this command ``python -m pip install --upgrade pip``.
-* **Bower** Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower 
-* **Mapnik** Version 2.2. Installation instructions: http://mapnik.org/pages/downloads.html. If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible. Please read `this note on our Wiki <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#mapnik>`_ about how this limitation affects Arches.
-* **JDK** Use these installers: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. On Windows, be sure to set the JAVA_HOME system environment variable.
-* **Elasticsearch 5.2.1** Technically speaking, Elasticsearch is a dependency. However, Arches comes with an easy way to install it, which is described in `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_. We recommend waiting until the end of step 5 below to deal with Elasticsearch.
-
-These instructions will provide some guidance on installing the required dependencies and getting Arches up and running quickly.
-
-* `Installing Dependencies Ubuntu <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Ubuntu>`_
-* `Installing Dependencies macOS <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-macOS>`_
-* `Installing Dependencies Windows <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows>`_
-
-Installing Arches
-===================
-
 Once you have all of the dependencies installed, open a command prompt and use the following steps to install the latest stable release of Arches. To install the latest non-stable Arches code (generally only necessary for developers), you can follow `these installation steps <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
 
 #. Create and enter a new directory called Projects::
