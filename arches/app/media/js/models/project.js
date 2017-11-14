@@ -161,7 +161,8 @@ define([
                     }
                 })
                 .pluck('cardid').value()
-                self.cards(approvedCards)
+                var diff = _.difference(self.cards(), approvedCards)
+                self.cards(_.union(diff, approvedCards))
             }
 
             self.updateApproved = function(val){

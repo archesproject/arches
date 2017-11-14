@@ -69,23 +69,25 @@ class ProjectManagerView(BaseManagerView):
         resources = []
 
         projects = []
-
+        all_ordered_card_ids = []
         for project in models.MobileProject.objects.order_by('name'):
             ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
-            ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            all_ordered_card_ids += ordered_card_ids
             project_dict = project.__dict__
-            project_dict['cards'] = ordered_ids
+            project_dict['cards'] = ordered_card_ids
             project_dict['users'] = [u.id for u in project.users.all()]
             project_dict['groups'] = [g.id for g in project.users.all()]
             projects.append(project_dict)
 
-        for graph in graphs:
-            # cards = models.CardModel.objects.filter(graph=graph)
-            # cards[0].cardxnodexwidget_set.all()
-            # cards[0].cardxnodexwidget_set.all()[0]
-            # cards[0].cardxnodexwidget_set.all()[0].widget
-            # cards[0].cardxnodexwidget_set.all()[0].node
-            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]})
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+        for i, graph in enumerate(graphs):
+            cards = []
+            if i == 0 or unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
