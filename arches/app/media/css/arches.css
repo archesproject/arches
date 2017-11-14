@@ -2566,6 +2566,10 @@ ul .collapse li:last-of-type {
     top: 22px;
 }
 
+.report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
+    margin-top: 0px;
+}
+
 .resource-grid-meta-container {
     position: absolute;
     right: 15px;
@@ -5121,6 +5125,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     flex: 1;
     background: #ebeef0;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .branch-panel {
@@ -6705,7 +6710,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .map-widget-container-expanded {
-    top: 10px;
+    top: 6px;
     right: 10px;
     background: rgba(17, 17, 17, 0.21);
     opacity: .9;
@@ -7356,7 +7361,7 @@ a#close-map-tools.map-widget-icon:hover {
     top: 50px;
     left: 0px;
     height: 50px;
-    width: 250px;
+    width: 290px;
     padding: 12px 7px 7px 17px;
     font-size: 17px;
     color: #888;
@@ -7367,7 +7372,11 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .overlay-tool-icon {
-    padding-right: 7px;
+    padding-right: 3px;
+}
+
+.overlay-tool-group {
+    float: right;
 }
 
 .map-overlay-name {
@@ -9287,18 +9296,60 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
+.mpm-card {
+    min-height: 550px;
+}
+
 .mpm-card-content {
     margin-top: -54px;
     margin-left: -35px;
+}
+
+.mpm-card-list {
+    min-height: 400px;
+    min-width: 200px;
+    max-width: 1125px;
+    width: 50%;
+}
+
+.mpm-card-list.available {
+    padding-right: 5px;
+}
+
+.mpm-card-list.approved {
+    padding-left: 5px;
+}
+
+.mpm-card-list-items {
+    overflow-y: auto;
+    height: 385px;
+}
+
+.mpm-card-list-items .ko_container {
+    min-height: 100%;
+    background-color: #f9f9f9;
+}
+
+.mpm-card-list-header {
+    padding: 10px;
+    border-style: solid;
+    border-width: 0.25px;
+    border-color: #eee;
+    background-color: #f8f8f8;
 }
 
 .mpm-left-panel {
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
-    height: 540px;
+    height: 550px;
+    margin-left: -2px;
     background: #fcfcfc;
     border-right: 1px solid #ddd;
+}
+
+#identities-card .library-card:not(.selected-card) {
+    border-left: 5px solid #f8f8f8;
 }
 
 .identities-list .mpm-left-panel {
@@ -9361,12 +9412,16 @@ a.search-facet-item.disabled {
 }
 
 .mpm-group-users {
-    height: 375px;
+    height: 390px;
     overflow-y: scroll;
-    margin-top: 1px;
+    margin-top: 5px;
     border-top: solid;
     border-width: 0.25px;
     border-color: #eee;
+}
+
+.get-user-detail:hover {
+    background: #f8f8f8;
 }
 
 .mpm-right-panel .list-group.user-cards {
@@ -9402,7 +9457,31 @@ a.search-facet-item.disabled {
     text-overflow: ellipsis;
 }
 
-.mpm-user-name {
+.mpm-card-container {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 430px;
+    overflow-y: hidden;
+    margin-top: 5px;
+    margin-right: 35px;
+}
+
+.mpm-card-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 35px;
+    padding-top: 10px;
+}
+
+.mpm-card-filter {
+    width: 300px;
+}
+
+.mpm-user-name h4 {
     font-size: 15px;
     font-weight: 500;
     color: #156AB7;
@@ -9415,8 +9494,19 @@ a.search-facet-item.disabled {
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;
-    margin-top: 0px;
-    margin-bottom: 0px;
+}
+
+.mpm-toggle-container {
+    width: 400px;
+    display: flex;
+}
+
+.library-card-main.mpm-resource-list {
+    top: 7px;
+}
+
+.library-card-main.mpm-resource-list .added {
+    color: #64bd63;
 }
 
 .list-group-item .mpm-user-summary {
@@ -9430,19 +9520,31 @@ a.search-facet-item.disabled {
     height: 280px;
 }
 
+
 .mpm-user-subtitle {
     color: #777;
     font-size: 13px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 0px 10px;
+    padding: 0px 10px 0px 0px;
+    margin-top: -3px;
 }
 
 .mpm-user-subtitle.user {
     padding: 0px;
     justify-content: left;
 }
+
+.mpm-user-subtitle.resource {
+    padding: 0px;
+    justify-content: left;
+}
+
+.mpm-widget-labels {
+    padding-left: 5px;
+}
+
 
 .mpm-user-groups {
     color: #777;
@@ -9473,6 +9575,7 @@ a.search-facet-item.disabled {
     top: 12px;
     right: 12px;
     font-size: 12px;
+    color: #999;
 }
 
 .mpm-user-status {
@@ -9510,9 +9613,20 @@ a.search-facet-item.disabled {
 }
 
 .mpm-item-listing-header {
+    padding-left: 10px;
+    margin-top: 0px;
     color: #454545;
     font-size: 15px;
     font-weight: 500;
+}
+
+.mpm-account-switch {
+    margin-top: 20px;
+}
+
+.mpm-account-switch-text {
+    padding-left: 40px;
+    margin-top: -17px;
 }
 
 .project-search-widget.mpm-item-listing {
@@ -9536,6 +9650,7 @@ a.search-facet-item.disabled {
 
 .mpm-node-detail-metadata {
     list-style: none;
+    color: #777;
 }
 
 .mpm-activation-panel {
@@ -9549,6 +9664,8 @@ a.search-facet-item.disabled {
     padding-top: 10px;
     padding-bottom: 10px;
     border-top: 1px solid #eee;
+    height: 135px;
+    overflow-y: scroll;
 }
 
 .profile-mpm-panel {
@@ -9614,7 +9731,12 @@ a.search-facet-item.disabled {
 	color: #777;
 	padding: 3px;
 	font-style: italic;
+    text-align: center;
 	background: #ddd;
+}
+
+.library-card .project-status {
+    text-align: left;
 }
 
 .project-status.active {

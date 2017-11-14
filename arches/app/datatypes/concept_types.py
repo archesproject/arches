@@ -1,7 +1,9 @@
 import uuid
+import csv
 from arches.app.models import models
 from arches.app.models import concept
 from arches.app.datatypes.base import BaseDataType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
 from arches.app.utils.date_utils import SortableDate
@@ -62,16 +64,26 @@ class ConceptDataType(BaseConceptDataType):
 
     def validate(self, value, source=''):
         errors = []
+        
+        ## first check to see if the validator has been passed a valid UUID,
+        ## which should be the case at this point. return error if not.
+        try:
+            uuid.UUID(value)
+        except ValueError:
+            message = "This is an invalid concept prefLabel, or an incomplete UUID"
+            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
+            return errors
+            
+        ## if good UUID, test whether it corresponds to an actual Value object
         try:
             models.Value.objects.get(pk=value)
         except ObjectDoesNotExist:
-            message = "Not a valid domain value"
+            message = "This UUID does not correspond to a valid domain value"
             errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, value, source, message, 'This data was not imported.')})
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = value.strip()
-        return ret
+        return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
         if 'concept_export_value_type' in kwargs:
@@ -104,20 +116,19 @@ class ConceptDataType(BaseConceptDataType):
 class ConceptListDataType(BaseConceptDataType):
     def validate(self, value, source=''):
         errors = []
+
+        ## iterate list of values and use the concept validation on each one
+        validate_concept = DataTypeFactory().get_instance('concept')
         for v in value:
             val = v.strip()
-            try:
-                models.Value.objects.get(pk=val)
-            except ObjectDoesNotExist:
-                message = "Not a valid domain value"
-                errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}. {4}'.format(self.datatype_model.datatype, val, source, message, 'This data was not imported.')})
+            errors += validate_concept.validate(val)
         return errors
 
     def transform_import_values(self, value, nodeid):
-        ret = []
-        concept = ConceptDataType()
-        for val in [v.strip() for v in value.split(',')]:
-            ret.append(concept.transform_import_values(val, nodeid))
+        ret =[]
+        for val in csv.reader([value], delimiter=',', quotechar='"'):
+            for v in val:
+                ret.append(v.strip())
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):

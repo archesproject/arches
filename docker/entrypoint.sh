@@ -2,11 +2,11 @@
 
 HELP_TEXT="
 
-Arguments:  
-	run_arches: Default. Run the Arches server  
-	run_tests: Run unit tests  
-	setup_arches: Delete any existing Arches database and set up a fresh one  
-	-h or help: Display help text  
+Arguments:
+	run_arches: Default. Run the Arches server
+	run_tests: Run unit tests
+	setup_arches: Delete any existing Arches database and set up a fresh one
+	-h or help: Display help text
 "
 
 display_help() {
@@ -53,7 +53,7 @@ activate_virtualenv() {
 
 
 
-#### Install 
+#### Install
 
 init_arches() {
 	if db_exists; then
@@ -64,12 +64,13 @@ init_arches() {
 		setup_arches
 	fi
 
-	init_arches_projects
+	init_arches_project
 }
 
 
+# Setup Postgresql and Elasticsearch
 setup_arches() {
-	# Setup Postgresql and Elasticsearch (this deletes your existing database)
+	cd_arches_root
 
 	echo "" && echo ""
 	echo "*** Initializing database ***"
@@ -113,6 +114,7 @@ setup_arches() {
 		fi
 	fi
 
+	run_migrations
 }
 
 
@@ -152,6 +154,7 @@ set_dev_mode() {
 	echo ""
 	echo "----- SETTING DEV MODE -----"
 	echo ""
+	cd_arches_root
 	python ${ARCHES_ROOT}/setup.py develop
 }
 
@@ -171,7 +174,7 @@ install_bower_components() {
 
 #### Misc
 
-init_arches_projects() {
+init_arches_project() {
 	if [[ ! -z ${ARCHES_PROJECT} ]]; then
 		echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
 		if [[ ! -d ${APP_FOLDER} ]] || [[ ! "$(ls -A ${APP_FOLDER})" ]]; then
@@ -283,11 +286,11 @@ run_django_server() {
 	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
 	cd_app_folder
-	if [[ ${DJANGO_RELOAD} == "True" ]]; then
+	if [[ ${DJANGO_REMOTE_DEBUG} != "True" ]]; then
 	    echo "Running Django with livereload."
 		exec python manage.py runserver 0.0.0.0:${DJANGO_PORT}
 	else
-        echo "Running Django with options --noreload --nothreading."
+        echo "Running Django with options --noreload --nothreading for remote debugging."
 		exec python manage.py runserver --noreload --nothreading 0.0.0.0:${DJANGO_PORT}
 	fi
 }
@@ -308,7 +311,7 @@ run_gunicorn_server() {
 
 
 
-#### Main commands 
+#### Main commands
 run_arches() {
 
 	init_arches
@@ -316,7 +319,6 @@ run_arches() {
 
 	if [[ "${DJANGO_MODE}" == "DEV" ]]; then
 		set_dev_mode
-		run_migrations
 	fi
 
 	run_custom_scripts
@@ -327,10 +329,6 @@ run_arches() {
 		collect_static
 		run_gunicorn_server
 	fi
-
-	
-
-	
 }
 
 
@@ -400,4 +398,3 @@ do
 	esac
 	shift # next argument or value
 done
-

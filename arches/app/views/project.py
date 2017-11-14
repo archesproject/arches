@@ -19,8 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponseNotFound
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
@@ -29,9 +31,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
+from arches.app.models.card import Card
 from arches.app.models.system_settings import settings
 from arches.app.views.base import BaseManagerView
-from django.contrib.auth.models import User, Group
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
 class ProjectManagerView(BaseManagerView):
@@ -47,7 +49,6 @@ class ProjectManagerView(BaseManagerView):
                 print e
             return result
 
-        projects = models.MobileProject.objects.order_by('name')
         identities = []
         for group in Group.objects.all():
             users = group.user_set.all()
@@ -63,9 +64,35 @@ class ProjectManagerView(BaseManagerView):
                 group_ids.append(group.id)
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
+
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resources = []
+
+        projects = []
+        all_ordered_card_ids = []
+        for project in models.MobileProject.objects.order_by('name'):
+            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            all_ordered_card_ids += ordered_card_ids
+            project_dict = project.__dict__
+            project_dict['cards'] = ordered_card_ids
+            project_dict['users'] = [u.id for u in project.users.all()]
+            project_dict['groups'] = [g.id for g in project.users.all()]
+            projects.append(project_dict)
+
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+        for i, graph in enumerate(graphs):
+            cards = []
+            if i == 0 or unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+
         context = self.get_context_data(
             projects=JSONSerializer().serialize(projects),
             identities=JSONSerializer().serialize(identities),
+            resources=JSONSerializer().serialize(resources),
             main_script='views/project-manager',
         )
 
@@ -74,6 +101,21 @@ class ProjectManagerView(BaseManagerView):
         context['nav']['help'] = (_('Mobile Project Manager'),'help/project-manager-help.htm')
 
         return render(request, 'views/project-manager.htm', context)
+
+    def delete(self, request):
+
+        project_id = None
+        try:
+            project_id = JSONDeserializer().deserialize(request.body)['id']
+        except Exception as e:
+            print e
+
+        if project_id is not None:
+            ret = models.MobileProject.objects.get(pk=project_id)
+            ret.delete()
+            return JSONResponse(ret)
+
+        return HttpResponseNotFound()
 
     def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileProjectXUser):
         project_identity_ids = set([u.id for u in related_identities])
@@ -94,6 +136,7 @@ class ProjectManagerView(BaseManagerView):
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
+
         if data['id'] is None:
             project = models.MobileProject()
             project.createdby = self.request.user
@@ -101,6 +144,24 @@ class ProjectManagerView(BaseManagerView):
             project = models.MobileProject.objects.get(pk=data['id'])
             self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
             self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
+
+            project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
+            form_card_ids = set(data['cards'])
+            cards_to_remove = project_card_ids - form_card_ids
+            cards_to_add = form_card_ids - project_card_ids
+            cards_to_update = project_card_ids & form_card_ids
+
+            for card_id in cards_to_add:
+                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project, sortorder=data['cards'].index(card_id))
+
+            for card_id in cards_to_update:
+                mobile_project_card = models.MobileProjectXCard.objects.filter(mobile_project=project).get(card=models.CardModel.objects.get(cardid=card_id))
+                mobile_project_card.sortorder=data['cards'].index(card_id)
+                mobile_project_card.save()
+
+            for card_id in cards_to_remove:
+                models.MobileProjectXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project).delete()
+
 
         if project.active != data['active']:
             # notify users in the project that the state of the project has changed
@@ -119,7 +180,15 @@ class ProjectManagerView(BaseManagerView):
 
         with transaction.atomic():
             project.save()
-        return JSONResponse({'success':True, 'project': project})
+
+        ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+        ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+        project_dict = project.__dict__
+        project_dict['cards'] = ordered_ids
+        project_dict['users'] = [u.id for u in project.users.all()]
+        project_dict['groups'] = [g.id for g in project.users.all()]
+
+        return JSONResponse({'success':True, 'project': project_dict})
 
 
     def get_project_users(self, project):

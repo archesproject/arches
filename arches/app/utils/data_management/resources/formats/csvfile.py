@@ -36,25 +36,29 @@ class ConceptLookup():
         self.create = create
         self.add_domain_values_to_lookups()
 
-    def lookup_labelid_from_label(self, label, collectionid):
-        ret = []
-        for la in label.split(','):
-            ret.append(self.lookup_label(la.strip(), collectionid))
-        return (',').join(ret)
-
     def lookup_label(self, label, collectionid):
         ret = label
-        if collectionid not in self.lookups:
-            try:
-                self.lookups[collectionid] = Concept().get_child_collections(collectionid)
-                ret = self.lookup_labelid_from_label(label, collectionid)
-            except:
-                return label
-        else:
-            for concept in self.lookups[collectionid]:
-                if label == concept[1]:
-                    ret = concept[2]
+        collection_values = self.lookups[collectionid]
+        for concept in collection_values:
+            if label == concept[1]:
+                ret = concept[2]
         return ret
+
+    def lookup_labelid_from_label(self, value, collectionid):
+        ret = []
+        for val in csv.reader([value], delimiter=',', quotechar='"'):
+            for v in val:
+                v = v.strip()
+                try:
+                    ret.append(self.new_lookup_label(v, collectionid))
+                except:
+                    self.lookups[collectionid] = Concept().get_child_collections(collectionid)
+                    ret.append(self.lookup_label(v, collectionid))
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(ret)
+        for v in [output.getvalue()]:
+            return v.strip('\r\n')
 
     def add_domain_values_to_lookups(self):
         for node in Node.objects.filter(Q(datatype='domain-value') | Q(datatype='domain-value-list')):
@@ -242,7 +246,7 @@ class CsvReader(Reader):
             print '%s resources processed' % str(save_count)
 
 
-    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False):
+    def import_business_data(self, business_data=None, mapping=None, overwrite='append', bulk=False, create_concepts=False, create_collections=False):
         # errors = businessDataValidator(self.business_data)
 
         def process_resourceid(resourceid, overwrite):
@@ -296,10 +300,10 @@ class CsvReader(Reader):
                 node_datatypes = {str(nodeid): datatype for nodeid, datatype in  Node.objects.values_list('nodeid', 'datatype').filter(~Q(datatype='semantic'), graph__isresource=True)}
                 all_nodes = Node.objects.all()
                 datatype_factory = DataTypeFactory()
-                concept_lookup = ConceptLookup()
+                concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
-                for node in Node.objects.filter(isrequired=True).values_list('nodeid', 'name'):
+                for node in Node.objects.filter(isrequired=True, graph_id=mapping['resource_model_id']).values_list('nodeid', 'name'):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
@@ -315,6 +319,26 @@ class CsvReader(Reader):
                         resourceids.append(row['ResourceID'])
                     previous_row_for_validation = row['ResourceID']
 
+                    if create_concepts == True:
+                        for node in mapping['nodes']:
+                            if node['data_type'] in ['concept', 'concept-list', 'domain-value', 'domain-value-list'] and node['file_field_name'] in row.keys():
+
+                                # print row[node['file_field_name']]
+                                concept = []
+                                for val in csv.reader([row[node['file_field_name']]], delimiter=',', quotechar='"'):
+                                    concept.append(val)
+                                concept = concept[0]
+
+                                # check if collection is in concepts_to_create, add collection to concepts_to_create if it's not and add first child concept
+                                if node['arches_nodeid'] not in concepts_to_create:
+                                    concepts_to_create[node['arches_nodeid']] = {}
+                                    for concept_value in concept:
+                                        concepts_to_create[node['arches_nodeid']][str(uuid.uuid4())] = concept_value
+                                # if collection in concepts to create then add child concept to collection
+                                elif row[node['file_field_name']] not in concepts_to_create[node['arches_nodeid']].values():
+                                    for concept_value in concept:
+                                        concepts_to_create[node['arches_nodeid']][str(uuid.uuid4())] = concept_value
+
                 if len(non_contiguous_resource_ids) > 0:
                     print '*'*80
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
@@ -322,6 +346,109 @@ class CsvReader(Reader):
                     print 'ERROR: The preceding ResourceIDs are non-contiguous in your csv file. Please sort your csv file by ResourceID and try import again.'
                     print '*'*80
                     sys.exit()
+
+                def create_reference_data(new_concepts, create_collections):
+                    errors = []
+                    candidates = Concept().get(id='00000000-0000-0000-0000-000000000006')
+                    for arches_nodeid, concepts in new_concepts.iteritems():
+                        collectionid = str(uuid.uuid4())
+                        topconceptid = str(uuid.uuid4())
+                        node = Node.objects.get(nodeid=arches_nodeid)
+
+                        # if node.datatype is concept or concept-list create concepts and collections
+                        if node.datatype in ['concept', 'concept-list']:
+                            # create collection if create_collections = create, otherwise append to collection already assigned to node
+                            if create_collections == True:
+                                collection_legacyoid = node.name + '_' + str(node.graph_id) + '_import'
+                                # check to see that there is not already a collection for this node
+                                if node.config['rdmCollection'] != None:
+                                    errors.append({'type': 'WARNING', 'message': 'A collection already exists for the {0} node. Use the add option to add concepts to this collection.'.format(node.name)})
+                                    if len(errors) > 0:
+                                        self.errors += errors
+                                    collection = None
+                                else:
+                                    # if there is no collection assigned to this node, create one and assign it to the node
+                                    try:
+                                        # check to see that a collection with this legacyid does not already exist
+                                        collection = Concept().get(legacyoid=collection_legacyoid)
+                                        errors.append({'type': 'WARNING', 'message': 'A collection with the legacyid {0} already exists.'.format(node.name + '_' + str(node.graph_id) + '_import')})
+                                        if len(errors) > 0:
+                                            self.errors += errors
+                                    except:
+                                        collection = Concept({
+                                            'id': collectionid,
+                                            'legacyoid': collection_legacyoid,
+                                            'nodetype': 'Collection'
+                                        })
+                                        collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                        node.config['rdmCollection'] = collectionid
+                                        node.save()
+                                        collection.save()
+                            else:
+                                # if create collection = add check that there is a collection associated with node, if no collection associated with node create a collection and associated with the node
+                                try:
+                                    collection = Concept().get(id=node.config['rdmCollection'])
+                                except:
+                                    collection = Concept({
+                                        'id': collectionid,
+                                        'legacyoid': node.name + '_' + str(node.graph_id) + '_import',
+                                        'nodetype': 'Collection'
+                                    })
+                                    collection.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                    node.config['rdmCollection'] = collectionid
+                                    node.save()
+                                    collection.save()
+
+                            if collection != None:
+                                topconcept_legacyoid = node.name + '_' + str(node.graph_id)
+                                # Check if top concept already exists, if not create it and add to candidates scheme
+                                try:
+                                    topconcept = Concept().get(legacyoid=topconcept_legacyoid)
+                                except:
+                                    topconcept = Concept({
+                                        'id': topconceptid,
+                                        'legacyoid': topconcept_legacyoid,
+                                        'nodetype': 'Concept'
+                                    })
+                                    topconcept.addvalue({'id': str(uuid.uuid4()), 'value': node.name + '_import', 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                    topconcept.save()
+                                candidates.add_relation(topconcept, 'narrower')
+
+                                # create child concepts and relate to top concept and collection accordingly
+                                for conceptid, value in concepts.iteritems():
+                                    concept_legacyoid = value + '_' + node.name + '_' + str(node.graph_id)
+                                    # check if concept already exists, if not create and add to topconcept and collection
+                                    try:
+                                        conceptid = [concept for concept in topconcept.get_child_concepts(topconcept.id) if concept[1] == value][0][0]
+                                        concept = Concept().get(id=conceptid)
+                                    except:
+                                        concept = Concept({
+                                            'id': conceptid,
+                                            'legacyoid': concept_legacyoid,
+                                            'nodetype': 'Concept'
+                                        })
+                                        concept.addvalue({'id': str(uuid.uuid4()), 'value': value, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel'})
+                                        concept.save()
+                                    collection.add_relation(concept, 'member')
+                                    topconcept.add_relation(concept, 'narrower')
+
+                        #if node.datatype is domain or domain-list create options array in node.config
+                        elif node.datatype in ['domain-value', 'domain-value-list']:
+                            for domainid, value in new_concepts[arches_nodeid].iteritems():
+                                # check if value already exists in domain
+                                if value not in [t['text'] for t in node.config['options']]:
+                                    domainvalue = {
+                                        "text": value,
+                                        "selected": False,
+                                        "id": domainid
+                                    }
+                                    node.config['options'].append(domainvalue)
+                                    node.save()
+
+                if create_concepts == True:
+                    create_reference_data(concepts_to_create, create_collections)
+                # if concepts are created on import concept_lookup must be instatiated afterward
+                concept_lookup = ConceptLookup()
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:
@@ -371,7 +498,7 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_import_values(value, nodeid)
                             errors = datatype_instance.validate(value, source)
                         except Exception as e:
-                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, e)})
+                            errors.append({'type': 'ERROR', 'message': 'datatype: {0} value: {1} {2} - {3}'.format(datatype_instance.datatype_model.classname, value, source, str(e) + ' or is not a prefLabel in the given collection.')})
                         if len(errors) > 0:
                             value = None
                             self.errors += errors
@@ -396,18 +523,20 @@ class CsvReader(Reader):
                     # return deepcopy(blank_tile)
                     return cPickle.loads(cPickle.dumps(blank_tile, -1))
 
-                def check_required_nodes(tile, required_nodes, all_nodes):
+                def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
                     # Check that each required node in a tile is populated.
                     errors = []
                     if len(required_nodes) > 0:
-                        if target_tile.data != {}:
-                            for target_k, target_v in target_tile.data.iteritems():
+                        if bool(tile.data):
+                            for target_k, target_v in tile.data.iteritems():
                                 if target_k in required_nodes.keys() and target_v is None:
-                                    populated_tiles.pop(populated_tiles.index(target_tile))
+                                    populated_tiles.pop(populated_tiles.index(parent_tile))
                                     errors.append({'type': 'WARNING', 'message': 'The {0} node is required and must be populated in order to populate the {1} nodes. This data was not imported.'.format(required_nodes[target_k],  ', '.join(all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list('name', flat=True)))})
-                        elif target_tile.tiles != None:
-                            for tile in tiles:
-                                check_required_nodes(tile)
+                        elif bool(tile.tiles):
+                            for tile_k, tile_v in tile.tiles.iteritems():
+                                if len(tile_v) > 0:
+                                    for t in tile_v:
+                                        check_required_nodes(t, parent_tile, required_nodes, all_nodes)
                     if len(errors) > 0:
                         self.errors += errors
 
@@ -538,7 +667,7 @@ class CsvReader(Reader):
                         if target_tile != None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
-                            check_required_nodes(target_tile, required_nodes, all_nodes)
+                            check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
 
                     previous_row_resourceid = row['ResourceID']
                     legacyid = row['ResourceID']

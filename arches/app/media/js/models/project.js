@@ -18,9 +18,10 @@ define([
             self.active = ko.observable(false);
             self.createdby = ko.observable(null);
             self.lasteditedby = ko.observable(null);
-            self.users = ko.observableArray();
-            self.groups = ko.observableArray();
+            self.users = ko.observableArray([]);
+            self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
+            self.cards = ko.observableArray([]);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
@@ -151,6 +152,29 @@ define([
                 };
             };
 
+
+            self.updateCards = function(val) {
+                var approvedCards = _.chain(val.targetParent())
+                .filter(function(card){
+                    if (card.approved()) {
+                        return card.cardid
+                    }
+                })
+                .pluck('cardid').value()
+                var diff = _.difference(self.cards(), approvedCards)
+                self.cards(_.union(diff, approvedCards))
+            }
+
+            self.updateApproved = function(val){
+                val.item.approved(true);
+                self.updateCards(val)
+            };;
+
+            self.updateUnapproved = function(val){
+                val.item.approved(false);
+                self.updateCards(val)
+            };
+
             self.toggleShowDetails = function() {
                 self.setIdentityApproval();
                 self.showDetails(!self.showDetails())
@@ -169,6 +193,7 @@ define([
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
+                    cards: self.cards
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -190,6 +215,7 @@ define([
             self.lasteditedby(source.lasteditedby_id);
             self.groups(source.groups);
             self.users(source.users);
+            self.cards(source.cards);
             self.set('id', source.id);
         },
 
@@ -214,6 +240,7 @@ define([
                     self.lasteditedby(request.responseJSON.project.lasteditedby_id);
                     self.groups(request.responseJSON.project.groups);
                     self.users(request.responseJSON.project.users);
+                    self.cards(request.responseJSON.project.cards);
                     this._project(this.json());
                 };
             };

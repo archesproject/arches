@@ -3,11 +3,12 @@ define([
     'knockout',
     'views/base-manager',
     'viewmodels/project-manager',
+    'viewmodels/alert',
     'models/project',
     'project-manager-data',
     'arches',
     'bindings/datepicker'
-], function(_, ko, BaseManagerView, ProjectManagerViewModel, ProjectModel, data, arches) {
+], function(_, ko, BaseManagerView, ProjectManagerViewModel, AlertViewModel, ProjectModel, data, arches) {
     var viewModel = new ProjectManagerViewModel(data);
 
     viewModel.saveProject = function() {
@@ -39,12 +40,40 @@ define([
                     description: '',
                     startdate: null,
                     enddate: null,
-                    id: null
+                    id: null,
+                    cards: [],
+                    users: [],
+                    groups: []
                 },
                 identities: data.identities
             }));
         }
     }
+
+    viewModel.deleteProject = function(){
+        var self = this;
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmProjectDelete.title, arches.confirmProjectDelete.text, function() {
+            return;
+        }, function(a){
+            self.loading(true)
+            if (self.selectedProject()) {
+                self.selectedProject().delete(function(){
+                    self.loading(false);
+                    self.projects.remove(self.selectedProject());
+                    self.selectedProject(undefined)
+                });
+            };
+        }));
+    }
+
+
+    if (viewModel.projects().length === 0) {
+        viewModel.newProject()
+    } else {
+        viewModel.selectedProject(viewModel.projects()[0])
+    }
+
+    viewModel.resourceList.items()[0].selected(true)
 
     var pageView = new BaseManagerView({
         viewModel: viewModel
