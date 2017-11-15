@@ -55,9 +55,8 @@ class JSONSerializer(object):
         if (isinstance(obj, basestring)):
             return obj
 
-        ret = self.handle_object(obj)
-
-        return json.dumps(ret, cls=DjangoJSONEncoder, sort_keys=True, **options.copy())
+        sort_keys = options.pop("sort_keys", True)
+        return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
 
     def handle_object(self, object):
