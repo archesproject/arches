@@ -70,10 +70,11 @@ class ProjectManagerView(BaseManagerView):
 
         projects, resources = self.get_project_resources(project_models)
 
+        serializer = JSONSerializer()
         context = self.get_context_data(
-            projects=JSONSerializer().serialize(projects),
-            identities=JSONSerializer().serialize(identities),
-            resources=JSONSerializer().serialize(resources),
+            projects=serializer.serialize(projects, sort_keys=False),
+            identities=serializer.serialize(identities, sort_keys=False),
+            resources=serializer.serialize(resources, sort_keys=False),
             main_script='views/project-manager',
         )
 

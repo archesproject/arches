@@ -87,10 +87,11 @@ class UserManagerView(BaseManagerView):
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
-            context['identities'] = JSONSerializer().serialize(user_details['identities'])
-            context['resources'] = JSONSerializer().serialize(user_details['resources'])
-            
+
+            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'], sort_keys=False)
+            context['identities'] = JSONSerializer().serialize(user_details['identities'], sort_keys=False)
+            context['resources'] = JSONSerializer().serialize(user_details['resources'], sort_keys=False)
+
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
