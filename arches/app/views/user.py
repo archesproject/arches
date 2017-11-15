@@ -25,6 +25,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
+from arches.app.models.card import Card
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -68,7 +69,9 @@ class UserManagerView(BaseManagerView):
              if gp not in user_projects:
                  user_projects.append(gp)
 
-        return {'identities': identities, 'user_projects': user_projects}
+        projects, resources = self.get_project_resources(user_projects)
+
+        return {'identities': identities, 'user_projects': projects, 'resources': resources}
 
     def get(self, request):
 
@@ -86,6 +89,8 @@ class UserManagerView(BaseManagerView):
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
+            context['resources'] = JSONSerializer().serialize(user_details['resources'])
+            
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
@@ -105,6 +110,7 @@ class UserManagerView(BaseManagerView):
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
+            context['resources'] = JSONSerializer().serialize(user_details['resources'])
 
             user_info = request.POST.copy()
             user_info['id'] = request.user.id
@@ -126,3 +132,28 @@ class UserManagerView(BaseManagerView):
             context['form'] = form
 
             return render(request, 'views/user-profile-manager.htm', context)
+
+    def get_project_resources(self, project_models):
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resources = []
+        projects = []
+        all_ordered_card_ids = []
+        for project in project_models:
+            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            all_ordered_card_ids += ordered_card_ids
+            project_dict = project.__dict__
+            project_dict['cards'] = ordered_card_ids
+            project_dict['users'] = [u.id for u in project.users.all()]
+            project_dict['groups'] = [g.id for g in project.users.all()]
+            projects.append(project_dict)
+
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+        for i, graph in enumerate(graphs):
+            cards = []
+            if i == 0 or unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+
+        return projects, resources

@@ -381,26 +381,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                     Models and Data Entry Cards
                                                 </p>
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <li class="">
-                                                        Assets (3 data entry cards)
-                                                        <ul class="mpm-node-detail-metadata">
-                                                            <li class="">
-                                                                Name, Modification Event, Condition Assessment
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <li class="">
-                                                        Investigation Activities (3 data entry cards)
-                                                        <ul class="mpm-node-detail-metadata">
-                                                            <li class="">
-                                                                Name, Event Location, Activity Type
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
+
+                                                    <ul class="mpm-node-detail-metadata">
+                                                        <!--ko foreach: {data: project.resources, as: 'resource'} -->
+                                                        <li class="">
+                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
+                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                            <ul class="mpm-node-detail-metadata">
+                                                                <li data-bind="text: card.name"></li>
+                                                            </ul>
+                                                            <!--/ko-->
+                                                        </li>
+                                                        <!--/ko-->
+                                                    </ul>
                                             </div>
 
                                         </div>
@@ -587,7 +580,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         return {
             'error_count': {{form.errors|length}},
             'projects': {{user_projects}},
-            'identities': {{identities}}
+            'identities': {{identities}},
+            'resources': {{resources}}
         }
     });
 {% endautoescape %}</script>
