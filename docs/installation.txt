@@ -1,71 +1,125 @@
-﻿############
+﻿#################
+Installing Arches
+#################
+
 Installation
-############
+============
 
-Once you have all of the dependencies installed, open a command prompt and use the following steps to install the latest stable release of Arches. To install the latest non-stable Arches code (generally only necessary for developers), you can follow `these installation steps <https://github.com/archesproject/arches/wiki/Developer-Installation>`_.
+Once you have all the dependencies taken care of you are ready to install Arches.
 
-#. Create and enter a new directory called Projects::
+#. **Create and enter a new directory called Projects**::
 
     mkdir Projects && cd Projects
 
-#. Create a virtual environment called ENV::
+#. **Create a virtual environment called ENV**::
 
     virtualenv ENV
 
-#. Activate the new virtual environment
+#. **Activate the virtual environment**
 
-    **Linux and macOS**::
+    Linux and macOS::
 
         source ENV/bin/activate
 
-    **Windows**::
+    Windows::
 
         ENV\Scripts\activate
 
-    .. note:: At this point (once the virtual environment is activated), Windows users need to manually install Shapely. `Follow these instructions <https://github.com/archesproject/arches/wiki/Installing-Dependencies-on-Windows#shapely>`_.
+    .. note:: Once the virtual environment is activated for the first time, Windows users need to manually install Shapely. See the Shapely note in :ref:`WindowsInstallation`.
+    
+    When you activate your virtual environment, your command prompt will be prefixed with ``(ENV)``. If you need to deactivate it for any reason, run ``deactivate``.
 
-#. Install Arches into your virtual environment
+#. **Install Arches into your virtual environment**
 
-    You can install Arches with pip::
+    Use the following to get the latest stable release of Arches::
 
         pip install arches --no-binary :all:
 
+    .. note:: If you are a developer hoping to contribute to the Arches project, it's here that you should `install from directly from the repo <https://github.com/archesproject/arches/wiki/Developer-Installation-(draft-2)#installing-from-the-repo>`_.
+
     .. warning:: Running a pip installation without the ``--no-binary :all:`` argument will install ``arches`` in your virtual environment, but will not install all of the separate python packages that you need. This will cause you to not be able to proceed with the following steps.
 
-#. Create a new Arches project
+#. **Create a new Arches Project**
 
-    A project is a standalone Arches app that sits outside of your virtual environment and facilitates all of the customizations that you will need to make one installation of Arches different from the next.
+    Now that Arches is installed, you can make a Project. This is where you will make all of the customizations and branding that will make one installation of Arches different from the next. The name of your project should only be lowercase, and should use underscores instead of spaces or hyphens. The example below uses `my_project`.
 
-    **Linux and macOS**::
+    Linux and macOS::
     
         arches-project create my_project
 
-    **Windows**::
+    Windows::
 
         python C:\Projects\ENV\Scripts\arches-project create my_project
+        
+    .. note:: If this command ends in an error related to bower, you will need to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
-    .. note:: On Windows, the above command will end in an error on the last step of the command. The workaround for this is to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
+#. **Update settings_local.py**
 
-    .. warning:: On Windows, you must specify the path to your GDAL library before continuing. Open ``settings.py`` in your new project and add this line: ``GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal201.dll'`` Be sure to adjust the path as necessary for your installation, and note the *forward* slashes.
+    Before you continue, you may need to open ``my_project\my_project\settings_local.py`` and change some environment-specific settings.
+    
+    * Depending on your Postgres/PostGIS installation, you may need to uncomment the DATABASES section and change the username and password, as well as the name of your PostGIS template database. If you will have multiple Arches projects using the same database, make sure to change the database name here as well.
+    
+    * On Windows, you must specify the path to your GDAL library. Add the following line. Be sure to adjust the path as necessary for your GDAL installation, and note the *forward* slashes::
 
-    At this point you should `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ (unless you have done so already) before continuing.
+            GDAL_LIBRARY_PATH = "C:/OSGeo4W64/bin/gdal201.dll"
+            
+    * See Arches System Settings for a full rundown of how settings are handled in Arches.
+            
+    .. note:: At this point you must `install ElasticSearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_ and make sure it is running before continuing.
+    
+#. **Setup the database**
 
-#. Setup your Arches database
+    To begin working with your Project, first enter it::
+    
+        cd my_project
 
-    First, make sure ElasticSearch is installed and running
-
-    Then create your Arches database with::
+    and then (with ElasticSearch running) run::
 
         python manage.py packages -o setup_db
+        
+    .. note:: You may be prompted to enter a password for the ``postgres`` user, depending on your OS and how you installed Postgres/Postgis. Generally, our installation scripts set this password to ``postgis``.
 
-#. Run the development server
+#. **Run the development server**
 
-    To view Arches, run::
+    To confirm things are working, run::
 
         python manage.py runserver
 
-    You can now view Arches by navigating to ``localhost:8000`` in a browser.
+    and navigate to ``localhost:8000`` in Chrome.
+    
+    The default login credentials are 'admin' for both username and password. To change this password and create new users, navigate to `localhost:8000/admin`.
+    
+#. **Next steps...**
 
+    Now that you have Arches installed and a Project created, you are ready to begin.
+    
+    * Initial Settings Configuration
+    
+    * Read More about Projects
+    
+    * Loading a Package into your Project
+    
+#. **Load a Package into your Project**
+
+    In Arches there is a distinction between Projects (which hold your branding and static files) and Packages, which hold everything from database modeling definitions to business data itself. Once you have created and entered your project, you can load an example Package with this command::
+    
+        python manage.py packages -o load_package -s https://github.com/legiongis/test-package-load/archive/master.zip -db true
+        
+
+    
+General Troubleshooting
+=======================
+
+* On macOS, If you get this error ``ValueError: --enable-zlib requested but zlib not found, aborting.``
+    
+    try running ``xcode-select --install`` (`reference <http://stackoverflow.com/questions/32909426/zlib-error-when-installing-pillow-on-mac>`_)
+    
+* Getting a connection error::
+
+    ConnectionError: ConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it) caused by: NewConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it)
+    
+    means Arches is not able to communicate with ElasticSearch. Most likely, ElasticSearch is just not running, so just start it up and reload the page. If you can confirm that it _is_ running, make sure Arches is pointed to to correct port.
+    
 More about Arches Projects
 ===========================
 
@@ -88,7 +142,7 @@ The general structure of a new Arches project is:::
 settings.py
 ^^^^^^^^^^^^
 
-Many project-specific settings are defined here. You will likely want to add a ``settings_local.py`` file that can separately store variables that you may want to keep out of the public eye (db passwords, API keys, etc.).
+Many project-specific settings are defined here. You should use ``settings_local.py`` to store variables that you may want to keep out of the public eye (db passwords, API keys, etc.).
 
 templates
 ^^^^^^^^^^^
