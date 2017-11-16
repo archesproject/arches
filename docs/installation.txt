@@ -95,17 +95,15 @@ Once you have all the dependencies taken care of you are ready to install Arches
     
     * Initial Settings Configuration
     
-    * Read More about Projects
+    * Loading a Package into your Project (see below)
     
-    * Loading a Package into your Project
+    * Read More about Projects (see below)
     
 #. **Load a Package into your Project**
 
     In Arches there is a distinction between Projects (which hold your branding and static files) and Packages, which hold everything from database modeling definitions to business data itself. Once you have created and entered your project, you can load an example Package with this command::
     
         python manage.py packages -o load_package -s https://github.com/legiongis/test-package-load/archive/master.zip -db true
-        
-
     
 General Troubleshooting
 =======================
