@@ -65,6 +65,7 @@ class Command(BaseCommand):
         fn_config = imp.load_source('', source)
         details = fn_config.details
         fn = models.Function(
+            functionid = details['functionid'],
             name = details['name'],
             functiontype = details['type'],
             description = details['description'],
