@@ -64,6 +64,7 @@ class Command(BaseCommand):
             details = json.load(f)
 
         instance = models.Widget(
+            widgetid = details['widgetid'],
             name = details['name'],
             datatype = details['datatype'],
             helptext = details['helptext'],
