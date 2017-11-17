@@ -21,8 +21,8 @@ The most important settings to begin with are related to the map on the Search p
 
 After getting the Map Settings figured out, you will probably want to change the name of your app (System Settings), or create some Saved Searches to make it easier for the users to explore your database (Saved Searches).
 
-All System Settings
-===================
+Full Explanation of the System Settings UI
+==========================================
 
 System Settings
 ----------------
