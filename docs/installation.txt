@@ -49,7 +49,7 @@ Once you have all the dependencies taken care of you are ready to install Arches
 
     Windows::
 
-        python C:\Projects\ENV\Scripts\arches-project create my_project
+        python ENV\Scripts\arches-project create my_project
         
     .. note:: If this command ends in an error related to bower, you will need to enter ``my_project\my_project\`` (the directory that contains ``bower.json``) and run this command: ``bower install``.
 
@@ -89,21 +89,17 @@ Once you have all the dependencies taken care of you are ready to install Arches
     
     The default login credentials are 'admin' for both username and password. To change this password and create new users, navigate to `localhost:8000/admin`.
     
-#. **Next steps...**
+**Next steps...**
 
-    Now that you have Arches installed and a Project created, you are ready to begin.
-    
-    * Initial Settings Configuration
-    
-    * Loading a Package into your Project (see below)
-    
-    * Read More about Projects (see below)
-    
-#. **Load a Package into your Project**
+Now that you have Arches installed and a Project created, you are ready to begin.
 
-    In Arches there is a distinction between Projects (which hold your branding and static files) and Packages, which hold everything from database modeling definitions to business data itself. Once you have created and entered your project, you can load an example Package with this command::
+* Modify some :doc:`Initial Configuration </initial-configuration>` settings
+
+* Read more about :doc:`Projects and Packages </projects-and-packages>`
     
-        python manage.py packages -o load_package -s https://github.com/legiongis/test-package-load/archive/master.zip -db true
+* For a quick start that will create an example database schema in your new Arches project (and allow you to begin recording data right away), you can **load a sample package** with the following command::
+
+    python manage.py packages -o load_package -s https://github.com/archesproject/arches-sample-data/archive/master.zip -db true
     
 General Troubleshooting
 =======================
