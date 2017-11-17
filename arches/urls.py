@@ -118,7 +118,7 @@ urlpatterns = [
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
     url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
-    url(r'^project_manager/(?P<projectid>%s)/resources$' % uuid_regex, ProjectResources.as_view(), name='project_resources'),
+    url(r'^project_resources/(?P<projectid>%s)/resources$' % uuid_regex, ProjectResources.as_view(), name='project_resources'),
     url(r'^project_manager/*', ProjectManagerView.as_view(), name="project_manager"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
