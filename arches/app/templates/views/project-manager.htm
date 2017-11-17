@@ -38,7 +38,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="layer-list">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
-                        <h4 class="title-block-title">{% trans 'Projects' %}</h4>
+                        <div class="mpm-title-block">
+                            <h4 class="title-block-title">{% trans 'Projects' %}</h4>
+                            <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
+                        </div>
                         <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
@@ -88,7 +91,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Add Project -->
                     <div class="library-panel-search-bar">
-                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
                         <!--ko if: selectedProject()-->
                         <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedProject">{% trans "Delete Project" %}</button>
                         <!--/ko-->

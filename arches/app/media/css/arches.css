@@ -9240,7 +9240,7 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor div.title-block-title {
     width: 255px;
-    height:86px;
+    height: 95px;
 }
 
 .mobile-project-manager-editor .library-card:first-child {
@@ -9262,6 +9262,7 @@ a.search-facet-item.disabled {
 .mobile-project-manager-editor .layer-list {
     background: transparent;
     border-top: 0px;
+    padding-top: 5px;
 }
 
 .mpm-project-card {
@@ -9568,7 +9569,19 @@ a.search-facet-item.disabled {
     padding-left: 5px;
 }
 
+.mpm-title-block {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px
+}
 
+.mpm-title-block .title-block-title {
+    width: 107px;
+    margin-top: 3px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    padding-top: 12px;
+}
 
 .mpm-project-status {
     position: absolute;

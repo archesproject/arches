@@ -65,34 +65,16 @@ class ProjectManagerView(BaseManagerView):
                 default_perms = default_perms + list(group.permissions.all())
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
-        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        resources = []
 
-        projects = []
-        all_ordered_card_ids = []
-        for project in models.MobileProject.objects.order_by('name'):
-            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
-            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
-            all_ordered_card_ids += ordered_card_ids
-            project_dict = project.__dict__
-            project_dict['cards'] = ordered_card_ids
-            project_dict['users'] = [u.id for u in project.users.all()]
-            project_dict['groups'] = [g.id for g in project.users.all()]
-            projects.append(project_dict)
+        project_models = models.MobileProject.objects.order_by('name')
 
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+        projects, resources = self.get_project_resources(project_models)
 
-        for i, graph in enumerate(graphs):
-            cards = []
-            if i == 0 or unicode(graph.graphid) in active_graphs:
-                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
-
-            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
-
+        serializer = JSONSerializer()
         context = self.get_context_data(
-            projects=JSONSerializer().serialize(projects),
-            identities=JSONSerializer().serialize(identities),
-            resources=JSONSerializer().serialize(resources),
+            projects=serializer.serialize(projects, sort_keys=False),
+            identities=serializer.serialize(identities, sort_keys=False),
+            resources=serializer.serialize(resources, sort_keys=False),
             main_script='views/project-manager',
         )
 
@@ -234,3 +216,28 @@ class ProjectManagerView(BaseManagerView):
             msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Project that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
+
+    def get_project_resources(self, project_models):
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resources = []
+        projects = []
+        all_ordered_card_ids = []
+        for project in project_models:
+            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
+            all_ordered_card_ids += ordered_card_ids
+            project_dict = project.__dict__
+            project_dict['cards'] = ordered_card_ids
+            project_dict['users'] = [u.id for u in project.users.all()]
+            project_dict['groups'] = [g.id for g in project.users.all()]
+            projects.append(project_dict)
+
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+
+        for i, graph in enumerate(graphs):
+            cards = []
+            if i == 0 or unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+
+        return projects, resources
