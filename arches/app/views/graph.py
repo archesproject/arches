@@ -58,7 +58,7 @@ def get_ontology_namespaces():
         g.parse(ontology.path.path)
     for namespace in g.namespaces():
         if str(namespace[1]) not in ontology_namespaces:
-            ontology_namespaces[str(namespace[1])] = namespace[0]
+            ontology_namespaces[str(namespace[1])] = str(namespace[0])
     return ontology_namespaces
 
 

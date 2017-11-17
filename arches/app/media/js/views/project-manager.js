@@ -50,22 +50,32 @@ define([
         }
     }
 
-    viewModel.deleteProject = function(){
-        var self = this;
-        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmProjectDelete.title, arches.confirmProjectDelete.text, function() {
-            return;
-        }, function(a){
-            self.loading(true)
-            if (self.selectedProject()) {
-                self.selectedProject().delete(function(){
-                    self.loading(false);
-                    self.projects.remove(self.selectedProject());
-                    self.selectedProject(undefined)
-                });
-            };
-        }));
+    viewModel.deleteProject = function(project){
+        if (!project.active()) {
+            var self = this;
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmProjectDelete.title, arches.confirmProjectDelete.text, function() {
+                return;
+            }, function(a){
+                self.loading(true)
+                if (project) {
+                    project.delete(function(){
+                        self.loading(false);
+                        self.projects.remove(project);
+                    });
+                    if (project === self.selectedProject()) {
+                        self.selectedProject(undefined);
+                    }
+                };
+            }));
+        }
     }
 
+    viewModel.deleteSelectedProject = function(){
+        if (this.selectedProject()) {
+            this.deleteProject(this.selectedProject())
+            this.selectedProject(undefined)
+        };
+    }
 
     if (viewModel.projects().length === 0) {
         viewModel.newProject()
