@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.card import Card
+from arches.app.models.project import Project
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -34,7 +35,6 @@ from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.JSONResponse import JSONResponse
 
 class UserManagerView(BaseManagerView):
-
 
     def get_last_login(self, date):
         result = _("Not yet logged in")
@@ -135,26 +135,14 @@ class UserManagerView(BaseManagerView):
             return render(request, 'views/user-profile-manager.htm', context)
 
     def get_project_resources(self, project_models):
-        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
         projects = []
         all_ordered_card_ids = []
+
         for project in project_models:
-            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
-            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
-            all_ordered_card_ids += ordered_card_ids
-            project_dict = project.__dict__
-            project_dict['cards'] = ordered_card_ids
-            project_dict['users'] = [u.id for u in project.users.all()]
-            project_dict['groups'] = [g.id for g in project.users.all()]
+            proj = Project.objects.get(id=project.id)
+            project_dict = proj.serialize()
+            all_ordered_card_ids += project_dict['cards']
             projects.append(project_dict)
-
-        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-
-        for i, graph in enumerate(graphs):
-            cards = []
-            if i == 0 or unicode(graph.graphid) in active_graphs:
-                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
-            resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
         return projects, resources

@@ -51,22 +51,44 @@ define([
             items: ko.observableArray(params.resources)
         });
 
-        this.resourceList.selected.subscribe(function(val){
-            var flatten = function(scope) {
-                return function(data){
-                    var self = scope;
+        this.processResource = function(data) {
                     self.resourceList.initCards(data.cards)
                     self.resourceList.selected().cards(data.cards)
                     self.flattenCards(self.resourceList.selected())
-                }
-            }
+        }
 
+        this.processResources = function(data) {
+            if (_.some(self.resourceList.items(), function(r) {return data.id === r.id}) === false) {
+                data.cards = ko.observableArray(data.cards)
+                data.cardsflat = ko.observableArray();
+                self.resourceList.initCards(data.cards)
+                self.resourceList.items.push(data)
+            }
+        }
+
+        this.getProjectResources = function(project){
+            var successCallback = function(data){
+                project.collectedResources(true)
+                _.each(data.resources, self.processResources)
+                _.each(self.resourceList.items(), self.flattenCards)
+            }
+            if (!project.collectedResources()) {
+                $.ajax({
+                    url: arches.urls.project_resources(project.id)
+                })
+                .done(successCallback)
+                .fail(function(data){console.log('request failed', data)})
+            }
+        }
+
+
+        this.resourceList.selected.subscribe(function(val){
             if (val) {
                 if (ko.unwrap(val.cards).length === 0) {
                     $.ajax({
                         url: arches.urls.resource_cards.replace('//', '/' + val.id + '/')
                     })
-                    .done(flatten(self))
+                    .done(self.processResource)
                     .fail(function(data){console.log('card request failed', data)})
                 }
             }

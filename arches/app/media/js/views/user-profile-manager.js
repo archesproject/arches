@@ -36,20 +36,32 @@ define([
 
             self.viewModel.projectManager = new ProjectManagerViewModel(data);
 
-            _.each(self.viewModel.projectManager.projects(), function(project){
-                var resource_lookup = {};
-                var resources = [];
-                _.each(self.viewModel.projectManager.resourceList.items(), function(resource){
-                    _.each(resource.cards(), function(card) {
-                        if (_.contains(project.cards(), card.cardid)) {
-                            resource_lookup[resource.id] ? resource_lookup[resource.id].cards.push(card) : resource_lookup[resource.id] = {name: resource.name, cards:[card]};
-                        }
+            _.each(self.viewModel.projectManager.projects(), function(project) {
+                project.resources = ko.computed(function() {
+                    var resources = [];
+                    var resource_lookup = {};
+                    _.each(self.viewModel.projectManager.resourceList.items(), function(resource) {
+                        _.each(resource.cards(), function(card) {
+                                if (_.contains(project.cards(), card.cardid)) {
+                                    if (resource_lookup[resource.id]) {
+                                        resource_lookup[resource.id].cards.push(card)
+                                    } else {
+                                        resource_lookup[resource.id] = {
+                                            name: resource.name,
+                                            cards: [card]
+                                        };
+                                    }
+                                }
+                        })
+                    });
+                    _.each(resource_lookup, function(resource) {
+                        resources.push(resource)
                     })
-                });
-                _.each(resource_lookup, function(resource){
-                    resources.push(resource)
+                        resources.sort(function(a, b) {
+                        return a.name - b.name;
+                    });
+                    return resources;
                 })
-                project.resources = resources.sort(function (a, b) {return a.name - b.name;});
             }, self)
 
             self.viewModel.credentials = koMapping.fromJS({
@@ -72,7 +84,6 @@ define([
                         self.viewModel.changePasswordSuccess(data.success);
                         self.viewModel.toggleChangePasswordForm();
                     }
-
                 }).fail(function(err) {
                     console.log(err);
                 });

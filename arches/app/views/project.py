@@ -27,11 +27,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
+from django.views.generic import View
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.card import Card
+from arches.app.models.project import Project
 from arches.app.models.system_settings import settings
 from arches.app.views.base import BaseManagerView
 
@@ -222,14 +224,11 @@ class ProjectManagerView(BaseManagerView):
         resources = []
         projects = []
         all_ordered_card_ids = []
+
         for project in project_models:
-            ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
-            ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
-            all_ordered_card_ids += ordered_card_ids
-            project_dict = project.__dict__
-            project_dict['cards'] = ordered_card_ids
-            project_dict['users'] = [u.id for u in project.users.all()]
-            project_dict['groups'] = [g.id for g in project.users.all()]
+            proj = Project.objects.get(id=project.id)
+            project_dict = proj.serialize()
+            all_ordered_card_ids += project_dict['cards']
             projects.append(project_dict)
 
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
@@ -241,3 +240,25 @@ class ProjectManagerView(BaseManagerView):
             resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
         return projects, resources
+
+
+# @method_decorator(can_read_resource_instance(), name='dispatch')
+class ProjectResources(View):
+
+    def get(self, request, projectid=None):
+        graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resources = []
+        all_ordered_card_ids = []
+
+        proj = Project.objects.get(id=projectid)
+        all_ordered_card_ids = proj.get_ordered_cards()
+        print all_ordered_card_ids
+        active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
+        print active_graphs
+        for i, graph in enumerate(graphs):
+            cards = []
+            if unicode(graph.graphid) in active_graphs:
+                cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
+                resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
+
+        return JSONResponse({'success':True, 'resources': resources})
