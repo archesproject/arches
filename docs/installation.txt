@@ -112,42 +112,8 @@ General Troubleshooting
     
     try running ``xcode-select --install`` (`reference <http://stackoverflow.com/questions/32909426/zlib-error-when-installing-pillow-on-mac>`_)
     
-* Getting a connection error::
+* Getting a connection error like this (in the dev server output or in the browser)
 
-    ConnectionError: ConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it) caused by: NewConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it)
+    `ConnectionError: ConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it) caused by: NewConnectionError(<urllib3.connection.HTTPConnection object at 0x0000000005C6BC50>: Failed to establish a new connection: [Errno 10061] No connection could be made because the target machine actively refused it)`
     
-    means Arches is not able to communicate with ElasticSearch. Most likely, ElasticSearch is just not running, so just start it up and reload the page. If you can confirm that it _is_ running, make sure Arches is pointed to to correct port.
-    
-More about Arches Projects
-===========================
-
-Arches Projects facilitate all of the customizations that you will need to make one installation of Arches different from the next. You can update html to modify web page branding, and add functions, datatypes, and widgets to introduce new functionality. A project sits outside of your virtual environment, and can thus be transferred to any other system where Arches is installed.
-
-The general structure of a new Arches project is:::
-
-	my_project/
-	└─ manage.py
-	└─ my_project/
-	      └─ settings.py
-	      └─ datatypes/
-	      └─ functions/
-	      └─ media/
-	      └─ templates/
-	      └─ widgets/
-
-*Note that not all files are shown*
-
-settings.py
-^^^^^^^^^^^^
-
-Many project-specific settings are defined here. You should use ``settings_local.py`` to store variables that you may want to keep out of the public eye (db passwords, API keys, etc.).
-
-templates
-^^^^^^^^^^^
-
-This directory holds HTML templates that you can modify to customize the branding and general appearance of your project.
-
-datatypes, fuctions, and widgets
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-These directories will store the custom datatypes, functions, and widgets that you can create for the project. Developers interested in pursuing these customizations should start with `this customization documentation <https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets>`_.
+    means Arches is not able to communicate with ElasticSearch. Most likely, ElasticSearch is just not running, so just start it up and reload the page. If you can confirm that it `is` running, make sure Arches is pointed to to correct port.

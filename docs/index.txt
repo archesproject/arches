@@ -14,6 +14,7 @@ Arches v4 Documentation
 
     requirements-and-dependencies
     installation
+    projects-and-packages
     initial-configuration
     managing-map-layers
     managing-resources
@@ -23,7 +24,6 @@ Arches v4 Documentation
     import-export
     ontologies-in-arches
     rdm
-    create-package
     additional-configuration
 
 .. toctree::
