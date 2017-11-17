@@ -9578,6 +9578,17 @@ a.search-facet-item.disabled {
     color: #999;
 }
 
+.mpm-project-delete {
+    position: absolute;
+    top: 31px;
+    right: 12px;
+    font-size: 12px;
+}
+
+.mpm-project-delete.disabled {
+    color: #ccc;
+}
+
 .mpm-user-status {
     color: #ccc;
     padding: 4px 10px;
