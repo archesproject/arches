@@ -1,0 +1,87 @@
+#########################
+Requirements/Dependencies
+#########################
+
+System Requirements
+===================
+
+Arches works on Linux, Windows, or macOS, but some of its dependencies may be more difficult to install on certain operating systems. Most enterprise-level installations of Arches have been created on Linux servers.
+
+To begin development or make a test installation of Arches, you will need the following:
+
++ **2gb disk space**
+	+ ~1.5gb for all dependencies and 600mb for Arches.
+	+ In production, the amount of disk space you need will depend on the number of resources in your database, specifically uploaded images or media files.
+
++ **4gb memory (RAM)**
+	+ This recommendation is based on the fact that ElasticSearch requires 2gb to run, and as per `official ElasticSearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#_give_less_than_half_your_memory_to_lucene>`_ no more than half of your system's memory should be dedicated to ElasticSearch.
+	+ In development, it's possible to force ElasticSearch to run with only 1gb of memory, as we have noted `here <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch#running-elasticsearch>`_.
+	+ In production, you may want to increase your memory, and allow ElasticSearch to use `up to 32gb of memory <https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html#compressed_oops>`_.
+
+*Please note that Arches v4 is only fully supported in Chrome.*
+
+Software Dependencies
+=====================
+
+* **PostgreSQL 9.6 with PostGIS 2.3** (see below)
+* **GDAL > 1.11.5** and **GEOS** (see below)
+* **Python 2.7** https://www.python.org/downloads/
+    
+    .. note:: We have tested with Python versions 2.7.6 to 2.7.13, but any later 2.7.x release should also work. If you are able to confirm that > 2.7.13 is compatible, let us know.
+        
+    .. note:: Python 2.7.9 and later comes with pip, however, with < 2.7.9, you will need to get pip from here: https://pip.pypa.io/en/latest/installing.html. We also recommend upgrading pip with this command ``python -m pip install --upgrade pip``.
+        
+* **Bower** https://bower.io/#install-bower (requires NodeJS/npm)
+* **Mapnik 2.2** http://mapnik.org/pages/downloads.html. *Windows users, see below*.
+* **JDK** http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+* **Elasticsearch 5.2.1**
+    - To learn more about how Arches works with ElasticSearch, please read `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_. We recommend waiting until *after* you have Arches installed to deal with Elasticsearch.
+
+------------------
+
+The installation process for each component listed may differ based on your operating system, so please check below for more info.
+
+Installing Dependencies on Linux
+--------------------------------
+
+You can find fully scripted dependency installations for both Ubuntu and CentOS `here <https://github.com/archesproject/arches/tree/master/arches/install>`_.
+
+.. _WindowsInstallation:
+
+Installing Dependencies on Windows
+----------------------------------
+
+Be aware that you must install 32-bit or 64-bit versions of all dependencies based on your Windows system's architecture. In our experience, the following installation order should work well.
+
+**PostgreSQL 9.6 with PostGIS 2.3** - Use the `EnterpriseDB installers <https://www.postgresql.org/download/windows/>`_, and use Stack Builder (included) to get PostGIS. After installation, add the following to your system's PATH environment variable: ``C:\Program Files\PostgreSQL\9.6\bin``. **Important** Remember to note the password that you set for the default `postgres` user.
+
+**GDAL and GEOS** - Use the OSgeo4W installer found here: https://trac.osgeo.org/osgeo4w/, and choose to install the GDAL package (you don't need to install QGIS or GRASS). After installation, add the following to your system's PATH environment variable: ``C:\OSGeo4W64\bin``.
+
+**bower** - Requires NodeJS/npm. Installation instructions here: https://bower.io/#install-bower
+
+**Mapnik** - *If you are on 64-bit Windows you will not be able to install Mapnik; the Python bindings are not compatible.* Arches is fully functional without Mapnik, but some of the extra map overlay capabilities are lost. Specifically, if you are adding a Tilestache layer as a map overlay, you will not be able to use any of the Mapnik-based providers as described in this section of the `Tilestache documentation <http://tilestache.org/doc/#providers>`_.
+
+**JDK** - Use the installers found here: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html.
+Once installed, find Java on your operating system. It will be somewhere like ``C:\Program Files\Java\jdk*.*.*_**``. Now take that full path, and add it to the JAVA_HOME system environment variable.
+
+**Python 2.7** - We recommend using 2.7.13, found here: https://www.python.org/downloads/ You must choose 32-bit or 64-bit Python depending on your operating system architecture.
+
+**pip** - Python 2.7.13 comes with pip already, but we do recommend upgrading pip::
+
+    python -m pip install --upgrade pip
+
+**Shapely** - On Windows, the Shapely python library **doesn't install correctly by default**. We recommend that *after* creating and activating your virtual environment but *before* installing Arches, you download the appropriate file for your system architecture (32-bit or 64-bit), Shapely-1.5.17-cp27-cp27m-<win32 or win-amd64>.whl, from `here <http://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely>`_ and then run::
+
+    pip install path\to\Shapely....whl
+    
+**Elasticsearch** - Take care of this after you have Arches fully installed. Use the command recommended in `Installing and Running Elasticsearch <https://github.com/archesproject/arches/wiki/Installing-and-Running-Elasticsearch>`_.
+
+Installing Dependencies on macOS
+--------------------------------
+
+Please see `this gist <https://gist.github.com/jmunowitch/35eb1d20a0b9cbf86f4b0eb4b167d43a>`_ for the easiest way to install all dependencies on macOS. Running this script in full will create an installation of Arches based on the current repo, but you can use pieces of it for individual dependencies as well.
+
+Further notes:
+
+* **PostgreSQL 9.6 with PostGIS 2.3** - Use `Postgres.app <http://postgresapp.com>`_.
+* **GEOS** - Use version 3.6.1 (3.6.2 has caused trouble on macOS).

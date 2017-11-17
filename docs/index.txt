@@ -12,17 +12,17 @@ Arches v4 Documentation
     :caption: User Documentation
     :maxdepth: 2
 
+    requirements-and-dependencies
     installation
+    projects-and-packages
     initial-configuration
     managing-map-layers
     managing-resources
     using-the-arches-designer
     creating-resources
-    project-setup
     import-export
     ontologies-in-arches
     rdm
-    create-package
     additional-configuration
 
 .. toctree::

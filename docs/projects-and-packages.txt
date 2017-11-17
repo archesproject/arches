@@ -1,3 +1,41 @@
+#####################
+Projects and Packages
+#####################
+
+Projects
+--------
+
+Arches Projects facilitate all of the customizations that you will need to make one installation of Arches different from the next. You can update html to modify web page branding, and add functions, datatypes, and widgets to introduce new functionality. A project sits outside of your virtual environment, and can thus be transferred to any other system where Arches is installed.
+
+The general structure of a new Arches project is:::
+
+	my_project/
+	└─ manage.py
+	└─ my_project/
+	      └─ settings.py
+	      └─ datatypes/
+	      └─ functions/
+	      └─ media/
+	      └─ templates/
+	      └─ widgets/
+
+*Note that not all files are shown*
+
+settings.py
+^^^^^^^^^^^^
+
+Many project-specific settings are defined here. You should use ``settings_local.py`` to store variables that you may want to keep out of the public eye (db passwords, API keys, etc.).
+
+templates
+^^^^^^^^^^^
+
+This directory holds HTML templates that you can modify to customize the branding and general appearance of your project.
+
+datatypes, fuctions, and widgets
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These directories will store the custom datatypes, functions, and widgets that you can create for the project. Developers interested in pursuing these customizations should start with `this customization documentation <https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets>`_.
+
 Packages
 --------
 
@@ -7,52 +45,52 @@ A package is an external collection of arches data (resource models, business da
 Loading a Package
 `````````````````
 
-#. To load a package simply run the load_package command using your \*project's manage.py file:
+To load a package simply run the load_package command using your \*project's manage.py file:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
+    python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
 
 
-    -db    `true` to run setup_db to rebuild your database. default = 'false'
-    -ow    `overwrite` to overwrite concepts and collections. default = 'ignore'
-    -st    `stage` to stage concepts and collections. default = 'stage'
-    -s     a path to a zipfile located on github or locally
-    -o     operation name
+-db    `true` to run setup_db to rebuild your database. default = 'false'
+-ow    `overwrite` to overwrite concepts and collections. default = 'ignore'
+-st    `stage` to stage concepts and collections. default = 'stage'
+-s     a path to a zipfile located on github or locally
+-o     operation name
 
-    If you do not pass the `-db True` to the load_package command, your database will not be recreated. If you already have resource models and branches with the same id as those you are importing, you will be prompted to confirm whether you would like to keep or overwrite each model or branch.
+If you do not pass the `-db True` to the load_package command, your database will not be recreated. If you already have resource models and branches with the same id as those you are importing, you will be prompted to confirm whether you would like to keep or overwrite each model or branch.
 
-    \*It is important to note that you cannot load a package directly into core Arches. Currently packages must be loaded into a project. :doc:`Create a project <../project-setup>`.
+\*It is important to note that you cannot load a package directly into core Arches. Currently packages must be loaded into a project. :doc:`Create a project <../project-setup>`.
 
-    If you are a developer running the latest arches you probably want to create a project with a new arches installation. This ensures that the `arches_project create` command uses the latest project templates.
+If you are a developer running the latest arches you probably want to create a project with a new arches installation. This ensures that the `arches_project create` command uses the latest project templates.
 
-        #. Uninstall arches from your virtualenv
+    #. Uninstall arches from your virtualenv
 
-            .. code-block:: bash
+        .. code-block:: bash
 
-                pip uninstall arches
+            pip uninstall arches
 
-        #. Navigate into arches root folder delete the `build` directory
+    #. Navigate into arches root folder delete the `build` directory
 
-        #. Reinstall arches
+    #. Reinstall arches
 
-            .. code-block:: bash
+        .. code-block:: bash
 
-                python setup.py install
+            python setup.py install
 
-                python setup.py develop
+            python setup.py develop
 
-        #. Navigate to where you want to create your new project and run:
+    #. Navigate to where you want to create your new project and run:
 
-            .. code-block:: bash
+        .. code-block:: bash
 
-                arches-project create mynewproject
+            arches-project create mynewproject
 
-        #. Finally run the `load_package` command using the projects manage.py file.
+    #. Finally run the `load_package` command using the projects manage.py file.
 
-            .. code-block:: bash
+        .. code-block:: bash
 
-                python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
+            python manage.py packages -o load_package -s https://github.com/package/archive/branch.zip -db true
 
 
 Creating a New Package
