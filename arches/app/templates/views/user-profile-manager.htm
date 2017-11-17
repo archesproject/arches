@@ -330,7 +330,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </li>
                                                 </ul>
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails()}">{% trans 'View Details' %}</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.projectManager.getProjectResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -383,7 +383,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </p>
 
                                                     <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: project.resources, as: 'resource'} -->
+                                                        <!--ko foreach: {data: project.resources(), as: 'resource'} -->
                                                         <li class="">
                                                             <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
                                                             <!--ko foreach: {data: resource.cards, as: 'card'} -->

@@ -22,6 +22,7 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
+            self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
                 var user = _.find(self.identities, function(i) {
