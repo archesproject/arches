@@ -35,6 +35,7 @@ define(['arches',
             this.set('active', ko.observable());
             this.set('ontologyproperty', ko.observable());
             this.set('sortorder', ko.observable());
+            this.set('disabled', ko.observable());
 
 
             this._card = ko.observable('{}');
@@ -113,7 +114,8 @@ define(['arches',
                                 nodeModel.widget = new CardWidgetModel(cardWidgetData, {
                                     node: nodeModel,
                                     card: self,
-                                    datatype: datatype
+                                    datatype: datatype,
+                                    disabled: attributes.data.disabled
                                 });
                                 widgets.push(nodeModel.widget);
                             }
