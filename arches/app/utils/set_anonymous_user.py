@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
+from django.utils.deprecation import MiddlewareMixin
 
-class SetAnonymousUser(object):
+class SetAnonymousUser(MiddlewareMixin):
     def process_request(self, request):
         if request.user.is_anonymous():
             try:
