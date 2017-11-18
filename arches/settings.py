@@ -292,7 +292,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'arches.app.utils.set_anonymous_user.SetAnonymousUser',
+    'arches.app.utils.middleware.SetAnonymousUser',
 ]
 
 ROOT_URLCONF = 'arches.urls'
