@@ -832,15 +832,15 @@ class UserProfile(models.Model):
         db_table = 'user_profile'
 
 
-class MobileProject(models.Model):
+class MobileSurveyModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField(null=True)
     active = models.BooleanField(default=False)
     createdby = models.ForeignKey(User, related_name='createdby')
     lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
-    users = models.ManyToManyField(to=User, through='MobileProjectXUser')
-    groups = models.ManyToManyField(to=Group, through='MobileProjectXGroup')
-    cards = models.ManyToManyField(to=CardModel, through='MobileProjectXCard')
+    users = models.ManyToManyField(to=User, through='MobileSurveyXUser')
+    groups = models.ManyToManyField(to=Group, through='MobileSurveyXGroup')
+    cards = models.ManyToManyField(to=CardModel, through='MobileSurveyXCard')
     startdate = models.DateField(blank=True, null=True)
     enddate = models.DateField(blank=True, null=True)
     description = models.TextField(null=True)
@@ -850,37 +850,37 @@ class MobileProject(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'mobile_projects'
+        db_table = 'mobile_surveys'
 
 
-class MobileProjectXUser(models.Model):
-    mobile_project_x_user_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+class MobileSurveyXUser(models.Model):
+    mobile_survey_x_user_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
-        db_table = 'mobile_projects_x_users'
-        unique_together = ('mobile_project', 'user',)
+        db_table = 'mobile_surveys_x_users'
+        unique_together = ('mobile_survey', 'user',)
 
 
-class MobileProjectXGroup(models.Model):
-    mobile_project_x_group_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+class MobileSurveyXGroup(models.Model):
+    mobile_survey_x_group_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = True
-        db_table = 'mobile_projects_x_groups'
-        unique_together = ('mobile_project', 'group',)
+        db_table = 'mobile_surveys_x_groups'
+        unique_together = ('mobile_survey', 'group',)
 
-class MobileProjectXCard(models.Model):
-    mobile_project_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+class MobileSurveyXCard(models.Model):
+    mobile_survey_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
-    mobile_project = models.ForeignKey(MobileProject, on_delete=models.CASCADE)
+    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
     sortorder = models.IntegerField(default=0)
 
     class Meta:
         managed = True
-        db_table = 'mobile_projects_x_cards'
-        unique_together = ('mobile_project', 'card',)
+        db_table = 'mobile_surveys_x_cards'
+        unique_together = ('mobile_survey', 'card',)

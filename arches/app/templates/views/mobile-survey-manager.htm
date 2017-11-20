@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block title %}
 {{ block.super }}
-{% trans "Mobile Project Manager" %}
+{% trans "Mobile Survey Manager" %}
 {% endblock title %}
 
 
@@ -39,10 +39,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="" style="margin-right: 10px;">
                         <div class="mpm-title-block">
-                            <h4 class="title-block-title">{% trans 'Projects' %}</h4>
-                            <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Project" %}</button>
+                            <h4 class="title-block-title">{% trans 'Surveys' %}</h4>
+                            <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newProject">{% trans "New Survey" %}</button>
                         </div>
-                        <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectFilter, valueUpdate: 'keyup'">
+                        <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="visible: projectFilter().length > 0, click: function() { projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
@@ -53,14 +53,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 
-            <!-- Project Listing Panel-->
+            <!-- Survey Listing Panel-->
             <div id="user-grid" class="grid" style="position: relative; height: 0px; margin-left: -7px; display:none;" data-bind="visible: true">
 
                 <!-- ko if: projects().length ===  0 -->
                 <div id="default-message-panel" class="left-column-message" style="">
-                    {% trans "You haven't saved any projects." %}
+                    {% trans "You haven't saved any surveys." %}
                     <p class="default-message">
-                        {% trans "Use the form to set up a project, then save your edits, and you're done!" %}
+                        {% trans "Use the form to set up a survey, then save your edits, and you're done!" %}
                     </p>
                 </div>
                 <!-- /ko -->
@@ -70,7 +70,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- ko foreach: filteredProjects() -->
                     <div class="library-card selected selected-card" data-bind="css: {'selected-card': $parent.selectedProject()===$data, 'inactive': !active()}, click: function (p) { $parent.selectedProject(null);$parent.selectedProject(p); }" style="width: 270px;">
                         <div class="mpm-project-card">
-                            <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></a>
+                            <a class="mpm-project-name" data-bind="text: name() === '' ? '{% trans "Unnamed Survey" %}' : name()"></a>
                         </div>
                         <div class="mpm-project-status" data-bind="text: active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                         <a class="mpm-project-delete" data-bind="click: function(val){$parent.deleteProject(val)}, clickBubble: false, css: {'disabled': active()}" href="" class="" aria-expanded="true">{% trans 'delete' %}</a>
@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Add Project -->
                     <div class="library-panel-search-bar">
                         <!--ko if: selectedProject()-->
-                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedProject">{% trans "Delete Project" %}</button>
+                        <button id="" class="btn btn-lg btn-danger btn-active-dark btn-labeled ion-minus-round" data-bind="click: deleteSelectedProject">{% trans "Delete Survey" %}</button>
                         <!--/ko-->
                     </div>
                 </div>
@@ -107,7 +107,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="">
                                 <div class="project-status" data-bind="css: selectedProject().active() ? 'active' : 'inactive', text: selectedProject().active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                             </div>
-                            <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Project" %}' : selectedProject().name()"></h3>
+                            <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Survey" %}' : selectedProject().name()"></h3>
 
                             <div class="">
                                 <ul class="project-metadata">
@@ -159,7 +159,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         <li id="activation-group" class="">
                                             <a id="project-summary-tab" data-toggle="tab" href="#project-summary-card" class="card-tab-title" aria-expanded="false">
-                                                                {% trans 'Activate Project' %}
+                                                                {% trans 'Activate Survey' %}
                                                             </a>
                                         </li>
                                     </ul>
@@ -185,14 +185,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Project name' %}</label>
+                                                                                    <label class="control-label account-label">{% trans 'Survey name' %}</label>
                                                                                     <input type="text" class="form-control input-lg account-input" data-bind="value: selectedProject().name, valueUpdate: 'keyup'">
                                                                                 </div>
                                                                             </div>
 
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
-                                                                                    {% trans 'Pick a concise name that makes it easy for people to find your project' %}
+                                                                                    {% trans 'Pick a concise name that makes it easy for people to find your survey' %}
                                                                                 </p>
                                                                             </div>
                                                                         </div>
@@ -202,13 +202,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Project start date' %}</label>
+                                                                                    <label class="control-label account-label">{% trans 'Survey start date' %}</label>
                                                                                     <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-sm-6">
                                                                                 <p class="account-tips">
-                                                                                    {% trans 'The project start and end dates are used to limit when people can add or edit Arches data.' %}
+                                                                                    {% trans 'The survey start and end dates are used to limit when people can add or edit Arches data.' %}
                                                                                 </p>
                                                                             </div>
                                                                         </div>
@@ -216,7 +216,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         <div class="row">
                                                                             <div class="col-sm-5">
                                                                                 <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Project end' %}</label>
+                                                                                    <label class="control-label account-label">{% trans 'Survey end' %}</label>
                                                                                     <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
                                                                                 </div>
                                                                             </div>
@@ -258,7 +258,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="flex relative">
 
                                                         <div class="mpm-left-panel" style="" data-bind="with:resourceList">
-                                                            {% include 'views/project-manager/resource-list.htm' %}
+                                                            {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
                                                         <div class="mpm-right-panel">
@@ -324,7 +324,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                                     </div>
                                                                     <div class="mpm-card-list approved">
-                                                                    <div class="mpm-card-list-header">{% trans 'Added to Project' %}</div>
+                                                                    <div class="mpm-card-list-header">{% trans 'Added to Survey' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved, addToSelf: true}" class="ko_container ui-sortable" style="min-height:100%">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.approved() === true)">
@@ -377,7 +377,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="flex relative">
 
                                                         <div class="mpm-left-panel" style="" data-bind="with:identityList">
-                                                            {% include 'views/project-manager/identity-list.htm' %}
+                                                            {% include 'views/mobile-survey-manager/identity-list.htm' %}
                                                         </div>
 
                                                         <div class="mpm-right-panel">
@@ -413,7 +413,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                 <span class="switch switch-small mpm-account-switch" data-bind="css: {'on': selectedProject().hasIdentity()}, click: function(){selectedProject().toggleIdentity()}"><small></small>
 
                                                                                 </span>
-                                                                                <p class="mpm-account-switch-text" style="margin-bottom: 0px;">{% trans 'Add this user to project' %}</p>
+                                                                                <p class="mpm-account-switch-text" style="margin-bottom: 0px;">{% trans 'Add this user to survey' %}</p>
                                                                                         <div style="display:flex; flex-direction:row;">
                                                                                         <div class="arches-toggle-sm"></div>
                                                                                             <div style="margin-top: -17px;"></div>
@@ -510,7 +510,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                         </div>
                                                                                         <ul class="mpm-node-detail-metadata">
                                                                                             <li class="">
-                                                                                                Remove project data from from user's device on next login?
+                                                                                                Remove survey data from from user's device on next login?
                                                                                             </li>
                                                                                             <li class="">
                                                                                                 <!--Switchery : Unchecked-->
@@ -587,7 +587,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                                             </div>
                                                                                             <ul class="mpm-node-detail-metadata">
                                                                                                 <li class="">
-                                                                                                    Remove project data from from user's device on next login?
+                                                                                                    Remove survey data from from user's device on next login?
                                                                                                 </li>
                                                                                                 <li class="">
                                                                                                     <!--Switchery : Unchecked-->
@@ -644,7 +644,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="col-sm-5 col-md-3">
 
                                                                 <div class="box-inline">
-                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">Activate Project</p>
+                                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">{% trans 'Activate Survey' %}</p>
 
                                                                     <div class="toggle-container">
                                                                         <span class="switch switch-small" data-bind="css: {'on': selectedProject().active()}, click: function(){
@@ -658,15 +658,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <!-- Help Message-->
                                                             <div class="col-sm-6 col-md-9">
                                                                 <p class="account-tips" style="margin-top: 20px;">
-                                                                    By activating the project you will send users an email with the information needed to begin data editing activitites.
+                                                                    By activating the survey you will send users an email with the information needed to begin data editing activitites.
                                                                 </p>
                                                             </div>
                                                         </div>
 
-                                                        <!-- Project Settings -->
+                                                        <!-- Survey Settings -->
                                                         <div class="mpm-summary-panel">
                                                             <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Project Summary
+                                                                {% trans 'Summary' %}
                                                             </p>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
@@ -684,11 +684,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!-- User Summary -->
                                                         <div class="mpm-summary-panel">
                                                             <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                Groups/Users
+                                                                {% trans 'Groups/Users' %}
                                                             </p>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Groups (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
+                                                                    {% trans 'Groups' %} (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
                                                                         <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
                                                                         </li>
@@ -697,7 +697,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </ul>
                                                             <ul class="mpm-node-detail-metadata">
                                                                 <li class="">
-                                                                    Users (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
+                                                                    {% trans 'Users' %} (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
                                                                     <ul class="mpm-node-detail-metadata">
                                                                         <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
 
@@ -755,9 +755,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('project-manager-data', [], function() {
+        {% autoescape off %}define('mobile-survey-manager-data', [], function() {
             return {
-                projects: {{projects}},
+                projects: {{mobile_surveys}},
                 resources: {{resources}},
                 identities: {{identities}}
             };
