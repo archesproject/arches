@@ -36,6 +36,34 @@ define([
 
             self.viewModel.projectManager = new ProjectManagerViewModel(data);
 
+            _.each(self.viewModel.projectManager.projects(), function(project) {
+                project.resources = ko.computed(function() {
+                    var resources = [];
+                    var resource_lookup = {};
+                    _.each(self.viewModel.projectManager.resourceList.items(), function(resource) {
+                        _.each(resource.cards(), function(card) {
+                                if (_.contains(project.cards(), card.cardid)) {
+                                    if (resource_lookup[resource.id]) {
+                                        resource_lookup[resource.id].cards.push(card)
+                                    } else {
+                                        resource_lookup[resource.id] = {
+                                            name: resource.name,
+                                            cards: [card]
+                                        };
+                                    }
+                                }
+                        })
+                    });
+                    _.each(resource_lookup, function(resource) {
+                        resources.push(resource)
+                    })
+                        resources.sort(function(a, b) {
+                        return a.name - b.name;
+                    });
+                    return resources;
+                })
+            }, self)
+
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',
                 new_password: '',
@@ -56,7 +84,6 @@ define([
                         self.viewModel.changePasswordSuccess(data.success);
                         self.viewModel.toggleChangePasswordForm();
                     }
-
                 }).fail(function(err) {
                     console.log(err);
                 });

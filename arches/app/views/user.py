@@ -25,6 +25,8 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
+from arches.app.models.card import Card
+from arches.app.models.project import Project
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -33,7 +35,6 @@ from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.JSONResponse import JSONResponse
 
 class UserManagerView(BaseManagerView):
-
 
     def get_last_login(self, date):
         result = _("Not yet logged in")
@@ -68,7 +69,9 @@ class UserManagerView(BaseManagerView):
              if gp not in user_projects:
                  user_projects.append(gp)
 
-        return {'identities': identities, 'user_projects': user_projects}
+        projects, resources = self.get_project_resources(user_projects)
+
+        return {'identities': identities, 'user_projects': projects, 'resources': resources}
 
     def get(self, request):
 
@@ -84,8 +87,11 @@ class UserManagerView(BaseManagerView):
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
-            context['identities'] = JSONSerializer().serialize(user_details['identities'])
+
+            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'], sort_keys=False)
+            context['identities'] = JSONSerializer().serialize(user_details['identities'], sort_keys=False)
+            context['resources'] = JSONSerializer().serialize(user_details['resources'], sort_keys=False)
+
             return render(request, 'views/user-profile-manager.htm', context)
 
     def post(self, request):
@@ -105,6 +111,7 @@ class UserManagerView(BaseManagerView):
             context['validation_help'] = validation.password_validators_help_texts()
             context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
+            context['resources'] = JSONSerializer().serialize(user_details['resources'])
 
             user_info = request.POST.copy()
             user_info['id'] = request.user.id
@@ -126,3 +133,16 @@ class UserManagerView(BaseManagerView):
             context['form'] = form
 
             return render(request, 'views/user-profile-manager.htm', context)
+
+    def get_project_resources(self, project_models):
+        resources = []
+        projects = []
+        all_ordered_card_ids = []
+
+        for project in project_models:
+            proj = Project.objects.get(id=project.id)
+            project_dict = proj.serialize()
+            all_ordered_card_ids += project_dict['cards']
+            projects.append(project_dict)
+
+        return projects, resources

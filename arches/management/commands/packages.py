@@ -760,15 +760,6 @@ class Command(BaseCommand):
         if isinstance(data_source, basestring):
             data_source = [data_source]
 
-        update_system_settings = True
-        if os.path.exists(settings.SYSTEM_SETTINGS_LOCAL_PATH):
-            response = raw_input('Overwrite current system settings with package settings? (Y/N): ')
-            if response.lower() in ('t', 'true', 'y', 'yes'):
-                update_system_settings = True
-                print 'Using package system settings'
-            else:
-                update_system_settings = False
-
         create_collections = False
         if create_concepts:
             create_concepts = str(create_concepts).lower()
