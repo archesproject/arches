@@ -190,8 +190,6 @@ class Card(models.CardModel):
         ret['ontologyproperty'] = self.ontologyproperty
         ret['disabled'] = self.disabled
 
-        print ret['disabled']
-
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret['ontologyproperty'] = edge.ontologyproperty
