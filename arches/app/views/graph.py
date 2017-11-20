@@ -235,7 +235,8 @@ class GraphDataView(View):
         else:
             graph = Graph.objects.get(graphid=graphid)
             if self.action == 'get_related_nodes':
-                ret = graph.get_valid_ontology_classes(nodeid=nodeid)
+                parent_nodeid = request.GET.get('parent_nodeid', None)
+                ret = graph.get_valid_ontology_classes(nodeid=nodeid, parent_nodeid=parent_nodeid)
 
             elif self.action == 'get_valid_domain_nodes':
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)

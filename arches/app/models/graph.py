@@ -959,7 +959,7 @@ class Graph(models.GraphModel):
         else:
             return []
 
-    def get_valid_ontology_classes(self, nodeid=None):
+    def get_valid_ontology_classes(self, nodeid=None, parent_nodeid=None):
         """
         get possible ontology properties (and related classes) a node with the given nodeid can have
         taking into consideration it's current position in the graph
@@ -971,7 +971,10 @@ class Graph(models.GraphModel):
 
         ret = []
         if nodeid and self.ontology_id is not None:
-            parent_node = self.get_parent_node(nodeid)
+            if parent_nodeid is None:
+                parent_node = self.get_parent_node(nodeid)
+            else:
+                parent_node = models.Node.objects.get(pk=parent_nodeid)
             out_edges = self.get_out_edges(nodeid)
 
             ontology_classes = set()

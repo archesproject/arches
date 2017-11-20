@@ -1148,3 +1148,18 @@ class ResourceInstanceDataType(BaseDataType):
                     query.must(search_query)
         except KeyError, e:
             pass
+
+
+class NodeValueDataType(BaseDataType):
+    def validate(self, value, source=''):
+        errors = []
+        return errors
+
+    def get_display_value(self, tile, node):
+        pass
+
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        pass
+
+    def append_search_filters(self, value, node, query, request):
+        pass
