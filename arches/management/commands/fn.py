@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import uuid
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
@@ -64,6 +65,13 @@ class Command(BaseCommand):
         import imp
         fn_config = imp.load_source('', source)
         details = fn_config.details
+
+        try:
+            uuid.UUID(details['functionid'])
+        except:
+            details['functionid'] = unicode(uuid.uuid4())
+            print "Registering function with functionid:", details['functionid']
+
         fn = models.Function(
             functionid = details['functionid'],
             name = details['name'],
@@ -75,10 +83,7 @@ class Command(BaseCommand):
             component = details['component']
         )
 
-        try:
-            fn.save()
-        except IntegrityError as e:
-            print "{0} already exists".format(fn.name)
+        fn.save()
 
     def unregister(self, fn_name):
         """
