@@ -233,6 +233,8 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi'
 JWT_KEY = SECRET_KEY
+JWT_TOKEN_EXPIRATION = 50 #days before the token becomes stale
+JWT_ALGORITHM = 'HS256'
 
 TEMPLATES = [
     {

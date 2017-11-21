@@ -206,8 +206,8 @@ def get_token(request):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)
-    expiry = int(time.time()) + timedelta(days=50).total_seconds()
-    token = jws.sign({'username': user.username, 'expiry':expiry}, settings.JWT_KEY, algorithm='HS256')
+    expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
+    token = jws.sign({'username': user.username, 'expiration':expiration}, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
 
     return HttpResponse(token)
 

@@ -20,14 +20,14 @@ class SetAnonymousUser(MiddlewareMixin):
             
         request.user.user_groups = [group.name for group in request.user.groups.all()]
 
+
 class JWTAuthenticationMiddleware(MiddlewareMixin):
     def get_user_from_token(self, token):
-        decoded_json = jws.verify(token, settings.JWT_KEY, algorithms=['HS256'])
-        #jwt.decode(token, 'secret', algorithms='HS256')
+        decoded_json = jws.verify(token, settings.JWT_KEY, algorithms=[settings.JWT_ALGORITHM])
         decoded_dict = JSONDeserializer().deserialize(decoded_json)
 
         username = decoded_dict.get('username', None)
-        expiry = decoded_dict.get('expiry', None)
+        expiration = decoded_dict.get('expiration', None)
 
         print 'in get_user_from_token'
 
@@ -41,7 +41,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         if not user.is_active:
             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
 
-        if int(expiry) < int(time.time()):
+        if int(expiration) < int(time.time()):
             raise exceptions.AuthenticationFailed(_('Token Expired.'))
 
         return user
@@ -58,13 +58,6 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         if request.user.is_anonymous() and request.token is not '':
             # try to get the user info from the token if it exists
             request.user = SimpleLazyObject(lambda: self.get_user_from_token(request.token))
-
-        # if hasattr(request, 'session') and request.user.is_anonymous()
-        # if not (hasattr(request, 'session') and request.user.is_anonymous()):
-        # assert hasattr(request, 'session') and request.user.is_anonymous()
-        print 'token'
-        print request.token
-
 
 
 class TokenMiddleware(MiddlewareMixin):
