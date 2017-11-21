@@ -115,7 +115,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="project-status" data-bind="css: selectedProject().active() ? 'active' : 'inactive', text: selectedProject().active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                                     <li class="project-metadata-item">
                                         <span data-bind="text: selectedProject().startdate() || '?'"></span>
-                                        to
+                                        {% trans 'to' %}
                                         <span data-bind="text: selectedProject().enddate() || '?'"></span>
                                     </li>
                                 </div>

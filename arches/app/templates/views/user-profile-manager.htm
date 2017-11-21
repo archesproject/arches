@@ -322,7 +322,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="project-status" data-bind="text:project.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: project.active()}"></div>
                                                 <ul class="project-metadata">
                                                     <li class="project-metadata-item">
-                                                        September 19, 2017 to September 30, 2017
+                                                        <span data-bind="text: project.startdate() || '?'"></span>
+                                                        {% trans 'to' %}
+                                                        <span data-bind="text: project.enddate() || '?'"></span>
                                                     </li>
                                                 </ul>
                                             </div>
