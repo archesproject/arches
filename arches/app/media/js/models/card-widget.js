@@ -14,7 +14,8 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'widget_id': '',
                 'config': {},
                 'label': '',
-                'sortorder': null
+                'sortorder': null,
+                'disabled': false
             };
             this.widgetLookup = widgets;
             options || (options = {});
@@ -23,6 +24,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             this.node = (options.node || null);
             this.card = (options.card || null);
             this.datatype = (options.datatype || null);
+            this.disabled = (options.disabled || false);
             this.icon = 'ion-ios-paper';
             if (this.datatype) {
                 this.icon = this.datatype.iconclass;

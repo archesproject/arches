@@ -71,6 +71,7 @@ class Card(models.CardModel):
         # self.visible
         # self.sortorder
         # end from models.CardModel
+        self.disabled = False
         self.cardinality = ''
         self.cards = []
         self.widgets = []
@@ -139,6 +140,10 @@ class Card(models.CardModel):
 
         return self
 
+    def confirm_enabled_state(self, user, nodegroup):
+        if user.has_perms(['delete_nodegroup','write_nodegroup'], self.nodegroup) == False:
+            self.disabled = True
+
     def get_edge_to_parent(self):
         """
         Finds the edge model that relates this card to it's parent node
@@ -155,12 +160,13 @@ class Card(models.CardModel):
         perm -- the permission string to check (eg: 'read_nodegroup')
 
         """
-
         if user:
             if user.has_perm(perm, self.nodegroup):
+                self.confirm_enabled_state(user, self.nodegroup)
                 cards = []
                 for card in self.cards:
                     if user.has_perm(perm, card.nodegroup):
+                        card.confirm_enabled_state(user, card.nodegroup)
                         cards.append(card)
                 self.cards = cards
             else:
@@ -182,6 +188,7 @@ class Card(models.CardModel):
         ret['widgets'] = self.widgets
         ret['is_editable'] = self.is_editable
         ret['ontologyproperty'] = self.ontologyproperty
+        ret['disabled'] = self.disabled
 
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
@@ -204,7 +211,6 @@ class Card(models.CardModel):
                     widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
                     widget_model.label = node.name
                     ret['widgets'].append(widget_model)
-
         return ret
 
 
