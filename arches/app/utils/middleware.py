@@ -1,6 +1,5 @@
 import time
-from datetime import datetime
-from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import text_type
