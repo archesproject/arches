@@ -29,7 +29,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         username = decoded_dict.get('username', None)
         expiration = decoded_dict.get('expiration', None)
 
-        user = AnonymousUser()
+        user = None
         try:
             user = User.objects.get(username=username)
         except:
@@ -41,7 +41,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         if int(expiration) < int(time.time()):
             raise AuthenticationFailed(_('Token Expired.'))
 
-        return user
+        return user or AnonymousUser()
 
     def process_request(self, request):
         assert hasattr(request, 'token'), (
