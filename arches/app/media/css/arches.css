@@ -4422,7 +4422,7 @@ ul.jqtree_common li.jqtree-folder {
 .project-search-widget {
     position: absolute;
     top: -45px;
-    width: 350px;
+    width: 250px;
 }
 
 .profile-default-message-panel {
@@ -9252,7 +9252,7 @@ a.search-facet-item.disabled {
 }
 
 .mobile-project-manager-editor .clear-node-search {
-    top: 37px;
+    top: 50px;
 }
 
 .mobile-project-manager-editor .card-nav-container {

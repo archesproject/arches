@@ -304,7 +304,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" style="width: 250px;" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
@@ -326,7 +326,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <h3 class="project-panel-title" data-bind="text: project.name"></h3>
+                                            <h3 class="project-panel-title" data-bind="text: project.name() === '' ? '{% trans "Unnamed Survey" %}' : project.name()"></h3>
 
                                             <div class="">
                                                 <div class="project-details">
