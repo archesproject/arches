@@ -104,22 +104,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--Project heading-->
                         <div class="project-panel-header edit-mode">
-                            <div class="">
-                                <div class="project-status" data-bind="css: selectedProject().active() ? 'active' : 'inactive', text: selectedProject().active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
-                            </div>
                             <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Survey" %}' : selectedProject().name()"></h3>
+                            <ul class="msm-edit-buttons">
+                                <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
+                            </ul>
 
                             <div class="">
-                                <ul class="project-metadata">
+                                <div class="project-details">
+                                    <div class="project-status" data-bind="css: selectedProject().active() ? 'active' : 'inactive', text: selectedProject().active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></div>
                                     <li class="project-metadata-item">
                                         <span data-bind="text: selectedProject().startdate() || '?'"></span>
                                         to
                                         <span data-bind="text: selectedProject().enddate() || '?'"></span>
                                     </li>
-                                </ul>
-                                <div class="project-details">
-                                    <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                                 </div>
                             </div>
                         </div>

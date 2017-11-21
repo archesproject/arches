@@ -318,17 +318,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
-                                            <div class="">
+                                            <div class="user-survey">
                                                 <div class="project-status" data-bind="text:project.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: project.active()}"></div>
-                                            </div>
-                                            <h3 class="project-panel-title" data-bind="text: project.name"></h3>
-
-                                            <div class="">
                                                 <ul class="project-metadata">
                                                     <li class="project-metadata-item">
                                                         September 19, 2017 to September 30, 2017
                                                     </li>
                                                 </ul>
+                                            </div>
+                                            <h3 class="project-panel-title" data-bind="text: project.name"></h3>
+
+                                            <div class="">
                                                 <div class="project-details">
                                                     <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.projectManager.getProjectResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
