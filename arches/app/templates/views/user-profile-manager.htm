@@ -205,7 +205,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <div class="col-sm-5">
                                             <p class="account-tips">
-                                                {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
+                                                {% trans 'Arches uses your e-maill to alert you to surveys and tasks assigned to you.' %}
                                             </p>
                                         </div>
                                     </div>
@@ -287,12 +287,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- My Projects -->
                 <div class="profile-list profile-projects">
                     <div class="profile-header">
-                        My Projects
+                        {% trans 'My Surveys' %}
                     </div>
 
                     <!--ko ifnot: projectManager.projects().length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
-                        Sorry, but you haven't been invited to a project yet...
+                        {% trans "Sorry, but you haven't been invited to a survey yet..." %}
                     </div>
                     <!--/ko-->
 
@@ -301,16 +301,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
 
-                            <!-- Find a project -->
+                            <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" style="width: 250px;" placeholder="Find a project..." data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Projects List -->
+                        <!-- Survey List -->
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
@@ -318,17 +318,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
-                                            <div class="">
+                                            <div class="user-survey">
                                                 <div class="project-status" data-bind="text:project.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: project.active()}"></div>
-                                            </div>
-                                            <h3 class="project-panel-title" data-bind="text: project.name"></h3>
-
-                                            <div class="">
                                                 <ul class="project-metadata">
                                                     <li class="project-metadata-item">
-                                                        September 19, 2017 to September 30, 2017
+                                                        <span data-bind="text: project.startdate() || '?'"></span>
+                                                        {% trans 'to' %}
+                                                        <span data-bind="text: project.enddate() || '?'"></span>
                                                     </li>
                                                 </ul>
+                                            </div>
+                                            <h3 class="project-panel-title" data-bind="text: project.name() === '' ? '{% trans "Unnamed Survey" %}' : project.name()"></h3>
+
+                                            <div class="">
                                                 <div class="project-details">
                                                     <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.projectManager.getProjectResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
@@ -339,7 +341,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- <div class='profile-mpm-panel' data-bind="slideToggle: $data.showDetails, duration: 400, easing: 'swing'"> -->
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    Project Summary
+                                                    {% trans 'Survey Summary' %}
                                                 </p>
                                                 <ul class="mpm-node-detail-metadata">
                                                     <li class="">
@@ -379,7 +381,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="">
                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    Models and Data Entry Cards
+                                                    {% trans 'Models and Data Entry Cards' %}
                                                 </p>
 
                                                     <ul class="mpm-node-detail-metadata">
@@ -579,7 +581,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     define('profile-manager-data', [], function() {
         return {
             'error_count': {{form.errors|length}},
-            'projects': {{user_projects}},
+            'projects': {{user_surveys}},
             'identities': {{identities}},
             'resources': {{resources}}
         }

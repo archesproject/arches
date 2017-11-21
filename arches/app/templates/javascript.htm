@@ -187,8 +187,8 @@
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 form_manager: function(graphid){return "{% url 'form_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 permission_manager: function(graphid){return "{% url 'permission_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                project_resources: function(projectid){return "{% url 'project_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', projectid)},
-                project: "{% url 'project_manager' %}"
+                mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
+                mobile_survey: "{% url 'mobile_survey_manager' %}"
             },
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
@@ -206,9 +206,9 @@
                 title: "{% trans 'Delete map layer?' %}",
                 text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
-            confirmProjectDelete: {
-                title: "{% trans 'Delete project?' %}",
-                text: "{% trans 'Deleting this project will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
+            confirmSurveyDelete: {
+                title: "{% trans 'Delete survey?' %}",
+                text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
             graphImportFailed: {
                 title: "{% trans 'Graph import failed.'%}"

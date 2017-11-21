@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.models.project import Project
+from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -62,8 +62,8 @@ class UserManagerView(BaseManagerView):
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
 
-        user_projects = [pxu.mobile_project for pxu in models.MobileProjectXUser.objects.filter(user=user)]
-        user_projects_by_group = [pxu_x_group.mobile_project for pxu_x_group in models.MobileProjectXGroup.objects.filter(group__in=user.groups.all())]
+        user_projects = [pxu.mobile_survey for pxu in models.MobileSurveyXUser.objects.filter(user=user)]
+        user_projects_by_group = [pxu_x_group.mobile_survey for pxu_x_group in models.MobileSurveyXGroup.objects.filter(group__in=user.groups.all())]
 
         for gp in user_projects_by_group:
              if gp not in user_projects:
@@ -88,7 +88,7 @@ class UserManagerView(BaseManagerView):
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
 
-            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'], sort_keys=False)
+            context['user_surveys'] = JSONSerializer().serialize(user_details['user_projects'], sort_keys=False)
             context['identities'] = JSONSerializer().serialize(user_details['identities'], sort_keys=False)
             context['resources'] = JSONSerializer().serialize(user_details['resources'], sort_keys=False)
 
@@ -109,7 +109,7 @@ class UserManagerView(BaseManagerView):
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-            context['user_projects'] = JSONSerializer().serialize(user_details['user_projects'])
+            context['user_surveys'] = JSONSerializer().serialize(user_details['user_projects'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
             context['resources'] = JSONSerializer().serialize(user_details['resources'])
 
@@ -140,7 +140,7 @@ class UserManagerView(BaseManagerView):
         all_ordered_card_ids = []
 
         for project in project_models:
-            proj = Project.objects.get(id=project.id)
+            proj = MobileSurvey.objects.get(id=project.id)
             project_dict = proj.serialize()
             all_ordered_card_ids += project_dict['cards']
             projects.append(project_dict)

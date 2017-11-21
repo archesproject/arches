@@ -23,32 +23,32 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.utils.translation import ugettext as _
 
 
-class Project(models.MobileProject):
+class MobileSurvey(models.MobileSurveyModel):
     """
-    Used for mapping complete project objects to and from the database
+    Used for mapping complete mobile survey objects to and from the database
     """
 
     class Meta:
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super(Project, self).__init__(*args, **kwargs)
-        # from models.MobileProject
+        super(MobileSurvey, self).__init__(*args, **kwargs)
+        # from models.MobileSurveyModel
         # self.id = models.UUIDField(primary_key=True, default=uuid.uuid1)
         # self.name = models.TextField(null=True)
         # self.active = models.BooleanField(default=False)
         # self.createdby = models.ForeignKey(User, related_name='createdby')
         # self.lasteditedby = models.ForeignKey(User, related_name='lasteditedby')
-        # self.users = models.ManyToManyField(to=User, through='MobileProjectXUser')
-        # self.groups = models.ManyToManyField(to=Group, through='MobileProjectXGroup')
+        # self.users = models.ManyToManyField(to=User, through='MobileSurveyXUser')
+        # self.groups = models.ManyToManyField(to=Group, through='MobileSurveyXGroup')
         # self.startdate = models.DateField(blank=True, null=True)
         # self.enddate = models.DateField(blank=True, null=True)
         # self.description = models.TextField(null=True)
-        # end from models.MobileProject
+        # end from models.MobileSurvey
 
     def save(self):
         #with transaction.atomic():
-        super(Project, self).save()
+        super(MobileSurvey, self).save()
 
     def serialize(self):
         """
@@ -63,6 +63,6 @@ class Project(models.MobileProject):
         return ret
 
     def get_ordered_cards(self):
-        ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=self).order_by('sortorder')
+        ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=self).order_by('sortorder')
         ordered_card_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
         return ordered_card_ids

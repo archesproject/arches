@@ -2,14 +2,14 @@ define([
     'underscore',
     'knockout',
     'views/base-manager',
-    'viewmodels/project-manager',
+    'viewmodels/mobile-survey-manager',
     'viewmodels/alert',
-    'models/project',
-    'project-manager-data',
+    'models/mobile-survey',
+    'mobile-survey-manager-data',
     'arches',
     'bindings/datepicker'
-], function(_, ko, BaseManagerView, ProjectManagerViewModel, AlertViewModel, ProjectModel, data, arches) {
-    var viewModel = new ProjectManagerViewModel(data);
+], function(_, ko, BaseManagerView, MobileSurveyManagerViewModel, AlertViewModel, MobileSurveyModel, data, arches) {
+    var viewModel = new MobileSurveyManagerViewModel(data);
 
     viewModel.saveProject = function() {
         var self = this;
@@ -33,7 +33,7 @@ define([
 
     viewModel.newProject = function() {
         if (!this.selectedProject() || !this.selectedProject().dirty()) {
-            this.selectedProject(new ProjectModel({
+            this.selectedProject(new MobileSurveyModel({
                 source: {
                     name: '',
                     active: false,
@@ -53,7 +53,7 @@ define([
     viewModel.deleteProject = function(project){
         if (!project.active()) {
             var self = this;
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmProjectDelete.title, arches.confirmProjectDelete.text, function() {
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmSurveyDelete.title, arches.confirmSurveyDelete.text, function() {
                 return;
             }, function(a){
                 self.loading(true)
