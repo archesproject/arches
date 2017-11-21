@@ -19,11 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 from datetime import datetime, timedelta
 from django.template.loader import render_to_string
+from django.http import HttpResponse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
@@ -36,6 +38,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.forms import ArchesUserCreationForm
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from jose import jws
 
 
 def index(request):
@@ -191,6 +194,22 @@ def confirm_signup(request):
             'postdata': userinfo,
             'validation_help': validation.password_validators_help_texts()
         })
+
+@csrf_exempt
+def get_token(request):
+
+    """
+    the above token need to be saved in database, and a one-to-one
+    relation should exist with the username/user_pk
+    """
+
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    expiry = int(time.time()) + timedelta(days=50).total_seconds()
+    token = jws.sign({'username': user.username, 'expiry':expiry}, settings.JWT_KEY, algorithm='HS256')
+
+    return HttpResponse(token)
 
 def search(request):
     return render(request, 'views/search.htm')

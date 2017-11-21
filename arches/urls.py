@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^auth/password$', main.change_password, name='change_password'),
     url(r'^auth/signup$', main.signup, name='signup'),
     url(r'^auth/confirm_signup$', main.confirm_signup, name='confirm_signup'),
+    url(r'^auth/get_token$', main.get_token, name='get_token'),
     url(r'^auth/', main.auth, name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
