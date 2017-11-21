@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import text_type
+from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from jose import jwt, jws
@@ -29,20 +30,17 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         username = decoded_dict.get('username', None)
         expiration = decoded_dict.get('expiration', None)
 
-        print 'in get_user_from_token'
-
-
         user = AnonymousUser()
         try:
             user = User.objects.get(username=username)
-        except model.DoesNotExist:
-            raise exceptions.AuthenticationFailed(_('Invalid token.'))
+        except:
+            raise AuthenticationFailed(_('Invalid token.'))
 
         if not user.is_active:
-            raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
+            raise AuthenticationFailed(_('User inactive or deleted.'))
 
         if int(expiration) < int(time.time()):
-            raise exceptions.AuthenticationFailed(_('Token Expired.'))
+            raise AuthenticationFailed(_('Token Expired.'))
 
         return user
 
@@ -78,81 +76,5 @@ class TokenMiddleware(MiddlewareMixin):
         request.token = token
 
 
-# from django.utils.functional import SimpleLazyObject
-# from django.contrib.auth.models import AnonymousUser
-
-# def get_user_jwt(request):
-#     """
-#     Replacement for django session auth get_user & auth.get_user
-#      JSON Web Token authentication. Inspects the token for the user_id,
-#      attempts to get that user from the DB & assigns the user on the
-#      request object. Otherwise it defaults to AnonymousUser.
-
-#     This will work with existing decorators like LoginRequired  ;)
-
-#     Returns: instance of user object or AnonymousUser object
-#     """
-
-#     user = None
-#     try:
-#         user_jwt = request.user
-#         if user_jwt is not None:
-#             # store the first part from the tuple (user, obj)
-#             user = user_jwt[0]
-#     except:
-#         pass
-
-#     return user or AnonymousUser()
-
-
-# class JWTAuthenticationMiddleware(MiddlewareMixin):
-#     """ Middleware for authenticating JSON Web Tokens in Authorize Header """
-#     def process_request(self, request):
-#         request.user = SimpleLazyObject(lambda : get_user_jwt(request))
-
-
-# class JWTAuthentication(object):
-
-#     """
-#     Simple token based authentication.
-#     Clients should authenticate by passing the token key in the "Authorization"
-#     HTTP header, prepended with the string "Token ".  For example:
-#     Authorization: Token 401f7ac837da42b97f613d789819ff93537bee6a
-#     """
-
-#     def authenticate(self, request):
-#         auth = get_authorization_header(request).split()
-
-#         if not auth or auth[0].lower() != b'token':
-#             return None
-
-#         try:
-#             token = auth[1].decode()
-#         except UnicodeError:
-#             msg = _('Invalid token header. Token string should not contain invalid characters.')
-#             raise exceptions.AuthenticationFailed(msg)
-
-#         return self.authenticate_credentials(token)
-
-#     def authenticate_credentials(self, payload):
-
-#         decoded_dict = jws.verify(payload, 'seKre8', algorithms=['HS256'])
-
-#         username = decoded_dict.get('username', None)
-#         expiry = decoded_dict.get('expiry', None)
-
-#         try:
-#             usr = User.objects.get(username=username)
-#         except model.DoesNotExist:
-#             raise exceptions.AuthenticationFailed(_('Invalid token.'))
-
-#         if not usr.is_active:
-#             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
-
-#         if expiry < datetime.date.today():
-#             raise exceptions.AuthenticationFailed(_('Token Expired.'))
-
-#         return (usr, payload)
-
-#     def authenticate_header(self, request):
-#         return 'Token'
+class AuthenticationFailed(Exception):
+    pass
