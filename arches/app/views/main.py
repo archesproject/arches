@@ -34,7 +34,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth.password_validation as validation
 from arches.app.models.system_settings import settings
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, Http401Response
 from arches.app.utils.forms import ArchesUserCreationForm
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -206,10 +206,13 @@ def get_token(request):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)
-    expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
-    token = jws.sign({'username': user.username, 'expiration':expiration}, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
+    if user:
+        expiration = int(time.time()) + timedelta(days=settings.JWT_TOKEN_EXPIRATION).total_seconds()
+        token = jws.sign({'username': user.username, 'expiration':expiration}, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
 
-    return HttpResponse(token)
+        return HttpResponse(token)
+    else:
+        return Http401Response(www_auth_header='Bearer')
 
 def search(request):
     return render(request, 'views/search.htm')
