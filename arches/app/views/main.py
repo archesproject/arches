@@ -34,7 +34,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth.password_validation as validation
 from arches.app.models.system_settings import settings
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.utils.forms import ArchesUserCreationForm
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
