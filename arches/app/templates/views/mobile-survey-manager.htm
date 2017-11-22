@@ -255,41 +255,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div>
                                                     <div class="flex relative">
 
-                                                        <div class="mpm-left-panel" style="" data-bind="with:resourceList">
+                                                        <div class="msm-resource-panel" style="" data-bind="with:resourceList">
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="mpm-right-panel">
+                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
-
-                                                                <div class="row">
-                                                                    <!--ko if: resourceList.selected() -->
-                                                                    <div class="col-xs-12 col-sm-5 col-md-3">
-
-                                                                        <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
-                                                                            <span>
-                                                                                <i data-bind="css: (resourceList.selected().iconclass || 'fa fa-question')"></i>
-                                                                            </span>
-                                                                        </span>
-
-                                                                        <div class="mpm-group-name">
-                                                                            <a class="listitem_name" data-bind="text:resourceList.selected().name"></a>
-                                                                        </div>
-                                                                        <div class="mpm-group-subtitle" data-bind='text:resourceList.selected().subtitle'></div>
-                                                                    </div>
-                                                                    <!--/ko-->
-                                                                </div>
-
-
-
-
                                                                 <!--ko if: resourceList.selected() -->
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
-                                                                 <div class="mpm-card-toolbar">
+                                                                 <div class="msm-card-toolbar">
                                                                      <h4 class="mpm-item-listing-header">{% trans 'Data Entry Forms' %}</h4>
                                                                      <div class="mpm-card-filter">
-                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
+                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
                                                                      </div>
                                                                  </div>
                                                                 <div class="mpm-card-container">
