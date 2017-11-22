@@ -19,7 +19,7 @@
             <div class="mpm-group-subtitle" data-bind="text: $data.subtitle"></div>
         </div>
         <div class="msm-resource-status">
-            <div class="user-groups" data-bind="text: $data.added() ? 'Added' : 'Not added', css: {'added': $data.added}"></div>
+            <div class="user-groups" data-bind="text: $data.cardcount() + ' Forms Selected', css: {'added': $data.added}"></div>
         </div>
     </div>
 </div>
