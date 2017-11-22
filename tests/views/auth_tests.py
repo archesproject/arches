@@ -31,7 +31,7 @@ from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
 from arches.app.views.main import auth
 from arches.app.views.concept import RDMView
-from arches.app.utils.set_anonymous_user import SetAnonymousUser
+from arches.app.utils.middleware import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
 
 # these tests can be run from the command line via
