@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import uuid
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
@@ -63,6 +64,12 @@ class Command(BaseCommand):
         with open(source) as f:
             details = json.load(f)
 
+        try:
+            uuid.UUID(details['widgetid'])
+        except:
+            details['widgetid'] = unicode(uuid.uuid4())
+            print "Registering widget with widgetid:", details['widgetid']
+
         instance = models.Widget(
             widgetid = details['widgetid'],
             name = details['name'],
@@ -72,10 +79,7 @@ class Command(BaseCommand):
             component = details['component']
         )
 
-        try:
-            instance.save()
-        except IntegrityError as e:
-            print "{0} already exists".format(instance.name)
+        instance.save()
 
     def update(self, source):
         """

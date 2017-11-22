@@ -2,20 +2,20 @@ define([
     'arches',
     'underscore',
     'knockout',
-    'views/project-manager/identity-list',
-    'views/project-manager/resource-list',
-    'models/project',
+    'views/mobile-survey-manager/identity-list',
+    'views/mobile-survey-manager/resource-list',
+    'models/mobile-survey',
     'bindings/sortable'
-], function(arches, _, ko, IdentityList, ResourceList, ProjectModel) {
+], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
     * A base viewmodel for project management
     *
     * @constructor
-    * @name ProjectManagerViewModel
+    * @name MobileSurveyManagerViewModel
     *
     * @param  {string} params - a configuration object
     */
-    var ProjectManagerViewModel = function(params) {
+    var MobileSurveyManagerViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
 
@@ -74,7 +74,7 @@ define([
             }
             if (!project.collectedResources()) {
                 $.ajax({
-                    url: arches.urls.project_resources(project.id)
+                    url: arches.urls.mobile_survey_resources(project.id)
                 })
                 .done(successCallback)
                 .fail(function(data){console.log('request failed', data)})
@@ -96,7 +96,7 @@ define([
 
         this.projects = ko.observableArray(
             params.projects.map(function (project) {
-                return new ProjectModel({
+                return new MobileSurveyModel({
                     source: project,
                     identities: params.identities
                 });
@@ -130,5 +130,5 @@ define([
         });
 
     };
-    return ProjectManagerViewModel;
+    return MobileSurveyManagerViewModel;
 });

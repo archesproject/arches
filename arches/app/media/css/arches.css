@@ -4422,7 +4422,7 @@ ul.jqtree_common li.jqtree-folder {
 .project-search-widget {
     position: absolute;
     top: -45px;
-    width: 350px;
+    width: 250px;
 }
 
 .profile-default-message-panel {
@@ -9252,7 +9252,7 @@ a.search-facet-item.disabled {
 }
 
 .mobile-project-manager-editor .clear-node-search {
-    top: 37px;
+    top: 50px;
 }
 
 .mobile-project-manager-editor .card-nav-container {
@@ -9371,6 +9371,12 @@ a.search-facet-item.disabled {
     font-style: inherit;
     font-size: 12px;
     font-weight: 600;
+}
+
+.user-survey .project-status {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 .identities-list .mpm-left-panel .library-card-main.user {
@@ -9747,10 +9753,8 @@ a.search-facet-item.disabled {
 }
 
 .project-status {
-	position: absolute;
-	top: 10px;
-	right: 10px;
 	width: 70px;
+    height: 28px;
 	font-size: 13px;
 	color: #777;
 	padding: 3px;
@@ -9771,7 +9775,15 @@ a.search-facet-item.disabled {
 .project-metadata {
 	position: absolute;
     top: 35px;
-    right: 5px;
+    right: 0px;
+    list-style: none;
+    font-size: 14px;
+}
+
+.msm-edit-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     list-style: none;
     font-size: 14px;
 }
@@ -9783,10 +9795,12 @@ a.search-facet-item.disabled {
 }
 
 .project-details {
-	position: absolute;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
 	top: 40px;
-	left: 20px;
 	font-size: 14px;
+    margin-left: 10px;
 }
 
 .card-panel-body {

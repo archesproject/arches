@@ -26,7 +26,7 @@ from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
-from arches.app.views.project import ProjectManagerView, ProjectResources
+from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources
 from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -118,8 +118,8 @@ urlpatterns = [
     url(r'^map_layer_manager/(?P<maplayerid>%s)$' % uuid_regex, MapLayerManagerView.as_view(), name='map_layer_update'),
     url(r'^map_layer_manager/*', MapLayerManagerView.as_view(), name="map_layer_manager"),
     url(r'^user$', UserManagerView.as_view(), name="user_profile_manager"),
-    url(r'^project_resources/(?P<projectid>%s)/resources$' % uuid_regex, ProjectResources.as_view(), name='project_resources'),
-    url(r'^project_manager/*', ProjectManagerView.as_view(), name="project_manager"),
+    url(r'^mobile_survey_resources/(?P<surveyid>%s)/resources$' % uuid_regex, MobileSurveyResources.as_view(), name='mobile_survey_resources'),
+    url(r'^mobile_survey_manager/*', MobileSurveyManagerView.as_view(), name="mobile_survey_manager"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
