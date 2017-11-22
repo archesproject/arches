@@ -12,26 +12,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
             WidgetViewModel.apply(this, [params]);
-
-            var self = this;
-            var defaultValue = ko.unwrap(this.defaultValue)
-
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
-                this.value(defaultValue);
-            }
-
-            if (!self.form) {
-                self.value.subscribe(function(val){
-                    if (self.defaultValue() != val) {
-                        self.defaultValue(val)
-                    };
-                });
-                self.defaultValue.subscribe(function(val){
-                    if (self.value() != val) {
-                        self.value(val)
-                    };
-                });
-            };
         },
         template: { require: 'text!widget-templates/text' }
     });
