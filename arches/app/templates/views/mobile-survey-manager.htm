@@ -259,7 +259,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected()">
+                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
                                                                 <!--ko if: resourceList.selected() -->
@@ -267,7 +267,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                  <div class="msm-card-toolbar">
                                                                      <h4 class="mpm-item-listing-header">{% trans 'Data Entry Forms' %}</h4>
                                                                      <div class="mpm-card-filter">
-                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
+                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
                                                                      </div>
                                                                  </div>
                                                                 <div class="mpm-card-container">

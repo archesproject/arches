@@ -26,6 +26,7 @@ define([
             this.items = options.items;
             this.cardFilter = ko.observable('');
             this.selectedIndex = ko.observable(0);
+            this.hideResourceList = ko.observable(false);
 
             this.initCards = function(cards){
                 _.each(cards, function(card){
@@ -98,9 +99,14 @@ define([
 
             this.selected = ko.computed(function(){
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
-                res == '' || self.selectedIndex(_.indexOf(self.items(), res))
-                console.log(self.selectedIndex())
                 return res;
+            })
+
+            this.filteredItems = ko.computed(function(){
+                var filtered = _.filter(self.items(), function(item){return !item.filtered()});
+                self.selectedIndex(_.indexOf(filtered, self.selected()));
+                self.hideResourceList(!_.contains(filtered, self.selected())) //If the selected item is filtered out, we need to hide its cards
+                return filtered;
             })
         }
 
