@@ -9309,7 +9309,7 @@ a.search-facet-item.disabled {
 .mpm-card-list {
     min-height: 400px;
     min-width: 200px;
-    max-width: 1125px;
+    /*max-width: 1125px;*/
     width: 50%;
 }
 
@@ -9393,7 +9393,8 @@ a.search-facet-item.disabled {
 
 
 .mobile-project-manager-editor .identities-list .library-card {
-    margin-left:0;
+    margin-left: 0;
+    border-left: 0;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -9418,6 +9419,22 @@ a.search-facet-item.disabled {
     padding: 10px;
 }
 
+.msm-resource-cards {
+    position: absolute;
+    top: 15px;
+    width: 100%;
+    height: 490px;
+    padding: 10px;
+}
+
+.msm-resource-status {
+    display: inline-block;
+    width: 100%;
+    padding-right: 10px;
+    padding-top: 30px;
+    text-align: right;
+}
+
 .mpm-group-users {
     height: 390px;
     overflow-y: scroll;
@@ -9437,6 +9454,32 @@ a.search-facet-item.disabled {
 
 .mpm-account-detail-panel {
     margin: 20px 0px;
+}
+
+
+.msm-resource-panel .mpm-group-name {
+    position: relative;
+    padding-left: 25px;
+    left: 0px;
+    top: 0px;
+}
+
+.msm-resource-panel .mpm-group-subtitle {
+    position: relative;
+    padding-left: 25px;
+    left: 0px;
+    top: 0px;
+}
+
+.msm-resource-panel .library-icon {
+    position: relative;
+    padding: 0 5px;
+    left: 0;
+    top: 0;
+}
+
+.msm-resource-panel .title-block-title {
+    width: auto;
 }
 
 .mpm-group-name {
@@ -9473,14 +9516,14 @@ a.search-facet-item.disabled {
     overflow-y: hidden;
     margin-top: 5px;
     margin-right: 35px;
+    width: 100%;
 }
 
-.mpm-card-toolbar {
+.msm-card-toolbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
-    padding-right: 35px;
     padding-top: 10px;
 }
 
@@ -9510,10 +9553,47 @@ a.search-facet-item.disabled {
 
 .library-card-main.mpm-resource-list {
     top: 7px;
+    overflow:visible;
+    cursor: pointer;
+    width:100%;
 }
 
 .library-card-main.mpm-resource-list .added {
     color: #64bd63;
+}
+
+.msm-resource-list-header {
+    display:flex;
+    flex-direction: row;
+    left: 0px;
+}
+
+.msm-resource-panel {
+    width: 100%;
+}
+
+.msm-resource-name {
+    display: flex;
+    flex-direction: column;
+}
+
+.msm-resource-panel .library-card.selected.selected-card {
+    height: 550px;
+    -webkit-transition: height 0.25s;
+    /* Safari */
+    transition: height 0.25s;
+    background: #ffffff;
+    border-left: 0;
+}
+
+.msm-resource-panel .title-block-fixed {
+    display: flex;
+    background: white;
+    width: -webkit-fill-available;
+    margin-left: 0;
+    padding-bottom: 13px;
+    padding-top: 20px;
+    justify-content: space-between;
 }
 
 .list-group-item .mpm-user-summary {
@@ -9521,6 +9601,19 @@ a.search-facet-item.disabled {
     transition: height 600ms ease-out;
     overflow: hidden;
     padding: 0;
+}
+
+.msm-resource-panel .grid {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.msm-resource-panel .list-filter {
+    width: 250px;
+}
+
+.msm-resource-cards .mpm-card-container {
+    margin-right: 0;
 }
 
 .list-group-item .mpm-user-summary.expanded {
