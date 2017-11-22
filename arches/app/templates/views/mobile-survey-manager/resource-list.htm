@@ -2,27 +2,25 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block title %}{% trans "Resources" %}{% endblock %}
+{% block title %}{% trans "Click on the Resources you want to add to your project" %}{% endblock %}
 
 {% block search_placeholder %}{% trans "Find resource" %}{% endblock %}
 
 {% block listitem %}
-    <div data-bind="attr:{'title': $data.groups}">
-        <div class="library-icon" style="">
-        </div>
-
+<div data-bind="attr:{'title': $data.groups}">
+    <div class="library-card-main mpm-resource-list msm-resource-list-header">
         <div class="library-icon" style="" data-bind="">
             <span class="icon-wrap icon-wrap-sm ep-graph-title-icon">
                 <i data-bind="css: ($data.iconclass || 'fa fa-question')"></i>
             </span>
         </div>
-
-        <div class="library-card-main mpm-resource-list">
-            <a class="name">
-                <div data-bind="text: $data.name"></div>
-            </a>
-            <div class="user-groups" data-bind="text: $data.subtitle"></div>
+        <div class="msm-resource-name">
+            <div class="mpm-group-name"><a class="listitem-name" data-bind="text: $data.name"></a></div>
+            <div class="mpm-group-subtitle" data-bind="text: $data.subtitle"></div>
+        </div>
+        <div class="msm-resource-status">
             <div class="user-groups" data-bind="text: $data.added() ? 'Added' : 'Not added', css: {'added': $data.added}"></div>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -25,6 +25,7 @@ define([
             var self = this;
             this.items = options.items;
             this.cardFilter = ko.observable('');
+            this.selectedIndex = ko.observable(0);
 
             this.initCards = function(cards){
                 _.each(cards, function(card){
@@ -97,6 +98,8 @@ define([
 
             this.selected = ko.computed(function(){
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
+                res == '' || self.selectedIndex(_.indexOf(self.items(), res))
+                console.log(self.selectedIndex())
                 return res;
             })
         }
