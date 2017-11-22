@@ -14,7 +14,27 @@ define([
      * @param {string} params.config.options -
      */
     return ko.components.register('domain-radio-widget', {
-        viewModel: DomainWidgetViewModel,
+        viewModel: function(params) {
+            params.configKeys = ['defaultValue'];
+            DomainWidgetViewModel.apply(this, [params]);
+
+            var self = this;
+            var defaultValue = ko.unwrap(this.defaultValue)
+
+            if (!self.form) {
+                self.value.subscribe(function(){
+                    self.defaultValue(self.value())
+                })
+                self.defaultValue.subscribe(function(){
+                    self.value(self.defaultValue())
+                })
+            };
+
+            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+                this.value(defaultValue);
+            };
+
+        },
         template: {
             require: 'text!widget-templates/radio'
         }

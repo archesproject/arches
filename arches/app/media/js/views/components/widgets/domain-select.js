@@ -15,8 +15,14 @@ define([
      */
     return ko.components.register('domain-select-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder'];
+            params.configKeys = ['placeholder', 'defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
+
+            var defaultValue = ko.unwrap(this.defaultValue)
+
+            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+                this.value(defaultValue);
+            }
         },
         template: {
             require: 'text!widget-templates/select'

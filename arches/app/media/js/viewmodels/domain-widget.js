@@ -62,9 +62,27 @@ define([
             }
         };
 
-        this.isOptionSelected = function (opt) {
+        this.setDefaultOptionSelection = function(opt, selected) {
+            if (self.multiple) {
+                var val = self.defaultValue();
+                self.defaultValue(
+                    selected ?
+                    _.union([opt.id], val) :
+                    _.without(val ? val : [], opt.id)
+                );
+            } else if (selected) {
+              if (self.defaultValue() === opt.id) {
+                  self.defaultValue(null)
+                }
+              else {
+                  self.defaultValue(opt.id);
+              }
+            }
+        };
+
+        this.isOptionSelected = function (opt, val) {
             var selected = false;
-            var val = self.value();
+            var val = ko.unwrap(val);
             if (val && val.indexOf) {
                 selected = val.indexOf(opt.id) >= 0;
             }
