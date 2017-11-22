@@ -21,12 +21,16 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             }
 
             if (!self.form) {
-                self.value.subscribe(function(){
-                    self.defaultValue(self.value())
-                })
-                self.defaultValue.subscribe(function(){
-                    self.value(self.defaultValue())
-                })
+                self.value.subscribe(function(val){
+                    if (self.defaultValue() != val) {
+                        self.defaultValue(val)
+                    };
+                });
+                self.defaultValue.subscribe(function(val){
+                    if (self.value() != val) {
+                        self.value(val)
+                    };
+                });
             };
         },
         template: { require: 'text!widget-templates/text' }
