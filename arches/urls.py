@@ -27,6 +27,7 @@ from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.project import ProjectManagerView, ProjectResources
+from arches.app.views.auth import LoginView
 from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -42,7 +43,7 @@ urlpatterns = [
     url(r'^auth/signup$', main.signup, name='signup'),
     url(r'^auth/confirm_signup$', main.confirm_signup, name='confirm_signup'),
     url(r'^auth/get_token$', main.get_token, name='get_token'),
-    url(r'^auth/', main.auth, name='auth'),
+    url(r'^auth/', LoginView.as_view(), name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),

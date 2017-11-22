@@ -50,41 +50,6 @@ def index(request):
         'copyright_year': settings.COPYRIGHT_YEAR
     })
 
-@never_cache
-def auth(request):
-    auth_attempt_success = None
-    # POST request is taken to mean user is logging in
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is None:
-            try:
-                userobj = User.objects.get(email=username)
-                user = authenticate(username=userobj.username, password=password)
-            except:
-                auth_attempt_success = False
-        if user is not None and user.is_active:
-            login(request, user)
-            user.password = ''
-            auth_attempt_success = True
-        else:
-            auth_attempt_success = False
-
-    next = request.GET.get('next', reverse('home'))
-    if auth_attempt_success:
-        return redirect(next)
-    else:
-        if request.GET.get('logout', None) is not None:
-            logout(request)
-            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
-            return redirect('auth')
-        else:
-            return render(request, 'login.htm', {
-                'auth_failed': (auth_attempt_success is not None),
-                'next': next
-            })
-
 @login_required
 def change_password(request):
     messages = {'invalid_password': None, 'password_validations': None, 'success': None, 'other': None, 'mismatched':None}

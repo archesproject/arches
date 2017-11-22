@@ -29,7 +29,7 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
-from arches.app.views.main import auth
+from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
 from arches.app.utils.middleware import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
@@ -56,7 +56,8 @@ class AuthTests(ArchesTestCase):
         request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
         request.user = self.user
         apply_middleware(request)
-        response = auth(request)
+        view = LoginView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location') == reverse('home'))
