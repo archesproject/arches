@@ -20,6 +20,7 @@ from django.views.generic import View
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
 
 class LoginView(View):
     def get(self, request):
@@ -41,33 +42,24 @@ class LoginView(View):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+
         if user is None:
             try:
                 # try using the users email to login
                 userobj = User.objects.get(email=username)
                 user = authenticate(username=userobj.username, password=password)
             except:
-                auth_attempt_success = False
+                pass
 
+        next = request.GET.get('next', reverse('home'))
+        
         if user is not None and user.is_active:
             login(request, user)
             user.password = ''
             auth_attempt_success = True
-            #return redirect(next)
-        else:
-            auth_attempt_success = False
-
-        next = request.GET.get('next', reverse('home'))
-        if auth_attempt_success:
             return redirect(next)
-        else:
-            if request.GET.get('logout', None) is not None:
-                logout(request)
-                # need to redirect to 'auth' so that the user is set to anonymous via the middleware
-                return redirect('auth')
-            else:
-                print 'here i am'
-                return render(request, 'login.htm', {
-                    'auth_failed': (auth_attempt_success is not None),
-                    'next': next
-                })
+
+        return render(request, 'login.htm', {
+            'auth_failed': True,
+            'next': next
+        }, status=401)

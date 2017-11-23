@@ -62,6 +62,56 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location') == reverse('home'))
 
+    def test_login_w_email(self):
+        """
+        Test that a user can login with their email address and is redirected to the home page
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'test@archesproject.org', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('home'))
+
+    def test_invalid_credentials(self):
+        """
+        Test that a user can't login with invalid credentials
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'wrong', 'password': 'wrong'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 401)
+
+    def test_logout(self):
+        """
+        Test that a user can logout
+
+        """
+
+        view = LoginView.as_view()
+        
+        request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        request = self.factory.get(reverse('auth'), {'logout': 'true'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('auth'))
+
     def test_set_anonymous_user_middleware(self):
         """
         Test to check that any anonymous request to the system gets the anonymous user set on the
