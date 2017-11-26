@@ -7903,6 +7903,10 @@ a.clear-geojson-button:hover {
     text-align: center;
 }
 
+.library-grid {
+    padding: 10px 15px;
+}
+
 .library-grid-title {
     font-weight: normal;
     font-size: 15px;
@@ -9249,6 +9253,11 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .library-card {
     margin-left: -5px;
+    background: #fff;
+}
+
+.mobile-project-manager-editor .library-card:hover {
+    background: #fafafa;
 }
 
 .mobile-project-manager-editor .clear-node-search {
@@ -9302,12 +9311,15 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    margin-top: -54px;
-    margin-left: -35px;
+    padding: 20px;
+}
+
+.account-wrapper {
+    padding-top: 20px;
 }
 
 .mpm-card-list {
-    min-height: 400px;
+    min-height: 300px;
     min-width: 200px;
     /*max-width: 1125px;*/
     width: 50%;
@@ -9323,12 +9335,12 @@ a.search-facet-item.disabled {
 
 .mpm-card-list-items {
     overflow-y: auto;
-    height: 385px;
+    height: 365px;
 }
 
 .mpm-card-list-items .ko_container {
     min-height: 100%;
-    background-color: #f9f9f9;
+    background-color: #fbfbfb;
 }
 
 .mpm-card-list-header {
@@ -9397,6 +9409,11 @@ a.search-facet-item.disabled {
     border-left: 0;
 }
 
+.mobile-project-manager-editor .identities-list .library-card:first-child {
+    border-top: 1px solid #ddd;
+    margin-top: 5px;
+}
+
 .mobile-project-manager-editor .tab-content {
     padding:1px;
 }
@@ -9424,7 +9441,7 @@ a.search-facet-item.disabled {
     top: 15px;
     width: 100%;
     height: 490px;
-    padding: 10px;
+    padding: 10px 35px;
 }
 
 .msm-resource-status {
@@ -9512,7 +9529,6 @@ a.search-facet-item.disabled {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    height: 430px;
     overflow-y: hidden;
     margin-top: 5px;
     margin-right: 35px;
@@ -9524,11 +9540,11 @@ a.search-facet-item.disabled {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
-    padding-top: 10px;
+    padding: 60px 0px 15px 0px;
 }
 
 .mpm-card-filter {
-    width: 300px;
+    width: 400px;
 }
 
 .mpm-user-name h4 {
@@ -9552,10 +9568,17 @@ a.search-facet-item.disabled {
 }
 
 .library-card-main.mpm-resource-list {
-    top: 7px;
+    top: 8px;
     overflow:visible;
     cursor: pointer;
     width:100%;
+}
+
+.selected-card div .library-card-main.mpm-resource-list {
+    background: #fbfbfb;
+    padding: 6px 0px;
+    margin-top: -8px;
+    border-bottom: 1px solid #eee;
 }
 
 .library-card-main.mpm-resource-list .added {
@@ -9578,21 +9601,24 @@ a.search-facet-item.disabled {
 }
 
 .msm-resource-panel .library-card.selected.selected-card {
-    height: 550px;
+    height: 605px;
     -webkit-transition: height 0.25s;
     /* Safari */
     transition: height 0.25s;
     background: #ffffff;
-    border-left: 0;
+    border: 1px solid #ddd;
 }
 
 .msm-resource-panel .title-block-fixed {
     display: flex;
     background: white;
+    border-bottom-width: 0px;
     width: -webkit-fill-available;
     margin-left: 0;
     padding-bottom: 13px;
     padding-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
     justify-content: space-between;
 }
 
@@ -9606,6 +9632,11 @@ a.search-facet-item.disabled {
 .msm-resource-panel .grid {
     margin-left: 1px;
     margin-right: 1px;
+    width: 100%;
+    padding: 0px 20px 0px 20px;
+    background: #fff;
+    border-top-width: 0px;
+    max-width: 1600px;
 }
 
 .msm-resource-panel .list-filter {
@@ -9714,6 +9745,14 @@ a.search-facet-item.disabled {
 .mpm-user-status.user {
     padding: 4px 0px;
     text-align: left;
+}
+
+.mpm-instructions {
+    position: absolute;
+    top: 10px;
+    color: #555;
+    font-size: 13px;
+    padding: 15px 20px 5px 5px;
 }
 
 .mpm-user-name .mpm-user-status.invited {
