@@ -9311,7 +9311,7 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    padding: 20px;
+    padding: 10px;
 }
 
 .account-wrapper {
@@ -9347,7 +9347,7 @@ a.search-facet-item.disabled {
     padding: 10px;
     border-style: solid;
     border-width: 0.25px;
-    border-color: #eee;
+    border-color: #eaeaea;
     background-color: #f8f8f8;
 }
 
@@ -9407,6 +9407,7 @@ a.search-facet-item.disabled {
 .mobile-project-manager-editor .identities-list .library-card {
     margin-left: 0;
     border-left: 0;
+    height: 65px;
 }
 
 .mobile-project-manager-editor .identities-list .library-card:first-child {
@@ -9448,7 +9449,7 @@ a.search-facet-item.disabled {
     display: inline-block;
     width: 100%;
     padding-right: 10px;
-    padding-top: 30px;
+    padding-top: 25px;
     text-align: right;
 }
 
@@ -9478,7 +9479,7 @@ a.search-facet-item.disabled {
     position: relative;
     padding-left: 25px;
     left: 0px;
-    top: 0px;
+    top: 2px;
 }
 
 .msm-resource-panel .mpm-group-subtitle {
@@ -9492,7 +9493,7 @@ a.search-facet-item.disabled {
     position: relative;
     padding: 0 5px;
     left: 0;
-    top: 0;
+    top: 3px;
 }
 
 .msm-resource-panel .title-block-title {
@@ -9582,7 +9583,7 @@ a.search-facet-item.disabled {
 }
 
 .library-card-main.mpm-resource-list .added {
-    color: #64bd63;
+    color: #1E6FB7;
 }
 
 .msm-resource-list-header {
@@ -9615,7 +9616,7 @@ a.search-facet-item.disabled {
     border-bottom-width: 0px;
     width: -webkit-fill-available;
     margin-left: 0;
-    padding-bottom: 13px;
+    padding-bottom: 5px;
     padding-top: 20px;
     margin-left: 10px;
     margin-right: 10px;
@@ -9632,6 +9633,7 @@ a.search-facet-item.disabled {
 .msm-resource-panel .grid {
     margin-left: 1px;
     margin-right: 1px;
+    margin-top: 68px;
     width: 100%;
     padding: 0px 20px 0px 20px;
     background: #fff;
@@ -9639,8 +9641,15 @@ a.search-facet-item.disabled {
     max-width: 1600px;
 }
 
+
 .msm-resource-panel .list-filter {
-    width: 250px;
+    width: 400px;
+    height: 40px;
+    margin-top: -5px;
+}
+
+.msm-resource-panel .list-filter .clear-node-search {
+    margin-top: 4px;
 }
 
 .msm-resource-cards .mpm-card-container {
@@ -9676,6 +9685,9 @@ a.search-facet-item.disabled {
     padding-left: 5px;
 }
 
+.msm-resource-panel .ep-graph-title-icon {
+    background: #eee;
+}
 
 .mpm-user-groups {
     color: #777;

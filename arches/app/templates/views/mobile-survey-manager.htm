@@ -106,8 +106,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="project-panel-header edit-mode">
                             <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Survey" %}' : selectedProject().name()"></h3>
                             <ul class="msm-edit-buttons">
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                                 <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                             </ul>
 
                             <div class="">
@@ -261,22 +261,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
-                                                            <p class="mpm-instructions">
-                                                                Drag &amp; drop the forms you want in your project from the "Available forms" column to the "Selected forms" column.  <strong> Note that the order of the forms in the "Selected forms" column determines the order of display in the mobile app.</strong>
-                                                            </p>
+                                                        <div class="msm-resource-cards relative" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
+
+                                                                <p class="mpm-instructions">
+                                                                    Drag &amp; drop the forms you want in your project from the "Available forms" column to the "Selected forms" column.  <strong> Note that the order of the forms in the "Selected forms" column determines the order of display in the mobile app.</strong>
+                                                                </p>
+
                                                                 <!--ko if: resourceList.selected() -->
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
                                                                  <div class="msm-card-toolbar">
+
+
+                                                                    
                                                                      <div class="mpm-card-filter">
                                                                          <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mpm-card-container">
                                                                     <div class="mpm-card-list available">
-                                                                    <div class="mpm-card-list-header">{% trans 'Available to Add' %}</div>
+                                                                    <div class="mpm-card-list-header">{% trans 'Available forms' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data:resourceList.selected().cards, afterMove: selectedProject().updateUnapproved,  addToSelf: true}" class="ko_container ui-sortable">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === false)">
@@ -304,7 +309,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
                                                             </div>
                                                                     <div class="mpm-card-list approved">
-                                                                    <div class="mpm-card-list-header">{% trans 'Added to Survey' %}</div>
+                                                                    <div class="mpm-card-list-header">{% trans 'Selected forms' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved, addToSelf: true}" class="ko_container ui-sortable" style="min-height:100%">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.approved() === true)">
