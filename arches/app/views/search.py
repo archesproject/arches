@@ -33,7 +33,7 @@ from arches.app.models.concept import Concept
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.date_utils import SortableDate
 from arches.app.search.search_engine_factory import SearchEngineFactory
