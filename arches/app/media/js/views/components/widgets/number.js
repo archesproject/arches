@@ -10,7 +10,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('number-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width', 'min', 'max'];
+            params.configKeys = ['placeholder', 'width', 'min', 'max', 'defaultValue'];
 
             WidgetViewModel.apply(this, [params]);
             var self = this;
