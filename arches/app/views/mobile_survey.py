@@ -33,12 +33,12 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.models.project import Project
+from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.system_settings import settings
 from arches.app.views.base import BaseManagerView
 
 @method_decorator(group_required('Application Administrator'), name='dispatch')
-class ProjectManagerView(BaseManagerView):
+class MobileSurveyManagerView(BaseManagerView):
 
 
     def get(self, request):
@@ -68,23 +68,23 @@ class ProjectManagerView(BaseManagerView):
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
 
-        project_models = models.MobileProject.objects.order_by('name')
+        mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
 
-        projects, resources = self.get_project_resources(project_models)
+        mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
 
         serializer = JSONSerializer()
         context = self.get_context_data(
-            projects=serializer.serialize(projects, sort_keys=False),
+            mobile_surveys=serializer.serialize(mobile_surveys, sort_keys=False),
             identities=serializer.serialize(identities, sort_keys=False),
             resources=serializer.serialize(resources, sort_keys=False),
-            main_script='views/project-manager',
+            main_script='views/mobile-survey-manager',
         )
 
-        context['nav']['title'] = _('Mobile Project Manager')
+        context['nav']['title'] = _('Mobile Survey Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Mobile Project Manager'),'help/project-manager-help.htm')
+        context['nav']['help'] = (_('Mobile Survey Manager'),'help/project-manager-help.htm')
 
-        return render(request, 'views/project-manager.htm', context)
+        return render(request, 'views/mobile-survey-manager.htm', context)
 
     def delete(self, request):
 
@@ -95,39 +95,39 @@ class ProjectManagerView(BaseManagerView):
             print e
 
         if project_id is not None:
-            ret = models.MobileProject.objects.get(pk=project_id)
+            ret = models.MobileSurveyModel.objects.get(pk=project_id)
             ret.delete()
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
 
-    def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileProjectXUser):
+    def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileSurveyXUser):
         project_identity_ids = set([u.id for u in related_identities])
         identities_to_remove = project_identity_ids - set(data[identity_type])
         identities_to_add = set(data[identity_type]) - project_identity_ids
 
         for identity in identities_to_add:
             if identity_type == 'users':
-                xmodel.objects.create(user=identity_model.objects.get(id=identity), mobile_project=project)
+                xmodel.objects.create(user=identity_model.objects.get(id=identity), mobile_survey=project)
             else:
-                xmodel.objects.create(group=identity_model.objects.get(id=identity), mobile_project=project)
+                xmodel.objects.create(group=identity_model.objects.get(id=identity), mobile_survey=project)
 
         for identity in identities_to_remove:
             if identity_type == 'users':
-                xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_project=project).delete()
+                xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_survey=project).delete()
             else:
-                xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_project=project).delete()
+                xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=project).delete()
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
         if data['id'] is None:
-            project = models.MobileProject()
+            project = models.MobileSurveyModel()
             project.createdby = self.request.user
         else:
-            project = models.MobileProject.objects.get(pk=data['id'])
-            self.update_identities(data, project, project.users.all(), 'users', User, models.MobileProjectXUser)
-            self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileProjectXGroup)
+            project = models.MobileSurveyModel.objects.get(pk=data['id'])
+            self.update_identities(data, project, project.users.all(), 'users', User, models.MobileSurveyXUser)
+            self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
             project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
             form_card_ids = set(data['cards'])
@@ -136,15 +136,15 @@ class ProjectManagerView(BaseManagerView):
             cards_to_update = project_card_ids & form_card_ids
 
             for card_id in cards_to_add:
-                models.MobileProjectXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project, sortorder=data['cards'].index(card_id))
+                models.MobileSurveyXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=project, sortorder=data['cards'].index(card_id))
 
             for card_id in cards_to_update:
-                mobile_project_card = models.MobileProjectXCard.objects.filter(mobile_project=project).get(card=models.CardModel.objects.get(cardid=card_id))
+                mobile_project_card = models.MobileSurveyXCard.objects.filter(mobile_survey=project).get(card=models.CardModel.objects.get(cardid=card_id))
                 mobile_project_card.sortorder=data['cards'].index(card_id)
                 mobile_project_card.save()
 
             for card_id in cards_to_remove:
-                models.MobileProjectXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_project=project).delete()
+                models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=project).delete()
 
 
         if project.active != data['active']:
@@ -165,7 +165,7 @@ class ProjectManagerView(BaseManagerView):
         with transaction.atomic():
             project.save()
 
-        ordered_cards = models.MobileProjectXCard.objects.filter(mobile_project=project).order_by('sortorder')
+        ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=project).order_by('sortorder')
         ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
         project_dict = project.__dict__
         project_dict['cards'] = ordered_ids
@@ -188,7 +188,7 @@ class ProjectManagerView(BaseManagerView):
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
             'link':request.build_absolute_uri(reverse('home')),
-            'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Project.  Please take a moment to review the project description and project start and end dates.'),
+            'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Survey.  Please take a moment to review the project description and project start and end dates.'),
             'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
         }
 
@@ -197,7 +197,7 @@ class ProjectManagerView(BaseManagerView):
 
         # create the email, and attach the HTML version as well.
         for user in self.get_project_users(project):
-            msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Project!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
+            msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Survey!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
@@ -206,7 +206,7 @@ class ProjectManagerView(BaseManagerView):
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
             'link':request.build_absolute_uri(reverse('home')),
-            'greeting': _('Hi!  The Mobile Project you were part of has ended or is temporarily suspended.  Please permform a final sync of your local dataset as soon as possible.'),
+            'greeting': _('Hi!  The Mobile Survey you were part of has ended or is temporarily suspended.  Please permform a final sync of your local dataset as soon as possible.'),
             'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
         }
 
@@ -215,18 +215,18 @@ class ProjectManagerView(BaseManagerView):
 
         # create the email, and attach the HTML version as well.
         for user in self.get_project_users(project):
-            msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Project that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
+            msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Survey that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
-    def get_project_resources(self, project_models):
+    def get_survey_resources(self, project_models):
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
         projects = []
         all_ordered_card_ids = []
 
         for project in project_models:
-            proj = Project.objects.get(id=project.id)
+            proj = MobileSurvey.objects.get(id=project.id)
             project_dict = proj.serialize()
             all_ordered_card_ids += project_dict['cards']
             projects.append(project_dict)
@@ -243,14 +243,14 @@ class ProjectManagerView(BaseManagerView):
 
 
 # @method_decorator(can_read_resource_instance(), name='dispatch')
-class ProjectResources(View):
+class MobileSurveyResources(View):
 
-    def get(self, request, projectid=None):
+    def get(self, request, surveyid=None):
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
         all_ordered_card_ids = []
 
-        proj = Project.objects.get(id=projectid)
+        proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
         print all_ordered_card_ids
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
