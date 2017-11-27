@@ -7903,10 +7903,6 @@ a.clear-geojson-button:hover {
     text-align: center;
 }
 
-.library-grid {
-    padding: 10px 15px;
-}
-
 .library-grid-title {
     font-weight: normal;
     font-size: 15px;
@@ -9253,11 +9249,6 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .library-card {
     margin-left: -5px;
-    background: #fff;
-}
-
-.mobile-project-manager-editor .library-card:hover {
-    background: #fafafa;
 }
 
 .mobile-project-manager-editor .clear-node-search {
@@ -9311,15 +9302,12 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    padding: 10px;
-}
-
-.account-wrapper {
-    padding-top: 20px;
+    margin-top: -54px;
+    margin-left: -35px;
 }
 
 .mpm-card-list {
-    min-height: 300px;
+    min-height: 400px;
     min-width: 200px;
     /*max-width: 1125px;*/
     width: 50%;
@@ -9335,19 +9323,19 @@ a.search-facet-item.disabled {
 
 .mpm-card-list-items {
     overflow-y: auto;
-    height: 361px;
+    height: 385px;
 }
 
 .mpm-card-list-items .ko_container {
     min-height: 100%;
-    background-color: #fbfbfb;
+    background-color: #f9f9f9;
 }
 
 .mpm-card-list-header {
     padding: 10px;
     border-style: solid;
     border-width: 0.25px;
-    border-color: #eaeaea;
+    border-color: #eee;
     background-color: #f8f8f8;
 }
 
@@ -9407,12 +9395,6 @@ a.search-facet-item.disabled {
 .mobile-project-manager-editor .identities-list .library-card {
     margin-left: 0;
     border-left: 0;
-    height: 65px;
-}
-
-.mobile-project-manager-editor .identities-list .library-card:first-child {
-    border-top: 1px solid #ddd;
-    margin-top: 5px;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -9442,14 +9424,14 @@ a.search-facet-item.disabled {
     top: 15px;
     width: 100%;
     height: 490px;
-    padding: 10px 35px;
+    padding: 10px;
 }
 
 .msm-resource-status {
     display: inline-block;
     width: 100%;
     padding-right: 10px;
-    padding-top: 25px;
+    padding-top: 30px;
     text-align: right;
 }
 
@@ -9479,7 +9461,7 @@ a.search-facet-item.disabled {
     position: relative;
     padding-left: 25px;
     left: 0px;
-    top: 2px;
+    top: 0px;
 }
 
 .msm-resource-panel .mpm-group-subtitle {
@@ -9493,12 +9475,11 @@ a.search-facet-item.disabled {
     position: relative;
     padding: 0 5px;
     left: 0;
-    top: 3px;
+    top: 0;
 }
 
 .msm-resource-panel .title-block-title {
     width: auto;
-    margin-top: 5px;
 }
 
 .mpm-group-name {
@@ -9528,10 +9509,10 @@ a.search-facet-item.disabled {
 
 .mpm-card-container {
     position: absolute;
-    top: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    height: 430px;
     overflow-y: hidden;
     margin-top: 5px;
     margin-right: 35px;
@@ -9539,16 +9520,15 @@ a.search-facet-item.disabled {
 }
 
 .msm-card-toolbar {
-    position: absolute;
-    top: 70px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
+    padding-top: 10px;
 }
 
 .mpm-card-filter {
-    width: 400px;
+    width: 300px;
 }
 
 .mpm-user-name h4 {
@@ -9572,21 +9552,14 @@ a.search-facet-item.disabled {
 }
 
 .library-card-main.mpm-resource-list {
-    top: 8px;
+    top: 7px;
     overflow:visible;
     cursor: pointer;
     width:100%;
 }
 
-.selected-card div .library-card-main.mpm-resource-list {
-    background: #fbfbfb;
-    padding: 6px 0px;
-    margin-top: -8px;
-    border-bottom: 1px solid #eee;
-}
-
 .library-card-main.mpm-resource-list .added {
-    color: #1E6FB7;
+    color: #64bd63;
 }
 
 .msm-resource-list-header {
@@ -9605,24 +9578,21 @@ a.search-facet-item.disabled {
 }
 
 .msm-resource-panel .library-card.selected.selected-card {
-    height: 605px;
+    height: 550px;
     -webkit-transition: height 0.25s;
     /* Safari */
     transition: height 0.25s;
     background: #ffffff;
-    border: 1px solid #ddd;
+    border-left: 0;
 }
 
 .msm-resource-panel .title-block-fixed {
     display: flex;
     background: white;
-    border-bottom-width: 0px;
     width: -webkit-fill-available;
     margin-left: 0;
-    padding-bottom: 5px;
-    padding-top: 12px;
-    margin-left: 10px;
-    margin-right: 10px;
+    padding-bottom: 13px;
+    padding-top: 20px;
     justify-content: space-between;
 }
 
@@ -9636,23 +9606,10 @@ a.search-facet-item.disabled {
 .msm-resource-panel .grid {
     margin-left: 1px;
     margin-right: 1px;
-    margin-top: 68px;
-    width: 100%;
-    padding: 0px 20px 0px 20px;
-    background: #fff;
-    border-top-width: 0px;
-    max-width: 1600px;
 }
-
 
 .msm-resource-panel .list-filter {
-    width: 400px;
-    height: 40px;
-    margin-top: -5px;
-}
-
-.msm-resource-panel .list-filter .clear-node-search {
-    margin-top: 4px;
+    width: 250px;
 }
 
 .msm-resource-cards .mpm-card-container {
@@ -9688,9 +9645,6 @@ a.search-facet-item.disabled {
     padding-left: 5px;
 }
 
-.msm-resource-panel .ep-graph-title-icon {
-    background: #eee;
-}
 
 .mpm-user-groups {
     color: #777;
@@ -9760,14 +9714,6 @@ a.search-facet-item.disabled {
 .mpm-user-status.user {
     padding: 4px 0px;
     text-align: left;
-}
-
-.mpm-instructions {
-    position: absolute;
-    top: 10px;
-    color: #555;
-    font-size: 13px;
-    padding: 15px 20px 5px 5px;
 }
 
 .mpm-user-name .mpm-user-status.invited {
@@ -9842,10 +9788,6 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
     height: 135px;
-}
-
-.msm-settings-summary {
-    min-height: 500px;
     overflow-y: scroll;
 }
 
