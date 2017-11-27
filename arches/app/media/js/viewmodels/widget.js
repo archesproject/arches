@@ -67,6 +67,26 @@ define(['knockout', 'underscore', 'uuid'], function (ko, _, uuid) {
             var obs = ko.observable(self.config()[key]);
             subscribeConfigObservable(obs, key);
         });
+
+        if (ko.isObservable(this.defaultValue)) {
+            var defaultValue = this.defaultValue();
+            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+                this.value(defaultValue);
+            }
+
+            if (!self.form) {
+                self.value.subscribe(function(val){
+                    if (self.defaultValue() != val) {
+                        self.defaultValue(val)
+                    };
+                });
+                self.defaultValue.subscribe(function(val){
+                    if (self.value() != val) {
+                        self.value(val)
+                    };
+                });
+            };
+        };
     };
     return WidgetViewModel;
 });
