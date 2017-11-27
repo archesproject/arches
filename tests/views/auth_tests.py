@@ -29,9 +29,9 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
-from arches.app.views.main import auth
+from arches.app.views.auth import LoginView
 from arches.app.views.concept import RDMView
-from arches.app.utils.set_anonymous_user import SetAnonymousUser
+from arches.app.utils.middleware import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
 
 # these tests can be run from the command line via
@@ -56,10 +56,61 @@ class AuthTests(ArchesTestCase):
         request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
         request.user = self.user
         apply_middleware(request)
-        response = auth(request)
+        view = LoginView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location') == reverse('home'))
+
+    def test_login_w_email(self):
+        """
+        Test that a user can login with their email address and is redirected to the home page
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'test@archesproject.org', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('home'))
+
+    def test_invalid_credentials(self):
+        """
+        Test that a user can't login with invalid credentials
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'wrong', 'password': 'wrong'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 401)
+
+    def test_logout(self):
+        """
+        Test that a user can logout
+
+        """
+
+        view = LoginView.as_view()
+        
+        request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        request = self.factory.get(reverse('auth'), {'logout': 'true'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('auth'))
 
     def test_set_anonymous_user_middleware(self):
         """
