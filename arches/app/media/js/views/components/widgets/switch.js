@@ -18,7 +18,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
-            params.configKeys = ['subtitle'];
+            params.configKeys = ['subtitle', 'defaultValue'];
             WidgetViewModel.apply(this, [params]);
             this.on = this.config().on || true;
             this.off = this.config().off || false;
@@ -32,6 +32,25 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             this.getvalue = this.config().getvalue || ko.computed(function(){
                 return this.value() === this.on;
             }, this);
+
+            this.setdefault = this.config().setdefault || function(self, evt){
+                if(self.defaultValue() === self.on){
+                    self.defaultValue(self.off)
+                }else{
+                    self.defaultValue(self.on)
+                }
+            }
+
+            this.getdefault = this.config().getdefault || ko.computed(function(){
+                return this.defaultValue() == this.on;
+            }, this);
+
+            var defaultValue = ko.unwrap(this.defaultValue)
+
+            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
+                this.value(defaultValue);
+            }
+
         },
         template: { require: 'text!widget-templates/switch' }
     });
