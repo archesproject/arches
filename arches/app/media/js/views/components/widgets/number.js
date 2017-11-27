@@ -14,17 +14,12 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
 
             WidgetViewModel.apply(this, [params]);
             var self = this;
-            var defaultValue = ko.unwrap(this.defaultValue)
             if (ko.isObservable(this.value)) {
                 this.value.subscribe(function(val){
                     if (self.value()){
                         self.value(Number(val))
                     }
                 }, self);
-            };
-
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
-                this.value(defaultValue);
             };
         },
         template: { require: 'text!widget-templates/number' }
