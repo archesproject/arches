@@ -9323,7 +9323,7 @@ a.search-facet-item.disabled {
 
 .mpm-card-list-items {
     overflow-y: auto;
-    height: 385px;
+    height: 361px;
 }
 
 .mpm-card-list-items .ko_container {
@@ -9480,6 +9480,7 @@ a.search-facet-item.disabled {
 
 .msm-resource-panel .title-block-title {
     width: auto;
+    margin-top: 5px;
 }
 
 .mpm-group-name {
@@ -9509,6 +9510,7 @@ a.search-facet-item.disabled {
 
 .mpm-card-container {
     position: absolute;
+    top: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -9520,11 +9522,12 @@ a.search-facet-item.disabled {
 }
 
 .msm-card-toolbar {
+    position: absolute;
+    top: 70px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
-    padding-top: 10px;
 }
 
 .mpm-card-filter {
@@ -9591,8 +9594,10 @@ a.search-facet-item.disabled {
     background: white;
     width: -webkit-fill-available;
     margin-left: 0;
-    padding-bottom: 13px;
-    padding-top: 20px;
+    padding-bottom: 5px;
+    padding-top: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
     justify-content: space-between;
 }
 
@@ -9788,6 +9793,10 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
     height: 135px;
+}
+
+.msm-settings-summary {
+    min-height: 500px;
     overflow-y: scroll;
 }
 

@@ -259,13 +259,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
+                                                        <div class="msm-resource-cards" data-bind="style: {top: ((resourceList.selectedIndex() * 60 + 120) + (resourceList.selectedIndex() * 1.5)) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
                                                                 <!--ko if: resourceList.selected() -->
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
                                                                  <div class="msm-card-toolbar">
-                                                                     <h4 class="mpm-item-listing-header">{% trans 'Data Entry Forms' %}</h4>
                                                                      <div class="mpm-card-filter">
                                                                          <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
                                                                      </div>
@@ -639,71 +638,75 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
                                                         </div>
 
-                                                        <!-- Survey Settings -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Summary' %}
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Number of edits: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Contributors: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Offline Basemap: Streets-Grey
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                        <!-- Survey Summary -->
+                                                        <div class="msm-settings">
 
-                                                        <!-- User Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Groups/Users' %}
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    {% trans 'Groups' %} (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    {% trans 'Users' %} (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
-
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-
-                                                        <!-- Model/Card Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Models and Data Entry Cards' %}
-                                                            </p>
-                                                            <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
-                                                                <!--ko if: resource.added() === true -->
+                                                            <!-- Survey Settings -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Summary' %}
+                                                                </p>
                                                                 <ul class="mpm-node-detail-metadata">
                                                                     <li class="">
-                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
-                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                                        <ul class="mpm-node-detail-metadata">
-                                                                            <!--ko if: card.approved -->
-                                                                            <li data-bind="text: card.name"></li>
-                                                                            <!--/ko-->
-                                                                        </ul>
-                                                                        <!--/ko-->
+                                                                        Number of edits: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Contributors: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Offline Basemap: Streets-Grey
                                                                     </li>
                                                                 </ul>
+                                                            </div>
+
+                                                            <!-- User Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Groups/Users' %}
+                                                                </p>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Groups' %} (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Users' %} (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
+
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <!-- Model/Card Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Models and Data Entry Cards' %}
+                                                                </p>
+                                                                <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
+                                                                    <!--ko if: resource.added() === true -->
+                                                                    <ul class="mpm-node-detail-metadata">
+                                                                        <li class="">
+                                                                            <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
+                                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                            <ul class="mpm-node-detail-metadata">
+                                                                                <!--ko if: card.approved -->
+                                                                                <li data-bind="text: card.name"></li>
+                                                                                <!--/ko-->
+                                                                            </ul>
+                                                                            <!--/ko-->
+                                                                        </li>
+                                                                    </ul>
+                                                                    <!--/ko-->
                                                                 <!--/ko-->
-                                                            <!--/ko-->
+                                                            </div>
                                                         </div>
 
                                                     </div>
