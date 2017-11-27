@@ -162,8 +162,12 @@ define([
                     }
                 })
                 .pluck('cardid').value()
-                var diff = _.difference(self.cards(), approvedCards)
-                self.cards(_.union(diff, approvedCards))
+                if (self.cards().length > approvedCards.length) {
+                    self.cards(approvedCards)
+                } else {
+                    var diff = _.difference(self.cards(), approvedCards)
+                    self.cards(_.union(diff, approvedCards))
+                }
             }
 
             self.updateApproved = function(val){
