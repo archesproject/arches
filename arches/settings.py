@@ -143,11 +143,11 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'xxxx@xxx.com'
-# EMAIL_HOST_PASSWORD = 'xxxxxxx'
-# EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'apeters@fargeo.com'
+EMAIL_HOST_PASSWORD = 'all$our1'
+EMAIL_PORT = 587
 
 POSTGIS_VERSION = (2, 0, 0)
 
@@ -332,27 +332,27 @@ BULK_IMPORT_BATCH_SIZE = 2000
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Local.json')
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
-        'OPTIONS': {
-            'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
-        }
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
-    },
-    {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
-        'OPTIONS': {
-            'min_length': 9,
-        }
-    },
+    # {
+    #     'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+    # },
+    # {
+    #     'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+    #     'OPTIONS': {
+    #         'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
+    #     }
+    # },
+    # {
+    #     'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+    # },
+    # {
+    #     'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+    # },
+    # {
+    #     'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+    #     'OPTIONS': {
+    #         'min_length': 9,
+    #     }
+    # },
 ]
 
 USE_LIVERELOAD = False

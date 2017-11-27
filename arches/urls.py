@@ -27,7 +27,7 @@ from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.project import ProjectManagerView, ProjectResources
-from arches.app.views.auth import LoginView
+from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView
 from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -39,10 +39,10 @@ uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 urlpatterns = [
     url(r'^$', main.index, name='root'),
     url(r'^index.htm', main.index, name='home'),
-    url(r'^auth/password$', main.change_password, name='change_password'),
-    url(r'^auth/signup$', main.signup, name='signup'),
-    url(r'^auth/confirm_signup$', main.confirm_signup, name='confirm_signup'),
-    url(r'^auth/get_token$', main.get_token, name='get_token'),
+    url(r'^auth/password$', ChangePasswordView.as_view(), name='change_password'),
+    url(r'^auth/signup$', SignupView.as_view(), name='signup'),
+    url(r'^auth/confirm_signup$', ConfirmSignupView.as_view(), name='confirm_signup'),
+    url(r'^auth/get_token$', GetTokenView.as_view(), name='get_token'),
     url(r'^auth/', LoginView.as_view(), name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
