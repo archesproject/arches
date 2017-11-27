@@ -261,7 +261,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="msm-resource-cards" data-bind="style: {top: ((resourceList.selectedIndex() * 60 + 120) + (resourceList.selectedIndex() * 1.5)) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
+                                                        <div class="msm-resource-cards" data-bind="style: {top: ((resourceList.selectedIndex() * 60 + 120) + (resourceList.selectedIndex() * 5.0)) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
 
@@ -273,7 +273,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
                                                                  <div class="msm-card-toolbar">
                                                                      <div class="mpm-card-filter">
-                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
+                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
                                                                     </div>
                                                                 </div>
                                                                 <div class="mpm-card-container">
@@ -309,7 +309,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <div class="mpm-card-list-header">{% trans 'Selected forms' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved, addToSelf: true}" class="ko_container ui-sortable" style="min-height:100%">
-                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.approved() === true)">
+                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === true)">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
                                                                             </div>
@@ -697,21 +697,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                                     {% trans 'Models and Data Entry Cards' %}
                                                                 </p>
+                                                                <!--ko if: resourceList.hasCards() -->
                                                                 <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
-                                                                    <!--ko if: resource.added() === true -->
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
-                                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                                            <ul class="mpm-node-detail-metadata">
-                                                                                <!--ko if: card.approved -->
-                                                                                <li data-bind="text: card.name"></li>
-                                                                                <!--/ko-->
-                                                                            </ul>
+                                                                <!--ko if: resource.added() === true -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
+                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <!--ko if: card.approved -->
+                                                                            <li data-bind="text: card.name"></li>
                                                                             <!--/ko-->
-                                                                        </li>
-                                                                    </ul>
-                                                                    <!--/ko-->
+                                                                        </ul>
+                                                                        <!--/ko-->
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--ko ifnot: resourceList.hasCards() -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div>{% trans 'No forms selected' %}</div>
+                                                                    </li>
+                                                                </ul>
                                                                 <!--/ko-->
                                                             </div>
                                                         </div>
