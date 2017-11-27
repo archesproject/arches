@@ -697,21 +697,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                                     {% trans 'Models and Data Entry Cards' %}
                                                                 </p>
+                                                                <!--ko if: resourceList.hasCards() -->
                                                                 <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
-                                                                    <!--ko if: resource.added() === true -->
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="">
-                                                                            <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
-                                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                                            <ul class="mpm-node-detail-metadata">
-                                                                                <!--ko if: card.approved -->
-                                                                                <li data-bind="text: card.name"></li>
-                                                                                <!--/ko-->
-                                                                            </ul>
+                                                                <!--ko if: resource.added() === true -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div data-bind="text: resource.name + ' (' + resource.cardcount() + ' data entry cards)'"></div>
+                                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <!--ko if: card.approved -->
+                                                                            <li data-bind="text: card.name"></li>
                                                                             <!--/ko-->
-                                                                        </li>
-                                                                    </ul>
-                                                                    <!--/ko-->
+                                                                        </ul>
+                                                                        <!--/ko-->
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--ko ifnot: resourceList.hasCards() -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div>{% trans 'No forms selected' %}</div>
+                                                                    </li>
+                                                                </ul>
                                                                 <!--/ko-->
                                                             </div>
                                                         </div>

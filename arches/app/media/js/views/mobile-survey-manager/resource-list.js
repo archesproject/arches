@@ -45,6 +45,7 @@ define([
                 }, self)
             }
 
+
             _.each(this.items(), function(item){
                 item.cards = item.cardsflat;
                 self.initCards(item.cards())
@@ -74,6 +75,13 @@ define([
                     });
 
                 });
+
+            this.hasCards = ko.computed(function() {
+                return _.filter(self.items(),
+                function(item){
+                    return item.added()
+                }).length > 0;
+            })
 
             this.resetCards = function(cards){
                 _.each(this.items(), function(item){
