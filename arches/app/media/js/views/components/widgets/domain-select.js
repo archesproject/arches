@@ -15,7 +15,7 @@ define([
      */
     return ko.components.register('domain-select-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder'];
+            params.configKeys = ['placeholder', 'defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
         },
         template: {
