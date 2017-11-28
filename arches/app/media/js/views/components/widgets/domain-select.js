@@ -17,12 +17,6 @@ define([
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
-
-            var defaultValue = ko.unwrap(this.defaultValue)
-
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
-                this.value(defaultValue);
-            }
         },
         template: {
             require: 'text!widget-templates/select'

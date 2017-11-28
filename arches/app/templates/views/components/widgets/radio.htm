@@ -43,7 +43,7 @@
                         'active': $parent.isOptionSelected($data, $parent.defaultValue)
                     },
                     click: function () {
-                        $parent.setDefaultOptionSelection($data, true);
+                        $parent.setOptionSelection($data, true);
                     }">
                     <input type="radio" data-bind="checked: $parent.defaultValue,
                         attr: {
