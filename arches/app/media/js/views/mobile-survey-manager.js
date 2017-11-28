@@ -83,8 +83,6 @@ define([
         viewModel.selectedProject(viewModel.projects()[0])
     }
 
-    viewModel.resourceList.items()[0].selected(true)
-
     var pageView = new BaseManagerView({
         viewModel: viewModel
     });

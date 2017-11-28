@@ -32,3 +32,12 @@ class JSONResponse(HttpResponse):
 
         # Content is a bytestring. See the `content` property methods.
         self.content = JSONSerializer().serialize(content, **options)
+
+
+class Http401Response(HttpResponse):
+    status_code = 401
+    
+    def __init__(self, *args, **kwargs):
+        www_auth_header = kwargs.pop('www_auth_header', 'Basic')
+        super(Http401Response, self).__init__(*args, **kwargs)
+        self['WWW-Authenticate'] = www_auth_header

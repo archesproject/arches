@@ -36,4 +36,17 @@
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input" data-bind="value: falseLabel, valueUpdate: 'keyup'">
 </div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
+  <div style="pad-hor">
+      <label data-bind="css: { 'active': defaultValue() }, click: function () { defaultValue(true) }" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue" value="true"><span data-bind="text:trueLabel"></span>
+      </label>
+      <label data-bind="css: { 'active': !defaultValue() }, click: function () { defaultValue(false) }" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue" value="false"><span data-bind="text:config().falseLabel"></span>
+      </label>
+  </div>
+</div>
 {% endblock config_form %}
