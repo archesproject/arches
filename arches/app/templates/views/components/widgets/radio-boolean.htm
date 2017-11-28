@@ -11,10 +11,10 @@
       </div></div>
       <div class="col-xs-12">
         <div style="pad-hor">
-        <label data-bind="css: { 'active': value() }, click: function () { value(true) }" class="form-radio form-normal form-text">
+        <label data-bind="css: { 'active': value(), 'disabled': disabled }, click: function () { if(!disabled{value(true);} }" class="form-radio form-normal form-text">
             <input type="radio" name="stat-w-label" data-bind="checked: value" value="true"><span data-bind="text:trueLabel"></span>
         </label>
-        <label data-bind="css: { 'active': !value() }, click: function () { value(false) }" class="form-radio form-normal form-text">
+        <label data-bind="css: { 'active': !value(), 'disabled': disabled }, click: function () { if(!disabled{value(false);} }" class="form-radio form-normal form-text">
             <input type="radio" name="stat-w-label" data-bind="checked: value" value="false"><span data-bind="text:config().falseLabel"></span>
         </label>
      </div>
