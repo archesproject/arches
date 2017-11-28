@@ -9641,7 +9641,7 @@ a.search-facet-item.disabled {
     padding: 0px 20px 0px 20px;
     background: #fff;
     border-top-width: 0px;
-    max-width: 1600px;
+    max-width: unset;
 }
 
 
