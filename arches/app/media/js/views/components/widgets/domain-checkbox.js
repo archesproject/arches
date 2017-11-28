@@ -15,6 +15,7 @@ define([
      */
     return ko.components.register('domain-checkbox-widget', {
         viewModel: function(params) {
+            params.configKeys = ['defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
 
             this.multiple = true;

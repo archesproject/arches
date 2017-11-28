@@ -14,7 +14,10 @@ define([
      * @param {string} params.config.options -
      */
     return ko.components.register('domain-radio-widget', {
-        viewModel: DomainWidgetViewModel,
+        viewModel: function(params) {
+            params.configKeys = ['defaultValue'];
+            DomainWidgetViewModel.apply(this, [params]);
+        },
         template: {
             require: 'text!widget-templates/radio'
         }
