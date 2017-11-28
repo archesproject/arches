@@ -82,7 +82,8 @@ define([
 
         this.isOptionSelected = function (opt, val) {
             var selected = false;
-            var val = ko.unwrap(val);
+            // var val = ko.unwrap(val);
+            var val = self.value()
             if (val && val.indexOf) {
                 selected = val.indexOf(opt.id) >= 0;
             }
