@@ -7,7 +7,7 @@ define([
     var nameLookup = {};
     var ConceptSelectViewModel = function(params) {
         var self = this;
-        params.configKeys = ['placeholder'];
+        params.configKeys = ['placeholder', 'defaultValue'];
         this.multiple = params.multiple || false;
 
         WidgetViewModel.apply(this, [params]);
