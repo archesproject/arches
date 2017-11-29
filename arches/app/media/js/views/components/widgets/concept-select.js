@@ -14,23 +14,6 @@ define([
             if (self.configForm){
                 self.select2Config.value = self.defaultValue
             };
-
-            if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
-                this.value(defaultValue);
-            };
-
-            if (!self.form) {
-                self.value.subscribe(function(val){
-                    if (self.defaultValue() != val) {
-                        self.defaultValue(val)
-                    };
-                });
-                self.defaultValue.subscribe(function(val){
-                    if (self.value() != val) {
-                        self.value(val)
-                    };
-                });
-            };
         },
         template: {
             require: 'text!widget-templates/concept-select'
