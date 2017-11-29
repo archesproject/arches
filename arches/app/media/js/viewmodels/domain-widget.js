@@ -16,6 +16,8 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
+        var value = self.configForm ? self.defaultValue : self.value;
+
         if (this.node.config.options) {
             this.options = this.node.config.options;
             this.options().forEach(function(option) {
@@ -64,7 +66,7 @@ define([
 
         this.isOptionSelected = function (opt) {
             var selected = false;
-            var val = self.value();
+            var val = self.value()
             if (val && val.indexOf) {
                 selected = val.indexOf(opt.id) >= 0;
             }
