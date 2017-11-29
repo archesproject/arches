@@ -141,7 +141,7 @@ class Card(models.CardModel):
         return self
 
     def confirm_enabled_state(self, user, nodegroup):
-        if user.has_perms(['delete_nodegroup','write_nodegroup'], self.nodegroup) == False:
+        if user.has_perms(['write_nodegroup'], self.nodegroup) == False:
             self.disabled = True
 
     def get_edge_to_parent(self):
