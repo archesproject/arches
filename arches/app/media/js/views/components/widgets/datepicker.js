@@ -23,7 +23,7 @@ define([
     return ko.components.register('datepicker-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat'];
+            params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
             WidgetViewModel.apply(this, [params]);
 
             this.placeholder = params.config().placeholder;
