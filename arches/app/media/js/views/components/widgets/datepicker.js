@@ -71,9 +71,6 @@ define([
                     self.defaultValue(self.on);
                 }
             }
-            this.getvalue = this.config().getvalue || ko.computed(function(){
-                return this.defaultValue() === this.on;
-            }, this);
 
             this.setdefault = this.config().setdefault || function(self, evt){
                 if(self.defaultValue() === self.on){
