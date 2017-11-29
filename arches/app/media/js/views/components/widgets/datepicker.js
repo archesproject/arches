@@ -61,6 +61,51 @@ define([
             this.onDateFormatSelection = function(val, e) {
                 this.dateFormat(e.currentTarget.value)
             };
+
+            this.on = this.config().on || 'Date of Data Entry';
+            this.off = this.config().off || '';
+            this.setvalue = this.config().setvalue || function(self, evt){
+                if(self.defaultValue() === self.on){
+                    self.defaultValue(self.off);
+                }else{
+                    self.defaultValue(self.on);
+                }
+            }
+            this.getvalue = this.config().getvalue || ko.computed(function(){
+                return this.defaultValue() === this.on;
+            }, this);
+
+            this.setdefault = this.config().setdefault || function(self, evt){
+                if(self.defaultValue() === self.on){
+                    self.defaultValue(self.off)
+                }else{
+                    self.defaultValue(self.on)
+                }
+            }
+
+            this.getdefault = this.config().getdefault || ko.computed(function(){
+                return this.defaultValue() == this.on;
+            }, this);
+
+            if (self.form && this.defaultValue() === 'Date of Data Entry') {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1;
+                var yyyy = today.getFullYear();
+
+                if(dd<10) {
+                    dd = '0'+dd
+                }
+
+                if(mm<10) {
+                    mm = '0'+mm
+                }
+
+                today = yyyy + '-' + mm + '-' + dd;
+                self.value(today);
+
+            };
+
         },
         template: {
             require: 'text!widget-templates/datepicker'
