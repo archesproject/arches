@@ -61,7 +61,6 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
-
             self.selectedIdentity = ko.computed(function() {
                 var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
@@ -122,9 +121,9 @@ define([
             self.toggleIdentity = function() {
                 var identity = self.selectedIdentity();
                 if (identity) {
-                    var identities = identity.type === 'user' ? self.users : self.groups;
+                    var currentIdentities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
-                        identities.remove(identity.id);
+                        currentIdentities.remove(identity.id);
                         if (identity.type === 'user') {
                             identity.approved(false);
                         } else {
@@ -139,14 +138,18 @@ define([
                             })
                         };
                     } else {
-                        identities.push(identity.id);
+                        if (!_.contains(currentIdentities(), identity.id)) {
+                            currentIdentities.push(identity.id);
+                        }
                         identity.approved(true);
                         _.chain(self.identities).filter(function(id) {
                             return id.type === 'user'
                         }).each(function(user) {
                             if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                 user.approved(true);
-                                self.users.push(user.id);
+                                if (!_.contains(self.users(), user.id)) {
+                                    self.users.push(user.id);
+                                }
                             }
                         })
                     };
