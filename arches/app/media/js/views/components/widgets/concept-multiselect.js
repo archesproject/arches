@@ -6,6 +6,7 @@ define([
     return ko.components.register('concept-multiselect-widget', {
         viewModel: function(params) {
             params.multiple = true;
+            params.configKeys = ['defaultValue'];
             ConceptSelectViewModel.apply(this, [params]);
         },
         template: {
