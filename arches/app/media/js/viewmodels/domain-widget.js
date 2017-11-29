@@ -85,7 +85,7 @@ define([
         this.multiple = false;
 
         this.displayValue = ko.computed(function() {
-            var val = value;
+            var val = self.value();
             var opts = ko.unwrap(self.flatOptions);
             var displayVal = null;
             if (val) {
