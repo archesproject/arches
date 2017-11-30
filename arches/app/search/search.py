@@ -198,6 +198,7 @@ class SearchEngine(object):
         }
 
     def count(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']
