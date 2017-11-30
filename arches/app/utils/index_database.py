@@ -38,7 +38,7 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
     se = SearchEngineFactory().create()
     if clear_index:
         q = Query(se=se)
-        q.delete(index='strings', doc_type='term', ignore=[404])
+        q.delete(index='strings', doc_type='term')
 
     resource_types = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).values_list('graphid', flat=True)
     index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size)
