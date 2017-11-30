@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'remove_resources', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'load_concept_scheme', 'export_business_data', 'export_graphs', 'add_tileserver_layer', 'delete_tileserver_layer',
             'create_mapping_file', 'import_reference_data', 'import_graphs', 'import_business_data','import_business_data_relations', 'import_mapping_file', 'save_system_settings', 'add_mapbox_layer', 'seed_resource_tile_cache', 'update_project_templates','load_package','create_package', 'export_package_configs'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
@@ -153,9 +153,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
-
-        if options['operation'] == 'remove_resources':
-            self.remove_resources(load_id=options['load_id'],force=options['yes'])
 
         if options['operation'] == 'load_concept_scheme':
             self.load_concept_scheme(package_name, options['source'])
@@ -725,18 +722,6 @@ class Command(BaseCommand):
                 Permission.objects.create(codename='update_%s' % entitytype, name='%s - update' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='delete_%s' % entitytype, name='%s - delete' % entitytype , content_type=content_type[0])
-
-    def remove_resources(self, load_id='', force=False):
-        """
-        Runs the resource_remover command found in data_management.resources
-        """
-        # resource_remover.delete_resources(load_id)
-        if not force:
-            if not utils.get_yn_input("all resources will be removed. continue?"):
-                return
-
-        resource_remover.clear_resources()
-        return
 
     def export_business_data(self, data_dest=None, file_format=None, config_file=None, graph=None, single_file=False):
         try:
