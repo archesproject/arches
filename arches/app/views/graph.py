@@ -347,6 +347,9 @@ class CardView(GraphBaseView):
                 return redirect('card_manager', graphid=cardid)
 
         card.confirm_enabled_state(request.user, card.nodegroup)
+        for c in card.cards:
+            c.confirm_enabled_state(request.user, c.nodegroup)
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
