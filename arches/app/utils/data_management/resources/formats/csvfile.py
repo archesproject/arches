@@ -9,6 +9,7 @@ import traceback
 from copy import deepcopy
 from format import Writer
 from format import Reader
+from elasticsearch import TransportError
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept
 from arches.app.models.models import Node, NodeGroup, ResourceXResource, GraphXMapping
@@ -231,13 +232,26 @@ class CsvReader(Reader):
                     Resource.bulk_save(resources=resources)
                     del resources[:]  #clear out the array
             else:
-                newresourceinstance.save()
+                try:
+                    newresourceinstance.save()
+                except TransportError as e:
+                    cause = json.dumps(e.info['error']['caused_by'],indent=1)
+                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceid, cause)
+                    errors.append({'type': 'WARNING', 'message': msg})
+                    newresourceinstance.delete()
+                    save_count=save_count-1
+                except Exception as e:
+                    msg = '%s: WARNING: failed to index document in resource: %s. Exception detail:\n%s\n' % (datetime.datetime.now(), resourceid, e)
+                    errors.append({'type': 'WARNING', 'message': msg})
+                    newresourceinstance.delete()
+                    save_count=save_count-1
+                
         else:
             errors.append({'type': 'WARNING', 'message': 'No resource created for legacyid: {0}. Make sure there is data to be imported for this resource and it is mapped properly in your mapping file.'.format(legacyid)})
-            if len(errors) > 0:
-                self.errors += errors
-
-
+            
+        if len(errors) > 0:
+            self.errors += errors
+         
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE/4) == 0:
             print '%s resources processed' % str(save_count)
 
