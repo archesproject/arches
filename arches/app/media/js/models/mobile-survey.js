@@ -165,22 +165,18 @@ define([
                     }
                 })
                 .pluck('cardid').value()
-                if (self.cards().length > approvedCards.length) {
-                    self.cards(approvedCards)
-                } else {
-                    var diff = _.difference(self.cards(), approvedCards)
-                    self.cards(_.union(diff, approvedCards))
-                }
+                var diff = _.difference(self.cards(), approvedCards)
+                self.cards(_.union(diff, approvedCards))
             }
 
             self.updateApproved = function(val){
                 val.item.approved(true);
                 self.updateCards(val)
-            };;
+            };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
-                self.updateCards(val)
+                self.cards.remove(val.item.cardid)
             };
 
             self.toggleShowDetails = function() {
