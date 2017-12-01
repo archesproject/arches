@@ -79,7 +79,9 @@ define([
             this.hasCards = ko.computed(function() {
                 return _.filter(self.items(),
                 function(item){
-                    return item.added()
+                    if (item.added){
+                        return item.added()
+                    }
                 }).length > 0;
             })
 
