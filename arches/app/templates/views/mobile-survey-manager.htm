@@ -347,10 +347,41 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!-- Data Card -->
-                                        <div id="data-card" class="mpm-card tab-pane fade">
-                                            Data...
+                <!-- Data Card -->
+                <div id="data-card" class="mpm-card tab-pane fade">
+                    <div class="mpm-card-content">
+                        <div class="panel-body card-panel-body project-card-body">
+                            <div class="card-content">
+                                <div class="mpm-activation-panel">
+                                            <div class="row pad-btm">
+                                                <!-- Activate Switch -->
+                                                <div class="col-sm-5 col-md-3">
+
+                                                    <div class="box-inline">
+                                                        <p class="mpm-item-listing-header data-panel" style="margin-bottom: 0px;">{% trans 'Allow users to download data' %}</p>
+
+                                                        <div class="toggle-container">
+                                                            <span class="switch switch-small" data-bind="css: {'on': selectedProject().datadownload()}, click: function(){
+                                                                selectedProject().datadownload(!selectedProject().datadownload());
+                                                            }"><small></small></span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- Help Message-->
+                                                <div class="col-sm-6 col-md-9">
+                                                    <p class="account-tips" style="margin-top: 20px;">
+                                                        {% trans 'Downloading data allows users to access and edit existing Arches information in the field' %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                         </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                                         <div id="identities-card" class="identities-list mpm-card tab-pane fade">
 

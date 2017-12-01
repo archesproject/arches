@@ -44,6 +44,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.startdate = models.DateField(blank=True, null=True)
         # self.enddate = models.DateField(blank=True, null=True)
         # self.description = models.TextField(null=True)
+        # self.datadownload = models.BooleanField(default=False)
         # end from models.MobileSurvey
 
     def save(self):
