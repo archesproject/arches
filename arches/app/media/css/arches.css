@@ -9797,6 +9797,10 @@ a.search-facet-item.disabled {
     font-weight: 500;
 }
 
+.mpm-item-listing-header.data-panel {
+    padding-left: 0px;
+}
+
 .mpm-account-switch {
     margin-top: 20px;
 }

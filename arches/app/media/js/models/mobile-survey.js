@@ -22,6 +22,7 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
+            self.datadownload = ko.observable();
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -197,7 +198,8 @@ define([
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
-                    cards: self.cards
+                    cards: self.cards,
+                    datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -220,6 +222,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
 
@@ -245,6 +248,7 @@ define([
                     self.groups(request.responseJSON.mobile_survey.groups);
                     self.users(request.responseJSON.mobile_survey.users);
                     self.cards(request.responseJSON.mobile_survey.cards);
+                    self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };
             };
