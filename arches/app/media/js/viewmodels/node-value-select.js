@@ -36,9 +36,6 @@ define([
                 updateTileList(params.node.config.nodeid());
             });
         }
-        this.tileList.subscribe(function(list) {
-            console.log(list);
-        });
 
         this.select2Config = {
             value: this.value,
