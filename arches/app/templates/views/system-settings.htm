@@ -53,7 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             resourceid: '{{resourceid}}',
             graph: {{graph_json}},
             relationship_types: {{ relationship_types }},
-            displayName: '{{ displayname }}'
+            displayname: '{{displayname | escapejs}}'
         };
     });
     {% endautoescape %}

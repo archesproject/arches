@@ -237,6 +237,24 @@ class ResourceData(View):
 
 
 @method_decorator(can_read_resource_instance(), name='dispatch')
+class ResourceTiles(View):
+    def get(self, request, resourceid=None):
+        nodeid = request.GET.get('nodeid', None)
+        permitted_tiles = []
+        perm = 'read_nodegroup'
+        tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+        if nodeid is not None:
+            node = models.Node.objects.get(pk=nodeid)
+            tiles.filter(nodegroup=node.nodegroup)
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile = Tile.objects.get(pk=tile.tileid)
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+        return JSONResponse({'tiles': permitted_tiles})
+
+
+@method_decorator(can_read_resource_instance(), name='dispatch')
 class ResourceCards(View):
     def get(self, request, resourceid=None):
         cards = []
