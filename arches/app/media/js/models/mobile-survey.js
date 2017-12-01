@@ -239,12 +239,12 @@ define([
                     userCallback.call(this, request, status, model);
                 }
                 if (status === 'success') {
-                    self.set('id', request.responseJSON.project.id);
-                    self.createdby(request.responseJSON.project.createdby_id);
-                    self.lasteditedby(request.responseJSON.project.lasteditedby_id);
-                    self.groups(request.responseJSON.project.groups);
-                    self.users(request.responseJSON.project.users);
-                    self.cards(request.responseJSON.project.cards);
+                    self.set('id', request.responseJSON.mobile_survey.id);
+                    self.createdby(request.responseJSON.mobile_survey.createdby_id);
+                    self.lasteditedby(request.responseJSON.mobile_survey.lasteditedby_id);
+                    self.groups(request.responseJSON.mobile_survey.groups);
+                    self.users(request.responseJSON.mobile_survey.users);
+                    self.cards(request.responseJSON.mobile_survey.cards);
                     this._project(this.json());
                 };
             };
