@@ -27,6 +27,7 @@ from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
 from arches.app.views.map import MapLayerManagerView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources
+from arches.app.views.auth import LoginView, SignupView, ConfirmSignupView, ChangePasswordView, GetTokenView
 from arches.app.models.system_settings import settings
 
 # Uncomment the next two lines to enable the admin:
@@ -38,10 +39,11 @@ uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 urlpatterns = [
     url(r'^$', main.index, name='root'),
     url(r'^index.htm', main.index, name='home'),
-    url(r'^auth/password$', main.change_password, name='change_password'),
-    url(r'^auth/signup$', main.signup, name='signup'),
-    url(r'^auth/confirm_signup$', main.confirm_signup, name='confirm_signup'),
-    url(r'^auth/', main.auth, name='auth'),
+    url(r'^auth/password$', ChangePasswordView.as_view(), name='change_password'),
+    url(r'^auth/signup$', SignupView.as_view(), name='signup'),
+    url(r'^auth/confirm_signup$', ConfirmSignupView.as_view(), name='confirm_signup'),
+    url(r'^auth/get_token$', GetTokenView.as_view(), name='get_token'),
+    url(r'^auth/', LoginView.as_view(), name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^admin/reindex/resources$', ReIndexResources.as_view(), name="reindex"),
     url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
@@ -97,10 +99,10 @@ urlpatterns = [
     url(r'^resource/(?P<resourceid>%s)/history$' % uuid_regex, ResourceEditLogView.as_view(), name='resource_edit_log'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
     url(r'^resource/(?P<resourceid>%s)/cards$' % uuid_regex, ResourceCards.as_view(), name='resource_cards'),
-    url(r'^resource/(?P<resourceid>%s)/tiles$' % uuid_regex, ResourceTiles.as_view(), name='resource_tiles'),
     url(r'^resource/history$', ResourceEditLogView.as_view(), name="edit_history"),
     url(r'^resource/related/(?P<resourceid>%s|())$' % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
     url(r'^resource/descriptors/(?P<resourceid>%s|())$' % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
+    url(r'^resource/(?P<resourceid>%s)/tiles$' % uuid_regex, ResourceTiles.as_view(), name='resource_tiles'),
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),

@@ -7903,6 +7903,10 @@ a.clear-geojson-button:hover {
     text-align: center;
 }
 
+.library-grid {
+    padding: 10px 15px;
+}
+
 .library-grid-title {
     font-weight: normal;
     font-size: 15px;
@@ -9249,6 +9253,11 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .library-card {
     margin-left: -5px;
+    background: #fff;
+}
+
+.mobile-project-manager-editor .library-card:hover {
+    background: #fafafa;
 }
 
 .mobile-project-manager-editor .clear-node-search {
@@ -9302,12 +9311,15 @@ a.search-facet-item.disabled {
 }
 
 .mpm-card-content {
-    margin-top: -54px;
-    margin-left: -35px;
+    padding: 10px;
+}
+
+.account-wrapper {
+    padding-top: 20px;
 }
 
 .mpm-card-list {
-    min-height: 400px;
+    min-height: 300px;
     min-width: 200px;
     /*max-width: 1125px;*/
     width: 50%;
@@ -9323,19 +9335,19 @@ a.search-facet-item.disabled {
 
 .mpm-card-list-items {
     overflow-y: auto;
-    height: 385px;
+    height: 361px;
 }
 
 .mpm-card-list-items .ko_container {
     min-height: 100%;
-    background-color: #f9f9f9;
+    background-color: #fbfbfb;
 }
 
 .mpm-card-list-header {
     padding: 10px;
     border-style: solid;
     border-width: 0.25px;
-    border-color: #eee;
+    border-color: #eaeaea;
     background-color: #f8f8f8;
 }
 
@@ -9395,6 +9407,12 @@ a.search-facet-item.disabled {
 .mobile-project-manager-editor .identities-list .library-card {
     margin-left: 0;
     border-left: 0;
+    height: 65px;
+}
+
+.mobile-project-manager-editor .identities-list .library-card:first-child {
+    border-top: 1px solid #ddd;
+    margin-top: 5px;
 }
 
 .mobile-project-manager-editor .tab-content {
@@ -9424,14 +9442,14 @@ a.search-facet-item.disabled {
     top: 15px;
     width: 100%;
     height: 490px;
-    padding: 10px;
+    padding: 10px 35px;
 }
 
 .msm-resource-status {
     display: inline-block;
     width: 100%;
     padding-right: 10px;
-    padding-top: 30px;
+    padding-top: 25px;
     text-align: right;
 }
 
@@ -9461,7 +9479,7 @@ a.search-facet-item.disabled {
     position: relative;
     padding-left: 25px;
     left: 0px;
-    top: 0px;
+    top: 2px;
 }
 
 .msm-resource-panel .mpm-group-subtitle {
@@ -9475,11 +9493,12 @@ a.search-facet-item.disabled {
     position: relative;
     padding: 0 5px;
     left: 0;
-    top: 0;
+    top: 3px;
 }
 
 .msm-resource-panel .title-block-title {
     width: auto;
+    margin-top: 5px;
 }
 
 .mpm-group-name {
@@ -9509,10 +9528,10 @@ a.search-facet-item.disabled {
 
 .mpm-card-container {
     position: absolute;
+    top: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    height: 430px;
     overflow-y: hidden;
     margin-top: 5px;
     margin-right: 35px;
@@ -9520,15 +9539,16 @@ a.search-facet-item.disabled {
 }
 
 .msm-card-toolbar {
+    position: absolute;
+    top: 70px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
-    padding-top: 10px;
 }
 
 .mpm-card-filter {
-    width: 300px;
+    width: 400px;
 }
 
 .mpm-user-name h4 {
@@ -9552,14 +9572,21 @@ a.search-facet-item.disabled {
 }
 
 .library-card-main.mpm-resource-list {
-    top: 7px;
+    top: 8px;
     overflow:visible;
     cursor: pointer;
     width:100%;
 }
 
+.selected-card div .library-card-main.mpm-resource-list {
+    background: #fbfbfb;
+    padding: 6px 0px;
+    margin-top: -8px;
+    border-bottom: 1px solid #eee;
+}
+
 .library-card-main.mpm-resource-list .added {
-    color: #64bd63;
+    color: #1E6FB7;
 }
 
 .msm-resource-list-header {
@@ -9578,21 +9605,24 @@ a.search-facet-item.disabled {
 }
 
 .msm-resource-panel .library-card.selected.selected-card {
-    height: 550px;
+    height: 605px;
     -webkit-transition: height 0.25s;
     /* Safari */
     transition: height 0.25s;
     background: #ffffff;
-    border-left: 0;
+    border: 1px solid #ddd;
 }
 
 .msm-resource-panel .title-block-fixed {
     display: flex;
     background: white;
+    border-bottom-width: 0px;
     width: -webkit-fill-available;
     margin-left: 0;
-    padding-bottom: 13px;
-    padding-top: 20px;
+    padding-bottom: 5px;
+    padding-top: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
     justify-content: space-between;
 }
 
@@ -9606,10 +9636,23 @@ a.search-facet-item.disabled {
 .msm-resource-panel .grid {
     margin-left: 1px;
     margin-right: 1px;
+    margin-top: 68px;
+    width: 100%;
+    padding: 0px 20px 0px 20px;
+    background: #fff;
+    border-top-width: 0px;
+    max-width: unset;
 }
 
+
 .msm-resource-panel .list-filter {
-    width: 250px;
+    width: 400px;
+    height: 40px;
+    margin-top: -5px;
+}
+
+.msm-resource-panel .list-filter .clear-node-search {
+    margin-top: 4px;
 }
 
 .msm-resource-cards .mpm-card-container {
@@ -9645,6 +9688,9 @@ a.search-facet-item.disabled {
     padding-left: 5px;
 }
 
+.msm-resource-panel .ep-graph-title-icon {
+    background: #eee;
+}
 
 .mpm-user-groups {
     color: #777;
@@ -9716,6 +9762,14 @@ a.search-facet-item.disabled {
     text-align: left;
 }
 
+.mpm-instructions {
+    position: absolute;
+    top: 10px;
+    color: #555;
+    font-size: 13px;
+    padding: 15px 20px 5px 5px;
+}
+
 .mpm-user-name .mpm-user-status.invited {
     color: #64bd63;
 }
@@ -9741,6 +9795,10 @@ a.search-facet-item.disabled {
     color: #454545;
     font-size: 15px;
     font-weight: 500;
+}
+
+.mpm-item-listing-header.data-panel {
+    padding-left: 0px;
 }
 
 .mpm-account-switch {
@@ -9788,6 +9846,10 @@ a.search-facet-item.disabled {
     padding-bottom: 10px;
     border-top: 1px solid #eee;
     height: 135px;
+}
+
+.msm-settings-summary {
+    min-height: 500px;
     overflow-y: scroll;
 }
 

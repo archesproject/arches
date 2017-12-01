@@ -32,7 +32,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 
 class UserManagerView(BaseManagerView):
 
@@ -62,16 +62,16 @@ class UserManagerView(BaseManagerView):
             identities.append({'name': user.email or user.username, 'groups': ', '.join(groups), 'type': 'user', 'id': user.pk, 'default_permissions': set(default_perms), 'is_superuser':user.is_superuser, 'group_ids': group_ids, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
 
 
-        user_projects = [pxu.mobile_survey for pxu in models.MobileSurveyXUser.objects.filter(user=user)]
-        user_projects_by_group = [pxu_x_group.mobile_survey for pxu_x_group in models.MobileSurveyXGroup.objects.filter(group__in=user.groups.all())]
+        user_mobile_surveys = [pxu.mobile_survey for pxu in models.MobileSurveyXUser.objects.filter(user=user)]
+        user_mobile_surveys_by_group = [pxu_x_group.mobile_survey for pxu_x_group in models.MobileSurveyXGroup.objects.filter(group__in=user.groups.all())]
 
-        for gp in user_projects_by_group:
-             if gp not in user_projects:
-                 user_projects.append(gp)
+        for gp in user_mobile_surveys_by_group:
+             if gp not in user_mobile_surveys:
+                 user_mobile_surveys.append(gp)
 
-        projects, resources = self.get_project_resources(user_projects)
+        mobile_surveys, resources = self.get_mobile_survey_resources(user_mobile_surveys)
 
-        return {'identities': identities, 'user_projects': projects, 'resources': resources}
+        return {'identities': identities, 'user_surveys': mobile_surveys, 'resources': resources}
 
     def get(self, request):
 
@@ -88,7 +88,7 @@ class UserManagerView(BaseManagerView):
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
 
-            context['user_surveys'] = JSONSerializer().serialize(user_details['user_projects'], sort_keys=False)
+            context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'], sort_keys=False)
             context['identities'] = JSONSerializer().serialize(user_details['identities'], sort_keys=False)
             context['resources'] = JSONSerializer().serialize(user_details['resources'], sort_keys=False)
 
@@ -109,7 +109,7 @@ class UserManagerView(BaseManagerView):
             context['nav']['login'] = True
             context['nav']['help'] = (_('Profile Editing'),'help/profile-manager-help.htm')
             context['validation_help'] = validation.password_validators_help_texts()
-            context['user_surveys'] = JSONSerializer().serialize(user_details['user_projects'])
+            context['user_surveys'] = JSONSerializer().serialize(user_details['user_surveys'])
             context['identities'] = JSONSerializer().serialize(user_details['identities'])
             context['resources'] = JSONSerializer().serialize(user_details['resources'])
 
@@ -134,15 +134,15 @@ class UserManagerView(BaseManagerView):
 
             return render(request, 'views/user-profile-manager.htm', context)
 
-    def get_project_resources(self, project_models):
+    def get_mobile_survey_resources(self, mobile_survey_models):
         resources = []
-        projects = []
+        mobile_surveys = []
         all_ordered_card_ids = []
 
-        for project in project_models:
-            proj = MobileSurvey.objects.get(id=project.id)
-            project_dict = proj.serialize()
-            all_ordered_card_ids += project_dict['cards']
-            projects.append(project_dict)
+        for mobile_survey in mobile_survey_models:
+            survey = MobileSurvey.objects.get(id=mobile_survey.id)
+            mobile_survey_dict = survey.serialize()
+            all_ordered_card_ids += mobile_survey_dict['cards']
+            mobile_surveys.append(mobile_survey_dict)
 
-        return projects, resources
+        return mobile_surveys, resources

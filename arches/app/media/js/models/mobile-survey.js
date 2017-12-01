@@ -22,6 +22,7 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
+            self.datadownload = ko.observable();
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -60,7 +61,6 @@ define([
             self.lasteditedbyName = ko.computed(function() {
                 return getUserName(self.lasteditedby());
             });
-
 
             self.selectedIdentity = ko.computed(function() {
                 var selected = _.filter(self.identities, function(identity) {
@@ -122,9 +122,9 @@ define([
             self.toggleIdentity = function() {
                 var identity = self.selectedIdentity();
                 if (identity) {
-                    var identities = identity.type === 'user' ? self.users : self.groups;
+                    var currentIdentities = identity.type === 'user' ? self.users : self.groups;
                     if (self.hasIdentity()) {
-                        identities.remove(identity.id);
+                        currentIdentities.remove(identity.id);
                         if (identity.type === 'user') {
                             identity.approved(false);
                         } else {
@@ -139,14 +139,18 @@ define([
                             })
                         };
                     } else {
-                        identities.push(identity.id);
+                        if (!_.contains(currentIdentities(), identity.id)) {
+                            currentIdentities.push(identity.id);
+                        }
                         identity.approved(true);
                         _.chain(self.identities).filter(function(id) {
                             return id.type === 'user'
                         }).each(function(user) {
                             if (_.intersection(user.group_ids, self.groups()).length > 0) {
                                 user.approved(true);
-                                self.users.push(user.id);
+                                if (!_.contains(self.users(), user.id)) {
+                                    self.users.push(user.id);
+                                }
                             }
                         })
                     };
@@ -169,11 +173,11 @@ define([
             self.updateApproved = function(val){
                 val.item.approved(true);
                 self.updateCards(val)
-            };;
+            };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
-                self.updateCards(val)
+                self.cards.remove(val.item.cardid)
             };
 
             self.toggleShowDetails = function() {
@@ -194,7 +198,8 @@ define([
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
-                    cards: self.cards
+                    cards: self.cards,
+                    datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -217,6 +222,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
 
@@ -236,12 +242,13 @@ define([
                     userCallback.call(this, request, status, model);
                 }
                 if (status === 'success') {
-                    self.set('id', request.responseJSON.project.id);
-                    self.createdby(request.responseJSON.project.createdby_id);
-                    self.lasteditedby(request.responseJSON.project.lasteditedby_id);
-                    self.groups(request.responseJSON.project.groups);
-                    self.users(request.responseJSON.project.users);
-                    self.cards(request.responseJSON.project.cards);
+                    self.set('id', request.responseJSON.mobile_survey.id);
+                    self.createdby(request.responseJSON.mobile_survey.createdby_id);
+                    self.lasteditedby(request.responseJSON.mobile_survey.lasteditedby_id);
+                    self.groups(request.responseJSON.mobile_survey.groups);
+                    self.users(request.responseJSON.mobile_survey.users);
+                    self.cards(request.responseJSON.mobile_survey.cards);
+                    self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };
             };

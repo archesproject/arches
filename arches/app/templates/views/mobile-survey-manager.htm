@@ -97,7 +97,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
-                <div id="page-content" class="library-grid" style="display:none;" data-bind="visible: true">
+                <div id="" class="library-grid" style="display:none;" data-bind="visible: true">
 
                     <!-- ko if: selectedProject() -->
                     <div id="sample-project" class="project-panel">
@@ -106,8 +106,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="project-panel-header edit-mode">
                             <h3 class="project-panel-title" data-bind="text: selectedProject().name() === '' ? '{% trans "Unnamed Survey" %}' : selectedProject().name()"></h3>
                             <ul class="msm-edit-buttons">
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                                 <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveProject, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Save Edits' %}</button>
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': selectedProject().dirty()==false}">{% trans 'Discard Edits' %}</button>
                             </ul>
 
                             <div class="">
@@ -167,79 +167,81 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Summary Card -->
                                         <div id="summary-card" class="mpm-card tab-pane fade active in" style="">
-                                            <div class="panel-body card-panel-body project-card-body">
-                                                <div id="" class="card-content">
+                                            <div class="mpm-card-content">
+                                                <div class="panel-body card-panel-body project-card-body">
+                                                    <div id="" class="card-content">
 
-                                                    <!-- Project Info -->
-                                                    <section id="" class="profile-list edit-mode">
-                                                        <div class="account-wrapper">
-                                                            <div class="row relative">
+                                                        <!-- Project Info -->
+                                                        <section id="" class="profile-list edit-mode">
+                                                            <div class="account-wrapper">
+                                                                <div class="row relative">
 
 
-                                                                <!-- Section Content -->
-                                                                <div class="col-sm-12">
+                                                                    <!-- Section Content -->
+                                                                    <div class="col-sm-12">
 
-                                                                    <div id="account-crud" class="" style="">
-                                                                        <div class="row">
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Survey name' %}</label>
-                                                                                    <input type="text" class="form-control input-lg account-input" data-bind="value: selectedProject().name, valueUpdate: 'keyup'">
+                                                                        <div id="account-crud" class="" style="">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-5">
+                                                                                    <div class="form-group">
+                                                                                        <label class="control-label account-label">{% trans 'Survey name' %}</label>
+                                                                                        <input type="text" class="form-control input-lg account-input" data-bind="value: selectedProject().name, valueUpdate: 'keyup'">
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="col-sm-6">
+                                                                                    <p class="account-tips">
+                                                                                        {% trans 'Pick a concise name that makes it easy for people to find your survey' %}
+                                                                                    </p>
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div class="col-sm-6">
-                                                                                <p class="account-tips">
-                                                                                    {% trans 'Pick a concise name that makes it easy for people to find your survey' %}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
+                                                                            <hr style="border-color: #eee;">
 
-                                                                        <hr style="border-color: #eee;">
-
-                                                                        <div class="row">
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Survey start date' %}</label>
-                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
+                                                                            <div class="row">
+                                                                                <div class="col-sm-5">
+                                                                                    <div class="form-group">
+                                                                                        <label class="control-label account-label">{% trans 'Survey start date' %}</label>
+                                                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: selectedProject().enddate}, value: selectedProject().startdate">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-6">
+                                                                                    <p class="account-tips">
+                                                                                        {% trans 'The survey start and end dates are used to limit when people can add or edit Arches data.' %}
+                                                                                    </p>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-sm-6">
-                                                                                <p class="account-tips">
-                                                                                    {% trans 'The survey start and end dates are used to limit when people can add or edit Arches data.' %}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
 
-                                                                        <div class="row">
-                                                                            <div class="col-sm-5">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Survey end' %}</label>
-                                                                                    <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <hr style="border-color: #eee;">
-
-                                                                        <div class="row">
-                                                                            <div class="col-sm-12">
-                                                                                <div class="form-group">
-                                                                                    <label class="control-label account-label">{% trans 'Description' %}</label>
-                                                                                    <div>
-                                                                                        <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: selectedProject().description, valueUpdate: 'keyup'"></textarea>
+                                                                            <div class="row">
+                                                                                <div class="col-sm-5">
+                                                                                    <div class="form-group">
+                                                                                        <label class="control-label account-label">{% trans 'Survey end' %}</label>
+                                                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: selectedProject().startdate, maxDate: false}, value: selectedProject().enddate">
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
 
-                                                                        </div>
+                                                                            <hr style="border-color: #eee;">
 
+                                                                            <div class="row">
+                                                                                <div class="col-sm-12">
+                                                                                    <div class="form-group">
+                                                                                        <label class="control-label account-label">{% trans 'Description' %}</label>
+                                                                                        <div>
+                                                                                            <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: selectedProject().description, valueUpdate: 'keyup'"></textarea>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </section>
+                                                        </section>
 
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -251,7 +253,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Models Card -->
                                         <div id="models-card" class="identities-list tab-pane fade">
-                                            <div>
+                                            <div class="mpm-card-content">
                                                 <div>
                                                     <div class="flex relative">
 
@@ -259,20 +261,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             {% include 'views/mobile-survey-manager/resource-list.htm' %}
                                                         </div>
 
-                                                        <div class="msm-resource-cards" data-bind="style: {top: (resourceList.selectedIndex() * 60 + 120) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
+                                                        <div class="msm-resource-cards" data-bind="style: {top: ((resourceList.selectedIndex() * 60 + 120) + (resourceList.selectedIndex() * 5.0)) + 'px' }, visible: resourceList.selected() && resourceList.hideResourceList() != true">
 
                                                             <div class="relative">
+
+                                                                <p class="mpm-instructions">
+                                                                    Drag &amp; drop the forms you want in your project from the "Available forms" column to the "Selected forms" column.  <strong> Note that the order of the forms in the "Selected forms" column determines the order of display in the mobile app.</strong>
+                                                                </p>
+
                                                                 <!--ko if: resourceList.selected() -->
                                                                  <!--ko if: resourceList.selected().cards().length > 0 -->
                                                                  <div class="msm-card-toolbar">
-                                                                     <h4 class="mpm-item-listing-header">{% trans 'Data Entry Forms' %}</h4>
                                                                      <div class="mpm-card-filter">
-                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup', event: {keyup: function(val){console.log('thest')}}">
-                                                                     </div>
-                                                                 </div>
+                                                                         <input class="form-control input-lg" placeholder="{% trans 'find a form...' %}" type="text" data-bind="value: resourceList.cardFilter, valueUpdate: 'keyup'">
+                                                                    </div>
+                                                                </div>
                                                                 <div class="mpm-card-container">
                                                                     <div class="mpm-card-list available">
-                                                                    <div class="mpm-card-list-header">{% trans 'Available to Add' %}</div>
+                                                                    <div class="mpm-card-list-header">{% trans 'Available forms' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data:resourceList.selected().cards, afterMove: selectedProject().updateUnapproved,  addToSelf: true}" class="ko_container ui-sortable">
                                                                         <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === false)">
@@ -298,12 +304,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                    </div>
+                                                            </div>
                                                                     <div class="mpm-card-list approved">
-                                                                    <div class="mpm-card-list-header">{% trans 'Added to Survey' %}</div>
+                                                                    <div class="mpm-card-list-header">{% trans 'Selected forms' %}</div>
                                                                     <div class="mpm-card-list-items">
                                                                     <div data-bind="sortable: {data: resourceList.selected().cards, afterMove: selectedProject().updateApproved, addToSelf: true}" class="ko_container ui-sortable" style="min-height:100%">
-                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.approved() === true)">
+                                                                        <div class="list-group-item get-user-detail" data-bind="click: function(){ $data.expanded(!$data.expanded()) }, visible: ($data.filtered() === false && $data.approved() === true)">
                                                                             <div class="mpm-user-title mpm-user-name">
                                                                                 <h4 data-bind='text: $data.name'></h4>
                                                                             </div>
@@ -341,10 +347,41 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
 
-                                        <!-- Data Card -->
-                                        <div id="data-card" class="mpm-card tab-pane fade">
-                                            Data...
+                <!-- Data Card -->
+                <div id="data-card" class="mpm-card tab-pane fade">
+                    <div class="mpm-card-content">
+                        <div class="panel-body card-panel-body project-card-body">
+                            <div class="card-content">
+                                <div class="mpm-activation-panel">
+                                            <div class="row pad-btm">
+                                                <!-- Activate Switch -->
+                                                <div class="col-sm-5 col-md-3">
+
+                                                    <div class="box-inline">
+                                                        <p class="mpm-item-listing-header data-panel" style="margin-bottom: 0px;">{% trans 'Allow users to download data' %}</p>
+
+                                                        <div class="toggle-container">
+                                                            <span class="switch switch-small" data-bind="css: {'on': selectedProject().datadownload()}, click: function(){
+                                                                selectedProject().datadownload(!selectedProject().datadownload());
+                                                            }"><small></small></span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- Help Message-->
+                                                <div class="col-sm-6 col-md-9">
+                                                    <p class="account-tips" style="margin-top: 20px;">
+                                                        {% trans 'Downloading data allows users to access and edit existing Arches information in the field' %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                         </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                                         <div id="identities-card" class="identities-list mpm-card tab-pane fade">
 
@@ -639,56 +676,60 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
                                                         </div>
 
-                                                        <!-- Survey Settings -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Summary' %}
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    Number of edits: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Contributors: 0
-                                                                </li>
-                                                                <li class="">
-                                                                    Offline Basemap: Streets-Grey
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                        <!-- Survey Summary -->
+                                                        <div class="msm-settings">
 
-                                                        <!-- User Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Groups/Users' %}
-                                                            </p>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    {% trans 'Groups' %} (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li class="">
-                                                                    {% trans 'Users' %} (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
-                                                                    <ul class="mpm-node-detail-metadata">
-                                                                        <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
+                                                            <!-- Survey Settings -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Summary' %}
+                                                                </p>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        Number of edits: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Contributors: 0
+                                                                    </li>
+                                                                    <li class="">
+                                                                        Offline Basemap: Streets-Grey
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
 
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                            <!-- User Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Groups/Users' %}
+                                                                </p>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Groups' %} (<span data-bind="text: selectedProject().approvedGroupNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text:  selectedProject().approvedGroupNames().join(', ')">
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        {% trans 'Users' %} (<span data-bind="text: selectedProject().approvedUserNames().length"></span>)
+                                                                        <ul class="mpm-node-detail-metadata">
+                                                                            <li class="" data-bind="text: selectedProject().approvedUserNames().join(', ')">
 
-                                                        <!-- Model/Card Summary -->
-                                                        <div class="mpm-summary-panel">
-                                                            <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                                {% trans 'Models and Data Entry Cards' %}
-                                                            </p>
-                                                            <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <!-- Model/Card Summary -->
+                                                            <div class="mpm-summary-panel">
+                                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                                    {% trans 'Models and Data Entry Cards' %}
+                                                                </p>
+                                                                <!--ko if: resourceList.hasCards() -->
+                                                                <!--ko foreach: {data: resourceList.items, as: 'resource'} -->
                                                                 <!--ko if: resource.added() === true -->
                                                                 <ul class="mpm-node-detail-metadata">
                                                                     <li class="">
@@ -703,7 +744,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     </li>
                                                                 </ul>
                                                                 <!--/ko-->
-                                                            <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--/ko-->
+                                                                <!--ko ifnot: resourceList.hasCards() -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li class="">
+                                                                        <div>{% trans 'No forms selected' %}</div>
+                                                                    </li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                            </div>
                                                         </div>
 
                                                     </div>

@@ -72,8 +72,13 @@ class SearchEngine(object):
 
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except Exception as detail:
-                self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
-                raise detail
+                try:
+                    # ignore 404 errors (index_not_found_exception)
+                    if detail.status_code == 404:
+                        pass
+                except:
+                    self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
+                    raise detail
         else:
             try:
                 return self.es.delete(ignore=[404], **kwargs)
@@ -198,6 +203,7 @@ class SearchEngine(object):
         }
 
     def count(self, **kwargs):
+        kwargs = self._add_prefix(**kwargs)
         count = self.es.count(**kwargs)
         if count is not None:
             return count['count']

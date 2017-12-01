@@ -22,17 +22,19 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-
+from tests import test_settings as settings
 from tests.base_test import ArchesTestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.test.client import RequestFactory, Client
-from arches.app.views.main import auth
+from arches.app.views.auth import LoginView, GetTokenView
 from arches.app.views.concept import RDMView
-from arches.app.utils.set_anonymous_user import SetAnonymousUser
+from arches.app.utils.middleware import SetAnonymousUser
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.management.commands.packages import Command as PackageCommand
+from jose import jwt, jws
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/auth_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -56,10 +58,103 @@ class AuthTests(ArchesTestCase):
         request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
         request.user = self.user
         apply_middleware(request)
-        response = auth(request)
+        view = LoginView.as_view()
+        response = view(request)
 
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get('location') == reverse('home'))
+
+    def test_login_w_email(self):
+        """
+        Test that a user can login with their email address and is redirected to the home page
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'test@archesproject.org', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('home'))
+
+    def test_invalid_credentials(self):
+        """
+        Test that a user can't login with invalid credentials
+
+        """
+
+        request = self.factory.post(reverse('auth'), {'username': 'wrong', 'password': 'wrong'})
+        request.user = self.user
+        apply_middleware(request)
+        view = LoginView.as_view()
+        response = view(request)
+
+        self.assertTrue(response.status_code == 401)
+
+    def test_logout(self):
+        """
+        Test that a user can logout
+
+        """
+
+        view = LoginView.as_view()
+        
+        request = self.factory.post(reverse('auth'), {'username': 'test', 'password': 'password'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        request = self.factory.get(reverse('auth'), {'logout': 'true'})
+        request.user = self.user
+        apply_middleware(request)
+        response = view(request)
+
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location') == reverse('auth'))
+
+    def test_get_token(self):
+        """
+        Test to get a JSON Web Token given a valid username and password
+
+        """
+
+        response = self.client.post(reverse('get_token'), {'username': 'test', 'password': 'password'})
+        token = response.content
+        decoded_json = jws.verify(token, settings.JWT_KEY, algorithms=[settings.JWT_ALGORITHM])
+        decoded_dict = JSONDeserializer().deserialize(decoded_json)
+        username = decoded_dict.get('username', None)
+
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(username == 'test')
+
+    def test_get_token_from_invalid_user(self):
+        """
+        Test that we can't get a JSON Web Token given an invalid username and password
+
+        """
+
+        response = self.client.post(reverse('get_token'), {'username': 'alksjdffd', 'password': 'asdf'})
+
+        self.assertTrue(response.status_code == 401)
+
+    def test_use_token_for_access_to_privileged_page(self):
+        """
+        Test that we can use a valid JSON Web Token to gain access to a page that requires a logged in user
+
+        """
+
+        response = self.client.get(reverse('rdm', args=['']))
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(response.get('location').split('?')[0] == reverse('auth'))
+        self.assertTrue(response.get('location').split('?')[0] != reverse('rdm', args=['']))
+
+        response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})
+        token = response.content
+        response = self.client.get(reverse('rdm', args=['']), HTTP_AUTHORIZATION='Bearer %s' % token)
+
+        self.assertTrue(response.status_code == 200)
 
     def test_set_anonymous_user_middleware(self):
         """

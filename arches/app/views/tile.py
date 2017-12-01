@@ -21,7 +21,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.views.tileserver import clean_resource_cache

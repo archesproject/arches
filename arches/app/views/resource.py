@@ -33,7 +33,7 @@ from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.base import BaseManagerView

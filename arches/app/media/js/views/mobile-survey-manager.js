@@ -43,7 +43,8 @@ define([
                     id: null,
                     cards: [],
                     users: [],
-                    groups: []
+                    groups: [],
+                    datadownload: false
                 },
                 identities: data.identities
             }));
@@ -82,8 +83,6 @@ define([
     } else {
         viewModel.selectedProject(viewModel.projects()[0])
     }
-
-    viewModel.resourceList.items()[0].selected(true)
 
     var pageView = new BaseManagerView({
         viewModel: viewModel

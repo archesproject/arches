@@ -20,7 +20,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from arches.app.utils.decorators import group_required
 from arches.app.utils.index_database import index_resources_by_type
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @method_decorator(group_required('Graph Editor'), name='dispatch')
