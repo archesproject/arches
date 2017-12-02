@@ -9445,21 +9445,30 @@ a.search-facet-item.disabled {
     padding: 10px 35px;
 }
 
-.msm-resource-status {
-    display: inline-block;
-    width: 100%;
+.msm-item-status {
+    position: absolute;
+    right: 10px;
     padding-right: 10px;
     padding-top: 25px;
     text-align: right;
+    font-size: 13px;
+    color: #999;
 }
 
-.mpm-group-users {
+.msm-user-summary {
+    display:flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.msm-group-users {
     height: 390px;
     overflow-y: scroll;
     margin-top: 5px;
     border-top: solid;
     border-width: 0.25px;
     border-color: #eee;
+    width: 50%;
 }
 
 .get-user-detail:hover {
@@ -9818,6 +9827,11 @@ a.search-facet-item.disabled {
 .mpm-user-summary {
     padding: 10px;
 }
+
+.msm-user-summary .mpm-user-summary {
+    width: 50%;
+}
+
 
 .mpm-model-detail-panel {
     padding-left: 10px;

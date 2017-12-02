@@ -62,12 +62,41 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+            self.userFilter = ko.observable('');
+            self.selectedUser = ko.observable();
+
+            self.filteredUsers = ko.computed(function() {
+                var filter = self.userFilter();
+                this.selected = _.filter(self.identities, function(identity) {
+                    return ko.unwrap(identity.selected);
+                });
+                var list = []
+
+                if (this.selected.length === 1) {
+                    list = this.selected[0].users;
+                    if (filter.length === 0) {
+                        return list;
+                    }
+                }
+
+                return _.filter(list, function(user) {
+                    if (user.username.startsWith(filter)) {
+                        return user
+                    }
+                });
+
+            });
+
             self.selectedIdentity = ko.computed(function() {
                 var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
+                if (selected.length === 1 && selected[0].users) {
+                    self.selectedUser(selected[0].users.length > 0 ? selected[0].users[0] : undefined);
+                }
                 return selected.length > 0 ? selected[0] : undefined;
             });
+
 
             self.approvedUserNames = ko.computed(function() {
                 names = [];
@@ -88,27 +117,6 @@ define([
                 }, this);
                 return names;
             })
-
-            self.userFilter = ko.observable('');
-
-            self.filteredUsers = ko.computed(function() {
-                var filter = self.userFilter();
-                var selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                var list = []
-                if (selected.length === 1) {
-                    list = selected[0].users;
-                    if (filter.length === 0) {
-                        return list;
-                    }
-                }
-                return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {
-                        return user
-                    }
-                });
-            });
 
             self.hasIdentity = function() {
                 var approved = false;

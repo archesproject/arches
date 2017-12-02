@@ -8,27 +8,25 @@
 
 {% block listitem %}
     <div data-bind="attr:{'title': $data.groups}">
-        <div class="library-icon" style="">
-            <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
-                <i data-bind="attr: {class: 'fa fa-' + $data.type}"></i>
-            </span>
+        <div class="library-card-main mpm-resource-list msm-resource-list-header">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle" data-bind="css: $data.type === 'group' ? 'bg-purple' : 'bg-mint'">
+                    <i data-bind="attr: {class: 'fa fa-' + $data.type}"></i>
+                </span>
+            </div>
+            <div class="msm-resource-name" data-bind="css: {'user': $data.type ==='user' }">
+                <div class="mpm-group-name"><a class="listitem-name" data-bind="text: $data.name"></a></div>
+                <div class="mpm-group-subtitle" data-bind="text: $data.type ==='user' ? '{% trans 'Arches User' %}' : '{% trans 'Arches Group' %}'"></div>
+            </div>
+            <div class="msm-item-status">
+                <!-- ko if: $data.approved() -->
+                <div class="added" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Group selected' %}</div>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.approved() -->
+                <div data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Group not selected' %}</div>
+                <!-- /ko -->
+            </div>
         </div>
-
-
-        <div class="library-card-main" style="" data-bind="css: {'user': $data.type ==='user' }">
-            <a class="name">
-                <div data-bind="text: $data.name"></div>
-            </a>
-            <div class="user-groups" data-bind="text: $data.groups"></div>
-        </div>
-        <!-- ko if: $data.approved() -->
-        <div class="project-status invited" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Approved' %}</div>
-        <!-- /ko -->
-        <!-- ko ifnot: $data.approved() -->
-        <div class="project-status" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Not Approved' %}</div>
-        <!-- /ko -->
     </div>
-
-
 
 {% endblock %}
