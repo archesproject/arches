@@ -19,12 +19,7 @@
                 <div class="mpm-group-subtitle" data-bind="text: $data.type ==='user' ? '{% trans 'Arches User' %}' : '{% trans 'Arches Group' %}'"></div>
             </div>
             <div class="msm-item-status">
-                <!-- ko if: $data.approved() -->
-                <div class="added" data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Group selected' %}</div>
-                <!-- /ko -->
-                <!-- ko ifnot: $data.approved() -->
-                <div data-bind="css: {'user': $data.type ==='user' }"> {% trans 'Group not selected' %}</div>
-                <!-- /ko -->
+                <div data-bind="css: {'user': $data.type ==='user', 'added': $data.approved() }, text: ($data.type ==='user' ? '{% trans 'User' %}' : '{% trans 'Group' %}') + ' ' + ($data.approved() ? '{% trans 'selected' %}' : '{% trans 'not selected' %}')"></div>
             </div>
         </div>
     </div>
