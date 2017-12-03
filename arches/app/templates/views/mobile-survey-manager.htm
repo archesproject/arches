@@ -393,9 +393,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 
-                            <div class="msm-resource-panel" style="" data-bind="with:identityList">
-                                {% include 'views/mobile-survey-manager/identity-list.htm' %}
-                            </div>
+                                                        <div class="msm-resource-panel identities" style="" data-bind="with:identityList">
+                                                            {% include 'views/mobile-survey-manager/identity-list.htm' %}
+                                                        </div>
 
                                                         <!-- start identity content -->
                                                         <div class="msm-resource-cards" data-bind="style: {top: ((identityList.selectedIndex() * 60 + 120) + (identityList.selectedIndex() * 5.0)) + 'px' }, visible: identityList.selected()  && identityList.hideIdentityDetails() != true">

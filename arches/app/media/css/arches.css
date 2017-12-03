@@ -9622,6 +9622,16 @@ a.search-facet-item.disabled {
     border: 1px solid #ddd;
 }
 
+.msm-resource-panel.identities .library-card.selected.selected-card {
+    height: 490px;
+    -webkit-transition: height 0.25s;
+    /* Safari */
+    transition: height 0.25s;
+    background: #ffffff;
+    border: 1px solid #ddd;
+}
+
+
 .msm-resource-panel .title-block-fixed {
     display: flex;
     background: white;
