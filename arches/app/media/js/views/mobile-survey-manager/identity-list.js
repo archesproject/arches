@@ -21,6 +21,8 @@ define([
         * @param {boolean} options.card - a reference to the selected {@link CardModel}
         */
         initialize: function(options) {
+            this.selectedIndex = ko.observable(0);
+            this.hideIdentityDetails = ko.observable(false);
             ListView.prototype.initialize.apply(this, arguments);
             var self = this;
             this.items = options.items;
@@ -32,7 +34,14 @@ define([
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
                 return res;
             })
+            this.filteredItems = ko.computed(function(){
+                var filtered = _.filter(self.items(), function(item){return !item.filtered()});
+                self.selectedIndex(_.indexOf(filtered, self.selected()));
+                self.hideIdentityDetails(!_.contains(filtered, self.selected())) //If the selected item is filtered out, we need to hide its cards
+                return filtered;
+            })
         }
+
 
     });
     return IdentityList;

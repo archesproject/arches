@@ -121,7 +121,6 @@ define([
         this.selectedProject.subscribe(function(val){
             if (val) {
                 self.identityList.clearSelection();
-                self.identityList.items()[0].selected(true);
                 self.resourceList.clearSelection();
                 self.resourceList.resetCards(val.cards());
                 val.update();
