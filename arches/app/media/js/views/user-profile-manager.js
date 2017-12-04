@@ -34,13 +34,13 @@ define([
                 this.showEditUserForm(!this.showEditUserForm())
             };
 
-            self.viewModel.projectManager = new MobileSurveyManagerViewModel(data);
+            self.viewModel.mobileSurveyManager = new MobileSurveyManagerViewModel(data);
 
-            _.each(self.viewModel.projectManager.projects(), function(project) {
+            _.each(self.viewModel.mobileSurveyManager.projects(), function(project) {
                 project.resources = ko.computed(function() {
                     var resources = [];
                     var resource_lookup = {};
-                    _.each(self.viewModel.projectManager.resourceList.items(), function(resource) {
+                    _.each(self.viewModel.mobileSurveyManager.resourceList.items(), function(resource) {
                         _.each(resource.cards(), function(card) {
                                 if (_.contains(project.cards(), card.cardid)) {
                                     if (resource_lookup[resource.id]) {
