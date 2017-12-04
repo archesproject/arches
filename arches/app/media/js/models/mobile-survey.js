@@ -138,8 +138,8 @@ define([
                         } else {
                             identity.approved(false);
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user'
-                            }).each(function(user) {
+                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id)
+                            }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
                                     self.users.remove(user.id);
@@ -151,16 +151,21 @@ define([
                             currentIdentities.push(identity.id);
                         }
                         identity.approved(true);
-                        _.chain(self.identities).filter(function(id) {
-                            return id.type === 'user'
-                        }).each(function(user) {
-                            if (_.intersection(user.group_ids, self.groups()).length > 0) {
-                                user.approved(true);
-                                if (!_.contains(self.users(), user.id)) {
-                                    self.users.push(user.id);
+                        if (identity.type === 'user') {
+                            self.users.push(identity.id);
+                        } else {
+                            _.chain(self.identities).filter(function(id) {
+                                var identity = identity;
+                                return id.type === 'user'
+                            }).each(function(user) {
+                                if (_.intersection(user.group_ids, self.groups()).length > 0) {
+                                    user.approved(true);
+                                    if (!_.contains(self.users(), user.id)) {
+                                        self.users.push(user.id);
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     };
                 };
             };
