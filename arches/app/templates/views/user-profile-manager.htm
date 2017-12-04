@@ -290,13 +290,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% trans 'My Surveys' %}
                     </div>
 
-                    <!--ko ifnot: projectManager.projects().length -->
+                    <!--ko ifnot: mobileSurveyManager.projects().length -->
                     <div id="default-mobile-projects" class="profile-default-message-panel">
                         {% trans "Sorry, but you haven't been invited to a survey yet..." %}
                     </div>
                     <!--/ko-->
 
-                    <!--ko if: projectManager.projects().length -->
+                    <!--ko if: mobileSurveyManager.projects().length -->
                     <!-- Project Invitations List -->
                     <div id="mobile-projects-list" class="profile-default-message-panel">
                         <div class="row">
@@ -304,8 +304,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: projectManager.projectFilter, valueUpdate: 'keyup'">
-                                    <span class="clear-node-search" data-bind="visible: projectManager.projectFilter().length > 0, click: function() { projectManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a survey...' %}" data-bind="value: mobileSurveyManager.projectFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyManager.projectFilter().length > 0, click: function() { mobileSurveyManager.projectFilter(''); }"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -314,7 +314,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="" class="row">
                             <div class="col-sm-9 col-sm-offset-3 mar-top">
                                 <div class="">
-                                    <!--ko foreach: {data: projectManager.filteredProjects(), as: 'project'} -->
+                                    <!--ko foreach: {data: mobileSurveyManager.filteredProjects(), as: 'project'} -->
                                     <div class="project-panel">
 
                                         <div class="project-panel-header">
@@ -332,7 +332,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="">
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.projectManager.getProjectResources(val)}">{% trans 'View Details' %}</a>
+                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.toggleShowDetails(); $parent.mobileSurveyManager.getMobileSurveyResources(val)}">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
