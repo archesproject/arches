@@ -9445,6 +9445,10 @@ a.search-facet-item.disabled {
     padding: 10px 35px;
 }
 
+.msm-resource-cards.identities {
+    height: 435px;
+}
+
 .msm-item-status {
     position: absolute;
     right: 10px;
@@ -9459,10 +9463,11 @@ a.search-facet-item.disabled {
     display:flex;
     flex-direction: row;
     width: 100%;
+    height: 350px;
 }
 
 .msm-group-users {
-    height: 390px;
+    height: 350px;
     overflow-y: scroll;
     margin-top: 5px;
     border-top: solid;
