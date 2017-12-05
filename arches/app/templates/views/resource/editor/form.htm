@@ -215,10 +215,12 @@
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
+                                            <!--ko if: !card.get('disabled') -->
                                             <div class="install-buttons" data-bind="css: { 'expanded-buttons': tile.expanded() }">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                             </div>
+                                            <!-- /ko -->
                                             <!-- /ko -->
                                         <!-- /ko -->
 
