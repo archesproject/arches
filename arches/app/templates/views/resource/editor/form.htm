@@ -142,10 +142,12 @@
 
                                         <!-- Save/Add Button -->
                                         <!-- ko if: innerTile.dirty() && !forceBlank -->
+                                        <!--ko if: !card.get('disabled') -->
                                         <div class="install-buttons" data-bind="css: { 'expanded-buttons': innerTile.expanded() }">
-                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel" %}</button>
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
+                                            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile, innerTile)">{% trans "Cancel--" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save++" %}</button>
                                         </div>
+                                        <!-- /ko -->
                                         <!-- /ko -->
 
                                     </div>
@@ -205,23 +207,22 @@
 
                                         <!-- Save/Add Buttons -->
                                         <!-- ko if: tile.dirty -->
+                                        <!--ko if: !card.get('disabled') -->
                                             <!-- ko if: forceBlank -->
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n', css: { 'expanded-buttons': tile.expanded() }" style="display: none;">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans 'Add' %}</button>
                                             </div>
-                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
-                                            <!-- /ko -->
+                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null --><!-- /ko -->
                                             <!-- /ko -->
 
                                             <!-- ko if: !forceBlank -->
-                                            <!--ko if: !card.get('disabled') -->
                                             <div class="install-buttons" data-bind="css: { 'expanded-buttons': tile.expanded() }">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, cardinality)">{% trans "Save" %}</button>
                                             </div>
                                             <!-- /ko -->
-                                            <!-- /ko -->
+                                        <!-- /ko -->
                                         <!-- /ko -->
 
                                         <!-- ko if: !tile.dirty() -->
