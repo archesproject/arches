@@ -23,6 +23,15 @@
 </div>
 {% endblock form %}
 
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd class='number-widget-report'>
+    <div data-bind="text: prefix(), css: {'number-prefix': prefix()}"></div>
+    <div data-bind="text: value()"></div>
+    <div data-bind="text: suffix(), css: {'number-suffix': suffix()}"></div>
+</dd>
+{% endblock report %}
+
 {% block config_form %}
 <div class="control-label">
     {% trans "Placeholder" %}
