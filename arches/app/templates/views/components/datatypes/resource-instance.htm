@@ -6,7 +6,7 @@
     </div>
     <div>
         <select data-bind="
-            disable: isEditable === false,
+            disabled: isEditable === false || disabled,
             placeholder: '{% trans "Select a resource model" %}',
             value: config.graphid,
             options: resourceModels ,
