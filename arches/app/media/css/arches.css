@@ -9449,6 +9449,19 @@ a.search-facet-item.disabled {
     height: 435px;
 }
 
+.number-widget-report {
+    display: flex;
+    flex-direction: row;
+}
+
+.number-prefix {
+    padding-right: 1px;
+}
+
+.number-suffix {
+    padding-left: 1px;
+}
+
 .msm-item-status {
     position: absolute;
     right: 10px;
