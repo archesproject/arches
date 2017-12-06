@@ -75,11 +75,60 @@ define([
                 'featureEditingDisabled',
                 'overlayConfigs',
                 'overlayOpacity',
-                'mapControlsHidden'
+                'mapControlsHidden',
+                'defaultValueType',
+                'defaultValue'
             ];
 
             WidgetViewModel.apply(this, [params]);
 
+            this.loadDefaultValue = function(val, load) {
+                if (val === 0 || val === null) {
+                    self.clearGeometries(null);
+                    self.defaultValue("");
+                }
+                else if (val === 1 && self.draw) {
+                    if (!load) {
+                        self.defaultValue(self.draw.getAll());
+                    }
+                    if (self.defaultValue()) {
+                        setTimeout(self.loadGeometriesIntoDrawLayer, 1500);
+                      };
+                }
+                else if (val === 2 && self.draw) {
+                    self.clearGeometries(null);
+                    navigator.geolocation.getCurrentPosition(function(location) {
+                      self.defaultValue(
+                          {
+                            type: "FeatureCollection",
+                            features: [
+                              {
+                                geometry: {
+                                  type: 'Point',
+                                  coordinates: [location.coords.longitude, location.coords.latitude]
+                                },
+                                type: 'Feature',
+                                properties: {
+                                  timestamp: location.timestamp,
+                                  accuracy: location.coords.accuracy,
+                                  altitude: location.coords.altitude,
+                                  altitudeAccuracy: location.coords.altitudeAccuracy,
+                                  heading: location.coords.heading,
+                                  speed: location.coords.speed
+                                }
+                              }
+                            ]
+                          }
+                      );
+                      if (self.defaultValue()) {
+                          self.loadGeometriesIntoDrawLayer();
+                          self.zoomToDrawLayer();
+                        };
+                  });
+                }
+            };
+
+            this.defaultValueType.subscribe(this.loadDefaultValue);
             this.mapImage = ko.observable(null);
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
@@ -183,6 +232,25 @@ define([
                 this.geocodeProviderDetails.component(provider.component);
             }, this)
 
+
+            this.defaultValueOptions = [
+                {
+                    "name": "",
+                    "defaultOptionid": 0,
+                    "value": ""
+                },
+                {
+                    "name": "Drawn Location",
+                    "defaultOptionid": 1,
+                    "value": "Drawn Location"
+                },
+                {
+                    "name": "Current Device Location",
+                    "defaultOptionid": 2,
+                    "value": "Current Device Location"
+                }
+            ];
+
             this.loadGeometriesIntoDrawLayer = function() {
                 self.geojsonInput(false);
                 self.xyInput.active(false);
@@ -192,8 +260,8 @@ define([
                     if (val) {
                         self.draw.add(val);
                     }
+                    self.drawFeaturesOnMap(self.draw.getAll().features.length > 0)
                 }
-                self.drawFeaturesOnMap(self.draw.getAll().features.length > 0)
             };
 
             this.zoomToDrawLayer = function(){
@@ -206,9 +274,11 @@ define([
             this.clearGeometries = function(val, key) {
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
-                } else if (val.features.length === 0 && self.context === 'search-filter') {
-                    self.searchBuffer(null);
-                    self.updateSearchQueryLayer([]);
+                } else if (val) {
+                    if (val.features.length === 0 && self.context === 'search-filter') {
+                        self.searchBuffer(null);
+                        self.updateSearchQueryLayer([]);
+                    }
                 }
             };
 
@@ -1556,6 +1626,13 @@ define([
                     self.map.on('moveend', self.updateConfigs);
                 }
 
+                if (self.defaultValueType() && self.defaultValueType() != '' || self.defaultValueType() > 0) {
+                    if (self.defaultValueType() == 1){
+                        self.value(self.defaultValue())
+                    }
+                    this.loadDefaultValue(self.defaultValueType(), true);
+                };
+
             }; //end setup map
 
             // preprocess relative paths for app tileserver
@@ -1609,7 +1686,15 @@ define([
             this.selectBasemap = function(val) {
                 self.basemap(val.name)
                 self.setBasemap(val);
-            }
+            };
+
+
+
+
+
+
+
+
 
             this.mapStyle.layers = this.addInitialLayers();
 
