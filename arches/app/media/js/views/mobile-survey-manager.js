@@ -43,7 +43,8 @@ define([
                     id: null,
                     cards: [],
                     users: [],
-                    groups: []
+                    groups: [],
+                    datadownload: false
                 },
                 identities: data.identities
             }));

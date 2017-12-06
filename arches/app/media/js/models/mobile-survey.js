@@ -22,6 +22,7 @@ define([
             self.groups = ko.observableArray([]);
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
+            self.datadownload = ko.observable();
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -61,12 +62,41 @@ define([
                 return getUserName(self.lasteditedby());
             });
 
+            self.userFilter = ko.observable('');
+            self.selectedUser = ko.observable();
+
+            self.filteredUsers = ko.computed(function() {
+                var filter = self.userFilter();
+                this.selected = _.filter(self.identities, function(identity) {
+                    return ko.unwrap(identity.selected);
+                });
+                var list = []
+
+                if (this.selected.length === 1) {
+                    list = this.selected[0].users;
+                    if (filter.length === 0) {
+                        return list;
+                    }
+                }
+
+                return _.filter(list, function(user) {
+                    if (user.username.startsWith(filter)) {
+                        return user
+                    }
+                });
+
+            });
+
             self.selectedIdentity = ko.computed(function() {
                 var selected = _.filter(self.identities, function(identity) {
                     return ko.unwrap(identity.selected);
                 });
+                if (selected.length === 1 && selected[0].users) {
+                    self.selectedUser(selected[0].users.length > 0 ? selected[0].users[0] : undefined);
+                }
                 return selected.length > 0 ? selected[0] : undefined;
             });
+
 
             self.approvedUserNames = ko.computed(function() {
                 names = [];
@@ -88,27 +118,6 @@ define([
                 return names;
             })
 
-            self.userFilter = ko.observable('');
-
-            self.filteredUsers = ko.computed(function() {
-                var filter = self.userFilter();
-                var selected = _.filter(self.identities, function(identity) {
-                    return ko.unwrap(identity.selected);
-                });
-                var list = []
-                if (selected.length === 1) {
-                    list = selected[0].users;
-                    if (filter.length === 0) {
-                        return list;
-                    }
-                }
-                return _.filter(list, function(user) {
-                    if (user.username.startsWith(filter)) {
-                        return user
-                    }
-                });
-            });
-
             self.hasIdentity = function() {
                 var approved = false;
                 var identity = self.selectedIdentity();
@@ -129,8 +138,8 @@ define([
                         } else {
                             identity.approved(false);
                             _.chain(self.identities).filter(function(id) {
-                                return id.type === 'user'
-                            }).each(function(user) {
+                                return id.type === 'user' && _.contains(_.pluck(this.selectedIdentity().users, 'id'), id.id)
+                            }, this).each(function(user) {
                                 if (_.intersection(user.group_ids, self.groups()).length === 0) { // user does not belong to any accepted groups
                                     user.approved(false);
                                     self.users.remove(user.id);
@@ -142,16 +151,21 @@ define([
                             currentIdentities.push(identity.id);
                         }
                         identity.approved(true);
-                        _.chain(self.identities).filter(function(id) {
-                            return id.type === 'user'
-                        }).each(function(user) {
-                            if (_.intersection(user.group_ids, self.groups()).length > 0) {
-                                user.approved(true);
-                                if (!_.contains(self.users(), user.id)) {
-                                    self.users.push(user.id);
+                        if (identity.type === 'user') {
+                            self.users.push(identity.id);
+                        } else {
+                            _.chain(self.identities).filter(function(id) {
+                                var identity = identity;
+                                return id.type === 'user'
+                            }).each(function(user) {
+                                if (_.intersection(user.group_ids, self.groups()).length > 0) {
+                                    user.approved(true);
+                                    if (!_.contains(self.users(), user.id)) {
+                                        self.users.push(user.id);
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     };
                 };
             };
@@ -165,22 +179,18 @@ define([
                     }
                 })
                 .pluck('cardid').value()
-                if (self.cards().length > approvedCards.length) {
-                    self.cards(approvedCards)
-                } else {
-                    var diff = _.difference(self.cards(), approvedCards)
-                    self.cards(_.union(diff, approvedCards))
-                }
+                var diff = _.difference(self.cards(), approvedCards)
+                self.cards(_.union(diff, approvedCards))
             }
 
             self.updateApproved = function(val){
                 val.item.approved(true);
                 self.updateCards(val)
-            };;
+            };
 
             self.updateUnapproved = function(val){
                 val.item.approved(false);
-                self.updateCards(val)
+                self.cards.remove(val.item.cardid)
             };
 
             self.toggleShowDetails = function() {
@@ -201,7 +211,8 @@ define([
                     id: self.get('id'),
                     groups: self.groups,
                     users: self.users,
-                    cards: self.cards
+                    cards: self.cards,
+                    datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
             });
@@ -224,6 +235,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
 
@@ -243,12 +255,13 @@ define([
                     userCallback.call(this, request, status, model);
                 }
                 if (status === 'success') {
-                    self.set('id', request.responseJSON.project.id);
-                    self.createdby(request.responseJSON.project.createdby_id);
-                    self.lasteditedby(request.responseJSON.project.lasteditedby_id);
-                    self.groups(request.responseJSON.project.groups);
-                    self.users(request.responseJSON.project.users);
-                    self.cards(request.responseJSON.project.cards);
+                    self.set('id', request.responseJSON.mobile_survey.id);
+                    self.createdby(request.responseJSON.mobile_survey.createdby_id);
+                    self.lasteditedby(request.responseJSON.mobile_survey.lasteditedby_id);
+                    self.groups(request.responseJSON.mobile_survey.groups);
+                    self.users(request.responseJSON.mobile_survey.users);
+                    self.cards(request.responseJSON.mobile_survey.cards);
+                    self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };
             };

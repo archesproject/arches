@@ -111,6 +111,13 @@ class NumberDataType(BaseDataType):
     def transform_import_values(self, value, nodeid):
         return float(value)
 
+    def convert_value(self, tile, nodeid):
+        try:
+            tile.data[nodeid].upper()
+            tile.data[nodeid] = float(tile.data[nodeid])
+        except:
+            pass
+
     def append_to_document(self, document, nodevalue, nodeid, tile):
         document['numbers'].append({'number': nodevalue, 'nodegroup_id': tile.nodegroup_id})
 

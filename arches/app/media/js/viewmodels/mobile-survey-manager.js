@@ -66,21 +66,20 @@ define([
             }
         }
 
-        this.getProjectResources = function(project){
+        this.getMobileSurveyResources = function(mobilesurvey){
             var successCallback = function(data){
-                project.collectedResources(true)
+                mobilesurvey.collectedResources(true)
                 _.each(data.resources, self.processResources)
                 _.each(self.resourceList.items(), self.flattenCards)
             }
-            if (!project.collectedResources()) {
+            if (!mobilesurvey.collectedResources()) {
                 $.ajax({
-                    url: arches.urls.mobile_survey_resources(project.id)
+                    url: arches.urls.mobile_survey_resources(mobilesurvey.id)
                 })
                 .done(successCallback)
                 .fail(function(data){console.log('request failed', data)})
             }
         }
-
 
         this.resourceList.selected.subscribe(function(val){
             if (val) {
@@ -121,7 +120,6 @@ define([
         this.selectedProject.subscribe(function(val){
             if (val) {
                 self.identityList.clearSelection();
-                self.identityList.items()[0].selected(true);
                 self.resourceList.clearSelection();
                 self.resourceList.resetCards(val.cards());
                 val.update();

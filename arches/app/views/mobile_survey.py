@@ -82,113 +82,114 @@ class MobileSurveyManagerView(BaseManagerView):
 
         context['nav']['title'] = _('Mobile Survey Manager')
         context['nav']['icon'] = 'fa-server'
-        context['nav']['help'] = (_('Mobile Survey Manager'),'help/project-manager-help.htm')
+        context['nav']['help'] = (_('Mobile Survey Manager'),'help/mobile-survey-manager-help.htm')
 
         return render(request, 'views/mobile-survey-manager.htm', context)
 
     def delete(self, request):
 
-        project_id = None
+        mobile_survey_id = None
         try:
-            project_id = JSONDeserializer().deserialize(request.body)['id']
+            mobile_survey_id = JSONDeserializer().deserialize(request.body)['id']
         except Exception as e:
             print e
 
-        if project_id is not None:
-            ret = models.MobileSurveyModel.objects.get(pk=project_id)
+        if mobile_survey_id is not None:
+            ret = models.MobileSurveyModel.objects.get(pk=mobile_survey_id)
             ret.delete()
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
 
-    def update_identities(self, data, project, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileSurveyXUser):
-        project_identity_ids = set([u.id for u in related_identities])
-        identities_to_remove = project_identity_ids - set(data[identity_type])
-        identities_to_add = set(data[identity_type]) - project_identity_ids
+    def update_identities(self, data, mobile_survey, related_identities, identity_type='users', identity_model=User, xmodel=models.MobileSurveyXUser):
+        mobile_survey_identity_ids = set([u.id for u in related_identities])
+        identities_to_remove = mobile_survey_identity_ids - set(data[identity_type])
+        identities_to_add = set(data[identity_type]) - mobile_survey_identity_ids
 
         for identity in identities_to_add:
             if identity_type == 'users':
-                xmodel.objects.create(user=identity_model.objects.get(id=identity), mobile_survey=project)
+                xmodel.objects.create(user=identity_model.objects.get(id=identity), mobile_survey=mobile_survey)
             else:
-                xmodel.objects.create(group=identity_model.objects.get(id=identity), mobile_survey=project)
+                xmodel.objects.create(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey)
 
         for identity in identities_to_remove:
             if identity_type == 'users':
-                xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_survey=project).delete()
+                xmodel.objects.filter(user=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
             else:
-                xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=project).delete()
+                xmodel.objects.filter(group=identity_model.objects.get(id=identity), mobile_survey=mobile_survey).delete()
 
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
         if data['id'] is None:
-            project = models.MobileSurveyModel()
-            project.createdby = self.request.user
+            mobile_survey = models.MobileSurveyModel()
+            mobile_survey.createdby = self.request.user
         else:
-            project = models.MobileSurveyModel.objects.get(pk=data['id'])
-            self.update_identities(data, project, project.users.all(), 'users', User, models.MobileSurveyXUser)
-            self.update_identities(data, project, project.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
+            mobile_survey = models.MobileSurveyModel.objects.get(pk=data['id'])
+            self.update_identities(data, mobile_survey, mobile_survey.users.all(), 'users', User, models.MobileSurveyXUser)
+            self.update_identities(data, mobile_survey, mobile_survey.groups.all(), 'groups', Group, models.MobileSurveyXGroup)
 
-            project_card_ids = set([unicode(c.cardid) for c in project.cards.all()])
+            mobile_survey_card_ids = set([unicode(c.cardid) for c in mobile_survey.cards.all()])
             form_card_ids = set(data['cards'])
-            cards_to_remove = project_card_ids - form_card_ids
-            cards_to_add = form_card_ids - project_card_ids
-            cards_to_update = project_card_ids & form_card_ids
+            cards_to_remove = mobile_survey_card_ids - form_card_ids
+            cards_to_add = form_card_ids - mobile_survey_card_ids
+            cards_to_update = mobile_survey_card_ids & form_card_ids
 
             for card_id in cards_to_add:
-                models.MobileSurveyXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=project, sortorder=data['cards'].index(card_id))
+                models.MobileSurveyXCard.objects.create(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey, sortorder=data['cards'].index(card_id))
 
             for card_id in cards_to_update:
-                mobile_project_card = models.MobileSurveyXCard.objects.filter(mobile_survey=project).get(card=models.CardModel.objects.get(cardid=card_id))
-                mobile_project_card.sortorder=data['cards'].index(card_id)
-                mobile_project_card.save()
+                mobile_survey_card = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).get(card=models.CardModel.objects.get(cardid=card_id))
+                mobile_survey_card.sortorder=data['cards'].index(card_id)
+                mobile_survey_card.save()
 
             for card_id in cards_to_remove:
-                models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=project).delete()
+                models.MobileSurveyXCard.objects.filter(card=models.CardModel.objects.get(cardid=card_id), mobile_survey=mobile_survey).delete()
 
 
-        if project.active != data['active']:
-            # notify users in the project that the state of the project has changed
+        if mobile_survey.active != data['active']:
+            # notify users in the mobile_survey that the state of the mobile_survey has changed
             if data['active']:
-                self.notify_project_start(request, project)
+                self.notify_mobile_survey_start(request, mobile_survey)
             else:
-                self.notify_project_end(request, project)
-        project.name = data['name']
-        project.description = data['description']
+                self.notify_mobile_survey_end(request, mobile_survey)
+        mobile_survey.name = data['name']
+        mobile_survey.description = data['description']
         if data['startdate'] != '':
-            project.startdate = data['startdate']
+            mobile_survey.startdate = data['startdate']
         if data['enddate'] != '':
-            project.enddate = data['enddate']
-        project.active = data['active']
-        project.lasteditedby = self.request.user
+            mobile_survey.enddate = data['enddate']
+        mobile_survey.datadownload = data['datadownload']
+        mobile_survey.active = data['active']
+        mobile_survey.lasteditedby = self.request.user
 
         with transaction.atomic():
-            project.save()
+            mobile_survey.save()
 
-        ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=project).order_by('sortorder')
+        ordered_cards = models.MobileSurveyXCard.objects.filter(mobile_survey=mobile_survey).order_by('sortorder')
         ordered_ids = [unicode(mpc.card.cardid) for mpc in ordered_cards]
-        project_dict = project.__dict__
-        project_dict['cards'] = ordered_ids
-        project_dict['users'] = [u.id for u in project.users.all()]
-        project_dict['groups'] = [g.id for g in project.groups.all()]
+        mobile_survey_dict = mobile_survey.__dict__
+        mobile_survey_dict['cards'] = ordered_ids
+        mobile_survey_dict['users'] = [u.id for u in mobile_survey.users.all()]
+        mobile_survey_dict['groups'] = [g.id for g in mobile_survey.groups.all()]
 
-        return JSONResponse({'success':True, 'project': project_dict})
+        return JSONResponse({'success':True, 'mobile_survey': mobile_survey_dict})
 
 
-    def get_project_users(self, project):
-        users = set(project.users.all())
+    def get_mobile_survey_users(self, mobile_survey):
+        users = set(mobile_survey.users.all())
 
-        for group in project.groups.all():
+        for group in mobile_survey.groups.all():
             users |= set(group.user_set.all())
 
         return users
 
-    def notify_project_start(self, request, project):
+    def notify_mobile_survey_start(self, request, mobile_survey):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
             'link':request.build_absolute_uri(reverse('home')),
-            'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Survey.  Please take a moment to review the project description and project start and end dates.'),
+            'greeting': _('Welcome to Arches!  You\'ve just been added to a Mobile Survey.  Please take a moment to review the mobile_survey description and mobile_survey start and end dates.'),
             'closing': _('If you have any qustions contact the site administrator at {admin_email}.'.format(admin_email=admin_email)),
         }
 
@@ -196,12 +197,12 @@ class MobileSurveyManagerView(BaseManagerView):
         text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
 
         # create the email, and attach the HTML version as well.
-        for user in self.get_project_users(project):
+        for user in self.get_mobile_survey_users(mobile_survey):
             msg = EmailMultiAlternatives(_('You\'ve been invited to an {app_name} Survey!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
-    def notify_project_end(self, request, project):
+    def notify_mobile_survey_end(self, request, mobile_survey):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ''
         email_context = {
             'button_text': _('Logon to {app_name}'.format(app_name=settings.APP_NAME)),
@@ -214,22 +215,22 @@ class MobileSurveyManagerView(BaseManagerView):
         text_content = strip_tags(html_content) # this strips the html, so people will have the text as well.
 
         # create the email, and attach the HTML version as well.
-        for user in self.get_project_users(project):
+        for user in self.get_mobile_survey_users(mobile_survey):
             msg = EmailMultiAlternatives(_('There\'s been a change to an {app_name} Survey that you\'re part of!'.format(app_name=settings.APP_NAME)), text_content, admin_email, [user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
-    def get_survey_resources(self, project_models):
+    def get_survey_resources(self, mobile_survey_models):
         graphs = models.GraphModel.objects.filter(isresource=True).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resources = []
-        projects = []
+        mobile_surveys = []
         all_ordered_card_ids = []
 
-        for project in project_models:
-            proj = MobileSurvey.objects.get(id=project.id)
-            project_dict = proj.serialize()
-            all_ordered_card_ids += project_dict['cards']
-            projects.append(project_dict)
+        for mobile_survey in mobile_survey_models:
+            survey = MobileSurvey.objects.get(id=mobile_survey.id)
+            mobile_survey_dict = survey.serialize()
+            all_ordered_card_ids += mobile_survey_dict['cards']
+            mobile_surveys.append(mobile_survey_dict)
 
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
 
@@ -239,7 +240,7 @@ class MobileSurveyManagerView(BaseManagerView):
                 cards = [Card.objects.get(pk=card.cardid) for card in models.CardModel.objects.filter(graph=graph)]
             resources.append({'name': graph.name, 'id': graph.graphid, 'subtitle': graph.subtitle, 'iconclass': graph.iconclass, 'cards': cards})
 
-        return projects, resources
+        return mobile_surveys, resources
 
 
 # @method_decorator(can_read_resource_instance(), name='dispatch')
