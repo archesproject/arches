@@ -41,6 +41,5 @@ class Migration(migrations.Migration):
                     	set config = config - 'defaultValueType'
                     	WHERE widgetid in (SELECT widgetid FROM widgets WHERE name = 'map-widget');
                 """
-                """
                 ),
     ]
