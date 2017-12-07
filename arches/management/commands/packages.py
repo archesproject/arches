@@ -128,7 +128,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
-        print 'package: '+ package_name
 
         if options['operation'] == 'setup':
             self.setup(package_name, es_install_location=options['dest_dir'])

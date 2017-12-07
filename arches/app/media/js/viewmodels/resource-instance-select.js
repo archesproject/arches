@@ -71,13 +71,14 @@ define([
             return displayVal;
         });
         updateName();
-
+        
         this.select2Config = {
             value: this.value,
             clickBubble: true,
             multiple: this.multiple,
             placeholder: this.placeholder,
             allowClear: true,
+            disabled: this.disabled,
             ajax: {
                 url: arches.urls.search_results,
                 dataType: 'json',
