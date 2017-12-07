@@ -50,7 +50,7 @@ class ConceptLookup():
             for v in val:
                 v = v.strip()
                 try:
-                    ret.append(self.new_lookup_label(v, collectionid))
+                    ret.append(self.lookup_label(v, collectionid))
                 except:
                     self.lookups[collectionid] = Concept().get_child_collections(collectionid)
                     ret.append(self.lookup_label(v, collectionid))
