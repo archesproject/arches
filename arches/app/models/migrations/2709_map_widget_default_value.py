@@ -8,7 +8,7 @@ from django.core import management
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2707_datepicker_widget_default_value'),
+        ('models', '2591_formatted_numbers'),
     ]
 
     operations = [
