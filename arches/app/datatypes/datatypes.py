@@ -204,6 +204,22 @@ class DateDataType(BaseDataType):
             pass
 
 
+class EDTFDataType(BaseDataType):
+
+    def validate(self, value, source=''):
+        errors = []
+
+        # use the EDTF parser to validate that the user supplied string is a valid EDTF
+
+        return errors
+
+    def append_to_document(self, document, nodevalue, nodeid, tile):
+        document['dates'].append({'edtf': nodevalue, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+
+    def append_search_filters(self, value, node, query, request):
+        pass
+
+
 class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def validate(self, value, source=None):
