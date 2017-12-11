@@ -42,27 +42,27 @@ define([
         };
 
         this.toggleOptionSelection = function (opt) {
-            if (ko.unwrap(self.disabled) === false) {
-                var selected = !self.isOptionSelected(opt);
-                self.setOptionSelection(opt, selected);
-            }
+            var selected = !self.isOptionSelected(opt);
+            self.setOptionSelection(opt, selected);
         };
 
         this.setOptionSelection = function (opt, selected) {
-            if (self.multiple) {
-                var val = value();
-                value(
-                    selected ?
-                    _.union([opt.id], val) :
-                    _.without(val ? val : [], opt.id)
-                );
-            } else if (selected) {
-              if (value() === opt.id) {
-                  value(null)
+            if (ko.unwrap(self.disabled) === false) {
+                if (self.multiple) {
+                    var val = value();
+                    value(
+                        selected ?
+                        _.union([opt.id], val) :
+                        _.without(val ? val : [], opt.id)
+                    );
+                } else if (selected) {
+                  if (value() === opt.id) {
+                      value(null)
+                    }
+                  else {
+                      value(opt.id);
+                  }
                 }
-              else {
-                  value(opt.id);
-              }
             }
         };
 
