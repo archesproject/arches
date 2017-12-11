@@ -42,8 +42,10 @@ define([
         };
 
         this.toggleOptionSelection = function (opt) {
-            var selected = !self.isOptionSelected(opt);
-            self.setOptionSelection(opt, selected);
+            if (ko.unwrap(self.disabled) === false) {
+                var selected = !self.isOptionSelected(opt);
+                self.setOptionSelection(opt, selected);
+            }
         };
 
         this.setOptionSelection = function (opt, selected) {
