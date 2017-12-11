@@ -31,9 +31,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('operation', nargs='?')
 
+        parser.add_argument('-y', '--yes', action='store_true', dest='yes',
+            help='used to force a yes answer to any user input "continue? y/n" prompt')
+
     def handle(self, *args, **options):
         if options['operation'] == 'remove_resources':
-            self.remove_resources()
+            self.remove_resources(force=options['yes'])
 
     def remove_resources(self, load_id='', force=False):
         """
