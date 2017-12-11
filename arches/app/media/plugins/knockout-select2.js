@@ -106,6 +106,11 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
                 }
                 return value(val.val);
             });
+
+            if (ko.unwrap(select2Config.disabled)) {
+                $(el).select2("disable");
+            };
+
             $(el).on("select2-opening", function(val) {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
