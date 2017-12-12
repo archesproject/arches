@@ -109,5 +109,5 @@ def get(id):
 uuid.get_or_create = get
 
 def update_system_settings_cache(tile):
-    if tile.resourceinstance_id == settings.RESOURCE_INSTANCE_ID:
+    if str(tile.resourceinstance_id) == str(settings.RESOURCE_INSTANCE_ID):
         settings.update_from_db()
