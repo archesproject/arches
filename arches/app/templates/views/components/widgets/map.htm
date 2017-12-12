@@ -12,7 +12,7 @@
         <img data-bind="attr: {src: mapImage() }">
     </div>
     <!-- /ko -->
-
+    <div data-bind="css:{'map-disabled': disabled}"></div>
     <div class="relative" data-bind="mapboxgl: {
         mapOptions: {
             style: mapStyle,
@@ -130,7 +130,7 @@
 
 
                         <!--ko ifnot: featureEditingDisabled -->
-
+                        <!--ko ifnot: disabled -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
 
@@ -187,6 +187,7 @@
                             </div>
                             <ul class="leaflet-draw-actions"></ul>
                         </div>
+                        <!--/ko-->
                         <!--/ko-->
                         <!--/ko-->
                     </div>
