@@ -600,5 +600,25 @@
         </div>
 
     </div>
+
+    <div class="panel">
+
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-default-value" aria-expanded="false" class="collapsed">{% trans "Default Value" %}</a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="map-config-default-value" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body accordion-body">
+                <div class="control-label">
+                    {% trans "Select Location" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container" style="height: 200px;">
+                    <select type="" id="" placeholder="{% trans " Default Value " %}" data-bind="options: defaultValueOptions, optionsText:'name', optionsValue:'defaultOptionid', value: defaultValueType, chosen: {width: '100%', allow_single_deselect: true, disable_search: true}"></select>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock config_form %}

@@ -2301,6 +2301,13 @@ div.dropdown-menu.open {
     height: 36px;
 }
 
+.search-choice-close:before {
+    font-size: 14px;
+     color: grey;
+     content: "\f00d";
+     font-family: FontAwesome;
+}
+
 .list-group-item.active:hover, .list-group-item.active:active, .list-group-item.active:focus {
     background-color: #f9f9f9;
     border-bottom: 1px solid #eee;
