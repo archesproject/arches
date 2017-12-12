@@ -6701,6 +6701,15 @@ a .csv-chart-menubar-item {
     line-height: 1.5;
 }
 
+.map-disabled {
+    background-color: black;
+    height: 500px;
+    opacity: 0.2;
+    margin-bottom: -500px;
+    position: relative;
+    z-index: 100;
+}
+
 .map-widget-container a {
     color: #fff;
 }
