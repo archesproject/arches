@@ -82,53 +82,6 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
-            this.loadDefaultValue = function(val, load) {
-                if (val === 0 || val === null) {
-                    self.clearGeometries(null);
-                    self.defaultValue("");
-                }
-                else if (val === 1 && self.draw) {
-                    if (!load) {
-                        self.defaultValue(self.draw.getAll());
-                    }
-                    if (self.defaultValue()) {
-                        setTimeout(self.loadGeometriesIntoDrawLayer, 1500);
-                      };
-                }
-                else if (val === 2 && self.draw) {
-                    self.clearGeometries(null);
-                    navigator.geolocation.getCurrentPosition(function(location) {
-                      self.defaultValue(
-                          {
-                            type: "FeatureCollection",
-                            features: [
-                              {
-                                geometry: {
-                                  type: 'Point',
-                                  coordinates: [location.coords.longitude, location.coords.latitude]
-                                },
-                                type: 'Feature',
-                                properties: {
-                                  timestamp: location.timestamp,
-                                  accuracy: location.coords.accuracy,
-                                  altitude: location.coords.altitude,
-                                  altitudeAccuracy: location.coords.altitudeAccuracy,
-                                  heading: location.coords.heading,
-                                  speed: location.coords.speed
-                                }
-                              }
-                            ]
-                          }
-                      );
-                      if (self.defaultValue()) {
-                          self.loadGeometriesIntoDrawLayer();
-                          self.zoomToDrawLayer();
-                        };
-                  });
-                }
-            };
-
-            this.defaultValueType.subscribe(this.loadDefaultValue);
             this.mapImage = ko.observable(null);
             this.configType = params.reportHeader || 'header';
             this.resizeOnChange = ko.pureComputed(function() {
@@ -231,25 +184,6 @@ define([
                 this.geocodeProviderDetails.api_key(provider.api_key);
                 this.geocodeProviderDetails.component(provider.component);
             }, this)
-
-
-            this.defaultValueOptions = [
-                {
-                    "name": "",
-                    "defaultOptionid": 0,
-                    "value": ""
-                },
-                {
-                    "name": "Drawn Location",
-                    "defaultOptionid": 1,
-                    "value": "Drawn Location"
-                },
-                {
-                    "name": "Current Device Location",
-                    "defaultOptionid": 2,
-                    "value": "Current Device Location"
-                }
-            ];
 
             this.loadGeometriesIntoDrawLayer = function() {
                 self.geojsonInput(false);
@@ -1688,13 +1622,73 @@ define([
                 self.setBasemap(val);
             };
 
+            this.defaultValueOptions = [
+                {
+                    "name": "",
+                    "defaultOptionid": 0,
+                    "value": ""
+                },
+                {
+                    "name": "Drawn Location",
+                    "defaultOptionid": 1,
+                    "value": "Drawn Location"
+                },
+                {
+                    "name": "Current Device Location",
+                    "defaultOptionid": 2,
+                    "value": "Current Device Location"
+                }
+            ];
 
+            if (this.configForm || this.state === 'form') {
 
-
-
-
-
-
+                this.loadDefaultValue = function(val, load) {
+                    if (val === 0 || val === null) {
+                        self.clearGeometries(null);
+                        self.defaultValue("");
+                    }
+                    else if (val === 1 && self.draw) {
+                        if (!load) {
+                            self.defaultValue(self.draw.getAll());
+                        }
+                        if (self.defaultValue()) {
+                            setTimeout(self.loadGeometriesIntoDrawLayer, 1500);
+                        };
+                    }
+                    else if (val === 2 && self.draw) {
+                        self.clearGeometries(null);
+                        navigator.geolocation.getCurrentPosition(function(location) {
+                            self.defaultValue(
+                                {
+                                    type: "FeatureCollection",
+                                    features: [
+                                        {
+                                            geometry: {
+                                                type: 'Point',
+                                                coordinates: [location.coords.longitude, location.coords.latitude]
+                                            },
+                                            type: 'Feature',
+                                            properties: {
+                                                timestamp: location.timestamp,
+                                                accuracy: location.coords.accuracy,
+                                                altitude: location.coords.altitude,
+                                                altitudeAccuracy: location.coords.altitudeAccuracy,
+                                                heading: location.coords.heading,
+                                                speed: location.coords.speed
+                                            }
+                                        }
+                                    ]
+                                }
+                            );
+                            if (self.defaultValue()) {
+                                self.loadGeometriesIntoDrawLayer();
+                                self.zoomToDrawLayer();
+                            };
+                        });
+                    }
+                };
+                this.defaultValueType.subscribe(this.loadDefaultValue);
+            };
 
             this.mapStyle.layers = this.addInitialLayers();
 
