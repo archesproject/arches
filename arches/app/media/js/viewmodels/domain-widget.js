@@ -47,20 +47,22 @@ define([
         };
 
         this.setOptionSelection = function (opt, selected) {
-            if (self.multiple) {
-                var val = value();
-                value(
-                    selected ?
-                    _.union([opt.id], val) :
-                    _.without(val ? val : [], opt.id)
-                );
-            } else if (selected) {
-              if (value() === opt.id) {
-                  value(null)
+            if (ko.unwrap(self.disabled) === false) {
+                if (self.multiple) {
+                    var val = value();
+                    value(
+                        selected ?
+                        _.union([opt.id], val) :
+                        _.without(val ? val : [], opt.id)
+                    );
+                } else if (selected) {
+                  if (value() === opt.id) {
+                      value(null)
+                    }
+                  else {
+                      value(opt.id);
+                  }
                 }
-              else {
-                  value(opt.id);
-              }
             }
         };
 

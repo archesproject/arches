@@ -13,7 +13,8 @@
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
                 <label class="form-radio form-normal form-text"
                     data-bind="css: {
-                        'active': $parent.isOptionSelected($data)
+                        'active': $parent.isOptionSelected($data),
+                        'disabled': $parent.disabled
                     },
                     click: function () {
                         $parent.setOptionSelection($data, true);
