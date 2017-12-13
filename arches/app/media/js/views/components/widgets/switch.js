@@ -46,7 +46,9 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             }, this);
 
             var defaultValue = ko.unwrap(this.defaultValue)
-
+            if (this.value() === null && this.defaultValue() !== null) {
+                this.value(this.defaultValue());
+            }
             if (this.tile && this.tile.tileid() == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
             }
