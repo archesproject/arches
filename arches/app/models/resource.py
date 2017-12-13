@@ -30,6 +30,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Resource(models.ResourceInstance):
@@ -338,3 +339,30 @@ class Resource(models.ResourceInstance):
         ret['tiles'] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
+
+    def get_node_value(self, node_name):
+        """
+        Take a node_name (string) as an argument and return a value based on
+        the node_name.
+
+        only string, domain, domain-list, concept, and concept-list datatypes should be handled
+        """
+        datatype_list = [
+            'string', 'domain', 'domain-list', 'concept', 'concept-list']
+        nodes = models.Node.objects.filter(
+            name=node_name, datatype__in=datatype_list)
+        if not nodes:
+            return "No match for {0} found.".format(node_name)
+            
+        try:
+            nodegroups = [node.nodegroup_id for node in nodes]
+            tiles = self.tilemodel_set.filter(nodegroup_id__in=nodegroups)
+            for tile in tiles:
+                for k,v in tile.data.iteritems():
+                    if models.Node.objects.get(pk=k).name == node_name:
+                        value_id = v
+            if type(value_id) is list:
+                return value_id
+            return models.Value.objects.get(pk=value_id).value
+        except ObjectDoesNotExist as detail:
+            return detail
