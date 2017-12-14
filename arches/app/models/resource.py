@@ -353,7 +353,7 @@ class Resource(models.ResourceInstance):
             name=node_name, datatype__in=datatype_list)
         if not nodes:
             return "No match for {0} found.".format(node_name)
-            
+
         try:
             nodegroups = [node.nodegroup_id for node in nodes]
             tiles = self.tilemodel_set.filter(nodegroup_id__in=nodegroups)
@@ -362,7 +362,10 @@ class Resource(models.ResourceInstance):
                     if models.Node.objects.get(pk=k).name == node_name:
                         value_id = v
             if type(value_id) is list:
-                return value_id
+                value_id = [vid.encode('utf-8') for vid in value_id]
+                if len(value_id) > 1:
+                    return [models.Value.objects.get(pk=vid).value for vid in value_id]
+                return models.Value.objects.get(pk=value_id[0]).value
             return models.Value.objects.get(pk=value_id).value
         except ObjectDoesNotExist as detail:
-            return detail
+            return "No value for {0} found.".format(node_name)
