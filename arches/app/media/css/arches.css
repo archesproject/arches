@@ -6734,12 +6734,15 @@ a .csv-chart-menubar-item {
 div.row.widget-wrapper.report-header {
     margin-right: 5px;
     padding: 0px;
-    margin-top: -20px;
     width: 100%;
 }
 
 div.row.widget-wrapper.report-header:hover {
     background: #ebeef0;
+}
+
+.report-header .control-label.widget-input-label {
+    display: none;
 }
 
 .map-widget-container-expanded {
