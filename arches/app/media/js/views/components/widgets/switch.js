@@ -39,20 +39,27 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 } else if (this.value() === false) {
                     result = false;
                 };
-                console.log(result)
                 return result;
             }, this);
 
             this.setdefault = this.config().setdefault || function(self, evt){
                 if(self.defaultValue() === self.on){
+                    self.defaultValue(self.null)
+                }else if(self.defaultValue() === self.null){
                     self.defaultValue(self.off)
-                }else{
+                }else if(self.defaultValue() === self.off){
                     self.defaultValue(self.on)
                 }
             }
 
             this.getdefault = this.config().getdefault || ko.computed(function(){
-                return this.defaultValue() == this.on;
+                var result = null;
+                if (this.defaultValue() === this.on) {
+                    result = true;
+                } else if (this.defaultValue() === false) {
+                    result = false;
+                };
+                return result;
             }, this);
 
             var defaultValue = ko.unwrap(this.defaultValue)

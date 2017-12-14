@@ -27,7 +27,7 @@
   {% trans "Default Value" %}
 </div>
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault}, click: setdefault"><small></small></span>
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>
