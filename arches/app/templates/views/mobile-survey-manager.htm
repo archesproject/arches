@@ -248,7 +248,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Map Card -->
                                         <div id="location-card" class="mpm-card tab-pane fade">
-                                            Location....
+                                            <div>
+                                              <!-- ko component: {
+                                                  name: 'map-widget',
+                                                  params: {
+                                                    type: 'report-header',
+                                                    configForm: false,
+                                                    node: null,
+                                                    value: null,
+                                                    state: 'form',
+                                                    config: {
+                                                        basemap: basemap.name,
+                                                        bearing: 0,
+                                                        centerX: defaultCenterX,
+                                                        centerY: defaultCenterY,
+                                                        featureColor: "rgba(55,32,196,0.85)",
+                                                        featureEditingDisabled: false,
+                                                        featureLineWidth: 2,
+                                                        featurePointSize: 6,
+                                                        geocodePlaceholder: "Locate a Place or Address",
+                                                        geocodeProvider: geocoderDefault,
+                                                        geocoderVisible: true,
+                                                        geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                                        mapControlsHidden: false,
+                                                        maxZoom: mapDefaultMaxZoom,
+                                                        minZoom: mapDefaultMinZoom,
+                                                        overlayConfigs: [],
+                                                        overlayOpacity: 0,
+                                                        pitch: 0,
+                                                        zoom: mapDefaultZoom
+                                                    }
+                                                }
+                                              } --><!-- /ko -->
+                                            </div>
                                         </div>
 
                                         <!-- Models Card -->

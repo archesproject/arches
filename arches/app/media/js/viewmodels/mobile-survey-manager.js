@@ -5,6 +5,7 @@ define([
     'views/mobile-survey-manager/identity-list',
     'views/mobile-survey-manager/resource-list',
     'models/mobile-survey',
+    'views/components/widgets/map',
     'bindings/sortable'
 ], function(arches, _, ko, IdentityList, ResourceList, MobileSurveyModel) {
     /**
@@ -22,6 +23,17 @@ define([
         this.identityList = new IdentityList({
             items: ko.observableArray(params.identities)
         });
+
+        this.basemap = _.filter(arches.mapLayers, function(layer) {
+            return !layer.isoverlay;
+        })[0];
+
+        this.defaultCenterX = arches.mapDefaultX;
+        this.defaultCenterY = arches.mapDefaultY;
+        this.geocoderDefault = arches.geocoderDefault;
+        this.mapDefaultZoom = arches.mapDefaultZoom;
+        this.mapDefaultMaxZoom = arches.mapDefaultMaxZoom;
+        this.mapDefaultMinZoom = arches.mapDefaultMinZoom;
 
         this.flattenCards = function(r) {
             var addedCardIds = [];
