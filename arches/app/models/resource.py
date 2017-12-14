@@ -342,24 +342,25 @@ class Resource(models.ResourceInstance):
 
     def get_node_values(self, node_name):
         """
-        Take a node_name (string) as an argument and return a value based on
-        the node_name.
+        Take a node_name (string) as an argument and return a list of values.
+        If an invalid node 
 
-        only string, domain, domain-list, concept, and concept-list datatypes should be handled
+        only string, domain, domain-list, concept, and concept-list datatypes
+        are handled at this time.
         """
         datatype_list = [
             'string', 'domain', 'domain-list', 'concept', 'concept-list']
         nodes = models.Node.objects.filter(
-            name=node_name, datatype__in=datatype_list)
-        if not nodes:
-            return []
+            name=node_name, datatype__in=datatype_list,graph_id=self.graph_id)
+        if len(nodes) != 1:
+            print "invalid node name or multiple nodes with the same name"
+            return False
 
-        nodegroups = [node.nodegroup_id for node in nodes]
-        tiles = self.tilemodel_set.filter(nodegroup_id__in=nodegroups)
+        tiles = self.tilemodel_set.filter(nodegroup_id=nodes[0].nodegroup_id)
         value_ids = []
         for tile in tiles:
             for node_id, value in tile.data.iteritems():
-                if models.Node.objects.get(pk=node_id).name == node_name:
+                if node_id == str(nodes[0].nodeid):
                     if type(value) is list:
                         for v in value:
                             value_ids.append(v)
@@ -372,3 +373,4 @@ class Resource(models.ResourceInstance):
                     pk=value_id).value for value_id in value_ids]
         except ObjectDoesNotExist as detail:
             return []
+            
