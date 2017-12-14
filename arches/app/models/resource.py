@@ -340,7 +340,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def get_node_value(self, node_name):
+    def get_node_values(self, node_name):
         """
         Take a node_name (string) as an argument and return a value based on
         the node_name.
@@ -352,20 +352,23 @@ class Resource(models.ResourceInstance):
         nodes = models.Node.objects.filter(
             name=node_name, datatype__in=datatype_list)
         if not nodes:
-            return "No match for {0} found.".format(node_name)
+            return []
 
-        try:
-            nodegroups = [node.nodegroup_id for node in nodes]
-            tiles = self.tilemodel_set.filter(nodegroup_id__in=nodegroups)
-            for tile in tiles:
-                for k,v in tile.data.iteritems():
-                    if models.Node.objects.get(pk=k).name == node_name:
-                        value_id = v
-            if type(value_id) is list:
-                value_id = [vid.encode('utf-8') for vid in value_id]
-                if len(value_id) > 1:
-                    return [models.Value.objects.get(pk=vid).value for vid in value_id]
-                return models.Value.objects.get(pk=value_id[0]).value
-            return models.Value.objects.get(pk=value_id).value
+        nodegroups = [node.nodegroup_id for node in nodes]
+        tiles = self.tilemodel_set.filter(nodegroup_id__in=nodegroups)
+        value_ids = []
+        for tile in tiles:
+            for node_id, value in tile.data.iteritems():
+                if models.Node.objects.get(pk=node_id).name == node_name:
+                    if type(value) is list:
+                        for v in value:
+                            value_ids.append(v)
+                    else:
+                        value_ids.append(value)
+        value_ids = [vid.encode('utf-8') for vid in value_ids if vid]
+        try:        
+            return [
+                models.Value.objects.get(
+                    pk=value_id).value for value_id in value_ids]
         except ObjectDoesNotExist as detail:
-            return "No value for {0} found.".format(node_name)
+            return []
