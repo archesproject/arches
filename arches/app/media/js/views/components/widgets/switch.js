@@ -22,15 +22,25 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             WidgetViewModel.apply(this, [params]);
             this.on = this.config().on || true;
             this.off = this.config().off || false;
+            this.null = this.config().null || null;
             this.setvalue = this.config().setvalue || function(self, evt){
                 if(self.value() === self.on){
+                    self.value(self.null);
+                }else if (self.value() === self.null) {
                     self.value(self.off);
-                }else{
+                }else if (self.value() === self.off) {
                     self.value(self.on);
                 }
             }
             this.getvalue = this.config().getvalue || ko.computed(function(){
-                return this.value() === this.on;
+                var result = null;
+                if (this.value() === this.on) {
+                    result = true;
+                } else if (this.value() === false) {
+                    result = false;
+                };
+                console.log(result)
+                return result;
             }, this);
 
             this.setdefault = this.config().setdefault || function(self, evt){
