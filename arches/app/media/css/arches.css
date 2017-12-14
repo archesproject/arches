@@ -191,6 +191,18 @@
     background-clip: content-box;
 }
 
+.switch.switch-small.switch-widget {
+    width: 35px;
+}
+
+.switch.switch-widget.on>small {
+    left: 22px;
+}
+
+.switch.switch-widget.null>small {
+    left: 12px;
+}
+
 #card-preview {
     margin-bottom: 10px;
 }
@@ -857,6 +869,11 @@ a.select2-search-choice-close {
 .switch.on {
     background-color: #64bd63;
     border-color: #64bd63;
+}
+
+.switch.null {
+    background-color: #ddd;
+    border-color: #ddd;
 }
 
 .switch.on>small {
