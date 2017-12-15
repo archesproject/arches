@@ -357,20 +357,26 @@ class Resource(models.ResourceInstance):
             return False
 
         tiles = self.tilemodel_set.filter(nodegroup_id=nodes[0].nodegroup_id)
-        value_ids = []
+        values = []
         for tile in tiles:
             for node_id, value in tile.data.iteritems():
                 if node_id == str(nodes[0].nodeid):
                     if type(value) is list:
                         for v in value:
-                            value_ids.append(v)
+                            values.append(v)
                     else:
-                        value_ids.append(value)
-        value_ids = [vid.encode('utf-8') for vid in value_ids if vid]
+                        values.append(value)
+
+        for value in values:
+            if type(value) is unicode:
+                value = value.encode('utf-8')
+
         try:        
             return [
                 models.Value.objects.get(
-                    pk=value_id).value for value_id in value_ids]
+                    pk=value).value for value in values]
+        except ValueError:
+            return values
         except ObjectDoesNotExist as detail:
-            return []
+            return False
             
