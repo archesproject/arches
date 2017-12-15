@@ -33,6 +33,7 @@ from django.views.generic import View
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import group_required
+from arches.app.utils.geo_utils import GeoUtils
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.mobile_survey import MobileSurvey
@@ -48,7 +49,8 @@ class MobileSurveyManagerView(BaseManagerView):
         def get_last_login(date):
             result = _("Not yet logged in")
             try:
-                result = datetime.strftime(date, '%Y-%m-%d %H:%M')
+                if date is not None:
+                    result = datetime.strftime(date, '%Y-%m-%d %H:%M')
             except TypeError as e:
                 print e
             return result
@@ -75,6 +77,11 @@ class MobileSurveyManagerView(BaseManagerView):
 
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
         mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
+
+        for mobile_survey in mobile_surveys:
+            multipart = mobile_survey['bounds']
+            singlepart = GeoUtils().convert_multipart_to_singlepart(multipart)
+            mobile_survey['bounds'] = singlepart
 
         serializer = JSONSerializer()
         context = self.get_context_data(
@@ -170,10 +177,10 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_survey.active = data['active']
 
         polygons = []
-        print data['bounds']
-        for feature in data['bounds']['features']:
-            for coord in feature['geometry']['coordinates']:
-                polygons.append(Polygon(coord))
+        if 'features' in data['bounds']:
+            for feature in data['bounds']['features']:
+                for coord in feature['geometry']['coordinates']:
+                    polygons.append(Polygon(coord))
 
         mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
@@ -190,7 +197,6 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_survey_dict['bounds'] = mobile_survey.bounds.geojson
 
         return JSONResponse({'success':True, 'mobile_survey': mobile_survey_dict})
-
 
     def get_mobile_survey_users(self, mobile_survey):
         users = set(mobile_survey.users.all())

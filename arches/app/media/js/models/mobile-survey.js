@@ -23,7 +23,7 @@ define([
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
             self.datadownload = ko.observable();
-            self.bounds = ko.observable(null);
+            self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -32,7 +32,6 @@ define([
                 });
                 return user ? user.name : '';
             };
-            console.log(arches)
 
             self.setIdentityApproval = function() {
                 var groups = ko.unwrap(this.groups)
@@ -225,20 +224,33 @@ define([
             });
         },
 
-        parseGeoJson: function(geojson) {
-            var multipoly = JSON.parse(geojson);
-            var fc = {"type": "FeatureCollection", "features": []}
-            _.each(multipoly.coordinates, function(coord){
-                fc.features.push(
-                    { "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": coord
-                    },
-                    "properties": {}
-                })
-            });
-            return fc
+        getDefaultBounds: function(geojson) {
+            result = geojson;
+            if (!geojson) {
+                var fc = {"type": "FeatureCollection", "features": []}
+                var geomFactory = function(coords){
+                    return { "type": "Feature",
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": coords
+                                },
+                                "properties": {}
+                            };
+                        }
+                //TODO: make the true project boundry available in the arches object rather than just the hexBinBounds
+                //and use the true bounds here instead of the hexBinBounds.
+                var extent = arches.hexBinBounds
+                var coords = [[
+                    [extent[0], extent[1]],
+                    [extent[2], extent[1]],
+                    [extent[2], extent[3]],
+                    [extent[0], extent[3]],
+                    [extent[0], extent[1]]
+                ]]
+                fc.features.push(geomFactory(coords));
+                result = fc;
+            }
+            return result;
         },
 
         parse: function(source) {
@@ -254,7 +266,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
-            self.bounds(self.parseGeoJson(source.bounds));
+            self.bounds(self.getDefaultBounds(source.bounds));
             self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
@@ -282,7 +294,7 @@ define([
                     self.groups(request.responseJSON.mobile_survey.groups);
                     self.users(request.responseJSON.mobile_survey.users);
                     self.cards(request.responseJSON.mobile_survey.cards);
-                    self.bounds(self.parseGeoJson(request.responseJSON.mobile_survey.bounds));
+                    self.bounds(self.getDefaultBounds(request.responseJSON.mobile_survey.bounds));
                     self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };
