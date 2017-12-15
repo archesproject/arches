@@ -20,6 +20,8 @@ from datetime import datetime
 from django.db import transaction
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
+from django.contrib.gis.geos import MultiPolygon
+from django.contrib.gis.geos import Polygon
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseNotFound
@@ -72,7 +74,6 @@ class MobileSurveyManagerView(BaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
 
         mobile_survey_models = models.MobileSurveyModel.objects.order_by('name')
-
         mobile_surveys, resources = self.get_survey_resources(mobile_survey_models)
 
         serializer = JSONSerializer()
@@ -167,6 +168,14 @@ class MobileSurveyManagerView(BaseManagerView):
             mobile_survey.enddate = data['enddate']
         mobile_survey.datadownload = data['datadownload']
         mobile_survey.active = data['active']
+
+        polygons = []
+        print data['bounds']
+        for feature in data['bounds']['features']:
+            for coord in feature['geometry']['coordinates']:
+                polygons.append(Polygon(coord))
+
+        mobile_survey.bounds = MultiPolygon(polygons)
         mobile_survey.lasteditedby = self.request.user
 
         with transaction.atomic():
@@ -178,6 +187,7 @@ class MobileSurveyManagerView(BaseManagerView):
         mobile_survey_dict['cards'] = ordered_ids
         mobile_survey_dict['users'] = [u.id for u in mobile_survey.users.all()]
         mobile_survey_dict['groups'] = [g.id for g in mobile_survey.groups.all()]
+        mobile_survey_dict['bounds'] = mobile_survey.bounds.geojson
 
         return JSONResponse({'success':True, 'mobile_survey': mobile_survey_dict})
 
@@ -259,9 +269,7 @@ class MobileSurveyResources(View):
 
         proj = MobileSurvey.objects.get(id=surveyid)
         all_ordered_card_ids = proj.get_ordered_cards()
-        print all_ordered_card_ids
         active_graphs = set([unicode(card.graph_id) for card in models.CardModel.objects.filter(cardid__in=all_ordered_card_ids)])
-        print active_graphs
         for i, graph in enumerate(graphs):
             cards = []
             if unicode(graph.graphid) in active_graphs:

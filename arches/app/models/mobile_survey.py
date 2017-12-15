@@ -44,6 +44,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.startdate = models.DateField(blank=True, null=True)
         # self.enddate = models.DateField(blank=True, null=True)
         # self.description = models.TextField(null=True)
+        # self.bounds = models.MultiPolygonField(null=True)
         # self.datadownload = models.BooleanField(default=False)
         # end from models.MobileSurvey
 
@@ -57,7 +58,9 @@ class MobileSurvey(models.MobileSurveyModel):
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
         """
-        obj = JSONSerializer().handle_model(self)
+        serializer = JSONSerializer()
+        serializer.geom_format = 'geojson'
+        obj = serializer.handle_model(self)
         ordered_cards = self.get_ordered_cards()
         ret = JSONSerializer().serializeToPython(obj)
         ret['cards'] = ordered_cards

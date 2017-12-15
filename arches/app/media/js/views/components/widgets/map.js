@@ -476,6 +476,12 @@ define([
                     this.layers.unshift(this.searchQueryLayer);
                 }
 
+                if (this.context === 'survey-bounds') {
+                    this.searchQueryLayer = this.defineSearchQueryLayer();
+                    console.log(this.searchQueryLayer)
+                    this.layers.unshift(this.searchQueryLayer);
+                }
+
                 this.layers.forEach(function(mapLayer) {
                     if (mapLayer.name === this.basemap()) {
                         _.each(mapLayer.layer_definitions, function(layer) {

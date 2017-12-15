@@ -23,6 +23,7 @@ define([
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
             self.datadownload = ko.observable();
+            self.bounds = ko.observable(null);
             self.collectedResources = ko.observable(false);
 
             var getUserName = function(id) {
@@ -31,6 +32,7 @@ define([
                 });
                 return user ? user.name : '';
             };
+            console.log(arches)
 
             self.setIdentityApproval = function() {
                 var groups = ko.unwrap(this.groups)
@@ -212,6 +214,7 @@ define([
                     groups: self.groups,
                     users: self.users,
                     cards: self.cards,
+                    bounds: self.bounds,
                     datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
@@ -220,6 +223,22 @@ define([
             self.dirty = ko.computed(function() {
                 return self.json() !== self._project() || !self.get('id');
             });
+        },
+
+        parseGeoJson: function(geojson) {
+            var multipoly = JSON.parse(geojson);
+            var fc = {"type": "FeatureCollection", "features": []}
+            _.each(multipoly.coordinates, function(coord){
+                fc.features.push(
+                    { "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": coord
+                    },
+                    "properties": {}
+                })
+            });
+            return fc
         },
 
         parse: function(source) {
@@ -235,6 +254,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.bounds(self.parseGeoJson(source.bounds));
             self.datadownload(source.datadownload);
             self.set('id', source.id);
         },
@@ -246,6 +266,7 @@ define([
         _getURL: function(method) {
             return this.url;
         },
+
 
         save: function(userCallback, scope) {
             var self = this;
@@ -261,6 +282,7 @@ define([
                     self.groups(request.responseJSON.mobile_survey.groups);
                     self.users(request.responseJSON.mobile_survey.users);
                     self.cards(request.responseJSON.mobile_survey.cards);
+                    self.bounds(self.parseGeoJson(request.responseJSON.mobile_survey.bounds));
                     self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());
                 };
