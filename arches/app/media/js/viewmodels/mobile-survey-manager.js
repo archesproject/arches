@@ -28,6 +28,13 @@ define([
             return !layer.isoverlay;
         })[0];
 
+        this.resizeMap = function() {
+            setTimeout(
+                function() {
+                    dispatchEvent(new Event('resize'))
+                }, 200)
+        }
+
         this.defaultCenterX = arches.mapDefaultX;
         this.defaultCenterY = arches.mapDefaultY;
         this.geocoderDefault = arches.geocoderDefault;
