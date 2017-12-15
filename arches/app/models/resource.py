@@ -373,6 +373,6 @@ class Resource(models.ResourceInstance):
                     pk=value).value for value in values]
         except ValueError:
             return values
-        except ObjectDoesNotExist as detail:
+        except ObjectDoesNotExist:
             return []
             
