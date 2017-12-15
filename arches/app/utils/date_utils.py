@@ -55,10 +55,18 @@ class SortableDate(object):
         #     self.month = '1' if self.fd.month == '0' or self.fd.month is '' else self.fd.month
         #     self.day = '1' if self.fd.day == '0' or self.fd.day is '' else self.fd.day
     
-class ExtendedDateFormat(object):
+class SortableDateRange(object):
+    def __init__(self):
+        self.lower = None
+        self.upper = None
+
+class ExtendedDateFormat(SortableDateRange):
+        
     def __init__(self, date=None):
+        super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
         self.edtf = None
+        self.result_set = None
         
         self.parse(date)
 
@@ -66,7 +74,9 @@ class ExtendedDateFormat(object):
         if not date:
             return None
 
+        self.edtf = None
         self.orig_date = date
+        self.result_set = None
 
         try: 
             # handle for incorrectly formatted year only dates 
@@ -81,16 +91,22 @@ class ExtendedDateFormat(object):
             pass
 
         self.edtf = parse_edtf(date)
+         
+        result = self.handle_object(self.edtf)
+        if isinstance(result, list):
+            self.result_set = result
+        else:
+            self.lower, self.upper = result
 
     def is_valid(self):
-        return False if self.as_float() is None else True
+        return True if self.lower or self.upper or self.result_set else False
 
     def is_leap_year(self, year):
         if ((year % 4 == 0) and (year % 100 != 0)) or (year % 400 == 0):
             return True
         return False
 
-    def to_foat(self, **kwargs):
+    def to_sortable_date(self, **kwargs):
         year = kwargs.pop('year', None)
         month = kwargs.pop('month', '')
         month = '1' if month == '0' or month is '' else month
@@ -104,9 +120,6 @@ class ExtendedDateFormat(object):
             return year + int("%s%s" % (month,day))
         except:
             return None
-
-    def to_sortable(self):
-        return self.handle_object(self.edtf)
 
     def handle_object(self, object):
         """ 
@@ -149,7 +162,7 @@ class ExtendedDateFormat(object):
         year = date._precise_year('earliest')
         month = date._precise_month('earliest')
         day = date._precise_day('earliest')
-        lower = self.to_foat(year=year, month=month, day=day)
+        lower = self.to_sortable_date(year=year, month=month, day=day)
 
         year = date._precise_year('latest')
         month = date._precise_month('latest')
@@ -162,7 +175,7 @@ class ExtendedDateFormat(object):
                 day = 29
             else:
                 day = 28
-        upper = self.to_foat(year=year, month=month, day=day)
+        upper = self.to_sortable_date(year=year, month=month, day=day)
 
         return (lower,upper)
 
@@ -170,7 +183,9 @@ class ExtendedDateFormat(object):
         """Called to handle a list of dates"""
         arr = []
         for item in l.objects:
-            arr.append(self.handle_object(item))
+            dr = SortableDateRange()
+            dr.lower, dr.upper = self.handle_object(item)
+            arr.append(dr)
 
         return arr
 
@@ -185,10 +200,10 @@ class ExtendedDateFormat(object):
             num_length = len(str(object._precise_year()))
             sig_digits = str(object._precise_year())[0:int(object.precision)]
             padding = num_length - int(object.precision)
-            lower = self.to_foat(year=(sig_digits + ('0' * padding)))
-            upper = self.to_foat(year=(sig_digits + ('9' * padding)), month=12, day=31)
+            lower = self.to_sortable_date(year=(sig_digits + ('0' * padding)))
+            upper = self.to_sortable_date(year=(sig_digits + ('9' * padding)), month=12, day=31)
         except:
             # support for edtf.LongYear
-            lower = self.to_foat(year=object._precise_year())
-            upper = self.to_foat(year=object._precise_year(), month=12, day=31)
+            lower = self.to_sortable_date(year=object._precise_year())
+            upper = self.to_sortable_date(year=object._precise_year(), month=12, day=31)
         return (lower, upper)

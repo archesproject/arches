@@ -201,21 +201,20 @@ class SortableDateTests(ArchesTestCase):
             o = i
 
         print("parsing '%s'" % i)
-        f = ExtendedDateFormat(i).to_sortable()
-        #sys.stdout.write(" => %s()\n" % type(f).__name__)
+        f = ExtendedDateFormat(i)
 
         if len(test_case) == 2:
-            if isinstance(f, list):
-                for i, item in enumerate(f):
-                    self.assertEqual(unicode(item[0]), test_case[1][i][0])
-                    self.assertEqual(unicode(item[1]), test_case[1][i][1])
+            if f.result_set:
+                for i, item in enumerate(f.result_set):
+                    self.assertEqual(unicode(item.lower), test_case[1][i][0])
+                    self.assertEqual(unicode(item.upper), test_case[1][i][1])
             else:
-                self.assertEqual(unicode(f[0]), test_case[1])
+                self.assertEqual(unicode(f.lower), test_case[1])
         elif len(test_case) == 3 or len(test_case) == 5:
-            self.assertEqual(unicode(f[0]), test_case[1])
-            self.assertEqual(unicode(f[1]), test_case[2])
+            self.assertEqual(unicode(f.lower), test_case[1])
+            self.assertEqual(unicode(f.upper), test_case[2])
         elif len(test_case) == 4:
-            self.assertEqual(unicode(f[0]), test_case[1])
+            self.assertEqual(unicode(f.lower), test_case[1])
         else:
             raise Exception('')
 
