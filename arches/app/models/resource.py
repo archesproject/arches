@@ -367,10 +367,6 @@ class Resource(models.ResourceInstance):
                     else:
                         values.append(value)
 
-        for value in values:
-            if type(value) is unicode:
-                value = value.encode('utf-8')
-
         try:        
             return [
                 models.Value.objects.get(
@@ -378,5 +374,5 @@ class Resource(models.ResourceInstance):
         except ValueError:
             return values
         except ObjectDoesNotExist as detail:
-            return False
+            return []
             
