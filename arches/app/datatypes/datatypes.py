@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from shapely.geometry import asShape
 from elasticsearch import Elasticsearch
+from edtf import parse_edtf
 
 EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
