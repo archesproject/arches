@@ -44,6 +44,7 @@ define([
                     cards: [],
                     users: [],
                     groups: [],
+                    bounds: null,
                     datadownload: false
                 },
                 identities: data.identities

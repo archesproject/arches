@@ -208,7 +208,7 @@ define([
             this.clearGeometries = function(val, key) {
                 if (self.draw !== undefined && val === null) {
                     self.draw.deleteAll()
-                } else if (val) {
+                } else if (val.features) {
                     if (val.features.length === 0 && self.context === 'search-filter') {
                         self.searchBuffer(null);
                         self.updateSearchQueryLayer([]);
@@ -474,6 +474,10 @@ define([
                 if (this.context === 'search-filter') {
                     this.searchQueryLayer = this.defineSearchQueryLayer();
                     this.layers.unshift(this.searchQueryLayer);
+                }
+
+                if (this.context === 'survey-bounds') {
+                    setTimeout(self.loadGeometriesIntoDrawLayer, 1500);
                 }
 
                 this.layers.forEach(function(mapLayer) {

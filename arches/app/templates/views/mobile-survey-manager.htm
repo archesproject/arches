@@ -136,7 +136,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </a>
                                         </li>
                                         <li id="card-group" class="">
-                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false">
+                                            <a id="map-tab" data-toggle="tab" href="#location-card" class="card-tab-title" aria-expanded="false" data-bind="click: resizeMap">
                                                                 {% trans 'Location' %}
                                                             </a>
                                         </li>
@@ -247,8 +247,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Map Card -->
-                                        <div id="location-card" class="mpm-card tab-pane fade">
-                                            Location....
+                                        <div id="location-card" class="mpm-card tab-pane fade msm-location-card ">
+                                            <div>
+                                              <!-- ko component: {
+                                                  name: 'map-widget',
+                                                  params: {
+                                                    type: 'survey-bounds',
+                                                    configForm: false,
+                                                    node: null,
+                                                    value: selectedProject().bounds,
+                                                    state: 'form',
+                                                    config: {
+                                                        basemap: basemap.name,
+                                                        bearing: 0,
+                                                        centerX: defaultCenterX,
+                                                        centerY: defaultCenterY,
+                                                        featureColor: "rgba(55,32,196,0.85)",
+                                                        featureEditingDisabled: false,
+                                                        featureLineWidth: 2,
+                                                        featurePointSize: 6,
+                                                        geocodePlaceholder: "Locate a Place or Address",
+                                                        geocodeProvider: geocoderDefault,
+                                                        geocoderVisible: true,
+                                                        geometryTypes: [{'id':'Polygon','text':'Polygon'}],
+                                                        mapControlsHidden: false,
+                                                        maxZoom: mapDefaultMaxZoom,
+                                                        minZoom: mapDefaultMinZoom,
+                                                        overlayConfigs: [],
+                                                        overlayOpacity: 0,
+                                                        pitch: 0,
+                                                        zoom: mapDefaultZoom
+                                                    }
+                                                }
+                                              } --><!-- /ko -->
+                                            </div>
+                                            <div class="col-sm-12 msm-basemap-location">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                                    <input type="text" class="form-control input-lg" data-bind="value: selectedProject().tilecache, valueUpdate: 'keyup'">
+                                                </div>
+                                            </div>
+
                                         </div>
 
                                         <!-- Models Card -->

@@ -133,7 +133,7 @@
                         <!--ko ifnot: disabled -->
                         <div class="leaflet-draw-section">
                             <div class="leaflet-draw-toolbar leaflet-bar">
-
+                                <!--ko ifnot: _.contains(['survey-bounds'], context) -->
                                 <a class="" style="background-position: -342px -2px;" href="#" title='{% trans "Add Easting/Northing" %}' data-bind="click: function(){xyInput.active(!xyInput.active())}, css: {'active': xyInput.active}"><i class="fa fa-thumb-tack"></i></a>
                                 <div class="map-tool-container map-tool-item xy" data-bind="fadeVisible: xyInput.active, delay:100, fade: 200, css: {'buffer': context === 'search-filter'}">
                                     <div class="form-control">
@@ -149,7 +149,7 @@
                                         <button class="btn btn-primary btn-sm btn-block mar-top" disabled data-bind="click: function(){xyInput.addLocation()}, enable: xyInput.validCoords">{% trans "Add Location" %}</button>
                                     </div>
                                 </div>
-
+                                <!--/ko-->
                                 <!-- ko foreach: geometryTypes -->
                                 <a class="" href="#" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, attr: {'class': self.geometryTypeDetails[$data.id].class, 'title': self.geometryTypeDetails[$data.id].title}, css: {'active': self.geometryTypeDetails[$data.id].active}">
                                         <span class="sr-only" data-bind="text: self.geometryTypeDetails[$data.id].title"></span>
