@@ -298,6 +298,10 @@ class Concept(object):
                                 find_concepts(subconcept)
 
                     find_concepts(concept)
+                    # if the concept is a collection, loop through the nodes and delete their rdmCollection values
+                    for node in models.Node.objects.filter(config__rdmCollection=concept.id):
+                        node.config['rdmCollection'] = None
+                        node.save()
 
                 models.Concept.objects.get(pk=key).delete()
         return
@@ -382,15 +386,15 @@ class Concept(object):
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
 
         """
-        
+
         relationtypes = ' or '.join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = 'and depth < %s' % depth_limit if depth_limit else ''
         child_valuetypes = ("','").join(child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category='label').values_list('valuetype', flat=True))
         limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
-        
+
         if order_hierarchically:
             sql = """
-                WITH RECURSIVE 
+                WITH RECURSIVE
 
                  ordered_relationships AS (
                     (
@@ -443,7 +447,7 @@ class Concept(object):
                         JOIN ordered_relationships b ON(b.conceptidto = r.conceptidfrom)
                         WHERE ({relationtypes})
                         ORDER BY sortorder, valuesto
-                    ) 
+                    )
                 ),
 
                 children AS (
@@ -469,7 +473,7 @@ class Concept(object):
                 (
                     select row_to_json(d)
                     FROM (
-                        SELECT * 
+                        SELECT *
                         FROM values
                         WHERE conceptid={recursive_table}.conceptidto
                         AND valuetype in ('prefLabel')
@@ -482,34 +486,34 @@ class Concept(object):
                     ) d
                 ) as valueto,
                 depth, count(*) OVER() AS full_count
-               
+
                FROM {recursive_table} order by row {limit_clause};
 
             """
- 
+
             subquery = """, results as (
                 SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
                 FROM children c
                 JOIN values ON(values.conceptid = c.conceptidto)
-                WHERE LOWER(values.value) like '%%%s%%' 
+                WHERE LOWER(values.value) like '%%%s%%'
                 AND values.valuetype in ('prefLabel')
                     UNION
                 SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth
                 FROM children c
                 JOIN results r on (r.conceptidfrom=c.conceptidto)
             )""" % query.lower() if query is not None else ""
-            
+
             recursive_table = "results" if query else "children"
 
             sql = sql.format(
-                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
-                parent_valuetype=parent_valuetype, depth_limit=depth_limit, limit_clause=limit_clause, subquery=subquery, 
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes,
+                parent_valuetype=parent_valuetype, depth_limit=depth_limit, limit_clause=limit_clause, subquery=subquery,
                 recursive_table=recursive_table, languageid=languageid, short_languageid=languageid.split('-')[0]
             )
 
         else:
             sql = """
-                WITH RECURSIVE 
+                WITH RECURSIVE
                     children AS (
                         SELECT r.conceptidfrom, r.conceptidto, r.relationtype, 1 AS depth
                             FROM relations r
@@ -523,7 +527,7 @@ class Concept(object):
                             {depth_limit}
                     ),
                     results AS (
-                        SELECT  
+                        SELECT
                             valuefrom.value as valuefrom, valueto.value as valueto,
                             valuefrom.valueid as valueidfrom, valueto.valueid as valueidto,
                             valuefrom.valuetype as valuetypefrom, valueto.valuetype as valuetypeto,
@@ -535,12 +539,12 @@ class Concept(object):
                             JOIN children c ON(c.conceptidto = valueto.conceptid)
                             JOIN values valuefrom ON(c.conceptidfrom = valuefrom.conceptid)
                             JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
-                        WHERE valueto.valuetype in ('{child_valuetypes}') 
+                        WHERE valueto.valuetype in ('{child_valuetypes}')
                         AND valuefrom.valuetype in ('{child_valuetypes}')
                     )
                     SELECT distinct {columns}
                     FROM results {limit_clause}
-    
+
             """
 
             if not columns:
@@ -554,7 +558,7 @@ class Concept(object):
                 """
 
             sql = sql.format(
-                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes, 
+                conceptid=conceptid, relationtypes=relationtypes, child_valuetypes=child_valuetypes,
                 columns=columns, depth_limit=depth_limit, limit_clause=limit_clause
             )
 
@@ -767,7 +771,7 @@ class Concept(object):
                         ret.sortorder = float(label.value)
                     except:
                         ret.sortorder = None
-  
+
             label = temp.get_preflabel(lang=lang)
             ret.label = label.value
             ret.id = label.conceptid
@@ -1089,7 +1093,7 @@ class ConceptValue(object):
             value.value = self.value
             value.concept_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
-            
+
             if self.language != '':
                 # need to normalize language ids to the form xx-XX
                 lang_parts = self.language.lower().replace('_', '-').split('-')
