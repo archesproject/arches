@@ -845,6 +845,7 @@ class MobileSurveyModel(models.Model):
     enddate = models.DateField(blank=True, null=True)
     description = models.TextField(null=True)
     bounds = models.MultiPolygonField(null=True)
+    tilecache = models.TextField(null=True)
     datadownload = models.BooleanField(default=False)
 
     def __unicode__(self):

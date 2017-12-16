@@ -9489,6 +9489,15 @@ a.search-facet-item.disabled {
     height: 435px;
 }
 
+.msm-basemap-location {
+    background-color: #fff;
+}
+
+.msm-location-card .row.widget-wrapper {
+    padding-right: 0px;
+    margin-left: 3px;
+}
+
 .number-widget-report {
     display: flex;
     flex-direction: row;

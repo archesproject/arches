@@ -18,4 +18,9 @@ class Migration(migrations.Migration):
             name='bounds',
             field=django.contrib.gis.db.models.fields.MultiPolygonField(null=True, srid=4326),
         ),
+        migrations.AddField(
+            model_name='mobilesurveymodel',
+            name='tilecache',
+            field=django.contrib.gis.db.models.TextField(null=True),
+        ),
     ]

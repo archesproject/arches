@@ -247,7 +247,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <!-- Map Card -->
-                                        <div id="location-card" class="mpm-card tab-pane fade">
+                                        <div id="location-card" class="mpm-card tab-pane fade msm-location-card ">
                                             <div>
                                               <!-- ko component: {
                                                   name: 'map-widget',
@@ -281,6 +281,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 }
                                               } --><!-- /ko -->
                                             </div>
+                                            <div class="col-sm-12 msm-basemap-location">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                                    <input type="text" class="form-control input-lg" data-bind="value: selectedProject().tilecache, valueUpdate: 'keyup'">
+                                                </div>
+                                            </div>
+
                                         </div>
 
                                         <!-- Models Card -->

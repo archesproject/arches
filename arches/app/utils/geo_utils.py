@@ -31,16 +31,18 @@ class GeoUtils(object):
         return JSONDeserializer().deserialize(centroid)
 
     def convert_multipart_to_singlepart(self, geom, format="geojson"):
-        multipart = json.loads(geom)
-        fc = {"type": "FeatureCollection", "features": []}
-        for coords in multipart['coordinates']:
-            geom = { "type": "Feature",
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": coords
-                        },
-                        "properties": {}
-                    };
-            fc['features'].append(geom)
-        result = json.dumps(fc)
-        return fc
+        result = None
+        if geom != None:
+            multipart = json.loads(geom)
+            fc = {"type": "FeatureCollection", "features": []}
+            for coords in multipart['coordinates']:
+                geom = { "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": coords
+                            },
+                            "properties": {}
+                        };
+                fc['features'].append(geom)
+            result = fc
+        return result

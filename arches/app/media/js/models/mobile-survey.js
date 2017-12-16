@@ -23,6 +23,7 @@ define([
             self.showDetails = ko.observable(false);
             self.cards = ko.observableArray([]);
             self.datadownload = ko.observable();
+            self.tilecache = ko.observable();
             self.bounds = ko.observable(self.getDefaultBounds(null));
             self.collectedResources = ko.observable(false);
 
@@ -214,6 +215,7 @@ define([
                     users: self.users,
                     cards: self.cards,
                     bounds: self.bounds,
+                    tilecache: self.tilecache,
                     datadownload: self.datadownload
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._project()), jsObj))
@@ -266,6 +268,7 @@ define([
             self.groups(source.groups);
             self.users(source.users);
             self.cards(source.cards);
+            self.tilecache(source.tilecache);
             self.bounds(self.getDefaultBounds(source.bounds));
             self.datadownload(source.datadownload);
             self.set('id', source.id);
@@ -294,6 +297,7 @@ define([
                     self.groups(request.responseJSON.mobile_survey.groups);
                     self.users(request.responseJSON.mobile_survey.users);
                     self.cards(request.responseJSON.mobile_survey.cards);
+                    self.tilecache(request.responseJSON.mobile_survey.tilecache);
                     self.bounds(self.getDefaultBounds(request.responseJSON.mobile_survey.bounds));
                     self.datadownload(request.responseJSON.mobile_survey.datadownload);
                     this._project(this.json());

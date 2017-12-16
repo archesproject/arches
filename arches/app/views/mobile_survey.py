@@ -175,6 +175,7 @@ class MobileSurveyManagerView(BaseManagerView):
             mobile_survey.enddate = data['enddate']
         mobile_survey.datadownload = data['datadownload']
         mobile_survey.active = data['active']
+        mobile_survey.tilecache = data['tilecache']
 
         polygons = []
         if 'features' in data['bounds']:

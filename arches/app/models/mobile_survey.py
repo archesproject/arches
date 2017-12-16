@@ -45,6 +45,7 @@ class MobileSurvey(models.MobileSurveyModel):
         # self.enddate = models.DateField(blank=True, null=True)
         # self.description = models.TextField(null=True)
         # self.bounds = models.MultiPolygonField(null=True)
+        # self.tilecache = models.TextField(null=True)
         # self.datadownload = models.BooleanField(default=False)
         # end from models.MobileSurvey
 
