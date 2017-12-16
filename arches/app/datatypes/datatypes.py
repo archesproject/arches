@@ -10,7 +10,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.date_utils import SortableDate
+from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Exists
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.contrib.gis.geos import GEOSGeometry
@@ -188,7 +188,7 @@ class DateDataType(BaseDataType):
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile):
-        document['dates'].append({'date': SortableDate(nodevalue).as_float(), 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
+        document['dates'].append({'date': ExtendedDateFormat(nodevalue).lower, 'nodegroup_id': tile.nodegroup_id, 'nodeid': nodeid})
 
     def append_search_filters(self, value, node, query, request):
         try:

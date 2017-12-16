@@ -5,55 +5,30 @@ from edtf.parser.parser_classes import Date, DateAndTime, Interval, Unspecified,
     PartialUncertainOrApproximate, PartialUnspecified, OneOfASet, \
     MultipleDates, Level2Interval, ExponentialYear
 
-class SortableDate(object):
-    def __init__(self, date=None):
-        self.orig_date = date
-        # self.year = None
-        # self.month =  None
-        # self.day = None
-        self.edtf = None
-        
-        if date:
-            self.parse(date)
-        
-    def as_float(self):
-        try:
-            year = int(self.edtf.year) * 10000
-            month = self.edtf.month.zfill(2)
-            day = self.edtf.day.zfill(2)
-            #return int("%s%s%s" % (self.year,month,day))
-            return year + int("%s%s" % (month,day))
-        except:
-            return None
+# class SortableDate(object):
+#     def __init__(self, date):
+#         self.orig_date = date
+#         self.fd = FlexiDate.from_str(str(self.orig_date))
+#         self.year = None
+#         self.month =  None
+#         self.day = None
+#         if self.fd is not None:
+#             self.year = self.fd.year
+#             self.month = '1' if self.fd.month == '0' or self.fd.month is '' else self.fd.month
+#             self.day = '1' if self.fd.day == '0' or self.fd.day is '' else self.fd.day
 
-    def is_valid(self):
-        return False if self.as_float() is None else True
+#     def as_float(self):
+#         try:
+#             year = int(self.year) * 10000
+#             month = self.month.zfill(2)
+#             day = self.day.zfill(2)
+#             #return int("%s%s%s" % (self.year,month,day))
+#             return year + int("%s%s" % (month,day))
+#         except:
+#             return None
 
-    def parse(self, date):
-        if not date:
-            return None
-
-        self.orig_date = date
-
-        try:
-            d = date.zfill(4)
-            int(d)
-            date = d
-        except:
-            pass
-
-        # if isinstance(date, int):
-        #     self.year = date
-        #     self.month = 0
-        #     self.day = 0
-
-        self.edtf = parse_edtf(date)
-
-        # self.fd = FlexiDate.from_str(str(self.orig_date))
-        # if self.fd is not None:
-        #     self.year = self.fd.year
-        #     self.month = '1' if self.fd.month == '0' or self.fd.month is '' else self.fd.month
-        #     self.day = '1' if self.fd.day == '0' or self.fd.day is '' else self.fd.day
+#     def is_valid(self):
+#         return False if self.as_float() is None else True
     
 class SortableDateRange(object):
     def __init__(self):
@@ -61,17 +36,17 @@ class SortableDateRange(object):
         self.upper = None
 
 class ExtendedDateFormat(SortableDateRange):
-        
     def __init__(self, date=None):
         super(ExtendedDateFormat, self).__init__()
         self.orig_date = None
         self.edtf = None
         self.result_set = None
+        self.sortable_date = None
         
         self.parse(date)
 
-    def parse(self, date):
-        if not date:
+    def parse(self, date=None):
+        if date == None:
             return None
 
         self.edtf = None
