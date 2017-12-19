@@ -269,7 +269,7 @@ class ResourceReportView(BaseManagerView):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         resource = Resource.objects.get(pk=resourceid)
         displayname = resource.displayname
-        resource_models = Graph.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_models = models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         related_resource_summary = [{'graphid':str(g.graphid), 'name':g.name, 'resources':[]} for g in resource_models]
         related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
         related_resources = related_resources_search_results['related_resources']
@@ -291,8 +291,8 @@ class ResourceReportView(BaseManagerView):
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
         except models.Report.DoesNotExist:
            report = None
+
         graph = Graph.objects.get(graphid=resource_instance.graph.pk)
-        resource_graphs = Graph.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
         forms = resource_instance.graph.form_set.filter(visible=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
@@ -326,21 +326,20 @@ class ResourceReportView(BaseManagerView):
             main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates),
-            forms=JSONSerializer().serialize(forms),
-            tiles=JSONSerializer().serialize(permitted_tiles),
-            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
-            cards=JSONSerializer().serialize(permitted_cards),
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False),
+            forms=JSONSerializer().serialize(forms, sort_keys=False),
+            tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards, sort_keys=False),
+            cards=JSONSerializer().serialize(permitted_cards, sort_keys=False),
             datatypes_json=JSONSerializer().serialize(datatypes),
             geocoding_providers = geocoding_providers,
-            related_resources=JSONSerializer().serialize(related_resource_summary),
+            related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_sources=map_sources,
-            resource_graphs=resource_graphs,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name,
-            graph_json = JSONSerializer().serialize(graph),
+            graph_json = JSONSerializer().serialize(graph, sort_keys=False),
             resourceid=resourceid,
             displayname=displayname,
          )
