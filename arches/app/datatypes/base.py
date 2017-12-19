@@ -70,7 +70,7 @@ class BaseDataType(object):
         """
         return None
 
-    def convert_value(self, tile, nodeid):
+    def clean(self, tile, nodeid):
         """
         Converts '' values to null when saving a tile.
         """
